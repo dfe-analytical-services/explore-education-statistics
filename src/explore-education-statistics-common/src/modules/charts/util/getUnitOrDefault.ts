@@ -1,8 +1,8 @@
 import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
 const getUnitOrDefault = (
+  configUnit: string | undefined,
   dataSetCategoryConfigs: DataSetCategoryConfig[],
-  configUnit?: string,
 ) => {
   if (configUnit) {
     return configUnit;

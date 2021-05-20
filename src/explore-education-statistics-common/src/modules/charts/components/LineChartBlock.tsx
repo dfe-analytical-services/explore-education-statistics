@@ -161,7 +161,7 @@ const LineChartBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={getUnitOrDefault(dataSetCategoryConfigs, axes.minor.unit)}
+            unit={getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs)}
             width={yAxisWidth}
             tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />

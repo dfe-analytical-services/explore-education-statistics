@@ -116,7 +116,7 @@ const VerticalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={getUnitOrDefault(dataSetCategoryConfigs, axes.minor.unit)}
+            unit={getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs)}
             width={parseNumber(axes.minor.size)}
             tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />

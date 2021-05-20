@@ -118,7 +118,7 @@ const HorizontalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={getUnitOrDefault(dataSetCategoryConfigs, axes.minor.unit)}
+            unit={getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs)}
             height={xAxisHeight}
             padding={{ left: 0, right: 20 }}
             tickMargin={10}
