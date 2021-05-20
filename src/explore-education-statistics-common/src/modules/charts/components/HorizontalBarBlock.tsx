@@ -17,7 +17,7 @@ import {
 } from '@common/modules/charts/util/domainTicks';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
-import getUnit from '@common/modules/charts/util/getUnit';
+import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
@@ -118,7 +118,7 @@ const HorizontalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={getUnit(axes.minor.unit, dataSetCategoryConfigs)}
+            unit={getUnitOrDefault(dataSetCategoryConfigs, axes.minor.unit)}
             height={xAxisHeight}
             padding={{ left: 0, right: 20 }}
             tickMargin={10}
