@@ -31,7 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public void SendPublicationRoleEmail(string email, Publication publication, PublicationRole role)
         {
-            // TODO EES-2311
+            var uri = _configuration.GetValue<string>("AdminUri");
+            var template = _configuration.GetValue<string>("NotifyPublicationRoleTemplateId");
+
+            var emailValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://{uri}"},
+                {"role", role.ToString()},
+                {"publication", publication.Title}
+            };
+
+            _emailService.SendEmail(email, template, emailValues);
         }
 
         public void SendReleaseRoleEmail(string email, Release release, ReleaseRole role)

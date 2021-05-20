@@ -7,6 +7,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -16,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendInviteEmail()
         {
+            const string expectedTemplateId = "invite-template-id";
+            
             var expectedValues = new Dictionary<string, dynamic>
             {
                 {"url", "https://admin-uri"}
@@ -26,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             emailService.Setup(mock =>
                     mock.SendEmail(
                         "test@test.com",
-                        "notify-invite-template-id",
+                        expectedTemplateId,
                         expectedValues
                     ))
                 .Verifiable();
@@ -38,7 +41,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             emailService.Verify(
                 s => s.SendEmail(
                     "test@test.com",
-                    "notify-invite-template-id",
+                    expectedTemplateId,
+                    expectedValues
+                )
+            );
+
+            VerifyAllMocks(emailService);
+        }
+
+        [Fact]
+        public void SendPublicationRoleEmail()
+        {
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test Publication"
+            };
+
+            const string expectedTemplateId = "publication-role-template-id";
+
+            var expectedValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://admin-uri"},
+                {"role", Owner.ToString()},
+                {"publication", "Test Publication"},
+            };
+
+            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+
+            emailService.Setup(mock =>
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Verifiable();
+
+            var service = SetupEmailTemplateService(emailService: emailService.Object);
+
+            service.SendPublicationRoleEmail("test@test.com", publication, Owner);
+
+            emailService.Verify(
+                s => s.SendEmail(
+                    "test@test.com",
+                    expectedTemplateId,
                     expectedValues
                 )
             );
@@ -61,6 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 TimePeriodCoverage = December
             };
 
+            const string expectedTemplateId = "release-role-template-id";
+            
             var expectedValues = new Dictionary<string, dynamic>
             {
                 {"url", $"https://admin-uri/publication/{release.Publication.Id}/release/{release.Id}/summary"},
@@ -74,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             emailService.Setup(mock =>
                     mock.SendEmail(
                         "test@test.com",
-                        "notify-release-role-template-id",
+                        expectedTemplateId,
                         expectedValues
                     ))
                 .Verifiable();
@@ -86,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             emailService.Verify(
                 s => s.SendEmail(
                     "test@test.com",
-                    "notify-release-role-template-id",
+                    expectedTemplateId,
                     expectedValues
                 )
             );
@@ -97,15 +145,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> ConfigurationMock()
         {
             var notifyInviteTemplateSection = new Mock<IConfigurationSection>();
+            var publicationRoleTemplateSection = new Mock<IConfigurationSection>();
             var releaseRoleTemplateSection = new Mock<IConfigurationSection>();
             var adminUriSection = new Mock<IConfigurationSection>();
             var configuration = new Mock<IConfiguration>();
 
             notifyInviteTemplateSection.Setup(m => m.Value)
-                .Returns("notify-invite-template-id");
+                .Returns("invite-template-id");
+
+            publicationRoleTemplateSection.Setup(m => m.Value)
+                .Returns("publication-role-template-id");
 
             releaseRoleTemplateSection.Setup(m => m.Value)
-                .Returns("notify-release-role-template-id");
+                .Returns("release-role-template-id");
 
             adminUriSection.Setup(m => m.Value)
                 .Returns("admin-uri");
@@ -113,6 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             configuration
                 .Setup(m => m.GetSection("NotifyInviteTemplateId"))
                 .Returns(notifyInviteTemplateSection.Object);
+
+            configuration
+                .Setup(m => m.GetSection("NotifyPublicationRoleTemplateId"))
+                .Returns(publicationRoleTemplateSection.Object);
 
             configuration
                 .Setup(m => m.GetSection("NotifyReleaseRoleTemplateId"))
