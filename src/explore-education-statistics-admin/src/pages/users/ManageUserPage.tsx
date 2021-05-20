@@ -122,8 +122,8 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   const handleAddPublicationRole = useFormSubmit<AddPublicationRoleFormValues>(
     async values => {
       const submission: UserPublicationRoleSubmission = {
-        releaseId: values.selectedPublicationId,
-        releaseRole: values.selectedPublicationRole,
+        publicationId: values.selectedPublicationId,
+        publicationRole: values.selectedPublicationRole,
       };
 
       await userService.addUserPublicationRole(userId, submission);
