@@ -110,9 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var highlights = result.Highlights.ToList();
                 var subjects = result.Subjects.ToList();
 
-                Assert.Equal(publication.Id, result.Id);
-                Assert.Equal(release1.Id, result.LatestReleaseId);
-
                 Assert.Equal(2, highlights.Count);
                 Assert.Equal(highlight1, highlights[0]);
                 Assert.Equal(highlight2, highlights[1]);
