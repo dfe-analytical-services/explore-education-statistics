@@ -36,8 +36,8 @@ export interface UserReleaseRoleSubmission {
 }
 
 export interface UserPublicationRoleSubmission {
-  releaseId: string;
-  releaseRole: string;
+  publicationId: string;
+  publicationRole: string;
 }
 
 export interface UserInvite {
