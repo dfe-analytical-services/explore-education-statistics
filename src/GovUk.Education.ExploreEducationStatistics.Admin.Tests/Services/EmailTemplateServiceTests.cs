@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void SendInviteEmail()
         {
             const string expectedTemplateId = "invite-template-id";
-            
+
             var expectedValues = new Dictionary<string, dynamic>
             {
                 {"url", "https://admin-uri"}
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             const string expectedTemplateId = "release-role-template-id";
-            
+
             var expectedValues = new Dictionary<string, dynamic>
             {
                 {"url", $"https://admin-uri/publication/{release.Publication.Id}/release/{release.Id}/summary"},
