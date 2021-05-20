@@ -227,6 +227,7 @@ const ChartAxisConfiguration = ({
       max: Yup.number(),
       min: Yup.number(),
       visible: Yup.boolean(),
+      unit: Yup.string(),
     });
 
     if (type === 'major' && !definition.axes.major?.constants?.groupBy) {

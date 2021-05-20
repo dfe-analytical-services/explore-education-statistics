@@ -13,6 +13,7 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
+import WarningMessage from '@common/components/WarningMessage';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
@@ -55,6 +56,19 @@ const ChartDataSetsConfiguration = ({
     [meta.locations],
   );
 
+  const hasMixedUnits = useMemo(() => {
+    const units: string[] = [];
+    dataSets.forEach(dataSet => {
+      const foundIndicator = meta.indicators.find(
+        indicator => indicator.value === dataSet.indicator,
+      );
+      if (foundIndicator) {
+        units.push(foundIndicator.unit);
+      }
+    });
+    return !units.every(unit => unit === units[0]);
+  }, [dataSets, meta.indicators]);
+
   useEffect(() => {
     updateForm({
       formKey: 'dataSets',
@@ -64,6 +78,11 @@ const ChartDataSetsConfiguration = ({
 
   return (
     <>
+      {hasMixedUnits && (
+        <WarningMessage>
+          Selected data sets have different indicator units.
+        </WarningMessage>
+      )}
       <Formik<FormValues>
         initialValues={{
           filters: mapValues(meta.filters, filterGroup =>
