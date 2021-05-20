@@ -52,7 +52,10 @@ const RoleForm = ({ roles, user, onSubmit }: Props) => {
               hint="The users role within the service."
             >
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-quarter">
+                <div
+                  className="govuk-grid-column-one-quarter"
+                  data-testid="select-role"
+                >
                   <FormFieldSelect<UpdateRoleFormValues>
                     label="Role"
                     name="selectedRoleId"
