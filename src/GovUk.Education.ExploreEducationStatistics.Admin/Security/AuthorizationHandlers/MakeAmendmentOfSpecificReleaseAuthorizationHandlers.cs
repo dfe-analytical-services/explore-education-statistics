@@ -1,44 +1,60 @@
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     public class MakeAmendmentOfSpecificReleaseRequirement : IAuthorizationRequirement
-    {}
-
-    public class MakeAmendmentOfSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
     {
-        public MakeAmendmentOfSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new CanMakeAmendmentOfAllReleasesAuthorizationHandler(context),
-            new HasEditorRoleOnReleaseAuthorizationHandler(context))
-        {
+    }
 
+    public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
+        : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
+    {
+        private readonly ContentDbContext _contentDbContext;
+        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+
+        public MakeAmendmentOfSpecificReleaseAuthorizationHandler(ContentDbContext contentDbContext,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository)
+        {
+            _contentDbContext = contentDbContext;
+            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _userReleaseRoleRepository = userReleaseRoleRepository;
         }
 
-        public class CanMakeAmendmentOfAllReleasesAuthorizationHandler :
-            EntityAuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            MakeAmendmentOfSpecificReleaseRequirement requirement,
+            Release release)
         {
-            public CanMakeAmendmentOfAllReleasesAuthorizationHandler(ContentDbContext context)
-                : base(ctx =>
-                    ctx.Entity.Live
-                    && IsLatestVersionOfRelease(context, ctx.Entity)
-                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.MakeAmendmentsOfAllReleases)) {}
-        }
+            if (!release.Live || !IsLatestVersionOfRelease(_contentDbContext, release))
+            {
+                return;
+            }
 
-        public class HasEditorRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement>
-        {
-            public HasEditorRoleOnReleaseAuthorizationHandler(ContentDbContext context)
-                : base(context, ctx =>
-                    ctx.Release.Live
-                    && IsLatestVersionOfRelease(context, ctx.Release)
-                    && ContainsEditorRole(ctx.Roles))
-            {}
+            if (SecurityUtils.HasClaim(context.User, MakeAmendmentsOfAllReleases))
+            {
+                context.Succeed(requirement);
+                return;
+            }
+
+            var publicationRoles =
+                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+
+            if (ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
+            {
+                context.Succeed(requirement);
+            }
         }
 
         private static bool IsLatestVersionOfRelease(ContentDbContext context, Release release)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -49,6 +51,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, userReleaseRoles[0].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllRolesByUser()
+        {
+            var user = new User();
+            var release = new Release();
+
+            var userReleaseRoles = new List<UserReleaseRole>
+            {
+                new UserReleaseRole
+                {
+                    User = user,
+                    Release = release,
+                    Role = Contributor
+                },
+                new UserReleaseRole
+                {
+                    User = user,
+                    Release = release,
+                    Role = Lead
+                },
+            };
+
+            var otherUserReleaseRoles = new List<UserReleaseRole>
+            {
+                // Role for different release
+                new UserReleaseRole
+                {
+                    User = user,
+                    Release = new Release(),
+                    Role = Approver
+                },
+                // Role for different user
+                new UserReleaseRole
+                {
+                    User = new User(),
+                    Release = release,
+                    Role = Approver
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(user);
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.AddRangeAsync(otherUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.GetAllRolesByUser(user.Id, release.Id);
+
+                Assert.Equal(userReleaseRoles.Select(role => role.Role).ToList(), result);
             }
         }
 

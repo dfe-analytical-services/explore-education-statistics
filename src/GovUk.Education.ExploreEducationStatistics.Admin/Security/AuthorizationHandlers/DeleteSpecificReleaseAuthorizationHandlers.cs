@@ -1,42 +1,49 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement
     {}
     
-    public class DeleteSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<DeleteSpecificReleaseRequirement, Release>
+    public class DeleteSpecificReleaseAuthorizationHandler
+        : AuthorizationHandler<DeleteSpecificReleaseRequirement, Release>
     {
-        public DeleteSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new CanDeleteAllReleaseAmendmentsAuthorizationHandler(),
-            new HasEditorRoleOnReleaseAmendmentAuthorizationHandler(context))
+        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+
+        public DeleteSpecificReleaseAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
         {
-            
-        }
-        
-        public class CanDeleteAllReleaseAmendmentsAuthorizationHandler : 
-            EntityAuthorizationHandler<DeleteSpecificReleaseRequirement, Release>
-        {
-            public CanDeleteAllReleaseAmendmentsAuthorizationHandler() 
-                : base(ctx => 
-                    ctx.Entity.Amendment 
-                    && ctx.Entity.Status != ReleaseStatus.Approved
-                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.DeleteAllReleaseAmendments)) {}
+            _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
-        public class HasEditorRoleOnReleaseAmendmentAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<DeleteSpecificReleaseRequirement>
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            DeleteSpecificReleaseRequirement requirement,
+            Release release)
         {
-            public HasEditorRoleOnReleaseAmendmentAuthorizationHandler(ContentDbContext context) 
-                : base(context, ctx => 
-                    ctx.Release.Amendment 
-                    && ctx.Release.Status != ReleaseStatus.Approved
-                    && ContainsEditorRole(ctx.Roles))
-            {}
+            if (!release.Amendment || release.Status == Approved)
+            {
+                return;
+            }
+
+            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+            {
+                context.Succeed(requirement);
+                return;
+            }
+
+            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+
+            if (ContainPublicationOwnerRole(publicationRoles))
+            {
+                context.Succeed(requirement);
+            }
         }
     }
 }

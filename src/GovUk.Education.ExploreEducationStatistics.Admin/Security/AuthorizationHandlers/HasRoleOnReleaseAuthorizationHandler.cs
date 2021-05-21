@@ -2,17 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class ReleaseAndRolesAuthorizationContext
+    public abstract class HasRoleOnReleaseAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, Release> 
+        where TRequirement : IAuthorizationRequirement
     {
-        public ReleaseAndRolesAuthorizationContext(Release release, List<ReleaseRole> roles)
+        private readonly IUserReleaseRoleRepository _releaseRoleRepository;
+        private readonly Predicate<ReleaseRolesAuthorizationContext> _test;
+
+        protected HasRoleOnReleaseAuthorizationHandler(IUserReleaseRoleRepository releaseRoleRepository,
+            Predicate<ReleaseRolesAuthorizationContext> test)
+        {
+            _releaseRoleRepository = releaseRoleRepository;
+            _test = test;
+        }
+
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+            TRequirement requirement,
+            Release release)
+        {
+            var releaseRoles = await _releaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+
+            if (releaseRoles.Any())
+            {
+                if (_test == null || _test.Invoke(new ReleaseRolesAuthorizationContext(release, releaseRoles)))
+                {
+                    context.Succeed(requirement);   
+                }
+            }
+        }
+    }
+    
+    public class ReleaseRolesAuthorizationContext
+    {
+        public ReleaseRolesAuthorizationContext(Release release, List<ReleaseRole> roles)
         {
             Release = release;
             Roles = roles;
@@ -21,38 +49,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public Release Release { get; set; }
 
         public List<ReleaseRole> Roles { get; set; }
-    }
-    
-    public abstract class HasRoleOnReleaseAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, Release> 
-        where TRequirement : IAuthorizationRequirement
-    {
-        private readonly ContentDbContext _context;
-        private readonly Predicate<ReleaseAndRolesAuthorizationContext>? _roleTest;
-
-        protected HasRoleOnReleaseAuthorizationHandler(ContentDbContext context, Predicate<ReleaseAndRolesAuthorizationContext> roleTest = null)
-        {
-            _context = context;
-            _roleTest = roleTest;
-        }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
-            TRequirement requirement,
-            Release release)
-        {
-            var userId = authContext.User.GetUserId();
-
-            var releaseRoles = await _context
-                .UserReleaseRoles
-                .Where(r => r.ReleaseId == release.Id && r.UserId == userId)
-                .ToListAsync();
-
-            var ctx =
-                new ReleaseAndRolesAuthorizationContext(release, releaseRoles.Select(r => r.Role).ToList());
-            
-            if (releaseRoles.Any() && (_roleTest == null || _roleTest.Invoke(ctx))) 
-            {
-                authContext.Succeed(requirement);    
-            }
-        }
     }
 }

@@ -1,6 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         PublishSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<
             PublishSpecificReleaseRequirement, Release>
     {
-        public PublishSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
+        public PublishSpecificReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository) : base(
             new CanPublishAllReleasesAuthorizationHandler(),
-            new HasApproverRoleOnReleaseAuthorizationHandler(context))
+            new HasApproverRoleOnReleaseAuthorizationHandler(userReleaseRoleRepository))
         {
         }
 
@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             EntityAuthorizationHandler<PublishSpecificReleaseRequirement, Release>
         {
             public CanPublishAllReleasesAuthorizationHandler() : base(ctx =>
+                // TODO EES-2132 what is this?
                 ctx.Entity.Status == ReleaseStatus.Approved
                 && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.PublishAllReleases))
             {
@@ -33,8 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private class HasApproverRoleOnReleaseAuthorizationHandler
             : HasRoleOnReleaseAuthorizationHandler<PublishSpecificReleaseRequirement>
         {
-            public HasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context)
-                : base(context, ctx => ContainsApproverRole(ctx.Roles))
+            public HasApproverRoleOnReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository)
+                : base(userReleaseRoleRepository, ctx => ContainsApproverRole(ctx.Roles))
             {
             }
         }
