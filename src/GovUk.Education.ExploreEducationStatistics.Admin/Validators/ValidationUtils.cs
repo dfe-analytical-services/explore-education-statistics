@@ -85,18 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
 
-        // User
+        // User Management
         UserAlreadyExists,
-        UserDoesNotExist,
-        UserAlreadyHasReleaseRole,
+        UserAlreadyHasResourceRole,
 
         // Invite
         InviteNotFound,
         InvalidEmailAddress,
         InvalidUserRole,
-
-        // Publication
-        PublicationDoesNotExist,
 
         // Methodology
         MethodologyDoesNotExist,

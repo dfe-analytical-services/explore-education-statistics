@@ -8,16 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
@@ -26,29 +22,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class UserManagementService : IUserManagementService
     {
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-        private readonly IUserService _userService;
         private readonly ContentDbContext _contentDbContext;
-        private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
+        private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IUserRoleService _userRoleService;
+        private readonly IUserService _userService;
 
-        public UserManagementService(
-            UsersAndRolesDbContext usersAndRolesDbContext,
-            IUserService userService,
+        public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
-            IEmailService emailService,
-            IConfiguration configuration,
-            UserManager<ApplicationUser> userManager,
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
+            IEmailTemplateService emailTemplateService,
+            IUserRoleService userRoleService,
+            IUserService userService)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
-            _userService = userService;
             _contentDbContext = contentDbContext;
-            _emailService = emailService;
-            _configuration = configuration;
-            _userManager = userManager;
-            _persistenceHelper = persistenceHelper;
+            _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
+            _emailTemplateService = emailTemplateService;
+            _userRoleService = userRoleService;
+            _userService = userService;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -74,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             role => role.Id,
                             (prev, role) => new UserViewModel
                             {
-                                Id = prev.user.Id,
+                                Id = Guid.Parse(prev.user.Id),
                                 Name = prev.user.FirstName + " " + prev.user.LastName,
                                 Email = prev.user.Email,
                                 Role = role.Name
@@ -86,58 +78,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> AddUserReleaseRole(Guid userId,
-            UserReleaseRoleRequest userReleaseRole)
+        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListPublications()
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
+                .OnSuccess(_ =>
                 {
-                    return await _persistenceHelper
-                        .CheckEntityExists<Release>(
-                            userReleaseRole.ReleaseId,
-                            q => q.Include(r => r.Publication)
-                        )
-                        .OnSuccess(release =>
+                    return _contentDbContext.Publications
+                        .Select(p => new TitleAndIdViewModel
                         {
-                            return ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole)
-                                .OnSuccessVoid(async () =>
-                                {
-                                    await ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole);
-
-                                    var newReleaseRole = new UserReleaseRole
-                                    {
-                                        ReleaseId = userReleaseRole.ReleaseId,
-                                        Role = userReleaseRole.ReleaseRole,
-                                        UserId = userId
-                                    };
-
-                                    await _contentDbContext.AddAsync(newReleaseRole);
-                                    await _contentDbContext.SaveChangesAsync();
-
-                                    SendNewReleaseRoleEmail(userId, release, newReleaseRole.Role);
-                                });
-                        });
+                            Id = p.Id,
+                            Title = p.Title
+                        })
+                        .ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
-        {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    return await _persistenceHelper
-                        .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
-                        .OnSuccessVoid(async userReleaseRole =>
-                        {
-                            _contentDbContext.Remove(userReleaseRole);
-                            await _contentDbContext.SaveChangesAsync();
-                        });
-                });
-        }
-
-        public async Task<Either<ActionResult, List<IdTitlePair>>> ListReleases()
+        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListReleases()
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -147,10 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Include(r => r.Publication)
                         .ToList()
                         .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
-                        .Select(r => new IdTitlePair
+                        .Select(r => new TitleAndIdViewModel
                         {
                             Id = r.Id,
-                            Title = $"{r.Publication.Title} - {r.Title}",
+                            Title = $"{r.Publication.Title} - {r.Title}"
                         })
                         .ToList();
                 });
@@ -162,21 +119,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel()
+                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel
                         {
                             Id = r.Id,
                             Name = r.Name,
                             NormalizedName = r.NormalizedName
-                        }).OrderBy(x => x.Name)
+                        })
+                        .OrderBy(x => x.Name)
                         .ToListAsync();
                 });
-        }
-
-        public Task<Either<ActionResult, List<EnumExtensions.EnumValue>>> ListReleaseRoles()
-        {
-            return _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(_ => EnumExtensions.GetValues<ReleaseRole>());
         }
 
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
@@ -198,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     role => role.Id,
                     (prev, role) => new UserViewModel
                     {
-                        Id = prev.user.Id,
+                        Id = Guid.Parse(prev.user.Id),
                         Name = prev.user.FirstName + " " + prev.user.LastName,
                         Email = prev.user.Email,
                         Role = role.Name
@@ -209,50 +160,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        public async Task<Either<ActionResult, UserViewModel>> GetUser(string userId)
+        public async Task<Either<ActionResult, UserViewModel>> GetUser(Guid id)
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess<ActionResult, Unit, UserViewModel>(async () =>
+                .OnSuccess(async () =>
                 {
-                    var user = await _usersAndRolesDbContext.Users
-                        .FirstOrDefaultAsync(u => u.Id == userId);
-
-                    if (user == null)
-                    {
-                        return ValidationActionResult(UserDoesNotExist);
-                    }
-
-                    var userReleaseRoles = _contentDbContext.UserReleaseRoles
-                        .Include(urr => urr.Release)
-                        .ThenInclude(r => r.Publication)
-                        .ToList()
-                        .Where(urr => urr.UserId == Guid.Parse(userId) &&
-                                      urr.Release.Publication.IsLatestVersionOfRelease(urr.Release.Id))
-                        .Select(x => new UserReleaseRoleViewModel
+                    return await _usersAndRolesPersistenceHelper
+                        .CheckEntityExists<ApplicationUser, string>(id.ToString())
+                        .OnSuccess(async user =>
                         {
-                            Id = x.Id,
-                            Publication = _contentDbContext.Publications
-                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
-                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                            Release = _contentDbContext.Releases
-                                .Where(r => r.Id == x.ReleaseId)
-                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
-                        })
-                        .ToList()
-                        .OrderBy(x => x.Publication.Title)
-                        .ThenBy(x => x.Release.Title)
-                        .ToList();
+                            return await _userRoleService.GetGlobalRoles(user.Id)
+                                .OnSuccessCombineWith(globalRoles => _userRoleService.GetPublicationRoles(id))
+                                .OnSuccessCombineWith(globalAndPublicationRoles => _userRoleService.GetReleaseRoles(id))
+                                .OnSuccess(tuple =>
+                                {
+                                    var ((globalRoles, publicationRoles), releaseRoles) = tuple;
 
-                    return new UserViewModel
-                    {
-                        Id = user.Id,
-                        Name = user.FirstName + " " + user.LastName,
-                        Email = user.Email,
-                        Role = GetUserRoleId(user.Id),
-                        UserReleaseRoles = userReleaseRoles
-                    };
+                                    // Currently we only allow a user to have a maximum of one global role
+                                    var globalRole = globalRoles.First();
+
+                                    return new UserViewModel
+                                    {
+                                        Id = id,
+                                        Name = user.FirstName + " " + user.LastName,
+                                        Email = user.Email,
+                                        Role = globalRole.Id,
+                                        UserPublicationRoles = publicationRoles,
+                                        UserReleaseRoles = releaseRoles
+                                    };
+                                });
+                        });
                 });
         }
 
@@ -305,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                     await _usersAndRolesDbContext.UserInvites.AddAsync(invite);
                     await _usersAndRolesDbContext.SaveChangesAsync();
-                    SendInviteEmail(email);
+                    _emailTemplateService.SendInviteEmail(email);
                     return invite;
                 });
         }
@@ -333,86 +271,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess<ActionResult, Unit, Unit>(async () =>
+                .OnSuccess(async () =>
                 {
-                    var user = await _usersAndRolesDbContext.Users.FirstOrDefaultAsync(i => i.Id == userId);
-                    if (user == null)
+                    // Currently we only allow a user to have a maximum of one global role
+                    var existingRole =
+                        await _usersAndRolesDbContext.UserRoles.FirstOrDefaultAsync(userRole =>
+                            userRole.UserId == userId);
+                    if (existingRole == null)
                     {
-                        return ValidationActionResult(UserDoesNotExist);
+                        return await _userRoleService.AddGlobalRole(userId, roleId);
                     }
 
-                    var userRole = await _usersAndRolesDbContext.UserRoles.FirstOrDefaultAsync(i => i.UserId == userId);
-                    if (userRole == null)
-                    {
-                        return ValidationActionResult(InvalidUserRole);
-                    }
-
-                    await _userManager.RemoveFromRoleAsync(user, GetRoleName(userRole.RoleId));
-                    await _userManager.AddToRoleAsync(user, GetRoleName(roleId));
-
-                    return Unit.Instance;
+                    return await _userRoleService.RemoveGlobalRole(userId, existingRole.RoleId)
+                        .OnSuccess(() => _userRoleService.AddGlobalRole(userId, roleId));
                 });
-        }
-
-        private string GetRoleName(string roleId)
-        {
-            var userRole = _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == roleId);
-
-            return userRole?.Name;
-        }
-
-        private string GetUserRoleId(string userId)
-        {
-            var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
-
-            return userRole?.RoleId;
-        }
-
-        private void SendInviteEmail(string email)
-        {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyInviteTemplateId");
-
-
-            var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + uri}};
-
-            _emailService.SendEmail(email, template, emailValues);
-        }
-
-        private void SendNewReleaseRoleEmail(Guid userId, Release release,
-            ReleaseRole role)
-        {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
-            var email = _usersAndRolesDbContext.Users
-                .First(x => x.Id == userId.ToString())
-                .Email;
-
-            var link = (role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary");
-            var emailValues = new Dictionary<string, dynamic>
-            {
-                {"url", $"https://{uri}/publication/{release.Publication.Id}/release/{release.Id}/{link}"},
-                {"role", role.ToString()},
-                {"publication", release.Publication.Title},
-                {"release", release.Title}
-            };
-
-            _emailService.SendEmail(email, template, emailValues);
-        }
-
-        private async Task<Either<ActionResult, bool>> ValidateUserReleaseRoleCanBeAdded(Guid userId,
-            UserReleaseRoleRequest userReleaseRole)
-        {
-            var existing = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
-                r.UserId == userId && r.ReleaseId == userReleaseRole.ReleaseId &&
-                r.Role == userReleaseRole.ReleaseRole);
-
-            if (existing != null)
-            {
-                return ValidationActionResult(UserAlreadyHasReleaseRole);
-            }
-
-            return true;
         }
     }
 }

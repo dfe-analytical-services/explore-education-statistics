@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return _userService;
         }
 
-        public async void AssertForbidden<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
+        public async Task AssertForbidden<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
         {
             var result = await action.Invoke(_userService);
 
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             _userService.VerifyNoOtherCalls();
         }
 
-        public async void AssertSuccess<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
+        public async Task AssertSuccess<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
         {
             var result = await action.Invoke(_userService);
 

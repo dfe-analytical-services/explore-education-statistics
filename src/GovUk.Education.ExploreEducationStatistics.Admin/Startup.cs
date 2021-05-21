@@ -264,6 +264,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IUserRoleService, UserRoleService>();
+            services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
+            services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -285,6 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
+            services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
@@ -329,6 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
+            AddPersistenceHelper<UsersAndRolesDbContext>(services);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();

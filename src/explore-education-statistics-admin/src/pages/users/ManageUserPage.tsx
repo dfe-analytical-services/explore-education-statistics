@@ -263,13 +263,13 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                             key={userReleaseRole.id}
                           >
                             <td className="govuk-table__cell">
-                              {userReleaseRole.publication.title}
+                              {userReleaseRole.publication}
                             </td>
                             <td className="govuk-table__cell">
-                              {userReleaseRole.release.title}
+                              {userReleaseRole.release}
                             </td>
                             <td className="govuk-table__cell">
-                              {userReleaseRole.releaseRole.name}
+                              {userReleaseRole.role}
                             </td>
                             <td className="govuk-table__cell">
                               <ButtonText
