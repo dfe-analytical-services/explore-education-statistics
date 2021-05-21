@@ -24,12 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
             emailService.Setup(mock =>
-                    mock.SendEmail(
-                        "test@test.com",
-                        "notify-invite-template-id",
-                        expectedValues
-                    ))
-                .Verifiable();
+                mock.SendEmail(
+                    "test@test.com",
+                    "notify-invite-template-id",
+                    expectedValues
+                ));
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com",
                     "notify-invite-template-id",
                     expectedValues
-                )
+                ), Times.Once
             );
 
             VerifyAllMocks(emailService);
@@ -72,12 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
             emailService.Setup(mock =>
-                    mock.SendEmail(
-                        "test@test.com",
-                        "notify-release-role-template-id",
-                        expectedValues
-                    ))
-                .Verifiable();
+                mock.SendEmail(
+                    "test@test.com",
+                    "notify-release-role-template-id",
+                    expectedValues
+                ));
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
@@ -88,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com",
                     "notify-release-role-template-id",
                     expectedValues
-                )
+                ), Times.Once
             );
 
             VerifyAllMocks(emailService);

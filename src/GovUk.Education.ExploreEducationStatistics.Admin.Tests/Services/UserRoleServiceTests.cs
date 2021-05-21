@@ -178,10 +178,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendPublicationRoleEmail(user.Email,
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        Owner))
-                .Verifiable();
+                mock.SendPublicationRoleEmail(user.Email,
+                    It.Is<Publication>(p => p.Id == publication.Id),
+                    Owner));
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -386,10 +385,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendReleaseRoleEmail(user.Email,
-                        It.Is<Release>(r => r.Id == release.Id),
-                        Contributor))
-                .Verifiable();
+                mock.SendReleaseRoleEmail(user.Email,
+                    It.Is<Release>(r => r.Id == release.Id),
+                    Contributor));
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
