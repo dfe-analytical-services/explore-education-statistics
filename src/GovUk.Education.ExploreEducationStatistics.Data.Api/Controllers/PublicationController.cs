@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("api/publications")]
+    [Route("api")]
     [ApiController]
     public class PublicationController : ControllerBase
     {
@@ -18,10 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _publicationService = publicationService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublication(Guid id)
+        [HttpGet("publications/{publicationId}")]
+        public async Task<ActionResult<SubjectsAndHighlightsViewModel>> GetLatestPublicationSubjectsAndHighlights(Guid publicationId)
         {
-            return await _publicationService.GetPublication(id).HandleFailuresOrOk();
+            return await _publicationService
+                .GetLatestPublicationSubjectsAndHighlights(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}")]
+        public async Task<ActionResult<SubjectsAndHighlightsViewModel>> GetReleaseSubjectsAndHighlights(Guid releaseId)
+        {
+            return await _publicationService
+                .GetReleaseSubjectsAndHighlights(releaseId)
+                .HandleFailuresOrOk();
         }
     }
 }

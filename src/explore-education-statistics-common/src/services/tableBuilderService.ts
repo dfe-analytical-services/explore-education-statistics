@@ -91,14 +91,7 @@ export interface TableHighlight {
   description?: string;
 }
 
-export interface Publication {
-  id: string;
-  subjects: Subject[];
-  highlights: TableHighlight[];
-}
-
-export interface Release {
-  id: string;
+export interface SubjectsAndHighlights {
   subjects: Subject[];
   highlights: TableHighlight[];
 }
@@ -187,14 +180,32 @@ export interface TableDataResponse {
   subjectMeta: TableDataSubjectMeta;
 }
 
+export interface SelectedPublication {
+  id: string;
+  title: string;
+  slug: string;
+  selectedRelease: {
+    id: string;
+    slug: string;
+    latestData: boolean;
+  };
+  latestRelease: {
+    title: string;
+  };
+}
+
 const tableBuilderService = {
   getThemes(): Promise<Theme[]> {
     return dataApi.get('/themes');
   },
-  getPublication(publicationId: string): Promise<Publication> {
+  getPublicationSubjectsAndHighlights(
+    publicationId: string,
+  ): Promise<SubjectsAndHighlights> {
     return dataApi.get(`/publications/${publicationId}`);
   },
-  getRelease(releaseId: string): Promise<Release> {
+  getReleaseSubjectsAndHighlights(
+    releaseId: string,
+  ): Promise<SubjectsAndHighlights> {
     return dataApi.get(`/releases/${releaseId}`);
   },
   getSubjectMeta(subjectId: string): Promise<SubjectMeta> {

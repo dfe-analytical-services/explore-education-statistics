@@ -34,9 +34,10 @@ const PreReleaseTableToolPage = ({
   const { value: tableToolState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const { subjects, ...release } = await tableBuilderService.getRelease(
-      releaseId,
-    );
+    const {
+      subjects,
+      ...release
+    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
 
     const highlights = release.highlights.filter(
       highlight => highlight.id !== dataBlockId,
@@ -108,8 +109,9 @@ const PreReleaseTableToolPage = ({
       <LoadingSpinner loading={isLoading}>
         {tableToolState && (
           <TableToolWizard
-            scrollOnMount
             themeMeta={[]}
+            hidePublicationSelectionStage
+            scrollOnMount
             initialState={tableToolState}
             renderHighlightLink={highlight => (
               <Link

@@ -1,3 +1,4 @@
+using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -28,6 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
+        [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
+        {
+            return await GetReleaseSummaryViewModel(
+                PublicContentPublicationPath(publicationSlug),
+                PublicContentLatestReleasePath(publicationSlug)
+            );
+        }
+
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
@@ -37,9 +47,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
-        private async Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/summary")]
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug, string releaseSlug)
+        {
+            return await GetReleaseSummaryViewModel(
+                PublicContentPublicationPath(publicationSlug),
+                PublicContentReleasePath(publicationSlug, releaseSlug)
+            );
+        }
+
+        private Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
             string publicationPath,
             string releasePath)
+        {
+            return CreateFromCachedPublicationAndRelease(publicationPath, releasePath, 
+                (publication, release) => new ReleaseViewModel(release, publication));
+        }
+        
+        private Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(
+            string publicationPath,
+            string releasePath)
+        {
+            return CreateFromCachedPublicationAndRelease(publicationPath, releasePath, 
+                (publication, release) => new ReleaseSummaryViewModel(release, publication));
+        }
+        
+        private async Task<ActionResult<T>> CreateFromCachedPublicationAndRelease<T>(
+            string publicationPath,
+            string releasePath,
+            Func<CachedPublicationViewModel, CachedReleaseViewModel, T> func)
         {
             var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
             var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
@@ -48,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
             if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
             {
-                return new ReleaseViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
+                return func.Invoke(publicationTask.Result.Right, releaseTask.Result.Right);
             }
 
             return NotFound();

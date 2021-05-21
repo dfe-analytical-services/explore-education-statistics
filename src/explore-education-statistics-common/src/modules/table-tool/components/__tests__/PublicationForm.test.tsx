@@ -396,8 +396,13 @@ describe('PublicationForm', () => {
     );
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
-    const expected: PublicationFormValues = {
+    const expected: PublicationFormValues & {
+      publicationSlug: string;
+      publicationTitle: string;
+    } = {
       publicationId: 'publication-5',
+      publicationSlug: 'pupil-absence-in-schools-in-england',
+      publicationTitle: 'Pupil absence in schools in England',
     };
 
     await waitFor(() => {

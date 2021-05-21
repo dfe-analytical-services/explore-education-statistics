@@ -1336,7 +1336,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             <li>
               <a
                 class="govuk-link"
-                href="/find-statistics/test-publication/2000-01"
+                href="/find-statistics/test-publication"
               >
                 View the release for this data
               </a>
@@ -1370,7 +1370,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
 </main>
 `;
 
-exports[`TableToolPage renders the Table Tool page correctly when a Theme is chosen, giving the user a choice of Publications 1`] = `
+exports[`TableToolPage renders the Table Tool page correctly when Theme metadata is provided, giving the user a choice of Publications 1`] = `
 <main
   class="govuk-main-wrapper app-main-class"
   id="main-content"
@@ -1848,7 +1848,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Theme is cho
 </main>
 `;
 
-exports[`TableToolPage renders the Table Tool page correctly when this is not the latest data 1`] = `
+exports[`TableToolPage renders the Table Tool page correctly when a Fast Track is provided and this is not the latest data 1`] = `
 <main
   class="govuk-main-wrapper app-main-class"
   id="main-content"
@@ -2558,7 +2558,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is not th
               <span
                 class="govuk-!-font-weight-bold"
               >
-                Tax Year 2019/2020
+                Latest Release Title
               </span>
             </a>
           </div>
@@ -2706,7 +2706,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is not th
             <li>
               <a
                 class="govuk-link"
-                href="/find-statistics/test-publication/2000-01"
+                href="/find-statistics/test-publication/selected-release-slug"
               >
                 View the release for this data
               </a>
@@ -2740,7 +2740,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is not th
 </main>
 `;
 
-exports[`TableToolPage renders the Table Tool page correctly when this is the latest data 1`] = `
+exports[`TableToolPage renders the Table Tool page correctly when a Fast Track is provided and this is the latest data 1`] = `
 <main
   class="govuk-main-wrapper app-main-class"
   id="main-content"
@@ -3581,7 +3581,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is the la
             <li>
               <a
                 class="govuk-link"
-                href="/find-statistics/test-publication/2000-01"
+                href="/find-statistics/test-publication"
               >
                 View the release for this data
               </a>

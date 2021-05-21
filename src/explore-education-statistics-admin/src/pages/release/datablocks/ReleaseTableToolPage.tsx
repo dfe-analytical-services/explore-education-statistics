@@ -70,7 +70,9 @@ const ReleaseTableToolPage = ({
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const { subjects } = await tableBuilderService.getRelease(releaseId);
+    const {
+      subjects,
+    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
 
     return {
       initialStep: 1,
@@ -106,6 +108,7 @@ const ReleaseTableToolPage = ({
 
             <TableToolWizard
               themeMeta={[]}
+              hidePublicationSelectionStage
               initialState={initialState}
               finalStep={({ response, query }) => (
                 <WizardStep>
