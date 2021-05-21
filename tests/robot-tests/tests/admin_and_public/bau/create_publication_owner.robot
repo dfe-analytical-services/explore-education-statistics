@@ -70,7 +70,16 @@ Assert that test users are present in table
     user checks results table cell contains  5  2  	BAU User
     user checks results table cell contains  1  3  	Manage
 
-Give Analyst1 User1 publication owner rights
+Give Analyst1 User1 publication owner role
     [Tags]  HappyPath
     user clicks element  //*[tbody]//tr[1]//td[3]//a
-    Sleep  1000
+    user selects from list by label  //*[@name="selectedPublicationId"]  ${PUBLICATION_NAME}
+    user selects from list by label  //*[@name="selectedPublicationRole"]  Owner
+    user clicks button  Add publication access
+
+Assert that Analyst1 User1 has correct publication role
+    [Tags]  HappyPath
+    user checks results table cell contains  1  1  ${PUBLICATION_NAME}  //*[@data-testid="publication-access-table"]
+
+Test
+    Sleep  100000
