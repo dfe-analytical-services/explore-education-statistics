@@ -14,8 +14,8 @@ export interface AddReleaseRoleFormValues {
 }
 
 interface Props {
-  releases: IdTitlePair[] | undefined;
-  releaseRoles: string[] | undefined;
+  releases?: IdTitlePair[];
+  releaseRoles?: string[];
   user: User;
   onRemove: (userReleaseRole: UserReleaseRole) => void;
   onSubmit: (

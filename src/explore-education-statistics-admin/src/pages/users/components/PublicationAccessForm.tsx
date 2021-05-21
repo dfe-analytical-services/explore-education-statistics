@@ -14,8 +14,8 @@ export interface AddPublicationRoleFormValues {
 }
 
 interface Props {
-  publications: IdTitlePair[] | undefined;
-  publicationRoles: string[] | undefined;
+  publications?: IdTitlePair[];
+  publicationRoles?: string[];
   user: User;
   onRemove: (userPublicationRole: UserPublicationRole) => void;
   onSubmit: (

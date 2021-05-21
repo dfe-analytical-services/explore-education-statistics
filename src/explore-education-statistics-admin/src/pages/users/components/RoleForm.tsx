@@ -13,7 +13,7 @@ export interface UpdateRoleFormValues {
 }
 
 interface Props {
-  roles: Role[] | undefined;
+  roles?: Role[];
   user: User;
   onSubmit: (
     values: UpdateRoleFormValues,
@@ -49,7 +49,7 @@ const RoleForm = ({ roles, user, onSubmit }: Props) => {
               id="role"
               legend="Role"
               legendSize="m"
-              hint="The users role within the service."
+              hint="The users's role within the service."
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-quarter">

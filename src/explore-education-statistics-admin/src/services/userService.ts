@@ -56,8 +56,8 @@ export interface Role {
 }
 
 export interface ResourceRoles {
-  Publication: [] | undefined;
-  Release: [] | undefined;
+  Publication?: [];
+  Release?: [];
 }
 
 export interface UsersService {
