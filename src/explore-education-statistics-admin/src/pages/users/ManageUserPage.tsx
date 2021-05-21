@@ -37,7 +37,7 @@ const addReleaseFormErrorMappings = [
   mapFieldErrors<AddReleaseRoleFormValues>({
     target: 'selectedReleaseRole',
     messages: {
-      USER_ALREADY_HAS_RELEASE_ROLE: 'The user already has this release role',
+      USER_ALREADY_HAS_RESOURCE_ROLE: 'The user already has this release role',
     },
   }),
 ];
@@ -46,7 +46,7 @@ const addPublicationFormErrorMappings = [
   mapFieldErrors<AddPublicationRoleFormValues>({
     target: 'selectedPublicationRole',
     messages: {
-      USER_ALREADY_HAS_PUBLICATION_ROLE:
+      USER_ALREADY_HAS_RESOURCE_ROLE:
         'The user already has this publication role',
     },
   }),
