@@ -43,11 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("users/{userId}")]
-        public async Task<ActionResult<Unit>> UpdateUser(string userId, UserEditViewModel model)
+        [HttpPut("users/{userId:guid}")]
+        public async Task<ActionResult<Unit>> UpdateUser(Guid userId, UserEditViewModel model)
         {
             return await _userManagementService
-                .UpdateUser(userId, model.RoleId)
+                .UpdateUser(userId.ToString(), model.RoleId)
                 .HandleFailuresOrOk();
         }
 
