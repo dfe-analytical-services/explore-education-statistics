@@ -80,11 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
-                        .OnSuccessCombineWith(release => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
+                        .OnSuccessDo(release => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
                         .OnSuccessVoid(async tuple =>
                         {
-                            var (userAndPublication, _) = tuple;
-                            var (user, publication) = userAndPublication;
+                            var (user, publication) = tuple;
                             await _userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
@@ -105,11 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
                             q => q.Include(r => r.Publication)))
-                        .OnSuccessCombineWith(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
+                        .OnSuccessDo(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
                         .OnSuccessVoid(async tuple =>
                         {
-                            var (userAndRelease, _) = tuple;
-                            var (user, release) = userAndRelease;
+                            var (user, release) = tuple;
                             await _userReleaseRoleRepository.Create(
                                 userId: userId,
                                 releaseId: release.Id,
