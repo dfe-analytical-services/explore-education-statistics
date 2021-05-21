@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
-        public async Task<UserPublicationRole> GetByRole(Guid userId, Guid publicationId, PublicationRole role)
+        public async Task<UserPublicationRole> GetByUserAndRole(Guid userId, Guid publicationId, PublicationRole role)
         {
             return await _contentDbContext.UserPublicationRoles.FirstOrDefaultAsync(r =>
                 r.UserId == userId &&

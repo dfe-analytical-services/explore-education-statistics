@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             PublicationRole role,
             Guid createdById);
 
-        public Task<UserPublicationRole> GetByRole(Guid userId,
+        public Task<UserPublicationRole> GetByUserAndRole(Guid userId,
             Guid publicationId,
             PublicationRole role);
     }

@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
-        public async Task<UserReleaseRole> GetByRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole> GetByUserAndRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
                 r.UserId == userId &&

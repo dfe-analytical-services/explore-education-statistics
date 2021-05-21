@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetByRole()
+        public async Task GetByUserAndRole()
         {
             var userReleaseRole = new UserReleaseRole
             {
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.GetByRole(userReleaseRole.UserId, userReleaseRole.ReleaseId, Contributor);
+                var result = await service.GetByUserAndRole(userReleaseRole.UserId, userReleaseRole.ReleaseId, Contributor);
 
                 Assert.Equal(userReleaseRole.Id, result.Id);
                 Assert.Equal(userReleaseRole.UserId, result.UserId);
