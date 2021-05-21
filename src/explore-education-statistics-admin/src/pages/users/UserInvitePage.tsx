@@ -127,7 +127,7 @@ const UserInvitePage = ({
                   id="role-fieldset"
                   legend="Role"
                   legendSize="m"
-                  hint="The users role within the service."
+                  hint="The users' role within the service."
                 >
                   <FormFieldSelect<FormValues>
                     label="Role"
