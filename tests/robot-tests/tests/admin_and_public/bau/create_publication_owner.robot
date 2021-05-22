@@ -10,6 +10,7 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publication_owner %{RUN_IDENTIFIER}
+${RELEASE_NAME}  ${PUBLICATION_NAME} - Academic Year 2025/26
 ${SUBJECT_NAME}      UI test subject
 
 ${DATA_FILE_NAME}  dates
@@ -73,13 +74,38 @@ Assert that test users are present in table
 Give Analyst1 User1 publication owner role
     [Tags]  HappyPath
     user clicks element  //*[tbody]//tr[1]//td[3]//a
-    user selects from list by label  //*[@name="selectedPublicationId"]  ${PUBLICATION_NAME}
-    user selects from list by label  //*[@name="selectedPublicationRole"]  Owner
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+    user selects from list by label  css:[name="selectedPublicationRole"]  Owner
     user clicks button  Add publication access
+
+
+Give Analyst1 User1 release access
+    [Tags]  HappyPath
+    user waits until element is enabled  css:[name="selectedReleaseId"]
+    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+    user selects from list by label  css:[name="selectedReleaseRole"]  Approver
+    user clicks button  Add release access
+    user clicks element  //*[@data-testid="Add-release-access"]//button
 
 Assert that Analyst1 User1 has correct publication role
     [Tags]  HappyPath
     user checks results table cell contains  1  1  ${PUBLICATION_NAME}  //*[@data-testid="publication-access-table"]
 
+
+Sign in as Analyst1 User1 & navigate to publication
+    [Tags]  HappyPath
+    user signs in as analyst1
+    user goes to url  %{ADMIN_URL}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+
+Edit release content
+    [Tags]  HappyPath
+    user opens accordion section  ${PUBLICATION_NAME}
+    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
+    user opens details dropdown   ${RELEASE_NAME} (not Live)  ${accordion}
+    user clicks button  Edit this release
+#    user clicks button  Confirm
 Test
     Sleep  100000
