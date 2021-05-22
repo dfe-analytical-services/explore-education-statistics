@@ -10,6 +10,7 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publication_owner %{RUN_IDENTIFIER}
+
 ${RELEASE_NAME}  ${PUBLICATION_NAME} - Academic Year 2025/26
 ${SUBJECT_NAME}      UI test subject
 
@@ -27,7 +28,6 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   AY    2025
 
-
 Navigate to admin dashboard and assert publication is present
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
@@ -41,7 +41,6 @@ Navigate to manage users page
     user checks table column heading contains  1  2  Email
     user checks table column heading contains  1  3  Role
     user checks table column heading contains  1  4  Actions
-
 
 Assert that test users are present in table
     [Tags]  HappyPath
@@ -79,19 +78,15 @@ Give Analyst1 User1 publication owner role
     user selects from list by label  css:[name="selectedPublicationRole"]  Owner
     user clicks button  Add publication access
 
-
 Give Analyst1 User1 release access
     [Tags]  HappyPath
+    # stale element exception if you don't wait until it's enabled
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  Approver
     user clicks button  Add release access
-    user clicks element  //*[@data-testid="Add-release-access"]//button
-
-Assert that Analyst1 User1 has correct publication role
-    [Tags]  HappyPath
-    user checks results table cell contains  1  1  ${PUBLICATION_NAME}  //*[@data-testid="publication-access-table"]
-
 
 Sign in as Analyst1 User1 & navigate to publication
     [Tags]  HappyPath
@@ -100,12 +95,67 @@ Sign in as Analyst1 User1 & navigate to publication
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}  120
 
-Edit release content
+Navigate to release
     [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown   ${RELEASE_NAME} (not Live)  ${accordion}
-    user clicks button  Edit this release
-#    user clicks button  Confirm
-Test
-    Sleep  100000
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+
+Upload subject file
+    [Tags]  HappyPath
+    user clicks link  Data and files
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}seven_filters.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}seven_filters.meta.csv
+    user clicks button  Upload data files
+    user waits until h2 is visible  Uploaded data files
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user checks headed table body row contains  Status           Complete  ${section}  180
+
+Add meta guidance to ${SUBJECT_NAME} subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document  90
+    user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
+    ...  meta guidance content
+    user clicks button  Save guidance
+
+Navigate to 'Footnotes' page
+    [Tags]  HappyPath
+    user clicks link  Footnotes
+    user waits until h2 is visible  Footnotes
+
+Add footnote to ${SUBJECT_NAME}
+    [Tags]  HappyPath
+    user waits until page contains link   Create footnote
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+    user clicks footnote radio   ${SUBJECT_NAME}   Applies to all data
+    user clicks element  id:footnoteForm-content
+    user enters text into element  id:footnoteForm-content  Footnote 1 ${FOOTNOTE_TEXT_2}
+    user clicks button  Save footnote
+    user waits until h2 is visible  Footnotes
+
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list   Test public access list
+
+Go to "Sign off" page
+    [Tags]  HappyPath
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
+
+Approve release
+    [Tags]  HappyPath
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+    user clicks radio   Approved for publication
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user clicks radio   As soon as possible
+    user clicks button   Update status
