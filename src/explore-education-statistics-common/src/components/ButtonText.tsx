@@ -7,6 +7,7 @@ interface Props {
   className?: string;
   disabled?: boolean;
   id?: string;
+  testId?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
   underline?: boolean;
@@ -17,11 +18,13 @@ const ButtonText = ({
   className,
   type = 'button',
   underline = true,
+  testId,
   ...props
 }: Props) => {
   return (
     <button
-      // eslint-disable-next-line react/jsx-props-no-spreading
+      data-testid={testId}
+      // eslint-disable-next-line react/jsx-props-no-spreadings
       {...props}
       className={classNames(
         styles.button,

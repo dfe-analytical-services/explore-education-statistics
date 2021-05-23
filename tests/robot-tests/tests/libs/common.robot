@@ -505,6 +505,11 @@ user checks key stat definition
     user waits until element is visible  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]
     user checks element should contain  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]  ${definition}
 
+user clicks testid if exists
+    [Arguments]  ${label}
+    user waits until element is enabled  //*[@data-testid="${label}"]
+    user clicks element if exists  //*[@data-testid="${label}/"]
+
 user clicks radio
     [Arguments]  ${label}
     user clicks element  xpath://label[text()="${label}"]/../input[@type="radio"]
@@ -512,6 +517,8 @@ user clicks radio
 user clicks radio if exists
     [Arguments]  ${label}
     user clicks element if exists  xpath://label[text()="${label}"]/../input[@type="radio"]
+
+
 
 user checks radio is checked
     [Arguments]  ${label}

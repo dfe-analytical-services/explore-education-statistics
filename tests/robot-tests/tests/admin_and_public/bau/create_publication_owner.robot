@@ -209,17 +209,30 @@ Add a Footnote as a release Lead
     user waits until h2 is visible  Footnotes
 
 
-Change analyst1 User1's permissions to contributor only
+Change analyst1 User1's release permissions to contributor only
     [Tags]  HappyPath
     user signs in as bau1
     user goes to url  %{ADMIN_URL}/administration/users
     user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
     user clicks element  //*[tbody]//tr[1]//td[3]//a
-    user waits until element is enabled  css:[name="selectedPublicationId"]
-    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+
+    # need to do some sort of for / for each loop here
+    # want to remove everything from the release access
+
+    # REMOVE PRE-EXISTING RELEASE ACCESS
+    # At this point 2 rows should exist (approver & lead)
+    user waits for page to finish loading
+    user clicks element if exists  css:[data-testid="remove-release-access"]
+    user clicks element if exists  css:[data-testid="remove-release-access"]
+
+
     Sleep  10000
-    user clicks element  //*[@data-testid="publication-access-table"]//tbody//tr[1]//td[3]//button
-#    user removes publication access from user  1
-#    user removes publication access from user  2
-#    user removes publication access from user  3
-    Sleep  100000
+    # ADD RELEASE ACCESS
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
+    user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
+    # REMOVE PUBLICATION OWNER ACCESS
+    user waits until element is enabled  //*[@data-testid="remove-publication-owner-access"]
+    user clicks element  //*[@data-testid="remove-publication-owner-access"]
+
+
+    Sleep  10000
