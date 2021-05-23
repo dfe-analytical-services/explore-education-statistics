@@ -56,4 +56,11 @@ user checks headed table body row cell contains
     [Arguments]  ${row_heading}  ${cell}  ${content}  ${parent}=css:table  ${wait}=${timeout}
     user waits until parent contains element  ${parent}  xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[${cell}][contains(., "${content}")]  timeout=${wait}
 
+user clicks link in headed table body row cell
+    [Arguments]  ${row_heading}  ${cell}  ${content}  ${parent}=css:table  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[${cell}][contains(., "${content}")]  timeout=${wait}
 
+user removes publication access from user
+    [Arguments]  ${row}  ${parent}=//*[@data-testid="publication-access-table"]  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//tbody//tr[${row}]//td[3]  timeout=${wait}
+    user clicks element  //*[@data-testid="publication-access-table"]//tbody//tr[${row}]//td[3]

@@ -18,7 +18,7 @@ ${DATA_FILE_NAME}  dates
 
 ${FOOTNOTE_TEXT_1}  test footnote from the bau user
 ${FOOTNOTE_TEXT_2}  test footnote from the publication owner! (analyst)
-${FOOTNOTE_TEXT_3}  an edited footnote from the publication owner! (analyst)
+${FOOTNOTE_TEXT_3}  A footnote as analyst1 User1 with the Lead role on release ${RELEASE_NAME}
 
 ${FOOTNOTE_DATABLOCK_NAME}  test data block (footnotes)
 
@@ -72,6 +72,7 @@ Assert that test users are present in table
 
 Give Analyst1 User1 publication owner role
     [Tags]  HappyPath
+    user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
     user clicks element  //*[tbody]//tr[1]//td[3]//a
     user waits until element is enabled  css:[name="selectedPublicationId"]
     user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
@@ -145,17 +146,80 @@ Add public prerelease access list
     user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
 
-Go to "Sign off" page
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
+#Go to "Sign off" page
+#    [Tags]  HappyPath
+#    user clicks link   Sign off
+#    user waits until h2 is visible  Sign off
+#    user waits until page contains button  Edit release status
+#
+#Approve release
+#    [Tags]  HappyPath
+#    user clicks button  Edit release status
+#    user waits until h2 is visible  Edit release status
+#    user clicks radio   Approved for publication
+#    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+#    user clicks radio   As soon as possible
+#    user clicks button   Update status
 
-Approve release
+
+Navigate to administration to change Analyst1 user1's release access
     [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
+    user signs in as bau1
+    user goes to url  %{ADMIN_URL}/administration/users
+    user checks table column heading contains  1  1  Name
+    user checks table column heading contains  1  2  Email
+    user checks table column heading contains  1  3  Role
+    user checks table column heading contains  1  4  Actions
+
+
+Give analyst1 user1 lead access on release ${RELEASE_NAME}
+    [Tags]  HappyPath
+    user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
+    user clicks element  //*[tbody]//tr[1]//td[3]//a
+    # stale element exception if you don't wait until it's enabled
+    user waits until element is enabled  css:[name="selectedReleaseId"]
+    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
+    user selects from list by label  css:[name="selectedReleaseRole"]  Lead
+    user clicks button  Add release access
+
+
+Log in as analyst1 User1 to start work as a release lead on release ${RELEASE_NAME}
+    [Tags]  HappyPath
+    user signs in as analyst1
+    user goes to url  %{ADMIN_URL}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+
+Navigate to 'Footnotes' section
+    [Tags]  HappyPath
+    user clicks link  Footnotes
+    user waits until h2 is visible  Footnotes
+
+Add a Footnote as a release Lead
+    [Tags]  HappyPath
+    user waits until page contains link   Create footnote
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+    user clicks footnote radio   ${SUBJECT_NAME}   Applies to all data
+    user clicks element  id:footnoteForm-content
+    user enters text into element  id:footnoteForm-content  Footnote 3 ${FOOTNOTE_TEXT_3}
+    user clicks button  Save footnote
+    user waits until h2 is visible  Footnotes
+
+
+Change analyst1 User1's permissions to contributor only
+    [Tags]  HappyPath
+    user signs in as bau1
+    user goes to url  %{ADMIN_URL}/administration/users
+    user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
+    user clicks element  //*[tbody]//tr[1]//td[3]//a
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+    Sleep  10000
+    user clicks element  //*[@data-testid="publication-access-table"]//tbody//tr[1]//td[3]//button
+#    user removes publication access from user  1
+#    user removes publication access from user  2
+#    user removes publication access from user  3
+    Sleep  100000
