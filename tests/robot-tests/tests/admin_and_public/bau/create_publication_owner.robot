@@ -221,7 +221,14 @@ Change analyst1 User1's release permissions to contributor only
 
     # REMOVE PRE-EXISTING RELEASE ACCESS
     # At this point 2 rows should exist (approver & lead)
-    user waits for page to finish loading
+
+
+    # 1. IF css:[data-testid="remove-release-access"] exists then...
+    # 2. wait until it is enabled
+    # 3. Click the button
+    # 4. Else carry on with the test
+
+    user waits until element is enabled # NEED IF STATEMENT HERE
     user clicks element if exists  css:[data-testid="remove-release-access"]
     user clicks element if exists  css:[data-testid="remove-release-access"]
 
