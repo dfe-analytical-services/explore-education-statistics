@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
@@ -104,21 +105,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             {
                 var nameClaim = info.Principal.FindFirstValue(JwtClaimTypes.Name);
 
-                if (nameClaim.IndexOf(' ') > 0)
+                if (nameClaim == null)
                 {
-                    firstName = nameClaim.Substring(0, nameClaim.IndexOf(' '));
-                    lastName = nameClaim.Substring(nameClaim.IndexOf(' ') + 1);
-                }
-                else
-                {
-                    firstName = nameClaim;
+                    _logger.LogWarning($@"No Name Claims found during user login, so no first or last name 
+                                       information is available from {ClaimTypes.GivenName}, {ClaimTypes.Surname} or 
+                                       {JwtClaimTypes.Name} - falling back to blank first and last names");
+                    firstName = "";
                     lastName = "";
+                }
+                else 
+                {
+                    if (nameClaim.IndexOf(' ') > 0)
+                    {
+                        firstName = nameClaim.Substring(0, nameClaim.IndexOf(' '));
+                        lastName = nameClaim.Substring(nameClaim.IndexOf(' ') + 1);
+                    }
+                    else
+                    {
+                        firstName = nameClaim;
+                        lastName = "";
+                    }    
                 }
             }
 
             if (email == null)
             {
-                ErrorMessage = "Email address not returned from Azure Active Directory";
+                _logger.LogWarning($@"No Email Claim found during user login from {ClaimTypes.Email} or 
+                                           {ClaimTypes.Name}");
+                ErrorMessage = "Email address not returned from Identity Provider";
                 return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
             }
 
@@ -130,9 +144,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     i.Email.ToLower() == email.ToLower()
                     && i.Accepted == false);
 
-            // If the user has an invite register them automatically
+            // If the user has an invite, register them automatically
             if (inviteToSystem != null)
             {
+                // create a new set of AspNetUser records for the Identity Framework 
                 var user = new ApplicationUser
                 {
                     UserName = email,
@@ -141,33 +156,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     LastName = lastName
                 };
                 
-                var createdUserResult = await _userManager.CreateAsync(user);
+                var createdAspNetUserResult = await _userManager.CreateAsync(user);
+                var addedAspNetUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
+                var recordLoginDetailsUserResult = await _userManager.AddLoginAsync(user, info);
 
-                var addedUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
-
-                if (createdUserResult.Succeeded && addedUserRoles.Succeeded)
+                // if adding the new Identity Framework user records succeeded, continue on to create internal User 
+                // and Role records for the application itself and sign the user in 
+                if (createdAspNetUserResult.Succeeded && addedAspNetUserRoles.Succeeded && recordLoginDetailsUserResult.Succeeded)
                 {
-                    var newUser = new User
+                    // mark the invite as accepted
+                    inviteToSystem.Accepted = true;
+                    _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
+
+                    // create a set of internal User and Role records based on invites if the internal User record
+                    // doesn't yet exist
+                    var existingInternalUser = await _contentDbContext
+                        .Users
+                        .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+                    if (existingInternalUser == null)
                     {
-                        Id = new Guid(user.Id),
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email
-                    };
+                        var newInternalUser = new User
+                        {
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email
+                        };
                     
-                    _contentDbContext.Users.Add(newUser);
-
-                    await _contentDbContext.SaveChangesAsync();
-
-                    createdUserResult = await _userManager.AddLoginAsync(user, info);
-                    if (createdUserResult.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {0} provider", info.LoginProvider);
-
-                        inviteToSystem.Accepted = true;
-                        _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
-                        await _usersAndRolesDbContext.SaveChangesAsync();
+                        await _contentDbContext.Users.AddAsync(newInternalUser);
 
                         var releaseInvites = _contentDbContext
                             .UserReleaseInvites
@@ -175,29 +191,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                         await releaseInvites.ForEachAsync(invite =>
                         {
-                            _contentDbContext.Add(new UserReleaseRole
+                            _contentDbContext.AddAsync(new UserReleaseRole
                             {
                                 ReleaseId = invite.ReleaseId,
                                 Role = invite.Role,
-                                UserId = newUser.Id,
+                                UserId = newInternalUser.Id,
                             });
 
                             invite.Accepted = true;
                         });
-
-                        await _contentDbContext.SaveChangesAsync();
-                        await _usersAndRolesDbContext.SaveChangesAsync();
-                        
-                        return LocalRedirect(returnUrl);
                     }
+
+                    await _contentDbContext.SaveChangesAsync();
+                    await _usersAndRolesDbContext.SaveChangesAsync();
+                    
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation("User created an account using {0} provider", info.LoginProvider);
+                    return LocalRedirect(returnUrl);
                 }
 
-                foreach (var error in createdUserResult.Errors)
+                foreach (var error in createdAspNetUserResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
 
-                foreach (var error in addedUserRoles.Errors)
+                foreach (var error in addedAspNetUserRoles.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                
+                foreach (var error in recordLoginDetailsUserResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
