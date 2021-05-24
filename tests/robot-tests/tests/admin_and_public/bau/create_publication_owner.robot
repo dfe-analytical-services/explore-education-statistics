@@ -10,15 +10,13 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publication_owner %{RUN_IDENTIFIER}
-
-${RELEASE_NAME}  ${PUBLICATION_NAME} - Academic Year 2025/26
+${RELEASE_NAME}      ${PUBLICATION_NAME} - Academic Year 2025/26
 ${SUBJECT_NAME}      UI test subject
+${DATA_FILE_NAME}    dates
 
-${DATA_FILE_NAME}  dates
-
-${FOOTNOTE_TEXT_1}  test footnote from the bau user
-${FOOTNOTE_TEXT_2}  test footnote from the publication owner! (analyst)
-${FOOTNOTE_TEXT_3}  A footnote as analyst1 User1 with the Lead role on release ${RELEASE_NAME}
+${FOOTNOTE_TEXT_1}   test footnote from the bau user
+${FOOTNOTE_TEXT_2}   test footnote from the publication owner! (analyst)
+${FOOTNOTE_TEXT_3}   A footnote as analyst1 User1 with the Lead role on release ${RELEASE_NAME}
 
 ${FOOTNOTE_DATABLOCK_NAME}  test data block (footnotes)
 
@@ -76,6 +74,8 @@ Give Analyst1 User1 publication owner role
     user clicks element  //*[tbody]//tr[1]//td[3]//a
     user waits until element is enabled  css:[name="selectedPublicationId"]
     user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+
+    user waits until element is enabled  css:[name="selectedPublicationRole"]
     user selects from list by label  css:[name="selectedPublicationRole"]  Owner
     user clicks button  Add publication access
 
@@ -146,58 +146,74 @@ Add public prerelease access list
     user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
 
-#Go to "Sign off" page
-#    [Tags]  HappyPath
-#    user clicks link   Sign off
-#    user waits until h2 is visible  Sign off
-#    user waits until page contains button  Edit release status
-#
-#Approve release
-#    [Tags]  HappyPath
-#    user clicks button  Edit release status
-#    user waits until h2 is visible  Edit release status
-#    user clicks radio   Approved for publication
-#    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-#    user clicks radio   As soon as possible
-#    user clicks button   Update status
+Go to "Sign off" page
+    [Tags]  HappyPath
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
 
+Check analyst1 User1 can approve release for immediate publication
+    [Tags]  HappyPath
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+    user clicks radio   Approved for publication
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by publication owner
+    user clicks radio   As soon as possible
+    user clicks button   Update status
 
-Navigate to administration to change Analyst1 user1's release access
+Wait for release process status to be Complete
+    [Tags]  HappyPath
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
+    user checks page does not contain button  Edit release status
+
+Navigate to administration as bau1
     [Tags]  HappyPath
     user signs in as bau1
     user goes to url  %{ADMIN_URL}/administration/users
-    user checks table column heading contains  1  1  Name
-    user checks table column heading contains  1  2  Email
-    user checks table column heading contains  1  3  Role
-    user checks table column heading contains  1  4  Actions
 
-
-Give analyst1 user1 lead access on release ${RELEASE_NAME}
+Give analyst1 user1 contributor only access on release ${RELEASE_NAME}
     [Tags]  HappyPath
     user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
     user clicks element  //*[tbody]//tr[1]//td[3]//a
-    # stale element exception if you don't wait until it's enabled
+    user clicks button  Remove
     user waits until element is enabled  css:[name="selectedReleaseId"]
+
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
     user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Lead
+    user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
     user clicks button  Add release access
 
 
-Log in as analyst1 User1 to start work as a release lead on release ${RELEASE_NAME}
+
+
+Log in as analyst1 User1 to start work as a release contributor on ${RELEASE_NAME}
     [Tags]  HappyPath
     user signs in as analyst1
     user goes to url  %{ADMIN_URL}
+#    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+#
+#    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+#    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+#    Sleep  10000
+
+Create amendment
+    [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  Academic Year 2025/26
+    user opens accordion section  ${PUBLICATION_NAME}
+    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
+    user opens details dropdown   ${RELEASE_NAME} (Live - Latest release)  ${accordion}
+    user clicks button  Amend this release
+    user clicks button  Confirm
+    Sleep  100000
 
 Navigate to 'Footnotes' section
     [Tags]  HappyPath
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
-Add a Footnote as a release Lead
+Add a Footnote as a release contributor
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -208,38 +224,7 @@ Add a Footnote as a release Lead
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-
-Change analyst1 User1's release permissions to contributor only
-    [Tags]  HappyPath
-    user signs in as bau1
-    user goes to url  %{ADMIN_URL}/administration/users
-    user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
-    user clicks element  //*[tbody]//tr[1]//td[3]//a
-
-    # need to do some sort of for / for each loop here
-    # want to remove everything from the release access
-
-    # REMOVE PRE-EXISTING RELEASE ACCESS
-    # At this point 2 rows should exist (approver & lead)
-
-
-    # 1. IF css:[data-testid="remove-release-access"] exists then...
-    # 2. wait until it is enabled
-    # 3. Click the button
-    # 4. Else carry on with the test
-
-    user waits until element is enabled # NEED IF STATEMENT HERE
-    user clicks element if exists  css:[data-testid="remove-release-access"]
-    user clicks element if exists  css:[data-testid="remove-release-access"]
-
-
-    Sleep  10000
-    # ADD RELEASE ACCESS
-    user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
-    # REMOVE PUBLICATION OWNER ACCESS
-    user waits until element is enabled  //*[@data-testid="remove-publication-owner-access"]
-    user clicks element  //*[@data-testid="remove-publication-owner-access"]
-
+Navigate to content
+    user clicks link Content
 
     Sleep  10000
