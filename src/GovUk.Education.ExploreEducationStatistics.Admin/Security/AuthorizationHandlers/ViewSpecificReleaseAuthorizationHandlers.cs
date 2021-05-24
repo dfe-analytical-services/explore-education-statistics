@@ -1,7 +1,10 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+using Microsoft.AspNetCore.Authorization;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
@@ -10,8 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ViewSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ViewReleaseRequirement, Release>
     {
         public ViewSpecificReleaseAuthorizationHandler(
-            IUserReleaseRoleRepository userReleaseRoleRepository, IPreReleaseService preReleaseService) : base(
+            IUserPublicationRoleRepository userPublicationRoleRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository,
+            IPreReleaseService preReleaseService) : base(
             new CanSeeAllReleasesAuthorizationHandler(),
+            new HasOwnerRoleOnParentPublicationAuthorizationHandler(userPublicationRoleRepository),
             new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(userReleaseRoleRepository),
             new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(userReleaseRoleRepository, preReleaseService))
         {
@@ -21,15 +27,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             ViewReleaseRequirement>
         {
             public CanSeeAllReleasesAuthorizationHandler()
-                : base(SecurityClaimTypes.AccessAllReleases) {}
+                : base(SecurityClaimTypes.AccessAllReleases)
+            {
+            }
         }
 
         public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
             : HasRoleOnReleaseAuthorizationHandler<ViewReleaseRequirement>
         {
-            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository)
+            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
+                IUserReleaseRoleRepository userReleaseRoleRepository)
                 : base(userReleaseRoleRepository, context => ContainsUnrestrictedViewerRole(context.Roles))
-            {}
+            {
+            }
+        }
+
+        public class HasOwnerRoleOnParentPublicationAuthorizationHandler
+            : AuthorizationHandler<ViewReleaseRequirement, Release>
+        {
+            private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+
+            public HasOwnerRoleOnParentPublicationAuthorizationHandler(
+                IUserPublicationRoleRepository userPublicationRoleRepository)
+            {
+                _userPublicationRoleRepository = userPublicationRoleRepository;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context,
+                ViewReleaseRequirement requirement,
+                Release release)
+            {
+                var publicationRoles =
+                    await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(),
+                        release.PublicationId);
+
+                if (ContainPublicationOwnerRole(publicationRoles))
+                {
+                    context.Succeed(requirement);
+                }
+            }
         }
 
         public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
@@ -47,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     var windowStatus = preReleaseService.GetPreReleaseWindowStatus(context.Release, UtcNow);
                     return windowStatus.Access == PreReleaseAccess.Within;
                 })
-            {}
+            {
+            }
         }
     }
 }

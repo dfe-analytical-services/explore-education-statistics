@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
@@ -17,39 +19,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and is tested
          * against the supplied entity, and fails otherwise
          */
-        public static void AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
+        public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
             IAuthorizationHandler handler,
             TEntity entity,
             params SecurityClaimTypes[] claimsExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
-            scenarios.ForEach(scenario => AssertHandlerHandlesScenarioSuccessfully<TEntity, TRequirement>(handler, scenario));
+            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
         }
 
-        public static void AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
+        public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
+            IAuthorizationHandler handler,
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
+            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
+        }
+        
+        public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             TEntity entity,
             params SecurityClaimTypes[] claimsExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
-            scenarios.ForEach(scenario => AssertHandlerHandlesScenarioSuccessfully<TEntity, TRequirement>(handlerSupplier, scenario));
+            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
-        public static void AssertHandlerHandlesScenarioSuccessfully<TEntity, TRequirement>(
+        public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            HandlerTestScenario<TEntity> scenario) where TRequirement : IAuthorizationRequirement
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
+            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+        }
+
+        public static async Task AssertHandlerHandlesScenarioSuccessfully<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            HandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
         {
             using (var context = DbUtils.InMemoryApplicationDbContext())
             {
                 var handler = handlerSupplier(context);
-                AssertHandlerHandlesScenarioSuccessfully<TEntity, TRequirement>(handler, scenario);
+                await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
             }
         }
 
-        private static List<HandlerTestScenario<TEntity>> GetClaimTestScenarios<TEntity>(
-            TEntity entity,
+        private static List<HandlerTestScenario> GetClaimTestScenarios(
+            object entity,
             SecurityClaimTypes[] claimsExpectedToSucceed)
         {
             return GetEnumValues<SecurityClaimTypes>()
@@ -61,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new Claim(claim.ToString(), "")
                         );
 
-                        return new HandlerTestScenario<TEntity>
+                        return new HandlerTestScenario
                         {
                             User = user,
                             Entity = entity,
@@ -75,9 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ToList();
         }
 
-        public static async void AssertHandlerHandlesScenarioSuccessfully<TEntity, TRequirement>(
+        public static async Task AssertHandlerHandlesScenarioSuccessfully<TRequirement>(
             IAuthorizationHandler handler,
-            HandlerTestScenario<TEntity> scenario)
+            HandlerTestScenario scenario)
             where TRequirement : IAuthorizationRequirement
         {
             var authContext = new AuthorizationHandlerContext(
@@ -105,10 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return user;
         }
 
-        public class HandlerTestScenario<TEntity>
+        public class HandlerTestScenario
         {
-            public TEntity Entity { get; set; }
-
+            public object Entity { get; set; }
+            
             public ClaimsPrincipal User { get; set; }
 
             public bool ExpectedToPass { get; set; }

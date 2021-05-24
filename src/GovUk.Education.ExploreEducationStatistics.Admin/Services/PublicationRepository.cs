@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -36,14 +37,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
         {
-            var userReleasesForTopic = await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .ThenInclude(release => release.Publication)
-                .Where(r => r.UserId == userId && r.Release.Publication.TopicId == topicId && r.Role != ReleaseRole.PrereleaseViewer)
-                .Select(r => r.Release)
-                .Distinct()
+            var userReleasesForTopicFromReleases = await _context.UserReleaseRoles
+                .Include(userReleaseRole => userReleaseRole.Release.Publication)
+                .Where(userReleaseRole => userReleaseRole.UserId == userId &&
+                                          userReleaseRole.Release.Publication.TopicId == topicId &&
+                                          userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
+                .Select(userReleaseRole => userReleaseRole.Release)
                 .ToListAsync();
+
+            var userReleasesForTopicFromPublications = await _context.UserPublicationRoles
+                .Where(userPublicationRole => userPublicationRole.UserId == userId &&
+                                              userPublicationRole.Publication.TopicId == topicId &&
+                                              userPublicationRole.Role == Owner)
+                .SelectMany(userPublicationRole => userPublicationRole.Publication.Releases)
+                .Include(release => release.Publication)
+                .ToListAsync();
+
+            var userReleasesForTopic = userReleasesForTopicFromReleases
+                .Concat(userReleasesForTopicFromPublications)
+                .Distinct()
+                .ToList();
 
             var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
 

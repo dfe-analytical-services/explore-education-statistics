@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     User = user,
                     Release = release,
                     Role = Lead
-                },
+                }
             };
 
             var otherUserReleaseRoles = new List<UserReleaseRole>
@@ -111,7 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetAllRolesByUser(user.Id, release.Id);
 
-                Assert.Equal(userReleaseRoles.Select(role => role.Role).ToList(), result);
+                Assert.Equal(2, result.Count);
+                Assert.Equal(Contributor, result[0]);
+                Assert.Equal(Lead, result[1]);
             }
         }
 

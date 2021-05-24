@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+﻿using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
@@ -9,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class MarkSpecificMethodologyAsDraftAuthorizationHandlerTests
     {
         [Fact]
-        public void MarkSpecificMethodologyAsDraftAuthorizationHandler()
+        public async Task MarkSpecificMethodologyAsDraftAuthorizationHandler()
         {
-            AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificMethodologyAsDraftRequirement>(
+            await AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificMethodologyAsDraftRequirement>(
                 new MarkSpecificMethodologyAsDraftAuthorizationHandler(),
                 MarkAllMethodologiesDraft
             );

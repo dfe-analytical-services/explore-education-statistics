@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -111,7 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetAllRolesByUser(user.Id, publication.Id);
 
-                Assert.Equal(userPublicationRoles.Select(role => role.Role).ToList(), result);
+                Assert.Single(result);
+                Assert.Equal(Owner, result[0]);
             }
         }
 

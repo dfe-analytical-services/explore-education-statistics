@@ -8,33 +8,30 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement
+    public class UpdatePublicationRequirement : IAuthorizationRequirement
     {
     }
 
-    public class CreateReleaseForSpecificPublicationAuthorizationHandler 
-        : AuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
+    public class UpdatePublicationAuthorizationHandler : AuthorizationHandler<UpdatePublicationRequirement, Publication>
     {
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public CreateReleaseForSpecificPublicationAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository)
+        public UpdatePublicationAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            CreateReleaseForSpecificPublicationRequirement requirement,
+            UpdatePublicationRequirement requirement,
             Publication publication)
         {
-            if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))
+            if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
             {
                 context.Succeed(requirement);
                 return;
             }
 
-            var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
+            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
 
             if (ContainPublicationOwnerRole(publicationRoles))
             {
