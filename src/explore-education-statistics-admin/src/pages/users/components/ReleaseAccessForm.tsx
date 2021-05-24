@@ -51,7 +51,10 @@ const ReleaseAccessForm = ({
               hint="The releases a user can access within the service."
             >
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half">
+                <div
+                  className="govuk-grid-column-one-half"
+                  data-testid="select-release-role"
+                >
                   <FormFieldSelect<AddReleaseRoleFormValues>
                     label="Release"
                     name="selectedReleaseId"
@@ -72,7 +75,10 @@ const ReleaseAccessForm = ({
                     }))}
                   />
                 </div>
-                <div className="govuk-grid-column-one-quarter">
+                <div
+                  className="govuk-grid-column-one-quarter"
+                  data-testid="Add-release-access"
+                >
                   {user && (
                     <Button type="submit" className="govuk-!-margin-top-6">
                       Add release access
@@ -112,7 +118,10 @@ const ReleaseAccessForm = ({
                       {userReleaseRole.role}
                     </td>
                     <td className="govuk-table__cell">
-                      <ButtonText onClick={() => onRemove(userReleaseRole)}>
+                      <ButtonText
+                        onClick={() => onRemove(userReleaseRole)}
+                        data-testid="remove-release-access"
+                      >
                         Remove
                       </ButtonText>
                     </td>

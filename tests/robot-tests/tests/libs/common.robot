@@ -272,6 +272,10 @@ user waits until element is enabled
     [Arguments]   ${element}
     wait until element is enabled   ${element}
 
+user waits until element is enabled if exists
+    [Arguments]  ${elemtn}
+    user waits until element is enabled if
+
 user checks element is enabled
     [Arguments]   ${element}
     element should be enabled   ${element}
@@ -505,6 +509,11 @@ user checks key stat definition
     user waits until element is visible  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]
     user checks element should contain  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]  ${definition}
 
+user clicks testid if exists
+    [Arguments]  ${label}
+    user waits until element is enabled  //*[@data-testid="${label}"]
+    user clicks element if exists  //*[@data-testid="${label}/"]
+
 user clicks radio
     [Arguments]  ${label}
     user clicks element  xpath://label[text()="${label}"]/../input[@type="radio"]
@@ -512,7 +521,7 @@ user clicks radio
 user clicks radio if exists
     [Arguments]  ${label}
     user clicks element if exists  xpath://label[text()="${label}"]/../input[@type="radio"]
-
+s
 user checks radio is checked
     [Arguments]  ${label}
     user checks page contains element  xpath://label[text()="${label}"]/../input[@type="radio" and @checked]
