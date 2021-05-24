@@ -11,6 +11,7 @@ Suite Teardown    user closes the browser
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publication_owner %{RUN_IDENTIFIER}
 ${RELEASE_NAME}      ${PUBLICATION_NAME} - Academic Year 2025/26
+${RELEASE_TYPE}      Academic Year 2025/26
 ${SUBJECT_NAME}      UI test subject
 ${DATA_FILE_NAME}    dates
 
@@ -172,11 +173,10 @@ Navigate to administration as bau1
     user signs in as bau1
     user goes to url  %{ADMIN_URL}/administration/users
 
-Give analyst1 user1 contributor only access on release ${RELEASE_NAME}
+Give analyst1 user1 contributor / approver only access on release ${RELEASE_NAME}
     [Tags]  HappyPath
     user waits until element is enabled  //*[tbody]//tr[1]//td[3]//a
     user clicks element  //*[tbody]//tr[1]//td[3]//a
-    user clicks button  Remove
     user waits until element is enabled  css:[name="selectedReleaseId"]
 
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
@@ -184,29 +184,19 @@ Give analyst1 user1 contributor only access on release ${RELEASE_NAME}
     user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
     user clicks button  Add release access
 
-
-
-
-Log in as analyst1 User1 to start work as a release contributor on ${RELEASE_NAME}
+Create amendment as analyst1
     [Tags]  HappyPath
     user signs in as analyst1
     user goes to url  %{ADMIN_URL}
-#    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-#
-#    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-#    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
-#    Sleep  10000
-
-Create amendment
-    [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  Academic Year 2025/26
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     user opens details dropdown   ${RELEASE_NAME} (Live - Latest release)  ${accordion}
+    ${details}=  user gets details content element  Academic Year 2025/26 (Live - Latest release)  ${accordion}
+    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
     user clicks button  Amend this release
     user clicks button  Confirm
-    Sleep  100000
 
 Navigate to 'Footnotes' section
     [Tags]  HappyPath
