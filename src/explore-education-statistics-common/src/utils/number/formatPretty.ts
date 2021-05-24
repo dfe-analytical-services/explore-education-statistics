@@ -55,9 +55,15 @@ export default function formatPretty(
   if (unit) {
     switch (unit) {
       case '£':
-        return `£${formattedValue}`;
+        if (numberValue >= 0) {
+          return `£${formattedValue}`;
+        }
+        return `-£${formattedValue.substring(1)}`;
       case '£m':
-        return `£${formattedValue}m`;
+        if (numberValue >= 0) {
+          return `£${formattedValue}m`;
+        }
+        return `-£${formattedValue.substring(1)}m`;
       default:
         return `${formattedValue}${unit}`;
     }
