@@ -144,7 +144,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     && i.Accepted == false);
 
             // If the newly logging in User has an unaccepted invite with a matching email address to the User logging
-            // in, register them with the Identity Framework and also create any "internal" User records too. 
+            // in, register them with the Identity Framework and also create any "internal" User records too if they 
+            // don't already exist.  If they *do* exist already, link the new Identity Framework user with the existing 
+            // "internal" User via the same id (more below).
             if (inviteToSystem != null)
             {
                 // Mark the invite as accepted
