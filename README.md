@@ -385,7 +385,7 @@ To generate a migration for the UsersAndRolesDbContext:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext -v
+dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
 ### Resetting the storage emulator

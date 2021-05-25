@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesDb
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
-    public partial class EES2226_InitialCreate : Migration
+    public partial class EES2226_UsersAndRolesInitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -212,58 +212,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "cf67b697-bddd-41bd-86e0-11b7e11d99b3", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "BAU User", "BAU USER" },
-                    { "f9ddb43e-aa9e-41ed-837d-3062e130c425", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "Analyst", "ANALYST" },
-                    { "17e634f4-7a2b-4a23-8636-b079877b4232", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "Prerelease User", "PRERELEASE USER" }
-                });
+                values: new object[] { "cf67b697-bddd-41bd-86e0-11b7e11d99b3", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "BAU User", "BAU USER" });
 
             migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "e7f7c82e-aaf3-43db-a5ab-755678f67d04", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-analyst1@education.gov.uk", false, "Analyst1", "User1", true, null, "EES-ANALYST1@EDUCATION.GOV.UK", "EES-ANALYST1@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-analyst1@education.gov.uk" },
-                    { "6620bccf-2433-495e-995d-fc76c59d9c62", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-analyst2@education.gov.uk", false, "Analyst2", "User2", true, null, "EES-ANALYST2@EDUCATION.GOV.UK", "EES-ANALYST2@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-analyst2@education.gov.uk" },
-                    { "b390b405-ef90-4b9d-8770-22948e53189a", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-analyst3@education.gov.uk", false, "Analyst3", "User3", true, null, "EES-ANALYST3@EDUCATION.GOV.UK", "EES-ANALYST3@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-analyst3@education.gov.uk" },
-                    { "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-bau1@education.gov.uk", false, "Bau1", "User1", true, null, "EES-BAU1@EDUCATION.GOV.UK", "EES-BAU1@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-bau1@education.gov.uk" },
-                    { "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-bau2@education.gov.uk", false, "Bau2", "User2", true, null, "EES-BAU2@EDUCATION.GOV.UK", "EES-BAU2@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-bau2@education.gov.uk" },
-                    { "d5c85378-df85-482c-a1ce-09654dae567d", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-prerelease1@education.gov.uk", false, "Prerelease1", "User1", true, null, "EES-PRERELEASE1@EDUCATION.GOV.UK", "EES-PRERELEASE1@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-prerelease1@education.gov.uk" },
-                    { "ee9a02c1-b3f9-402c-9e9b-4fb78d737050", 0, "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "ees-prerelease2@education.gov.uk", false, "Prerelease2", "User2", true, null, "EES-PRERELEASE2@EDUCATION.GOV.UK", "EES-PRERELEASE2@EDUCATION.GOV.UK", null, null, false, "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6", false, "ees-prerelease2@education.gov.uk" }
-                });
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "f9ddb43e-aa9e-41ed-837d-3062e130c425", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "Analyst", "ANALYST" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "17e634f4-7a2b-4a23-8636-b079877b4232", "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3", "Prerelease User", "PRERELEASE USER" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoleClaims",
                 columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
                 values: new object[,]
                 {
-                    { -29, "ApproveAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -20, "CanViewPrereleaseContacts", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -22, "CreateAnyMethodology", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -23, "UpdateAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -24, "AccessAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -21, "CanViewPrereleaseContacts", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -30, "PublishAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -19, "PrereleasePagesAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -31, "MakeAmendmentsOfAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -2, "ApplicationAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -32, "DeleteAllReleaseAmendments", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -33, "ManageAllTaxonomy", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -34, "UpdateAllPublications", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -35, "MarkAllMethodologiesDraft", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -36, "AccessAllImports", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -37, "CancelAllFileImports", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -31, "MakeAmendmentsOfAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -13, "ApplicationAccessGranted", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
                     { -17, "PrereleasePagesAccessGranted", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -32, "DeleteAllReleaseAmendments", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -18, "AnalystPagesAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -12, "ManageAnyMethodology", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -11, "ManageAnyUser", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -16, "PrereleasePagesAccessGranted", "", "17e634f4-7a2b-4a23-8636-b079877b4232" },
-                    { -15, "ApplicationAccessGranted", "", "17e634f4-7a2b-4a23-8636-b079877b4232" },
-                    { -28, "ApproveAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -27, "AccessAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -26, "UpdateAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
+                    { -21, "CanViewPrereleaseContacts", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
                     { -25, "CreateAnyMethodology", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -2, "ApplicationAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -26, "UpdateAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
+                    { -27, "AccessAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
+                    { -28, "ApproveAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
+                    { -14, "AnalystPagesAccessGranted", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
+                    { -30, "PublishAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -29, "ApproveAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -24, "AccessAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -3, "AccessAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -4, "AccessAllTopics", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -5, "MarkAllReleasesAsDraft", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
@@ -272,36 +256,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                     { -8, "UpdateAllReleases", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -9, "CreateAnyPublication", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
                     { -10, "CreateAnyRelease", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { -14, "AnalystPagesAccessGranted", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { -13, "ApplicationAccessGranted", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserLogins",
-                columns: new[] { "LoginProvider", "ProviderKey", "ProviderDisplayName", "UserId" },
-                values: new object[,]
-                {
-                    { "OpenIdConnect", "5zzTEeAYz71aVPJ1ho1VGW3cYk7_qcQpkDqYYxbH3po", "OpenIdConnect", "e7f7c82e-aaf3-43db-a5ab-755678f67d04" },
-                    { "OpenIdConnect", "s5vNxMDGwRCvg3MTtLEDomZqOKl7cvv2f8PW5NvJzbw", "OpenIdConnect", "ee9a02c1-b3f9-402c-9e9b-4fb78d737050" },
-                    { "OpenIdConnect", "uLGzMPaxGz0nY6nbff7wkBP7ly2iLdephomGPFOP0k8", "OpenIdConnect", "d5c85378-df85-482c-a1ce-09654dae567d" },
-                    { "OpenIdConnect", "EKTK7hPGgxGVxRSBjgTv51XVJhtMo91sIcADfjSuJjw", "OpenIdConnect", "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63" },
-                    { "OpenIdConnect", "cb3XrjF6BLuMZ5P3aRo8wBobF7tAshdk2gF0X5Qm68o", "OpenIdConnect", "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd" },
-                    { "OpenIdConnect", "ces_f2I3zCjGZ9HUprWF3RiQgswrKvPFAY1Lwu_KI6M", "OpenIdConnect", "b390b405-ef90-4b9d-8770-22948e53189a" },
-                    { "OpenIdConnect", "RLdgJMsfN6QVjpCbkaOYIpzh6DA3QpRfnBcfIx46uDM", "OpenIdConnect", "6620bccf-2433-495e-995d-fc76c59d9c62" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserRoles",
-                columns: new[] { "UserId", "RoleId" },
-                values: new object[,]
-                {
-                    { "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { "d5c85378-df85-482c-a1ce-09654dae567d", "17e634f4-7a2b-4a23-8636-b079877b4232" },
-                    { "e7f7c82e-aaf3-43db-a5ab-755678f67d04", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { "6620bccf-2433-495e-995d-fc76c59d9c62", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { "b390b405-ef90-4b9d-8770-22948e53189a", "f9ddb43e-aa9e-41ed-837d-3062e130c425" },
-                    { "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
-                    { "ee9a02c1-b3f9-402c-9e9b-4fb78d737050", "17e634f4-7a2b-4a23-8636-b079877b4232" }
+                    { -11, "ManageAnyUser", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -12, "ManageAnyMethodology", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -18, "AnalystPagesAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -19, "PrereleasePagesAccessGranted", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -20, "CanViewPrereleaseContacts", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -22, "CreateAnyMethodology", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -23, "UpdateAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" },
+                    { -15, "ApplicationAccessGranted", "", "17e634f4-7a2b-4a23-8636-b079877b4232" },
+                    { -16, "PrereleasePagesAccessGranted", "", "17e634f4-7a2b-4a23-8636-b079877b4232" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -13,6 +13,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Migrations\UsersAndRolesMigrations\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   
   <ItemGroup>
     <Content Include="Migrations\ContentMigrations\Html\Pupil_Absence_Statistics\*.html">
@@ -187,6 +193,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Folder Include="Migrations\ContentMigrations" />
+    <Folder Include="Migrations\UsersAndRolesMigrations" />
     <Folder Include="Services\Security" />
     <Folder Include="ViewModels\Blocks" />
   </ItemGroup>
