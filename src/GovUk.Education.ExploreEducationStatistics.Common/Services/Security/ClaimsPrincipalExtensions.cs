@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
             // on their JWT
             var internalUserIdClaim = principal
                 .Claims
-                .First(claim => claim.Type == UserClaimTypes.InternalUserId.ToString());
+                .FirstOrDefault(claim => claim.Type == UserClaimTypes.InternalUserId.ToString());
 
             if (internalUserIdClaim != null)
             {
