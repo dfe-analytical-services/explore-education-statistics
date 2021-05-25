@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
                 .Claims
                 .First(claim => claim.Type == ClaimTypes.NameIdentifier);
 
-            return new Guid(userIdClaim.Value);
+            return Guid.Parse(userIdClaim.Value);
         }
     }
 }

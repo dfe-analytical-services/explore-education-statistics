@@ -424,10 +424,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .CustomSources(" https://cdnjs.cloudflare.com")
                     .UnsafeInline())
                 .FontSources(s => s.Self())
-                .FormActions(s => s
-                    .CustomSources("https://login.microsoftonline.com")
-                    .Self()
-                )
+                .FormActions(s =>
+                {
+                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnect").GetValue<string>("Authority");
+                    var loginAuthorityUri = new Uri(loginAuthorityUrl);
+                    s
+                        .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
+                        .Self();
+                })
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self())
                 .ImageSources(s => s.CustomSources("data:"))

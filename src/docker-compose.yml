@@ -57,3 +57,10 @@ services:
 
         # So that the container doesn't shut down, sleep this thread
         sleep infinity
+  idp:
+    container_name: ees-idp
+    build:
+      context: .
+      dockerfile: Dockerfile-Keycloak
+    ports:
+      - 5030:8080
