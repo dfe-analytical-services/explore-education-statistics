@@ -104,13 +104,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   ]);
 
   return (
-    <Page title="Create your own tables online" caption="Table Tool" wide>
+    <Page title="Create your own tables" caption="Table Tool" wide>
       <p>
         Choose the data and area of interest you want to explore and then use
         filters to create your table.
-      </p>
-
-      <p>
+        <br />
         Once you've created your table, you can download the data it contains
         for your own offline analysis.
       </p>
@@ -143,10 +141,10 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           response,
           selectedPublication: selectedPublicationDetails,
         }) => (
-          <WizardStep>
+          <WizardStep size="l">
             {wizardStepProps => (
               <>
-                <WizardStepHeading {...wizardStepProps}>
+                <WizardStepHeading {...wizardStepProps} isActive>
                   Explore data
                 </WizardStepHeading>
 

@@ -78,7 +78,7 @@ describe('DataBlockPageTabs', () => {
 
       expect(stepHeadings).toHaveLength(1);
       expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current): Choose a subject',
+        'Step 1 (current) Choose a subject',
       );
 
       expect(screen.getAllByRole('listitem')).toHaveLength(1);
@@ -120,12 +120,12 @@ describe('DataBlockPageTabs', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(5);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2: Choose locations');
-      expect(stepHeadings[2]).toHaveTextContent('Step 3: Choose time period');
-      expect(stepHeadings[3]).toHaveTextContent('Step 4: Choose your filters');
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a subject');
+      expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose locations');
+      expect(stepHeadings[2]).toHaveTextContent('Step 3 Choose time period');
+      expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose your filters');
       expect(stepHeadings[4]).toHaveTextContent(
-        'Step 5 (current): Update data block',
+        'Step 5 (current) Update data block',
       );
 
       expect(screen.getByLabelText('Name')).toHaveValue('Test data block');
@@ -189,9 +189,9 @@ describe('DataBlockPageTabs', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(2);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a subject');
       expect(stepHeadings[1]).toHaveTextContent(
-        'Step 2 (current): Choose locations',
+        'Step 2 (current) Choose locations',
       );
     });
   });
@@ -234,9 +234,9 @@ describe('DataBlockPageTabs', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(2);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a subject');
       expect(stepHeadings[1]).toHaveTextContent(
-        'Step 2 (current): Choose locations',
+        'Step 2 (current) Choose locations',
       );
     });
   });

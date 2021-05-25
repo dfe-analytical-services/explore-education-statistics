@@ -33,7 +33,7 @@ describe('ReleaseStatusPage', () => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('public-release-url')).toHaveTextContent(
+    expect(screen.getByLabelText('Url')).toHaveValue(
       'http://localhost/find-statistics/publication-1-slug/release-1-slug',
     );
   });

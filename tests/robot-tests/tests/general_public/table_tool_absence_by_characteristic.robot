@@ -11,7 +11,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
     user waits for page to finish loading
 
 Select "Pupil absence" publication
@@ -20,7 +20,7 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user clicks radio      Pupil absence in schools in England
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible  Choose a subject
+    user waits until element is visible  xpath://span[text()="Choose a subject"]
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Validate "Absence by characteristic" subject details
@@ -34,7 +34,7 @@ Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user clicks radio   Absence by characteristic
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible  Choose locations
+    user waits until element is visible  xpath://span[text()="Choose locations"]
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
 Select Location Country, England
@@ -43,7 +43,7 @@ Select Location Country, England
     user clicks checkbox    England
     user clicks element     id:locationFiltersForm-submit
     # Extra timeout until EES-315/316
-    user waits until h2 is visible  Choose time period
+    user waits until element is visible  xpath://span[text()="Choose time period"]
     user checks previous table tool step contains  3    National    England
 
 Select Start date and End date
@@ -51,10 +51,9 @@ Select Start date and End date
     user selects from list by label  id:timePeriodForm-start   2012/13
     user selects from list by label  id:timePeriodForm-end   2015/16
     user clicks element     id:timePeriodForm-submit
-    user waits until h2 is visible  Choose your filters
+    user waits until element is visible  xpath://span[text()="Choose your filters"]
     user waits until page contains element   id:filtersForm-indicators
-    user checks previous table tool step contains  4    Start date    2012/13
-    user checks previous table tool step contains  4    End date      2015/16
+    user checks previous table tool step contains  4    Time period    2012/13 to 2015/16
 
 Select Indicators - Authorised absence rate
     [Tags]  HappyPath
@@ -244,13 +243,13 @@ Validate rows after reordering
 
 User generates a permanent link
     [Tags]   HappyPath
-    user clicks element    xpath://*[text()="Generate permanent link"]
-    user waits until page contains element   xpath://a[text()="View permanent link"]   60
+    user clicks element    xpath://*[text()="Share your table"]
+    user waits until page contains element   xpath://a[text()="View share link"]   60
     user checks generated permalink is valid
 
 User validates permanent link works correctly
     [Tags]   HappyPath
-    user clicks link   View permanent link
+    user clicks link   View share link
     select window    NEW
     user waits until h1 is visible  'Absence by characteristic' from 'Pupil absence in schools in England'
 
@@ -300,3 +299,5 @@ User validates permalink table
     user checks results table cell contains  3    6     3.6%
     user checks results table cell contains  3    7     3.5%
     user checks results table cell contains  3    8     4.2%
+
+

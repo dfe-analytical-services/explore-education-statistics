@@ -20,6 +20,7 @@ import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import WizardStepEditButton from './WizardStepEditButton';
 
 export interface FormValues {
   indicators: string[];
@@ -76,8 +77,11 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     };
   }, [initialValues, subjectMeta]);
 
+  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
+    <WizardStepHeading {...props} stepEnabled={stepEnabled}>
+      Choose your filters
+    </WizardStepHeading>
   );
 
   return (
@@ -195,51 +199,56 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         }
 
         return (
-          <>
-            {stepHeading}
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              {stepHeading}
+              <SummaryList noBorder>
+                <SummaryListItem term="Indicators">
+                  <CollapsibleList>
+                    {Object.values(subjectMeta.indicators)
+                      .flatMap(group => group.options)
+                      .filter(indicator =>
+                        form.values.indicators.includes(indicator.value),
+                      )
+                      .map(indicator => (
+                        <li key={indicator.value}>{indicator.label}</li>
+                      ))}
+                  </CollapsibleList>
+                </SummaryListItem>
 
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
-
-            <SummaryList noBorder>
-              <SummaryListItem term="Indicators">
-                <CollapsibleList>
-                  {Object.values(subjectMeta.indicators)
-                    .flatMap(group => group.options)
-                    .filter(indicator =>
-                      form.values.indicators.includes(indicator.value),
-                    )
-                    .map(indicator => (
-                      <li key={indicator.value}>{indicator.label}</li>
-                    ))}
-                </CollapsibleList>
-              </SummaryListItem>
-
-              {Object.entries(subjectMeta.filters)
-                .filter(([groupKey]) => !!form.values.filters[groupKey])
-                .map(([filterGroupKey, filterGroup]) => (
-                  <SummaryListItem
-                    key={filterGroupKey}
-                    term={filterGroup.legend}
-                  >
-                    <CollapsibleList>
-                      {Object.values(filterGroup.options)
-                        .flatMap(group => group.options)
-                        .filter(option =>
-                          form.values.filters[filterGroupKey].includes(
-                            option.value,
-                          ),
-                        )
-                        .map(option => (
-                          <li key={option.value}>{option.label}</li>
-                        ))}
-                    </CollapsibleList>
-                  </SummaryListItem>
-                ))}
-            </SummaryList>
-          </>
+                {Object.entries(subjectMeta.filters)
+                  .filter(([groupKey]) => !!form.values.filters[groupKey])
+                  .map(([filterGroupKey, filterGroup]) => (
+                    <SummaryListItem
+                      key={filterGroupKey}
+                      term={filterGroup.legend}
+                    >
+                      <CollapsibleList>
+                        {Object.values(filterGroup.options)
+                          .flatMap(group => group.options)
+                          .filter(option =>
+                            form.values.filters[filterGroupKey].includes(
+                              option.value,
+                            ),
+                          )
+                          .map(option => (
+                            <li key={option.value}>{option.label}</li>
+                          ))}
+                      </CollapsibleList>
+                    </SummaryListItem>
+                  ))}
+              </SummaryList>
+            </div>
+            <div className="govuk-grid-column-one-third dfe-align--right">
+              {stepEnabled && (
+                <WizardStepEditButton {...props} editTitle="Edit filters" />
+              )}
+              <ResetFormOnPreviousStep
+                currentStep={currentStep}
+                stepNumber={stepNumber}
+              />
+            </div>
+          </div>
         );
       }}
     </Formik>

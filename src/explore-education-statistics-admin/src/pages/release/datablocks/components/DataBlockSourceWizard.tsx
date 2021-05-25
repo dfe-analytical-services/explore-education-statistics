@@ -143,7 +143,7 @@ const DataBlockSourceWizard = ({
         hidePublicationSelectionStage
         initialState={tableToolState}
         finalStep={({ response, query }) => (
-          <WizardStep>
+          <WizardStep size="l">
             {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>

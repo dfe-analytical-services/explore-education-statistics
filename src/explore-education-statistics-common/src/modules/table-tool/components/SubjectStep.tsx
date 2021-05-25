@@ -11,6 +11,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import { Subject, TableHighlight } from '@common/services/tableBuilderService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
+import WizardStepEditButton from './WizardStepEditButton';
 
 const subjectTabsId = 'subjectTabs';
 const subjectTabIds = {
@@ -36,12 +37,16 @@ const SubjectStep = ({
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const { isActive } = stepProps;
+  const { isActive, currentStep, stepNumber } = stepProps;
 
   const hasHighlights = renderHighlightLink && highlights.length > 0;
-
-  const heading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading={!hasHighlights}>
+  const stepEnabled = currentStep > stepNumber;
+  const stepHeading = (
+    <WizardStepHeading
+      {...stepProps}
+      fieldsetHeading={!hasHighlights}
+      stepEnabled={stepEnabled}
+    >
       {hasHighlights
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
@@ -62,7 +67,7 @@ const SubjectStep = ({
           hasHighlights ? (
             <h3 className="govuk-fieldset__heading">Choose a subject</h3>
           ) : (
-            heading
+            stepHeading
           )
         }
         legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
@@ -71,7 +76,7 @@ const SubjectStep = ({
 
     return hasHighlights ? (
       <>
-        {heading}
+        {stepHeading}
 
         <Tabs id={subjectTabsId}>
           <TabsSection
@@ -121,13 +126,19 @@ const SubjectStep = ({
     subjects.find(({ id }) => subjectId === id)?.name ?? 'None';
 
   return (
-    <>
-      {heading}
-
-      <SummaryList noBorder>
-        <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
-      </SummaryList>
-    </>
+    <div className="govuk-grid-row">
+      <div className="govuk-grid-column-two-thirds">
+        {stepHeading}
+        <SummaryList noBorder>
+          <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+        </SummaryList>
+      </div>
+      <div className="govuk-grid-column-one-third dfe-align--right">
+        {stepEnabled && (
+          <WizardStepEditButton {...stepProps} editTitle="Change subject" />
+        )}
+      </div>
+    </div>
   );
 };
 
