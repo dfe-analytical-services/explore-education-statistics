@@ -2,13 +2,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -16,16 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ContentDbContext _contentDbContext;
-            
+
         public ApplicationUserProfileService(
-            UserManager<ApplicationUser> userManager, 
-            RoleManager<IdentityRole> roleManager, 
-            ContentDbContext contentDbContext)
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _contentDbContext = contentDbContext;
         }
 
         async Task IProfileService.GetProfileDataAsync(ProfileDataRequestContext context)
@@ -56,14 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Add the user's Roles, so we can optionally provide role-based authorization
             roleNames.ToList().ForEach(roleName => 
                 context.IssuedClaims.Add(new Claim(JwtClaimTypes.Role, roleName)));
-
-            var internalUser = await _contentDbContext
-                .Users
-                .SingleAsync(u => u.Email.ToLower() == user.Email.ToLower());
-            
-            // Add the service's User Id to the JWT so that it can be looked up later when determining which service
-            // User is performing actions
-            context.IssuedClaims.Add(new Claim(UserClaimTypes.InternalUserId.ToString(), internalUser.Id.ToString()));
         }
 
         public Task IsActiveAsync(IsActiveContext context)

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -142,50 +143,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     i.Email.ToLower() == email.ToLower()
                     && i.Accepted == false);
 
-            // If the user has an invite, register them automatically
+            // If the newly logging in User has an unaccepted invite with a matching email address to the User logging
+            // in, register them with the Identity Framework and also create any "internal" User records too. 
             if (inviteToSystem != null)
             {
-                // create a new set of AspNetUser records for the Identity Framework 
-                var user = new ApplicationUser
+                // Mark the invite as accepted
+                inviteToSystem.Accepted = true;
+                _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
+
+                // See if we have an "internal" User record in existence yet that has a matching email address to the
+                // new user logging in.  If we do, create this new AspNetUser record with a matching one-to-one id.
+                // Otherwise, later on we'll create a new "internal" Users record with an id matching this AspNetUser's 
+                // id, continuing to establish the one-to-one relationship.
+                var existingInternalUser = await _contentDbContext
+                    .Users
+                    .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+                // Create a new set of AspNetUser records for the Identity Framework.
+                var identityUser = new ApplicationUser
                 {
+                    Id = existingInternalUser?.Id.ToString() ?? Guid.NewGuid().ToString(),
                     UserName = email,
                     Email = email,
                     FirstName = firstName,
                     LastName = lastName
                 };
                 
-                var createdIdentityUserResult = await _userManager.CreateAsync(user);
-                var addedIdentityUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
-                var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(user, info);
+                var createdIdentityUserResult = await _userManager.CreateAsync(identityUser);
+                var addedIdentityUserRoles = await _userManager.AddToRoleAsync(identityUser, inviteToSystem.Role.Name);
+                var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(identityUser, info);
 
-                // if adding the new Identity Framework user records succeeded, continue on to create internal User 
-                // and Role records for the application itself and sign the user in 
+                // If adding the new Identity Framework user records succeeded, continue on to create internal User 
+                // and Role records for the application itself and sign the user in.
                 if (createdIdentityUserResult.Succeeded && addedIdentityUserRoles.Succeeded && recordIdpLoginDetailsResult.Succeeded)
                 {
-                    // mark the invite as accepted
-                    inviteToSystem.Accepted = true;
-                    _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
-
-                    // create a set of internal User and Role records based on invites if the internal User record
-                    // doesn't yet exist
-                    var existingInternalUser = await _contentDbContext
-                        .Users
-                        .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-
+                    // If we didn't yet have an existing "internal" User record matching this new login in the Users
+                    // table, create one now, being sure to establish the one-to-one id relationship between the  
+                    // AspNetUsers record and the Users record.
                     if (existingInternalUser == null)
                     {
                         var newInternalUser = new User
                         {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Email = user.Email
+                            Id = Guid.Parse(identityUser.Id),
+                            FirstName = identityUser.FirstName,
+                            LastName = identityUser.LastName,
+                            Email = identityUser.Email
                         };
                     
                         await _contentDbContext.Users.AddAsync(newInternalUser);
 
                         var releaseInvites = _contentDbContext
                             .UserReleaseInvites
-                            .Where(i => i.Email.ToLower() == user.Email.ToLower());
+                            .Where(i => i.Email.ToLower() == identityUser.Email.ToLower());
 
                         await releaseInvites.ForEachAsync(invite =>
                         {
@@ -203,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     await _contentDbContext.SaveChangesAsync();
                     await _usersAndRolesDbContext.SaveChangesAsync();
                     
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await _signInManager.SignInAsync(identityUser, isPersistent: false);
                     _logger.LogInformation("User created an account using {0} provider", info.LoginProvider);
                     return LocalRedirect(returnUrl);
                 }
