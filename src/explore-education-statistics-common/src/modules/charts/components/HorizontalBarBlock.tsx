@@ -118,11 +118,16 @@ const HorizontalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs)}
             height={xAxisHeight}
             padding={{ left: 0, right: 20 }}
             tickMargin={10}
-            tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
+            tickFormatter={tick =>
+              formatPretty(
+                tick,
+                getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs),
+                minorAxisDecimals,
+              )
+            }
           />
 
           <YAxis

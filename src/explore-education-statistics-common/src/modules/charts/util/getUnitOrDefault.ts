@@ -13,10 +13,7 @@ const getUnitOrDefault = (
   });
 
   // Check if all units are the same, leave blank if not.
-  // Don't display £ as unable to position them before the value. (EES-2278)
-  return units.length === 0 ||
-    units[0] === '£' ||
-    !units.every(unit => unit === units[0])
+  return units.length === 0 || !units.every(unit => unit === units[0])
     ? ''
     : units[0];
 };
