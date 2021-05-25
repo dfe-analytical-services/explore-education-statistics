@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
@@ -156,13 +154,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     LastName = lastName
                 };
                 
-                var createdAspNetUserResult = await _userManager.CreateAsync(user);
-                var addedAspNetUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
-                var recordLoginDetailsUserResult = await _userManager.AddLoginAsync(user, info);
+                var createdIdentityUserResult = await _userManager.CreateAsync(user);
+                var addedIdentityUserRoles = await _userManager.AddToRoleAsync(user, inviteToSystem.Role.Name);
+                var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(user, info);
 
                 // if adding the new Identity Framework user records succeeded, continue on to create internal User 
                 // and Role records for the application itself and sign the user in 
-                if (createdAspNetUserResult.Succeeded && addedAspNetUserRoles.Succeeded && recordLoginDetailsUserResult.Succeeded)
+                if (createdIdentityUserResult.Succeeded && addedIdentityUserRoles.Succeeded && recordIdpLoginDetailsResult.Succeeded)
                 {
                     // mark the invite as accepted
                     inviteToSystem.Accepted = true;
@@ -210,17 +208,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     return LocalRedirect(returnUrl);
                 }
 
-                foreach (var error in createdAspNetUserResult.Errors)
+                foreach (var error in createdIdentityUserResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
 
-                foreach (var error in addedAspNetUserRoles.Errors)
+                foreach (var error in addedIdentityUserRoles.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 
-                foreach (var error in recordLoginDetailsUserResult.Errors)
+                foreach (var error in recordIdpLoginDetailsResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }

@@ -6,5 +6,3 @@ ENV KEYCLOAK_PASSWORD=admin
 ENV KEYCLOAK_IMPORT=/tmp/keycloak-ees-realm.json 
 
 COPY ./keycloak-ees-realm.json /tmp/keycloak-ees-realm.json
-
-##ENTRYPOINT ["dotnet", "GovUk.Education.ExploreEducationStatistics.Content.Api.dll"]
