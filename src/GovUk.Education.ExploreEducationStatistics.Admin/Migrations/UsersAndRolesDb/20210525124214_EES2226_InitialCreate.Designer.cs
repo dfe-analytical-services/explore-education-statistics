@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesDb
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20210129142030_EES1692RemoveAnalystClaimsToUpdateAndAccessAllMethodologies")]
-    partial class EES1692RemoveAnalystClaimsToUpdateAndAccessAllMethodologies
+    [Migration("20210525124214_EES2226_InitialCreate")]
+    partial class EES2226_InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -121,119 +121,119 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst1@example.com",
+                            Email = "ees-analyst1@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Analyst1",
                             LastName = "User1",
                             LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST1@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST1@EXAMPLE.COM",
+                            NormalizedEmail = "EES-ANALYST1@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-ANALYST1@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "analyst1@example.com"
+                            UserName = "ees-analyst1@education.gov.uk"
                         },
                         new
                         {
                             Id = "6620bccf-2433-495e-995d-fc76c59d9c62",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst2@example.com",
+                            Email = "ees-analyst2@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Analyst2",
                             LastName = "User2",
                             LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST2@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST2@EXAMPLE.COM",
+                            NormalizedEmail = "EES-ANALYST2@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-ANALYST2@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "analyst2@example.com"
+                            UserName = "ees-analyst2@education.gov.uk"
                         },
                         new
                         {
                             Id = "b390b405-ef90-4b9d-8770-22948e53189a",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst3@example.com",
+                            Email = "ees-analyst3@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Analyst3",
                             LastName = "User3",
                             LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST3@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST3@EXAMPLE.COM",
+                            NormalizedEmail = "EES-ANALYST3@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-ANALYST3@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "analyst3@example.com"
+                            UserName = "ees-analyst3@education.gov.uk"
                         },
                         new
                         {
                             Id = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "bau1@example.com",
+                            Email = "ees-bau1@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Bau1",
                             LastName = "User1",
                             LockoutEnabled = true,
-                            NormalizedEmail = "BAU1@EXAMPLE.COM",
-                            NormalizedUserName = "BAU1@EXAMPLE.COM",
+                            NormalizedEmail = "EES-BAU1@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-BAU1@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "bau1@example.com"
+                            UserName = "ees-bau1@education.gov.uk"
                         },
                         new
                         {
                             Id = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "bau2@example.com",
+                            Email = "ees-bau2@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Bau2",
                             LastName = "User2",
                             LockoutEnabled = true,
-                            NormalizedEmail = "BAU2@EXAMPLE.COM",
-                            NormalizedUserName = "BAU2@EXAMPLE.COM",
+                            NormalizedEmail = "EES-BAU2@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-BAU2@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "bau2@example.com"
+                            UserName = "ees-bau2@education.gov.uk"
                         },
                         new
                         {
                             Id = "d5c85378-df85-482c-a1ce-09654dae567d",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "prerelease1@example.com",
+                            Email = "ees-prerelease1@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Prerelease1",
                             LastName = "User1",
                             LockoutEnabled = true,
-                            NormalizedEmail = "PRERELEASE1@EXAMPLE.COM",
-                            NormalizedUserName = "PRERELEASE1@EXAMPLE.COM",
+                            NormalizedEmail = "EES-PRERELEASE1@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-PRERELEASE1@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "prerelease1@example.com"
+                            UserName = "ees-prerelease1@education.gov.uk"
                         },
                         new
                         {
                             Id = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "prerelease2@example.com",
+                            Email = "ees-prerelease2@education.gov.uk",
                             EmailConfirmed = false,
                             FirstName = "Prerelease2",
                             LastName = "User2",
                             LockoutEnabled = true,
-                            NormalizedEmail = "PRERELEASE2@EXAMPLE.COM",
-                            NormalizedUserName = "PRERELEASE2@EXAMPLE.COM",
+                            NormalizedEmail = "EES-PRERELEASE2@EDUCATION.GOV.UK",
+                            NormalizedUserName = "EES-PRERELEASE2@EDUCATION.GOV.UK",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
                             TwoFactorEnabled = false,
-                            UserName = "prerelease2@example.com"
+                            UserName = "ees-prerelease2@education.gov.uk"
                         });
                 });
 
@@ -558,6 +558,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         {
                             Id = -25,
                             ClaimType = "CreateAnyMethodology",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -26,
+                            ClaimType = "UpdateAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -27,
+                            ClaimType = "AccessAllMethodologies",
                             ClaimValue = "",
                             RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },

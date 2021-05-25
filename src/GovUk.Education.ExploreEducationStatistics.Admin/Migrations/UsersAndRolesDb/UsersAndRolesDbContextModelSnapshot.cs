@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesDb
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
     partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot

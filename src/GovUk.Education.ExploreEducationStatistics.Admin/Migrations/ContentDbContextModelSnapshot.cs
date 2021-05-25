@@ -4,16 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20200825153306_EES1145AllowReleasePreviousVersionIdToBeNullable")]
-    partial class EES1145AllowReleasePreviousVersionIdToBeNullable
+    partial class ContentDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,6 +180,134 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         });
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MetaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("NumBatches")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rows")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RowsPerBatch")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StagePercentageComplete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TotalRows")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ZipFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId")
+                        .IsUnique();
+
+                    b.HasIndex("MetaFileId")
+                        .IsUnique();
+
+                    b.HasIndex("ZipFileId")
+                        .IsUnique()
+                        .HasFilter("[ZipFileId] IS NOT NULL");
+
+                    b.ToTable("DataImports");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportError", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DataImportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataImportId");
+
+                    b.ToTable("DataImportErrors");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReplacedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RootPath")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ReplacedById")
+                        .IsUnique()
+                        .HasFilter("[ReplacedById] IS NOT NULL");
+
+                    b.HasIndex("ReplacingId")
+                        .IsUnique()
+                        .HasFilter("[ReplacingId] IS NOT NULL");
+
+                    b.HasIndex("SourceId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.Property<Guid>("Id")
@@ -261,6 +387,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Title = "Pupil absence statistics: methodology",
                             Updated = new DateTime(2019, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MethodologyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("MethodologyId");
+
+                    b.ToTable("MethodologyFiles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
@@ -345,7 +492,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MetaGuidance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NextReleaseDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreReleaseAccessList")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("PreviousVersionId")
@@ -500,45 +653,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReleaseFileReferenceId")
+                    b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReleaseFileReferenceId");
+                    b.HasIndex("FileId");
 
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("ReleaseFiles");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Filename")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseFileType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
-
-                    b.ToTable("ReleaseFileReferences");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", b =>
@@ -681,52 +811,85 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04"),
-                            Email = "analyst1@example.com",
+                            Email = "ees-analyst1@education.gov.uk",
                             FirstName = "Analyst1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62"),
-                            Email = "analyst2@example.com",
+                            Email = "ees-analyst2@education.gov.uk",
                             FirstName = "Analyst2",
                             LastName = "User2"
                         },
                         new
                         {
                             Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a"),
-                            Email = "analyst3@example.com",
+                            Email = "ees-analyst3@education.gov.uk",
                             FirstName = "Analyst3",
                             LastName = "User3"
                         },
                         new
                         {
                             Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
-                            Email = "bau1@example.com",
+                            Email = "ees-bau1@education.gov.uk",
                             FirstName = "Bau1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63"),
-                            Email = "bau2@example.com",
+                            Email = "ees-bau2@education.gov.uk",
                             FirstName = "Bau2",
                             LastName = "User2"
                         },
                         new
                         {
                             Id = new Guid("d5c85378-df85-482c-a1ce-09654dae567d"),
-                            Email = "prerelease1@example.com",
+                            Email = "ees-prerelease1@education.gov.uk",
                             FirstName = "Prerelease1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050"),
-                            Email = "prerelease2@example.com",
+                            Email = "ees-prerelease2@education.gov.uk",
                             FirstName = "Prerelease2",
                             LastName = "User2"
                         });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserPublicationRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("PublicationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPublicationRoles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserReleaseInvite", b =>
@@ -841,6 +1004,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnName("DataBlock_Heading")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HighlightDescription")
+                        .HasColumnName("DataBlock_HighlightDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("HighlightName")
                         .HasColumnName("DataBlock_HighlightName")
                         .HasColumnType("nvarchar(max)");
@@ -871,9 +1038,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("9ccb0daf-91a1-4cb0-b3c1-2aed452338bc"),
                             ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                             Order = 1,
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null}],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"LegendHeight\":0,\"Title\":null,\"Alt\":null,\"Height\":0,\"Width\":null}]",
+                            Charts = "[]",
                             Name = "Key Stat 1",
-                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2016,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
+                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2016,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"EnglishDevolvedArea\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
                             Summary = "{\"DataKeys\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\"],\"DataSummary\":[\"Up from 4.6% in 2015/16\"],\"DataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.\"],\"DataDefinitionTitle\":[\"What is overall absence?\"]}",
                             Table = "{\"TableHeaders\":{\"ColumnGroups\":[],\"Columns\":[{\"Level\":null,\"Value\":\"2016_AY\",\"Type\":\"TimePeriod\"}],\"RowGroups\":[[{\"Level\":\"country\",\"Value\":\"E92000001\",\"Type\":\"Location\"}]],\"Rows\":[{\"Level\":null,\"Value\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Type\":\"Indicator\"}]}}"
                         },
@@ -882,9 +1049,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
                             ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
                             Order = 1,
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"f9ae4976-7cd3-4718-834a-09349b6eb377_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null}],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"LegendHeight\":0,\"Title\":null,\"Alt\":null,\"Height\":0,\"Width\":null}]",
+                            Charts = "[{\"Type\":\"line\",\"Title\":null,\"Alt\":null,\"Height\":0,\"Width\":null,\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null}],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Legend\":{\"Position\":\"top\",\"Items\":[{\"DataSet\":{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Unauthorised absence rate\",\"Colour\":\"#4763a5\",\"Symbol\":\"circle\",\"LineStyle\":\"solid\"},{\"DataSet\":{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Overall absence rate\",\"Colour\":\"#f5a450\",\"Symbol\":\"cross\",\"LineStyle\":\"solid\"},{\"DataSet\":{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Authorised absence rate\",\"Colour\":\"#005ea5\",\"Symbol\":\"diamond\",\"LineStyle\":\"solid\"}]}}]",
                             Name = "Key Stats aggregate table",
-                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
+                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"EnglishDevolvedArea\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
                             Summary = "{\"DataKeys\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\"],\"DataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"DataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.\",\"Number of authorised absences as a percentage of the overall school population.\",\"Number of unauthorised absences as a percentage of the overall school population.\"],\"DataDefinitionTitle\":[\"What is overall absence?\",\"What is authorized absence?\",\"What is unauthorized absence?\"]}",
                             Table = "{\"TableHeaders\":{\"ColumnGroups\":[],\"Columns\":[{\"Level\":null,\"Value\":\"2012_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2013_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2014_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2015_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2016_AY\",\"Type\":\"TimePeriod\"}],\"RowGroups\":[[{\"Level\":\"country\",\"Value\":\"E92000001\",\"Type\":\"Location\"}]],\"Rows\":[{\"Level\":null,\"Value\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Type\":\"Indicator\"},{\"Level\":null,\"Value\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Type\":\"Indicator\"},{\"Level\":null,\"Value\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Type\":\"Indicator\"}]}}"
                         },
@@ -893,9 +1060,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                             ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                             Order = 0,
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"f9ae4976-7cd3-4718-834a-09349b6eb377_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null}],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"LegendHeight\":0,\"Title\":null,\"Alt\":null,\"Height\":0,\"Width\":null}]",
+                            Charts = "[{\"Type\":\"line\",\"Title\":null,\"Alt\":null,\"Height\":0,\"Width\":null,\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null,\"Config\":null}],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[],\"ReferenceLines\":[],\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"Label\":null,\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Legend\":{\"Position\":\"top\",\"Items\":[{\"DataSet\":{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Unauthorised absence rate\",\"Colour\":\"#4763a5\",\"Symbol\":\"circle\",\"LineStyle\":\"solid\"},{\"DataSet\":{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Overall absence rate\",\"Colour\":\"#f5a450\",\"Symbol\":\"cross\",\"LineStyle\":\"solid\"},{\"DataSet\":{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},\"Label\":\"Authorised absence rate\",\"Colour\":\"#005ea5\",\"Symbol\":\"diamond\",\"LineStyle\":\"solid\"}]}}]",
                             Name = "Generic data block - National",
-                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
+                            Query = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"Indicators\":[\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\"],\"Locations\":{\"GeographicLevel\":null,\"Country\":[\"E92000001\"],\"EnglishDevolvedArea\":null,\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"PlanningArea\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null},\"IncludeGeoJson\":null}",
                             Table = "{\"TableHeaders\":{\"ColumnGroups\":[],\"Columns\":[{\"Level\":null,\"Value\":\"2012_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2013_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2014_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2015_AY\",\"Type\":\"TimePeriod\"},{\"Level\":null,\"Value\":\"2016_AY\",\"Type\":\"TimePeriod\"}],\"RowGroups\":[[{\"Level\":\"country\",\"Value\":\"E92000001\",\"Type\":\"Location\"}]],\"Rows\":[{\"Level\":null,\"Value\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Type\":\"Indicator\"},{\"Level\":null,\"Value\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Type\":\"Indicator\"},{\"Level\":null,\"Value\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Type\":\"Indicator\"}]}}"
                         });
                 });
@@ -942,12 +1109,75 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("ContentSectionId");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "File")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", "FileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "MetaFile")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", "MetaFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ZipFile")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", "ZipFileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportError", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", "DataImport")
+                        .WithMany("Errors")
+                        .HasForeignKey("DataImportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacedBy")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "Replacing")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacingId");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("LegacyReleases")
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "Methodology")
+                        .WithMany()
+                        .HasForeignKey("MethodologyId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -1045,25 +1275,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFile", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReleaseFileReference")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "File")
                         .WithMany()
-                        .HasForeignKey("ReleaseFileReferenceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany()
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany()
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1081,6 +1302,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("Updates")
                         .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserPublicationRole", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
