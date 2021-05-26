@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             if (env.IsDevelopment())
             {
-                StartupSecurityConfiguration.AddBootstrapUsers(app, env, Configuration);
+                BootstrapUsersUtil.AddBootstrapUsers(app, env, Configuration);
             } 
         }
 
