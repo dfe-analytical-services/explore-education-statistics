@@ -311,7 +311,7 @@ describe('DataBlockTabs', () => {
           ...testDataBlock,
           table: {
             tableHeaders: mapUnmappedTableHeaders(
-              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              getDefaultTableHeaderConfig(fullTable),
             ),
             indicators: [
               'authorised-absence-rate',
@@ -377,7 +377,7 @@ describe('DataBlockTabs', () => {
           ...testDataBlock,
           table: {
             tableHeaders: mapUnmappedTableHeaders(
-              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              getDefaultTableHeaderConfig(fullTable),
             ),
             indicators: [
               'authorised-absence-rate',

@@ -23,7 +23,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
   const fullTable = mapFullTable(data.fullTable);
   const tableHeadersConfig = mapTableHeadersConfig(
     data.configuration.tableHeaders,
-    fullTable.subjectMeta,
+    fullTable,
   );
 
   const { subjectName, publicationName } = fullTable.subjectMeta;

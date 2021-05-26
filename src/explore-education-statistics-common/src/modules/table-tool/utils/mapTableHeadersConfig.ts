@@ -1,5 +1,5 @@
 import { Filter } from '@common/modules/table-tool/types/filters';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import {
   TableHeader,
@@ -12,32 +12,44 @@ import {
  */
 export default function mapTableHeadersConfig(
   tableHeaders: UnmappedTableHeadersConfig,
-  meta: FullTableMeta,
+  table: FullTable,
 ): TableHeadersConfig {
+  const { subjectMeta, results } = table;
   const mapToFilters = (headers: TableHeader[]): Filter[] => {
-    return headers.map(header => {
+    // When terms are selected the time period range can include ones not displayed in the table,
+    // filter these out to ensure the reorder headings list is correct
+    const filteredHeaders = headers.filter(header => {
+      if (header.type === 'TimePeriod') {
+        return results.find(result => result.timePeriod === header.value)
+          ? header
+          : null;
+      }
+      return header;
+    });
+
+    return filteredHeaders.map(header => {
       let matchingFilter: Filter | undefined;
 
       switch (header.type) {
         case 'Indicator':
-          matchingFilter = meta.indicators.find(
+          matchingFilter = subjectMeta.indicators.find(
             indicator => indicator.value === header.value,
           );
           break;
         case 'Filter':
-          matchingFilter = Object.values(meta.filters)
+          matchingFilter = Object.values(subjectMeta.filters)
             .flatMap(filterGroup => filterGroup.options)
             .find(filter => filter.value === header.value);
           break;
         case 'Location':
-          matchingFilter = meta.locations.find(
+          matchingFilter = subjectMeta.locations.find(
             location =>
               location.level === header.level &&
               location.value === header.value,
           );
           break;
         case 'TimePeriod':
-          matchingFilter = meta.timePeriodRange.find(
+          matchingFilter = subjectMeta.timePeriodRange.find(
             timePeriod => timePeriod.value === header.value,
           );
           break;

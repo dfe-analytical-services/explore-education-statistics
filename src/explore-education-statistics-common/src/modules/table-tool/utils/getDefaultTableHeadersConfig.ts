@@ -2,7 +2,10 @@ import {
   Filter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import last from 'lodash/last';
@@ -63,8 +66,9 @@ function getSortedRowColGroups(
 
 function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   fullTableMeta: FullTableMeta,
+  filteredTimePeriodRange: TimePeriodFilter[],
 ): TableHeadersConfig {
-  const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
+  const { indicators, filters, locations } = fullTableMeta;
 
   const { columnGroups, rowGroups } = getSortedRowColGroups(
     removeSingleOptionFilterGroups([
@@ -76,7 +80,7 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   return {
     columnGroups,
     rowGroups,
-    columns: timePeriodRange,
+    columns: filteredTimePeriodRange,
     rows: indicators,
   };
 }
@@ -90,18 +94,33 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
  * to create the best possible table for them.
  */
 export default function getDefaultTableHeaderConfig(
-  fullTableMeta: FullTableMeta,
+  fullTable: FullTable,
 ): TableHeadersConfig {
+  const {
+    indicators,
+    filters,
+    locations,
+    timePeriodRange,
+  } = fullTable.subjectMeta;
+  const { results } = fullTable;
+
+  // When terms are selected the time period range can include ones not displayed in the table,
+  // filter these out to ensure the reorder headings list is correct
+  const filteredTimePeriodRange = timePeriodRange.filter(period =>
+    results.find(result => result.timePeriod === period.value) ? period : null,
+  );
+
   // In the following instance, we should display the time periods in the
   // columns and the indicators in the rows as this should be still be
   // okay for most resolutions.
   // Above this, we will potentially start creating too many columns
   // and cause the user to have to horizontally scroll. We should avoid this!
-  if (fullTableMeta.timePeriodRange.length < 8) {
-    return getFixedTimePeriodAndIndicatorTableHeadersConfig(fullTableMeta);
+  if (filteredTimePeriodRange.length < 8) {
+    return getFixedTimePeriodAndIndicatorTableHeadersConfig(
+      fullTable.subjectMeta,
+      filteredTimePeriodRange,
+    );
   }
-
-  const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
 
   const { columnGroups, rowGroups } = getSortedRowColGroups([
     // Can potentially remove all other groups, but should
@@ -111,7 +130,7 @@ export default function getDefaultTableHeaderConfig(
       ...Object.values(filters).map(group => group.options),
       locations,
     ]),
-    timePeriodRange,
+    filteredTimePeriodRange,
     indicators,
   ]);
 

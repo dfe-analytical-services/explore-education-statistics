@@ -55,10 +55,7 @@ const PreReleaseTableToolPage = ({
       ]);
 
       const fullTable = mapFullTable(tableData);
-      const tableHeaders = mapTableHeadersConfig(
-        table.tableHeaders,
-        fullTable.subjectMeta,
-      );
+      const tableHeaders = mapTableHeadersConfig(table.tableHeaders, fullTable);
 
       return {
         initialStep: 5,
