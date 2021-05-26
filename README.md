@@ -59,25 +59,30 @@ You will need the following groups of dependencies to run the project successful
    - [.NET Core v3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
    
-2. To emulate azure storage you will require either:
+2. To emulate azure storage you will require:
    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
 
-  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows 
+  x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
 
-   - [Azurite](https://github.com/Azure/Azurite)
    - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
    - [LocalDB](https://download.microsoft.com/download/2/A/5/2A5260C3-4143-47D8-9823-E91BB0121F94/ENU/x64/SqlLocalDB.msi)
    
-   You will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator
-for development, specifically the table storage component which is not supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the service.
+   You will currently need to use Windows or a Windows VM with ports 10001, 10002 and 10003 exposed to run the service 
+   due to a dependency on Azure Storage Emulator for development, specifically the table storage component which is not 
+   supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the 
+   service.
 
-   Alternatively you could create your own Storage Account on Azure and ammend your storage connection string to point to this.
+   Alternatively you could create your own Storage Account on Azure and amend your storage connection strings to point 
+   to this.
 
 3. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
    - [Docker and Docker Compose](https://docs.docker.com/)
 
+The SQL Server Developer Edition is free and more fully-featured than SQL Express. Note that SQL Express is still 
+required for its LocalDB support for the Azure Storage Emulator.
 4. **Linux only** - Add symlinks to libmagic-1
 
    ```
@@ -88,6 +93,14 @@ for development, specifically the table storage component which is not supported
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
+### Setting up the database and Identity Provider
+
+The service can be started against a set of non-existent database. If no pre-existing `content` or `statistics` 
+databases yet exist on the target SQL Server instance, starting up the service will create them and provide the basic
+starting data to get up and running.
+
+Similarly, the service can be started alongside a local Identity Provider called [Keycloak]() 
+
 ### Running the backend
 
 1. Add the following to your `hosts` file:
@@ -95,14 +108,50 @@ for development, specifically the table storage component which is not supported
    ```
    127.0.0.1    db
    127.0.0.1    data-storage
-   ```
 
-2. If using SQLServer (instead of Docker), you should create your public frontend databases:
+2. Ensure you have Azure Storage Emulator running.
 
-   - `content`
-   - `statistics`
+3. Start the locally-provided Identity Provider or configure your own.
 
-3. Ensure you have Azure Storage Emulator running.
+Out of the box, the project supplies a Docker container Identity Provider called [Keycloak](https://www.keycloak.org/) 
+but any OpenID Connect compatible Identity Provider can be used e.g. Active Directory.
+
+- To run the out-of-the-box Keycloak Identity Provider:
+
+  ```
+  cd useful-scripts
+  ./run.js idp
+  ```
+
+To then get the other service components to use Keycloak, set the following environment variable:
+```
+IdpProviderConfiguration=Keycloak
+```
+And additionally if wanting to set up a set of Keycloak users automatically in the service in order to start using 
+the service against an empty set of databases, set the following environment variable:
+```
+BootstrapUsersConfiguration=KeycloakBootstrapUsers
+```
+The effect of setting these 2 environment variables together will allow authentication of users with Keycloak and those
+users specified within the 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` will automatically be 
+able to be users to access the system as "BAU Users" - effectively able to bootstrap the rest of the data needed to use 
+the service, including the ability to invite other users to join the service.
+
+Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory and provide its 
+credentials in a file called 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` and a set of users'
+email addresses who you want to access the system straight away in a file called 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}BootstrapUsers.json`.  
+Then set the environment variables above like:
+```
+IdpProviderConfiguration={NameOfYourIdentityProvider}
+BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
+```
+
+If choosing to provide your own OpenID Connect configuration file, you can use the existing Keycloak configuration file
+as a reference, at 
+[appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json).
 
 #### Running the applications
 
@@ -129,6 +178,22 @@ Examples:
   cd useful-scripts
   ./run.js admin processor notifier
   ```
+  
+  More specifically, to run the admin using Keycloak as the Identity Provider and to auto-create a set of users from 
+  Keycloak within the admin:
+
+  Set the following environment variables:
+  ```
+  IdpProviderConfiguration=Keycloak
+  BootstrapUsersConfiguration=KeycloakBootstrapUsers
+  ```
+  
+  and then continue on to run:
+
+  ```
+  cd useful-scripts
+  ./run.js admin processor notifier
+  ```
 
 ##### Using Docker
 
@@ -148,6 +213,20 @@ Examples:
   ```
   cd src/
   docker-compose up -d db
+  ```
+
+- To run the Keycloak IdP:
+
+  ```
+  cd src/
+  docker-compose up -d idp
+  ```
+
+  or
+  
+  ```
+  cd useful-scripts/
+  ./run.js idp
   ```
 
 ### Running the frontend

@@ -1,12 +1,22 @@
+using System;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
+using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
@@ -252,6 +262,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkSpecificMethodologyAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificMethodologyAuthorizationHandler>();
+        }
+
+        /**
+         * Add any bootstrapping BAU users that we have specified on startup. 
+         */
+        public static void AddBootstrapUsers(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IConfiguration configuration)
+        {
+            if (!env.IsDevelopment())
+            {
+                throw new Exception("Cannot add bootstrap users in non-Development environments");
+            }
+            
+            var bauBootstrapUsers = configuration.GetSection("BootstrapUsers").GetValue<string>("BAU")?.Split(',');
+
+            Console.Out.WriteLine(">>>>>>>>>>>" + bauBootstrapUsers);
+            
+            if (bauBootstrapUsers.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+            using var usersAndRolesDb = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>();
+            using var contentDb = serviceScope.ServiceProvider.GetService<ContentDbContext>();
+
+            var bauRole = usersAndRolesDb.Roles.First(r => r.Name.Equals("BAU User"));
+
+            var existingEmailInvites = usersAndRolesDb
+                .UserInvites
+                .Select(i => i.Email.ToLower())
+                .ToList();
+
+            var existingUserEmails = contentDb
+                .Users
+                .Select(u => u.Email.ToLower())
+                .ToList();
+
+            var newInvitesToCreate = bauBootstrapUsers
+                .Where(email =>
+                    !existingEmailInvites.Contains(email.ToLower()) &&
+                    !existingUserEmails.Contains(email.ToLower()))
+                .Select(email =>
+                    new UserInvite
+                    {
+                        Email = email,
+                        Role = bauRole,
+                        Accepted = false,
+                        Created = DateTime.UtcNow,
+                    });
+
+            if (newInvitesToCreate.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            usersAndRolesDb.UserInvites.AddRange(newInvitesToCreate);
+            usersAndRolesDb.SaveChanges();
         }
     }
 }
