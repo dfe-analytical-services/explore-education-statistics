@@ -1,43 +1,37 @@
 import ButtonText from '@common/components/ButtonText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import UrlContainer from '@common/components/UrlContainer';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
-import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
 import publicationService from '@common/services/publicationService';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import {
+  SelectedPublication,
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
+import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
-  publication: FinalStepRenderProps['publication'];
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  releaseId?: string;
-  releaseSlug?: string;
-  latestData?: boolean;
-  latestReleaseTitle?: string;
+  selectedPublication: SelectedPublication;
 }
 
 const TableToolFinalStep = ({
   table,
   tableHeaders,
-  publication,
   query,
-  releaseId,
-  releaseSlug,
-  latestData = true,
-  latestReleaseTitle,
+  selectedPublication,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -51,12 +45,11 @@ const TableToolFinalStep = ({
     setPermalinkId('');
   }, [tableHeaders]);
 
-  const { value: pubMethodology } = useAsyncRetry(async () => {
-    if (publication) {
-      return publicationService.getPublicationMethodology(publication.slug);
-    }
-    return undefined;
-  }, [publication]);
+  const { value: pubMethodology } = useAsyncRetry(
+    async () =>
+      publicationService.getPublicationMethodology(selectedPublication.slug),
+    [selectedPublication],
+  );
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders) {
@@ -71,7 +64,7 @@ const TableToolFinalStep = ({
           tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
         },
       },
-      releaseId,
+      selectedPublication.selectedRelease.id,
     );
 
     setPermalinkId(id);
@@ -99,9 +92,11 @@ const TableToolFinalStep = ({
       {table && currentTableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3">
-            {latestData && <Tag strong>This is the latest data</Tag>}
+            {selectedPublication.selectedRelease.latestData && (
+              <Tag strong>This is the latest data</Tag>
+            )}
 
-            {!latestData && publication && latestReleaseTitle && (
+            {!selectedPublication.selectedRelease.latestData && (
               <>
                 <div className="govuk-!-margin-bottom-3">
                   <Tag strong colour="orange">
@@ -113,12 +108,12 @@ const TableToolFinalStep = ({
                   className="dfe-print-hidden"
                   unvisited
                   to="/find-statistics/[publication]"
-                  as={`/find-statistics/${publication.slug}`}
+                  as={`/find-statistics/${selectedPublication.slug}`}
                   testId="View latest data link"
                 >
                   View latest data:{' '}
                   <span className="govuk-!-font-weight-bold">
-                    {latestReleaseTitle}
+                    {selectedPublication.latestRelease.title}
                   </span>
                 </Link>
               </>
@@ -177,20 +172,20 @@ const TableToolFinalStep = ({
       </ul>
 
       <h3>Additional options</h3>
-      {publication && table && (
+      {table && (
         <ul className="govuk-list">
           <li>
-            {releaseSlug ? (
+            {selectedPublication.selectedRelease.latestData ? (
               <Link
-                to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${publication.slug}/${releaseSlug}`}
+                to="/find-statistics/[publication]"
+                as={`/find-statistics/${selectedPublication.slug}`}
               >
                 View the release for this data
               </Link>
             ) : (
               <Link
-                to="/find-statistics/[publication]"
-                as={`/find-statistics/${publication.slug}`}
+                to="/find-statistics/[publication]/[releaseSlug]"
+                as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
                 View the release for this data
               </Link>
@@ -198,7 +193,7 @@ const TableToolFinalStep = ({
           </li>
           <li>
             <DownloadCsvButton
-              fileName={`data-${publication.slug}`}
+              fileName={`data-${selectedPublication.slug}`}
               fullTable={table}
               onClick={() =>
                 logEvent({
@@ -217,7 +212,7 @@ const TableToolFinalStep = ({
           </li>
           <li>
             <DownloadExcelButton
-              fileName={`data-${publication.slug}`}
+              fileName={`data-${selectedPublication.slug}`}
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}
               onClick={() =>

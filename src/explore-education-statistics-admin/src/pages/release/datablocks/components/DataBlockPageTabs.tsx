@@ -56,7 +56,9 @@ const DataBlockPageTabs = ({
     error,
     isLoading,
   } = useAsyncRetry<InitialTableToolState>(async () => {
-    const { subjects } = await tableBuilderService.getRelease(releaseId);
+    const {
+      subjects,
+    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
 
     if (!dataBlock) {
       return {

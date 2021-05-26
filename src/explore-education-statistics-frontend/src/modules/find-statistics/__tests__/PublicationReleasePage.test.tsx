@@ -8,7 +8,9 @@ import OfficialStats from './__data__/content.api.response.official.stats.json';
 describe('PublicationReleasePage', () => {
   test('renders national statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage data={(NationalStats as unknown) as Release} />,
+      <PublicationReleasePage
+        release={(NationalStats as unknown) as Release}
+      />,
     );
 
     expect(
@@ -20,7 +22,9 @@ describe('PublicationReleasePage', () => {
 
   test('renders national statistics section', () => {
     render(
-      <PublicationReleasePage data={(NationalStats as unknown) as Release} />,
+      <PublicationReleasePage
+        release={(NationalStats as unknown) as Release}
+      />,
     );
 
     expect(
@@ -30,7 +34,9 @@ describe('PublicationReleasePage', () => {
 
   test('renders official statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage data={(OfficialStats as unknown) as Release} />,
+      <PublicationReleasePage
+        release={(OfficialStats as unknown) as Release}
+      />,
     );
 
     expect(
@@ -42,7 +48,9 @@ describe('PublicationReleasePage', () => {
 
   test('renders official statistics section', () => {
     render(
-      <PublicationReleasePage data={(OfficialStats as unknown) as Release} />,
+      <PublicationReleasePage
+        release={(OfficialStats as unknown) as Release}
+      />,
     );
 
     expect(

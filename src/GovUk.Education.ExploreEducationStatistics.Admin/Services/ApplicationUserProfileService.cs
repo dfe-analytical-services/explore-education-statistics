@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Add the user's Roles, so we can optionally provide role-based authorization
             roleNames.ToList().ForEach(roleName => 
                 context.IssuedClaims.Add(new Claim(JwtClaimTypes.Role, roleName)));
-            
         }
 
         public Task IsActiveAsync(IsActiveContext context)

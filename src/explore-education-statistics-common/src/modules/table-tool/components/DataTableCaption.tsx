@@ -10,7 +10,6 @@ export function generateTableTitle({
   timePeriodRange,
   locations,
   subjectName,
-  publicationName,
   filters,
   expanded,
 }: FullTableMeta & {
@@ -47,7 +46,7 @@ export function generateTableTitle({
     .filter(label => label !== 'Total');
   const filterString = filterList.length ? ` for ${commaList(filterList)}` : '';
 
-  return `Table showing ${indicatorString}'${subjectName}'${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
+  return `Table showing ${indicatorString}'${subjectName}'${filterString}${locationsString}${timePeriodString}`;
 }
 
 interface Props extends FullTableMeta {

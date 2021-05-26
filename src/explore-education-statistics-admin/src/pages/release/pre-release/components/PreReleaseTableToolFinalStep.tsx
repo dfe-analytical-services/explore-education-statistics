@@ -4,7 +4,6 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
-import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
@@ -12,7 +11,10 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface TableToolFinalStepProps {
-  publication: FinalStepRenderProps['publication'];
+  publication?: {
+    id: string;
+    slug: string;
+  };
   releaseId: string;
   table: FullTable;
   tableHeaders: TableHeadersConfig;

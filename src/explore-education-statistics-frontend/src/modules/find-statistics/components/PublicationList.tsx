@@ -27,7 +27,7 @@ function PublicationList({ publications }: Props) {
                 <Link
                   to="/find-statistics/[publication]"
                   as={`/find-statistics/${slug}`}
-                  data-testid={`View stats link for ${title}`}
+                  testId={`View stats link for ${title}`}
                 >
                   View statistics and data{' '}
                   <span className="govuk-visually-hidden">for {title}</span>

@@ -20,11 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.GetPublication(_publicationId))
-                .ReturnsAsync(new PublicationViewModel());
+                .Setup(s => s.GetLatestPublicationSubjectsAndHighlights(_publicationId))
+                .ReturnsAsync(new SubjectsAndHighlightsViewModel());
 
             publicationService
-                .Setup(s => s.GetPublication(It.Is<Guid>(guid => guid != _publicationId)))
+                .Setup(s => s.GetLatestPublicationSubjectsAndHighlights(It.Is<Guid>(guid => guid != _publicationId)))
                 .ReturnsAsync(new NotFoundResult());
 
             _controller = new PublicationController(publicationService.Object);
@@ -33,14 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetPublication_Ok()
         {
-            var result = await _controller.GetPublication(_publicationId);
-            Assert.IsAssignableFrom<PublicationViewModel>(result.Value);
+            var result = await _controller.GetLatestPublicationSubjectsAndHighlights(_publicationId);
+            Assert.IsAssignableFrom<SubjectsAndHighlightsViewModel>(result.Value);
         }
 
         [Fact]
         public async Task GetPublication_NotFound()
         {
-            var result = await _controller.GetPublication(Guid.NewGuid());
+            var result = await _controller.GetLatestPublicationSubjectsAndHighlights(Guid.NewGuid());
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
     }

@@ -164,12 +164,27 @@ export default {
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
+  getLatestPublicationReleaseSummary(
+    publicationSlug: string,
+  ): Promise<ReleaseSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/latest/summary`,
+    );
+  },
   getPublicationRelease(
     publicationSlug: string,
     releaseSlug: string,
   ): Promise<Release> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
+    );
+  },
+  getPublicationReleaseSummary(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<ReleaseSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
     );
   },
   getLatestPreReleaseAccessList(

@@ -21,8 +21,10 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
+import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
   ReleaseTableDataQuery,
+  SelectedPublication,
   Subject,
   SubjectMeta,
   TableHighlight,
@@ -31,25 +33,17 @@ import tableBuilderService, {
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
-interface Publication {
-  id: string;
-  title: string;
-  slug: string;
-}
-
 export interface InitialTableToolState {
   initialStep: number;
+  selectedPublication?: SelectedPublication;
   subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
-  releaseSlug?: string;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
-  latestData?: boolean;
-  latestReleaseTitle?: string;
 }
 
 interface TableToolState extends InitialTableToolState {
@@ -60,17 +54,18 @@ interface TableToolState extends InitialTableToolState {
 }
 
 export interface FinalStepRenderProps {
-  publication?: Publication;
   query?: ReleaseTableDataQuery;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
+  selectedPublication?: SelectedPublication;
 }
 
 export interface TableToolWizardProps {
   themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
+  hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
@@ -82,6 +77,7 @@ const TableToolWizard = ({
   themeMeta = [],
   initialState = {},
   scrollOnMount,
+  hidePublicationSelectionStage,
   renderHighlightLink,
   finalStep,
   onSubmit,
@@ -110,25 +106,37 @@ const TableToolWizard = ({
     ...initialState,
   });
 
-  const publication = useMemo<Publication | undefined>(() => {
-    return themeMeta
-      .flatMap(option => option.topics)
-      .flatMap(option => option.publications)
-      .find(option => option.id === state.query.publicationId);
-  }, [state.query.publicationId, themeMeta]);
-
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
+    publicationSlug,
+    publicationTitle,
   }) => {
-    const publicationMeta = await tableBuilderService.getPublication(
+    const subjectsAndHighlights = await tableBuilderService.getPublicationSubjectsAndHighlights(
       selectedPublicationId,
     );
 
+    const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
+      publicationSlug,
+    );
+
     updateState(draft => {
-      draft.subjects = publicationMeta.subjects;
-      draft.highlights = publicationMeta.highlights;
+      draft.subjects = subjectsAndHighlights.subjects;
+      draft.highlights = subjectsAndHighlights.highlights;
 
       draft.query.publicationId = selectedPublicationId;
+      draft.selectedPublication = {
+        id: selectedPublicationId,
+        slug: publicationSlug,
+        title: publicationTitle,
+        selectedRelease: {
+          id: latestRelease.id,
+          latestData: latestRelease.latestRelease,
+          slug: latestRelease.slug,
+        },
+        latestRelease: {
+          title: latestRelease.title,
+        },
+      };
     });
   };
 
@@ -282,7 +290,7 @@ const TableToolWizard = ({
               return nextStep;
             }}
           >
-            {!state.query.releaseId && (
+            {!hidePublicationSelectionStage && (
               <WizardStep>
                 {stepProps => (
                   <PublicationForm
@@ -348,7 +356,7 @@ const TableToolWizard = ({
               finalStep({
                 query: state.query,
                 response: state.response,
-                publication,
+                selectedPublication: state.selectedPublication,
               })}
           </Wizard>
 

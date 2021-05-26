@@ -21,6 +21,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
+import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
 import React, { memo } from 'react';
 import {
   CartesianGrid,
@@ -160,9 +161,14 @@ const LineChartBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={axes.minor.unit}
             width={yAxisWidth}
-            tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
+            tickFormatter={tick =>
+              formatPretty(
+                tick,
+                getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs),
+                minorAxisDecimals,
+              )
+            }
           />
 
           <XAxis

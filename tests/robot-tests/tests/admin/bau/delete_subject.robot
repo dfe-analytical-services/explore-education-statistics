@@ -153,7 +153,7 @@ Create table
     user clicks element   id:filtersForm-submit
     user waits until results table appears     180
     user waits until element contains   css:[data-testid="dataTableCaption"]
-    ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 for 2019
+    ...  Table showing Admission Numbers for 'UI test subject' in Bolton 001 for 2019
     sleep  1   # Because otherwise the "Set as table highlight" checkbox gets checked on CI pipeline?!?!
     user enters text into element  id:dataBlockDetailsForm-name         UI test table name
     user enters text into element  id:dataBlockDetailsForm-heading      UI test table title

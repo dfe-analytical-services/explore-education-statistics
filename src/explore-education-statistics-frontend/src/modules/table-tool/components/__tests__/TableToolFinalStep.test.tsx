@@ -15,12 +15,6 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 describe('TableToolFinalStep', () => {
-  const testPublication: FinalStepRenderProps['publication'] = {
-    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
-    title: 'Test publication',
-    slug: 'test-publication',
-  };
-
   const testQuery: TableDataQuery = {
     publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
     subjectId: '1f1b1780-a607-454e-b331-08d9097c40f5',
@@ -215,13 +209,41 @@ describe('TableToolFinalStep', () => {
     ],
   };
 
+  const testSelectedPublicationWithLatestRelease = {
+    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    title: 'Test publication',
+    slug: 'test-publication',
+    selectedRelease: {
+      id: 'latest-release-id',
+      latestData: true,
+      slug: 'latest-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
+  const testSelectedPublicationWithNonLatestRelease = {
+    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    title: 'Test publication',
+    slug: 'test-publication',
+    selectedRelease: {
+      id: 'selected-release-id',
+      latestData: false,
+      slug: 'selected-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
   test('renders the final step successfully', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -238,7 +260,7 @@ describe('TableToolFinalStep', () => {
     // test that the preview table is rendered correctly
     expect(
       screen.queryByText(
-        "Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26",
+        "Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26",
       ),
     ).toBeInTheDocument();
     const table = screen.queryByTestId('dataTableCaption-table');
@@ -275,10 +297,10 @@ describe('TableToolFinalStep', () => {
   test('shows and hides table header re-ordering controls successfully', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -303,15 +325,13 @@ describe('TableToolFinalStep', () => {
     ).toMatchSnapshot();
   });
 
-  test(`renders the 'View the release for this data' URL with the Release's slug, if supplied`, async () => {
+  test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        releaseId="test-release-id"
-        releaseSlug="test-release-slug"
+        selectedPublication={testSelectedPublicationWithNonLatestRelease}
       />,
     );
 
@@ -320,7 +340,7 @@ describe('TableToolFinalStep', () => {
     }) as HTMLAnchorElement;
 
     expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/test-release-slug',
+      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
 
     expect(
@@ -328,13 +348,13 @@ describe('TableToolFinalStep', () => {
     ).toMatchSnapshot();
   });
 
-  test(`renders the 'View the release for this data' URL with only the Publication slug, if the Release slug is not supplied`, async () => {
+  test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -354,11 +374,10 @@ describe('TableToolFinalStep', () => {
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        latestData
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -378,12 +397,10 @@ describe('TableToolFinalStep', () => {
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        latestData={false}
-        latestReleaseTitle="Latest Release Title"
+        selectedPublication={testSelectedPublicationWithNonLatestRelease}
       />,
     );
 
@@ -392,7 +409,7 @@ describe('TableToolFinalStep', () => {
     }) as HTMLAnchorElement;
 
     expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication',
+      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
 
     expect(

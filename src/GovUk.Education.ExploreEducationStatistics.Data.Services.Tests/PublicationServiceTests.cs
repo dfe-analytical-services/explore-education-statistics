@@ -105,13 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var service = BuildPublicationService(context, releaseService: releaseService.Object);
 
-                var result = (await service.GetPublication(publication.Id)).Right;
+                var result = (await service.GetLatestPublicationSubjectsAndHighlights(publication.Id)).Right;
 
                 var highlights = result.Highlights.ToList();
                 var subjects = result.Subjects.ToList();
-
-                Assert.Equal(publication.Id, result.Id);
-                Assert.Equal(release1.Id, result.LatestReleaseId);
 
                 Assert.Equal(2, highlights.Count);
                 Assert.Equal(highlight1, highlights[0]);
@@ -131,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using var context = StatisticsDbUtils.InMemoryStatisticsDbContext();
             var service = BuildPublicationService(context);
 
-            var result = await service.GetPublication(Guid.NewGuid());
+            var result = await service.GetLatestPublicationSubjectsAndHighlights(Guid.NewGuid());
             Assert.IsType<NotFoundResult>(result.Left);
         }
 

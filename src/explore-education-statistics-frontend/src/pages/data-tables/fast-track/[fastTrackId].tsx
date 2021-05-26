@@ -14,28 +14,56 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   const { fastTrackId } = query as Dictionary<string>;
 
   const [fastTrack, themeMeta] = await Promise.all([
-    fastTrackService.getFastTrackTable(fastTrackId),
+    fastTrackService.getFastTrackTableAndReleaseMeta(fastTrackId),
     tableBuilderService.getThemes(),
   ]);
 
-  if (!fastTrack?.query.publicationId) {
+  if (!fastTrack) {
+    throw new Error('Fast track not found');
+  }
+
+  if (!fastTrack.query.publicationId) {
     throw new Error('Fast track table does not have `query.publicationId`');
   }
 
-  if (!fastTrack?.query.subjectId) {
+  if (!fastTrack.query.subjectId) {
     throw new Error('Fast track table does not have `query.subjectId`');
   }
 
-  const [publication, subjectMeta] = await Promise.all([
-    tableBuilderService.getPublication(fastTrack.query.publicationId),
+  const selectedPublication = themeMeta
+    .flatMap(option => option.topics)
+    .flatMap(option => option.publications)
+    .find(option => option.id === fastTrack.query.publicationId);
+
+  if (!selectedPublication) {
+    throw new Error(
+      'Fast track `query.publicationId` is not found in the themeMeta list',
+    );
+  }
+
+  const [subjectsAndHighlights, subjectMeta] = await Promise.all([
+    tableBuilderService.getReleaseSubjectsAndHighlights(fastTrack.releaseId),
     tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
   ]);
 
   return {
     props: {
       fastTrack,
+      selectedPublication: {
+        id: selectedPublication.id,
+        title: selectedPublication.title,
+        slug: selectedPublication.slug,
+        selectedRelease: {
+          id: fastTrack.releaseId,
+          slug: fastTrack.releaseSlug,
+          latestData: fastTrack.latestData,
+        },
+        latestRelease: {
+          title: fastTrack.latestReleaseTitle,
+        },
+      },
       subjectMeta,
-      publication,
+      subjectsAndHighlights,
       themeMeta,
     },
   };

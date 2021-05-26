@@ -87,7 +87,7 @@ const ReleaseSummary = ({
           )}
         </SummaryListItem>
         {release.internalReleaseNote && (
-          <SummaryListItem term="Internal release note">
+          <SummaryListItem term="Internal note">
             <span className="dfe-multiline-content">
               {release.internalReleaseNote}
             </span>

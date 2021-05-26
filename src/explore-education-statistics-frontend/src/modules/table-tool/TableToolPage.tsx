@@ -6,32 +6,36 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { FastTrackTable } from '@common/services/fastTrackService';
+import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
-  Publication,
+  SelectedPublication,
   SubjectMeta,
+  SubjectsAndHighlights,
   Theme,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
 );
 
 export interface TableToolPageProps {
-  publication?: Publication;
+  selectedPublication?: SelectedPublication;
+  subjectsAndHighlights?: SubjectsAndHighlights;
   fastTrack?: FastTrackTable;
   subjectMeta?: SubjectMeta;
   themeMeta: Theme[];
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
-  publication: initialPublication,
+  selectedPublication,
+  subjectsAndHighlights: initialSubjectsAndHighlights,
   fastTrack,
   subjectMeta,
   themeMeta,
@@ -44,13 +48,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   }, [fastTrack, subjectMeta]);
 
   const initialState = useMemo<InitialTableToolState | undefined>(() => {
-    if (!initialPublication) {
+    if (!initialSubjectsAndHighlights) {
       return undefined;
     }
 
-    const { id: publicationId, subjects } = initialPublication;
+    const { subjects } = initialSubjectsAndHighlights;
 
-    const highlights = initialPublication.highlights.filter(
+    const highlights = initialSubjectsAndHighlights.highlights.filter(
       highlight => highlight.id !== fastTrack?.id,
     );
 
@@ -67,16 +71,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         highlights,
         query: {
           ...fastTrack.query,
-          releaseId: fastTrack.releaseId,
+          releaseId: selectedPublication?.selectedRelease.id,
         },
-        releaseSlug: fastTrack.releaseSlug,
+        selectedPublication,
         subjectMeta,
         response: {
           table: fullTable,
           tableHeaders,
         },
-        latestData: fastTrack.latestData,
-        latestReleaseTitle: fastTrack.latestReleaseTitle,
       };
     }
 
@@ -85,14 +87,21 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       subjects,
       highlights,
       query: {
-        publicationId,
+        publicationId: selectedPublication?.id,
+        releaseId: selectedPublication?.selectedRelease.id,
         subjectId: '',
         indicators: [],
         filters: [],
         locations: {},
       },
+      selectedPublication,
     };
-  }, [fastTrack, initialPublication, subjectMeta]);
+  }, [
+    selectedPublication,
+    fastTrack,
+    initialSubjectsAndHighlights,
+    subjectMeta,
+  ]);
 
   return (
     <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -108,6 +117,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
       <TableToolWizard
         key={fastTrack?.id}
+        hidePublicationSelectionStage={!!fastTrack}
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
@@ -128,7 +138,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {highlight.name}
           </Link>
         )}
-        finalStep={({ publication, query, response }) => (
+        finalStep={({
+          query,
+          response,
+          selectedPublication: selectedPublicationDetails,
+        }) => (
           <WizardStep>
             {wizardStepProps => (
               <>
@@ -136,16 +150,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                   Explore data
                 </WizardStepHeading>
 
-                {response && query && (
+                {response && query && selectedPublicationDetails && (
                   <TableToolFinalStep
-                    publication={publication}
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    releaseId={initialState?.query?.releaseId}
-                    releaseSlug={initialState?.releaseSlug}
-                    latestData={initialState?.latestData}
-                    latestReleaseTitle={initialState?.latestReleaseTitle}
+                    selectedPublication={selectedPublicationDetails}
                   />
                 )}
               </>
@@ -172,32 +182,58 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
   query,
 }) => {
-  const { publicationSlug = '' } = query as Dictionary<string>;
+  const { publicationSlug = '', releaseSlug = '' } = query as Dictionary<
+    string
+  >;
 
   const themeMeta = await tableBuilderService.getThemes();
 
-  const publicationId =
-    themeMeta
-      .flatMap(option => option.topics)
-      .flatMap(option => option.publications)
-      .find(option => option.slug === publicationSlug)?.id ?? '';
+  const selectedPublication = themeMeta
+    .flatMap(option => option.topics)
+    .flatMap(option => option.publications)
+    .find(option => option.slug === publicationSlug);
 
-  const publication = publicationId
-    ? await tableBuilderService.getPublication(publicationId)
-    : undefined;
-
-  if (publication) {
+  if (!selectedPublication) {
     return {
       props: {
         themeMeta,
-        publication,
       },
     };
   }
 
+  const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
+    publicationSlug,
+  );
+
+  const selectedRelease =
+    !releaseSlug || latestRelease.slug === releaseSlug
+      ? latestRelease
+      : await publicationService.getPublicationReleaseSummary(
+          publicationSlug,
+          releaseSlug,
+        );
+
+  const subjectsAndHighlights = await tableBuilderService.getReleaseSubjectsAndHighlights(
+    selectedRelease.id,
+  );
+
   return {
     props: {
       themeMeta,
+      selectedPublication: {
+        id: selectedPublication.id,
+        slug: selectedPublication.slug,
+        title: selectedPublication.title,
+        selectedRelease: {
+          id: selectedRelease.id,
+          latestData: selectedRelease.latestRelease,
+          slug: selectedRelease.slug,
+        },
+        latestRelease: {
+          title: latestRelease.title,
+        },
+      },
+      subjectsAndHighlights,
     },
   };
 };

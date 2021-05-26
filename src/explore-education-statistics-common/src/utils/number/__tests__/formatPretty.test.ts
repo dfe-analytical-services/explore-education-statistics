@@ -95,4 +95,30 @@ describe('formatPretty', () => {
     expect(formatPretty('n/a')).toBe('n/a');
     expect(formatPretty('')).toBe('');
   });
+
+  describe('Handling units', () => {
+    test('returns the unit after the value', () => {
+      expect(formatPretty('42', '%')).toBe('42%');
+    });
+
+    test('returns negative values with the unit', () => {
+      expect(formatPretty('-42', '%')).toBe('-42%');
+    });
+
+    test('returns £ before the value for £ units', () => {
+      expect(formatPretty('42', '£')).toBe('£42');
+    });
+
+    test('returns the correct format for negative numbers with £ units', () => {
+      expect(formatPretty('-42', '£')).toBe('-£42');
+    });
+
+    test('returns £ before the value for £m units', () => {
+      expect(formatPretty('42', '£m')).toBe('£42m');
+    });
+
+    test('returns the correct format for negative numbers with £m units', () => {
+      expect(formatPretty('-42', '£m')).toBe('-£42m');
+    });
+  });
 });

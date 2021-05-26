@@ -198,7 +198,7 @@ describe('ReleaseStatusForm', () => {
       screen.queryByRole('group', { name: 'When to publish' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByLabelText('Internal release note')).toHaveValue(
+    expect(screen.getByLabelText('Internal note')).toHaveValue(
       'Test release note',
     );
 
@@ -251,7 +251,7 @@ describe('ReleaseStatusForm', () => {
 
       userEvent.click(screen.getByLabelText('Ready for higher review'));
       await userEvent.type(
-        screen.getByLabelText('Internal release note'),
+        screen.getByLabelText('Internal note'),
         'Test release note',
       );
 
@@ -282,7 +282,7 @@ describe('ReleaseStatusForm', () => {
   });
 
   describe('in Higher Level Review', () => {
-    test('shows error message when internal release note is empty', async () => {
+    test('shows error message when internal note is empty', async () => {
       render(
         <ReleaseStatusForm
           release={{
@@ -295,12 +295,12 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('Internal release note'));
+      userEvent.click(screen.getByLabelText('Internal note'));
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByRole('link', { name: 'Enter an internal release note' }),
+          screen.getByRole('link', { name: 'Enter an internal note' }),
         ).toHaveAttribute('href', '#releaseStatusForm-internalReleaseNote');
       });
     });
@@ -325,7 +325,7 @@ describe('ReleaseStatusForm', () => {
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
-          screen.getByRole('link', { name: 'Enter an internal release note' }),
+          screen.getByRole('link', { name: 'Enter an internal note' }),
         ).toBeInTheDocument();
 
         expect(handleSubmit).not.toHaveBeenCalled();
@@ -349,7 +349,7 @@ describe('ReleaseStatusForm', () => {
 
       userEvent.click(screen.getByLabelText('In draft'));
       await userEvent.type(
-        screen.getByLabelText('Internal release note'),
+        screen.getByLabelText('Internal note'),
         'Test release note',
       );
 
@@ -452,7 +452,7 @@ describe('ReleaseStatusForm', () => {
       expect(publishDate.getByLabelText('Year')).toHaveValue(2020);
     });
 
-    test('shows error message when internal release note is empty', async () => {
+    test('shows error message when internal note is empty', async () => {
       render(
         <ReleaseStatusForm
           release={{
@@ -465,12 +465,12 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('Internal release note'));
+      userEvent.click(screen.getByLabelText('Internal note'));
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByRole('link', { name: 'Enter an internal release note' }),
+          screen.getByRole('link', { name: 'Enter an internal note' }),
         ).toHaveAttribute('href', '#releaseStatusForm-internalReleaseNote');
       });
     });
@@ -489,7 +489,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       // Focus the field above before tabbing through the options
-      userEvent.click(screen.getByLabelText('Internal release note'));
+      userEvent.click(screen.getByLabelText('Internal note'));
       userEvent.tab();
       userEvent.tab();
 
@@ -546,7 +546,7 @@ describe('ReleaseStatusForm', () => {
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
-          screen.getByRole('link', { name: 'Enter an internal release note' }),
+          screen.getByRole('link', { name: 'Enter an internal note' }),
         ).toBeInTheDocument();
         expect(
           screen.getByRole('link', { name: 'Choose when to publish' }),
@@ -603,7 +603,7 @@ describe('ReleaseStatusForm', () => {
 
       userEvent.click(screen.getByLabelText('In draft'));
       await userEvent.type(
-        screen.getByLabelText('Internal release note'),
+        screen.getByLabelText('Internal note'),
         'Test release note',
       );
 
@@ -648,7 +648,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       await userEvent.type(
-        screen.getByLabelText('Internal release note'),
+        screen.getByLabelText('Internal note'),
         'Test release note',
       );
 
@@ -705,7 +705,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       await userEvent.type(
-        screen.getByLabelText('Internal release note'),
+        screen.getByLabelText('Internal note'),
         'Test release note',
       );
 

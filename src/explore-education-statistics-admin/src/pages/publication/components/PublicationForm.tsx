@@ -99,7 +99,7 @@ const PublicationForm = ({
     }
 
     return initialValues ? 'none' : 'existing';
-  }, [initialValues, approvedMethodologies]);
+  }, [initialValues]);
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({

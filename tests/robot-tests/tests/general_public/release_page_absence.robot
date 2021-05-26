@@ -21,6 +21,7 @@ Navigate to Absence publication
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
     user clicks testid element  View stats link for Pupil absence in schools in England
+    user waits until h1 is visible  Pupil absence in schools in England  90
 
 Validate title
     [Tags]  HappyPath
@@ -156,7 +157,7 @@ Validate Key Statistics data block -- Charts tab
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
    user clicks element   id:releaseHeadlines-tables-tab
-   user waits until element contains   css:[data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
+   user waits until element contains   css:[data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' in England between 2012/13 and 2016/17
 
    user checks table column heading contains  1   1   2012/13  css:#releaseHeadlines-tables table
    user checks table column heading contains  1   2   2013/14  css:#releaseHeadlines-tables table

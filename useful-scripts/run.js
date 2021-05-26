@@ -74,6 +74,11 @@ const projects = {
     command: 'dotnet build && func host start --port=7073 --pause-on-error',
     colour: chalk.blue,
   },
+  idp: {
+    path: path.join(projectRoot, 'src'),
+    command: 'docker-compose up idp',
+    colour: chalk.gray,
+  },
 };
 
 const labelStream = (stream, project, transform) =>
@@ -108,5 +113,10 @@ matchingProjects.forEach((project, index) => {
       project,
       line => `${chalk.red('[ERROR]')} ${line}`,
     ).pipe(process.stderr);
+
+    process.on('SIGINT', () => {
+      subProcess.kill('SIGINT');
+      subProcess.on('close', process.exit);
+    });
   }, 1000 * index);
 });

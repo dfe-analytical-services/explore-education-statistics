@@ -140,6 +140,7 @@ const DataBlockSourceWizard = ({
 
       <TableToolWizard
         themeMeta={[]}
+        hidePublicationSelectionStage
         initialState={tableToolState}
         finalStep={({ response, query }) => (
           <WizardStep>

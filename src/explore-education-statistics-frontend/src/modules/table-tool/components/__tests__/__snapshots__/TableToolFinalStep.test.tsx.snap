@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TableToolFinalStep renders the 'View the release for this data' URL with only the Publication slug, if the Release slug is not supplied 1`] = `
+exports[`TableToolFinalStep renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication 1`] = `
 <div
   class="govuk-!-margin-bottom-4"
   data-testid="Table tool final step container"
@@ -401,7 +401,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -537,7 +537,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
 </div>
 `;
 
-exports[`TableToolFinalStep renders the 'View the release for this data' URL with the Release's slug, if supplied 1`] = `
+exports[`TableToolFinalStep renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication 1`] = `
 <div
   class="govuk-!-margin-bottom-4"
   data-testid="Table tool final step container"
@@ -924,11 +924,28 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
   <div
     class="govuk-!-margin-bottom-3"
   >
-    <strong
-      class="govuk-tag"
+    <div
+      class="govuk-!-margin-bottom-3"
     >
-      This is the latest data
-    </strong>
+      <strong
+        class="govuk-tag govuk-tag--orange"
+      >
+        This data is not from the latest release
+      </strong>
+    </div>
+    <a
+      class="govuk-link govuk-link--no-visited-state dfe-print-hidden"
+      data-testid="View latest data link"
+      href="/find-statistics/test-publication"
+    >
+      View latest data:
+       
+      <span
+        class="govuk-!-font-weight-bold"
+      >
+        Latest Release Title
+      </span>
+    </a>
   </div>
   <figure
     class="figure"
@@ -938,7 +955,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -1044,7 +1061,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     <li>
       <a
         class="govuk-link"
-        href="/find-statistics/test-publication/test-release-slug"
+        href="/find-statistics/test-publication/selected-release-slug"
       >
         View the release for this data
       </a>
@@ -1492,7 +1509,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -1598,7 +1615,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     <li>
       <a
         class="govuk-link"
-        href="/find-statistics/test-publication"
+        href="/find-statistics/test-publication/selected-release-slug"
       >
         View the release for this data
       </a>
@@ -2029,7 +2046,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -2641,7 +2658,7 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -3179,7 +3196,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div

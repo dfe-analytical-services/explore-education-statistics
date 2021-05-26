@@ -109,6 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
         public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
@@ -326,6 +327,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
 
             modelBuilder.Entity<User>();
+
+            modelBuilder.Entity<UserPublicationRole>()
+                .Property(r => r.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<UserPublicationRole>()
+                .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserPublicationRole>()
+                .Property(r => r.Role)
+                .HasConversion(new EnumToStringConverter<PublicationRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)
