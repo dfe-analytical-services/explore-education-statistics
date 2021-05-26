@@ -27,12 +27,14 @@ interface FormValues {
 }
 
 interface Props {
+  canUpdateRelease?: boolean;
   isReleaseLive?: boolean;
   preReleaseAccessList: string;
   onSubmit: (values: FormValues) => void;
 }
 
 const PublicPreReleaseAccessForm = ({
+  canUpdateRelease = false,
   isReleaseLive = false,
   preReleaseAccessList,
   onSubmit,
@@ -98,6 +100,12 @@ const PublicPreReleaseAccessForm = ({
                 Public pre-release access list preview
               </h3>
 
+              {!canUpdateRelease && (
+                <WarningMessage>
+                  This release has been approved, and can no longer be updated
+                </WarningMessage>
+              )}
+
               <PreviewHtml
                 className={styles.preview}
                 html={preReleaseAccessList}
@@ -106,8 +114,8 @@ const PublicPreReleaseAccessForm = ({
             </>
           )}
 
-          {!isReleaseLive && (
-            <Button onClick={toggleForm}>
+          {canUpdateRelease && (
+            <Button onClick={toggleForm} data-testid="access-list-btn">
               {`${
                 preReleaseAccessList ? 'Edit' : 'Create'
               } public pre-release access list`}

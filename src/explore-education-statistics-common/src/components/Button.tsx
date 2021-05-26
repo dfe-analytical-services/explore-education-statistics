@@ -4,6 +4,7 @@ import React, { MouseEventHandler, ReactNode } from 'react';
 export interface ButtonProps {
   children: ReactNode;
   className?: string;
+  'data-testid'?: string;
   disabled?: boolean;
   id?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
@@ -14,11 +15,13 @@ export interface ButtonProps {
 const Button = ({
   children,
   className,
+  'data-testid': dataTestId,
   id,
   onClick,
   disabled = false,
   variant,
   type = 'button',
+  ...props
 }: ButtonProps) => {
   return (
     <button
@@ -32,6 +35,7 @@ const Button = ({
         },
         className,
       )}
+      data-testid={dataTestId}
       disabled={disabled}
       id={id}
       onClick={onClick}

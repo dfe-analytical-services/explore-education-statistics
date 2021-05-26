@@ -8,6 +8,7 @@ import {
   releaseStatusRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
+import permissionService from '@admin/services/permissionService';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
@@ -33,6 +34,11 @@ const ReleasePreReleaseAccessPage = () => {
   } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
     releaseId,
   ]);
+
+  const { value: canUpdateRelease = false } = useAsyncHandledRetry(
+    () => permissionService.canUpdateRelease(releaseId),
+    [releaseId],
+  );
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -110,6 +116,7 @@ const ReleasePreReleaseAccessPage = () => {
             <h2>Public pre-release access list</h2>
 
             <PublicPreReleaseAccessForm
+              canUpdateRelease={canUpdateRelease}
               isReleaseLive={release.live}
               preReleaseAccessList={release.preReleaseAccessList}
               onSubmit={async ({ preReleaseAccessList }) => {

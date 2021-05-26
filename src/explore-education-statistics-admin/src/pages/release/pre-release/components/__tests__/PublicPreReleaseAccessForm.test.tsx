@@ -18,6 +18,7 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
         />
@@ -38,7 +39,11 @@ describe('PublicPreReleaseAccessForm', () => {
   test('clicking Create button renders form with default text', () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
+        <PublicPreReleaseAccessForm
+          canUpdateRelease
+          preReleaseAccessList=""
+          onSubmit={noop}
+        />
       </TestConfigContextProvider>,
     );
 
@@ -67,6 +72,7 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           isReleaseLive
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
@@ -100,7 +106,11 @@ describe('PublicPreReleaseAccessForm', () => {
   test('submitting form hides the form', async () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
+        <PublicPreReleaseAccessForm
+          canUpdateRelease
+          preReleaseAccessList=""
+          onSubmit={noop}
+        />
       </TestConfigContextProvider>,
     );
 
@@ -127,6 +137,7 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           preReleaseAccessList=""
           onSubmit={handleSubmit}
         />
@@ -155,5 +166,19 @@ describe('PublicPreReleaseAccessForm', () => {
         preReleaseAccessList: 'Test updated access list',
       });
     });
+  });
+
+  test('does not render the Create / Edit button if the user does not have permission to update the release', () => {
+    render(
+      <TestConfigContextProvider>
+        <PublicPreReleaseAccessForm
+          canUpdateRelease={false}
+          preReleaseAccessList=""
+          onSubmit={noop}
+        />
+      </TestConfigContextProvider>,
+    );
+
+    expect(screen.queryByTestId('access-list-btn')).not.toBeInTheDocument();
   });
 });
