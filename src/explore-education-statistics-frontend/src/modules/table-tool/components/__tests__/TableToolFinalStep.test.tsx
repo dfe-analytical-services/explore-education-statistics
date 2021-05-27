@@ -1,4 +1,3 @@
-import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import {
   CategoryFilter,
   Indicator,
@@ -249,7 +248,7 @@ describe('TableToolFinalStep', () => {
 
     // test the reordering controls for the table headers are present
     const groups = screen.queryAllByRole('group');
-    expect(groups).toHaveLength(1);
+    expect(groups).toHaveLength(2);
     const reorderTableHeadersGroup = groups[0];
     expect(
       within(reorderTableHeadersGroup).queryByRole('button', {
@@ -268,26 +267,34 @@ describe('TableToolFinalStep', () => {
     expect(table).toMatchSnapshot();
 
     // test the permalink controls are present
-    expect(screen.queryByText('Share your table')).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Generate permanent link' }),
+      screen.queryByRole('button', { name: 'Share your table' }),
     ).toBeInTheDocument();
 
     // test that the additional options are rendered correctly
-    expect(screen.queryByText('Additional options')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('link', { name: 'View the release for this data' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {
-        name: 'Download the data of this table (CSV)',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {
-        name: 'Download table as Excel spreadsheet (XLSX)',
-      }),
-    ).toBeInTheDocument();
+    const additionalOptionsRevealButton = screen.getByRole('button', {
+      name: 'Additional options',
+    });
+
+    expect(additionalOptionsRevealButton).toBeInTheDocument();
+
+    userEvent.click(additionalOptionsRevealButton);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('link', { name: 'View the release for this data' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {
+          name: 'Download the data of this table (CSV)',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {
+          name: 'Download table as Excel spreadsheet (XLSX)',
+        }),
+      ).toBeInTheDocument();
+    });
 
     expect(
       screen.getByTestId('Table tool final step container'),
@@ -335,13 +342,21 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const viewReleaseLink = screen.getByRole('link', {
-      name: 'View the release for this data',
-    }) as HTMLAnchorElement;
+    const additionalOptionsRevealButton = screen.getByRole('button', {
+      name: 'Additional options',
+    });
 
-    expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/selected-release-slug',
-    );
+    userEvent.click(additionalOptionsRevealButton);
+
+    await waitFor(() => {
+      const viewReleaseLink = screen.getByRole('link', {
+        name: 'View the release for this data',
+      }) as HTMLAnchorElement;
+
+      expect(viewReleaseLink.href).toEqual(
+        'http://localhost/find-statistics/test-publication/selected-release-slug',
+      );
+    });
 
     expect(
       screen.getByTestId('Table tool final step container'),
@@ -358,13 +373,21 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const viewReleaseLink = screen.getByRole('link', {
-      name: 'View the release for this data',
-    }) as HTMLAnchorElement;
+    const additionalOptionsRevealButton = screen.getByRole('button', {
+      name: 'Additional options',
+    });
 
-    expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication',
-    );
+    userEvent.click(additionalOptionsRevealButton);
+
+    await waitFor(() => {
+      const viewReleaseLink = screen.getByRole('link', {
+        name: 'View the release for this data',
+      }) as HTMLAnchorElement;
+
+      expect(viewReleaseLink.href).toEqual(
+        'http://localhost/find-statistics/test-publication',
+      );
+    });
 
     expect(
       screen.getByTestId('Table tool final step container'),
@@ -393,7 +416,6 @@ describe('TableToolFinalStep', () => {
       screen.getByTestId('Table tool final step container'),
     ).toMatchSnapshot();
   });
-
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
     render(
       <TableToolFinalStep
@@ -402,14 +424,6 @@ describe('TableToolFinalStep', () => {
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
       />,
-    );
-
-    const viewReleaseLink = screen.getByRole('link', {
-      name: 'View the release for this data',
-    }) as HTMLAnchorElement;
-
-    expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
 
     expect(
@@ -428,6 +442,22 @@ describe('TableToolFinalStep', () => {
     );
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');
+
+    const additionalOptionsRevealButton = screen.getByRole('button', {
+      name: 'Additional options',
+    });
+
+    userEvent.click(additionalOptionsRevealButton);
+
+    await waitFor(() => {
+      const viewReleaseLink = screen.getByRole('link', {
+        name: 'View the release for this data',
+      }) as HTMLAnchorElement;
+
+      expect(viewReleaseLink.href).toEqual(
+        'http://localhost/find-statistics/test-publication/selected-release-slug',
+      );
+    });
 
     expect(
       screen.getByTestId('Table tool final step container'),

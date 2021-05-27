@@ -145,7 +145,7 @@ describe('TableToolWizard', () => {
 
     expect(stepHeadings).toHaveLength(1);
     expect(stepHeadings[0]).toHaveTextContent(
-      'Step 1 (current): Choose a publication',
+      'Step 1 (current) Choose a publication',
     );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
@@ -198,7 +198,7 @@ describe('TableToolWizard', () => {
 
       expect(stepHeadings).toHaveLength(1);
       expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current): Choose a subject',
+        'Step 1 (current) Choose a subject',
       );
     });
   });
@@ -235,12 +235,12 @@ describe('TableToolWizard', () => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
       expect(stepHeadings).toHaveLength(5);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a publication');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2: Choose a subject');
-      expect(stepHeadings[2]).toHaveTextContent('Step 3: Choose locations');
-      expect(stepHeadings[3]).toHaveTextContent('Step 4: Choose time period');
+      expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a publication');
+      expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose a subject');
+      expect(stepHeadings[2]).toHaveTextContent('Step 3 Choose locations');
+      expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose time period');
       expect(stepHeadings[4]).toHaveTextContent(
-        'Step 5 (current): Choose your filters',
+        'Step 5 (current) Choose your filters',
       );
 
       // Step 1
@@ -280,16 +280,10 @@ describe('TableToolWizard', () => {
       const step4 = within(screen.getByTestId('wizardStep-4'));
 
       expect(
-        step4.getByText('Start date', { selector: 'dt' }),
+        step4.getByText('Time period', { selector: 'dt' }),
       ).toBeInTheDocument();
       expect(
-        step4.getByText('End date', { selector: 'dt' }),
-      ).toBeInTheDocument();
-      expect(
-        step4.getByText('2013/14', { selector: 'dd' }),
-      ).toBeInTheDocument();
-      expect(
-        step4.getByText('2014/15', { selector: 'dd' }),
+        step4.getByText('2013/14 to 2014/15', { selector: 'dd' }),
       ).toBeInTheDocument();
 
       // Step 5

@@ -13,6 +13,7 @@ import React, { useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import WizardStepEditButton from './WizardStepEditButton';
 
 interface FormValues {
   start: string;
@@ -76,8 +77,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     return matchingOption ? matchingOption.label : '';
   };
 
+  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
       Choose time period
     </WizardStepHeading>
   );
@@ -171,23 +173,29 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             <WizardStepFormActions {...props} />
           </Form>
         ) : (
-          <>
-            {stepHeading}
-
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
-
-            <SummaryList noBorder>
-              <SummaryListItem term="Start date">
-                {form.values.start && getOptionLabel(form.values.start)}
-              </SummaryListItem>
-              <SummaryListItem term="End date">
-                {form.values.end && getOptionLabel(form.values.end)}
-              </SummaryListItem>
-            </SummaryList>
-          </>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              {stepHeading}
+              <SummaryList noBorder>
+                <SummaryListItem term="Time period">
+                  {form.values.start &&
+                    form.values.end &&
+                    `${getOptionLabel(form.values.start)} to ${getOptionLabel(
+                      form.values.end,
+                    )}`}
+                </SummaryListItem>
+              </SummaryList>
+            </div>
+            <div className="govuk-grid-column-one-third dfe-align--right">
+              {stepEnabled && (
+                <WizardStepEditButton {...props} editTitle="Edit time period" />
+              )}
+              <ResetFormOnPreviousStep
+                currentStep={currentStep}
+                stepNumber={stepNumber}
+              />
+            </div>
+          </div>
         );
       }}
     </Formik>

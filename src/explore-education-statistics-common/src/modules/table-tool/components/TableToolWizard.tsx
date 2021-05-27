@@ -30,7 +30,7 @@ import tableBuilderService, {
   TableHighlight,
   Theme,
 } from '@common/services/tableBuilderService';
-import React, { ReactElement, ReactNode, useMemo } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { useImmer } from 'use-immer';
 
 export interface InitialTableToolState {

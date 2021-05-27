@@ -7,9 +7,15 @@ export interface WizardStepProps {
   children: ((props: InjectedWizardProps) => ReactNode) | ReactNode;
   onBack?: () => void;
   id?: string;
+  size?: 's' | 'l';
 }
 
-const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
+const WizardStep = ({
+  children,
+  id,
+  size = 's',
+  ...restProps
+}: WizardStepProps) => {
   // Hide injected props from public API
   const injectedWizardProps = restProps as InjectedWizardProps;
 
@@ -49,11 +55,11 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
       tabIndex={-1}
       hidden={stepNumber > currentStep}
     >
-      <div className={styles.content}>
-        <span className={styles.number} aria-hidden>
-          <span className={styles.numberInner}>{stepNumber}</span>
-        </span>
-
+      <div
+        className={classNames(styles.content, {
+          [styles.contentSmall]: size === 's',
+        })}
+      >
         {typeof children === 'function'
           ? children(injectedWizardProps)
           : children}

@@ -6,55 +6,37 @@ import styles from './WizardStepHeading.module.scss';
 interface Props {
   children: ReactNode;
   fieldsetHeading?: boolean;
-  size?: 'xl' | 'l' | 'm' | 's';
+  stepEnabled?: boolean;
 }
 
 const WizardStepHeading = ({
   children,
-  currentStep,
   fieldsetHeading = false,
   isActive,
-  size = 'l',
   stepNumber,
-  setCurrentStep,
+  stepEnabled,
 }: Props & InjectedWizardProps) => {
-  const stepEnabled = currentStep > stepNumber;
-
   return (
-    <>
-      {isActive ? (
-        <h2
-          className={classNames(`govuk-heading-${size}`, {
-            'govuk-fieldset__heading': fieldsetHeading,
-          })}
-        >
-          <span className="govuk-visually-hidden">{`Step ${stepNumber} (current): `}</span>
-          {children}
-        </h2>
-      ) : (
-        <h2
-          className={classNames(`govuk-heading-${size}`, {
-            [styles.stepEnabled]: stepEnabled,
-          })}
-        >
-          <button
-            data-testid={`wizardStep-${stepNumber}-goToButton`}
-            type="button"
-            onClick={() => setCurrentStep(stepNumber)}
-            className={styles.stepButton}
-          >
-            <span className="govuk-visually-hidden">{`Step ${stepNumber}: `}</span>
-            {children}
-
-            {stepEnabled && (
-              <span className={styles.toggleText} aria-hidden>
-                Go to this step
-              </span>
-            )}
-          </button>
-        </h2>
-      )}
-    </>
+    <h2
+      className={classNames({
+        'govuk-heading-l dfe-flex dfe-align-items--center govuk-!-margin-top-6': isActive,
+        'govuk-fieldset__heading': fieldsetHeading && isActive,
+        [styles.stepEnabled]: stepEnabled && !isActive,
+      })}
+    >
+      <span
+        className={classNames('govuk-tag', {
+          'govuk-tag--turquoise govuk-!-margin-right-2': isActive,
+          'govuk-tag govuk-tag--grey': !isActive,
+        })}
+      >
+        {`Step ${stepNumber} `}
+        {isActive && <span className="govuk-visually-hidden">(current) </span>}
+      </span>
+      <span className={classNames({ 'govuk-visually-hidden': !isActive })}>
+        {children}
+      </span>
+    </h2>
   );
 };
 

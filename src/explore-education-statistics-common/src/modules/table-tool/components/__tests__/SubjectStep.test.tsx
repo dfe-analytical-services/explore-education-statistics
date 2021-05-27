@@ -197,7 +197,7 @@ describe('SubjectStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1 (current): Choose a subject',
+        name: 'Step 1 (current) Choose a subject',
       }),
     ).toBeInTheDocument();
   });
@@ -216,7 +216,7 @@ describe('SubjectStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1 (current): View a featured table or create your own',
+        name: 'Step 1 (current) View a featured table or create your own',
       }),
     ).toBeInTheDocument();
   });
@@ -285,7 +285,7 @@ describe('SubjectStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1: Choose a subject',
+        name: 'Step 1 Choose a subject',
       }),
     ).toBeInTheDocument();
   });
@@ -305,7 +305,7 @@ describe('SubjectStep', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Step 1: View a featured table or create your own',
+        name: 'Step 1 View a featured table or create your own',
       }),
     ).toBeInTheDocument();
   });
