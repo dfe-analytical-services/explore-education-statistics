@@ -114,7 +114,8 @@ Similarly, the service can be started alongside a local Identity Provider called
 3. Start the locally-provided Identity Provider or configure your own.
 
 Out of the box, the project supplies a Docker container Identity Provider called [Keycloak](https://www.keycloak.org/) 
-but any OpenID Connect compatible Identity Provider can be used e.g. Active Directory.
+but any OpenID Connect compatible Identity Provider can be used e.g. Active Directory. It must have Implicit Flow enabled 
+and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
 
 - To run the out-of-the-box Keycloak Identity Provider:
 
@@ -478,7 +479,18 @@ To delete all data in the storage emulator:
 AzureStorageEmulator.exe clear blob queue table
 ```
 
-## Automated tests
+### Taking a backup of Keycloak users
+
+If wanting to add more users to the standard set of users we use and are using Keycloak as the Identity Provider, the users will firstly need to be
+added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
+
+```
+docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \ 
+-Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.realmName=ees-realm -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.file=/tmp/new-ees-realm.json
+```
+
+Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
+realm configuration.
 
 Aside from unit tests for each project, we maintain suites of Robot Framework and Postman/Newman 
 tests that can be found in `tests`.
