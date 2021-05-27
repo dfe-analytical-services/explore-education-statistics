@@ -9,6 +9,7 @@ import {
   FieldMessageMapper,
   mapFieldErrors,
 } from '@common/validation/serverValidations';
+import useMountedRef from '@common/hooks/useMountedRef';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { ReactNode } from 'react';
@@ -107,10 +108,14 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
   validationSchema,
   onSubmit,
 }: Props<FormValues>) => {
+  const isMounted = useMountedRef();
+
   const handleSubmit = useFormSubmit<FormValues>(
     async (values, actions) => {
       await onSubmit(values);
-      actions.resetForm();
+      if (isMounted.current) {
+        actions.resetForm();
+      }
     },
     values => {
       return [...baseErrorMappings(values), ...errorMappings];

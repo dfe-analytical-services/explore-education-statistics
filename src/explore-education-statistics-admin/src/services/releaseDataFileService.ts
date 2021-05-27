@@ -38,6 +38,8 @@ export interface DataFile {
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
+  isQueuedZipUpload?: boolean;
+  isReplacedByZipFile?: boolean;
   permissions: DataFilePermissions;
 }
 

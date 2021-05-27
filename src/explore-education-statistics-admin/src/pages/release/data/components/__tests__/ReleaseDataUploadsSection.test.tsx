@@ -9,11 +9,18 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
+import _permissionService, {
+  DataFilePermissions,
+} from '@admin/services/permissionService';
 
 jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/permissionService');
 
 const releaseDataFileService = _releaseDataFileService as jest.Mocked<
   typeof _releaseDataFileService
+>;
+const permissionService = _permissionService as jest.Mocked<
+  typeof _permissionService
 >;
 
 describe('ReleaseDataUploadsSection', () => {
@@ -77,6 +84,13 @@ describe('ReleaseDataUploadsSection', () => {
 
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
+    percentageComplete: 0,
+    stagePercentageComplete: 0,
+    numberOfRows: 0,
+  };
+
+  const testImportingImportStatus: DataFileImportStatus = {
+    status: 'STAGE_1',
     percentageComplete: 0,
     stagePercentageComplete: 0,
     numberOfRows: 0,
@@ -807,10 +821,8 @@ describe('ReleaseDataUploadsSection', () => {
         expect(section3.getByTestId('Metadata file')).toHaveTextContent(
           'test-data.meta.csv',
         );
-        expect(section3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+        expect(section3.getByTestId('Data file size')).toHaveTextContent('');
+        expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
         expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
         expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
           'user1@test.com',
@@ -819,6 +831,72 @@ describe('ReleaseDataUploadsSection', () => {
           '18 August 2020 12:00',
         );
       });
+    });
+
+    test('updates the zip file size and rows when status changes', async () => {
+      releaseDataFileService.uploadZipDataFile.mockResolvedValue(
+        testUploadedDataFile,
+      );
+
+      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[0]);
+
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testImportingImportStatus,
+      );
+
+      permissionService.getDataFilePermissions.mockResolvedValue(
+        {} as DataFilePermissions,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      const zipFile = new File(['test'], 'test-data.zip', {
+        type: 'application/zip',
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test title',
+      );
+
+      userEvent.click(screen.getByLabelText('ZIP file'));
+
+      userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      await waitFor(() =>
+        expect(releaseDataFileService.uploadZipDataFile).toHaveBeenCalledWith(
+          'release-1',
+          {
+            name: 'Test title',
+            zipFile,
+          } as UploadZipDataFileRequest,
+        ),
+      );
+
+      const sections = screen.getAllByTestId('accordionSection');
+      const section3 = within(sections[2]);
+
+      await waitFor(() =>
+        expect(releaseDataFileService.getDataFile).toHaveBeenCalledWith(
+          'release-1',
+          testUploadedDataFile.id,
+        ),
+      );
+      expect(section3.getByTestId('Data file size')).toHaveTextContent('50 Kb');
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
     });
 
     describe('permissions during upload', () => {
