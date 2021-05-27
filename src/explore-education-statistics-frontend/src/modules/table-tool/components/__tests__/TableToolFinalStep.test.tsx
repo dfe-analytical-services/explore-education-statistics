@@ -10,8 +10,8 @@ import { TableDataQuery } from '@common/services/tableBuilderService';
 import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 describe('TableToolFinalStep', () => {
   const testQuery: TableDataQuery = {
