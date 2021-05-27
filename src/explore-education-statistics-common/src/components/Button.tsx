@@ -4,7 +4,7 @@ import React, { MouseEventHandler, ReactNode } from 'react';
 export interface ButtonProps {
   children: ReactNode;
   className?: string;
-  'data-testid'?: string;
+  testId?: string;
   disabled?: boolean;
   id?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
@@ -15,7 +15,7 @@ export interface ButtonProps {
 const Button = ({
   children,
   className,
-  'data-testid': dataTestId,
+  testId,
   id,
   onClick,
   disabled = false,
@@ -35,7 +35,7 @@ const Button = ({
         },
         className,
       )}
-      data-testid={dataTestId}
+      data-testid={testId}
       disabled={disabled}
       id={id}
       onClick={onClick}
