@@ -65,11 +65,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Publication-key"
                 >
                   Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Publication-value"
                 >
                   Test publication
                 </dd>
@@ -214,11 +216,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Geographic levels-key"
                               >
                                 Geographic levels
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Geographic levels-value"
                               >
                                 National
                               </dd>
@@ -229,11 +233,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Time period-key"
                               >
                                 Time period
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Time period-value"
                               >
                                 2020 Week 13 to 2021 Week 24
                               </dd>
@@ -244,11 +250,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Content-key"
                               >
                                 Content
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Content-value"
                               >
                                 <div
                                   class="dfe-content"
@@ -373,11 +381,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 />
               </div>
             </dl>
@@ -427,11 +437,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -729,11 +741,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -825,11 +839,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 />
               </div>
             </dl>
@@ -879,11 +895,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -998,11 +1016,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -1071,11 +1091,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
                   National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -1150,11 +1172,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 >
                   2018-19 to 2018-19
                 </dd>
@@ -1223,11 +1247,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -1247,11 +1273,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -1932,11 +1960,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -2005,11 +2035,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
                   National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -2084,11 +2116,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 >
                   2018-19 to 2018-19
                 </dd>
@@ -2157,11 +2191,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -2181,11 +2217,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -2849,11 +2887,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -2922,11 +2962,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
                   National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -3001,11 +3043,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 >
                   2018-19 to 2018-19
                 </dd>
@@ -3074,11 +3118,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -3098,11 +3144,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
