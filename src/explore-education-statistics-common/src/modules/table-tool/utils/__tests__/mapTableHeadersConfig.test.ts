@@ -347,56 +347,62 @@ describe('mapTableHeadersConfig', () => {
   });
 
   test('correctly maps term time periods to only return those in the table result', () => {
-    const testHeaderConfigWithTerms = JSON.parse(
-      JSON.stringify(testHeaderConfig),
-    );
-    testHeaderConfigWithTerms.columns = [
-      {
-        value: '2017_T1',
-        type: 'TimePeriod',
-      },
-      {
-        value: '2017_T1T2',
-        type: 'TimePeriod',
-      },
-      {
-        value: '2017_T2',
-        type: 'TimePeriod',
-      },
-      {
-        value: '2017_T3',
-        type: 'TimePeriod',
-      },
-      {
-        value: '2018_T1',
-        type: 'TimePeriod',
-      },
-    ];
+    const testHeaderConfigWithTerms: UnmappedTableHeadersConfig = {
+      ...testHeaderConfig,
+      columns: [
+        {
+          value: '2017_T1',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T1T2',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T2',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T3',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2018_T1',
+          type: 'TimePeriod',
+        },
+      ],
+    };
 
-    const testTableDataWithTerms = JSON.parse(JSON.stringify(testTableData));
-    testTableDataWithTerms.results = [
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2018_T1',
+    const testTableDataWithTerms = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        timePeriodRange: [
+          { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
+          { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
+          { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
+          { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
+          { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
+        ],
       },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2017_T1',
-      },
-    ];
-    testTableDataWithTerms.subjectMeta.timePeriodRange = [
-      { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
-      { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
-      { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
-      { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
-      { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
-    ];
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_T1',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_T1',
+        },
+      ],
+    };
+
     const table: FullTable = mapFullTable(testTableDataWithTerms);
     const headers = mapTableHeadersConfig(testHeaderConfigWithTerms, table);
 

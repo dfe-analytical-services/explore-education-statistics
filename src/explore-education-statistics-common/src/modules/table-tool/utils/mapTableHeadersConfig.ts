@@ -18,14 +18,11 @@ export default function mapTableHeadersConfig(
   const mapToFilters = (headers: TableHeader[]): Filter[] => {
     // When terms are selected the time period range can include ones not displayed in the table,
     // filter these out to ensure the reorder headings list is correct
-    const filteredHeaders = headers.filter(header => {
-      if (header.type === 'TimePeriod') {
-        return results.find(result => result.timePeriod === header.value)
-          ? header
-          : null;
-      }
-      return header;
-    });
+    const filteredHeaders = headers.filter(
+      header =>
+        header.type !== 'TimePeriod' ||
+        results.find(result => result.timePeriod === header.value),
+    );
 
     return filteredHeaders.map(header => {
       let matchingFilter: Filter | undefined;

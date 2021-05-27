@@ -107,7 +107,7 @@ export default function getDefaultTableHeaderConfig(
   // When terms are selected the time period range can include ones not displayed in the table,
   // filter these out to ensure the reorder headings list is correct
   const filteredTimePeriodRange = timePeriodRange.filter(period =>
-    results.find(result => result.timePeriod === period.value) ? period : null,
+    results.find(result => result.timePeriod === period.value),
   );
 
   // In the following instance, we should display the time periods in the

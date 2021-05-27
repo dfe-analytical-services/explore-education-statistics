@@ -152,74 +152,79 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config using a larger number of time periods than indicators', () => {
-    const testTableDataTimePeriods = JSON.parse(JSON.stringify(testTableData));
-    testTableDataTimePeriods.subjectMeta.indicators = [
-      {
-        value: 'overall-absence-sessions',
-        label: 'Number of overall absence sessions',
-        unit: '',
-        name: 'sess_overall',
-        decimalPlaces: 2,
+    const testTableDataTimePeriods = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        indicators: [
+          {
+            value: 'overall-absence-sessions',
+            label: 'Number of overall absence sessions',
+            unit: '',
+            name: 'sess_overall',
+            decimalPlaces: 2,
+          },
+          {
+            value: 'authorised-absence-sessions',
+            label: 'Number of authorised absence sessions',
+            unit: '',
+            name: 'sess_authorised',
+            decimalPlaces: 2,
+          },
+          {
+            value: 'persistent-absentees',
+            label: 'Number of persistent absentees',
+            unit: '',
+            name: 'enrolments_pa_10_exact',
+            decimalPlaces: 2,
+          },
+        ],
+        timePeriodRange: [
+          { label: '2014/15', code: 'AY', year: 2014 },
+          { label: '2015/16', code: 'AY', year: 2015 },
+          { label: '2016/17', code: 'AY', year: 2016 },
+          { label: '2017/18', code: 'AY', year: 2017 },
+          { label: '2018/19', code: 'AY', year: 2018 },
+        ],
       },
-      {
-        value: 'authorised-absence-sessions',
-        label: 'Number of authorised absence sessions',
-        unit: '',
-        name: 'sess_authorised',
-        decimalPlaces: 2,
-      },
-      {
-        value: 'persistent-absentees',
-        label: 'Number of persistent absentees',
-        unit: '',
-        name: 'enrolments_pa_10_exact',
-        decimalPlaces: 2,
-      },
-    ];
-    testTableDataTimePeriods.subjectMeta.timePeriodRange = [
-      { label: '2014/15', code: 'AY', year: 2014 },
-      { label: '2015/16', code: 'AY', year: 2015 },
-      { label: '2016/17', code: 'AY', year: 2016 },
-      { label: '2017/18', code: 'AY', year: 2017 },
-      { label: '2018/19', code: 'AY', year: 2018 },
-    ];
-    testTableDataTimePeriods.results = [
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2014_AY',
-      },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2015_AY',
-      },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2016_AY',
-      },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2017_AY',
-      },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2018_AY',
-      },
-    ];
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2015_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2016_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_AY',
+        },
+      ],
+    };
 
     const testSubjectMeta = mapFullTable(testTableDataTimePeriods);
 
@@ -259,38 +264,49 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config when two options for every filter type', () => {
-    const testTableDataTwoOptions = JSON.parse(JSON.stringify(testTableData));
-    testTableDataTwoOptions.subjectMeta.filters.SchoolType.options = {
-      Default: {
-        label: 'Default',
-        options: [
+    const testTableDataTwoOptions = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        filters: {
+          ...testTableData.subjectMeta.filters,
+          SchoolType: {
+            ...testTableData.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                label: 'Default',
+                options: [
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
+                  },
+                  {
+                    label: 'Special',
+                    value: 'special',
+                  },
+                ],
+              },
+            },
+          },
+        },
+        indicators: [
           {
-            label: 'State-funded secondary',
-            value: 'state-funded-secondary',
+            value: 'overall-absence-sessions',
+            label: 'Number of overall absence sessions',
+            unit: '',
+            name: 'sess_overall',
+            decimalPlaces: 2,
           },
           {
-            label: 'Special',
-            value: 'special',
+            value: 'authorised-absence-sessions',
+            label: 'Number of authorised absence sessions',
+            unit: '',
+            name: 'sess_authorised',
+            decimalPlaces: 2,
           },
         ],
       },
     };
-    testTableDataTwoOptions.subjectMeta.indicators = [
-      {
-        value: 'overall-absence-sessions',
-        label: 'Number of overall absence sessions',
-        unit: '',
-        name: 'sess_overall',
-        decimalPlaces: 2,
-      },
-      {
-        value: 'authorised-absence-sessions',
-        label: 'Number of authorised absence sessions',
-        unit: '',
-        name: 'sess_authorised',
-        decimalPlaces: 2,
-      },
-    ];
 
     const testSubjectMeta = mapFullTable(testTableDataTwoOptions);
 
@@ -325,50 +341,64 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config with siblingless filters removed when one option for every filter type', () => {
-    const testTableDataSiblingless = JSON.parse(JSON.stringify(testTableData));
-    testTableDataSiblingless.subjectMeta.filters.Characteristic.options = {
-      EthnicGroupMajor: {
-        label: 'Ethnic group major',
-        options: [
+    const testTableDataSiblingless = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        filters: {
+          ...testTableData.subjectMeta.filters,
+          Characteristic: {
+            ...testTableData.subjectMeta.filters.Characteristic,
+            options: {
+              EthnicGroupMajor: {
+                label: 'Ethnic group major',
+                options: [
+                  {
+                    label: 'Ethnicity Major Black Total',
+                    value: 'ethnicity-major-black-total',
+                  },
+                ],
+              },
+            },
+          },
+          SchoolType: {
+            ...testTableData.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                label: 'Default',
+                options: [
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+        indicators: [
           {
-            label: 'Ethnicity Major Black Total',
-            value: 'ethnicity-major-black-total',
+            value: 'overall-absence-sessions',
+            label: 'Number of overall absence sessions',
+            unit: '',
+            name: 'sess_overall',
+            decimalPlaces: 2,
           },
         ],
-      },
-    };
-    testTableDataSiblingless.subjectMeta.filters.SchoolType.options = {
-      Default: {
-        label: 'Default',
-        options: [
-          {
-            label: 'State-funded secondary',
-            value: 'state-funded-secondary',
-          },
+        locations: [
+          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
         ],
       },
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2014_AY',
+        },
+      ],
     };
-    testTableDataSiblingless.subjectMeta.indicators = [
-      {
-        value: 'overall-absence-sessions',
-        label: 'Number of overall absence sessions',
-        unit: '',
-        name: 'sess_overall',
-        decimalPlaces: 2,
-      },
-    ];
-    testTableDataSiblingless.subjectMeta.locations = [
-      { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-    ];
-    testTableDataSiblingless.results = [
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2014_AY',
-      },
-    ];
 
     const testSubjectMeta = mapFullTable(testTableDataSiblingless);
 
@@ -392,30 +422,35 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns the correct time periods when terms are selected', () => {
-    const testTableDataTerms = JSON.parse(JSON.stringify(testTableData));
-    testTableDataTerms.results = [
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2018_T1',
+    const testTableDataTerms = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        timePeriodRange: [
+          { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
+          { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
+          { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
+          { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
+          { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
+        ],
       },
-      {
-        filters: [],
-        geographicLevel: '',
-        location: {},
-        measures: {},
-        timePeriod: '2017_T1',
-      },
-    ];
-    testTableDataTerms.subjectMeta.timePeriodRange = [
-      { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
-      { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
-      { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
-      { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
-      { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
-    ];
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_T1',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_T1',
+        },
+      ],
+    };
 
     const testSubjectMeta = mapFullTable(testTableDataTerms);
 
