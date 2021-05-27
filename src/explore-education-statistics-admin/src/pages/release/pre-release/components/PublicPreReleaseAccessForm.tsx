@@ -115,7 +115,7 @@ const PublicPreReleaseAccessForm = ({
           )}
 
           {canUpdateRelease && (
-            <Button onClick={toggleForm} data-testid="access-list-btn">
+            <Button onClick={toggleForm} testId="access-list-btn">
               {`${
                 preReleaseAccessList ? 'Edit' : 'Create'
               } public pre-release access list`}

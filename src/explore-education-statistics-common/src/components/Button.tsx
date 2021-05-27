@@ -21,7 +21,6 @@ const Button = ({
   disabled = false,
   variant,
   type = 'button',
-  ...props
 }: ButtonProps) => {
   return (
     <button
