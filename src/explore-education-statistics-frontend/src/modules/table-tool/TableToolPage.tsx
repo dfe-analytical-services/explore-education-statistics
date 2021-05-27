@@ -62,7 +62,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       const fullTable = mapFullTable(fastTrack.fullTable);
       const tableHeaders = mapTableHeadersConfig(
         fastTrack.configuration.tableHeaders,
-        fullTable.subjectMeta,
+        fullTable,
       );
 
       return {

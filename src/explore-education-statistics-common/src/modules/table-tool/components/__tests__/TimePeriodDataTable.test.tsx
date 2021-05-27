@@ -22,7 +22,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData1.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -59,7 +59,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData1.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -79,7 +79,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData2.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -116,7 +116,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData2.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -136,7 +136,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData3.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -173,7 +173,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testData3.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -193,7 +193,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           testDataNoFilters.tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -293,7 +293,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
       },
-      fullTable.subjectMeta,
+      fullTable,
     );
 
     const { container } = render(
@@ -379,7 +379,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
       },
-      fullTable.subjectMeta,
+      fullTable,
     );
 
     const { container } = render(
@@ -464,7 +464,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
       },
-      fullTable.subjectMeta,
+      fullTable,
     );
 
     const { container } = render(
@@ -554,7 +554,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );
@@ -633,7 +633,7 @@ describe('TimePeriodDataTable', () => {
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           tableHeadersConfig,
-          fullTable.subjectMeta,
+          fullTable,
         )}
       />,
     );

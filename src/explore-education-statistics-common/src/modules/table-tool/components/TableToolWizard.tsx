@@ -258,7 +258,7 @@ const TableToolWizard = ({
     }
 
     const table = mapFullTable(tableData);
-    const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+    const tableHeaders = getDefaultTableHeaderConfig(table);
 
     if (onSubmit) {
       onSubmit(table);
