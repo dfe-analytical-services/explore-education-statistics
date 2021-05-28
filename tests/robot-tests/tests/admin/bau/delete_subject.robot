@@ -114,14 +114,14 @@ Navigate to 'Data blocks' page
 
     user clicks link  Create data block
     user waits until h2 is visible  Create data block
-    user waits until h2 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible   Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
@@ -132,7 +132,7 @@ Select locations
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
 
 Select time period
     [Tags]   HappyPath
@@ -141,7 +141,7 @@ Select time period
     user selects from list by label  id:timePeriodForm-start  2019
     user selects from list by label  id:timePeriodForm-end  2019
     user clicks element     id:timePeriodForm-submit
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
 
 Select indicators
     [Tags]  HappyPath

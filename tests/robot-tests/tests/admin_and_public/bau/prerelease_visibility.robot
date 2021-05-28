@@ -54,7 +54,8 @@ Go to 'Sign Off' page
     user clicks link  Sign off
     user waits for page to finish loading
     user waits until page contains testid  public-release-url
-    ${PUBLIC_RELEASE_LINK}=  Get Text  xpath://*[@data-testid="public-release-url"]
+    ${PUBLIC_RELEASE_LINK}=  Get Value  xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty  PUBLIC_RELEASE_LINK   ${PUBLIC_RELEASE_LINK}
     Set Suite Variable  ${PUBLIC_RELEASE_LINK}
 
 Go to Public Release Link
@@ -143,7 +144,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits for page to finish loading
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
 
 Check scheduled release isn't visible
     [Tags]  HappyPath

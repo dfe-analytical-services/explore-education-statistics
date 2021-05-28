@@ -97,23 +97,23 @@ Create data block table
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block
-    user waits until h2 is visible   Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user waits until page contains   Dates test subject
     user clicks radio    Dates test subject
     user clicks element   id:publicationSubjectForm-submit
 
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     id:locationFiltersForm-submit
 
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
     user selects from list by label  id:timePeriodForm-start  2020 Week 13
     user selects from list by label  id:timePeriodForm-end    2020 Week 16
     user clicks element     id:timePeriodForm-submit
 
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user clicks subheaded indicator checkbox  Open settings  Number of open settings
     user checks subheaded indicator checkbox is checked  Open settings  Number of open settings
     user clicks subheaded indicator checkbox  Open settings  Proportion of settings open
@@ -244,7 +244,7 @@ Verify newly published release is on Find Statistics page
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
-    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
+    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
 
 Navigate to newly published release page
@@ -624,7 +624,7 @@ Verify amendment is on Find Statistics page again
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
-    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
+    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
 
 Navigate to amendment release page

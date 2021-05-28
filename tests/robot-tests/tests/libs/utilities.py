@@ -167,6 +167,13 @@ def user_should_be_at_top_of_page():
         raise_assertion_error(
             f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
+def capture_large_screenshot_and_prompt_to_continue():
+    capture_large_screenshot()
+    warn("Failure encountered - continue? (Y/n)")
+    choice=input()
+    if (choice.lower().startsWith("n")):
+        raise_assertion_error('Test failed and you chose to stop the tests')
+
 
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
@@ -177,9 +184,10 @@ def capture_large_screenshot():
     original_height = currentWindow[1]
 
     sl.set_window_size(page_width, page_height)
-    warn("Capturing a screenshot at URL " + sl.get_location())
-    sl.capture_page_screenshot()
+    screenshot_location = sl.capture_page_screenshot()
     sl.set_window_size(page_width, original_height)
+
+    warn("Captured a screenshot at URL " + sl.get_location() + "     Screenshot saved to file://" + screenshot_location)
 
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
@@ -255,5 +263,9 @@ def remove_substring_from_right_of_string(string, substring):
 
 
 def user_clicks_element_if_exists(selector):
+    if element_finder.find(selector, required=False) is not None:
+        sl.click_element(selector)
+
+def user_chooses_what_to_do_on_step_failure(selector):
     if element_finder.find(selector, required=False) is not None:
         sl.click_element(selector)

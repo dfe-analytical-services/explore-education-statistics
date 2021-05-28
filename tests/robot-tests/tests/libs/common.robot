@@ -20,6 +20,7 @@ ${release_complete_wait}   900
 
 *** Keywords ***
 do this on failure
+#    capture large screenshot and prompt to continue
     capture large screenshot
     set selenium timeout  3
 
@@ -555,3 +556,11 @@ user checks page contains other release
 user checks page does not contain other release
     [Arguments]   ${other_release_title}
     user checks page does not contain element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+
+check that variable is not empty
+    [Arguments]   ${variable_name}  ${variable_value}
+    Run Keyword If	'${variable_value}'=='${EMPTY}'    Variable "${variable_name}" is empty.
+
+user waits until table tool wizard step is available
+    [Arguments]   ${table_tool_step_title}   ${wait}=${timeout}
+    user waits until element is visible  xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]  ${wait}

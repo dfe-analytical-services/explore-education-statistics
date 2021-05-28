@@ -115,7 +115,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
       <TableToolWizard
         key={fastTrack?.id}
-        hidePublicationSelectionStage={!!fastTrack}
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
