@@ -1,7 +1,9 @@
 import Link from '@admin/components/Link';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
+import DataFileUploadForm, {
+  DataFileUploadFormValues,
+} from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
   releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileReplaceRouteParams,
@@ -11,6 +13,7 @@ import {
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
+  DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -48,9 +51,96 @@ const ReleaseDataFileReplacePage = ({
     if (!dataFile?.replacedBy) {
       return undefined;
     }
-
-    return releaseDataFileService.getDataFile(releaseId, dataFile.replacedBy);
+    const file = await releaseDataFileService.getDataFile(
+      releaseId,
+      dataFile.replacedBy,
+    );
+    if (dataFile.isReplacedByZipFile) {
+      file.isQueuedZipUpload = true;
+    }
+    return file;
   }, [dataFile]);
+
+  const handleStatusChange = async (
+    file: DataFile,
+    { status }: DataFileImportStatus,
+  ) => {
+    setDataFile({
+      value: {
+        ...file,
+        status,
+        permissions: await permissionService.getDataFilePermissions(
+          releaseId,
+          file.id,
+        ),
+      },
+    });
+  };
+
+  const handleReplacementStatusChange = async (
+    file: DataFile,
+    { status }: DataFileImportStatus,
+  ) => {
+    let updatedDataFile = file;
+    if (
+      file.isQueuedZipUpload &&
+      ['UPLOADING', 'QUEUED'].indexOf(status) === -1
+    ) {
+      updatedDataFile = await releaseDataFileService.getDataFile(
+        releaseId,
+        file.id,
+      );
+    }
+
+    const permissions = await permissionService.getDataFilePermissions(
+      releaseId,
+      file.id,
+    );
+    setReplacementDataFile({
+      value: {
+        ...updatedDataFile,
+        status,
+        permissions,
+      },
+    });
+  };
+
+  const handleSubmit = async (
+    currentFile: DataFile,
+    values: DataFileUploadFormValues,
+  ) => {
+    let file: DataFile;
+
+    if (values.uploadType === 'csv') {
+      file = await releaseDataFileService.uploadDataFiles(releaseId, {
+        replacingFileId: currentFile.id,
+        dataFile: values.dataFile as File,
+        metadataFile: values.metadataFile as File,
+      });
+    } else {
+      file = await releaseDataFileService.uploadZipDataFile(releaseId, {
+        replacingFileId: currentFile.id,
+        zipFile: values.zipFile as File,
+      });
+    }
+
+    setDataFile({
+      value: {
+        ...currentFile,
+        replacedBy: file.id,
+        isReplacedByZipFile: values.uploadType !== 'csv',
+      },
+    });
+    setReplacementDataFile({
+      value: {
+        ...file,
+        permissions: await permissionService.getDataFilePermissions(
+          releaseId,
+          file.id,
+        ),
+      },
+    });
+  };
 
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
@@ -122,30 +212,8 @@ const ReleaseDataFileReplacePage = ({
                 dataFile={dataFile}
                 replacementDataFile={replacementDataFile}
                 releaseId={releaseId}
-                onStatusChange={async (file, { status }) => {
-                  setDataFile({
-                    value: {
-                      ...file,
-                      status,
-                      permissions: await permissionService.getDataFilePermissions(
-                        releaseId,
-                        file.id,
-                      ),
-                    },
-                  });
-                }}
-                onReplacementStatusChange={async (file, { status }) => {
-                  setReplacementDataFile({
-                    value: {
-                      ...file,
-                      status,
-                      permissions: await permissionService.getDataFilePermissions(
-                        releaseId,
-                        file.id,
-                      ),
-                    },
-                  });
-                }}
+                onStatusChange={handleStatusChange}
+                onReplacementStatusChange={handleReplacementStatusChange}
               />
             </section>
 
@@ -154,44 +222,7 @@ const ReleaseDataFileReplacePage = ({
                 <h2>Upload replacement data</h2>
 
                 <DataFileUploadForm
-                  onSubmit={async values => {
-                    let file: DataFile;
-
-                    if (values.uploadType === 'csv') {
-                      file = await releaseDataFileService.uploadDataFiles(
-                        releaseId,
-                        {
-                          replacingFileId: dataFile.id,
-                          dataFile: values.dataFile as File,
-                          metadataFile: values.metadataFile as File,
-                        },
-                      );
-                    } else {
-                      file = await releaseDataFileService.uploadZipDataFile(
-                        releaseId,
-                        {
-                          replacingFileId: dataFile.id,
-                          zipFile: values.zipFile as File,
-                        },
-                      );
-                    }
-
-                    setDataFile({
-                      value: {
-                        ...dataFile,
-                        replacedBy: file.id,
-                      },
-                    });
-                    setReplacementDataFile({
-                      value: {
-                        ...file,
-                        permissions: await permissionService.getDataFilePermissions(
-                          releaseId,
-                          file.id,
-                        ),
-                      },
-                    });
-                  }}
+                  onSubmit={values => handleSubmit(dataFile, values)}
                 />
               </section>
             ) : (
