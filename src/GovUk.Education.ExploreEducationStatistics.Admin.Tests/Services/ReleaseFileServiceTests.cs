@@ -1181,7 +1181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfoList[1].Size);
                 Assert.Equal(Ancillary, fileInfoList[1].Type);
                 Assert.Equal(ancillaryFile2.File.Created, fileInfoList[1].Created);
-                Assert.Equal(ancillaryFile2.File.CreatedBy.Email, fileInfoList[0].UserName);
+                Assert.Equal(ancillaryFile2.File.CreatedBy.Email, fileInfoList[1].UserName);
 
                 Assert.Equal(chartFile.File.Id, fileInfoList[2].Id);
                 Assert.Equal("png", fileInfoList[2].Extension);
@@ -1190,7 +1190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("20 Kb", fileInfoList[2].Size);
                 Assert.Equal(Chart, fileInfoList[2].Type);
                 Assert.Equal(chartFile.File.Created, fileInfoList[2].Created);
-                Assert.Equal(chartFile.File.CreatedBy.Email, fileInfoList[0].UserName);
+                Assert.Equal(chartFile.File.CreatedBy.Email, fileInfoList[2].UserName);
 
                 Assert.Equal(imageFile.File.Id, fileInfoList[3].Id);
                 Assert.Equal("png", fileInfoList[3].Extension);
@@ -1199,7 +1199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("30 Kb", fileInfoList[3].Size);
                 Assert.Equal(Image, fileInfoList[3].Type);
                 Assert.Equal(imageFile.File.Created, fileInfoList[2].Created);
-                Assert.Equal(imageFile.File.CreatedBy.Email, fileInfoList[0].UserName);
+                Assert.Equal(imageFile.File.CreatedBy.Email, fileInfoList[3].UserName);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
@@ -1642,6 +1642,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test Ancillary File", result.Right.Name);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
+                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

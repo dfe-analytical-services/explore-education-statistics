@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/ancillary")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> UploadAncillary(Guid releaseId,
+        public async Task<ActionResult<AdminFileInfo>> UploadAncillary(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFileService

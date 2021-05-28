@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
+        public Task<Either<ActionResult, AdminFileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         PrivateReleaseFiles,
                         releaseFile.Path());
 
-                    return releaseFile.ToFileInfo(blob);
+                    return await ToAdminFileInfo(releaseFile, blob);
                 });
         }
 
