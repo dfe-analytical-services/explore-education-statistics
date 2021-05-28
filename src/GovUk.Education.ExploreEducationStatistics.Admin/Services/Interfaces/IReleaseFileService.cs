@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name);
 
-        Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
+        Task<Either<ActionResult, AdminFileInfo>> UploadAncillary(Guid releaseId,
             IFormFile formFile,
             string name);
 

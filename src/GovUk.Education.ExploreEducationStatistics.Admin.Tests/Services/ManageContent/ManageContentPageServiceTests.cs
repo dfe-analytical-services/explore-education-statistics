@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
@@ -115,23 +116,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var ancillaryFileId = Guid.NewGuid();
             var dataFileId = Guid.NewGuid();
-            var files = new List<FileInfo>
+            var files = new List<AdminFileInfo>
             {
-                new FileInfo
+                new AdminFileInfo
                 {
                     Id = ancillaryFileId,
                     FileName = "ancillary.pdf",
                     Name = "Ancillary File",
                     Size = "10 Kb",
-                    Type = Ancillary
+                    Type = Ancillary,
+                    Created = DateTime.UtcNow,
+                    UserName = "ancillaryUserName"
                 },
-                new FileInfo
+                new AdminFileInfo
                 {
                     Id = dataFileId,
                     FileName = "data.csv",
                     Name = "Subject File",
                     Size = "20 Kb",
-                    Type = FileType.Data
+                    Type = FileType.Data,
+                    Created = DateTime.UtcNow,
+                    UserName = "dataUserName"
                 }
             };
 
