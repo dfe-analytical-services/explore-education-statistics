@@ -28,6 +28,7 @@ import {
   releaseAncillaryFileRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
+import FormattedDate from '@common/components/FormattedDate';
 
 interface FormValues {
   name: string;
@@ -243,6 +244,14 @@ const ReleaseFileUploadsSection = ({
                     </SummaryListItem>
                     <SummaryListItem term="File size">
                       {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
+                    </SummaryListItem>
+                    <SummaryListItem term="Uploaded by">
+                      <a href={`mailto:${file.userName}`}>{file.userName}</a>
+                    </SummaryListItem>
+                    <SummaryListItem term="Date uploaded">
+                      <FormattedDate format="d MMMM yyyy HH:mm">
+                        {file.created}
+                      </FormattedDate>
                     </SummaryListItem>
                     {canUpdateRelease && (
                       <SummaryListItem

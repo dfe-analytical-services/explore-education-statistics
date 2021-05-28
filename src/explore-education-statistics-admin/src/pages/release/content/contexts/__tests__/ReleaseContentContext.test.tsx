@@ -299,6 +299,8 @@ const basicRelease: EditableRelease = {
       name: 'prma',
       size: '268 Kb',
       type: 'Data',
+      userName: 'test@test.com',
+      created: '2021-05-27T00:00:00',
     },
   ],
   hasPreReleaseAccessList: false,
