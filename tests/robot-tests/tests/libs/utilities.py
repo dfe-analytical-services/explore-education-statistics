@@ -175,6 +175,11 @@ def capture_large_screenshot_and_prompt_to_continue():
         raise_assertion_error('Test failed and you chose to stop the tests')
 
 
+def capture_large_screenshot_and_html():
+    capture_large_screenshot()
+    capture_html()
+
+
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
     page_height = sl.driver.execute_script(
@@ -187,8 +192,16 @@ def capture_large_screenshot():
     screenshot_location = sl.capture_page_screenshot()
     sl.set_window_size(page_width, original_height)
 
-    warn("Captured a screenshot at URL " + sl.get_location() + "     Screenshot saved to file://" + screenshot_location)
+    warn(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
 
+
+def capture_html():
+    html = sl.get_source()
+    current_time_millis=round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
+    html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
+    html_file.write(html)
+    html_file.close()
+    warn(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')

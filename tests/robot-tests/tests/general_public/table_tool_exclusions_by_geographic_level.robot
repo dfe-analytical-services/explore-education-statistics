@@ -106,7 +106,7 @@ Validate Bury Number of fixed period exclusions row
 User generates a permanent link
     [Tags]   HappyPath
     user clicks button    Share your table
-    user waits until page contains element   xpath://a[text()="View share link"]   60
+    user waits until page contains testid  permalink-generated-url
     user checks generated permalink is valid
 
 User validates permanent link works correctly

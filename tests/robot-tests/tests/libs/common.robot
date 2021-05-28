@@ -20,8 +20,7 @@ ${release_complete_wait}   900
 
 *** Keywords ***
 do this on failure
-#    capture large screenshot and prompt to continue
-    capture large screenshot
+    capture large screenshot and html
     set selenium timeout  3
 
 user opens the browser

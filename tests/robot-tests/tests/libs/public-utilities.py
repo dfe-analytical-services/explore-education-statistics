@@ -104,7 +104,7 @@ def user_checks_generated_permalink_is_valid():
     elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
     url_without_basic_auth = re.sub(r'.*@', '', os.environ['PUBLIC_URL'])
     url_without_http = re.sub(r'^https?:\/\/', '', url_without_basic_auth)
-    current_url_without_http = re.sub(r'^https?:\/\/', '', elem.text)
+    current_url_without_http = re.sub(r'^https?:\/\/', '', elem.value)
     if not current_url_without_http.startswith(f"{url_without_http}/data-tables/permalink/"):
         raise_assertion_error(
             f'Generated permalink "{current_url_without_http}" is invalid! Should start with "{url_without_http}/data-tables/permalink/"')
