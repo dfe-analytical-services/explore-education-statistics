@@ -133,12 +133,8 @@ Verify created release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user checks summary list contains  Time period  Spring Term
-    user checks summary list contains  Release period  2025/26
-    user checks summary list contains  Lead statistician  Sean Gibson
-    user checks summary list contains  Release type  National Statistics
-
+    user verifies release summary  ${PUBLICATION_NAME}  Spring Term  2025/26  Sean Gibson  National Statistics
+    
 Edit release summary
     [Tags]  HappyPath
     user waits until page contains link  Edit release summary
@@ -153,9 +149,4 @@ Edit release summary
 Verify updated release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user checks summary list contains  Time period  Summer Term
-    user checks summary list contains  Release period  2026/27
-    user checks summary list contains  Lead statistician  Sean Gibson
-    user checks summary list contains  Release type  Official Statistics
+    user verifies release summary  ${PUBLICATION_NAME}  Summer Term  2026/27  Sean Gibson  Official Statistics

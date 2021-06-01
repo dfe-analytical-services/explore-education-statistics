@@ -50,8 +50,7 @@ Upload a ZIP file subject
 
 Check Absence in PRUs subject appears in 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link   Data blocks
-    user waits until h2 is visible  Data blocks
+    user navigates to Data blocks section
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block

@@ -30,32 +30,11 @@ Upload subject
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release  180
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
-
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
-    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   UI test subject  upload-file-test.csv  upload-file-test.meta.csv
 
 Start creating a data block
     [Tags]  HappyPath
-    user clicks link    Data blocks
-    user waits until h2 is visible  Data blocks
-    user waits until page contains  No data blocks have been created.
-
-    user clicks link  Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user navigates to Data blocks section
 
 Select subject "UI test subject"
     [Tags]  HappyPath
@@ -196,10 +175,7 @@ Validate data block is in list
 
 Create new content section
     [Tags]  HappyPath
-    user clicks link  Content
-    user waits until h2 is visible  ${PUBLICATION_NAME}
-    user clicks button  Add new section
-    user changes accordion section title  1   ${CONTENT_SECTION_NAME}
+    user creates new content section  ${PUBLICATION_NAME}  ${CONTENT_SECTION_NAME}  1
 
 Embed data block into release content
     [Tags]  HappyPath
@@ -410,20 +386,10 @@ Validate line chart embeds correctly
 Configure basic vertical bar chart
     [Tags]  HappyPath
     user goes to url  ${DATABLOCK_URL}
-
-    user waits until h2 is visible  ${DATABLOCK_NAME}
-    user waits until page does not contain loading spinner
-
-    user clicks link  Chart
-    user waits until table tool wizard step is available    Choose chart type
-    user clicks button  Vertical bar
-
-    user waits for chart preview to update
-
-    user enters text into element  id:chartConfigurationForm-height     500
-    user enters text into element  id:chartConfigurationForm-width      800
+    user configures basic chart   ${DATABLOCK_NAME}  500  800  Vertical bar
 
 Change vertical bar chart legend
+    [Tags]  HappyPath
     user clicks link  Legend
     user waits until h3 is visible  Legend
 
@@ -517,20 +483,8 @@ Save and validate vertical bar chart embeds correctly
 Configure basic horizontal bar chart
     [Tags]  HappyPath
     user goes to url  ${DATABLOCK_URL}
+    user configures basic horizontal bar chart   ${DATABLOCK_NAME}  600  700
 
-    user waits until h2 is visible  ${DATABLOCK_NAME}
-    user waits until page does not contain loading spinner
-
-    user clicks link  Chart
-    user waits until table tool wizard step is available    Choose chart type
-    user clicks button  Horizontal bar
-
-    user waits for chart preview to update
-
-    user enters text into element  id:chartConfigurationForm-height     600
-    user enters text into element  id:chartConfigurationForm-width      700
-
-    user waits for chart preview to update
 
 Validate basic horizontal bar chart preview
     [Tags]  HappyPath
@@ -610,24 +564,9 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     [Tags]  HappyPath
-    user goes to url  ${DATABLOCK_URL}
-
-    user waits until h2 is visible  ${DATABLOCK_NAME}
-    user waits until page does not contain loading spinner
-
-    user clicks link  Chart
-    user waits until table tool wizard step is available    Choose chart type
-    user clicks button  Geographic
-
-    user waits for chart preview to update
-    # Additional sleep to make sure chart has updated
-    sleep  0.3s
-
-    user enters text into element  id:chartConfigurationForm-height     700
-    user enters text into element  id:chartConfigurationForm-width      600
-
-    user waits for chart preview to update
-
+    user goes to url  ${DATABLOCK_URL}    
+    user configures basic chart   ${DATABLOCK_NAME}  700  600  Geographic
+ 
 Change geographic chart legend
     [Tags]  HappyPath
     user clicks link  Legend

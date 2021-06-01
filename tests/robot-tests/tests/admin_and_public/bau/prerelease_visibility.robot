@@ -27,27 +27,7 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user waits for page to finish loading
-    user clicks button  Upload data files
-
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until element contains  id:dataFileUploadForm-subjectTitle   ${EMPTY}
-    user waits until page contains accordion section   UI test subject  60
-    user opens accordion section   UI test subject
-
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
-    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  360
+    user uploads subject   UI test subject  upload-file-test.csv  upload-file-test.meta.csv
 
 Go to 'Sign Off' page
     [Tags]  HappyPath
@@ -69,7 +49,7 @@ Go to Public Release Link
 
 Return to admin
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
+    user navigates to admin dashboard  bau1
 
 Select release from admin dashboard
     [Tags]  HappyPath
@@ -142,9 +122,7 @@ Go to Public release page and ensure release isn't visible
 
 Go to Table Tool page
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits for page to finish loading
-    user waits until h1 is visible  Create your own tables
+        user navigates to data-tables page on public frontend
 
 Check scheduled release isn't visible
     [Tags]  HappyPath
@@ -158,7 +136,7 @@ Go to release URL and check release isn't visible
 
 Return to admin dashboard
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
+    user navigates to admin dashboard  bau1
 
 Go to release from admin dashboard
     [Tags]  HappyPath
@@ -174,20 +152,7 @@ Go to release from admin dashboard
 Approve release for immediate publication
     [Tags]  HappyPath
     user clicks link  Sign off
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
-
-Check release is approved
-    [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user approves release for immediate publication
 
 Go to public release URL and check release isn't visible
     [Tags]  HappyPath  NotAgainstLocal

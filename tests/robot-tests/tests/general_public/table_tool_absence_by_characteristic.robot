@@ -9,9 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    environment variable should be set  PUBLIC_URL
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
+    user navigates to data-tables page on public frontend
     user waits for page to finish loading
 
 Select "Pupil absence" publication
@@ -298,6 +296,3 @@ User validates permalink table
     user checks results table cell contains  3    5     3.4%
     user checks results table cell contains  3    6     3.6%
     user checks results table cell contains  3    7     3.5%
-    user checks results table cell contains  3    8     4.2%
-
-

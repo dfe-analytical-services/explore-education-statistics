@@ -9,10 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    environment variable should be set  PUBLIC_URL
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
-
+        user navigates to data-tables page on public frontend
 Go to permalink
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables/permalink/c5688b39-2630-4de0-a143-725df9e48690
@@ -75,7 +72,4 @@ Validate download files
 
 Use Create tables button
     [Tags]  HappyPath
-    user waits until h2 is visible  Create your own tables
-    user clicks link    Create tables
-
-    user waits until h1 is visible  Create your own tables
+    user navigates to data-tables page on public frontend

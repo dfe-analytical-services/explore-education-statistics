@@ -94,23 +94,7 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
-
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
-    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   UI test subject  upload-file-test.csv  upload-file-test.meta.csv
 
 Add metadata guidance
     [Tags]  HappyPath
@@ -141,8 +125,7 @@ Add metadata guidance
 
 Add table highlight
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user waits until h2 is visible  Data blocks
+    user navigates to Data blocks section
 
     user clicks link  Create data block
     user waits until table tool wizard step is available    Choose a subject
@@ -368,8 +351,8 @@ Go back to prerelease content page again
 
 Go to prerelease table tool page
     [Tags]  HappyPath
+    user waits until h2 is visible View a featured table or create your own
     user clicks link  Table tool
-
     user waits until h1 is visible  Create your own tables
     user waits until table tool wizard step is available  Choose a subject
 
@@ -388,7 +371,6 @@ Go to table highlight and validate table
 Create and validate custom table
     [Tags]  HappyPath
     user clicks link  Table tool
-
     user waits until h1 is visible  Create your own tables
 
     user clicks link  Create your own table

@@ -556,6 +556,24 @@ user checks page does not contain other release
     [Arguments]   ${other_release_title}
     user checks page does not contain element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
+user navigates to find statistics page on public frontend
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/find-statistics
+    user waits until h1 is visible  Find statistics and data
+    user waits for page to finish loading
+
+user navigates to publish release on public frontend
+    [Arguments]  ${PUBLICATION_NAME}
+    environment variable should be set PUBLIC_URL
+    user clicks testid element   View stats link for ${PUBLICATION_NAME}
+    user waits until h1 is visible   ${PUBLICATION_NAME}  90
+
+user navigates to data-tables page on public frontend
+    environment variable should be set PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}/data-tables
+    user waits until h1 is visible  Create your own tables
+    user waits for page to finish loading
+
 check that variable is not empty
     [Arguments]   ${variable_name}  ${variable_value}
     Run Keyword If	'${variable_value}'=='${EMPTY}'    Variable "${variable_name}" is empty.

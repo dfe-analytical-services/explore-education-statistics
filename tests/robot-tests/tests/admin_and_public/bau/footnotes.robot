@@ -29,26 +29,9 @@ Create new publication and release via API
 
 Upload subject
     [Tags]  HappyPath
-    user waits for page to finish loading
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}${DATA_FILE_NAME}.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}${DATA_FILE_NAME}.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SUBJECT_NAME}
-    user opens accordion section   ${SUBJECT_NAME}
-
-    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Subject title    ${SUBJECT_NAME}  ${section}
-    user checks headed table body row contains  Data file        dates.csv  ${section}
-    user checks headed table body row contains  Metadata file    dates.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   119  ${section}
-    user checks headed table body row contains  Data file size   17 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  360
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME} Academic Year 2025/26 (not Live)
+    user uploads subject   ${SUBJECT_NAME}  ${DATA_FILE_NAME}.csv  ${DATA_FILE_NAME}.meta.csv
 
 Add meta guidance to subject
     [Tags]  HappyPath
@@ -104,9 +87,7 @@ Confirm created footnotes
 
 Navigate to 'Create data block' page
     [Tags]  HappyPath
-    user clicks link    Data blocks
-
-    user waits until h2 is visible  Data blocks
+    user navigates to Data blocks section
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block
@@ -262,10 +243,7 @@ Wait for release process status to be Complete
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
-    environment variable should be set   PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible  Find statistics and data
-    user waits for page to finish loading
+    user navigates to find statistics page on public frontend
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
@@ -295,8 +273,7 @@ Check footnote on data block
 
 Navigate to table tool
     [Tags]  HappyPath
-    user goes to url   %{PUBLIC_URL}/data-tables
-    user waits for page to finish loading
+    user navigates to data-tables page on public frontend
 
 Choose publication
     [Tags]  HappyPath

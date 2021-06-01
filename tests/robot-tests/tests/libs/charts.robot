@@ -157,3 +157,18 @@ user checks map chart indicator tile contains
 user checks infographic chart contains alt
     [Arguments]  ${locator}  ${text}
     user waits until parent contains element  ${locator}  css:img[alt="${text}"]
+
+user configures basic chart
+    [Arguments]  ${DATABLOCK_NAME}  ${CHART_HEIGHT}  ${CHART_WIDTH}  ${CHART_TYPE}
+    @{list}=  create list  Horizontal bar  Vertical bar  Geographic
+    user waits until h2 is visible  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
+
+    user clicks link  Chart
+    user waits until h3 is visible  Choose chart type
+    user clicks button  ${CHART_TYPE}
+
+    user waits for chart preview to update
+
+    user enters text into element  id:chartConfigurationForm-height     ${CHART_HEIGHT}
+    user enters text into element  id:chartConfigurationForm-width      ${CHART_WIDTH}

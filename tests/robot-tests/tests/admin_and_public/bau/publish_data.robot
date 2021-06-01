@@ -36,40 +36,18 @@ Add public prerelease access list
     user clicks button  Save access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
-Go to "Sign off" page
+Go to "Sign off" page and approve release
     [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
-
-Approve release
-    [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests - latest release
-    user clicks radio  As soon as possible
-
-    user clicks button   Update status
-
-Verify release is scheduled
-    [Tags]  HappyPath
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
+    user approves release for immediate publication
 
 Wait for release process status to be Complete
     [Tags]  HappyPath
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user waits for release to publish
 
 Return to Admin Dashboard
     [Tags]  HappyPath
-    user goes to url    %{ADMIN_URL}
-    user waits until h1 is visible   Dashboard
-    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']    180
-
+    user navigates to admin dashboard  bau1
+   
 Create another release for the same publication
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
@@ -87,23 +65,7 @@ Verify new release summary
 Upload subject to new release
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SUBJECT_NAME}
-    user opens accordion section   ${SUBJECT_NAME}
-
-    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Subject title    ${SUBJECT_NAME}  ${section}
-    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  360
+    user uploads subject   ${SUBJECT_NAME}  upload-file-test.csv  upload-file-test.meta.csv
 
 Add meta guidance to subject
     [Tags]  HappyPath
@@ -116,15 +78,9 @@ Add meta guidance to subject
     ...  ${SUBJECT_NAME} meta guidance content
     user clicks button  Save guidance
 
-Navigate to 'Create data block' page
+Navigate to Data blocks page
     [Tags]  HappyPath
-    user clicks link    Data blocks
-
-    user waits until h2 is visible  Data blocks
-    user clicks link  Create data block
-
-    user waits until h2 is visible  Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user navigates to Data blocks section
 
 Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
@@ -190,42 +146,15 @@ Go to "Sign off" page for new release
 
 Approve new release
     [Tags]  HappyPath
-    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
-    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m
-    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B
-    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
-    set suite variable  ${PUBLISH_DATE_DAY}
-    set suite variable  ${PUBLISH_DATE_MONTH}
-    set suite variable  ${PUBLISH_DATE_MONTH_WORD}
-    set suite variable  ${PUBLISH_DATE_YEAR}
-
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio  As soon as possible
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
-
-    user clicks button   Update status
+    user approves release for schedulded release   12  3001
 
 Wait for release process status for new release to be Complete
     [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user waits for schedulded release to be complete   ${PUBLISH_DATE_DAY}  ${PUBLISH_DATE_MONTH_WORD}  ${PUBLISH_DATE_YEAR}
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
-    environment variable should be set   PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible  Find statistics and data
-    user waits for page to finish loading
+    user navigates to find statistics page on public frontend
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
@@ -241,8 +170,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     [Tags]  HappyPath
-    user clicks testid element   View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible   ${PUBLICATION_NAME}  90
+    user navigates to publish release on public frontend   ${PUBLICATION_NAME}
 
 Check latest release is correct
     [Tags]  HappyPath
@@ -267,9 +195,7 @@ Check other release is correct
 
 Go to Table Tool page
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
-    user waits for page to finish loading
+        user navigates to data-tables page on public frontend
 
 Select publication in table tool
     [Tags]  HappyPath

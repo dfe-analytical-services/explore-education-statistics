@@ -36,23 +36,7 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   Dates test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   Dates test subject
-    user opens accordion section   Dates test subject
-
-    ${section}=  user gets accordion section content element  Dates test subject
-    user checks headed table body row contains  Subject title    Dates test subject  ${section}
-    user checks headed table body row contains  Data file        dates.csv  ${section}
-    user checks headed table body row contains  Metadata file    dates.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   119  ${section}
-    user checks headed table body row contains  Data file size   17 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   Dates test subject  dates.csv  dates.meta.csv
 
 Add meta guidance
     [Tags]  HappyPath
@@ -91,9 +75,7 @@ Add ancillary file
 
 Create data block table
     [Tags]  HappyPath
-    user clicks link    Data blocks
-
-    user waits until h2 is visible  Data blocks
+    user navigates to Data blocks section
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block
@@ -197,23 +179,7 @@ Go to "Sign off" tab
 
 Approve release
     [Tags]  HappyPath
-    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
-    ${PUBLISH_DATE_MONTH}=  get current datetime  %B
-    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
-    set suite variable  ${PUBLISH_DATE_DAY}
-    set suite variable  ${PUBLISH_DATE_MONTH}
-    set suite variable  ${PUBLISH_DATE_YEAR}
-
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests - publish release and amend
-    user clicks radio  As soon as possible
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
-
-    user clicks button   Update status
+    user approves release for schedulded release   12  3001
 
 Verify release is scheduled
     [Tags]  HappyPath
@@ -230,10 +196,7 @@ Wait for release process status to be Complete
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
-    environment variable should be set   PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible  Find statistics and data
-    user waits for page to finish loading
+    user navigates to find statistics page on public frontend
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
@@ -382,21 +345,7 @@ Return to Admin to start creating an amendment
 
 Create amendment
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
-    user waits until page contains link    Create new publication
-    user waits until page contains accordion section  ${PUBLICATION_NAME}
-
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion_section}=  user gets accordion section content element  ${PUBLICATION_NAME}
-
-    user opens details dropdown  ${RELEASE_NAME}  ${accordion_section}
-    ${details_elem}=  user gets details content element  ${RELEASE_NAME} (Live - Latest release)  ${accordion_section}
-
-    user clicks button  Amend this release  ${details_elem}
-    user waits until h1 is visible  Confirm you want to amend this live release
-    user clicks button   Confirm
-    user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains title caption  Amend release for ${RELEASE_NAME}  60
+    user goes to admin frontend and creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
 
 Navigate to data replacement page
     [Tags]  HappyPath
@@ -472,7 +421,7 @@ Update existing meta guidance for amendment
 
     user clicks button  Save guidance
 
-# TODO: Add footnotes
+# TODO luke: Add footnotes
 
 Add ancillary file to amendment
     [Tags]  HappyPath
@@ -496,9 +445,7 @@ Add ancillary file to amendment
 
 Edit data block for amendment
     [Tags]  HappyPath
-    user clicks link    Data blocks
-
-    user waits until h2 is visible  Data blocks
+    user navigates to Data blocks section
 
     user waits until table is visible
     user checks table body has x rows  1
@@ -594,6 +541,8 @@ Approve amendment for immediate release
     user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Amendment approved by UI tests
     user clicks radio  As soon as possible
+    # TODO luke: Move below as option to
+    # user approves release for schedulded release
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3002
 

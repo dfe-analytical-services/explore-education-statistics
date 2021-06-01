@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Resource    ../../libs/common.robot
 Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
@@ -21,32 +22,10 @@ Verify Release summary
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Tax Year 2020-21 (not Live)
 
-    user waits until h2 is visible     Release summary
-    user checks summary list contains  Publication title      ${PUBLICATION_NAME}
-    user checks summary list contains  Time period            Tax Year
-    user checks summary list contains  Release period         2020-21
-    user checks summary list contains  Lead statistician      UI test contact name
-    user checks summary list contains  Release type           National Statistics
-
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file  id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
-    user chooses file  id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
-    user clicks button  Upload data files
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
-
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
-    user checks headed table body row contains  Data file        upload-file-test-with-filter.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test-with-filter.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   16 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   UI test subject  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
 Navigate to 'Footnotes' page
     [Tags]  HappyPath
@@ -109,12 +88,7 @@ Create Random Filter Select all footnote for new subject
 
 Navigate to 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link    Data blocks
-    user waits until h2 is visible  Data blocks
-
-    user clicks link  Create data block
-    user waits until h2 is visible  Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user navigates to Data blocks section
 
 Select subject "UI test subject"
     [Tags]  HappyPath
