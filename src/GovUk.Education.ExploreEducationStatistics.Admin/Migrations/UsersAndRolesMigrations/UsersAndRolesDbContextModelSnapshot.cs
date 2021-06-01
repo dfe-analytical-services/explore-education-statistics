@@ -4,16 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20210129142030_EES1692RemoveAnalystClaimsToUpdateAndAccessAllMethodologies")]
-    partial class EES1692RemoveAnalystClaimsToUpdateAndAccessAllMethodologies
+    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,127 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "e7f7c82e-aaf3-43db-a5ab-755678f67d04",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst1@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Analyst1",
-                            LastName = "User1",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST1@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST1@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "analyst1@example.com"
-                        },
-                        new
-                        {
-                            Id = "6620bccf-2433-495e-995d-fc76c59d9c62",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst2@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Analyst2",
-                            LastName = "User2",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST2@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST2@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "analyst2@example.com"
-                        },
-                        new
-                        {
-                            Id = "b390b405-ef90-4b9d-8770-22948e53189a",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "analyst3@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Analyst3",
-                            LastName = "User3",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "ANALYST3@EXAMPLE.COM",
-                            NormalizedUserName = "ANALYST3@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "analyst3@example.com"
-                        },
-                        new
-                        {
-                            Id = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "bau1@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Bau1",
-                            LastName = "User1",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "BAU1@EXAMPLE.COM",
-                            NormalizedUserName = "BAU1@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "bau1@example.com"
-                        },
-                        new
-                        {
-                            Id = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "bau2@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Bau2",
-                            LastName = "User2",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "BAU2@EXAMPLE.COM",
-                            NormalizedUserName = "BAU2@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "bau2@example.com"
-                        },
-                        new
-                        {
-                            Id = "d5c85378-df85-482c-a1ce-09654dae567d",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "prerelease1@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Prerelease1",
-                            LastName = "User1",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "PRERELEASE1@EXAMPLE.COM",
-                            NormalizedUserName = "PRERELEASE1@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "prerelease1@example.com"
-                        },
-                        new
-                        {
-                            Id = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Email = "prerelease2@example.com",
-                            EmailConfirmed = false,
-                            FirstName = "Prerelease2",
-                            LastName = "User2",
-                            LockoutEnabled = true,
-                            NormalizedEmail = "PRERELEASE2@EXAMPLE.COM",
-                            NormalizedUserName = "PRERELEASE2@EXAMPLE.COM",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "V7ZOUEOGN2HGZDN3HKPNIHLSUWWUHTA6",
-                            TwoFactorEnabled = false,
-                            UserName = "prerelease2@example.com"
-                        });
                 });
 
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.DeviceFlowCodes", b =>
@@ -563,6 +440,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         },
                         new
                         {
+                            Id = -26,
+                            ClaimType = "UpdateAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -27,
+                            ClaimType = "AccessAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
                             Id = -28,
                             ClaimType = "ApproveAllMethodologies",
                             ClaimValue = "",
@@ -679,57 +570,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins");
-
-                    b.HasData(
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "5zzTEeAYz71aVPJ1ho1VGW3cYk7_qcQpkDqYYxbH3po",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "e7f7c82e-aaf3-43db-a5ab-755678f67d04"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "RLdgJMsfN6QVjpCbkaOYIpzh6DA3QpRfnBcfIx46uDM",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "6620bccf-2433-495e-995d-fc76c59d9c62"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "ces_f2I3zCjGZ9HUprWF3RiQgswrKvPFAY1Lwu_KI6M",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "b390b405-ef90-4b9d-8770-22948e53189a"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "cb3XrjF6BLuMZ5P3aRo8wBobF7tAshdk2gF0X5Qm68o",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "EKTK7hPGgxGVxRSBjgTv51XVJhtMo91sIcADfjSuJjw",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "uLGzMPaxGz0nY6nbff7wkBP7ly2iLdephomGPFOP0k8",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "d5c85378-df85-482c-a1ce-09654dae567d"
-                        },
-                        new
-                        {
-                            LoginProvider = "OpenIdConnect",
-                            ProviderKey = "s5vNxMDGwRCvg3MTtLEDomZqOKl7cvv2f8PW5NvJzbw",
-                            ProviderDisplayName = "OpenIdConnect",
-                            UserId = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -745,43 +585,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "e7f7c82e-aaf3-43db-a5ab-755678f67d04",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            UserId = "6620bccf-2433-495e-995d-fc76c59d9c62",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            UserId = "b390b405-ef90-4b9d-8770-22948e53189a",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            UserId = "b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            UserId = "b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            UserId = "d5c85378-df85-482c-a1ce-09654dae567d",
-                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
-                        },
-                        new
-                        {
-                            UserId = "ee9a02c1-b3f9-402c-9e9b-4fb78d737050",
-                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

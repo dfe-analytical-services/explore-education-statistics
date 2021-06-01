@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -30,6 +32,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using IdentityServer4.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -385,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            UpdateDatabase(app);
+            UpdateDatabase(app, env);
 
             if (env.IsDevelopment())
             {
@@ -475,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
         }
 
-        private static void UpdateDatabase(IApplicationBuilder app)
+        private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
@@ -500,6 +503,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     ApplyCustomMigrations();
                 }
             }
+
+            if (env.IsDevelopment())
+            {
+                BootstrapUsersUtil.AddBootstrapUsers(app, env, Configuration);
+            } 
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)
