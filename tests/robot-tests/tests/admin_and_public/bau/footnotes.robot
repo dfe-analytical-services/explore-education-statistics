@@ -110,7 +110,7 @@ Navigate to 'Create data block' page
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block
-    user waits until h2 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
@@ -120,21 +120,21 @@ Select subject "${SUBJECT_NAME}" (data block)
 
 Select locations (data block)
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     id:locationFiltersForm-submit
 
 Select time period
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     id:timePeriodForm-submit
 
 Select indicators (data block)
     [Tags]  HappyPath
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user clicks button  Select all 2 subgroup options
 
 Select category filters (data block)
@@ -276,7 +276,7 @@ Verify newly published release is on Find Statistics page
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
-    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
+    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
 
 Navigate to newly published release page
@@ -314,21 +314,21 @@ Choose subject (table tool)
 
 Select locations (table tool)
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     id:locationFiltersForm-submit
 
 Select time period (table tool)
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     id:timePeriodForm-submit
 
 Select indicators (table tool)
     [Tags]  HappyPath
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user clicks button  Select all 2 subgroup options
 
 Select category filters (table tool)

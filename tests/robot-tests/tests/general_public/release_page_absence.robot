@@ -296,7 +296,7 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     [Documentation]  DFE-898
     [Tags]  HappyPath
     user clicks link    Create tables
-    user waits until h1 is visible  Create your own tables online   60
+    user waits until h1 is visible  Create your own tables   60
     user waits for page to finish loading
 
     user waits until page contains  Choose a subject   60

@@ -209,7 +209,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
 
 Select "Test Topic" publication
     [Tags]  HappyPath
@@ -219,14 +219,14 @@ Select "Test Topic" publication
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
 Select "${SUBJECT_NAME}" subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains  2    Subject     ${SUBJECT_NAME}
 
 Select National location
@@ -237,17 +237,16 @@ Select National location
 Click next step button
     [Tags]  HappyPath
     user clicks element     id:locationFiltersForm-submit
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
 
 Select start date and end date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2012/13
     user selects from list by label  id:timePeriodForm-end     2012/13
     user clicks element     id:timePeriodForm-submit
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element   id:filtersForm-indicators
-    user checks previous table tool step contains  4    Start date    2012/13
-    user checks previous table tool step contains  4    End date      2012/13
+    user checks previous table tool step contains  4    Time period    2012/13 to 2012/13
 
 Select Indicators
     [Tags]  HappyPath
@@ -280,7 +279,7 @@ Click submit button
 
 Wait until table is generated
     [Tags]  HappyPath
-    user waits until page contains button  Generate permanent link
+    user waits until page contains button  Share your table
 
 Wait until new footnote is visible
     [Tags]  HappyPath
@@ -350,9 +349,9 @@ Validate table cells
 Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Generate permanent link
+    user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL}
 
 Go to permalink
@@ -444,8 +443,7 @@ Confirm data replacement
 
 Delete second subject file
     [Tags]  HappyPath
-    user clicks link  Footnotes
-    user clicks link  Data and files
+    user clicks link  Back  # back from data replacement confirmation
     user waits until page contains accordion section  ${SECOND_SUBJECT}
     user opens accordion section  ${SECOND_SUBJECT}
     user scrolls to accordion section content  ${SECOND_SUBJECT}
@@ -556,12 +554,12 @@ Check the table has the same results as original table
 Check amended release doesn't contain deleted subject
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     user checks page does not contain  ${SECOND_SUBJECT}
 
@@ -661,24 +659,24 @@ Wait for release process status to be Complete again
 Go to Table Tool page for amendment
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
 
 Go to amended release & create table
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
 Select ${SUBJECT_NAME} subject
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains  2    Subject     ${SUBJECT_NAME}
 
 Select National location filter
@@ -689,14 +687,14 @@ Select National location filter
 Click the next step button
     [Tags]  HappyPath
     user clicks element     id:locationFiltersForm-submit
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
 
 Select start date + end date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2020 Week 13
     user selects from list by label  id:timePeriodForm-end     2021 Week 24
     user clicks element     id:timePeriodForm-submit
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element   id:filtersForm-indicators
 
 Select four indicators
@@ -721,7 +719,7 @@ Generate table
 
 Wait until the table is generated
     [Tags]  HappyPath
-    user waits until page contains button  Generate permanent link
+    user clicks button  Share your table
 
 Validate generated table
     [Tags]   HappyPath
@@ -730,9 +728,8 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Generate permanent link
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL_TWO}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL_TWO}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink

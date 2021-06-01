@@ -376,7 +376,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                     <div>
                       <h2 className="govuk-heading-m">
-                        Create your own tables online
+                        Create your own tables
                       </h2>
                       <p>
                         Explore our range of data and build your own tables from

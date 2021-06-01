@@ -51,7 +51,7 @@ Validate "Pupil absence" details component
 
     user waits until details dropdown contains publication   Pupil absence   Pupil absence in schools in England
     user checks publication bullet contains link   Pupil absence in schools in England    View statistics and data
-    user checks publication bullet contains link   Pupil absence in schools in England    Create your own tables online
+    user checks publication bullet contains link   Pupil absence in schools in England    Create your own tables
     user checks publication bullet does not contain link  Pupil absence in schools in England   Statistics at DfE
 
     user waits until details dropdown contains publication   Pupil absence   Pupil absence in schools in England: autumn and spring

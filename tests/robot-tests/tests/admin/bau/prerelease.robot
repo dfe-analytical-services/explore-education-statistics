@@ -19,14 +19,14 @@ ${RELEASE_URL}
 
 *** Keywords ***
 user chooses location, time period and filters
-    user waits until h2 is visible  Choose locations    90
+    user waits until table tool wizard step is available    Choose locations    90
 
     user opens details dropdown   Ward
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
 
-    user waits until h2 is visible  Choose time period  90
+    user waits until table tool wizard step is available    Choose time period  90
 
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
     ${timePeriodEndList}=   get list items  id:timePeriodForm-end
@@ -38,8 +38,8 @@ user chooses location, time period and filters
     user selects from list by label  id:timePeriodForm-end  2017
     user clicks element     id:timePeriodForm-submit
 
-    user waits until h2 is visible  Choose your filters
-    user checks previous table tool step contains  3    Start date    2005
+    user waits until table tool wizard step is available    Choose your filters
+    user checks previous table tool step contains  3    Time period    2005 to 2017
 
     user clicks indicator checkbox    Admission Numbers
 
@@ -145,7 +145,7 @@ Add table highlight
     user waits until h2 is visible  Data blocks
 
     user clicks link  Create data block
-    user waits until h2 is visible   Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
@@ -370,8 +370,8 @@ Go to prerelease table tool page
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a featured table or create your own
+    user waits until h1 is visible  Create your own tables
+    user waits until table tool wizard step is available  Choose a subject
 
 Validate table highlights
     [Tags]  HappyPath
@@ -389,11 +389,10 @@ Create and validate custom table
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a featured table or create your own
+    user waits until h1 is visible  Create your own tables
 
     user clicks link  Create your own table
-    user waits until h3 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
@@ -480,8 +479,8 @@ Go to prerelease table tool page as Analyst user
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a featured table or create your own
+    user waits until h1 is visible  Create your own tables
+    user waits until table tool wizard step is available  Choose a subject
 
 Validate table highlights as Analyst user
     [Tags]  HappyPath
@@ -499,11 +498,10 @@ Create and validate custom table as Analyst user
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a featured table or create your own
+    user waits until h1 is visible  Create your own tables
 
     user clicks link  Create your own table
-    user waits until h3 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user waits until page contains   UI test subject
     user clicks radio    UI test subject

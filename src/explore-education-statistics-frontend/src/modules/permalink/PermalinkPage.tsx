@@ -118,7 +118,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         </ul>
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          Create your own tables online
+          Create your own tables
         </h2>
         <p>
           Use our tool to build tables using our range of national and regional

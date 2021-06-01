@@ -1004,7 +1004,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -1012,19 +1012,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
                   data-testid="Subject-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
                   data-testid="Subject-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -1040,7 +1040,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -1075,6 +1075,79 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
                 Step 2 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
+                Choose a subject
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Subject"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                >
+                  Subject
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                >
+                  None
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-2-goToButton"
+                type="button"
+              >
+                Change subject
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 2
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-3"
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 3 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -1118,7 +1191,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-2-goToButton"
+                data-testid="wizardStep-3-goToButton"
                 type="button"
               >
                 Edit locations
@@ -1126,7 +1199,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 2
+                  Step 3
                 </span>
               </button>
             </div>
@@ -1136,8 +1209,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-3"
-      id="tableToolWizard-step-3"
+      data-testid="wizardStep-4"
+      id="tableToolWizard-step-4"
       tabindex="-1"
     >
       <div
@@ -1155,7 +1228,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 3 
+                Step 4 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -1193,7 +1266,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-3-goToButton"
+                data-testid="wizardStep-4-goToButton"
                 type="button"
               >
                 Edit time period
@@ -1201,7 +1274,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 3
+                  Step 4
                 </span>
               </button>
             </div>
@@ -1211,8 +1284,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-4"
-      id="tableToolWizard-step-4"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
       tabindex="-1"
     >
       <div
@@ -1230,7 +1303,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 4 
+                Step 5 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -1303,7 +1376,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -1311,7 +1384,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -1320,9 +1393,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -1334,7 +1408,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >
@@ -1948,7 +2022,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -1956,19 +2030,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
                   data-testid="Subject-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
                   data-testid="Subject-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -1984,7 +2058,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2019,6 +2093,79 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
                 Step 2 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
+                Choose a subject
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Subject"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                >
+                  Subject
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                >
+                  None
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-2-goToButton"
+                type="button"
+              >
+                Change subject
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 2
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-3"
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 3 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -2062,7 +2209,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-2-goToButton"
+                data-testid="wizardStep-3-goToButton"
                 type="button"
               >
                 Edit locations
@@ -2070,7 +2217,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 2
+                  Step 3
                 </span>
               </button>
             </div>
@@ -2080,8 +2227,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-3"
-      id="tableToolWizard-step-3"
+      data-testid="wizardStep-4"
+      id="tableToolWizard-step-4"
       tabindex="-1"
     >
       <div
@@ -2099,7 +2246,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 3 
+                Step 4 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -2137,7 +2284,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-3-goToButton"
+                data-testid="wizardStep-4-goToButton"
                 type="button"
               >
                 Edit time period
@@ -2145,7 +2292,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 3
+                  Step 4
                 </span>
               </button>
             </div>
@@ -2155,8 +2302,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-4"
-      id="tableToolWizard-step-4"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
       tabindex="-1"
     >
       <div
@@ -2174,7 +2321,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 4 
+                Step 5 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -2247,7 +2394,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -2255,7 +2402,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -2264,9 +2411,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -2278,7 +2426,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >
@@ -2875,7 +3023,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -2883,19 +3031,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
                   data-testid="Subject-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
                   data-testid="Subject-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -2911,7 +3059,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2946,6 +3094,79 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
                 Step 2 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
+                Choose a subject
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Subject"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                >
+                  Subject
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                >
+                  None
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-2-goToButton"
+                type="button"
+              >
+                Change subject
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 2
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-3"
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 3 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -2989,7 +3210,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-2-goToButton"
+                data-testid="wizardStep-3-goToButton"
                 type="button"
               >
                 Edit locations
@@ -2997,7 +3218,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 2
+                  Step 3
                 </span>
               </button>
             </div>
@@ -3007,8 +3228,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-3"
-      id="tableToolWizard-step-3"
+      data-testid="wizardStep-4"
+      id="tableToolWizard-step-4"
       tabindex="-1"
     >
       <div
@@ -3026,7 +3247,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 3 
+                Step 4 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -3064,7 +3285,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-3-goToButton"
+                data-testid="wizardStep-4-goToButton"
                 type="button"
               >
                 Edit time period
@@ -3072,7 +3293,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 3
+                  Step 4
                 </span>
               </button>
             </div>
@@ -3082,8 +3303,8 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
     </li>
     <li
       class="step"
-      data-testid="wizardStep-4"
-      id="tableToolWizard-step-4"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
       tabindex="-1"
     >
       <div
@@ -3101,7 +3322,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-tag govuk-tag govuk-tag--grey"
               >
-                Step 4 
+                Step 5 
               </span>
               <span
                 class="govuk-visually-hidden"
@@ -3174,7 +3395,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -3182,7 +3403,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -3191,9 +3412,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -3205,7 +3427,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >

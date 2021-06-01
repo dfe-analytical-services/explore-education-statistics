@@ -205,7 +205,10 @@ const ManagePublicationsAndReleasesTab = () => {
           </>
         ) : (
           <>
-            <h3 className="govuk-heading-s">
+            <h3
+              className="govuk-heading-s"
+              data-testid="no-permission-to-access-releases"
+            >
               You do not currently have permission to edit any releases within
               the service. To view a prerelease, please use the link provided to
               you by email.
