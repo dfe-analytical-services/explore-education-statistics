@@ -102,11 +102,15 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <SummaryListItem term="Published">
               <FormattedDate>{release.published}</FormattedDate>
             </SummaryListItem>
-            {isValidPartialDate(release.nextReleaseDate) && (
-              <SummaryListItem term="Next update">
-                <time>{formatPartialDate(release.nextReleaseDate)}</time>
-              </SummaryListItem>
-            )}
+            {release.latestRelease &&
+              isValidPartialDate(release.nextReleaseDate) && (
+                <SummaryListItem
+                  term="Next update"
+                  testId="next-update-list-item"
+                >
+                  <time>{formatPartialDate(release.nextReleaseDate)}</time>
+                </SummaryListItem>
+              )}
             {release.updates && release.updates.length > 0 && (
               <SummaryListItem term="Last updated">
                 <FormattedDate>{release.updates[0].on}</FormattedDate>

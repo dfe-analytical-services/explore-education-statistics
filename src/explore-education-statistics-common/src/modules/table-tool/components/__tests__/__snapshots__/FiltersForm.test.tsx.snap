@@ -10,11 +10,13 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
   >
     <dt
       class="govuk-summary-list__key"
+      data-testid="Indicators-key"
     >
       Indicators
     </dt>
     <dd
       class="govuk-summary-list__value"
+      data-testid="Indicators-value"
     >
       <ul
         class="govuk-list listContainer"
@@ -31,11 +33,13 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
   >
     <dt
       class="govuk-summary-list__key"
+      data-testid="School type-key"
     >
       School type
     </dt>
     <dd
       class="govuk-summary-list__value"
+      data-testid="School type-value"
     >
       <ul
         class="govuk-list listContainer"
@@ -52,11 +56,13 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
   >
     <dt
       class="govuk-summary-list__key"
+      data-testid="Characteristic-key"
     >
       Characteristic
     </dt>
     <dd
       class="govuk-summary-list__value"
+      data-testid="Characteristic-value"
     >
       <ul
         class="govuk-list listContainer"

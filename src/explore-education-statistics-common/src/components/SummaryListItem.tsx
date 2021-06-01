@@ -10,14 +10,26 @@ interface Props {
 const SummaryListItem = ({ actions, children, term, testId = term }: Props) => {
   return (
     <div className="govuk-summary-list__row" data-testid={testId}>
-      <dt className="govuk-summary-list__key">{term}</dt>
+      <dt className="govuk-summary-list__key" data-testid={`${testId}-key`}>
+        {term}
+      </dt>
 
       {typeof children !== 'undefined' && (
-        <dd className="govuk-summary-list__value">{children}</dd>
+        <dd
+          className="govuk-summary-list__value"
+          data-testid={`${testId}-value`}
+        >
+          {children}
+        </dd>
       )}
 
       {typeof actions !== 'undefined' && (
-        <dd className="govuk-summary-list__actions">{actions}</dd>
+        <dd
+          className="govuk-summary-list__actions"
+          data-testid={`${testId}-actions`}
+        >
+          {actions}
+        </dd>
       )}
     </div>
   );
