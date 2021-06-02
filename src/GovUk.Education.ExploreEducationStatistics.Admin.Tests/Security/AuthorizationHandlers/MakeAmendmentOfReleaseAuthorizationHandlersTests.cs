@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -402,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -439,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var previousVersion = new Release
                 {
-                    Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
+                    Id = Guid.NewGuid(),
                     Publication = publication,
                     Published = DateTime.UtcNow
                 };
