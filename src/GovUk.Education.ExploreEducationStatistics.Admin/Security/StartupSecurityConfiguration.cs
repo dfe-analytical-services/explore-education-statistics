@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                  */
                 // does this user have permission to manage all taxonomy?
                 options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
-                    policy.Requirements.Add(new ManageTaxonomyRequirement()));
+                    policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString()));
 
                 // does this user have permission to create a publication under a specific topic?
                 options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
@@ -227,11 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Pre Release management
              */
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
-
-            /**
-             * Taxonomy management
-             */
-            services.AddTransient<IAuthorizationHandler, ManageTaxonomyAuthorizationHandler>();
 
             /**
              * Methodology management
