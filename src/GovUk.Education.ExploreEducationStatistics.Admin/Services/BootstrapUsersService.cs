@@ -12,22 +12,28 @@ using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
-    public static class BootstrapUsersUtil
+    public class BootstrapUsersService
     {
+        private readonly IConfiguration _configuration;
+        private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
+        private readonly UsersAndRolesDbContext _contentDbContext;
+
+        public BootstrapUsersService(
+            IConfiguration configuration,
+            UsersAndRolesDbContext usersAndRolesDbContext, 
+            UsersAndRolesDbContext contentDbContext)
+        {
+            _configuration = configuration;
+            _usersAndRolesDbContext = usersAndRolesDbContext;
+            _contentDbContext = contentDbContext;
+        }
+
         /**
          * Add any bootstrapping BAU users that we have specified on startup. 
          */
-        public static void AddBootstrapUsers(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IConfiguration configuration)
+        public void AddBootstrapUsers()
         {
-            if (!env.IsDevelopment())
-            {
-                throw new Exception("Cannot add bootstrap users in non-Development environments");
-            }
-            
-            var bauBootstrapUserEmailAddresses = configuration
+            var bauBootstrapUserEmailAddresses = _configuration
                 .GetSection("BootstrapUsers")?
                 .GetValue<string>("BAU")?
                 .Split(',');
@@ -37,19 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 return;
             }
 
-            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope();
-            using var usersAndRolesDb = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>();
-            using var contentDb = serviceScope.ServiceProvider.GetService<ContentDbContext>();
+            var bauRole = _usersAndRolesDbContext.Roles.First(r => r.Name.Equals("BAU User"));
 
-            var bauRole = usersAndRolesDb.Roles.First(r => r.Name.Equals("BAU User"));
-
-            var existingEmailInvites = usersAndRolesDb
+            var existingEmailInvites = _usersAndRolesDbContext
                 .UserInvites
                 .Select(i => i.Email.ToLower())
                 .ToList();
 
-            var existingUserEmails = contentDb
+            var existingUserEmails = _contentDbContext
                 .Users
                 .Select(u => u.Email.ToLower())
                 .ToList();
@@ -72,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 return;
             }
 
-            usersAndRolesDb.UserInvites.AddRange(newInvitesToCreate);
-            usersAndRolesDb.SaveChanges();
+            _usersAndRolesDbContext.UserInvites.AddRange(newInvitesToCreate);
+            _usersAndRolesDbContext.SaveChanges();
         }
     }
 }
