@@ -59,30 +59,34 @@ You will need the following groups of dependencies to run the project successful
    - [.NET Core v3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
    
-2. To emulate azure storage you will require:
-   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
-
-  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows 
-  x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
-
-   - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
-   - [LocalDB](https://download.microsoft.com/download/2/A/5/2A5260C3-4143-47D8-9823-E91BB0121F94/ENU/x64/SqlLocalDB.msi)
-   
-   You will currently need to use Windows or a Windows VM with ports 10001, 10002 and 10003 exposed to run the service 
-   due to a dependency on Azure Storage Emulator for development, specifically the table storage component which is not 
-   supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the 
-   service.
-
-   Alternatively you could create your own Storage Account on Azure and amend your storage connection strings to point 
-   to this.
-
-3. To run the databases, you can use either:
+2. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
    - [Docker and Docker Compose](https://docs.docker.com/)
 
-The SQL Server Developer Edition is free and more fully-featured than SQL Express. Note that SQL Express is still 
-required for its LocalDB support for the Azure Storage Emulator.
+3. To emulate azure storage you will require:
+   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+
+  The installer for Windows x64 is 
+  [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+  
+  You can then run Azure Storage Emulator using the default instance of SQL Server as its data source, with the command:
+  
+  ```
+  AzureStorageEmulator.exe init /server .
+  ```
+  
+   You will currently need to use Windows (or a Windows VM with ports 10001, 10002 and 10003 exposed) to run the service 
+   due to a dependency on Azure Storage Emulator for development, specifically the table storage component which is not 
+   supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the 
+   service.
+
+   Alternatively if opting to not use Storage Explorer at all, you could create your own Storage Account on Azure and 
+   amend your storage connection strings to point to this.
+
+  - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+  - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+ 
 4. **Linux only** - Add symlinks to libmagic-1
 
    ```
@@ -133,11 +137,11 @@ the service against an empty set of databases, set the following environment var
 ```
 BootstrapUsersConfiguration=KeycloakBootstrapUsers
 ```
-The effect of setting these 2 environment variables together will allow authentication of users with Keycloak and those
+The effect of setting these 2 environment variables together will allow authentication of users with Keycloak, and those
 users specified within the 
-`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` will automatically be 
-able to be users to access the system as "BAU Users" - effectively able to bootstrap the rest of the data needed to use 
-the service, including the ability to invite other users to join the service.
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` will be available for use
+ as "BAU Users", who have the ability to create new Publications and Releases, and invite other users to the system to
+ work on those Publications and Releases.
 
 Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory and provide its 
 credentials in a file called 

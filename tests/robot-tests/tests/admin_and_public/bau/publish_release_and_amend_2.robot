@@ -444,6 +444,8 @@ Confirm data replacement
 Delete second subject file
     [Tags]  HappyPath
     user clicks link  Back  # back from data replacement confirmation
+    user clicks link  Back  # second back from data replacement confirmation
+    user clicks link  Back  # third back from data replacement confirmation!
     user waits until page contains accordion section  ${SECOND_SUBJECT}
     user opens accordion section  ${SECOND_SUBJECT}
     user scrolls to accordion section content  ${SECOND_SUBJECT}
