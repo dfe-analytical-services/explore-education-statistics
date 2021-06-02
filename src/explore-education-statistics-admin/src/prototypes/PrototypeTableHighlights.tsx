@@ -29,10 +29,7 @@ const PrototypeTableHighlights = () => {
       <PrototypePage wide>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <PageTitle
-              title="Create your own tables online"
-              caption="Table tool"
-            />
+            <PageTitle title="Create your own tables" caption="Table tool" />
             <p>
               Choose the data and area of interest you want to explore and then
               use filters to create your table.

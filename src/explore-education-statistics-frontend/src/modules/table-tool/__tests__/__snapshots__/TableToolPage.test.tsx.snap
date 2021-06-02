@@ -65,11 +65,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Publication-key"
                 >
                   Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Publication-value"
                 >
                   Test publication
                 </dd>
@@ -214,11 +216,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Geographic levels-key"
                               >
                                 Geographic levels
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Geographic levels-value"
                               >
                                 National
                               </dd>
@@ -229,11 +233,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Time period-key"
                               >
                                 Time period
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Time period-value"
                               >
                                 2020 Week 13 to 2021 Week 24
                               </dd>
@@ -244,11 +250,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
                             >
                               <dt
                                 class="govuk-summary-list__key"
+                                data-testid="Content-key"
                               >
                                 Content
                               </dt>
                               <dd
                                 class="govuk-summary-list__value"
+                                data-testid="Content-value"
                               >
                                 <div
                                   class="dfe-content"
@@ -373,11 +381,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 />
               </div>
             </dl>
@@ -427,11 +437,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -729,11 +741,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -825,11 +839,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Time period-key"
                 >
                   Time period
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Time period-value"
                 />
               </div>
             </dl>
@@ -879,11 +895,13 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -986,7 +1004,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -994,17 +1012,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Publication-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Publication-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -1020,7 +1040,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -1059,7 +1079,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose locations
+                Choose a subject
               </span>
             </h2>
             <dl
@@ -1067,23 +1087,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="National"
+                data-testid="Subject"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
-                  National
+                  Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
-                  <ul
-                    class="govuk-list listContainer"
-                  >
-                    <li>
-                      Great Britain
-                    </li>
-                  </ul>
+                  None
                 </dd>
               </div>
             </dl>
@@ -1099,7 +1115,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-2-goToButton"
                 type="button"
               >
-                Edit locations
+                Change subject
                  
                 <span
                   class="govuk-visually-hidden"
@@ -1138,7 +1154,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose time period
+                Choose locations
               </span>
             </h2>
             <dl
@@ -1146,17 +1162,25 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Time period"
+                data-testid="National"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
-                  Time period
+                  National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
-                  2018-19 to 2018-19
+                  <ul
+                    class="govuk-list listContainer"
+                  >
+                    <li>
+                      Great Britain
+                    </li>
+                  </ul>
                 </dd>
               </div>
             </dl>
@@ -1172,7 +1196,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-3-goToButton"
                 type="button"
               >
-                Edit time period
+                Edit locations
                  
                 <span
                   class="govuk-visually-hidden"
@@ -1211,6 +1235,81 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
+                Choose time period
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Time period"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                  data-testid="Time period-key"
+                >
+                  Time period
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                  data-testid="Time period-value"
+                >
+                  2018-19 to 2018-19
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-4-goToButton"
+                type="button"
+              >
+                Edit time period
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 4
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 5 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
                 Choose your filters
               </span>
             </h2>
@@ -1223,11 +1322,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -1247,11 +1348,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -1275,7 +1378,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -1283,7 +1386,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -1292,9 +1395,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -1306,7 +1410,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >
@@ -1920,7 +2024,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -1928,17 +2032,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Publication-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Publication-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -1954,7 +2060,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -1993,7 +2099,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose locations
+                Choose a subject
               </span>
             </h2>
             <dl
@@ -2001,23 +2107,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="National"
+                data-testid="Subject"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
-                  National
+                  Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
-                  <ul
-                    class="govuk-list listContainer"
-                  >
-                    <li>
-                      Great Britain
-                    </li>
-                  </ul>
+                  None
                 </dd>
               </div>
             </dl>
@@ -2033,7 +2135,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-2-goToButton"
                 type="button"
               >
-                Edit locations
+                Change subject
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2072,7 +2174,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose time period
+                Choose locations
               </span>
             </h2>
             <dl
@@ -2080,17 +2182,25 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Time period"
+                data-testid="National"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
-                  Time period
+                  National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
-                  2018-19 to 2018-19
+                  <ul
+                    class="govuk-list listContainer"
+                  >
+                    <li>
+                      Great Britain
+                    </li>
+                  </ul>
                 </dd>
               </div>
             </dl>
@@ -2106,7 +2216,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-3-goToButton"
                 type="button"
               >
-                Edit time period
+                Edit locations
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2145,6 +2255,81 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
+                Choose time period
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Time period"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                  data-testid="Time period-key"
+                >
+                  Time period
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                  data-testid="Time period-value"
+                >
+                  2018-19 to 2018-19
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-4-goToButton"
+                type="button"
+              >
+                Edit time period
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 4
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 5 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
                 Choose your filters
               </span>
             </h2>
@@ -2157,11 +2342,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -2181,11 +2368,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -2209,7 +2398,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -2217,7 +2406,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -2226,9 +2415,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -2240,7 +2430,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >
@@ -2837,7 +3027,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose a subject
+                Choose a publication
               </span>
             </h2>
             <dl
@@ -2845,17 +3035,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Subject"
+                data-testid="Publication"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Publication-key"
                 >
-                  Subject
+                  Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Publication-value"
                 >
-                  None
+                  Test publication
                 </dd>
               </div>
             </dl>
@@ -2871,7 +3063,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-1-goToButton"
                 type="button"
               >
-                Change subject
+                Change publication
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2910,7 +3102,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose locations
+                Choose a subject
               </span>
             </h2>
             <dl
@@ -2918,23 +3110,19 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="National"
+                data-testid="Subject"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
-                  National
+                  Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
-                  <ul
-                    class="govuk-list listContainer"
-                  >
-                    <li>
-                      Great Britain
-                    </li>
-                  </ul>
+                  None
                 </dd>
               </div>
             </dl>
@@ -2950,7 +3138,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-2-goToButton"
                 type="button"
               >
-                Edit locations
+                Change subject
                  
                 <span
                   class="govuk-visually-hidden"
@@ -2989,7 +3177,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
-                Choose time period
+                Choose locations
               </span>
             </h2>
             <dl
@@ -2997,17 +3185,25 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <div
                 class="govuk-summary-list__row"
-                data-testid="Time period"
+                data-testid="National"
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="National-key"
                 >
-                  Time period
+                  National
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="National-value"
                 >
-                  2018-19 to 2018-19
+                  <ul
+                    class="govuk-list listContainer"
+                  >
+                    <li>
+                      Great Britain
+                    </li>
+                  </ul>
                 </dd>
               </div>
             </dl>
@@ -3023,7 +3219,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="wizardStep-3-goToButton"
                 type="button"
               >
-                Edit time period
+                Edit locations
                  
                 <span
                   class="govuk-visually-hidden"
@@ -3062,6 +3258,81 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <span
                 class="govuk-visually-hidden"
               >
+                Choose time period
+              </span>
+            </h2>
+            <dl
+              class="govuk-summary-list govuk-summary-list--no-border"
+            >
+              <div
+                class="govuk-summary-list__row"
+                data-testid="Time period"
+              >
+                <dt
+                  class="govuk-summary-list__key"
+                  data-testid="Time period-key"
+                >
+                  Time period
+                </dt>
+                <dd
+                  class="govuk-summary-list__value"
+                  data-testid="Time period-value"
+                >
+                  2018-19 to 2018-19
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div
+            class="govuk-grid-column-one-third dfe-align--right"
+          >
+            <div
+              class="govuk-!-margin-top-2"
+            >
+              <button
+                class="stepButton"
+                data-testid="wizardStep-4-goToButton"
+                type="button"
+              >
+                Edit time period
+                 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  Step 4
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content contentSmall"
+      >
+        <div
+          class="govuk-grid-row"
+        >
+          <div
+            class="govuk-grid-column-two-thirds"
+          >
+            <h2
+              class="stepEnabled"
+            >
+              <span
+                class="govuk-tag govuk-tag govuk-tag--grey"
+              >
+                Step 5 
+              </span>
+              <span
+                class="govuk-visually-hidden"
+              >
                 Choose your filters
               </span>
             </h2>
@@ -3074,11 +3345,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Indicators-key"
                 >
                   Indicators
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Indicators-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -3098,11 +3371,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject studied-key"
                 >
                   Subject studied
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject studied-value"
                 >
                   <ul
                     class="govuk-list listContainer"
@@ -3126,7 +3401,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             >
               <button
                 class="stepButton"
-                data-testid="wizardStep-4-goToButton"
+                data-testid="wizardStep-5-goToButton"
                 type="button"
               >
                 Edit filters
@@ -3134,7 +3409,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 <span
                   class="govuk-visually-hidden"
                 >
-                  Step 4
+                  Step 5
                 </span>
               </button>
             </div>
@@ -3143,9 +3418,10 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
       </div>
     </li>
     <li
-      class="step"
-      data-testid="wizardStep-5"
-      id="tableToolWizard-step-5"
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-6"
+      id="tableToolWizard-step-6"
       tabindex="-1"
     >
       <div
@@ -3157,7 +3433,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
           <span
             class="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2"
           >
-            Step 5 
+            Step 6 
             <span
               class="govuk-visually-hidden"
             >

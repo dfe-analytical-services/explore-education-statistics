@@ -307,7 +307,7 @@ const PrototypeRelease = () => {
                 <PrototypeDownloadAncillary viewAsList />
               </TabsSection>
             </Tabs>
-            <h3 className="govuk-heading-m">Create your own tables online</h3>
+            <h3 className="govuk-heading-m">Create your own tables</h3>
             <p>
               Use our tool to build tables using our range of national and
               regional data

@@ -68,7 +68,7 @@ Return to Admin Dashboard
     [Tags]  HappyPath
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains element   id:publicationsReleases-themeTopic-themeId    180
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']    180
 
 Create another release for the same publication
     [Tags]  HappyPath
@@ -124,7 +124,7 @@ Navigate to 'Create data block' page
     user clicks link  Create data block
 
     user waits until h2 is visible  Create data block
-    user waits until h2 is visible   Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
@@ -134,7 +134,7 @@ Select subject "${SUBJECT_NAME}"
 
 Select locations
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)
@@ -147,14 +147,14 @@ Select locations
 
 Select time period
     [Tags]   HappyPath
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     id:timePeriodForm-submit
 
 Select indicators
     [Tags]  HappyPath
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
 
 Create table
@@ -236,7 +236,7 @@ Verify newly published release is on Find Statistics page
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
-    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
+    user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
 
 Navigate to published release page
@@ -268,7 +268,7 @@ Check other release is correct
 Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
     user waits for page to finish loading
 
 Select publication in table tool
@@ -277,18 +277,18 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible   View a featured table or create your own
+    user waits until table tool wizard step is available  Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_NAME}" in table tool
     [Tags]  HappyPath
     user clicks link  Create your own table
-    user waits until h3 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user waits until page contains   ${SUBJECT_NAME}
     user clicks radio    ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible  Choose locations
+    user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains  2    Subject    ${SUBJECT_NAME}
 
 Select locations in table tool
@@ -297,7 +297,7 @@ Select locations in table tool
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
     user clicks element     id:locationFiltersForm-submit
-    user waits until h2 is visible  Choose time period
+    user waits until table tool wizard step is available    Choose time period
     user checks previous table tool step contains  3   Local Authority    Barnsley
     user checks previous table tool step contains  3   Local Authority    Birmingham
 
@@ -309,7 +309,7 @@ Select time period in table tool
 
 Select indicators in table tool
     [Tags]  HappyPath
-    user waits until h2 is visible  Choose your filters
+    user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
     user clicks element   id:filtersForm-submit
 
@@ -342,10 +342,10 @@ Select table highlight from subjects step
     user waits until h1 is visible  Go back to previous step
     user clicks button  Confirm
 
-    user waits until h3 is visible  Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
     user clicks link  Featured tables
-    user waits until h3 is visible  Choose a table
+    user waits until table tool wizard step is available    Choose a table
 
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  Test highlight name
@@ -354,7 +354,7 @@ Select table highlight from subjects step
 
     user clicks link  Test highlight name
     user waits until results table appears  180
-    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
     [Tags]  HappyPath

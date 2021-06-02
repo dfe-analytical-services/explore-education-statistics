@@ -6,18 +6,19 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 describe('PublicPreReleaseAccessForm', () => {
-  test('renders with existing access list correctly', async () => {
-    const testAccessList = `
-<p>Test pre-release access list</p>
-<ul>
-    <li>Test person 1</li>
-    <li>Test person 2</li>
-</ul>
-`;
+  const testAccessList = `
+    <p>Test pre-release access list</p>
+    <ul>
+        <li>Test person 1</li>
+        <li>Test person 2</li>
+    </ul>
+  `;
 
+  test('renders with existing access list correctly', async () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
         />
@@ -38,7 +39,11 @@ describe('PublicPreReleaseAccessForm', () => {
   test('clicking Create button renders form with default text', () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
+        <PublicPreReleaseAccessForm
+          canUpdateRelease
+          preReleaseAccessList=""
+          onSubmit={noop}
+        />
       </TestConfigContextProvider>,
     );
 
@@ -56,17 +61,10 @@ describe('PublicPreReleaseAccessForm', () => {
   });
 
   test(`renders with existing access list correctly`, async () => {
-    const testAccessList = `
-<p>Test pre-release access list</p>
-<ul>
-    <li>Test person 1</li>
-    <li>Test person 2</li>
-</ul>
-`;
-
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           isReleaseLive
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
@@ -100,7 +98,11 @@ describe('PublicPreReleaseAccessForm', () => {
   test('submitting form hides the form', async () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
+        <PublicPreReleaseAccessForm
+          canUpdateRelease
+          preReleaseAccessList=""
+          onSubmit={noop}
+        />
       </TestConfigContextProvider>,
     );
 
@@ -127,6 +129,7 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
+          canUpdateRelease
           preReleaseAccessList=""
           onSubmit={handleSubmit}
         />
@@ -155,5 +158,23 @@ describe('PublicPreReleaseAccessForm', () => {
         preReleaseAccessList: 'Test updated access list',
       });
     });
+  });
+
+  test('does not render the Create / Edit button and shows a warning if the user does not have permission to update the release', () => {
+    render(
+      <TestConfigContextProvider>
+        <PublicPreReleaseAccessForm
+          canUpdateRelease={false}
+          preReleaseAccessList={testAccessList}
+          onSubmit={noop}
+        />
+      </TestConfigContextProvider>,
+    );
+    expect(
+      screen.getByText(
+        'This release has been approved, and can no longer be updated',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('access-list-btn')).not.toBeInTheDocument();
   });
 });

@@ -91,7 +91,7 @@ const PreReleaseTableToolPage = ({
 
   return (
     <>
-      <PageTitle title="Create your own tables online" caption="Table Tool" />
+      <PageTitle title="Create your own tables" caption="Table Tool" />
 
       <p>
         Choose the data and area of interest you want to explore and then use

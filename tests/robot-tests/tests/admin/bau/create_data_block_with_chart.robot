@@ -55,14 +55,14 @@ Start creating a data block
     user waits until page contains  No data blocks have been created.
 
     user clicks link  Create data block
-    user waits until h2 is visible   Choose a subject
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
-    user waits until h2 is visible  Choose locations    90
+    user waits until table tool wizard step is available    Choose locations    90
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
@@ -76,7 +76,7 @@ Select locations
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
-    user waits until h2 is visible  Choose time period  90
+    user waits until table tool wizard step is available    Choose time period  90
 
 Select time period
     [Tags]   HappyPath
@@ -89,9 +89,8 @@ Select time period
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     id:timePeriodForm-submit
-    user waits until h2 is visible  Choose your filters
-    user checks previous table tool step contains  3    Start date    2005
-    user checks previous table tool step contains  3    End date      2020
+    user waits until table tool wizard step is available    Choose your filters
+    user checks previous table tool step contains  3    Time period    2005 to 2020
 
 Select indicators
     [Tags]  HappyPath
@@ -303,7 +302,7 @@ Navigate to Chart tab
     set suite variable  ${DATABLOCK_URL}  ${url}
 
     user clicks link   Chart
-    user waits until h3 is visible  Choose chart type
+    user waits until table tool wizard step is available    Choose chart type
 
 Configure basic line chart
     [Tags]  HappyPath
@@ -416,7 +415,7 @@ Configure basic vertical bar chart
     user waits until page does not contain loading spinner
 
     user clicks link  Chart
-    user waits until h3 is visible  Choose chart type
+    user waits until table tool wizard step is available    Choose chart type
     user clicks button  Vertical bar
 
     user waits for chart preview to update
@@ -523,7 +522,7 @@ Configure basic horizontal bar chart
     user waits until page does not contain loading spinner
 
     user clicks link  Chart
-    user waits until h3 is visible  Choose chart type
+    user waits until table tool wizard step is available    Choose chart type
     user clicks button  Horizontal bar
 
     user waits for chart preview to update
@@ -617,7 +616,7 @@ Configure basic geographic chart
     user waits until page does not contain loading spinner
 
     user clicks link  Chart
-    user waits until h3 is visible  Choose chart type
+    user waits until table tool wizard step is available    Choose chart type
     user clicks button  Geographic
 
     user waits for chart preview to update
@@ -715,7 +714,7 @@ Configure basic infographic chart
     user waits until page does not contain loading spinner
 
     user clicks link  Chart
-    user waits until h3 is visible  Choose chart type
+    user waits until table tool wizard step is available    Choose chart type
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file  ${FILES_DIR}test-infographic.png
 

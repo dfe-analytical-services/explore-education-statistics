@@ -22,7 +22,7 @@ Click fast track link for 'Pupil absence rates' data block
 
 Validate Publication selected step option
     [Tags]  HappyPath
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Create your own tables
     user waits until page contains element    css:table
     user checks previous table tool step contains  1    Publication     Pupil absence in schools in England
 
@@ -33,10 +33,7 @@ Validate Subject selected step option
 Validate other selected step options
     [Tags]  HappyPath
     user checks previous table tool step contains  3    National        England
-
-    user checks previous table tool step contains  4    Start date      2012/13
-    user checks previous table tool step contains  4    End date        2016/17
-
+    user checks previous table tool step contains  4    Time period      2012/13 to 2016/17
     user checks previous table tool step contains  5    Indicators      Authorised absence rate
     user checks previous table tool step contains  5    Indicators      Overall absence rate
     user checks previous table tool step contains  5    Indicators      Unauthorised absence rate

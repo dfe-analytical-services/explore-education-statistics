@@ -116,7 +116,7 @@ export interface Release<
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
   latestRelease: boolean;
-  nextReleaseDate: PartialDate;
+  nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];
   type: {
     id: string;
