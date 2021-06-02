@@ -37,8 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required] public Guid TopicId { get; set; }
 
-        public Guid? MethodologyId { get; set; }
-
         public ExternalMethodology ExternalMethodology { get; set; }
 
         [Required] public ContactSaveViewModel Contact { get; set; }

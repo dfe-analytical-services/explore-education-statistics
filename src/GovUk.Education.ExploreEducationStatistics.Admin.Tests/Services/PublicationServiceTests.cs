@@ -133,8 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id
+                        TopicId = topic.Id
                     }
                 );
 
@@ -188,129 +187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Assert.True(result.IsLeft);
             AssertValidationProblem(result.Left, TopicDoesNotExist);
-        }
-
-        [Fact]
-        public async void CreatePublication_FailsWithNonExistingMethodology()
-        {
-            var topic = new Topic
-            {
-                Title = "Test topic"
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(topic);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.CreatePublication(
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test title",
-                        TopicId = topic.Id,
-                        MethodologyId = Guid.NewGuid(),
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyDoesNotExist);
-            }
-        }
-
-        [Fact]
-        public async void CreatePublication_FailsWithMethodologyAndExternalMethodology()
-        {
-            var topic = new Topic
-            {
-                Title = "Test topic"
-            };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Approved,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.CreatePublication(
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test title",
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id,
-                        ExternalMethodology = new ExternalMethodology
-                        {
-                            Title = "Test external",
-                            Url = "http://test.com"
-                        }
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, CannotSpecifyMethodologyAndExternalMethodology);
-            }
-        }
-
-
-        [Fact]
-        public async void CreatePublication_FailsWithUnapprovedMethodology()
-        {
-            var topic = new Topic
-            {
-                Title = "Test topic"
-            };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Draft,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.CreatePublication(
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test title",
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id,
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
-            }
         }
 
         [Fact]
@@ -416,8 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id,
+                        TopicId = topic.Id
                     }
                 );
 
@@ -516,8 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id,
+                        TopicId = topic.Id
                     }
                 );
 
@@ -597,8 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = publication.TopicId,
-                        MethodologyId = publication.MethodologyId,
+                        TopicId = publication.TopicId
                     }
                 );
 
@@ -667,8 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = publication.TopicId,
-                        MethodologyId = publication.MethodologyId,
+                        TopicId = publication.TopicId
                     }
                 );
 
@@ -722,135 +594,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, TopicDoesNotExist);
-            }
-        }
-
-        [Fact]
-        public async void UpdatePublication_FailsWithNonExistingMethodology()
-        {
-            var publication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Title = "Old topic"
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test publication",
-                        TopicId = publication.TopicId,
-                        MethodologyId = Guid.NewGuid(),
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyDoesNotExist);
-            }
-        }
-
-        [Fact]
-        public async void UpdatePublication_FailsWithMethodologyAndExternalMethodology()
-        {
-            var publication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Title = "Test topic"
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test publication",
-                        TopicId = publication.TopicId,
-                        MethodologyId = Guid.NewGuid(),
-                        ExternalMethodology = new ExternalMethodology
-                        {
-                            Title = "Test external",
-                            Url = "http://test.com"
-                        }
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, CannotSpecifyMethodologyAndExternalMethodology);
-            }
-        }
-
-        [Fact]
-        public async void UpdatePublication_FailsWithUnapprovedMethodology()
-        {
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Draft,
-            };
-            var publication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Title = "Test topic"
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(methodology);
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test publication",
-                        TopicId = publication.TopicId,
-                        MethodologyId = methodology.Id,
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
             }
         }
 

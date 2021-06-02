@@ -4,6 +4,7 @@ import methodologyService from '@admin/services/methodologyService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
+// TODO EES-2153 Remove this page
 const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
   return (
     <Page

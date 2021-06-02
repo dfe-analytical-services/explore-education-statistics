@@ -30,7 +30,9 @@ export interface BasicMethodology {
 
 const methodologyService = {
   getMethodologies(): Promise<BasicMethodology[]> {
-    return client.get<BasicMethodology[]>('/methodologies');
+    // TODO EES-2153 This was returning a list of all methodologies but will need removing
+    // when the Manage Publication page no longer offers that list
+    return Promise.resolve([]);
   },
 
   getMyMethodologies(): Promise<MethodologyStatusListItem[]> {

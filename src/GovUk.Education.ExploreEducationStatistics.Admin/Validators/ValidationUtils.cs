@@ -95,10 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         InvalidUserRole,
 
         // Methodology
-        MethodologyDoesNotExist,
         MethodologyMustBeDraft,
         MethodologyMustBeApproved,
-        CannotSpecifyMethodologyAndExternalMethodology,
 
         // Theme
         ThemeDoesNotExist,

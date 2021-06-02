@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Release : Versioned
+    public class Release : Versioned<Release>
     {
         public Guid Id { get; set; }
 

@@ -114,6 +114,7 @@ export const methodologiesIndexRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+// TODO EES-2153 Remove this route to the Create Methodology page
 export const methodologyCreateRoute: ProtectedRouteProps = {
   path: '/methodologies/create',
   component: MethodologyCreatePage,

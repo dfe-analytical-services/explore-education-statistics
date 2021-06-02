@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -27,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IMethodologyContentService _methodologyContentService;
-        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
@@ -37,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             ContentDbContext context,
             IMapper mapper,
             IMethodologyContentService methodologyContentService,
-            IMethodologyRepository methodologyRepository,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
@@ -47,31 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _context = context;
             _mapper = mapper;
             _methodologyContentService = methodologyContentService;
-            _methodologyRepository = methodologyRepository;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
-        }
-
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
-            MethodologyCreateRequest request)
-        {
-            var slug = SlugFromTitle(request.Title);
-            return await _userService.CheckCanCreateMethodology()
-                .OnSuccess(() => ValidateMethodologySlugUnique(slug))
-                .OnSuccess(async () =>
-                {
-                    var model = new Methodology
-                    {
-                        Title = request.Title,
-                        Slug = slug
-                    };
-
-                    var saved = await _context.Methodologies.AddAsync(model);
-                    await _context.SaveChangesAsync();
-                    return await GetSummaryAsync(saved.Entity.Id);
-                });
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
@@ -82,35 +60,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync()
-        {
-            return await _userService.CheckCanViewAllMethodologies()
-                .OnSuccess(async () =>
-                {
-                    var result = await _context.Methodologies.ToListAsync();
-                    return _mapper.Map<List<MethodologySummaryViewModel>>(result);
-                });
-        }
-
         public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync()
         {
             return await _userService
                 .CheckCanViewAllMethodologies()
                 .OnSuccess(async () =>
                 {
-                    var result = await _context
-                        .Methodologies
-                        .Include(m => m.Publications)
-                        .OrderBy(m => m.Title)
-                        .ToListAsync();
+                    return (await _context.PublicationMethodologies
+                        .Include(pm => pm.Publication)
+                        .ToList()
+                        .GroupBy(pm => pm.MethodologyParentId)
+                        .SelectAsync(async grouping =>
+                    {
+                        // TODO EES-2156 This intentionally only selects the first Methodology found
+                        // It will need updating when Methodology amendments are introduced
+                        // but it's likely the Methodology Dashboard will be removed before then
+                        var methodology = await _context.Methodologies.FirstAsync(m => m.MethodologyParentId == grouping.Key);
 
-                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(result);
-                })
-                .OrElse(async () =>
-                {
-                    var userId = _userService.GetUserId();
-                    var viewableMethodologies = await _methodologyRepository.GetMethodologiesForUser(userId);
-                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(viewableMethodologies);
+                        return new MethodologyPublicationsViewModel
+                        {
+                            Id = methodology.Id,
+                            Title = methodology.Title,
+                            Status = methodology.Status.ToString(),
+                            Publications = grouping.Select(publicationMethodology => new IdTitlePair
+                            {
+                                Id = publicationMethodology.Publication.Id,
+                                Title = publicationMethodology.Publication.Title
+                            }).ToList()
+                        };
+                    })).ToList();
                 });
         }
 
@@ -194,16 +172,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     return Unit.Instance;
                 });
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUnique(string slug)
-        {
-            if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug))
-            {
-                return ValidationActionResult(SlugNotUnique);
-            }
-
-            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
