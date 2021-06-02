@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Theme>(id)
-                .OnSuccess(_userService.CheckCanViewTheme)
+                .OnSuccess(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
 
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanAccessSystem()
                 .OnSuccess(
                     async _ => await _userService
-                        .CheckCanViewAllTopics()
+                        .CheckCanManageAllTaxonomy()
                         .OnSuccess(
                             async () => await _context.Themes
                                 .Include(theme => theme.Topics)

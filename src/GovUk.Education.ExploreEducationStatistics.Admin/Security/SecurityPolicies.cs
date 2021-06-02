@@ -55,13 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanManageAllTaxonomy,
 
         /**
-         * Topic / Theme management
-         */
-        CanViewAllTopics,
-        CanViewSpecificTheme,
-        CanViewSpecificTopic,
-
-        /**
          * Methodology management
          */
         CanCreateMethodologies,

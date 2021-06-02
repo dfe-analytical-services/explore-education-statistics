@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanAccessSystem)
-                .ExpectCheck(SecurityPolicies.CanViewAllTopics)
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy)
                 .AssertSuccess(
                     async userService =>
                     {
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanAccessSystem)
-                .ExpectCheck(SecurityPolicies.CanViewAllTopics, false)
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertSuccess(
                     async userService =>
                     {
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetTheme()
         {
             PolicyCheckBuilder()
-                .ExpectResourceCheck(_theme, SecurityPolicies.CanViewSpecificTheme, false)
+                .ExpectResourceCheck(_theme, SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {

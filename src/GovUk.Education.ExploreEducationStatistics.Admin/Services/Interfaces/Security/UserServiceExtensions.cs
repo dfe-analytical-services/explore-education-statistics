@@ -70,26 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodology, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanViewAllTopics(this IUserService userService)
-        {
-            return userService.CheckPolicy(SecurityPolicies.CanViewAllTopics);
-        }
-
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanViewAllReleases);
-        }
-
-        public static Task<Either<ActionResult, Theme>> CheckCanViewTheme(
-            this IUserService userService, Theme theme)
-        {
-            return userService.CheckPolicy(theme, SecurityPolicies.CanViewSpecificTheme);
-        }
-
-        public static Task<Either<ActionResult, Topic>> CheckCanViewTopic(
-            this IUserService userService, Topic topic)
-        {
-            return userService.CheckPolicy(topic, SecurityPolicies.CanViewSpecificTopic);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllTaxonomy(this IUserService userService)
