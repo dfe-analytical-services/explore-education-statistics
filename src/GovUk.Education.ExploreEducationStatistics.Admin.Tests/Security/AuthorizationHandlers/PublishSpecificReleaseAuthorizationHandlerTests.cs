@@ -53,11 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that no User Release roles will allow a draft Release to be published
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
                     contentDbContext =>
+                        new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
+                    new Release
                     {
-                        return new PublishSpecificReleaseAuthorizationHandler(
-                            new UserReleaseRoleRepository(contentDbContext));
-                    },
-                    new Release());
+                        Status = Draft
+                    }
+                );
             }
 
             [Fact]
@@ -65,8 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that only the Approver User Release role will allow an approved Release to be published
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
-                    contentDbContext => new PublishSpecificReleaseAuthorizationHandler(
-                        new UserReleaseRoleRepository(contentDbContext)),
+                    contentDbContext => 
+                        new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
                         Status = Approved
