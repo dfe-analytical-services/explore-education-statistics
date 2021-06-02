@@ -7,14 +7,23 @@ import React, {
 } from 'react';
 import noop from 'lodash/noop';
 
+export interface UnSavedEdit {
+  sectionId: string;
+  blockIds: string[];
+}
+
 export interface EditingContextState {
   isEditing: boolean;
   setEditing: (isEditing: boolean) => void;
+  unSavedEdits: UnSavedEdit[];
+  setUnSavedEdits: (unSavedEdits: UnSavedEdit[]) => void;
 }
 
 export const EditingContext = createContext<EditingContextState>({
   isEditing: false,
   setEditing: noop,
+  unSavedEdits: [],
+  setUnSavedEdits: noop,
 });
 
 export function useEditingContext() {
@@ -25,6 +34,7 @@ interface EditingContextProviderProps {
   children: ReactNode | ((state: EditingContextState) => ReactNode);
   value?: {
     isEditing: boolean;
+    unSavedEdits?: UnSavedEdit[];
   };
 }
 
@@ -35,13 +45,16 @@ export const EditingContextProvider = ({
   },
 }: EditingContextProviderProps) => {
   const [isEditing, setEditing] = useState<boolean>(value.isEditing);
+  const [unSavedEdits, setUnSavedEdits] = useState<UnSavedEdit[]>([]);
 
   const state = useMemo<EditingContextState>(() => {
     return {
       isEditing,
       setEditing,
+      unSavedEdits,
+      setUnSavedEdits,
     };
-  }, [isEditing]);
+  }, [isEditing, unSavedEdits]);
 
   return (
     <EditingContext.Provider value={state}>

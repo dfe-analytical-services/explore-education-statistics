@@ -6,13 +6,19 @@ import { EditableBlock } from '@admin/services/types/content';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import React, { useCallback } from 'react';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
+import {
+  addUnSavedEdit,
+  removeUnSavedEdit,
+} from '@admin/pages/release/content/components/utils/unSavedEdits';
 
 interface Props {
   allowImages?: boolean;
   releaseId: string;
   block: EditableBlock;
+  sectionId: string;
   editable?: boolean;
   onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
@@ -22,6 +28,7 @@ const ReleaseEditableBlock = ({
   allowImages = false,
   releaseId,
   block,
+  sectionId,
   editable = true,
   onSave,
   onDelete,
@@ -38,17 +45,30 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
+  const { unSavedEdits, setUnSavedEdits } = useEditingContext();
+
   const handleSave = useCallback(
     (content: string) => {
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
       onSave(block.id, contentWithPlaceholders);
+      setUnSavedEdits(removeUnSavedEdit(unSavedEdits, sectionId, block.id));
     },
-    [block.id, onSave],
+    [block.id, sectionId, onSave, unSavedEdits, setUnSavedEdits],
   );
 
   const handleDelete = useCallback(() => {
     onDelete(block.id);
   }, [block.id, onDelete]);
+
+  const handleBlur = (isDirty: boolean) => {
+    if (isDirty) {
+      setUnSavedEdits(addUnSavedEdit(unSavedEdits, sectionId, block.id));
+    }
+  };
+
+  const handleCancel = () => {
+    setUnSavedEdits(removeUnSavedEdit(unSavedEdits, sectionId, block.id));
+  };
 
   switch (block.type) {
     case 'DataBlock':
@@ -75,6 +95,8 @@ const ReleaseEditableBlock = ({
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
           transformImageAttributes={transformImageAttributes}
+          handleBlur={handleBlur}
+          onCancel={handleCancel}
           onSave={handleSave}
           onDelete={handleDelete}
           onImageUpload={allowImages ? handleImageUpload : undefined}
