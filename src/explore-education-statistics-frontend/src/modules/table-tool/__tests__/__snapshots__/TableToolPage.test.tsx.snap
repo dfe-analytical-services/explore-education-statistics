@@ -1016,13 +1016,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
-                  data-testid="Subject-key"
+                  data-testid="Publication-key"
                 >
                   Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
-                  data-testid="Subject-value"
+                  data-testid="Publication-value"
                 >
                   Test publication
                 </dd>
@@ -1091,11 +1091,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -2034,13 +2036,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
-                  data-testid="Subject-key"
+                  data-testid="Publication-key"
                 >
                   Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
-                  data-testid="Subject-value"
+                  data-testid="Publication-value"
                 >
                   Test publication
                 </dd>
@@ -2109,11 +2111,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
@@ -3035,13 +3039,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
-                  data-testid="Subject-key"
+                  data-testid="Publication-key"
                 >
                   Publication
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
-                  data-testid="Subject-value"
+                  data-testid="Publication-value"
                 >
                   Test publication
                 </dd>
@@ -3110,11 +3114,13 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               >
                 <dt
                   class="govuk-summary-list__key"
+                  data-testid="Subject-key"
                 >
                   Subject
                 </dt>
                 <dd
                   class="govuk-summary-list__value"
+                  data-testid="Subject-value"
                 >
                   None
                 </dd>
