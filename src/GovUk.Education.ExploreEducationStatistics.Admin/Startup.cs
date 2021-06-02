@@ -341,6 +341,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
+            // This service allows a set of users to be pre-invited to the service on startup.
+            if (HostEnvironment.IsDevelopment())
+            {
+                services.AddTransient<BootstrapUsersService>();
+            }
+
             // These services allow us to check our Policies within Controllers and Services
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
@@ -506,7 +512,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             if (env.IsDevelopment())
             {
-                BootstrapUsersUtil.AddBootstrapUsers(app, env, Configuration);
+                using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                    .CreateScope();
+                
+                serviceScope.ServiceProvider
+                    .GetService<BootstrapUsersService>()
+                    .AddBootstrapUsers();
             } 
         }
 
