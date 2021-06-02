@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(topicId, HydrateTopicForTopicViewModel)
-                .OnSuccess(_userService.CheckCanManageAllTaxonomy)
+                .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<TopicViewModel>);
         }
 
