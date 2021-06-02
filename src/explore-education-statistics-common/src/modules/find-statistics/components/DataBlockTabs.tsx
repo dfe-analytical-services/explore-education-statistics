@@ -133,9 +133,9 @@ const DataBlockTabs = ({
                     dataBlock.table.tableHeaders
                       ? mapTableHeadersConfig(
                           dataBlock.table.tableHeaders,
-                          fullTable.subjectMeta,
+                          fullTable,
                         )
-                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                      : getDefaultTableHeaderConfig(fullTable)
                   }
                 />
 

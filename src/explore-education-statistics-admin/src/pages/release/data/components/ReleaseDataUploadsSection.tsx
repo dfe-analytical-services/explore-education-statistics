@@ -120,6 +120,18 @@ const ReleaseDataUploadsSection = ({
     dataFile: DataFile,
     { status }: DataFileImportStatus,
   ) => {
+    // Update data file if uploading a zip so get the correct size and rows.
+    let updatedDataFile = dataFile;
+    if (
+      dataFile.isQueuedZipUpload &&
+      ['UPLOADING', 'QUEUED'].indexOf(status) === -1
+    ) {
+      updatedDataFile = await releaseDataFileService.getDataFile(
+        releaseId,
+        dataFile.id,
+      );
+    }
+
     const permissions = await permissionService.getDataFilePermissions(
       releaseId,
       dataFile.id,
@@ -130,7 +142,7 @@ const ReleaseDataUploadsSection = ({
         file.fileName !== dataFile.fileName
           ? file
           : {
-              ...file,
+              ...updatedDataFile,
               status,
               permissions,
             },
@@ -153,6 +165,7 @@ const ReleaseDataUploadsSection = ({
           name: values.subjectTitle.trim(),
           zipFile: values.zipFile as File,
         });
+        file.isQueuedZipUpload = true;
       }
 
       setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));

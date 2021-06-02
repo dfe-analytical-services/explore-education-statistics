@@ -61,7 +61,7 @@ describe('ReleasePreReleaseAccessPage', () => {
       expect(screen.queryByTestId('prerelease-url')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('prerelease-url')).toHaveTextContent(
+    expect(screen.getByLabelText('Url')).toHaveValue(
       'http://localhost/publication/publication-1/release/release-1/prerelease/content',
     );
   });

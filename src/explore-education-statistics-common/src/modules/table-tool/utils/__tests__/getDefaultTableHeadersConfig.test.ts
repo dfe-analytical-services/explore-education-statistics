@@ -3,104 +3,119 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
 describe('getDefaultTableHeadersConfig', () => {
-  test('returns correct config using a variety of options for every filter type', () => {
-    const testTableData: TableDataResponse = {
-      subjectMeta: {
-        filters: {
-          Characteristic: {
-            totalValue: '',
-            hint: '',
-            legend: 'Characteristic',
-            name: 'characteristic',
-            options: {
-              EthnicGroupMajor: {
-                label: 'Ethnic group major',
-                options: [
-                  {
-                    label: 'Ethnicity Major Black Total',
-                    value: 'ethnicity-major-black-total',
-                  },
-                  {
-                    label: 'Ethnicity Major Asian Total',
-                    value: 'ethnicity-major-asian-total',
-                  },
-                ],
-              },
-            },
-          },
-          SchoolType: {
-            totalValue: '',
-            hint: 'Filter by school type',
-            legend: 'School type',
-            name: 'school_type',
-            options: {
-              Default: {
-                label: 'Default',
-                options: [
-                  {
-                    label: 'State-funded secondary',
-                    value: 'state-funded-secondary',
-                  },
-                  {
-                    label: 'Special',
-                    value: 'special',
-                  },
-                  {
-                    label: 'State-funded primary',
-                    value: 'state-funded-primary',
-                  },
-                ],
-              },
+  const testTableData: TableDataResponse = {
+    subjectMeta: {
+      filters: {
+        Characteristic: {
+          totalValue: '',
+          hint: '',
+          legend: 'Characteristic',
+          name: 'characteristic',
+          options: {
+            EthnicGroupMajor: {
+              label: 'Ethnic group major',
+              options: [
+                {
+                  label: 'Ethnicity Major Black Total',
+                  value: 'ethnicity-major-black-total',
+                },
+                {
+                  label: 'Ethnicity Major Asian Total',
+                  value: 'ethnicity-major-asian-total',
+                },
+              ],
             },
           },
         },
-        footnotes: [],
-        geoJsonAvailable: false,
-        indicators: [
-          {
-            value: 'overall-absence-sessions',
-            label: 'Number of overall absence sessions',
-            unit: '',
-            name: 'sess_overall',
-            decimalPlaces: 2,
+        SchoolType: {
+          totalValue: '',
+          hint: 'Filter by school type',
+          legend: 'School type',
+          name: 'school_type',
+          options: {
+            Default: {
+              label: 'Default',
+              options: [
+                {
+                  label: 'State-funded secondary',
+                  value: 'state-funded-secondary',
+                },
+                {
+                  label: 'Special',
+                  value: 'special',
+                },
+                {
+                  label: 'State-funded primary',
+                  value: 'state-funded-primary',
+                },
+              ],
+            },
           },
-          {
-            value: 'authorised-absence-sessions',
-            label: 'Number of authorised absence sessions',
-            unit: '',
-            name: 'sess_authorised',
-            decimalPlaces: 2,
-          },
-          {
-            value: 'persistent-absentees',
-            label: 'Number of persistent absentees',
-            unit: '',
-            name: 'enrolments_pa_10_exact',
-            decimalPlaces: 2,
-          },
-          {
-            value: 'unauthorised-absence-sessions',
-            label: 'Number of unauthorised absence sessions',
-            unit: '',
-            name: 'sess_unauthorised',
-            decimalPlaces: 2,
-          },
-        ],
-        locations: [
-          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-          { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
-        ],
-        boundaryLevels: [],
-        publicationName: 'Pupil absence in schools in England',
-        subjectName: 'Absence by characteristic',
-        timePeriodRange: [
-          { label: '2014/15', code: 'AY', year: 2014 },
-          { label: '2015/16', code: 'AY', year: 2015 },
-        ],
+        },
       },
-      results: [],
-    };
+      footnotes: [],
+      geoJsonAvailable: false,
+      indicators: [
+        {
+          value: 'overall-absence-sessions',
+          label: 'Number of overall absence sessions',
+          unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
+        },
+        {
+          value: 'authorised-absence-sessions',
+          label: 'Number of authorised absence sessions',
+          unit: '',
+          name: 'sess_authorised',
+          decimalPlaces: 2,
+        },
+        {
+          value: 'persistent-absentees',
+          label: 'Number of persistent absentees',
+          unit: '',
+          name: 'enrolments_pa_10_exact',
+          decimalPlaces: 2,
+        },
+        {
+          value: 'unauthorised-absence-sessions',
+          label: 'Number of unauthorised absence sessions',
+          unit: '',
+          name: 'sess_unauthorised',
+          decimalPlaces: 2,
+        },
+      ],
+      locations: [
+        { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
+        { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
+      ],
+      boundaryLevels: [],
+      publicationName: 'Pupil absence in schools in England',
+      subjectName: 'Absence by characteristic',
+      timePeriodRange: [
+        { label: '2014/15', code: 'AY', year: 2014 },
+        { label: '2015/16', code: 'AY', year: 2015 },
+      ],
+    },
+    results: [
+      {
+        filters: [],
+        geographicLevel: '',
+        location: {},
+        measures: {},
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: [],
+        geographicLevel: '',
+        location: {},
+        measures: {},
+        timePeriod: '2015_AY',
+      },
+    ],
+  };
 
+  test('returns correct config using a variety of options for every filter type', () => {
     const testSubjectMeta = mapFullTable(testTableData);
 
     const {
@@ -108,7 +123,7 @@ describe('getDefaultTableHeadersConfig', () => {
       rowGroups,
       columns,
       columnGroups,
-    } = getDefaultTableHeaderConfig(testSubjectMeta.subjectMeta);
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -137,58 +152,10 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config using a larger number of time periods than indicators', () => {
-    const testTableData: TableDataResponse = {
+    const testTableDataTimePeriods = {
+      ...testTableData,
       subjectMeta: {
-        filters: {
-          Characteristic: {
-            totalValue: '',
-            hint: '',
-            legend: 'Characteristic',
-            name: 'characteristic',
-            options: {
-              EthnicGroupMajor: {
-                label: 'Ethnic group major',
-                options: [
-                  {
-                    label: 'Ethnicity Major Black Total',
-                    value: 'ethnicity-major-black-total',
-                  },
-                  {
-                    label: 'Ethnicity Major Asian Total',
-                    value: 'ethnicity-major-asian-total',
-                  },
-                ],
-              },
-            },
-          },
-          SchoolType: {
-            totalValue: '',
-            hint: 'Filter by school type',
-            legend: 'School type',
-            name: 'school_type',
-            options: {
-              Default: {
-                label: 'Default',
-                options: [
-                  {
-                    label: 'State-funded secondary',
-                    value: 'state-funded-secondary',
-                  },
-                  {
-                    label: 'Special',
-                    value: 'special',
-                  },
-                  {
-                    label: 'State-funded primary',
-                    value: 'state-funded-primary',
-                  },
-                ],
-              },
-            },
-          },
-        },
-        footnotes: [],
-        geoJsonAvailable: false,
+        ...testTableData.subjectMeta,
         indicators: [
           {
             value: 'overall-absence-sessions',
@@ -212,13 +179,6 @@ describe('getDefaultTableHeadersConfig', () => {
             decimalPlaces: 2,
           },
         ],
-        locations: [
-          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-          { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
-        ],
-        boundaryLevels: [],
-        publicationName: 'Pupil absence in schools in England',
-        subjectName: 'Absence by characteristic',
         timePeriodRange: [
           { label: '2014/15', code: 'AY', year: 2014 },
           { label: '2015/16', code: 'AY', year: 2015 },
@@ -227,17 +187,53 @@ describe('getDefaultTableHeadersConfig', () => {
           { label: '2018/19', code: 'AY', year: 2018 },
         ],
       },
-      results: [],
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2015_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2016_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_AY',
+        },
+      ],
     };
 
-    const testSubjectMeta = mapFullTable(testTableData);
+    const testSubjectMeta = mapFullTable(testTableDataTimePeriods);
 
     const {
       rows,
       rowGroups,
       columns,
       columnGroups,
-    } = getDefaultTableHeaderConfig(testSubjectMeta.subjectMeta);
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -268,35 +264,14 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config when two options for every filter type', () => {
-    const testTableData: TableDataResponse = {
+    const testTableDataTwoOptions = {
+      ...testTableData,
       subjectMeta: {
+        ...testTableData.subjectMeta,
         filters: {
-          Characteristic: {
-            totalValue: '',
-            hint: '',
-            legend: 'Characteristic',
-            name: 'characteristic',
-            options: {
-              EthnicGroupMajor: {
-                label: 'Ethnic group major',
-                options: [
-                  {
-                    label: 'Ethnicity Major Black Total',
-                    value: 'ethnicity-major-black-total',
-                  },
-                  {
-                    label: 'Ethnicity Major Asian Total',
-                    value: 'ethnicity-major-asian-total',
-                  },
-                ],
-              },
-            },
-          },
+          ...testTableData.subjectMeta.filters,
           SchoolType: {
-            totalValue: '',
-            hint: 'Filter by school type',
-            legend: 'School type',
-            name: 'school_type',
+            ...testTableData.subjectMeta.filters.SchoolType,
             options: {
               Default: {
                 label: 'Default',
@@ -314,8 +289,6 @@ describe('getDefaultTableHeadersConfig', () => {
             },
           },
         },
-        footnotes: [],
-        geoJsonAvailable: false,
         indicators: [
           {
             value: 'overall-absence-sessions',
@@ -332,29 +305,17 @@ describe('getDefaultTableHeadersConfig', () => {
             decimalPlaces: 2,
           },
         ],
-        locations: [
-          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-          { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
-        ],
-        boundaryLevels: [],
-        publicationName: 'Pupil absence in schools in England',
-        subjectName: 'Absence by characteristic',
-        timePeriodRange: [
-          { label: '2014/15', code: 'AY', year: 2014 },
-          { label: '2015/16', code: 'AY', year: 2015 },
-        ],
       },
-      results: [],
     };
 
-    const testSubjectMeta = mapFullTable(testTableData);
+    const testSubjectMeta = mapFullTable(testTableDataTwoOptions);
 
     const {
       rows,
       rowGroups,
       columns,
       columnGroups,
-    } = getDefaultTableHeaderConfig(testSubjectMeta.subjectMeta);
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -380,14 +341,14 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config with siblingless filters removed when one option for every filter type', () => {
-    const testTableData: TableDataResponse = {
+    const testTableDataSiblingless = {
+      ...testTableData,
       subjectMeta: {
+        ...testTableData.subjectMeta,
         filters: {
+          ...testTableData.subjectMeta.filters,
           Characteristic: {
-            totalValue: '',
-            hint: '',
-            legend: 'Characteristic',
-            name: 'characteristic',
+            ...testTableData.subjectMeta.filters.Characteristic,
             options: {
               EthnicGroupMajor: {
                 label: 'Ethnic group major',
@@ -401,10 +362,7 @@ describe('getDefaultTableHeadersConfig', () => {
             },
           },
           SchoolType: {
-            totalValue: '',
-            hint: 'Filter by school type',
-            legend: 'School type',
-            name: 'school_type',
+            ...testTableData.subjectMeta.filters.SchoolType,
             options: {
               Default: {
                 label: 'Default',
@@ -418,8 +376,6 @@ describe('getDefaultTableHeadersConfig', () => {
             },
           },
         },
-        footnotes: [],
-        geoJsonAvailable: false,
         indicators: [
           {
             value: 'overall-absence-sessions',
@@ -432,22 +388,26 @@ describe('getDefaultTableHeadersConfig', () => {
         locations: [
           { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
         ],
-        boundaryLevels: [],
-        publicationName: 'Pupil absence in schools in England',
-        subjectName: 'Absence by characteristic',
-        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
       },
-      results: [],
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2014_AY',
+        },
+      ],
     };
 
-    const testSubjectMeta = mapFullTable(testTableData);
+    const testSubjectMeta = mapFullTable(testTableDataSiblingless);
 
     const {
       rows,
       rowGroups,
       columns,
       columnGroups,
-    } = getDefaultTableHeaderConfig(testSubjectMeta.subjectMeta);
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     // Should only have indicators and time periods
     // when all other filter types are siblingless
@@ -459,5 +419,45 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(columns).toHaveLength(1);
     expect(columns[0].label).toBe('2014/15');
+  });
+
+  test('returns the correct time periods when terms are selected', () => {
+    const testTableDataTerms = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        timePeriodRange: [
+          { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
+          { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
+          { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
+          { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
+          { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
+        ],
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_T1',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_T1',
+        },
+      ],
+    };
+
+    const testSubjectMeta = mapFullTable(testTableDataTerms);
+
+    const { columns } = getDefaultTableHeaderConfig(testSubjectMeta);
+
+    expect(columns).toHaveLength(2);
+    expect(columns[0].label).toBe('2017/18 Autumn Term');
+    expect(columns[1].label).toBe('2018/19 Autumn Term');
   });
 });

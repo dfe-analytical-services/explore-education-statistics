@@ -13,7 +13,7 @@ user signs in as bau1
 
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -29,7 +29,7 @@ user signs in as analyst1
 
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
-    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home

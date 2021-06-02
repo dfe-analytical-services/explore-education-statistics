@@ -104,7 +104,7 @@ const DataBlockPageTabs = ({
     try {
       const tableHeaders = mapTableHeadersConfig(
         dataBlock.table.tableHeaders,
-        table.subjectMeta,
+        table,
       );
 
       return {

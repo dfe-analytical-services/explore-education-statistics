@@ -39,7 +39,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
 
     const tableHeaders = mapTableHeadersConfig(
       dataBlock.table.tableHeaders,
-      table.subjectMeta,
+      table,
     );
 
     return {

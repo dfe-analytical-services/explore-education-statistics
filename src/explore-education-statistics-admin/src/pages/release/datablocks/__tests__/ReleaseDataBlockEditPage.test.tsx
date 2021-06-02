@@ -193,7 +193,8 @@ describe('ReleaseDataBlockEditPage', () => {
       ).toBeInTheDocument();
 
       expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
-      expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
+
+      expect(screen.getByLabelText('Url')).toHaveValue(
         'http://localhost/data-tables/fast-track/block-1',
       );
     });
@@ -375,7 +376,7 @@ describe('ReleaseDataBlockEditPage', () => {
         expect(screen.getByTestId('Highlight description')).toHaveTextContent(
           'Test highlight description 1',
         );
-        expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
+        expect(screen.getByLabelText('Url')).toHaveValue(
           'http://localhost/data-tables/fast-track/block-1',
         );
       });
@@ -400,7 +401,7 @@ describe('ReleaseDataBlockEditPage', () => {
           screen.queryByTestId('Highlight description'),
         ).not.toBeInTheDocument();
 
-        expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
+        expect(screen.getByLabelText('Url')).toHaveValue(
           'http://localhost/data-tables/fast-track/block-1',
         );
       });

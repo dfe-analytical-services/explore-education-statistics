@@ -59,25 +59,34 @@ You will need the following groups of dependencies to run the project successful
    - [.NET Core v3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
    
-2. To emulate azure storage you will require either:
-   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
-
-  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
-
-   - [Azurite](https://github.com/Azure/Azurite)
-   - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
-   - [LocalDB](https://download.microsoft.com/download/2/A/5/2A5260C3-4143-47D8-9823-E91BB0121F94/ENU/x64/SqlLocalDB.msi)
-   
-   You will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator
-for development, specifically the table storage component which is not supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the service.
-
-   Alternatively you could create your own Storage Account on Azure and ammend your storage connection string to point to this.
-
-3. To run the databases, you can use either:
+2. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
    - [Docker and Docker Compose](https://docs.docker.com/)
 
+3. To emulate azure storage you will require:
+   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+
+  The installer for Windows x64 is 
+  [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+  
+  You can then run Azure Storage Emulator using the default instance of SQL Server as its data source, with the command:
+  
+  ```
+  AzureStorageEmulator.exe init /server .
+  ```
+  
+   You will currently need to use Windows (or a Windows VM with ports 10001, 10002 and 10003 exposed) to run the service 
+   due to a dependency on Azure Storage Emulator for development, specifically the table storage component which is not 
+   supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the 
+   service.
+
+   Alternatively if opting to not use Storage Explorer at all, you could create your own Storage Account on Azure and 
+   amend your storage connection strings to point to this.
+
+  - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+  - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+ 
 4. **Linux only** - Add symlinks to libmagic-1
 
    ```
@@ -88,6 +97,14 @@ for development, specifically the table storage component which is not supported
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
+### Setting up the database and Identity Provider
+
+The service can be started against a set of non-existent database. If no pre-existing `content` or `statistics` 
+databases yet exist on the target SQL Server instance, starting up the service will create them and provide the basic
+starting data to get up and running.
+
+Similarly, the service can be started alongside a local Identity Provider called [Keycloak]() 
+
 ### Running the backend
 
 1. Add the following to your `hosts` file:
@@ -95,14 +112,51 @@ for development, specifically the table storage component which is not supported
    ```
    127.0.0.1    db
    127.0.0.1    data-storage
-   ```
 
-2. If using SQLServer (instead of Docker), you should create your public frontend databases:
+2. Ensure you have Azure Storage Emulator running.
 
-   - `content`
-   - `statistics`
+3. Start the locally-provided Identity Provider or configure your own.
 
-3. Ensure you have Azure Storage Emulator running.
+Out of the box, the project supplies a Docker container Identity Provider called [Keycloak](https://www.keycloak.org/) 
+but any OpenID Connect compatible Identity Provider can be used e.g. Active Directory. It must have Implicit Flow enabled 
+and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
+
+- To run the out-of-the-box Keycloak Identity Provider:
+
+  ```
+  cd useful-scripts
+  ./run.js idp
+  ```
+
+To then get the other service components to use Keycloak, set the following environment variable:
+```
+IdpProviderConfiguration=Keycloak
+```
+And additionally if wanting to set up a set of Keycloak users automatically in the service in order to start using 
+the service against an empty set of databases, set the following environment variable:
+```
+BootstrapUsersConfiguration=KeycloakBootstrapUsers
+```
+The effect of setting these 2 environment variables together will allow authentication of users with Keycloak, and those
+users specified within the 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` will be available for use
+ as "BAU Users", who have the ability to create new Publications and Releases, and invite other users to the system to
+ work on those Publications and Releases.
+
+Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory and provide its 
+credentials in a file called 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` and a set of users'
+email addresses who you want to access the system straight away in a file called 
+`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}BootstrapUsers.json`.  
+Then set the environment variables above like:
+```
+IdpProviderConfiguration={NameOfYourIdentityProvider}
+BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
+```
+
+If choosing to provide your own OpenID Connect configuration file, you can use the existing Keycloak configuration file
+as a reference, at 
+[appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json).
 
 #### Running the applications
 
@@ -129,6 +183,22 @@ Examples:
   cd useful-scripts
   ./run.js admin processor notifier
   ```
+  
+  More specifically, to run the admin using Keycloak as the Identity Provider and to auto-create a set of users from 
+  Keycloak within the admin:
+
+  Set the following environment variables:
+  ```
+  IdpProviderConfiguration=Keycloak
+  BootstrapUsersConfiguration=KeycloakBootstrapUsers
+  ```
+  
+  and then continue on to run:
+
+  ```
+  cd useful-scripts
+  ./run.js admin processor notifier
+  ```
 
 ##### Using Docker
 
@@ -148,6 +218,20 @@ Examples:
   ```
   cd src/
   docker-compose up -d db
+  ```
+
+- To run the Keycloak IdP:
+
+  ```
+  cd src/
+  docker-compose up -d idp
+  ```
+
+  or
+  
+  ```
+  cd useful-scripts/
+  ./run.js idp
   ```
 
 ### Running the frontend
@@ -385,7 +469,7 @@ To generate a migration for the UsersAndRolesDbContext:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext -v
+dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
 ### Resetting the storage emulator
@@ -399,7 +483,18 @@ To delete all data in the storage emulator:
 AzureStorageEmulator.exe clear blob queue table
 ```
 
-## Automated tests
+### Taking a backup of Keycloak users
+
+If wanting to add more users to the standard set of users we use and are using Keycloak as the Identity Provider, the users will firstly need to be
+added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
+
+```
+docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \ 
+-Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.realmName=ees-realm -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.file=/tmp/new-ees-realm.json
+```
+
+Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
+realm configuration.
 
 Aside from unit tests for each project, we maintain suites of Robot Framework and Postman/Newman 
 tests that can be found in `tests`.

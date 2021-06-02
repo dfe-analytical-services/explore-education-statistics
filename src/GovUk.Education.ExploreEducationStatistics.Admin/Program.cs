@@ -16,8 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((ctx, builder) => 
-                    builder.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("IdpProviderConfiguration")}.json", true, true))
+                .ConfigureAppConfiguration((ctx, builder) =>
+                {
+                    builder.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("IdpProviderConfiguration")}.json", true, true);
+                    builder.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("BootstrapUsersConfiguration")}.json", true, true);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

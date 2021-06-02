@@ -151,12 +151,27 @@ describe('mapTableHeadersConfig', () => {
         { label: '2015/16', code: 'AY', year: 2015 },
       ],
     },
-    results: [],
+    results: [
+      {
+        filters: [],
+        geographicLevel: '',
+        location: {},
+        measures: {},
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: [],
+        geographicLevel: '',
+        location: {},
+        measures: {},
+        timePeriod: '2015_AY',
+      },
+    ],
   };
 
   test('maps headers to their classes', () => {
     const table: FullTable = mapFullTable(testTableData);
-    const headers = mapTableHeadersConfig(testHeaderConfig, table.subjectMeta);
+    const headers = mapTableHeadersConfig(testHeaderConfig, table);
 
     expect(headers.columnGroups).toEqual([
       [
@@ -299,7 +314,7 @@ describe('mapTableHeadersConfig', () => {
           },
         ],
       },
-      table.subjectMeta,
+      table,
     );
 
     expect(headers.rowGroups).toEqual([
@@ -331,6 +346,82 @@ describe('mapTableHeadersConfig', () => {
     ]);
   });
 
+  test('correctly maps term time periods to only return those in the table result', () => {
+    const testHeaderConfigWithTerms: UnmappedTableHeadersConfig = {
+      ...testHeaderConfig,
+      columns: [
+        {
+          value: '2017_T1',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T1T2',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T2',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2017_T3',
+          type: 'TimePeriod',
+        },
+        {
+          value: '2018_T1',
+          type: 'TimePeriod',
+        },
+      ],
+    };
+
+    const testTableDataWithTerms = {
+      ...testTableData,
+      subjectMeta: {
+        ...testTableData.subjectMeta,
+        timePeriodRange: [
+          { code: 'T1', label: '2017/18 Autumn Term', year: 2017 },
+          { code: 'T1T2', label: '2017/18 Autumn and Spring Term', year: 2017 },
+          { code: 'T2', label: '2017/18 Spring Term', year: 2017 },
+          { code: 'T3', label: '2017/18 Summer Term', year: 2017 },
+          { code: 'T1', label: '2018/19 Autumn Term', year: 2018 },
+        ],
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2018_T1',
+        },
+        {
+          filters: [],
+          geographicLevel: '',
+          location: {},
+          measures: {},
+          timePeriod: '2017_T1',
+        },
+      ],
+    };
+
+    const table: FullTable = mapFullTable(testTableDataWithTerms);
+    const headers = mapTableHeadersConfig(testHeaderConfigWithTerms, table);
+
+    expect(headers.columns).toEqual([
+      new TimePeriodFilter({
+        year: 2017,
+        code: 'T1',
+        label: '2017/18 Autumn Term',
+        order: 0,
+      }),
+      new TimePeriodFilter({
+        year: 2018,
+        code: 'T1',
+        label: '2018/19 Autumn Term',
+        order: 4,
+      }),
+    ]);
+  });
+
   test('throws error if there is an invalid header type', () => {
     const fullTable = mapFullTable(testTableData);
 
@@ -347,7 +438,7 @@ describe('mapTableHeadersConfig', () => {
     };
 
     expect(() => {
-      mapTableHeadersConfig(headers, fullTable.subjectMeta);
+      mapTableHeadersConfig(headers, fullTable);
     }).toThrowError(
       `Invalid header type: ${JSON.stringify(headers.columns[0])}`,
     );
@@ -369,7 +460,7 @@ describe('mapTableHeadersConfig', () => {
     };
 
     expect(() => {
-      mapTableHeadersConfig(headers, fullTable.subjectMeta);
+      mapTableHeadersConfig(headers, fullTable);
     }).toThrowError(
       `Could not find matching filter for header: ${JSON.stringify(
         headers.columns[0],
@@ -386,7 +477,7 @@ describe('mapTableHeadersConfig', () => {
         rowGroups: [],
         rows: [],
       },
-      fullTable.subjectMeta,
+      fullTable,
     );
 
     expect(headers.columnGroups).toEqual([]);

@@ -55,10 +55,7 @@ const PreReleaseTableToolPage = ({
       ]);
 
       const fullTable = mapFullTable(tableData);
-      const tableHeaders = mapTableHeadersConfig(
-        table.tableHeaders,
-        fullTable.subjectMeta,
-      );
+      const tableHeaders = mapTableHeadersConfig(table.tableHeaders, fullTable);
 
       return {
         initialStep: 5,
@@ -94,7 +91,7 @@ const PreReleaseTableToolPage = ({
 
   return (
     <>
-      <PageTitle title="Create your own tables online" caption="Table Tool" />
+      <PageTitle title="Create your own tables" caption="Table Tool" />
 
       <p>
         Choose the data and area of interest you want to explore and then use

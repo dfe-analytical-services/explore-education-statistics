@@ -49,7 +49,7 @@ describe('ReleaseTableToolPage', () => {
 
       expect(stepHeadings).toHaveLength(1);
       expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current): Choose a subject',
+        'Step 1 (current) Choose a subject',
       );
     });
 

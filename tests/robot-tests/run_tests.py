@@ -21,6 +21,7 @@ import requests
 from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
+from robot import rebot_cli as robot_rebot_cli
 
 import scripts.keyword_profile as kp
 from tests.libs.setup_auth_variables import setup_auth_variables
@@ -90,6 +91,22 @@ parser.add_argument("--disable-teardown",
                     dest="disable_teardown",
                     help="disable tearing down of any test data after completion",
                     action='store_true')
+parser.add_argument("--rerun-failed-tests",
+                    dest="rerun_failed_tests",
+                    action='store_true',
+                    help="rerun individual failed tests and merge results into original run results")
+parser.add_argument("--rerun-failed-suites",
+                    dest="rerun_failed_suites",
+                    action='store_true',
+                    help="rerun failed test suites and merge results into original run results")
+parser.add_argument("--timeout",
+                    default="30",
+                    dest="timeout",
+                    help="default robot timeout in seconds (default is 30)")
+parser.add_argument("--implicit-wait",
+                    default="5",
+                    dest="implicit_wait",
+                    help="default robot implicit wait in seconds (default is 5)")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -113,10 +130,6 @@ if args.admin_pass:
 if args.analyst_pass:
     os.environ['ANALYST_PASSWORD'] = args.analyst_pass
 
-# Default values
-timeout = 30
-implicit_wait = 5
-
 # Install chromedriver and add it to PATH
 chromedriver_filename = 'chromedriver.exe' if platform.system() == "Windows" else 'chromedriver'
 pyderman.install(file_directory='./webdriver/',
@@ -128,17 +141,28 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
+output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
+             "--output", output_file,
              # "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction"]
+
+robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
+
+if args.rerun_failed_tests:
+    robotArgs += ["--rerunfailed", "test-results/output.xml"]
+
+if args.rerun_failed_suites:
+    robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
+
 if args.tags:
     robotArgs += ["--include", args.tags]
 
 if args.ci:
-    robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v",
-                  "implicit_wait:" + str(implicit_wait)]
+    robotArgs += ["--xunit", "xunit"]
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
     robotArgs += ['--removekeywords',
@@ -306,8 +330,8 @@ if os.getenv('RELEASE_COMPLETE_WAIT'):
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
-# Remove any existing test results
-if Path('test-results').exists():
+# Remove any existing test results if running from scratch
+if not args.rerun_failed_tests and not args.rerun_failed_suites and Path('test-results').exists():
     shutil.rmtree("test-results")
 
 try:
@@ -324,7 +348,7 @@ try:
             os.remove('profile-data')
 
             # Keyword profiling
-            kp.run_keyword_profile('test-results/output.xml',
+            kp.run_keyword_profile(f'test-results/{output_file}',
                                    printresults=False,
                                    writepath='test-results/keyword-profiling-results.log')
             print("\nProfiling logs created in test-results/", flush=True)
@@ -345,7 +369,7 @@ try:
             os.remove('profile-data')
 
             # Keyword profiling
-            kp.run_keyword_profile('test-results/output.xml',
+            kp.run_keyword_profile(f'test-results/{output_file}',
                                    printresults=False,
                                    writepath='test-results/keyword-profiling-results.log')
             print("\nProfiling logs created in test-results/", flush=True)
@@ -355,5 +379,10 @@ finally:
     if not args.disable_teardown:
         print("Tearing down tests...", flush=True)
         delete_test_topic()
+
+    if args.rerun_failed_tests or args.rerun_failed_suites:
+        print("Combining rerun test results with original test results") 
+        outputs_to_merge=["test-results/output.xml","test-results/rerun.xml"]
+        robot_rebot_cli(outputs_to_merge, exit=False)
 
     print("Tests finished!")

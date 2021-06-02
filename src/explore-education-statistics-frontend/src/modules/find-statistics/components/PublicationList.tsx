@@ -40,7 +40,7 @@ function PublicationList({ publications }: Props) {
                   as={`/data-tables/${slug}`}
                   data-testid={`Create table link for ${title}`}
                 >
-                  Create your own tables online{' '}
+                  Create your own tables{' '}
                   <span className="govuk-visually-hidden">for {title}</span>
                 </Link>
               </div>

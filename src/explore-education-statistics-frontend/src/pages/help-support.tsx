@@ -90,8 +90,8 @@ function HelpSupportPage() {
             <p>
               To create your own tables and explore the national and regional
               data we have available via the service use the table tool
-              available in our{' '}
-              <a href="/data-tables">Create your own tables online</a> section.
+              available in our <a href="/data-tables">Create your own tables</a>{' '}
+              section.
             </p>
             <p>
               You can use our table tool to choose the data and area of

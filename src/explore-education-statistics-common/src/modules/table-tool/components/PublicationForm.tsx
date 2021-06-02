@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import WizardStepEditButton from './WizardStepEditButton';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -45,13 +46,16 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     initialValues = {
       publicationId: '',
     },
+    currentStep,
+    stepNumber,
   } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
   const lowercaseSearchTerm = searchTerm.toLowerCase();
+  const stepEnabled = currentStep > stepNumber;
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
       Choose a publication
     </WizardStepHeading>
   );
@@ -216,14 +220,24 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           .find(option => option.id === form.values.publicationId);
 
         return (
-          <>
-            {stepHeading}
-            <SummaryList noBorder>
-              <SummaryListItem term="Publication">
-                {publication?.title}
-              </SummaryListItem>
-            </SummaryList>
-          </>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              {stepHeading}
+              <SummaryList noBorder>
+                <SummaryListItem term="Publication">
+                  {publication?.title}
+                </SummaryListItem>
+              </SummaryList>
+            </div>
+            <div className="govuk-grid-column-one-third dfe-align--right">
+              {stepEnabled && (
+                <WizardStepEditButton
+                  {...props}
+                  editTitle="Change publication"
+                />
+              )}
+            </div>
+          </div>
         );
       }}
     </Formik>

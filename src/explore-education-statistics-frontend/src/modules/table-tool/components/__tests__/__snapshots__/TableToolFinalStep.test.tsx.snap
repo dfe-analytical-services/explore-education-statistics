@@ -10,7 +10,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     role="group"
   >
     <summary
-      aria-controls="details-content-8"
+      aria-controls="details-content-16"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -26,7 +26,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-8"
+      id="details-content-16"
     >
       <p
         class="govuk-hint"
@@ -483,57 +483,85 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        open=""
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-17"
+          aria-expanded="true"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="false"
+          class="govuk-details__text"
+          id="details-content-17"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;
 
@@ -547,7 +575,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     role="group"
   >
     <summary
-      aria-controls="details-content-6"
+      aria-controls="details-content-11"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -563,7 +591,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-6"
+      id="details-content-11"
     >
       <p
         class="govuk-hint"
@@ -1037,57 +1065,85 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        open=""
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-12"
+          aria-expanded="true"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="false"
+          class="govuk-details__text"
+          id="details-content-12"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication/selected-release-slug"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication/selected-release-slug"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;
 
@@ -1101,7 +1157,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     role="group"
   >
     <summary
-      aria-controls="details-content-12"
+      aria-controls="details-content-25"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -1117,7 +1173,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-12"
+      id="details-content-25"
     >
       <p
         class="govuk-hint"
@@ -1591,57 +1647,85 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        open=""
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-26"
+          aria-expanded="true"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="false"
+          class="govuk-details__text"
+          id="details-content-26"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication/selected-release-slug"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication/selected-release-slug"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;
 
@@ -1655,7 +1739,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
     role="group"
   >
     <summary
-      aria-controls="details-content-10"
+      aria-controls="details-content-21"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -1671,7 +1755,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-10"
+      id="details-content-21"
     >
       <p
         class="govuk-hint"
@@ -2128,57 +2212,84 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-22"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-22"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;
 
@@ -2740,57 +2851,85 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        open=""
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-2"
+          aria-expanded="true"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="false"
+          class="govuk-details__text"
+          id="details-content-2"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;
 
@@ -2805,7 +2944,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
     role="group"
   >
     <summary
-      aria-controls="details-content-3"
+      aria-controls="details-content-6"
       aria-expanded="true"
       class="govuk-details__summary"
       role="button"
@@ -2821,7 +2960,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
     <div
       aria-hidden="false"
       class="govuk-details__text"
-      id="details-content-3"
+      id="details-content-6"
     >
       <p
         class="govuk-hint"
@@ -3278,56 +3417,83 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
       </table>
     </div>
   </figure>
-  <h3>
-    Share your table
-  </h3>
-  <ul
-    class="govuk-list"
+  <div
+    class="govuk-grid-row"
   >
-    <li>
+    <div
+      class="govuk-grid-column-one-half"
+    >
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-7"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Additional options"
+          >
+            Additional options
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-7"
+        >
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <div
+      class="govuk-grid-column-one-half dfe-align--right"
+    >
       <button
         class="button"
         type="button"
       >
-        Generate permanent link
+        Share your table
       </button>
-    </li>
-  </ul>
-  <h3>
-    Additional options
-  </h3>
-  <ul
-    class="govuk-list"
+    </div>
+  </div>
+  <div
+    class="govuk-inset-text"
   >
-    <li>
-      <a
-        class="govuk-link"
-        href="/find-statistics/test-publication"
-      >
-        View the release for this data
-      </a>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download the data of this table (CSV)
-      </button>
-    </li>
-    <li>
-      <button
-        class="button"
-        type="button"
-      >
-        Download table as Excel spreadsheet (XLSX)
-      </button>
-    </li>
-  </ul>
-  <p
-    class="govuk-body"
-  >
-    If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-  </p>
+    <p>
+      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+    </p>
+  </div>
 </div>
 `;

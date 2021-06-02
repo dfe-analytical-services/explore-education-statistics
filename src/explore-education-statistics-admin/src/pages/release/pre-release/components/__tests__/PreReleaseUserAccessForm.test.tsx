@@ -166,7 +166,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a valid @education.gov.uk email address', {
+          screen.queryByText('Enter a valid @education.gov.uk email address', {
             selector: '#preReleaseUserAccessForm-email-error',
           }),
         ).toBeInTheDocument();

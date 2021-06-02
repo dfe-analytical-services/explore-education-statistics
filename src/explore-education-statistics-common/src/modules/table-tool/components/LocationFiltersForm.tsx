@@ -17,6 +17,7 @@ import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import WizardStepEditButton from './WizardStepEditButton';
 
 interface FormValues {
   locations: Dictionary<string[]>;
@@ -46,14 +47,14 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   } = props;
 
   const formOptions = useMemo(() => options, [options]);
-
+  const stepEnabled = currentStep > stepNumber;
   const stepHeading = useMemo(
     () => (
-      <WizardStepHeading {...props} fieldsetHeading>
+      <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
         Choose locations
       </WizardStepHeading>
     ),
-    [props],
+    [props, stepEnabled],
   );
 
   return (
@@ -150,34 +151,39 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         );
 
         return (
-          <>
-            {stepHeading}
-
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
-
-            <SummaryList noBorder>
-              {Object.entries(locationLevels)
-                .filter(
-                  ([levelKey, levelOptions]) =>
-                    levelOptions.length > 0 && formOptions[levelKey],
-                )
-                .map(([levelKey, levelOptions]) => (
-                  <SummaryListItem
-                    term={formOptions[levelKey].legend}
-                    key={levelKey}
-                  >
-                    <CollapsibleList>
-                      {sortBy(levelOptions, ['label']).map(level => (
-                        <li key={level.value}>{level.label}</li>
-                      ))}
-                    </CollapsibleList>
-                  </SummaryListItem>
-                ))}
-            </SummaryList>
-          </>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              {stepHeading}
+              <SummaryList noBorder>
+                {Object.entries(locationLevels)
+                  .filter(
+                    ([levelKey, levelOptions]) =>
+                      levelOptions.length > 0 && formOptions[levelKey],
+                  )
+                  .map(([levelKey, levelOptions]) => (
+                    <SummaryListItem
+                      term={formOptions[levelKey].legend}
+                      key={levelKey}
+                    >
+                      <CollapsibleList>
+                        {sortBy(levelOptions, ['label']).map(level => (
+                          <li key={level.value}>{level.label}</li>
+                        ))}
+                      </CollapsibleList>
+                    </SummaryListItem>
+                  ))}
+              </SummaryList>
+            </div>
+            <div className="govuk-grid-column-one-third dfe-align--right">
+              {stepEnabled && (
+                <WizardStepEditButton {...props} editTitle="Edit locations" />
+              )}
+              <ResetFormOnPreviousStep
+                currentStep={currentStep}
+                stepNumber={stepNumber}
+              />
+            </div>
+          </div>
         );
       }}
     </Formik>

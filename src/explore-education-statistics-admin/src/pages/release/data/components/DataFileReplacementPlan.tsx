@@ -26,6 +26,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
+import useMountedRef from '@common/hooks/useMountedRef';
 import React, { useMemo, useState } from 'react';
 import { generatePath } from 'react-router';
 
@@ -54,6 +55,8 @@ const DataFileReplacementPlan = ({
   const [deleteFootnote, setDeleteFootnote] = useState<
     FootnoteReplacementPlan
   >();
+
+  const isMounted = useMountedRef();
 
   const {
     value: plan,
@@ -392,8 +395,9 @@ const DataFileReplacementPlan = ({
                   if (onReplacement) {
                     onReplacement();
                   }
-
-                  toggleSubmitting.off();
+                  if (isMounted.current) {
+                    toggleSubmitting.off();
+                  }
                 }}
               >
                 Confirm data replacement
