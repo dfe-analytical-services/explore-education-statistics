@@ -91,6 +91,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
           renderEditableBlock={block => (
             <ReleaseEditableBlock
               block={block}
+              sectionId={release.headlinesSection.id}
               releaseId={release.id}
               onSave={updateBlock}
               onDelete={removeBlock}

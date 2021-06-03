@@ -17,6 +17,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ContentSection } from '@common/services/publicationService';
+import { getNumberOfUnSavedBlocks } from '@admin/pages/release/content/components/utils/unSavedEdits';
 import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -34,52 +35,62 @@ const ReleaseContentPageLoaded = () => {
         isEditing: canUpdateRelease,
       }}
     >
-      {({ isEditing }) => (
-        <>
-          {isEditing && (
-            <BrowserWarning>
-              <ul>
-                <li>Editing key statistic guidance text</li>
-                <li>Editing headline text</li>
-                <li>Editing text blocks</li>
-              </ul>
-            </BrowserWarning>
-          )}
+      {({ isEditing, unSavedEdits }) => {
+        const numOfEdits = getNumberOfUnSavedBlocks(unSavedEdits);
+        return (
+          <>
+            {isEditing && (
+              <BrowserWarning>
+                <ul>
+                  <li>Editing key statistic guidance text</li>
+                  <li>Editing headline text</li>
+                  <li>Editing text blocks</li>
+                </ul>
+              </BrowserWarning>
+            )}
 
-          {canUpdateRelease && (
-            <div className="govuk-form-group">
-              {unresolvedComments.length > 0 &&
-              unresolvedComments.length > 1 ? (
-                <WarningMessage>
-                  There are {unresolvedComments.length} unresolved comments
-                </WarningMessage>
-              ) : (
-                <WarningMessage>There is 1 unresolved comment</WarningMessage>
-              )}
+            {canUpdateRelease && (
+              <div className="govuk-form-group">
+                {numOfEdits > 0 && (
+                  <WarningMessage>
+                    {numOfEdits === 1
+                      ? 'One content block has unsaved changes. Clicking away from this tab will result in the changes being lost.'
+                      : `${numOfEdits} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
+                  </WarningMessage>
+                )}
+                {unresolvedComments.length > 0 &&
+                unresolvedComments.length > 1 ? (
+                  <WarningMessage>
+                    There are {unresolvedComments.length} unresolved comments
+                  </WarningMessage>
+                ) : (
+                  <WarningMessage>There is 1 unresolved comment</WarningMessage>
+                )}
 
-              <EditablePageModeToggle />
-            </div>
-          )}
+                <EditablePageModeToggle />
+              </div>
+            )}
 
-          <div
-            className={classNames('govuk-width-container', {
-              'govuk-!-margin-right-0': isEditing,
-            })}
-          >
             <div
-              className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+              className={classNames('govuk-width-container', {
+                'govuk-!-margin-right-0': isEditing,
+              })}
             >
-              <span className="govuk-caption-l">{release.title}</span>
+              <div
+                className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+              >
+                <span className="govuk-caption-l">{release.title}</span>
 
-              <h2 className="govuk-heading-l dfe-print-break-before">
-                {release.publication.title}
-              </h2>
+                <h2 className="govuk-heading-l dfe-print-break-before">
+                  {release.publication.title}
+                </h2>
 
-              <ReleaseContent />
+                <ReleaseContent />
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        );
+      }}
     </EditingContextProvider>
   );
 };

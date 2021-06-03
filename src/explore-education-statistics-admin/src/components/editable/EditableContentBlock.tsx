@@ -22,6 +22,8 @@ interface EditableContentBlockProps {
   label: string;
   hideLabel?: boolean;
   value: string;
+  handleBlur?: (isDirty: boolean) => void;
+  onCancel?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSave: (value: string) => void;
@@ -38,6 +40,8 @@ const EditableContentBlock = ({
   label,
   hideLabel = false,
   value,
+  handleBlur,
+  onCancel,
   onImageUpload,
   onImageUploadCancel,
   onSave,
@@ -81,7 +85,7 @@ const EditableContentBlock = ({
     [onSave, toggleEditing],
   );
 
-  if (onSave && isEditing) {
+  if (isEditing) {
     return (
       <EditableContentForm
         id={id}
@@ -90,8 +94,14 @@ const EditableContentBlock = ({
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
-        onCancel={toggleEditing.off}
+        onCancel={() => {
+          toggleEditing.off();
+          if (onCancel) {
+            onCancel();
+          }
+        }}
         onSubmit={handleSave}
+        handleBlur={handleBlur}
       />
     );
   }
