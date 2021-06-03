@@ -122,7 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanUpdatePublication)
-                .OnSuccessDo(_ => ValidateSelectedTopic(updatedPublication.TopicId))
+                .OnSuccessDo(async publication =>
+                {
+                    if (publication.TopicId != updatedPublication.TopicId)
+                    {
+                        return await ValidateSelectedTopic(updatedPublication.TopicId);   
+                    }
+                    return Unit.Instance;
+                })
                 .OnSuccessDo(_ => ValidateSelectedMethodology(
                     updatedPublication.MethodologyId,
                     updatedPublication.ExternalMethodology

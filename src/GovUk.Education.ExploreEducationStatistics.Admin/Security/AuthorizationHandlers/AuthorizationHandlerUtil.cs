@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -31,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         private static readonly List<ReleaseRole> ApproverRoles = new List<ReleaseRole>
         {
-            ReleaseRole.Approver,
+            ReleaseRole.Approver
         };
 
         public static bool ContainsPreReleaseViewerRole(IEnumerable<ReleaseRole> roles)
@@ -54,25 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             return ContainsAtLeastOneCommonRole(ApproverRoles, roles);
         }
 
+        public static bool ContainPublicationOwnerRole(IEnumerable<PublicationRole> roles)
+        {
+            return roles.Contains(Owner);
+        }
+
         public static bool ContainsAtLeastOneCommonRole(
             IEnumerable<ReleaseRole> roles1,
             IEnumerable<ReleaseRole> roles2)
         {
             return roles1.Intersect(roles2).Any();
-        }
-
-        public static List<ReleaseRole> GetReleaseRoles(
-            ClaimsPrincipal user,
-            Release release,
-            ContentDbContext context)
-        {
-            var userId = user.GetUserId();
-
-            return context
-                .UserReleaseRoles
-                .Where(r => r.ReleaseId == release.Id && r.UserId == userId)
-                .Select(r => r.Role)
-                .ToList();
         }
     }
 }

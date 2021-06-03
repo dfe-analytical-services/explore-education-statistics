@@ -75,13 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     },
                     new IdentityRoleClaim<string>
                     {
-                        Id = -4,
-                        RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.AccessAllTopics.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
                         Id = -5,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.MarkAllReleasesAsDraft.ToString(),

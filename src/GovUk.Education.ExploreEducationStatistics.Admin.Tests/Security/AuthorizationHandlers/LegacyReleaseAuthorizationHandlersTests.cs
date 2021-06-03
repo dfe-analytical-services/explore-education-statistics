@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -5,14 +6,15 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class LegacyReleaseAuthorizationHandlersTests
     {
         public class CreateLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public void CanCreateAnyLegacyRelease()
+            public async Task CanCreateAnyLegacyRelease()
             {
-                AssertReleaseHandlerSucceedsWithCorrectClaims<CreateLegacyReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<CreateLegacyReleaseRequirement>(
                     new CreateLegacyReleaseAuthorizationHandler.CanCreateAnyLegacyRelease(), 
                     CreateAnyRelease
                 );
@@ -22,9 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ViewLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public void CanViewAllLegacyReleases()
+            public async Task CanViewAllLegacyReleases()
             {
-                AssertReleaseHandlerSucceedsWithCorrectClaims<ViewLegacyReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewLegacyReleaseRequirement>(
                     new ViewLegacyReleaseAuthorizationHandler.CanViewAllLegacyReleases(), 
                     AccessAllReleases
                 );
@@ -34,9 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class UpdateLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public void CanUpdateAllLegacyReleases()
+            public async Task CanUpdateAllLegacyReleases()
             {
-                AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateLegacyReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateLegacyReleaseRequirement>(
                     new UpdateLegacyReleaseAuthorizationHandler.CanUpdateAllLegacyReleases(), 
                     UpdateAllReleases
                 );
@@ -46,9 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class DeleteLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public void CanDeleteAllLegacyReleases()
+            public async Task CanDeleteAllLegacyReleases()
             {
-                AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteLegacyReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteLegacyReleaseRequirement>(
                     new DeleteLegacyReleaseAuthorizationHandler.CanDeleteAllLegacyReleases(), 
                     UpdateAllReleases
                 );

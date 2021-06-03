@@ -5,40 +5,33 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement
-    {}
-    
-    public class DeleteSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<DeleteSpecificReleaseRequirement, Release>
+    public class UpdatePublicationRequirement : IAuthorizationRequirement
+    {
+    }
+
+    public class UpdatePublicationAuthorizationHandler : AuthorizationHandler<UpdatePublicationRequirement, Publication>
     {
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public DeleteSpecificReleaseAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
+        public UpdatePublicationAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            DeleteSpecificReleaseRequirement requirement,
-            Release release)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+            UpdatePublicationRequirement requirement,
+            Publication publication)
         {
-            if (!release.Amendment || release.Status == Approved)
-            {
-                return;
-            }
-
-            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+            if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
             {
                 context.Succeed(requirement);
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
 
             if (ContainPublicationOwnerRole(publicationRoles))
             {

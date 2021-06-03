@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -55,6 +56,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllByUser()
+        {
+            var user = new User();
+            var publication = new Publication();
+
+            var userPublicationRoles = new List<UserPublicationRole>
+            {
+                new UserPublicationRole
+                {
+                    User = user,
+                    Publication = publication,
+                    Role = Owner
+                }
+            };
+            
+            var otherUserPublicationRoles = new List<UserPublicationRole>
+            {
+                // Role for different publication
+                new UserPublicationRole
+                {
+                    User = user,
+                    Publication = new Publication(),
+                    Role = Owner
+                },
+                // Role for different user
+                new UserPublicationRole
+                {
+                    User = new User(),
+                    Publication = publication,
+                    Role = Owner
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(user);
+                await contentDbContext.AddAsync(publication); 
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.AddRangeAsync(otherUserPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleRepository(contentDbContext);
+
+                var result = await service.GetAllRolesByUser(user.Id, publication.Id);
+
+                Assert.Single(result);
+                Assert.Equal(Owner, result[0]);
             }
         }
 

@@ -5,49 +5,42 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
+    public class PublishSpecificReleaseRequirement : IAuthorizationRequirement
     {
     }
 
-    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
+    public class
+        PublishSpecificReleaseAuthorizationHandler : AuthorizationHandler<PublishSpecificReleaseRequirement, Release>
     {
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-        public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository)
+        public PublishSpecificReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
-            AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
+            PublishSpecificReleaseRequirement requirement,
             Release release)
         {
-            if (release.Status != Approved)
+            if (release.Status != ReleaseStatus.Approved)
             {
                 return;
             }
 
-            if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
+            if (SecurityUtils.HasClaim(context.User, PublishAllReleases))
             {
                 context.Succeed(requirement);
                 return;
             }
 
-            var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
             var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
-            if (ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
+            if (ContainsApproverRole(releaseRoles))
             {
                 context.Succeed(requirement);
             }

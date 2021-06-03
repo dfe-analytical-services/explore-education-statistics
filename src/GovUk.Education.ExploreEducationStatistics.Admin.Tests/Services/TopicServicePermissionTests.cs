@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetTopic()
         {
             PolicyCheckBuilder()
-                .ExpectResourceCheck(_topic, SecurityPolicies.CanViewSpecificTopic, false)
+                .ExpectResourceCheck(_topic, SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {

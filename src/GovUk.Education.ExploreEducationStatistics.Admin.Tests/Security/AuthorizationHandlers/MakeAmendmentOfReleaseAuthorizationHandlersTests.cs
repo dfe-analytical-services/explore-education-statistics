@@ -1,107 +1,507 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.MakeAmendmentOfSpecificReleaseAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class MakeAmendmentOfSpecificReleaseAuthorizationHandlersTests
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
     {
-        [Fact]
-        public void CanMakeAmendmentOfAllReleasesAuthorizationHandler()
+        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTests
         {
-            using (var context = DbUtils.InMemoryApplicationDbContext())
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()
             {
-                // Assert that no users can amend a non-Live Release
-                AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
-                    new CanMakeAmendmentOfAllReleasesAuthorizationHandler(context));
-            }
-        }
-
-        [Fact]
-        public void 
-            MakeAmendmentOfSpecificReleaseCanMakeAmendmentOfAllReleasesAuthorizationHandler_LiveAndLatestVersion()
-        {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
-            
-            var previousVersion = new Release
-            {
-                Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
-                PreviousVersionId = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
-                Publication = publication,
-                Published = DateTime.UtcNow
-            };
-            
-            var latestVersion = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                PreviousVersionId = previousVersion.Id,
-                Published = DateTime.UtcNow
-            };
-
-            using (var context = DbUtils.InMemoryApplicationDbContext())
-            {
-                context.AddRange(previousVersion, latestVersion);
-                context.SaveChanges();
-                
-                // Assert that any users with the "MakeAmendmentOfAllReleases" claim can amend an arbitrary Live and latest Release
-                // (and no other claim allows this)
-                AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
-                    new CanMakeAmendmentOfAllReleasesAuthorizationHandler(context),
-                    latestVersion, MakeAmendmentsOfAllReleases);
-            }
-        }
-        
-        [Fact]
-        public void HasEditorRoleOnReleaseAuthorizationHandler_ReleaseNotYetLive()
-        {
-            // Assert that no User Release roles will allow an Amendment to be made when the Release is not yet Live
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext => new HasEditorRoleOnReleaseAuthorizationHandler(contentDbContext));
-        }
-
-        [Fact]
-        public void HasEditorRoleOnReleaseAuthorizationHandler_LiveAndLatestVersion()
-        {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
-            
-            var previousVersion = new Release
-            {
-                Id = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
-                PreviousVersionId = new Guid("08f7c576-6e52-44ad-a98f-5215394d9abf"),
-                Publication = publication,
-                Published = DateTime.UtcNow
-            };
-            
-            var latestVersion = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                PreviousVersionId = previousVersion.Id,
-                Published = DateTime.UtcNow
-            };
-
-            // Assert that users with an editor role on the release can amend it if it is Live and the latest version
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
+                var release = new Release
                 {
-                    contentDbContext.Releases.AddRange(previousVersion, latestVersion);
-                    contentDbContext.SaveChanges();
-                    return new HasEditorRoleOnReleaseAuthorizationHandler(contentDbContext);
-                },
-                latestVersion,
-                ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Lead);
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication(),
+                    Status = Draft
+                };
+
+                // Assert that no users can amend a draft Release that is the only version
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication(),
+                    Status = Approved,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the only version
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release,
+                    MakeAmendmentsOfAllReleases);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_DraftVersion()
+            {
+                var publication = new Publication();
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Status = Draft
+                };
+
+                // Assert that no users can amend an amendment Release if it is not yet approved
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
+            {
+                var publication = new Publication();
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that no users can amend an amendment Release if it is not the latest version
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    previousVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
+            {
+                var publication = new Publication();
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the latest version
+                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion,
+                    MakeAmendmentsOfAllReleases);
+            }
+        }
+
+        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTestsPublicationRoleTests
+        {
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Status = Draft
+                };
+
+                // Assert that no User Publication roles will allow a draft Release that is the only version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Status = Approved,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that a User who has the Publication Owner role on a Release can amend it if it is the only version published
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release,
+                    Owner);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_DraftVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Status = Draft
+                };
+
+                // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that no User Publication roles will allow an amendment Release that is not the latest version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.AddAsync(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    previousVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that a User who has the Publication Owner role on a Release can amend it if it is the latest published version
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion,
+                    Owner);
+            }
+        }
+
+        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTestsReleaseRoleTests
+        {
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Status = Draft
+                };
+
+                // Assert that no User Release roles will allow a draft Release that is the only version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Status = Approved,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that no User Release roles will allow a published Release that is the only version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(release);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    release);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_DraftVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Status = Draft
+                };
+
+                // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that no User Release roles will allow an amendment Release that is not the latest version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.AddAsync(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    previousVersion);
+            }
+
+            [Fact]
+            public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
+            {
+                var publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var previousVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    Published = DateTime.UtcNow
+                };
+
+                var latestVersion = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = publication,
+                    PreviousVersionId = previousVersion.Id,
+                    Published = DateTime.UtcNow
+                };
+
+                // Assert that no User Release roles will allow an amendment Release that is the latest version to be amended
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Add(publication);
+                        contentDbContext.AddRange(previousVersion, latestVersion);
+                        contentDbContext.SaveChanges();
+
+                        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+                            new UserPublicationRoleRepository(contentDbContext));
+                    },
+                    latestVersion);
+            }
         }
     }
 }

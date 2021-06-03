@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -7,19 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
     }
 
-    public class UpdateSpecificMethodologyAuthorizationHandler
-        : CompoundAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
+    public class UpdateSpecificMethodologyAuthorizationHandler :
+        HasClaimAuthorizationHandler<UpdateSpecificMethodologyRequirement>
     {
-        public UpdateSpecificMethodologyAuthorizationHandler()
-            : base(new CanUpdateAllMethodologies())
+        public UpdateSpecificMethodologyAuthorizationHandler() : base(SecurityClaimTypes.UpdateAllMethodologies)
         {
         }
-        public class CanUpdateAllMethodologies
-            : HasClaimAuthorizationHandler<UpdateSpecificMethodologyRequirement>
-        {
-            public CanUpdateAllMethodologies()
-                : base(SecurityClaimTypes.UpdateAllMethodologies) {}
-        }
-
     }
 }

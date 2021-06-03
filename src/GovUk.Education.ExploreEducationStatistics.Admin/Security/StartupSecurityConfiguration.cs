@@ -151,27 +151,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                  */
                 // does this user have permission to manage all taxonomy?
                 options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
-                    policy.Requirements.Add(new ManageTaxonomyRequirement()));
+                    policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString()));
 
                 // does this user have permission to create a publication under a specific topic?
                 options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
                     policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
-
-                /**
-                 * Topic / Theme management
-                 */
-                // does this user have permission to view all Topics across the application?
-                options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
-
-                // does this user have permission to view a specific Theme?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificThemeRequirement()));
-
-                // does this user have permission to view a specific Topic?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificTopic.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificTopicRequirement()));
-
 
                 /**
                  * Methodology management
@@ -243,17 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Pre Release management
              */
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
-
-            /**
-             * Taxonomy management
-             */
-            services.AddTransient<IAuthorizationHandler, ManageTaxonomyAuthorizationHandler>();
-
-            /**
-             * Topic / Theme management
-             */
-            services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificTopicAuthorizationHandler>();
 
             /**
              * Methodology management

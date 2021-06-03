@@ -1,24 +1,18 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Authorization;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     public class ViewSpecificMethodologyAuthorizationHandlerTests
     {
         [Fact]
-        public void CanViewAllMethodologies()
+        public async Task CanViewAllMethodologies()
         {
-            AssertReleaseHandlerSucceedsWithCorrectClaims<ViewSpecificMethodologyRequirement>(
-                new ViewSpecificMethodologyAuthorizationHandler.CanViewAllMethodologies(),
+            await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificMethodologyRequirement>(
+                new ViewSpecificMethodologyAuthorizationHandler(),
                 AccessAllMethodologies);
         }
     }
