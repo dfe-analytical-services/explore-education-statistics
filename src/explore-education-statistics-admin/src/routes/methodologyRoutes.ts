@@ -11,28 +11,29 @@ export interface MethodologyRouteProps extends RouteProps {
 
 export type MethodologyRouteParams = {
   methodologyId: string;
+  publicationId: string;
 };
 
 export const methodologySummaryRoute: MethodologyRouteProps = {
-  path: '/methodologies/:methodologyId/summary',
+  path: '/publication/:publicationId/methodology/:methodologyId/summary',
   title: 'Summary',
   component: MethodologySummaryPage,
 };
 
 export const methodologySummaryEditRoute: MethodologyRouteProps = {
-  path: '/methodologies/:methodologyId/summary/edit',
+  path: '/publication/:publicationId/methodology/:methodologyId/summary/edit',
   title: 'Edit summary',
   component: MethodologySummaryEditPage,
 };
 
 export const methodologyContentRoute: MethodologyRouteProps = {
-  path: '/methodologies/:methodologyId/content',
+  path: '/publication/:publicationId/methodology/:methodologyId/content',
   title: 'Manage content',
   component: MethodologyContentPage,
 };
 
 export const methodologyStatusRoute: MethodologyRouteProps = {
-  path: '/methodologies/:methodologyId/status',
+  path: '/publication/:publicationId/methodology/:methodologyId/status',
   title: 'Sign off',
   component: MethodologyStatusPage,
 };

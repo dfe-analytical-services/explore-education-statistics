@@ -71,7 +71,10 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             message: 'Methodology must be approved',
             link: generatePath<MethodologyRouteParams>(
               methodologyStatusRoute.path,
-              { methodologyId: error.methodologyId },
+              {
+                methodologyId: error.methodologyId,
+                publicationId: release.publicationId,
+              },
             ),
           };
         case 'PublicMetaGuidanceRequired':
@@ -114,7 +117,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
       }
     });
-  }, [checklist.errors, releaseRouteParams]);
+  }, [checklist.errors, releaseRouteParams, release.publicationId]);
 
   const warnings = useMemo<ChecklistMessage[]>(() => {
     return checklist.warnings.map(warning => {
