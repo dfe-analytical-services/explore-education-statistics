@@ -200,18 +200,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var filesWithMetadata = await releaseFiles
                         .SelectAsync(async releaseFile =>
                         {
-                            var file = releaseFile.File;
-
                             var exists = await _blobStorageService.CheckBlobExists(
                                 PrivateReleaseFiles,
-                                file.Path());
+                                releaseFile.Path());
 
                             if (!exists)
                             {
-                                return await ToAncillaryFileInfoNotFound(file);
+                                return await ToAncillaryFileInfoNotFound(releaseFile);
                             }
 
-                            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, file.Path());
+                            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
                             return await ToAncillaryFileInfo(releaseFile, blob);
                         });
 
@@ -308,21 +306,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO: Remove after completion of EES-2343
-        private async Task<AncillaryFileInfo> ToAncillaryFileInfoNotFound(Content.Model.File file)
+        private async Task<AncillaryFileInfo> ToAncillaryFileInfoNotFound(ReleaseFile releaseFile)
         {
-            await _contentDbContext.Entry(file)
+            await _contentDbContext.Entry(releaseFile)
+                .Reference(rf => rf.File)
+                .LoadAsync();
+            await _contentDbContext.Entry(releaseFile.File)
                 .Reference(f => f.CreatedBy)
                 .LoadAsync();
 
             return new AncillaryFileInfo
             {
-                Id = file.Id,
-                FileName = file.Filename,
+                Id = releaseFile.File.Id,
+                FileName = releaseFile.File.Filename,
                 Name = "Unknown",
                 Size = "0.00 B",
-                Type = file.Type,
-                UserName = file.CreatedBy?.Email ?? "",
-                Created = file.Created
+                Type = releaseFile.File.Type,
+                UserName = releaseFile.File.CreatedBy?.Email ?? "",
+                Created = releaseFile.File.Created
             };
         }
     }
