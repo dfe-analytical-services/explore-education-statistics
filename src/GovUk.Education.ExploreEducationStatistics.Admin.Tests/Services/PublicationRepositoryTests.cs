@@ -310,6 +310,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetPublicationsForTopicRelatedToUser_PublicationHasNoReleases()
+        {
+            var user = new User();
+            var topic = new Topic();
+
+            // Check publications granted via the owner role are still returned when they contain no releases
+            // Set up publications without any releases, one for this topic and one for a different topic
+
+            var userPublicationRoles = new List<UserPublicationRole>
+            {
+                new UserPublicationRole
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Related publication 1",
+                        Releases = new List<Release>(),
+                        Topic = topic
+                    },
+                    User = user,
+                    Role = Owner
+                },
+                new UserPublicationRole
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Unrelated publication 1",
+                        Releases = new List<Release>(),
+                        Topic = new Topic()
+                    },
+                    User = user,
+                    Role = Owner
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupPublicationRepository(contentDbContext);
+                var result = await service.GetPublicationsForTopicRelatedToUserAsync(topic.Id, user.Id);
+
+                // Result should contain the publication related to this topic
+                Assert.Single(result);
+                Assert.Equal("Related publication 1", result[0].Title);
+            }
+        }
+
+        [Fact]
         public async Task ReleasesCorrectlyOrdered()
         {
             var topicId = Guid.NewGuid();
