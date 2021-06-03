@@ -1171,6 +1171,186 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Ancillary Test File 1", fileInfoList[0].Name);
                 Assert.Equal("10 Kb", fileInfoList[0].Size);
                 Assert.Equal(Ancillary, fileInfoList[0].Type);
+
+                Assert.Equal(ancillaryFile2.File.Id, fileInfoList[1].Id);
+                Assert.Equal("pdf", fileInfoList[1].Extension);
+                Assert.Equal("Ancillary 2.pdf", fileInfoList[1].FileName);
+                Assert.Equal("Ancillary Test File 2", fileInfoList[1].Name);
+                Assert.Equal("10 Kb", fileInfoList[1].Size);
+                Assert.Equal(Ancillary, fileInfoList[1].Type);
+
+                Assert.Equal(chartFile.File.Id, fileInfoList[2].Id);
+                Assert.Equal("png", fileInfoList[2].Extension);
+                Assert.Equal("chart.png", fileInfoList[2].FileName);
+                Assert.Equal("chart.png", fileInfoList[2].Name);
+                Assert.Equal("20 Kb", fileInfoList[2].Size);
+                Assert.Equal(Chart, fileInfoList[2].Type);
+
+                Assert.Equal(imageFile.File.Id, fileInfoList[3].Id);
+                Assert.Equal("png", fileInfoList[3].Extension);
+                Assert.Equal("image.png", fileInfoList[3].FileName);
+                Assert.Equal("image.png", fileInfoList[3].Name);
+                Assert.Equal("30 Kb", fileInfoList[3].Size);
+                Assert.Equal(Image, fileInfoList[3].Type);
+            }
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+        
+        [Fact]
+        public async Task GetReleaseAncillaryFilesInfo()
+        {
+            var release = new Release();
+
+            var ancillaryFile1 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Ancillary Test File 1",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary_1.pdf",
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary1@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var ancillaryFile2 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Ancillary Test File 2",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Ancillary 2.pdf",
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary2@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var chartFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "chart.png",
+                    Type = Chart,
+                    CreatedBy = new User
+                    {
+                        Email = "chart@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var dataFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                    CreatedBy = new User
+                    {
+                        Email = "dataFile@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var imageFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image.png",
+                    Type = Image,
+                    CreatedBy = new User
+                    {
+                        Email = "image@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(ancillaryFile1, ancillaryFile2,
+                    chartFile, dataFile, imageFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(),
+                        ancillaryFile2.Path())))
+                .ReturnsAsync(true);
+
+            blobStorageService.Setup(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile1.Path()))
+                .ReturnsAsync(new BlobInfo(
+                    path: ancillaryFile1.Path(),
+                    size: "10 Kb",
+                    contentType: "application/pdf",
+                    contentLength: 0L,
+                    meta: new Dictionary<string, string>(),
+                    created: null));
+
+            blobStorageService.Setup(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile2.Path()))
+                .ReturnsAsync(new BlobInfo(
+                    path: ancillaryFile2.Path(),
+                    size: "10 Kb",
+                    contentType: "application/pdf",
+                    contentLength: 0L,
+                    meta: new Dictionary<string, string>(),
+                    created: null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetReleaseAncillaryFilesInfo(release.Id);
+
+                Assert.True(result.IsRight);
+
+                blobStorageService.Verify(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(), ancillaryFile2.Path())),
+                        Times.Exactly(2));
+
+                blobStorageService.Verify(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(), ancillaryFile2.Path())),
+                        Times.Exactly(2));
+
+                var fileInfoList = result.Right.ToList();
+                Assert.Equal(2, fileInfoList.Count);
+
+                Assert.Equal(ancillaryFile1.File.Id, fileInfoList[0].Id);
+                Assert.Equal("pdf", fileInfoList[0].Extension);
+                Assert.Equal("ancillary_1.pdf", fileInfoList[0].FileName);
+                Assert.Equal("Ancillary Test File 1", fileInfoList[0].Name);
+                Assert.Equal("10 Kb", fileInfoList[0].Size);
+                Assert.Equal(Ancillary, fileInfoList[0].Type);
                 Assert.Equal(ancillaryFile1.File.Created, fileInfoList[0].Created);
                 Assert.Equal(ancillaryFile1.File.CreatedBy.Email, fileInfoList[0].UserName);
 
@@ -1182,28 +1362,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Ancillary, fileInfoList[1].Type);
                 Assert.Equal(ancillaryFile2.File.Created, fileInfoList[1].Created);
                 Assert.Equal(ancillaryFile2.File.CreatedBy.Email, fileInfoList[1].UserName);
-
-                Assert.Equal(chartFile.File.Id, fileInfoList[2].Id);
-                Assert.Equal("png", fileInfoList[2].Extension);
-                Assert.Equal("chart.png", fileInfoList[2].FileName);
-                Assert.Equal("chart.png", fileInfoList[2].Name);
-                Assert.Equal("20 Kb", fileInfoList[2].Size);
-                Assert.Equal(Chart, fileInfoList[2].Type);
-                Assert.Equal(chartFile.File.Created, fileInfoList[2].Created);
-                Assert.Equal(chartFile.File.CreatedBy.Email, fileInfoList[2].UserName);
-
-                Assert.Equal(imageFile.File.Id, fileInfoList[3].Id);
-                Assert.Equal("png", fileInfoList[3].Extension);
-                Assert.Equal("image.png", fileInfoList[3].FileName);
-                Assert.Equal("image.png", fileInfoList[3].Name);
-                Assert.Equal("30 Kb", fileInfoList[3].Size);
-                Assert.Equal(Image, fileInfoList[3].Type);
-                Assert.Equal(imageFile.File.Created, fileInfoList[3].Created);
-                Assert.Equal(imageFile.File.CreatedBy.Email, fileInfoList[3].UserName);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
+
 
         [Fact]
         public async Task GetFile()

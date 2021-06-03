@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -71,10 +70,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/ancillary")]
-        public async Task<ActionResult<IEnumerable<AdminFileInfo>>> GetAncillaryFiles(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<AncillaryFileInfo>>> GetReleaseAncillaryFilesInfo(Guid releaseId)
         {
             return await _releaseFileService
-                .ListAll(releaseId, Ancillary)
+                .GetReleaseAncillaryFilesInfo(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId}/ancillary")]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<AncillaryFileInfo>> UploadAncillary(Guid releaseId,
+            [FromQuery(Name = "name"), Required] string name, IFormFile file)
+        {
+            return await _releaseFileService
+                .UploadAncillary(releaseId, file, name)
                 .HandleFailuresOrOk();
         }
 
@@ -85,17 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseFileService
                 .UploadChart(releaseId, file, replacingId: id)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/ancillary")]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<AdminFileInfo>> UploadAncillary(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string name, IFormFile file)
-        {
-            return await _releaseFileService
-                .UploadAncillary(releaseId, file, name)
                 .HandleFailuresOrOk();
         }
 

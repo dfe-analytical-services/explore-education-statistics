@@ -3,8 +3,6 @@ import { FileInfo } from '@common/services/types/file';
 import downloadFile from './utils/file/downloadFile';
 
 interface AncillaryFileInfo extends FileInfo {
-  metaFileName: string;
-  rows: number;
   userName: string;
   created: string;
 }

@@ -116,27 +116,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var ancillaryFileId = Guid.NewGuid();
             var dataFileId = Guid.NewGuid();
-            var files = new List<AdminFileInfo>
+            var files = new List<FileInfo>
             {
-                new AdminFileInfo
+                new FileInfo
                 {
                     Id = ancillaryFileId,
                     FileName = "ancillary.pdf",
                     Name = "Ancillary File",
                     Size = "10 Kb",
                     Type = Ancillary,
-                    Created = DateTime.UtcNow,
-                    UserName = "ancillaryUserName"
                 },
-                new AdminFileInfo
+                new FileInfo
                 {
                     Id = dataFileId,
                     FileName = "data.csv",
                     Name = "Subject File",
                     Size = "20 Kb",
                     Type = FileType.Data,
-                    Created = DateTime.UtcNow,
-                    UserName = "dataUserName"
                 }
             };
 

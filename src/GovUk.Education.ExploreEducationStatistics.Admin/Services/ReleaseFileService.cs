@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, IEnumerable<AdminFileInfo>>> ListAll(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId,
             params FileType[] types)
         {
             return await _persistenceHelper
@@ -121,11 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (!exists)
                             {
-                                return await ToAdminFileInfoNotFound(file);
+                                return file.ToFileInfoNotFound();
                             }
 
                             var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, file.Path());
-                            return await ToAdminFileInfo(releaseFile, blob);
+                            return releaseFile.ToFileInfo(blob);
                         });
 
                     return filesWithMetadata
@@ -188,7 +188,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, AdminFileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
+        public async Task<Either<ActionResult, IEnumerable<AncillaryFileInfo>>> GetReleaseAncillaryFilesInfo(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
+                {
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, Ancillary);
+
+                    var filesWithMetadata = await releaseFiles
+                        .SelectAsync(async releaseFile =>
+                        {
+                            var file = releaseFile.File;
+
+                            var exists = await _blobStorageService.CheckBlobExists(
+                                PrivateReleaseFiles,
+                                file.Path());
+
+                            if (!exists)
+                            {
+                                return await ToAncillaryFileInfoNotFound(file);
+                            }
+
+                            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, file.Path());
+                            return await ToAncillaryFileInfo(releaseFile, blob);
+                        });
+
+                    return filesWithMetadata
+                        .OrderBy(file => file.Name)
+                        .AsEnumerable();
+                });
+        }
+
+        public Task<Either<ActionResult, AncillaryFileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -214,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         PrivateReleaseFiles,
                         releaseFile.Path());
 
-                    return await ToAdminFileInfo(releaseFile, blob);
+                    return await ToAncillaryFileInfo(releaseFile, blob);
                 });
         }
 
@@ -253,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<AdminFileInfo> ToAdminFileInfo(ReleaseFile releaseFile, BlobInfo blobInfo)
+        private async Task<AncillaryFileInfo> ToAncillaryFileInfo(ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             await _contentDbContext.Entry(releaseFile)
                 .Reference(rf => rf.File)
@@ -262,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Reference(f => f.CreatedBy)
                 .LoadAsync();
 
-            return new AdminFileInfo
+            return new AncillaryFileInfo
             {
                 Id = releaseFile.FileId,
                 FileName = releaseFile.File.Filename,
@@ -274,13 +307,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<AdminFileInfo> ToAdminFileInfoNotFound(Content.Model.File file)
+        private async Task<AncillaryFileInfo> ToAncillaryFileInfoNotFound(Content.Model.File file)
         {
             await _contentDbContext.Entry(file)
                 .Reference(f => f.CreatedBy)
                 .LoadAsync();
 
-            return new AdminFileInfo
+            return new AncillaryFileInfo
             {
                 Id = file.Id,
                 FileName = file.Filename,
