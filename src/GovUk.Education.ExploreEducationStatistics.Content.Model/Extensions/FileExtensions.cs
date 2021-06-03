@@ -52,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
         }
 
+        // TODO: Remove after completion of EES-2343
         public static FileInfo ToFileInfoNotFound(this File file)
         {
             return new FileInfo

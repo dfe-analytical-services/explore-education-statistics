@@ -307,6 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
+        // TODO: Remove after completion of EES-2343
         private async Task<AncillaryFileInfo> ToAncillaryFileInfoNotFound(Content.Model.File file)
         {
             await _contentDbContext.Entry(file)
