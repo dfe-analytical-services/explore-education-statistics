@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void GetMyPublicationsAndReleasesByTopicAsync_NoAccessOfSystem()
+        public void GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
         {
             var mocks = Mocks();
             var userService = mocks.UserService;
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetPublicationsForTopicRelatedToUser_CanViewRelatedReleases()
+        public void GetMyPublicationsAndReleasesByTopic_CanViewRelatedReleases()
         {
             var mocks = Mocks();
             var userService = mocks.UserService;
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetViewModel()
+        public void GetPublication()
         {
             var mocks = Mocks();
 
