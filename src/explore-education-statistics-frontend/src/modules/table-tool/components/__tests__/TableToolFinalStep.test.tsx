@@ -10,8 +10,22 @@ import { TableDataQuery } from '@common/services/tableBuilderService';
 import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
+import _publicationService from '@common/services/publicationService';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+
+jest.mock('@common/services/publicationService');
+
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
+
+// eslint-disable-next-line no-shadow
+enum ReleaseType {
+  AdHoc = 'Ad Hoc',
+  NationalStatistics = 'National Statistics',
+  OfficialStatistics = 'Official Statistics',
+}
 
 describe('TableToolFinalStep', () => {
   const testQuery: TableDataQuery = {
@@ -236,7 +250,84 @@ describe('TableToolFinalStep', () => {
     },
   };
 
+  const testPublication = {
+    id: '',
+    title: '',
+    yearTitle: '',
+    coverageTitle: '',
+    releaseName: '',
+    published: '',
+    slug: '',
+    summarySection: {
+      id: '',
+      order: 0,
+      heading: '',
+      content: [],
+    },
+    keyStatisticsSection: {
+      id: '',
+      order: 0,
+      heading: '',
+      content: [],
+    },
+    keyStatisticsSecondarySection: {
+      id: '',
+      order: 0,
+      heading: '',
+      content: [],
+    },
+    headlinesSection: {
+      id: '',
+      order: 0,
+      heading: '',
+      content: [],
+    },
+    publication: {
+      id: '',
+      slug: '',
+      title: '',
+      description: '',
+      dataSource: '',
+      summary: '',
+      otherReleases: [],
+      legacyReleases: [],
+      topic: {
+        theme: {
+          title: '',
+        },
+      },
+      contact: {
+        teamName: 'The team name',
+        teamEmail: 'team@name.com',
+        contactName: 'A person',
+        contactTelNo: '012345',
+      },
+      methodology: {
+        id: '',
+        slug: '',
+        summary: '',
+        title: '',
+      },
+    },
+    latestRelease: true,
+    relatedInformation: [],
+    type: {
+      id: '',
+      title: ReleaseType.NationalStatistics,
+    },
+    updates: [],
+    content: [],
+    downloadFiles: [],
+    dataLastPublished: '',
+    hasPreReleaseAccessList: true,
+    hasMetaGuidance: true,
+  };
+
   test('renders the final step successfully', async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
+
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -296,12 +387,33 @@ describe('TableToolFinalStep', () => {
       ).toBeInTheDocument();
     });
 
+    // test that contact us section is rendered correctly
+    const contactUsRevealButton = screen.getByRole('button', {
+      name: 'Contact us',
+    });
+    expect(contactUsRevealButton).toBeInTheDocument();
+
+    userEvent.click(contactUsRevealButton);
+
+    await waitFor(() => {
+      expect(screen.queryByText('The team name')).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', {
+          name: 'team@name.com',
+        }),
+      ).toBeInTheDocument();
+    });
+
     expect(
       screen.getByTestId('Table tool final step container'),
     ).toMatchSnapshot();
   });
 
   test('shows and hides table header re-ordering controls successfully', async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
+
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -333,6 +445,9 @@ describe('TableToolFinalStep', () => {
   });
 
   test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -364,6 +479,9 @@ describe('TableToolFinalStep', () => {
   });
 
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -395,6 +513,9 @@ describe('TableToolFinalStep', () => {
   });
 
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -417,6 +538,9 @@ describe('TableToolFinalStep', () => {
     ).toMatchSnapshot();
   });
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublication,
+    );
     render(
       <TableToolFinalStep
         query={testQuery}

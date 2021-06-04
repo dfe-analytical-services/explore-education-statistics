@@ -1957,13 +1957,6 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               </button>
             </div>
           </div>
-          <div
-            class="govuk-inset-text"
-          >
-            <p>
-              If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-            </p>
-          </div>
         </div>
       </div>
     </li>
@@ -2960,13 +2953,6 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               </button>
             </div>
           </div>
-          <div
-            class="govuk-inset-text"
-          >
-            <p>
-              If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-            </p>
-          </div>
         </div>
       </div>
     </li>
@@ -3962,13 +3948,6 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 Share your table
               </button>
             </div>
-          </div>
-          <div
-            class="govuk-inset-text"
-          >
-            <p>
-              If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-            </p>
           </div>
         </div>
       </div>
