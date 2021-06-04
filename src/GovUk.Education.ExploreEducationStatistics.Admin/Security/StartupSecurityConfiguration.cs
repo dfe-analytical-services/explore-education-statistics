@@ -180,6 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to approve a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new ApproveSpecificMethodologyRequirement()));
+
+                // does this user have permission to create an Amendment of a specific Methodology?
+                options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(), policy =>
+                    policy.Requirements.Add(new MakeAmendmentOfSpecificMethodologyRequirement()));
             });
         }
 
@@ -235,6 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkSpecificMethodologyAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificMethodologyAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
         }
     }
 }

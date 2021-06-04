@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
             
             [Fact]
-            public async void UserWithCorrectClaimCanCreateAmendmentOfPubliclyAccessibleMethodology()
+            public async Task UserWithCorrectClaimCanCreateAmendmentOfPubliclyAccessibleMethodology()
             {
                 await ForEachSecurityClaimAsync(async claim => {
                     
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
             
             [Fact]
-            public async void UserWithCorrectClaimCannotCreateAmendmentOfPrivateMethodology()
+            public async Task UserWithCorrectClaimCannotCreateAmendmentOfPrivateMethodology()
             {
                 await ForEachSecurityClaimAsync(async claim => 
                 {
@@ -92,15 +93,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
             
             [Fact]
-            public async void UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodology()
+            public async Task UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodology()
             {
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
                     
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
                 
-                publicationRoleRepository.Setup(s => 
-                        s.GetAllRolesByUser(UserId, Publication.Id))
+                publicationRoleRepository.Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
                     .ReturnsAsync(AsList(PublicationRole.Owner));
 
                 await handler.HandleAsync(authContext);
@@ -112,15 +112,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
             
             [Fact]
-            public async void UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodology()
+            public async Task UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodology()
             {
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
                     
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
                 
-                publicationRoleRepository.Setup(s => 
-                        s.GetAllRolesByUser(UserId, Publication.Id))
+                publicationRoleRepository.Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 await handler.HandleAsync(authContext);
@@ -132,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
             
             [Fact]
-            public async void UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentOfPrivateMethodology()
+            public async Task UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentOfPrivateMethodology()
             {
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
                     

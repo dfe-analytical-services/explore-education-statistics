@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
         {
             return new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {default(TRequirement)},
+                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
                 user, entity);
 
         }

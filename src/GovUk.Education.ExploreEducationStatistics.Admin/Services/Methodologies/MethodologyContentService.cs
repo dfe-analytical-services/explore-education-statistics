@@ -430,12 +430,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckCanUpdateMethodology(
             Tuple<Methodology, ContentSection> tuple)
         {
-            if (tuple.Item1.Status != MethodologyStatus.Draft)
-            {
-                return Task.FromResult<Either<ActionResult, Tuple<Methodology, ContentSection>>>(
-                    ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
-            }
-
             return _userService
                 .CheckCanUpdateMethodology(tuple.Item1)
                 .OnSuccess(_ => tuple);

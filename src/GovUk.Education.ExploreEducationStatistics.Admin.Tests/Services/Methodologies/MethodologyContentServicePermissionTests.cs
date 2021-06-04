@@ -10,7 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -32,12 +34,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanViewAllMethodologies)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanViewSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.GetContent(methodology.Id));
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.GetContent(methodology.Id);
+                        });
             }
         }
         
@@ -54,12 +60,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanViewAllMethodologies)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanViewSpecificMethodology)
                     .AssertForbidden(
-                        userService => 
-                            methodologyContentService.GetContentBlocks<ContentBlock>(methodology.Id));
+                        userService =>
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.GetContentBlocks<ContentBlock>(methodology.Id);
+                        });
             }
         }
         
@@ -76,12 +86,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanViewAllMethodologies)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanViewSpecificMethodology)
                     .AssertForbidden(
-                        userService => 
-                            methodologyContentService.GetContentSections(methodology.Id, MethodologyContentService.ContentListType.Content));
+                        userService =>
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.GetContentSections(methodology.Id,
+                                MethodologyContentService.ContentListType.Content);
+                        });
             }
         }
         
@@ -104,12 +119,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanViewAllMethodologies)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanViewSpecificMethodology)
                     .AssertForbidden(
-                        userService => 
-                            methodologyContentService.GetContentSection(methodology.Id, methodology.Content.First().Id));
+                        userService =>
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.GetContentSection(methodology.Id,
+                                methodology.Content.First().Id);
+                        });
             }
         }
         
@@ -126,12 +146,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
-                        userService => 
-                            methodologyContentService.ReorderContentSections(methodology.Id,new Dictionary<Guid, int>()));
+                        userService =>
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.ReorderContentSections(methodology.Id,
+                                new Dictionary<Guid, int>());
+                        });
             }
         }
 
@@ -148,15 +173,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.AddContentSection(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.AddContentSection(
                                 methodology.Id,
                                 new ContentSectionAddRequest(),
-                                MethodologyContentService.ContentListType.Content));
+                                MethodologyContentService.ContentListType.Content);
+                        });
             }
         }
 
@@ -180,15 +209,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.UpdateContentSectionHeading(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.UpdateContentSectionHeading(
                                 methodology.Id,
                                 methodology.Content.First().Id,
-                                "New heading"));
+                                "New heading");
+                        });
             }
         }
 
@@ -212,14 +245,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.RemoveContentSection(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.RemoveContentSection(
                                 methodology.Id,
-                                methodology.Content.First().Id));
+                                methodology.Content.First().Id);
+                        });
             }
         }
         
@@ -243,16 +280,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.ReorderContentBlocks(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.ReorderContentBlocks(
                                 methodology.Id,
                                 methodology.Content.First().Id,
                                 new Dictionary<Guid, int>()
-                                ));
+                            );
+                        });
             }
         }
         
@@ -263,7 +304,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection()
+                    new ContentSection
+                    {
+                        Id = Guid.NewGuid()
+                    }
                 }
 
             };
@@ -276,16 +320,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.AddContentBlock(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.AddContentBlock(
                                 methodology.Id,
                                 methodology.Content.First().Id,
                                 new ContentBlockAddRequest()
-                                ));
+                            );
+                        });
             }
         }
         
@@ -315,16 +363,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.RemoveContentBlock(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.RemoveContentBlock(
                                 methodology.Id,
                                 methodology.Content.First().Id,
                                 methodology.Content.First().Content.First().Id
-                                ));
+                            );
+                        });
             }
         }
         
@@ -354,17 +406,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
-                PolicyCheckBuilder<SecurityPolicies>()
-                    .ExpectResourceCheckToFail(methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                        CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
-                            methodologyContentService.UpdateTextBasedContentBlock(
+                        {
+                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+
+                            return methodologyContentService.UpdateTextBasedContentBlock(
                                 methodology.Id,
                                 methodology.Content.First().Id,
                                 methodology.Content.First().Content.First().Id,
                                 new ContentBlockUpdateRequest()
-                                ));
+                            );
+                        });
             }
         }
         

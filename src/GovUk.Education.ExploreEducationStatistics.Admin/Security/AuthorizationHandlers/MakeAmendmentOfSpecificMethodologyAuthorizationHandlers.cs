@@ -1,12 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
@@ -40,8 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             // Any user with the "MakeAmendmentsOfAllMethodologies" Claim can create an amendment of a
             // publicly-accessible Methodology.
-            
-            // TODO - need to check there's not already an existing Amendment
             if (SecurityUtils.HasClaim(context.User, MakeAmendmentsOfAllMethodologies))
             {
                 context.Succeed(requirement);
