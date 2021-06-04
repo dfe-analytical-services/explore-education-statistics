@@ -15,12 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         where TRequirement : IAuthorizationRequirement
     {
         private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
         protected ReleaseStatusAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             _releaseStatusRepository = releaseStatusRepository;
+            _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
         }
 
@@ -88,11 +91,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var roles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var publicationRoles =
+                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
             if (release.Status == ReleaseStatus.Approved
-                ? ContainsApproverRole(roles)
-                : ContainsEditorRole(roles))
+                ? ContainsApproverRole(releaseRoles)
+                : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {
                 context.Succeed(requirement);
             }
@@ -109,11 +114,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var roles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var publicationRoles =
+                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
             if (release.Status == ReleaseStatus.Approved
-                ? ContainsApproverRole(roles)
-                : ContainsEditorRole(roles))
+                ? ContainsApproverRole(releaseRoles)
+                : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {
                 context.Succeed(requirement);
             }
@@ -128,7 +135,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : ReleaseStatusAuthorizationHandler<MarkReleaseAsDraftRequirement>
     {
         public MarkReleaseAsDraftAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
         }
@@ -144,7 +153,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : ReleaseStatusAuthorizationHandler<MarkReleaseAsHigherLevelReviewRequirement>
     {
         public MarkReleaseAsHigherLevelReviewAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
         }
@@ -161,7 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public MarkReleaseAsApprovedAuthorizationHandler(
             IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
         }
