@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRoles = new List<UserReleaseRole>();
             var userPublicationRoles = new List<UserPublicationRole>();
-            
+
             // Set up a publication and releases related to the topic that will be granted via different release roles
 
             var relatedPublication1 = new Publication
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
-                var result = await service.GetPublicationsForTopicRelatedToUserAsync(topic.Id, user.Id);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 // Result should contain Related publication 1 and Related publication 2
                 // Related publication 3 is excluded because it's only granted via the PrereleaseViewer release role
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
-                var result = await service.GetPublicationsForTopicRelatedToUserAsync(topic.Id, user.Id);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 Assert.Empty(result);
             }
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
-                var result = await service.GetPublicationsForTopicRelatedToUserAsync(topic.Id, user.Id);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 Assert.Empty(result);
             }
@@ -357,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
-                var result = await service.GetPublicationsForTopicRelatedToUserAsync(topic.Id, user.Id);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 // Result should contain the publication related to this topic
                 Assert.Single(result);

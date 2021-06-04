@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(() =>
                             _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
                         .OrElse(() =>
-                            _publicationRepository.GetPublicationsForTopicRelatedToUserAsync(topicId,
+                            _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId,
                                 _userService.GetUserId()));
                 });
         }

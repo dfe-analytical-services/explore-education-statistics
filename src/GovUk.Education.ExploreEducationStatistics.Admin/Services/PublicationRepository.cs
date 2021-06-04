@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -35,9 +35,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId)
+        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(Guid topicId,
+            Guid userId)
         {
-            var userReleasesForTopicFromReleases = await _context.UserReleaseRoles
+            var publicationsGrantedByPublicationOwnerRole = await _context.UserPublicationRoles
+                .Where(userPublicationRole => userPublicationRole.UserId == userId &&
+                                              userPublicationRole.Publication.TopicId == topicId &&
+                                              userPublicationRole.Role == PublicationRole.Owner)
+                .Select(userPublicationRole => userPublicationRole.Publication)
+                .ToListAsync();
+
+            var releasesGrantedByReleaseRoles = await _context.UserReleaseRoles
                 .Include(userReleaseRole => userReleaseRole.Release.Publication)
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
                                           userReleaseRole.Release.Publication.TopicId == topicId &&
@@ -45,46 +53,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(userReleaseRole => userReleaseRole.Release)
                 .ToListAsync();
 
-            var userReleasesForTopicFromPublications = await _context.UserPublicationRoles
-                .Where(userPublicationRole => userPublicationRole.UserId == userId &&
-                                              userPublicationRole.Publication.TopicId == topicId &&
-                                              userPublicationRole.Role == Owner)
-                .SelectMany(userPublicationRole => userPublicationRole.Publication.Releases)
-                .Include(release => release.Publication)
-                .ToListAsync();
+            var publicationViewModels = new List<MyPublicationViewModel>();
 
-            var userReleasesForTopic = userReleasesForTopicFromReleases
-                .Concat(userReleasesForTopicFromPublications)
-                .Distinct()
-                .ToList();
+            publicationViewModels.AddRange(await publicationsGrantedByPublicationOwnerRole
+                .SelectAsync(async publication => await GetPublicationWithAllReleases(publication.Id)));
 
-            var userReleasesByPublication = new Dictionary<Publication, List<Release>>();
-
-            foreach (var publication in userReleasesForTopic
-                .Select(release => release.Publication)
-                .Distinct())
-            {
-                var releasesForPublication = userReleasesForTopic
-                    .FindAll(release => release.PublicationId == publication.Id);
-                userReleasesByPublication.Add(publication, releasesForPublication);
-            }
-
-            return userReleasesByPublication
-                .Select(publicationWithReleases =>
+            publicationViewModels.AddRange(await releasesGrantedByReleaseRoles
+                .GroupBy(release => release.Publication)
+                .SelectAsync(async publicationWithReleases =>
                 {
-                    var (publication, releases) = publicationWithReleases;
-                    var releaseIds = releases.Select(r => r.Id);
-                    
-                    var hydratedPublication = 
-                        HydratePublicationForPublicationViewModel(_context.Publications)
-                        .First(p => p.Id == publication.Id);
-                    
-                    hydratedPublication.Releases = hydratedPublication
-                        .Releases
-                        .FindAll(r => releaseIds.Contains(r.Id));
-                    
-                    return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
-                })
+                    var publication = publicationWithReleases.Key;
+                    var releaseIds = publicationWithReleases.Select(r => r.Id);
+                    return await GetPublicationWithFilteredReleases(publication.Id, releaseIds);
+                }));
+
+            return publicationViewModels
+                .OrderBy(model => model.Title)
                 .ToList();
         }
 
@@ -113,6 +97,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
                 .FirstAsync(p => p.Id == publicationId);
+
+            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+        }
+
+        private async Task<MyPublicationViewModel> GetPublicationWithFilteredReleases(Guid publicationId,
+            IEnumerable<Guid> releaseIds)
+        {
+            var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
+                    .FirstAsync(p => p.Id == publicationId);
+
+            hydratedPublication.Releases = hydratedPublication.Releases
+                .FindAll(r => releaseIds.Contains(r.Id));
 
             return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
         }

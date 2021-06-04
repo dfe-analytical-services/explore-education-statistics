@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
+        public void GetMyPublicationsAndReleasesByTopic_CanViewAllReleases()
         {
             var mocks = Mocks();
             var userService = mocks.UserService;
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
+        public void GetPublicationsForTopicRelatedToUser_CanViewRelatedReleases()
         {
             var mocks = Mocks();
             var userService = mocks.UserService;
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId))
+            publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topicId, userId))
                 .ReturnsAsync(list);
 
             var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Right;
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService.Verify(s => s.GetUserId());
             userService.VerifyNoOtherCalls();
 
-            publicationRepository.Verify(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId));
+            publicationRepository.Verify(s => s.GetPublicationsForTopicRelatedToUser(topicId, userId));
             publicationRepository.VerifyNoOtherCalls();
         }
 
