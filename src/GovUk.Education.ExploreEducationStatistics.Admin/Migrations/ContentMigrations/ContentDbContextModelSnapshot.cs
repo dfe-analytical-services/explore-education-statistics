@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("DataImportId");
 
-                    b.ToTable("DataImportError");
+                    b.ToTable("DataImportErrors");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
