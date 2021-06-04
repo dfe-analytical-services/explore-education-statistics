@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -45,8 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
+        [NotMapped]
         public Release ScheduledWithRelease { get; set; }
         
+        [NotMapped]
         public Guid ScheduledWithReleaseId { get; set; }
 
         public bool Approved => Status == MethodologyStatus.Approved;
