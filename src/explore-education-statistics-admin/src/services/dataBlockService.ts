@@ -7,6 +7,7 @@ export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
 export interface ReleaseDataBlockSummary {
   id: string;
   name: string;
+  created?: string;
   highlightName?: string;
   highlightDescription?: string;
   heading: string;
