@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -13,37 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class MethodologyControllerTests
     {
         private readonly Guid _methodologyId = Guid.NewGuid();
-
-        [Fact]
-        public async void CreateMethodologyAsync_Returns_Ok()
-        {
-            var request = new MethodologyCreateRequest();
-
-            var methodologyService = new Mock<IMethodologyService>();
-
-            methodologyService.Setup(s => s.CreateMethodologyAsync(request))
-                .ReturnsAsync(new Either<ActionResult, MethodologySummaryViewModel>(new MethodologySummaryViewModel()));
-            var controller = new MethodologyController(methodologyService.Object);
-
-            // Method under test
-            var result = await controller.CreateMethodologyAsync(request);
-            AssertOkResult(result);
-        }
-
-        [Fact]
-        public async void GetMethodologiesAsync_Returns_Ok()
-        {
-            var methodologyService = new Mock<IMethodologyService>();
-
-            methodologyService.Setup(s => s.ListAsync())
-                .ReturnsAsync(
-                    new Either<ActionResult, List<MethodologySummaryViewModel>>(new List<MethodologySummaryViewModel>()));
-            var controller = new MethodologyController(methodologyService.Object);
-
-            // Method under test
-            var result = await controller.GetMethodologiesAsync();
-            AssertOkResult(result);
-        }
 
         [Fact]
         public async void GetMethodologySummaryAsync_Returns_Ok()

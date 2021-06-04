@@ -24,109 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
     public class MethodologyServiceTests
     {
         [Fact]
-        public async Task CreateAsync()
-        {
-            var request = new MethodologyCreateRequest
-            {
-                Title = "Pupil absence statistics: methodology"
-            };
-
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var service = SetupMethodologyService(contentDbContext: context);
-
-                var viewModel = (await service.CreateMethodologyAsync(request)).Right;
-
-                var model = await context.Methodologies.FindAsync(viewModel.Id);
-
-                Assert.False(model.Live);
-                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.False(model.Updated.HasValue);
-
-                Assert.Null(viewModel.InternalReleaseNote);
-                Assert.Null(viewModel.Published);
-                Assert.Equal(Draft, viewModel.Status);
-                Assert.Equal(request.Title, viewModel.Title);
-            }
-        }
-
-        [Fact]
-        public async Task CreateAsync_SlugNotUnique()
-        {
-            var request = new MethodologyCreateRequest
-            {
-                Title = "Pupil absence statistics: methodology"
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext: context);
-
-                var createResult = await service.CreateMethodologyAsync(request);
-
-                Assert.True(createResult.IsRight);
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext: context);
-
-                var repeatedCreateResult = await service.CreateMethodologyAsync(request);
-
-                Assert.True(repeatedCreateResult.IsLeft);
-                AssertValidationProblem(repeatedCreateResult.Left, SlugNotUnique);
-            }
-        }
-
-        [Fact]
-        public async Task ListAsync()
-        {
-            var methodology1 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Title = "Methodology 1",
-                Status = Approved
-            };
-
-            var methodology2 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Title = "Methodology 2",
-                Status = Draft
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.AddRangeAsync(new List<Methodology>
-                {
-                    methodology1, methodology2
-                });
-                await context.SaveChangesAsync();
-            }
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext: context);
-
-                var methodologies = (await service.ListAsync()).Right;
-
-                Assert.Contains(methodologies,
-                    m => m.Id == methodology1.Id
-                         && m.Title == methodology1.Title
-                         && m.Status == methodology1.Status);
-
-                Assert.Contains(methodologies,
-                    m => m.Id == methodology2.Id
-                         && m.Title == methodology2.Title
-                         && m.Status == methodology2.Status);
-            }
-        }
-
-        [Fact]
         public async Task GetSummaryAsync()
         {
             var methodology = new Methodology
@@ -554,7 +451,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentDbContext,
                 AdminMapper(),
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
-                methodologyRepository ?? new MethodologyRepository(contentDbContext),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object,

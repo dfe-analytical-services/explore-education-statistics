@@ -80,10 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationSaveViewModel publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
-                .OnSuccess(_ => ValidateSelectedMethodology(
-                    publication.MethodologyId,
-                    publication.ExternalMethodology
-                ))
                 .OnSuccess(async _ =>
                 {
                     if (_context.Publications.Any(p => p.Slug == publication.Slug))
@@ -96,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ContactName = publication.Contact.ContactName,
                         ContactTelNo = publication.Contact.ContactTelNo,
                         TeamName = publication.Contact.TeamName,
-                        TeamEmail = publication.Contact.TeamEmail,
+                        TeamEmail = publication.Contact.TeamEmail
                     });
 
                     var saved = await _context.Publications.AddAsync(new Publication
@@ -104,7 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Contact = contact.Entity,
                         Title = publication.Title,
                         TopicId = publication.TopicId,
-                        MethodologyId = publication.MethodologyId,
                         Slug = publication.Slug,
                         ExternalMethodology = publication.ExternalMethodology
                     });
@@ -130,10 +125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                     return Unit.Instance;
                 })
-                .OnSuccessDo(_ => ValidateSelectedMethodology(
-                    updatedPublication.MethodologyId,
-                    updatedPublication.ExternalMethodology
-                ))
                 .OnSuccess(async publication =>
                 {
                     if (publication.Live)
@@ -152,7 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
-                    publication.MethodologyId = updatedPublication.MethodologyId;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
                     publication.Updated = DateTime.UtcNow;
 
@@ -195,34 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _userService.CheckCanCreatePublicationForTopic(topic)
                 .OnSuccess(_ => Unit.Instance);
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidateSelectedMethodology(
-            Guid? methodologyId,
-            ExternalMethodology? externalMethodology)
-        {
-            if (methodologyId != null && externalMethodology != null)
-            {
-                return ValidationActionResult(CannotSpecifyMethodologyAndExternalMethodology);
-            }
-
-            if (methodologyId != null)
-            {
-                var methodology = await _context.Methodologies.FindAsync(methodologyId);
-
-                if (methodology == null)
-                {
-                    return ValidationActionResult(MethodologyDoesNotExist);
-                }
-
-                // TODO: this will want updating when methodology status is fully implemented
-                if (methodology.Status != MethodologyStatus.Approved)
-                {
-                    return ValidationActionResult(MethodologyMustBeApproved);
-                }
-            }
-
-            return Unit.Instance;
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId)

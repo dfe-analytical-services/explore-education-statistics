@@ -70,7 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
             CreateMap<Methodology, MethodologyTitleViewModel>();
-            CreateMap<Methodology, MethodologyPublicationsViewModel>();
 
             CreateMap<Publication, IdTitlePair>();
 
