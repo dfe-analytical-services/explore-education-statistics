@@ -54,8 +54,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
 
         public bool ScheduledForPublishingImmediately => PublishingStrategy == MethodologyPublishingStrategy.Immediately;
-        public bool ScheduledForPublishingWithPublishedRelease => PublishingStrategy == MethodologyPublishingStrategy.WithRelease
-            && ScheduledWithRelease.Live;
+        
+        public bool ScheduledForPublishingWithPublishedRelease
+        {
+            get
+            {
+                if (ScheduledWithReleaseId != null && ScheduledWithRelease == null)
+                {
+                    throw new InvalidOperationException("ScheduledWithRelease field not included in Methodology");
+                }
+                return PublishingStrategy == MethodologyPublishingStrategy.WithRelease
+                       && ScheduledWithRelease.Live;
+            }
+        }
 
         public bool PubliclyAccessible => Approved &&
                                           (ScheduledForPublishingImmediately ||
