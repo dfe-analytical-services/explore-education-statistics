@@ -1,5 +1,5 @@
 import PublicationForm, {
-  PublicationFormValues,
+  FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -209,7 +209,7 @@ describe('PublicationForm', () => {
         teamEmail: 'team@test.com',
         contactName: 'John Smith',
         contactTelNo: '0123456789',
-      } as PublicationFormValues);
+      } as FormValues);
     });
   });
 
@@ -263,7 +263,7 @@ describe('PublicationForm', () => {
     test('can successfully submit without any changes', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
 
-      const initialValues: PublicationFormValues = {
+      const initialValues: FormValues = {
         title: 'Test title',
         topicId: 'topic-4',
         teamName: 'Test team',
@@ -299,7 +299,7 @@ describe('PublicationForm', () => {
     test('can successfully submit with updated topic', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
 
-      const initialValues: PublicationFormValues = {
+      const initialValues: FormValues = {
         title: 'Test title',
         topicId: 'topic-4',
         teamName: 'Test team',

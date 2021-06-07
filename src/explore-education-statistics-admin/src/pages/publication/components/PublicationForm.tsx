@@ -13,7 +13,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { ReactNode, useMemo } from 'react';
 
-interface FormValues {
+export interface FormValues {
   title: string;
   topicId?: string;
   teamName: string;
