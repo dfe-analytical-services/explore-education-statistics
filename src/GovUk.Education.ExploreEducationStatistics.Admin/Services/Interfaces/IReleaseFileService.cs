@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name);
 
-        Task<Either<ActionResult, IEnumerable<AncillaryFileInfo>>> GetReleaseAncillaryFilesInfo(Guid releaseId);
+        Task<Either<ActionResult, IEnumerable<AncillaryFileInfo>>> GetAncillaryFiles(Guid releaseId);
 
         Task<Either<ActionResult, AncillaryFileInfo>> UploadAncillary(Guid releaseId,
             IFormFile formFile,

@@ -70,10 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/ancillary")]
-        public async Task<ActionResult<IEnumerable<AncillaryFileInfo>>> GetReleaseAncillaryFilesInfo(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<AncillaryFileInfo>>> GetAncillaryFiles(Guid releaseId)
         {
             return await _releaseFileService
-                .GetReleaseAncillaryFilesInfo(releaseId)
+                .GetAncillaryFiles(releaseId)
                 .HandleFailuresOrOk();
         }
 

@@ -1198,7 +1198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async Task GetReleaseAncillaryFilesInfo()
+        public async Task GetAncillaryFiles()
         {
             var release = new Release();
 
@@ -1328,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.GetReleaseAncillaryFilesInfo(release.Id);
+                var result = await service.GetAncillaryFiles(release.Id);
 
                 Assert.True(result.IsRight);
 
