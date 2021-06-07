@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string InternalReleaseNote { get; set; }
         
+        [NotMapped]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
         [NotMapped]

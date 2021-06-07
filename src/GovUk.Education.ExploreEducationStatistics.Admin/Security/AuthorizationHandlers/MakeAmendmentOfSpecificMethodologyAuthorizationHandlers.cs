@@ -50,6 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
+            // TODO: this will need changing in the future to only allow owning Publications the permission to make
+            // Amendments, rather than just any linked Methodologies
             foreach (var publication in methodology.Publications)
             {
                 var publicationRoles =
