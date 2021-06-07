@@ -4,18 +4,8 @@ import methodologyService from '@admin/services/methodologyService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-<<<<<<< HEAD
 // TODO EES-2153 Remove this page
 const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
-=======
-interface MatchProps {
-  publicationId: string;
-}
-
-const MethodologyCreatePage = ({
-  history,
-}: RouteComponentProps<MatchProps>) => {
->>>>>>> EES-2350 intial FE work for new create methodology
   return (
     <Page
       wide

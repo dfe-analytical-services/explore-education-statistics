@@ -22,8 +22,6 @@ interface FormValues {
   contactTelNo: string;
 }
 
-export type PublicationFormValues = FormValues;
-
 const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'title',
@@ -35,8 +33,8 @@ const errorMappings = [
 interface Props {
   cancelButton?: ReactNode;
   id?: string;
-  initialValues?: PublicationFormValues;
-  onSubmit: (values: PublicationFormValues) => void;
+  initialValues?: FormValues;
+  onSubmit: (values: FormValues) => void;
 }
 
 const PublicationForm = ({
@@ -70,7 +68,7 @@ const PublicationForm = ({
     return schema;
   }, [initialValues?.topicId]);
 
-  const handleSubmit = useFormSubmit(async ({ ...values }: FormValues) => {
+  const handleSubmit = useFormSubmit(async (values: FormValues) => {
     await onSubmit(values);
   }, errorMappings);
 

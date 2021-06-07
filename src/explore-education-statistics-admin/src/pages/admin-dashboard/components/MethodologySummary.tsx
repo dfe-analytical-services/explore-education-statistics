@@ -32,7 +32,13 @@ const MethodologySummary = ({
     setShowEditExternalMethodologyForm,
   ] = useState<boolean>();
 
-  const { contact, externalMethodology, methodology, id, title } = publication;
+  const {
+    contact,
+    externalMethodology,
+    methodology,
+    id: publicationId,
+    title,
+  } = publication;
 
   const handleExternalMethodologySubmit = async (
     values: ExternalMethodology,
@@ -52,7 +58,10 @@ const MethodologySummary = ({
       },
     };
 
-    await publicationService.updatePublication(id, updatedPublication);
+    await publicationService.updatePublication(
+      publicationId,
+      updatedPublication,
+    );
     onChangePublication();
   };
 
@@ -68,7 +77,10 @@ const MethodologySummary = ({
       topicId,
     };
 
-    await publicationService.updatePublication(id, updatedPublication);
+    await publicationService.updatePublication(
+      publicationId,
+      updatedPublication,
+    );
     onChangePublication();
   };
 
@@ -77,7 +89,7 @@ const MethodologySummary = ({
       {methodology ? (
         <Link
           to={generatePath(methodologySummaryRoute.path, {
-            publicationId: id,
+            publicationId,
             methodologyId: methodology.id,
           })}
         >
@@ -126,7 +138,7 @@ const MethodologySummary = ({
                 <ButtonGroup className="govuk-!-margin-bottom-2">
                   <ButtonLink
                     to={generatePath(methodologyCreateRoute.path, {
-                      publicationId: id,
+                      publicationId,
                     })}
                     data-testid={`Create methodology for ${title}`}
                   >
@@ -135,6 +147,7 @@ const MethodologySummary = ({
                   <Button
                     type="button"
                     data-testid={`Link methodology for ${title}`}
+                    variant="secondary"
                     onClick={() => setShowAddExternalMethodologyForm(true)}
                   >
                     Link to an externally hosted methodology
