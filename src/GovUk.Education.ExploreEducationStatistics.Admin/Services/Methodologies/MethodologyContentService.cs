@@ -361,6 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var classType = GetContentBlockClassTypeFromEnumValue(type);
             var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
             newContentBlock.Id = Guid.NewGuid();
+            newContentBlock.Created = DateTime.UtcNow;
             return newContentBlock;
         }
 

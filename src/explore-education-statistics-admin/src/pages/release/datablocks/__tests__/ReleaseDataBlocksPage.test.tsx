@@ -30,6 +30,7 @@ describe('ReleaseDataBlocksPage', () => {
     {
       id: 'block-1',
       name: 'Block 1',
+      created: undefined,
       highlightName: 'Block 1 highlight name',
       heading: 'Block 1 heading',
       source: 'Block 1 source',
@@ -39,6 +40,7 @@ describe('ReleaseDataBlocksPage', () => {
     {
       id: 'block-2',
       name: 'Block 2',
+      created: '2021-01-01T15:00:00.0000000',
       heading: 'Block 2 heading',
       source: 'Block 2 source',
       contentSectionId: '',
@@ -75,36 +77,38 @@ describe('ReleaseDataBlocksPage', () => {
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
-    expect(row1Cells).toHaveLength(5);
+    expect(row1Cells).toHaveLength(6);
     expect(row1Cells[0]).toHaveTextContent('Block 1');
     expect(row1Cells[1]).toHaveTextContent('Yes');
     expect(row1Cells[2]).toHaveTextContent('Yes');
     expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
+    expect(row1Cells[4]).toHaveTextContent('Not available');
     expect(
-      within(row1Cells[4]).getByRole('link', { name: 'Edit block' }),
+      within(row1Cells[5]).getByRole('link', { name: 'Edit block' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-1',
     );
     expect(
-      within(row1Cells[4]).getByRole('button', { name: 'Delete block' }),
+      within(row1Cells[5]).getByRole('button', { name: 'Delete block' }),
     ).toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
 
-    expect(row2Cells).toHaveLength(5);
+    expect(row2Cells).toHaveLength(6);
     expect(row2Cells[0]).toHaveTextContent('Block 2');
     expect(row2Cells[1]).toHaveTextContent('No');
     expect(row2Cells[2]).toHaveTextContent('No');
     expect(row2Cells[3]).toHaveTextContent('None');
+    expect(row2Cells[4]).toHaveTextContent('1 January 2021 15:00');
     expect(
-      within(row2Cells[4]).getByRole('link', { name: 'Edit block' }),
+      within(row2Cells[5]).getByRole('link', { name: 'Edit block' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-2',
     );
     expect(
-      within(row2Cells[4]).getByRole('button', { name: 'Delete block' }),
+      within(row2Cells[5]).getByRole('button', { name: 'Delete block' }),
     ).toBeInTheDocument();
   });
 
@@ -131,30 +135,32 @@ describe('ReleaseDataBlocksPage', () => {
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
-    expect(row1Cells).toHaveLength(5);
+    expect(row1Cells).toHaveLength(6);
     expect(row1Cells[0]).toHaveTextContent('Block 1');
     expect(row1Cells[1]).toHaveTextContent('Yes');
     expect(row1Cells[2]).toHaveTextContent('Yes');
     expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
+    expect(row1Cells[4]).toHaveTextContent('Not available');
     expect(
-      within(row1Cells[4]).getByRole('link', { name: 'View block' }),
+      within(row1Cells[5]).getByRole('link', { name: 'View block' }),
     ).toBeInTheDocument();
     expect(
-      within(row1Cells[4]).queryByRole('button', { name: 'Delete block' }),
+      within(row1Cells[5]).queryByRole('button', { name: 'Delete block' }),
     ).not.toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
 
-    expect(row2Cells).toHaveLength(5);
+    expect(row2Cells).toHaveLength(6);
     expect(row2Cells[0]).toHaveTextContent('Block 2');
     expect(row2Cells[1]).toHaveTextContent('No');
     expect(row2Cells[2]).toHaveTextContent('No');
     expect(row2Cells[3]).toHaveTextContent('None');
+    expect(row2Cells[4]).toHaveTextContent('1 January 2021 15:00');
     expect(
-      within(row2Cells[4]).getByRole('link', { name: 'View block' }),
+      within(row2Cells[5]).getByRole('link', { name: 'View block' }),
     ).toBeInTheDocument();
     expect(
-      within(row2Cells[4]).queryByRole('button', { name: 'Delete block' }),
+      within(row2Cells[5]).queryByRole('button', { name: 'Delete block' }),
     ).not.toBeInTheDocument();
 
     expect(
@@ -268,7 +274,8 @@ describe('ReleaseDataBlocksPage', () => {
     expect(row1Cells[1]).toHaveTextContent('No');
     expect(row1Cells[2]).toHaveTextContent('No');
     expect(row1Cells[3]).toHaveTextContent('None');
-    expect(within(row1Cells[4]).getByRole('link')).toHaveAttribute(
+    expect(row1Cells[4]).toHaveTextContent('1 January 2021 15:00');
+    expect(within(row1Cells[5]).getByRole('link')).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-2',
     );
