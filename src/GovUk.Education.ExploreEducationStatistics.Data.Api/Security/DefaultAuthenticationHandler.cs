@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Security
         {
         }
 
-        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            return AuthenticateResult.NoResult();
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
     }
 }

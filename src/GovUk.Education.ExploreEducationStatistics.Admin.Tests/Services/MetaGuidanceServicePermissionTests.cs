@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -26,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void Get()
+        public async Task Get()
         {
-            PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -40,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Update()
+        public async Task Update()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

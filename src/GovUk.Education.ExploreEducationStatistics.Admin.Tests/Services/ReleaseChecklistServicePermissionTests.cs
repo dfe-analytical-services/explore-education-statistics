@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -24,10 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
         [Fact]
-        public void GetChecklist()
+        public async Task GetChecklist()
         {
-            PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {

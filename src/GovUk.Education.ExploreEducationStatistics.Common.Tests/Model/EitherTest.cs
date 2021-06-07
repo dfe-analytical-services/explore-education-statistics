@@ -283,8 +283,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async void OnSuccessCombineWith_FirstFails()
         {
             var either = await Task.FromResult(new Either<int, string>(500))
-                .OnSuccessCombineWith(firstSuccess => AssertFail<Task<Either<int, string>>>(
-                    "Second call should not be called if the first failed"));
+                .OnSuccessCombineWith(firstSuccess =>
+                {
+                    AssertFail("Second call should not be called if the first failed");
+                    return Task.FromResult(new Either<int, string>("this should not be called"));
+                });
 
             Assert.True(either.IsLeft);
             Assert.Equal(500, either.Left);

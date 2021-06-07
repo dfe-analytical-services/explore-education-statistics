@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
@@ -116,6 +117,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
+        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)
+        {
+            return CreateClaimsPrincipal(userId, new Claim[] {});
+        }
+
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
         {
             var identity = new ClaimsIdentity();
@@ -123,6 +129,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             identity.AddClaims(additionalClaims);
             var user = new ClaimsPrincipal(identity);
             return user;
+        }
+
+        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params SecurityClaimTypes[] additionalClaims)
+        {
+            return CreateClaimsPrincipal(userId, 
+                additionalClaims.Select(c => new Claim(c.ToString(), "")).ToArray());
+        }
+
+        public static void ForEachSecurityClaim(Action<SecurityClaimTypes> action)
+        {
+            GetEnumValues<SecurityClaimTypes>().ForEach(action.Invoke);
+        }
+        
+        public static Task ForEachSecurityClaimAsync(Func<SecurityClaimTypes, Task> action)
+        {
+            return GetEnumValues<SecurityClaimTypes>().ForEachAsync(action.Invoke);
+        }
+
+        public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<TRequirement, TEntity>(
+            ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
+        {
+            return new AuthorizationHandlerContext(
+                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                user, entity);
+
         }
 
         public class HandlerTestScenario
