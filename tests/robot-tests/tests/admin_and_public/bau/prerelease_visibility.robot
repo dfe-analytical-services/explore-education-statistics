@@ -16,13 +16,11 @@ Create test publication and release via API
     [Tags]  HappyPath
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   CY    2000
-    
+
 Verify release summary
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
-    user waits until h2 is visible  Release summary
-    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    user verifies release summary  ${PUBLICATION_NAME}  Calendar Year  2000  UI test contact name  National Statistics
 
 Upload subject
     [Tags]  HappyPath
@@ -49,7 +47,7 @@ Go to Public Release Link
 
 Return to admin
     [Tags]  HappyPath
-    user navigates to admin dashboard  bau1
+    user navigates to admin dashboard  Bau1
 
 Select release from admin dashboard
     [Tags]  HappyPath
@@ -65,7 +63,6 @@ Select release from admin dashboard
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list  Initial test public access list
 
 Update public prerelease access list
@@ -76,7 +73,9 @@ Add meta guidance to ${PUBLICATION_NAME} subject
     [Tags]  HappyPath
     user clicks link  Data and files
     user clicks link  Metadata guidance
-    user waits until h2 is visible  Public metadata guidance document  90
+    user waits until h2 is visible  Public metadata guidance document
+    user waits until page contains element  id:metaGuidanceForm-content
+    user waits until page contains element  id:metaGuidance-dataFiles
     user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
     user waits until page contains accordion section  UI test subject
     user enters text into meta guidance data file content editor  UI test subject  metaguidance content
@@ -114,45 +113,38 @@ Approve release and wait for it to be Scheduled
     user checks summary list contains  Next release expected  January 2001
     user waits for release process status to be  Scheduled  90
 
-Go to Public release page and ensure release isn't visible
+Check scheduled release isn't visible on public Table Tool
     [Tags]  HappyPath
-    # To get around basic auth on public frontend
-    user goes to url  %{PUBLIC_URL}
-    user goes to url  ${PUBLIC_RELEASE_LINK}
-
-Go to Table Tool page
-    [Tags]  HappyPath
-        user navigates to data-tables page on public frontend
-
-Check scheduled release isn't visible
-    [Tags]  HappyPath
-    environment variable should be set  TEST_THEME_NAME
+    user navigates to data tables page on public frontend
     user checks page does not contain  ${PUBLICATION_NAME}
 
-Go to release URL and check release isn't visible
-    [Tags]  HappyPath  NotAgainstLocal
+Go to public release URL and check release isn't visible
+    [Tags]  HappyPath
     user goes to url  ${PUBLIC_RELEASE_LINK}
+    user waits until page does not contain   ${PUBLICATION_NAME}
+
+Check "Page not found" appears
+    [Tags]  HappyPath  NotAgainstLocal
     user waits until page contains  Page not found
 
-Return to admin dashboard
+Go to admin release summary
     [Tags]  HappyPath
-    user navigates to admin dashboard  bau1
+    user navigates to admin dashboard  Bau1
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
 
-Go to release from admin dashboard
-    [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
-    ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
-    user clicks link  Edit this release
-
-Approve release for immediate publication
+Approve release for immediate publication but don't wait to finish
     [Tags]  HappyPath
     user clicks link  Sign off
-    user approves release for immediate publication
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+    user clicks radio   Approved for publication
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user clicks radio   As soon as possible
+    user clicks button   Update status
+    user waits until h2 is visible  Sign off
+    user checks summary list contains  Current status  Approved
 
 Go to public release URL and check release isn't visible
     [Tags]  HappyPath  NotAgainstLocal

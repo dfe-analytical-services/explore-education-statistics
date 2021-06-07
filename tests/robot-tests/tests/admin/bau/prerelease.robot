@@ -28,6 +28,7 @@ user chooses location, time period and filters
 
     user waits until table tool wizard step is available    Choose time period  90
 
+    user waits until page contains element  id:timePeriodForm-start
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
     ${timePeriodEndList}=   get list items  id:timePeriodForm-end
     ${expectedList}=   create list   Please select  2005  2007  2008  2010  2011  2012  2016  2017
@@ -101,8 +102,10 @@ Add metadata guidance
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user waits until page contains element  id:metaGuidance-dataFiles
     user waits until page contains accordion section  UI test subject
     user opens accordion section  UI test subject
+
     user checks summary list contains  Filename             upload-file-test.csv
     user checks summary list contains  Geographic levels
     ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
@@ -125,7 +128,8 @@ Add metadata guidance
 
 Add table highlight
     [Tags]  HappyPath
-    user navigates to Data blocks section
+    user clicks link  Data blocks
+    user waits until h2 is visible  Data blocks
 
     user clicks link  Create data block
     user waits until table tool wizard step is available    Choose a subject
@@ -159,7 +163,6 @@ Add basic release content
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list  Initial test public access list
 
 Update public prerelease access list
@@ -351,13 +354,14 @@ Go back to prerelease content page again
 
 Go to prerelease table tool page
     [Tags]  HappyPath
-    user waits until h2 is visible View a featured table or create your own
     user clicks link  Table tool
+
     user waits until h1 is visible  Create your own tables
     user waits until table tool wizard step is available  Choose a subject
 
 Validate table highlights
     [Tags]  HappyPath
+    user waits until page contains element   id:featuredTables
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
@@ -371,6 +375,7 @@ Go to table highlight and validate table
 Create and validate custom table
     [Tags]  HappyPath
     user clicks link  Table tool
+
     user waits until h1 is visible  Create your own tables
 
     user clicks link  Create your own table
@@ -466,6 +471,7 @@ Go to prerelease table tool page as Analyst user
 
 Validate table highlights as Analyst user
     [Tags]  HappyPath
+    user waits until page contains element  id:featuredTables
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]

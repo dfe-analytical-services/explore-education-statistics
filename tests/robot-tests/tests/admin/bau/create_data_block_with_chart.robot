@@ -34,7 +34,12 @@ Upload subject
 
 Start creating a data block
     [Tags]  HappyPath
-    user navigates to Data blocks section
+    user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
+    user waits until page contains  No data blocks have been created.
+
+    user clicks link  Create data block
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
@@ -59,6 +64,7 @@ Select locations
 
 Select time period
     [Tags]   HappyPath
+    user waits until page contains element  id:timePeriodForm-start
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
     ${timePeriodEndList}=   get list items  id:timePeriodForm-end
     ${expectedList}=   create list   Please select  2005  2007  2008  2009  2010  2011  2012  2016  2017  2018  2019  2020
@@ -165,7 +171,8 @@ Validate data block is in list
     user checks table column heading contains  1  2  Has chart
     user checks table column heading contains  1  3  In content
     user checks table column heading contains  1  4  Highlight name
-    user checks table column heading contains  1  5  Actions
+    user checks table column heading contains  1  5  Created date
+    user checks table column heading contains  1  6  Actions
 
     user checks table body has x rows  1
     user checks results table cell contains  1  1  ${DATABLOCK_NAME}
@@ -173,12 +180,12 @@ Validate data block is in list
     user checks results table cell contains  1  3  No
     user checks results table cell contains  1  4  UI test highlight name
 
-Create new content section
-    [Tags]  HappyPath
-    user creates new content section  ${PUBLICATION_NAME}  ${CONTENT_SECTION_NAME}  1
-
 Embed data block into release content
     [Tags]  HappyPath
+    user clicks link  Content
+    user waits until h2 is visible  ${PUBLICATION_NAME}
+
+    user creates new content section  1   ${CONTENT_SECTION_NAME}
     user clicks button   Add data block
     user selects from list by label  css:select[name="selectedDataBlock"]  ${DATABLOCK_NAME}
     user waits until element is visible  css:table
@@ -386,7 +393,12 @@ Validate line chart embeds correctly
 Configure basic vertical bar chart
     [Tags]  HappyPath
     user goes to url  ${DATABLOCK_URL}
-    user configures basic chart   ${DATABLOCK_NAME}  500  800  Vertical bar
+
+    user waits until h2 is visible  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
+
+    user clicks link  Chart
+    user configures basic chart   Vertical bar  500  800
 
 Change vertical bar chart legend
     [Tags]  HappyPath
@@ -483,8 +495,11 @@ Save and validate vertical bar chart embeds correctly
 Configure basic horizontal bar chart
     [Tags]  HappyPath
     user goes to url  ${DATABLOCK_URL}
-    user configures basic horizontal bar chart   ${DATABLOCK_NAME}  600  700
+    user waits until h2 is visible  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
 
+    user clicks link  Chart
+    user configures basic chart   Horizontal bar  600  700
 
 Validate basic horizontal bar chart preview
     [Tags]  HappyPath
@@ -565,8 +580,12 @@ Save and validate horizontal bar chart embeds correctly
 Configure basic geographic chart
     [Tags]  HappyPath
     user goes to url  ${DATABLOCK_URL}    
-    user configures basic chart   ${DATABLOCK_NAME}  700  600  Geographic
- 
+    user waits until h2 is visible  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
+
+    user clicks link  Chart
+    user configures basic chart   Geographic  700  600
+
 Change geographic chart legend
     [Tags]  HappyPath
     user clicks link  Legend

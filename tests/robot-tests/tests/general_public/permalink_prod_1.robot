@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-        user navigates to data-tables page on public frontend
+    user navigates to data tables page on public frontend
 
 Go to permalink
     [Tags]  HappyPath
@@ -27,7 +27,7 @@ Validate breadcrumbs
 Validate miscellaneous
     [Tags]  HappyPath
     user checks summary list contains  Created  7 April 2020
-    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing Number of pupil enrolments for 'Total days missed due to fixed period exclusions' for State-funded secondary from 'Permanent and fixed-period exclusions in England' in England between 2014/15 and 2016/17
+    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing Number of pupil enrolments for 'Total days missed due to fixed period exclusions' for State-funded secondary in England between 2014/15 and 2016/17
     user waits until page contains button    Print this page
 
 Validate table
@@ -49,7 +49,7 @@ Validate footnotes
 
 Validate download files
     [Tags]  HappyPath
-    user checks page contains element  xpath://button[text()="Download the underlying data of this table (CSV)"]
+    user checks page contains element  xpath://button[text()="Download the data of this table (CSV)"]
     user checks page contains element  xpath://button[text()="Download table as Excel spreadsheet (XLSX)"]
     # TODO: More / Check CSV?
 

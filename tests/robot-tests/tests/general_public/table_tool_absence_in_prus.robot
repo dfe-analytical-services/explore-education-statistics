@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Preprod
+Force Tags  GeneralPublic  Local  Dev  Preprod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    user navigates to data-tables page on public frontend
+    user navigates to data tables page on public frontend
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
@@ -17,7 +17,7 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user clicks radio      Pupil absence in schools in England
     user clicks element    id:publicationForm-submit
-    user waits until element is visible  xpath://span[text()="Choose a subject"]
+    user waits until table tool wizard step is available  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Validate "Absence in prus" subject details
@@ -31,7 +31,7 @@ Select subject "Absence in prus"
     [Tags]  HappyPath
     user clicks radio   Absence in prus
     user clicks element   id:publicationSubjectForm-submit
-    user waits until element is visible  xpath://span[text()="Choose locations"]
+    user waits until table tool wizard step is available  Choose locations
     user checks previous table tool step contains  2    Subject     Absence in prus
 
 Select Location Country, England
@@ -39,7 +39,7 @@ Select Location Country, England
     user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     id:locationFiltersForm-submit
-    user waits until element is visible  xpath://span[text()="Choose time period"]
+    user waits until table tool wizard step is available   Choose time period
     user checks previous table tool step contains  3   National     England
 
 Select Start date and End date
@@ -47,7 +47,7 @@ Select Start date and End date
     user selects from list by label  id:timePeriodForm-start   2013/14
     user selects from list by label  id:timePeriodForm-end     2016/17
     user clicks element     id:timePeriodForm-submit
-    user waits until element is visible  xpath://span[text()="Choose your filters"]
+    user waits until table tool wizard step is available  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Time period    2013/14 to 2016/17
 
@@ -107,7 +107,7 @@ Select locations LAs Barnet, Barnsley, Bedford
     user clicks checkbox            Bedford
 
     user clicks element   id:locationFiltersForm-submit
-    user waits until element is visible  xpath://span[text()="Choose time period"]
+    user waits until table tool wizard step is available  Choose time period
     user checks previous table tool step contains  3    Local Authority    Barnet
     user checks previous table tool step contains  3    Local Authority    Barnsley
     user checks previous table tool step contains  3    Local Authority    Bedford
@@ -117,7 +117,7 @@ Select new start and end date
     user selects from list by label  id:timePeriodForm-start   2014/15
     user selects from list by label  id:timePeriodForm-end     2015/16
     user clicks element     id:timePeriodForm-submit
-    user waits until element is visible  xpath://span[text()="Choose your filters"]
+    user waits until table tool wizard step is available  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Time period    2014/15 to 2015/16
 

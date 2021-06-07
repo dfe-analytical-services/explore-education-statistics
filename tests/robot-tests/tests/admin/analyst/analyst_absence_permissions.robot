@@ -44,7 +44,7 @@ Navigate to Absence release
 
 Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath
-    user verifies release summary  Publication title  Academic Year  2016/17  Data Analyst
+    user verifies release summary  Pupil absence in schools in England  Academic Year  2016/17  Data Analyst  Official Statistics
 
 Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath

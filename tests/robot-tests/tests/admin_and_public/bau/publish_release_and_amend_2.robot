@@ -164,22 +164,16 @@ Add second footnote to ${SUBJECT_NAME} subject
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
-
-Go to "Sign off" page
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
 
 Approve release
     [Tags]  HappyPath
+    user clicks link   Sign off
     user approves release for immediate publication
 
-Go to Table Tool page
+Go to public Table Tool page
     [Tags]  HappyPath
-    user navigates to data-tables page on public frontend
+    user navigates to data tables page on public frontend
 
 Select "Test Topic" publication
     [Tags]  HappyPath
@@ -333,11 +327,17 @@ Go to permalink
 
 Return to Admin
     [Tags]  HappyPath
-    user navigates to admin dashboard  bau1
+    user navigates to admin dashboard  Bau1
 
 Change methodology status to Draft
     [Tags]  HappyPath
-    user changes methodology status to Draft  ${METHODOLOGY_NAME}
+    user clicks link  manage methodologies
+    user clicks element  id:approved-methodologies-tab
+    user clicks link  ${METHODOLOGY_NAME}
+    user clicks link  Sign off
+    user clicks button  Edit status
+    user clicks element  id:methodologyStatusForm-status-Draft
+    user clicks button  Update status
 
 Edit methodology content
     [Tags]  HappyPath
@@ -356,13 +356,41 @@ Edit methodology content
 
 Change methodology status to Approved
     [Tags]  HappyPath
-    user changes methodology status to Approved 
+    user clicks link  Sign off
+    user changes methodology status to Approved
 
 Create amendment
     [Tags]  HappyPath
-    user goes to admin frontend and creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
+    user clicks link  Home
+    user creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
+
+Replace subject data
+    [Tags]  HappyPath
     user clicks link  Data and files
-    user replaces data files for amendment   ${SUBJECT_NAME}  dates.csv  dates.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user waits until h2 is visible  Uploaded data files
+
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user clicks link  Replace data  ${section}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
+    user clicks button  Upload data files
+
+    user waits until page contains  Footnotes: ERROR  120
+    user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
+    user clicks button  Delete footnote
+    user clicks button  Confirm
+
+    #EES-1442: Bug when Confirm data replacement button doesn't show
+    user reloads page
+    user waits until page contains  Footnotes: OK
+    user waits until page contains  Data blocks: OK
+    user waits until button is enabled  Confirm data replacement
+
+Confirm data replacement
+    [Tags]  HappyPath
     user clicks button  Confirm data replacement
 
 Delete second subject file
@@ -389,10 +417,7 @@ Add release note to amendment
 Go to "Sign off" page and approve amendment
     [Tags]  HappyPath
     user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
     user approves release for immediate publication
-    user waits for release process status to be  Complete    ${release_complete_wait}
 
 Go to permalink page & check for error element to be present
     [Tags]  HappyPath
@@ -470,9 +495,11 @@ Check amended release doesn't contain deleted subject
 
 Create amendment to modify release
     [Tags]  HappyPath
-    user navigates to admin dashboard  bau1
-    user clicks link  Home
-    user goes to admin frontend and creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
+    user navigates to admin dashboard  Bau1
+    user creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
+
+Add subject to release
+    [Tags]  HappyPath
     user clicks link  Data and files
     user uploads subject   ${THIRD_SUBJECT}  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
@@ -510,17 +537,16 @@ Update Seven filters footnote
 
 Go to "Sign off" to approve release for immedate publication
     [Tags]  HappyPath
+    user clicks link  Sign off
     user approves release for immediate publication
 
-Go to Table Tool page for amendment
+Go to public Table Tool page for amendment
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables
 
-Go to amended release & create table
+Select publication ${PUBLICATION_NAME}
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
@@ -529,7 +555,8 @@ Go to amended release & create table
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select ${SUBJECT_NAME} subject
+Select subject ${SUBJECT_NAME}
+    [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
@@ -572,10 +599,7 @@ Select the date cateogory
 Generate table
     [Tags]  HappyPath
     user clicks element     id:filtersForm-submit
-
-Wait until the table is generated
-    [Tags]  HappyPath
-    user clicks button  Share your table
+    user waits until page contains    Share your table
 
 Validate generated table
     [Tags]   HappyPath
@@ -584,7 +608,7 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Generate permanent link
+    user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL_TWO}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}

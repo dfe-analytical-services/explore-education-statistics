@@ -1,6 +1,5 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Resource    ../../libs/common.robot
 Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
@@ -21,6 +20,7 @@ Create test publication and release via API
 Verify Release summary
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Tax Year 2020-21 (not Live)
+    user verifies release summary  ${PUBLICATION_NAME}  Tax Year  2020-21  UI test contact name  National Statistics
 
 Upload subject
     [Tags]  HappyPath
@@ -88,7 +88,14 @@ Create Random Filter Select all footnote for new subject
 
 Navigate to 'Data blocks' page
     [Tags]  HappyPath
-    user navigates to Data blocks section
+    user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
+
+Create new data block
+    [Tags]  HappyPath
+    user clicks link  Create data block
+    user waits until h2 is visible  Create data block
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
@@ -110,8 +117,6 @@ Select locations
 
 Select time period
     [Tags]   HappyPath
-    ${timePeriodStartList}=   get list items  id:timePeriodForm-start
-    ${timePeriodEndList}=   get list items  id:timePeriodForm-end
     user selects from list by label  id:timePeriodForm-start  2019
     user selects from list by label  id:timePeriodForm-end  2019
     user clicks element     id:timePeriodForm-submit

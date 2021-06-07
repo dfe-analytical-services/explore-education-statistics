@@ -38,15 +38,12 @@ Add public prerelease access list
 
 Go to "Sign off" page and approve release
     [Tags]  HappyPath
+    user clicks link  Sign off
     user approves release for immediate publication
-
-Wait for release process status to be Complete
-    [Tags]  HappyPath
-    user waits for release to publish
 
 Return to Admin Dashboard
     [Tags]  HappyPath
-    user navigates to admin dashboard  bau1
+    user navigates to admin dashboard  Bau1
    
 Create another release for the same publication
     [Tags]  HappyPath
@@ -72,6 +69,7 @@ Add meta guidance to subject
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user waits until page contains element  id:metaGuidance-dataFiles
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user opens accordion section  ${SUBJECT_NAME}
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
@@ -80,7 +78,14 @@ Add meta guidance to subject
 
 Navigate to Data blocks page
     [Tags]  HappyPath
-    user navigates to Data blocks section
+    user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
+
+Create new data block
+    [Tags]  HappyPath
+    user clicks link  Create data block
+    user waits until h2 is visible  Create data block
+    user waits until table tool wizard step is available    Choose a subject
 
 Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
@@ -135,22 +140,12 @@ Save data block as a highlight
 Add public prerelease access list for new release
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
-
-Go to "Sign off" page for new release
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
 
 Approve new release
     [Tags]  HappyPath
-    user approves release for schedulded release   12  3001
-
-Wait for release process status for new release to be Complete
-    [Tags]  HappyPath
-    user waits for schedulded release to be complete   ${PUBLISH_DATE_DAY}  ${PUBLISH_DATE_MONTH_WORD}  ${PUBLISH_DATE_YEAR}
+    user clicks link   Sign off
+    user approves release for immediate publication
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
@@ -170,7 +165,8 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     [Tags]  HappyPath
-    user navigates to publish release on public frontend   ${PUBLICATION_NAME}
+    user clicks testid element   View stats link for ${PUBLICATION_NAME}
+    user waits until h1 is visible   ${PUBLICATION_NAME}  90
 
 Check latest release is correct
     [Tags]  HappyPath
@@ -195,7 +191,7 @@ Check other release is correct
 
 Go to Table Tool page
     [Tags]  HappyPath
-        user navigates to data-tables page on public frontend
+    user navigates to data tables page on public frontend
 
 Select publication in table tool
     [Tags]  HappyPath

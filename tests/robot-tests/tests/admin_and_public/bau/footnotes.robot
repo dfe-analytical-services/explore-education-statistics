@@ -13,8 +13,6 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - footnotes %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}      UI test subject
 
-${DATA_FILE_NAME}  dates
-
 ${FOOTNOTE_TEXT_1}  test footnote text (will be deleted)
 ${FOOTNOTE_TEXT_2}  A test footnote
 ${FOOTNOTE_TEXT_3}  A edited test footnote!
@@ -29,15 +27,16 @@ Create new publication and release via API
 
 Upload subject
     [Tags]  HappyPath
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
     user clicks link  Data and files
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME} Academic Year 2025/26 (not Live)
-    user uploads subject   ${SUBJECT_NAME}  ${DATA_FILE_NAME}.csv  ${DATA_FILE_NAME}.meta.csv
+    user uploads subject   ${SUBJECT_NAME}  dates.csv  dates.meta.csv
 
 Add meta guidance to subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user waits until page contains element  id:metaGuidance-dataFiles
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...   ${SUBJECT_NAME} meta guidance content
@@ -87,9 +86,10 @@ Confirm created footnotes
 
 Navigate to 'Create data block' page
     [Tags]  HappyPath
-    user navigates to Data blocks section
-    user clicks link  Create data block
+    user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
 
+    user clicks link  Create data block
     user waits until h2 is visible  Create data block
     user waits until table tool wizard step is available    Choose a subject
 
@@ -197,7 +197,6 @@ Check footnote in Preview content mode
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
 
 Go to "Sign off" page
@@ -262,18 +261,18 @@ Navigate to newly published release page
     user clicks testid element  View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
-Check footnote on data block
+Check footnote appears on data block
     [Tags]  HappyPath
     user waits until page contains element  id:releaseHeadlines-tables-tab
     user clicks element  id:releaseHeadlines-tables-tab
-    user scrolls to element  xpath://h3[.="Footnotes"]
+    user waits until parent contains element  id:releaseHeadlines-tables-tab  xpath://h3[text()="Footnotes"]
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
-Navigate to table tool
+Navigate to public Data tables page
     [Tags]  HappyPath
-    user navigates to data-tables page on public frontend
+    user navigates to data tables page on public frontend
 
 Choose publication
     [Tags]  HappyPath

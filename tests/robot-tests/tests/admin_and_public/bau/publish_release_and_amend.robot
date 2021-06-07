@@ -10,9 +10,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
 ${RELEASE_NAME}      Financial Year 3000-01
 ${DATABLOCK_NAME}    Dates data block name
@@ -43,6 +40,8 @@ Add meta guidance
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user waits until page contains element  id:metaGuidanceForm-content
+    user waits until page contains element  id:metaGuidance-dataFiles
     user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
     user waits until page contains accordion section  Dates test subject
 
@@ -75,9 +74,10 @@ Add ancillary file
 
 Create data block table
     [Tags]  HappyPath
-    user navigates to Data blocks section
-    user clicks link  Create data block
+    user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
 
+    user clicks link  Create data block
     user waits until h2 is visible  Create data block
     user waits until table tool wizard step is available    Choose a subject
 
@@ -168,31 +168,23 @@ Add test text to second accordion section
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list  Test public access list
-
-Go to "Sign off" tab
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
 
 Approve release
     [Tags]  HappyPath
-    user approves release for schedulded release   12  3001
+    user clicks link   Sign off
+    user approves release for scheduled release  2  12  3001
 
 Verify release is scheduled
     [Tags]  HappyPath
     user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
-    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next release expected  December 3001
 
-Wait for release process status to be Complete
+Approve release for immediate publication
     [Tags]  HappyPath
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user waits until page does not contain button  Edit release status
+    user approves release for immediate publication
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
@@ -202,10 +194,10 @@ Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
     user waits until page contains accordion section   %{TEST_THEME_NAME}  180
     user opens accordion section  %{TEST_THEME_NAME}
-    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}
 
-    user opens details dropdown  ${TOPIC_NAME}
-    user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
+    user opens details dropdown  %{TEST_TOPIC_NAME}
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   10
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
@@ -217,12 +209,18 @@ Navigate to newly published release page
 
 Verify release URL and page caption
     [Tags]  HappyPath
-    user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
+    user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
     user waits until page contains title caption  ${RELEASE_NAME}
 
 Verify publish and update dates
     [Tags]  HappyPath
-    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
+    set suite variable  ${PUBLISH_DATE_DAY}
+    set suite variable  ${PUBLISH_DATE_MONTH_WORD}
+    set suite variable  ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next update   December 3001
 
 Verify release associated files
@@ -296,13 +294,12 @@ Verify public pre-release access list
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until h2 is visible  Pre-release access list
-    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits until page contains  Test public access list
-
-    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
 
 Verify accordions are correct
     [Tags]  HappyPath
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
     user checks accordion is in position   Dates data block     1  id:content
     user checks accordion is in position   Test text            2  id:content
 
@@ -336,16 +333,10 @@ Verify Test text accordion section contains correct text
     user closes accordion section  Test text  id:content
     user clicks link  Summary
 
-Return to Admin to start creating an amendment
+Return to Admin and Create amendment
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
-
-Create amendment
-    [Tags]  HappyPath
-    user goes to admin frontend and creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
+    user navigates to admin dashboard  Bau1
+    user creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
 
 Navigate to data replacement page
     [Tags]  HappyPath
@@ -443,10 +434,13 @@ Add ancillary file to amendment
 
     user checks there are x accordion sections  2  id:file-uploads
 
+User navigates to Data blocks page
+    [Tags]  HappyPath
+    user clicks link   Data blocks
+    user waits until h2 is visible  Data blocks
+
 Edit data block for amendment
     [Tags]  HappyPath
-    user navigates to Data blocks section
-
     user waits until table is visible
     user checks table body has x rows  1
     user checks results table cell contains  1  1  ${DATABLOCK_NAME}
@@ -524,39 +518,12 @@ Add release note to amendment
 Update public prerelease access list for amendment
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user updates public prerelease access list  Updated public access list
-
-Go to "Sign off" page again
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
 
 Approve amendment for immediate release
     [Tags]  HappyPath
-    user clicks button   Edit release status
-    user waits until h2 is visible  Edit release status
-
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Amendment approved by UI tests
-    user clicks radio  As soon as possible
-    # TODO luke: Move below as option to
-    # user approves release for schedulded release
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3002
-
-    user clicks button  Update status
-
-Wait for release process status to be Complete again
-    [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user clicks link   Sign off
+    user approves release for immediate publication
 
 Go back to public find-statistics page
     [Tags]  HappyPath
@@ -568,10 +535,10 @@ Verify amendment is on Find Statistics page again
     [Tags]  HappyPath
     user waits until page contains accordion section   %{TEST_THEME_NAME}
     user opens accordion section  %{TEST_THEME_NAME}
-    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}
 
-    user opens details dropdown  ${TOPIC_NAME}
-    user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
+    user opens details dropdown  %{TEST_TOPIC_NAME}
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   10
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
@@ -582,7 +549,7 @@ Navigate to amendment release page
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
     user waits until page contains title caption  ${RELEASE_NAME}
 
-    user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
+    user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
 
     user checks breadcrumb count should be   3
     user checks nth breadcrumb contains   1    Home
@@ -595,10 +562,10 @@ Verify amendment is displayed as the latest release
     user checks page does not contain  View latest data:
     user checks page does not contain  See other releases (1)
 
-Verify amendment publish and update dates
+Verify amendment is published
     [Tags]  HappyPath
-    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user checks summary list contains  Next update  January 3002
+    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Next update  December 3001  # TODO: Check Next update date can be updated
 
 Verify amendment files
     [Tags]  HappyPath
@@ -676,13 +643,12 @@ Verify amendment public pre-release access list
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until h2 is visible  Pre-release access list
-    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits until page contains  Updated public access list
-
-    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
 
 Verify amendment accordions are correct
     [Tags]  HappyPath
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
     user checks accordion is in position   Dates data block     1  id:content
     user checks accordion is in position   Test text            2  id:content
 

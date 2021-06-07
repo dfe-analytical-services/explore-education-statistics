@@ -107,6 +107,7 @@ user adds basic release content
     user waits until element contains  id:releaseSummary  This section is empty
     user clicks button   Edit block  id:releaseSummary
     user presses keys  Test summary text for ${publication}
+    user clicks element   css:body  # To ensure Save button gets clicked
     user clicks button   Save  id:releaseSummary
     user waits until element contains  id:releaseSummary  Test summary text for ${publication}
 
@@ -310,21 +311,8 @@ user enters text into meta guidance data file content editor
     user waits until page contains testid   fileGuidanceContent-focused
     user enters text into element  ${editor}  ${text}
 
-user adds summary text block to content section
-    [Arguments]  ${text}
-    user clicks button  Add a summary text block 
-    user clicks button  Edit block 
-    user enters text into element  //*[@role="textbox"]//p  ${text} 
-    user clicks button  Save
-
-user adds release note to content 
-    [Arguments]  ${text}
-    user clicks button  Add note
-    user enters text into element  //*[@id="createReleaseNoteForm-reason"]  ${text}
-
-user goes to admin frontend and creates amendment for release
+user creates amendment for release
     [Arguments]  ${PUBLICATION_NAME}  ${RELEASE_NAME}  ${RELEASE_STATUS}
-    user navigates to admin dashboard  Analyst1
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
@@ -335,26 +323,7 @@ user goes to admin frontend and creates amendment for release
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
 
-user replaces data files for amendment 
-    [Arguments]  ${SUBJECT_NAME}  ${SUBJECT_FILE}  ${META_FILE}  ${text}  ${ERROR}
-    [Documentation]  EES-1442
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SUBJECT_NAME}
-    user opens accordion section   ${SUBJECT_NAME}
-    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user clicks link  Replace data  ${section}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}${SUBJECT_FILE}
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}${META_FILE}
-    user clicks button  Upload data files
-    user clicks button  Confirm
-    #EES-1442: Bug when Confirm data replacement button doesn't show
-    user reloads page
-    user waits until page contains  Footnotes: OK
-    user waits until page contains  Data blocks: OK
-    user waits until button is enabled  Confirm data replacement
-
-user deletes subject file 
+user deletes subject file
     [Arguments]  ${SUBJECT_NAME}
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user opens accordion section  ${SUBJECT_NAME}
@@ -365,7 +334,8 @@ user deletes subject file
     user clicks button  Confirm
 
 user approves release for immediate publication
-    user clicks link  Sign off
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
@@ -382,7 +352,8 @@ user navigates to admin dashboard
     [Arguments]  ${USER}
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome  ${USER}
+    user waits until page contains title caption  Welcome ${USER}
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
 
 user uploads subject 
     [Arguments]  ${SUBJECT_NAME}  ${SUBJECT_FILE}  ${META_FILE}
@@ -395,60 +366,45 @@ user uploads subject
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Status  Complete  ${section}  180
 
-user waits for release to publish 
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
-
-user navigates to Data blocks section 
-    user clicks link    Data blocks
-    user waits until h2 is visible  Data blocks
-
-user approves release for scheduled release 
-    [Arguments]  ${RELEASE_MONTH}  ${RELEASE_YEAR}
-    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
-    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m
-    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B
-    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
+user approves release for scheduled release
+    [Arguments]  ${DAYS_TILL_RELEASE}  ${RELEASE_MONTH}  ${RELEASE_YEAR}
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_TILL_RELEASE}
     set suite variable  ${PUBLISH_DATE_DAY}
     set suite variable  ${PUBLISH_DATE_MONTH}
     set suite variable  ${PUBLISH_DATE_MONTH_WORD}
     set suite variable  ${PUBLISH_DATE_YEAR}
+
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
 
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio  As soon as possible
+    user clicks radio  On a specific date
+    user waits until page contains   Publish date
+    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${RELEASE_MONTH}
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
 
     user clicks button   Update status
 
-user waits for scheduled release to be complete 
-    [Arguments]  ${PUBLISH_DAY}  ${PUBLISH_MONTH}  ${PUBLISH_YEAR}
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user checks summary list contains  Scheduled release  ${PUBLISH_DAY} ${PUBLISH_MONTH} ${PUBLISH_YEAR}
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
-
 user creates new content section
-    [Arguments]  ${PUBLICATION_NAME}  ${CONTENT_SECTION_NAME}  ${SECTION_NUMBER}
-    user waits until h2 is visible  ${PUBLICATION_NAME}
+    [Arguments]   ${SECTION_NUMBER}  ${CONTENT_SECTION_NAME}
+    user waits until button is enabled  Add new section
     user clicks button  Add new section
     user changes accordion section title  ${SECTION_NUMBER}   ${CONTENT_SECTION_NAME}
 
 user verifies release summary
-    [Arguments]  ${PUBLICATION_TITLE}  ${TIME_PERIOD}  ${RELEASE_PERIOD}  ${LEAD_STATISTICIAN}  ${RELEASE_TYPE}
+    [Arguments]  ${PUBLICATION_NAME}  ${TIME_PERIOD}  ${RELEASE_PERIOD}  ${LEAD_STATISTICIAN}  ${RELEASE_TYPE}
     user waits until h2 is visible     Release summary
     user checks summary list contains  Publication title      ${PUBLICATION_NAME}
     user checks summary list contains  Time period            ${TIME_PERIOD}
@@ -456,30 +412,8 @@ user verifies release summary
     user checks summary list contains  Lead statistician      ${LEAD_STATISTICIAN}
     user checks summary list contains  Release type           ${RELEASE_TYPE}
 
-user edits footnote 
-    [Arguments]  ${ID}  ${FOOTNOTE_TEXT}
-    user clicks link  Footnotes
-    user waits until h2 is visible  Footnotes
-    user clicks link  Edit footnote
-
-    user waits until h2 is visible  Edit footnote
-    user enters text into element  id:footnoteForm-content  ${FOOTNOTE_TEXT}
-    user clicks button  Save footnote
-    user waits until page contains  ${FOOTNOTE_TEXT}
-
-user changes methodology status to Draft 
-    [Arguments]  ${METHODOLOGY_NAME}
-    user clicks link  manage methodologies
-    user clicks element  //*[@id="approved-methodologies-tab"]
-    user clicks link  ${METHODOLOGY_NAME}
-    user clicks link  Sign off
+user changes methodology status to Approved
     user clicks button  Edit status
-    user clicks element  //*[@id="methodologyStatusForm-status-Draft"]
-    user clicks button  Update status
-
-user changes methodology status to Approved 
-    user clicks link  Sign off
-    user clicks button  Edit status
-    user clicks element  //*[@id="methodologyStatusForm-status-Approved"]
-    user enters text into element  //*[@id="methodologyStatusForm-internalReleaseNote"]  Approved by UI tests
+    user clicks element  id:methodologyStatusForm-status-Approved
+    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Approved by UI tests
     user clicks button  Update status
