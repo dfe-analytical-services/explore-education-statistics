@@ -41,9 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("methodology-themes")]
         public async Task<ActionResult<IEnumerable<ThemeTree<MethodologyTreeNode>>>> GetMethodologyThemes()
         {
-            return await _fileStorageService
-                .GetDeserialized<IEnumerable<ThemeTree<MethodologyTreeNode>>>(PublicContentMethodologyTreePath())
-                .HandleFailuresOrOk();
+            // TODO SOW4 EES-2378 Return all public methodologies from content database
+            return await Task.FromResult(new List<ThemeTree<MethodologyTreeNode>>());
         }
     }
 }

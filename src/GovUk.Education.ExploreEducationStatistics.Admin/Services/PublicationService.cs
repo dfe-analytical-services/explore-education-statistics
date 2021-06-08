@@ -253,7 +253,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.Type)
                 .Include(p => p.LegacyReleases)
-                .Include(p => p.Methodology)
                 .Include(p => p.Topic);
         }
     }

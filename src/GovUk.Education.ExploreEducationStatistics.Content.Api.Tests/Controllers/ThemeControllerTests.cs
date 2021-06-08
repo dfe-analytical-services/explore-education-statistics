@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -113,47 +114,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetMethodologyThemes()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<IEnumerable<ThemeTree<MethodologyTreeNode>>>(
-                        "methodology/tree.json"
-                    )
-                )
-                .ReturnsAsync(
-                    new List<ThemeTree<MethodologyTreeNode>>
-                    {
-                        new ThemeTree<MethodologyTreeNode>
-                        {
-                            Topics = new List<TopicTree<MethodologyTreeNode>>
-                            {
-                                new TopicTree<MethodologyTreeNode>
-                                {
-                                    Publications = new List<MethodologyTreeNode>
-                                    {
-                                        new MethodologyTreeNode()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                );
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
             var controller = new ThemeController(fileStorageService.Object);
 
             var result = await controller.GetMethodologyThemes();
 
-            Assert.IsAssignableFrom<IEnumerable<ThemeTree<MethodologyTreeNode>>>(result.Value);
-            Assert.Single(result.Value);
+            // TODO SOW4 EES-2378 Return all public methodologies from content database
+            // Assert.IsAssignableFrom<IEnumerable<ThemeTree<MethodologyTreeNode>>>(result.Value);
+            Assert.Empty(result.Value);
+            // Assert.Single(result.Value);
+            //
+            // var theme = result.Value.First();
+            //
+            // Assert.IsType<ThemeTree<MethodologyTreeNode>>(theme);
+            // Assert.Single(theme.Topics);
+            //
+            // var topic = theme.Topics.First();
+            // Assert.Single(topic.Publications);
 
-            var theme = result.Value.First();
-
-            Assert.IsType<ThemeTree<MethodologyTreeNode>>(theme);
-            Assert.Single(theme.Topics);
-
-            var topic = theme.Topics.First();
-            Assert.Single(topic.Publications);
+            MockUtils.VerifyAllMocks(fileStorageService);
         }
     }
 }

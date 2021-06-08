@@ -35,11 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test theme"
                     }
                 },
-                Methodology = new Methodology
-                {
-                    Title = "Test methodology",
-                    Status = MethodologyStatus.Approved,
-                },
                 Contact = new Contact
                 {
                     ContactName = "Test contact",
@@ -72,9 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Topic.Id, result.Right.TopicId);
                 Assert.Equal(publication.Topic.ThemeId, result.Right.ThemeId);
 
-                Assert.Equal(publication.Methodology.Id, result.Right.Methodology.Id);
-                Assert.Equal(publication.Methodology.Title, result.Right.Methodology.Title);
-
                 Assert.Equal(publication.Contact.Id, result.Right.Contact.Id);
                 Assert.Equal(publication.Contact.ContactName, result.Right.Contact.ContactName);
                 Assert.Equal(publication.Contact.ContactTelNo, result.Right.Contact.ContactTelNo);
@@ -102,18 +94,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test topic"
             };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Approved,
-            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(topic);
-                context.Add(methodology);
                 await context.SaveChangesAsync();
             }
 
@@ -147,9 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, publicationViewModel.TopicId);
 
-                Assert.Equal(methodology.Id, publicationViewModel.Methodology.Id);
-                Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
-
                 // Do an in depth check of the saved release
                 var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
                 Assert.False(createdPublication.Live);
@@ -164,9 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, createdPublication.TopicId);
                 Assert.Equal("Test topic", createdPublication.Topic.Title);
-
-                Assert.Equal(methodology.Id, createdPublication.Methodology.Id);
-                Assert.Equal("Test methodology", createdPublication.Methodology.Title);
             }
         }
 
@@ -239,21 +219,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "New topic"
             };
-            var methodology = new Methodology
-            {
-                Title = "New methodology",
-                Status = MethodologyStatus.Approved,
-            };
+
             var publication = new Publication
             {
                 Title = "Old title",
                 Topic = new Topic
                 {
                     Title = "Old topic"
-                },
-                Methodology = new Methodology
-                {
-                    Title = "Old methodology"
                 },
                 Contact = new Contact
                 {
@@ -269,7 +241,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(topic);
-                context.Add(methodology);
                 context.Add(publication);
 
                 await context.SaveChangesAsync();
@@ -304,9 +275,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, result.Right.TopicId);
-
-                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
-                Assert.Equal("New methodology", result.Right.Methodology.Title);
 
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
@@ -323,9 +291,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
-
-                Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
-                Assert.Equal("New methodology", updatedPublication.Methodology.Title);
             }
         }
 
@@ -336,11 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "New topic"
             };
-            var methodology = new Methodology
-            {
-                Title = "New methodology",
-                Status = MethodologyStatus.Approved,
-            };
+
             var publication = new Publication
             {
                 Slug = "old-title",
@@ -348,10 +309,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = new Topic
                 {
                     Title = "Old topic"
-                },
-                Methodology = new Methodology
-                {
-                    Title = "Old methodology"
                 },
                 Contact = new Contact
                 {
@@ -368,7 +325,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(topic);
-                context.Add(methodology);
                 context.Add(publication);
 
                 await context.SaveChangesAsync();
@@ -403,9 +359,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, result.Right.TopicId);
-
-                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
-                Assert.Equal("New methodology", result.Right.Methodology.Title);
 
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
@@ -423,9 +376,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
-
-                Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
-                Assert.Equal("New methodology", updatedPublication.Methodology.Title);
             }
         }
 
@@ -438,12 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = new Topic
                 {
                     Title = "Test topic"
-                },
-                Methodology = new Methodology
-                {
-                    Title = "Test methodology",
-                    Status = MethodologyStatus.Approved
-                },
+                }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -502,11 +447,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test topic"
                 },
-                Methodology = new Methodology
-                {
-                    Title = "Test methodology",
-                    Status = MethodologyStatus.Approved
-                },
                 Contact = sharedContact
             };
             var otherPublication = new Publication
@@ -563,10 +503,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = new Topic
                 {
                     Title = "Test topic"
-                },
-                Methodology = new Methodology
-                {
-                    Title = "Test methodology"
                 }
             };
 

@@ -31,12 +31,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.Methodologies.FindAsync(id);
         }
 
-        public async Task<Methodology> GetByRelease(Guid releaseId)
+        public async Task<List<Methodology>> GetByRelease(Guid releaseId)
         {
-            return await _context.Releases
-                .Where(release => release.Id == releaseId)
-                .Select(release => release.Publication.Methodology)
-                .SingleOrDefaultAsync();
+            // TODO SOW4 EES-2385 Get the latest methodologies related to this release
+            return await Task.FromResult(new List<Methodology>());
         }
 
         public async Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types)
@@ -49,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
+        // TODO SOW4 EES-2375 Move to Content API
         public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)
         {
             var methodology = await Get(id);
@@ -61,12 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return methodologyViewModel;
         }
 
+        // TODO SOW4 EES-2378 Move to Content API
         public List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
-                .ThenInclude(publication => publication.Methodology)
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
@@ -75,20 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Select(theme => BuildThemeTree(theme, includedReleaseIds))
                 .OrderBy(theme => theme.Title)
                 .ToList();
-        }
-
-        public async Task SetPublishedDate(Guid id, DateTime published)
-        {
-            var methodology = await Get(id);
-
-            if (methodology == null)
-            {
-                throw new ArgumentException("Methodology does not exist", nameof(id));
-            }
-
-            _context.Update(methodology);
-            methodology.Published = published;
-            await _context.SaveChangesAsync();
         }
 
         private static ThemeTree<MethodologyTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
@@ -127,7 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                Methodology = BuildMethodology(publication.Methodology)
+                // TODO SOW4 EES-2378 Update to build Methodology Tree with new model
+                // Might need to be multiple methodology tree nodes for a Publication?
+                Methodology = null
+                //Methodology = BuildMethodology(publication.Methodology)
             };
         }
 
@@ -154,7 +142,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            return publication.MethodologyId != null &&
+            // TODO SOW4 EES-2378 determine if Publication has one or more published methodologies)
+            const bool hasMethodologies = true;
+
+            return hasMethodologies &&
                    publication.Releases.Any(release => release.IsReleasePublished(includedReleaseIds));
         }
     }

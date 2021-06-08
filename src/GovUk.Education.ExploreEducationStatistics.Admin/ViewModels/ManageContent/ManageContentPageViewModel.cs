@@ -99,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public Contact Contact { get; set; }
 
+            // TODO SOW4 EES-2395 Update Manage Content page to show linked Methodology
             public MethodologyTitleViewModel Methodology { get; set; }
 
             public ExternalMethodology ExternalMethodology { get; set; }

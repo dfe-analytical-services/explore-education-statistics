@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -19,19 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<List<Methodology>> GetMethodologiesForUser(Guid userId)
+        public async Task<List<Methodology>> GetLatestMethodologiesByRelease(Guid releaseId)
         {
-            return await _contentDbContext.UserReleaseRoles
-                .Include(urr => urr.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Methodology)
-                .Where(urr =>
-                    urr.UserId == userId
-                    && urr.Release.Publication.MethodologyId != null
-                    && urr.Role != ReleaseRole.PrereleaseViewer)
-                .Select(urr => urr.Release.Publication.Methodology)
-                .Distinct()
-                .ToListAsync();
+            // TODO SOW4 EES-2379 Get latest methodologies for a Release for approval checklist
+            return await Task.FromResult(new List<Methodology>());
         }
     }
 }

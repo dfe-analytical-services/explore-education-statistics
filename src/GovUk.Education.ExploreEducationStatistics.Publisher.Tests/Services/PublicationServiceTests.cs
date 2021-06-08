@@ -61,16 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "third contact team name"
         };
 
-        private static readonly Methodology Methodology = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Title = "methodology title",
-            Slug = "methodology-slug",
-            Summary = "methodology summary",
-            Published = new DateTime(2020, 2, 10),
-            Updated = new DateTime(2020, 2, 11)
-        };
-
         private static readonly Publication PublicationA = new Publication
         {
             Id = Guid.NewGuid(),
@@ -108,7 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                   Url = "http://link.two/"
               }
             },
-            MethodologyId = Methodology.Id,
             Slug = "publication-a",
             Summary = "first publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
@@ -295,7 +284,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                context.Add(Methodology);
                 context.Add(Theme);
                 context.Add(Topic);
                 context.AddRange(Publications);
@@ -356,13 +344,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("http://link.two/", legacyReleases[1].Url);
                 Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
                 Assert.Equal("http://link.one/", legacyReleases[2].Url);
-
-                Assert.NotNull(viewModel.Methodology);
-                var methodology = viewModel.Methodology;
-                Assert.Equal(Methodology.Id, methodology.Id);
-                Assert.Equal("methodology-slug", methodology.Slug);
-                Assert.Equal("methodology summary", methodology.Summary);
-                Assert.Equal("methodology title", methodology.Title);
 
                 Assert.NotNull(viewModel.Releases);
                 var releases = viewModel.Releases;

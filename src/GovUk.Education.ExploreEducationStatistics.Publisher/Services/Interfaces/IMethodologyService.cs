@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<Methodology> Get(Guid id);
 
-        Task<Methodology> GetByRelease(Guid releaseId);
+        Task<List<Methodology>> GetByRelease(Guid releaseId);
 
         Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types);
 
+        // TODO SOW4 EES-2375 Move to Content API
         Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context);
 
+        // TODO SOW4 EES-2378 Move to Content API
         List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
-
-        Task SetPublishedDate(Guid id, DateTime published);
     }
 }
