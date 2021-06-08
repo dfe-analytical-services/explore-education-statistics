@@ -6,7 +6,6 @@ import {
 import { Release } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
@@ -16,7 +15,6 @@ import {
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
 import React, { ReactNode } from 'react';
-import LazyLoad from 'react-lazyload';
 
 interface Props {
   release: Release;
@@ -40,21 +38,17 @@ const ReleaseSummary = ({
       summary={getReleaseSummaryLabel(release)}
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
-          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
-
-          {release.amendment && <Tag>Amendment</Tag>}
-
-          {release.status === 'Approved' && (
-            <LazyLoad
-              once
-              scroll={false}
-              placeholder={
-                <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
-              }
-            >
-              <ReleaseServiceStatus exclude="details" releaseId={release.id} />
-            </LazyLoad>
+          {release.status !== 'Approved' && (
+            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
           )}
+          {release.status === 'Approved' && (
+            <ReleaseServiceStatus
+              exclude="details"
+              releaseId={release.id}
+              isApproved
+            />
+          )}
+          {release.amendment && <Tag>Amendment</Tag>}
         </TagGroup>
       }
     >

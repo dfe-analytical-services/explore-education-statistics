@@ -4,18 +4,20 @@ import releaseService, {
 } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { forceCheck } from 'react-lazyload';
+import Tag from '@common/components/Tag';
 
 interface Props {
   releaseId: string;
   refreshPeriod?: number;
   exclude?: 'status' | 'details';
+  isApproved?: boolean;
 }
 
 const ReleaseServiceStatus = ({
   releaseId,
   refreshPeriod = 10000,
   exclude,
+  isApproved = false,
 }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
@@ -24,27 +26,24 @@ const ReleaseServiceStatus = ({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchReleaseServiceStatus = useCallback(() => {
-    return releaseService
-      .getReleaseStatus(releaseId)
-      .then(status => {
-        if (!status) {
-          // 204 response waiting for status
-          setCurrentStatus({ overallStage: 'Validating' });
+    return releaseService.getReleaseStatus(releaseId).then(status => {
+      if (!status) {
+        // 204 response waiting for status
+        setCurrentStatus({ overallStage: 'Validating' });
+        timeoutRef.current = setTimeout(
+          fetchReleaseServiceStatus,
+          refreshPeriod,
+        );
+      } else {
+        setCurrentStatus(status);
+        if (status && status.overallStage === 'Started') {
           timeoutRef.current = setTimeout(
             fetchReleaseServiceStatus,
             refreshPeriod,
           );
-        } else {
-          setCurrentStatus(status);
-          if (status && status.overallStage === 'Started') {
-            timeoutRef.current = setTimeout(
-              fetchReleaseServiceStatus,
-              refreshPeriod,
-            );
-          }
         }
-      })
-      .then(forceCheck);
+      }
+    });
   }, [releaseId, refreshPeriod]);
 
   function cancelTimer() {
@@ -101,19 +100,28 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock
-          color={statusColor}
-          text={
-            currentStatus
-              ? currentStatus.overallStage
-              : 'Waiting to be scheduled...'
-          }
-          id={
-            currentStatus
-              ? `release-process-status-${currentStatus.overallStage}`
-              : 'release-process-status-WaitingToBeScheduled'
-          }
-        />
+        <>
+          {isApproved &&
+            !['Complete', 'Scheduled'].includes(currentStatus.overallStage) && (
+              <Tag>Approved</Tag>
+            )}
+          <StatusBlock
+            color={statusColor}
+            text={
+              currentStatus
+                ? (currentStatus.overallStage === 'Complete' &&
+                    isApproved &&
+                    'Published') ||
+                  currentStatus.overallStage
+                : 'Waiting to be scheduled...'
+            }
+            id={
+              currentStatus
+                ? `release-process-status-${currentStatus.overallStage}`
+                : 'release-process-status-WaitingToBeScheduled'
+            }
+          />
+        </>
       )}
 
       {currentStatus &&
