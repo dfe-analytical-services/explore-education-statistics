@@ -116,14 +116,14 @@ export const methodologiesIndexRoute: ProtectedRouteProps = {
 
 // TODO EES-2153 Remove this route to the Create Methodology page
 export const methodologyCreateRoute: ProtectedRouteProps = {
-  path: '/methodologies/create',
+  path: '/publication/:publicationId/create-methodology',
   component: MethodologyCreatePage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const methodologyRoute: ProtectedRouteProps = {
-  path: '/methodologies/:methodologyId',
+  path: '/publication/:publicationId/methodology/:methodologyId',
   component: MethodologyPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };

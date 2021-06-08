@@ -1,9 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import {
-  MethodologyRouteParams,
-  methodologySummaryRoute,
-} from '@admin/routes/methodologyRoutes';
 import methodologyService, {
   MethodologyStatusListItem,
 } from '@admin/services/methodologyService';
@@ -13,7 +9,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
-import { generatePath } from 'react-router';
 
 interface Model {
   approvedMethodologies: MethodologyStatusListItem[];
@@ -43,18 +38,7 @@ const MethodologiesTable = ({ methodologies }: MethodologiesTableProps) => {
       <tbody className="govuk-table__body">
         {methodologies.map(methodology => (
           <tr className="govuk-table__row" key={methodology.id}>
-            <td className="govuk-table__header">
-              <Link
-                to={generatePath<MethodologyRouteParams>(
-                  methodologySummaryRoute.path,
-                  {
-                    methodologyId: methodology.id,
-                  },
-                )}
-              >
-                {methodology.title}
-              </Link>
-            </td>
+            <td className="govuk-table__header">{methodology.title}</td>
             <td className="govuk-table__cell">
               <Tag strong>{methodology.status}</Tag>
             </td>

@@ -36,7 +36,7 @@ const MethodologyPage = ({
   match,
   location,
 }: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+  const { methodologyId, publicationId } = match.params;
 
   const { value, isLoading } = useAsyncHandledRetry(
     () => methodologyService.getMethodology(methodologyId),
@@ -46,8 +46,10 @@ const MethodologyPage = ({
   const currentRouteIndex =
     methodologyRoutes.findIndex(
       route =>
-        generatePath<MethodologyRouteParams>(route.path, { methodologyId }) ===
-        location.pathname,
+        generatePath<MethodologyRouteParams>(route.path, {
+          publicationId,
+          methodologyId,
+        }) === location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -64,6 +66,7 @@ const MethodologyPage = ({
     ? {
         label: previousRoute.title,
         linkTo: generatePath<MethodologyRouteParams>(previousRoute.path, {
+          publicationId,
           methodologyId,
         }),
       }
@@ -73,19 +76,14 @@ const MethodologyPage = ({
     ? {
         label: nextRoute.title,
         linkTo: generatePath<MethodologyRouteParams>(nextRoute.path, {
+          publicationId,
           methodologyId,
         }),
       }
     : undefined;
 
   return (
-    <Page
-      wide
-      breadcrumbs={[
-        { name: 'Manage methodologies', link: '/methodologies' },
-        { name: 'Edit methodology' },
-      ]}
-    >
+    <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
       <LoadingSpinner loading={isLoading}>
         {value ? (
           <>
@@ -111,6 +109,7 @@ const MethodologyPage = ({
               routes={navRoutes.map(route => ({
                 title: route.title,
                 to: generatePath<MethodologyRouteParams>(route.path, {
+                  publicationId,
                   methodologyId,
                 }),
               }))}

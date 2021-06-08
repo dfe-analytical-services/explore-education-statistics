@@ -12,10 +12,6 @@ const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
       title="Create new methodology"
       breadcrumbs={[
         {
-          name: 'Manage methodologies',
-          link: '/methodologies',
-        },
-        {
           name: 'Create new methodology',
         },
       ]}
