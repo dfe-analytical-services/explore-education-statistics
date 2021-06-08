@@ -175,13 +175,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = r.Publication.ExternalMethodology.Title,
                                 Url = r.Publication.ExternalMethodology.Url
                             }
-                            : null,
-                        Methodology = r.Publication.Methodology != null
-                            ? new MethodologyTitleViewModel
-                                {
-                                    Id = r.Publication.Methodology.Id,
-                                    Title = r.Publication.Methodology.Title
-                                }
                             : null
                     }))
                 .ForMember(

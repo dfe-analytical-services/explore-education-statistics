@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -12,13 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishMethodologyFunction
     {
-        private readonly IContentService _contentService;
         private readonly IPublishingService _publishingService;
 
-        public PublishMethodologyFunction(IContentService contentService,
-            IPublishingService publishingService)
+        public PublishMethodologyFunction(IPublishingService publishingService)
         {
-            _contentService = contentService;
             _publishingService = publishingService;
         }
 
@@ -34,9 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message);
 
-            var context = new PublishContext(DateTime.UtcNow, false);
-
-            await _contentService.UpdateMethodology(context, message.MethodologyId);
             await _publishingService.PublishMethodologyFiles(message.MethodologyId);
 
             logger.LogInformation("{0} completed",

@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyRepository
     {
-        Task<List<Methodology>> GetMethodologiesForUser(Guid userId);
+        Task<List<Methodology>> GetLatestMethodologiesByRelease(Guid releaseId);
     }
 }

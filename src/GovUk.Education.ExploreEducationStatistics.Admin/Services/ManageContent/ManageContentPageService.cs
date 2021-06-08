@@ -74,8 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
                 .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Methodology)
-                .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Topic.Theme)
                 .Include(r => r.Type)
                 .Include(r => r.Content)

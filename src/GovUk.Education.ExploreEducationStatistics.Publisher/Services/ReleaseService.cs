@@ -140,7 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var contentRelease = await _contentDbContext.Releases
                 .Include(release => release.Publication)
-                .ThenInclude(publication => publication.Methodology)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             var statisticsRelease = await _statisticsDbContext.Release
@@ -171,13 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             // Update the Publication published date since we always generate the Publication when generating Release Content
             contentRelease.Publication.Published = published;
-
-            // Update the Methodology published date if it's the first time it's published
-            var methodology = contentRelease.Publication.Methodology;
-            if (methodology != null)
-            {
-                methodology.Published ??= published;
-            }
 
             await _contentDbContext.SaveChangesAsync();
 

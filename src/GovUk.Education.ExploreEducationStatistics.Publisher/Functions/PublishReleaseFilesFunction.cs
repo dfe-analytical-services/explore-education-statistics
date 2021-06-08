@@ -60,10 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await UpdateStage(releaseId, releaseStatusId, Started);
                 try
                 {
-                    var methodology = await _methodologyService.GetByRelease(releaseId);
-                    // Publish the files of the Methodology if it's not already live
-                    // Since the Methodology will be published for the first time with this Release
-                    if (methodology != null && !methodology.Live)
+                    var methodologies = await _methodologyService.GetByRelease(releaseId);
+                    // TODO SOW4 EES-2385 Publish the files of the latest methodologies of this release that
+                    // aren't already live but depended on this release being published,
+                    // since those methodologies will be published for the first time with this release
+                    foreach (var methodology in methodologies)
                     {
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
                     }

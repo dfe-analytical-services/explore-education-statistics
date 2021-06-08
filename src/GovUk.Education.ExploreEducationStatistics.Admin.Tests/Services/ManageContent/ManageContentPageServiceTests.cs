@@ -18,7 +18,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -51,11 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Description = "Legacy 2018/19",
                         Order = 1,
                         Url = "http://legacy-2018-19"
-                    },
-                },
-                Methodology = new Methodology
-                {
-                    Title = "Methodology"
+                    }
                 },
                 Slug = "test-publication",
                 Summary = "Summary",
@@ -276,8 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Data Source", contentPublication.DataSource);
                 Assert.Equal("Description", contentPublication.Description);
                 Assert.Null(contentPublication.ExternalMethodology);
-                Assert.Equal(publication.Methodology.Id, contentPublication.Methodology.Id);
-                Assert.Equal("Methodology", contentPublication.Methodology.Title);
+                // TODO SOW4 EES-2395 Test Manage Content page view model has linked Methodology
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal("Summary", contentPublication.Summary);
                 Assert.Equal("Publication", contentPublication.Title);

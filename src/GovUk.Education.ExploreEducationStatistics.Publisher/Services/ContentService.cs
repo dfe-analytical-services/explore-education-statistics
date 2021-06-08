@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
         private readonly IDownloadService _downloadService;
-        private readonly IMethodologyService _methodologyService;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
@@ -28,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public ContentService(IBlobStorageService publicBlobStorageService,
             IFastTrackService fastTrackService,
             IDownloadService downloadService,
-            IMethodologyService methodologyService,
             IReleaseService releaseService,
             IPublicationService publicationService)
         {
@@ -37,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
             _publicationService = publicationService;
             _downloadService = downloadService;
-            _methodologyService = methodologyService;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -90,8 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await CacheTrees(context);
 
             var publications = _publicationService.GetPublicationsWithPublishedReleases();
-            var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
-                .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
@@ -104,11 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await CacheRelease(release, context);
                 }
             }
-
-            foreach (var methodologyId in methodologyIds)
-            {
-                await CacheMethodology(methodologyId, context);
-            }
         }
 
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
@@ -117,8 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var releases = await _releaseService.GetAsync(releaseIds);
             var publications = releases.Select(release => release.Publication).ToList();
-            var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
-                .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
@@ -130,23 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await CacheRelease(release, context);
                 }
             }
-
-            // Include Methodologies of the Publications if they are not already live
-            foreach (var methodologyId in methodologyIds)
-            {
-                var methodology = await _methodologyService.Get(methodologyId);
-                if (!methodology.Live)
-                {
-                    await CacheMethodology(methodology.Id, context);
-                }
-            }
-        }
-
-        public async Task UpdateMethodology(PublishContext context, Guid methodologyId)
-        {
-            await CacheMethodologyTree(context);
-            await CacheMethodology(methodologyId, context);
-            await _methodologyService.SetPublishedDate(methodologyId, context.Published);
         }
 
         public async Task UpdatePublication(PublishContext context, Guid publicationId)
@@ -156,16 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await CacheTrees(context);
             await CachePublication(publication.Id, context);
             await _publicationService.SetPublishedDate(publication.Id, context.Published);
-
-            if (publication.MethodologyId.HasValue)
-            {
-                var methodology = await _methodologyService.Get(publication.MethodologyId.Value);
-                if (!methodology.Live)
-                {
-                    await CacheMethodology(methodology.Id, context);
-                    await _methodologyService.SetPublishedDate(methodology.Id, context.Published);
-                }
-            }
         }
 
         public async Task UpdateTaxonomy(PublishContext context)
@@ -191,12 +152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _fastTrackService.CreateAllByRelease(release.Id, context);
         }
 
-        private async Task CacheMethodologyTree(PublishContext context, params Guid[] includedReleaseIds)
-        {
-            var tree = _methodologyService.GetTree(includedReleaseIds);
-            await Upload(PublicContentMethodologyTreePath, context, tree, _jsonSerializerSettingsCamelCase);
-        }
-
         private async Task CachePublicationTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             var tree = _publicationService.GetTree(includedReleaseIds);
@@ -207,12 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
-        }
-
-        private async Task CacheMethodology(Guid methodologyId, PublishContext context)
-        {
-            var viewModel = await _methodologyService.GetViewModelAsync(methodologyId, context);
-            await Upload(prefix => PublicContentMethodologyPath(viewModel.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
         private async Task CachePublication(Guid publicationId, PublishContext context, params Guid[] includedReleaseIds)
@@ -230,7 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task CacheTrees(PublishContext context, params Guid[] includedReleaseIds)
         {
             await CacheDownloadTree(context, includedReleaseIds);
-            await CacheMethodologyTree(context, includedReleaseIds);
             await CachePublicationTree(context, includedReleaseIds);
         }
 
