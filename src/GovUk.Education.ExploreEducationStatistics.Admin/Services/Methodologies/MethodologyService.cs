@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
                 .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(publicationId))
-                .OnSuccess(methodology => GetSummaryAsync(methodology.Id));
+                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(id)
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync()
+        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublications()
         {
             return await _userService
                 .CheckCanViewAllMethodologies()
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         await _publishingService.MethodologyChanged(methodology.Id);
                     }
 
-                    return await GetSummaryAsync(id);
+                    return await GetSummary(id);
                 });
         }
 
