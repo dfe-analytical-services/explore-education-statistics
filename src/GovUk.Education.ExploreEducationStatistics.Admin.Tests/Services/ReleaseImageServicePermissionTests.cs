@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -24,10 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void Upload()
+        public async Task Upload()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

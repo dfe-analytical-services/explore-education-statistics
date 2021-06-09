@@ -62,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewSpecificMethodology,
         CanUpdateSpecificMethodology,
         CanMarkSpecificMethodologyAsDraft,
-        CanApproveSpecificMethodology
+        CanApproveSpecificMethodology,
+        CanMakeAmendmentOfSpecificMethodology
     }
 }

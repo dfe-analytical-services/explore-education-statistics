@@ -70,6 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodology, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
+        public static Task<Either<ActionResult, Methodology>> CheckCanMakeAmendmentOfMethodology(
+            this IUserService userService, Methodology methodology)
+        {
+            return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanViewAllReleases);

@@ -216,6 +216,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
 
+            modelBuilder.Entity<ContentBlock>()
+                .Property(block => block.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
             modelBuilder.Entity<ContentSection>()
                 .Property(b => b.Type)
                 .HasConversion(new EnumToStringConverter<ContentSectionType>());

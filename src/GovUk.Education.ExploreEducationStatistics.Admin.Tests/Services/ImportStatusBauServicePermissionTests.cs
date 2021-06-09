@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetAllIncompleteImports()
         {
             PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanAccessAllImports)
+                .SetupCheck(SecurityPolicies.CanAccessAllImports)
                 .AssertSuccess(
                     async userService =>
                     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -31,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void Delete()
+        public async Task Delete()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -45,10 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Delete_MultipleFiles()
+        public async Task Delete_MultipleFiles()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void DeleteAll()
+        public async Task DeleteAll()
         {
             var releaseFile = new ReleaseFile
             {
@@ -78,12 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.AddAsync(releaseFile);
-                contentDbContext.SaveChangesAsync();
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -96,10 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetInfo()
+        public async Task GetInfo()
         {
-            PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -110,10 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListAll()
+        public async Task ListAll()
         {
-            PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -124,10 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Upload()
+        public async Task Upload()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -143,10 +144,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UploadAsZip()
+        public async Task UploadAsZip()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

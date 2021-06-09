@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;

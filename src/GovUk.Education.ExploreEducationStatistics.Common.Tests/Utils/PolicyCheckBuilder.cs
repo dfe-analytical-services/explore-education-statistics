@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             _userService = userService ?? new Mock<IUserService>();
         }
 
-        public PolicyCheckBuilder<TPolicy> ExpectCheck(TPolicy policy, bool checkResult = true)
+        public PolicyCheckBuilder<TPolicy> SetupCheck(TPolicy policy, bool checkResult = true)
         {
             _userService
                 .Setup(s => s.MatchesPolicy(policy))
@@ -28,10 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 
         public PolicyCheckBuilder<TPolicy> ExpectCheckToFail(TPolicy policy)
         {
-            return ExpectCheck(policy, false);
+            return SetupCheck(policy, false);
         }
 
-        public PolicyCheckBuilder<TPolicy> ExpectResourceCheck(
+        public PolicyCheckBuilder<TPolicy> SetupResourceCheck(
             object resource,
             TPolicy policy,
             bool checkResult = true)
@@ -43,9 +44,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return this;
         }
 
-        public PolicyCheckBuilder<TPolicy> ExpectResourceCheckToFail(object resource, TPolicy policy)
+        public PolicyCheckBuilder<TPolicy> SetupResourceCheckWithMatcher<T>(
+            Expression<Func<T, bool>> matcher,
+            TPolicy policy,
+            bool checkResult = true)
         {
-            return ExpectResourceCheck(resource, policy, false);
+            _userService
+                .Setup(s => s.MatchesPolicy(It.Is(matcher), policy))
+                .ReturnsAsync(checkResult);
+
+            return this;
+        }
+
+        public PolicyCheckBuilder<TPolicy> SetupResourceCheckToFail(object resource, TPolicy policy)
+        {
+            return SetupResourceCheck(resource, policy, false);
+        }
+
+        public PolicyCheckBuilder<TPolicy> SetupResourceCheckToFailWithMatcher<T>(Expression<Func<T, bool>> matcher, TPolicy policy)
+        {
+            return SetupResourceCheckWithMatcher(matcher, policy, false);
         }
 
         public Mock<IUserService> GetUserServiceMock()
@@ -57,21 +75,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         {
             var result = await action.Invoke(_userService);
 
-            PermissionTestUtils.AssertForbidden(result);
+            MockUtils.VerifyAllMocks(_userService);
 
-            _userService.VerifyAll();
-            _userService.VerifyNoOtherCalls();
+            PermissionTestUtils.AssertForbidden(result);
         }
 
         public async Task AssertSuccess<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
         {
             var result = await action.Invoke(_userService);
 
+            MockUtils.VerifyAllMocks(_userService);
+
             Assert.NotNull(result);
             Assert.True(result.IsRight);
-
-            _userService.VerifyAll();
-            _userService.VerifyNoOtherCalls();
         }
     }
 }

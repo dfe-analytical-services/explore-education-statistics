@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -26,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         [Fact]
-        public void Delete()
+        public async Task Delete()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
@@ -41,10 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public void Upload()
+        public async Task Upload()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
