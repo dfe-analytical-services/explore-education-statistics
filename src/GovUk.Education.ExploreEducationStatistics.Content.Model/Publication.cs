@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Release> Releases { get; set; } = new List<Release>();
 
+        public List<PublicationMethodology> Methodologies { get; set; }
+
         public ExternalMethodology ExternalMethodology { get; set; }
 
         public Uri LegacyPublicationUrl { get; set; }

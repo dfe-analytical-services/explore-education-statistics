@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            var methodologies = await _methodologyRepository.GetLatestMethodologiesByRelease(release.Id);
+            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
             var methodologiesNotApproved = methodologies
                 .Where(m => m.Status != MethodologyStatus.Approved)
                 .ToList();
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
-            var methodologies = await _methodologyRepository.GetLatestMethodologiesByRelease(release.Id);
+            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
             if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));

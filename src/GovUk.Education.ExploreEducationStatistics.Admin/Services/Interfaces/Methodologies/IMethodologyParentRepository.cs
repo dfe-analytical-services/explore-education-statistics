@@ -5,8 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies
 {
-    public interface IMethodologyRepository
+    public interface IMethodologyParentRepository
     {
-        Task<List<Methodology>> GetLatestByPublication(Guid publicationId);
+        public Task<List<MethodologyParent>> GetByPublication(Guid publicationId);
     }
 }
