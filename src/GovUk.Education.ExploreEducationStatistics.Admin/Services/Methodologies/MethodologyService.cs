@@ -35,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
 
-        public MethodologyService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public MethodologyService(
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
             IMapper mapper,
             IMethodologyContentService methodologyContentService,
