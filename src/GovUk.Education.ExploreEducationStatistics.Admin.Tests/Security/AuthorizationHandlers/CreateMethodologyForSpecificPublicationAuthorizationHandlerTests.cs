@@ -37,17 +37,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext = CreateAuthContext(user, Publication);
 
-                    publicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
-                        .ReturnsAsync(AsList<PublicationRole>());
-                    
+                    var expectedToPassByClaimAlone = claim == CreateAnyMethodology;
+
+                    if (!expectedToPassByClaimAlone)
+                    {
+                        publicationRoleRepository
+                            .Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
+                            .ReturnsAsync(AsList<PublicationRole>());
+                    }
+
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(publicationRoleRepository);
 
                     // Verify that the presence of the "CreateAnyMethodology" Claim will pass the handler test, without
                     // the need for a specific Publication to be provided
-                    var expectedToPass = claim == CreateAnyMethodology;
-                    Assert.Equal(expectedToPass, authContext.HasSucceeded);
+                    Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
             }
         }
