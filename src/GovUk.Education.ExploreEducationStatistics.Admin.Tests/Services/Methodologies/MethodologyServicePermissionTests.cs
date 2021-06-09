@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task CreateMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanCreateMethodologies)
+                .SetupResourceCheckToFail(_publication, SecurityPolicies.CanCreateMethodologyForSpecificPublication)
                 .AssertForbidden(
                     userService =>
                     {

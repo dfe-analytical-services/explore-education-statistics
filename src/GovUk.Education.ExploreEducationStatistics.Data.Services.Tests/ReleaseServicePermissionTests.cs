@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectsMeta()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

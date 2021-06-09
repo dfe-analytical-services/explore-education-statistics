@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions
             this IUserService userService,
             Release release)
         {
-            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewRelease);
+            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewSpecificRelease);
         }
     }
 }

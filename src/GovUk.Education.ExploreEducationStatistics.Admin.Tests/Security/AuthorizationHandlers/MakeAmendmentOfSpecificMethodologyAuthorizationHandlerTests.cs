@@ -20,57 +20,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
     {
+        private static readonly Guid UserId = Guid.NewGuid();
+
+        private static readonly PublicationMethodology Publication = new PublicationMethodology
+        {
+            PublicationId = Guid.NewGuid()
+        };
+
+        private static readonly Methodology PublicMethodology = new Methodology
+        {
+            Status = Approved,
+            PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+            MethodologyParent = new MethodologyParent()
+        };
+
+        private static readonly Methodology PrivateMethodology = new Methodology
+        {
+            Status = Draft,
+            MethodologyParent = new MethodologyParent()
+        };
+
+        private static readonly Methodology PublicMethodologyWithPublication = new Methodology
+        {
+            Status = Approved,
+            PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+            MethodologyParent = new MethodologyParent
+            {
+                Publications = AsList(Publication)
+            }
+        };
+
+        private static readonly Methodology PrivateMethodologyWithPublication = new Methodology
+        {
+            Status = Draft,
+            MethodologyParent = new MethodologyParent
+            {
+                Publications = AsList(Publication)
+            }
+        };
+
         public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerClaimTests
         {
-            private static readonly Guid UserId = Guid.NewGuid();
-            
-            private static readonly PublicationMethodology Publication = new PublicationMethodology
-            {
-                PublicationId = Guid.NewGuid()
-            };
-
-            private static readonly Methodology PublicMethodology = new Methodology
-            {
-                Status = Approved,
-                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
-                MethodologyParent = new MethodologyParent()
-            };
-                
-            private static readonly Methodology PrivateMethodology = new Methodology
-            {
-                Status = Draft,
-                MethodologyParent = new MethodologyParent()
-            };
-            
-            private static readonly Methodology PublicMethodologyWithPublication = new Methodology
-            {
-                Status = Approved,
-                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
-                MethodologyParent = new MethodologyParent
-                {
-                    Publications = AsList(Publication)   
-                }
-            };
-            
-            private static readonly Methodology PrivateMethodologyWithPublication = new Methodology
-            {
-                Status = Draft,
-                MethodologyParent = new MethodologyParent
-                {
-                    Publications = AsList(Publication)
-                }
-            };
-            
             [Fact]
             public async Task UserWithCorrectClaimCanCreateAmendmentOfPubliclyAccessibleMethodology()
             {
-                await ForEachSecurityClaimAsync(async claim => {
-                    
+                await ForEachSecurityClaimAsync(async claim =>
+                {
+
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                    
+
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext = CreateAuthContext(user, PublicMethodology);
-                    
+
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(publicationRoleRepository);
 
@@ -80,17 +81,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Assert.Equal(expectedToPass, authContext.HasSucceeded);
                 });
             }
-            
+
             [Fact]
             public async Task UserWithCorrectClaimCannotCreateAmendmentOfPrivateMethodology()
             {
-                await ForEachSecurityClaimAsync(async claim => 
+                await ForEachSecurityClaimAsync(async claim =>
                 {
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                    
+
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext = CreateAuthContext(user, PrivateMethodology);
-                    
+
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(publicationRoleRepository);
 
@@ -99,7 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Assert.False(authContext.HasSucceeded);
                 });
             }
-            
+        }
+        
+        public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerPublicationRoleTests
+        {
             [Fact]
             public async Task UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodology()
             {
@@ -108,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
                 
-                publicationRoleRepository.Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
+                publicationRoleRepository
+                    .Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
                     .ReturnsAsync(AsList(PublicationRole.Owner));
 
                 await handler.HandleAsync(authContext);
@@ -127,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
                 
-                publicationRoleRepository.Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
+                publicationRoleRepository
+                    .Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 await handler.HandleAsync(authContext);
@@ -154,23 +160,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // accessible.
                 Assert.False(authContext.HasSucceeded);
             }
+        }
 
-            private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Methodology methodology)
-            {
-                return CreateAuthorizationHandlerContext<MakeAmendmentOfSpecificMethodologyRequirement, Methodology>
-                    (user, methodology);
-            }
+        private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Methodology methodology)
+        {
+            return CreateAuthorizationHandlerContext<MakeAmendmentOfSpecificMethodologyRequirement, Methodology>
+                (user, methodology);
+        }
 
-            private static (MakeAmendmentOfSpecificMethodologyAuthorizationHandler, Mock<IUserPublicationRoleRepository>)
-                CreateHandlerAndDependencies()
-            {
-                var publicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        private static (MakeAmendmentOfSpecificMethodologyAuthorizationHandler, Mock<IUserPublicationRoleRepository>)
+            CreateHandlerAndDependencies()
+        {
+            var publicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
-                var handler = new MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
-                    publicationRoleRepository.Object);
+            var handler = new MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
+                publicationRoleRepository.Object);
 
-                return (handler, publicationRoleRepository);
-            }
+            return (handler, publicationRoleRepository);
         }
     }
 }

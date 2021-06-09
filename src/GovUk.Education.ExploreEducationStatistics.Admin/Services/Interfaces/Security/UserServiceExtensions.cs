@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Publication>> CheckCanCreateMethodologyForPublication(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanCreateMethodologies);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanCreateMethodologyForSpecificPublication);
         }
 
         public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublication(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdatePublication);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
             this IUserService userService, Release release)
         {
-            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewRelease);
+            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewSpecificRelease);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
