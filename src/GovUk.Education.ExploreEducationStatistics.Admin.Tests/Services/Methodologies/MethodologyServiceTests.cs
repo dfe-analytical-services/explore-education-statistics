@@ -452,6 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AdminMapper(),
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
+                methodologyRepository ?? new MethodologyRepository(contentDbContext),
                 methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);

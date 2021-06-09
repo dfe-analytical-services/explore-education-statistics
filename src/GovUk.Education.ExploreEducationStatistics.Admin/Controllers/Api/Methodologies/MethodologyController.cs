@@ -21,6 +21,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [Produces("application/json")]
+        [ProducesResponseType(typeof(MethodologySummaryViewModel), 200)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+        [HttpPost("api/publication/{publicationId}/methodology")]
+        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAsync(Guid publicationId)
+        {
+            return _methodologyService
+                .CreateMethodology(publicationId)
+                .HandleFailuresOrOk();
+        }
+        
+        [Produces("application/json")]
         [HttpGet("api/methodology/{methodologyId}/summary")]
         public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
         {

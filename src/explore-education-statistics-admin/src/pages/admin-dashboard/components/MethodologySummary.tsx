@@ -1,25 +1,22 @@
-import publicationService, {
-  ExternalMethodology,
-  MyPublication,
-} from '@admin/services/publicationService';
-import { BasicMethodology } from 'src/services/methodologyService';
-import ButtonGroup from '@common/components/ButtonGroup';
-import Button from '@common/components/Button';
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import FormattedDate from '@common/components/FormattedDate';
-import { methodologyCreateRoute } from '@admin/routes/routes';
 import {
-  methodologySummaryRoute,
+  MethodologyRouteParams,
   methodologySummaryEditRoute,
+  methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
+import methodologyService from '@admin/services/methodologyService';
+import publicationService, { ExternalMethodology, MyPublication } from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
+import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import React, { useState } from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useHistory } from 'react-router';
 import MethodologyExternalLinkForm from './MethodologyExternalLinkForm';
 
 export interface Props {
@@ -51,6 +48,8 @@ const MethodologySummary = ({
     id: publicationId,
     title,
   } = publication;
+
+  const history = useHistory();
 
   const handleExternalMethodologySubmit = async (
     values: ExternalMethodology,
@@ -183,14 +182,27 @@ const MethodologySummary = ({
             <>
               {!showAddExternalMethodologyForm && (
                 <ButtonGroup className="govuk-!-margin-bottom-2">
-                  <ButtonLink
-                    to={generatePath(methodologyCreateRoute.path, {
-                      publicationId,
-                    })}
+                  <Button
+                    onClick={async () => {
+                      const {
+                        id: methodologyId,
+                      } = await methodologyService.createMethodology(
+                        publicationId,
+                      );
+                      history.push(
+                        generatePath<MethodologyRouteParams>(
+                          methodologySummaryRoute.path,
+                          {
+                            publicationId,
+                            methodologyId,
+                          },
+                        ),
+                      );
+                    }}
                     data-testid={`Create methodology for ${title}`}
                   >
                     Create methodology
-                  </ButtonLink>
+                  </Button>
                   <Button
                     type="button"
                     data-testid={`Link methodology for ${title}`}

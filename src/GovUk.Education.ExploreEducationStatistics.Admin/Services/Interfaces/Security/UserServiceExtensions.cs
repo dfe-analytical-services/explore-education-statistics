@@ -40,10 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanViewAllMethodologies);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanCreateMethodology(
-            this IUserService userService)
+        public static Task<Either<ActionResult, Publication>> CheckCanCreateMethodologyForPublication(
+            this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanCreateMethodologies);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanCreateMethodologies);
         }
 
         public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(

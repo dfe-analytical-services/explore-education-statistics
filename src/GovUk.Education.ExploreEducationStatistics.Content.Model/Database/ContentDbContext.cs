@@ -136,7 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     p => new Uri(p));
 
             modelBuilder.Entity<Publication>()
-                .OwnsOne(p => p.ExternalMethodology).ToTable("ExternalMethodology");
+                .OwnsOne(p => p.ExternalMethodology)
+                .ToTable("ExternalMethodology");
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyParentId});

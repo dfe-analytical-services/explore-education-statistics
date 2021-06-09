@@ -11,12 +11,9 @@ export interface MethodologyStatusListItem {
   }[];
 }
 
-interface SaveMethodologySummary {
+export type UpdateMethodology = {
   title: string;
-}
-
-export type CreateMethodology = SaveMethodologySummary;
-export type UpdateMethodology = SaveMethodologySummary;
+};
 
 export type MethodologyStatus = 'Draft' | 'Approved';
 
@@ -41,8 +38,8 @@ const methodologyService = {
     return client.get<MethodologyStatusListItem[]>('/me/methodologies');
   },
 
-  createMethodology(data: CreateMethodology): Promise<IdTitlePair> {
-    return client.post(`/methodologies/`, data);
+  createMethodology(publicationId: string): Promise<IdTitlePair> {
+    return client.post(`/publication/${publicationId}/methodology`);
   },
 
   updateMethodology(

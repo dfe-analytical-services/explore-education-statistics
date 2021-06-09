@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMapper _mapper;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
@@ -38,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMapper mapper,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
+            IMethodologyRepository methodologyRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService)
@@ -47,9 +50,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _mapper = mapper;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
+            _methodologyRepository = methodologyRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
+        }
+
+        public Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
+                .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(publicationId))
+                .OnSuccess(methodology => GetSummaryAsync(methodology.Id));
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)

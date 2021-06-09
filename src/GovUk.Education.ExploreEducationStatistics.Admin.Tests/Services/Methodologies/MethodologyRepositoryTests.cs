@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -15,6 +16,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyRepositoryTests
     {
+	[Fact]
+        public async Task CreateMethodologyForPublication()
+        {
+            var publication = new Publication
+            {
+                Title = "The Publication Title",
+                Slug = "the-publication-slug"
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            Guid methodologyId;
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+                var methodology = await service.CreateMethodologyForPublication(publication.Id);
+                await contentDbContext.SaveChangesAsync();
+                methodologyId = methodology.Id;
+            }
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodology = await contentDbContext
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .ThenInclude(p => p.Publications)
+                    .ThenInclude(p => p.Publication)
+                    .SingleAsync(m => m.Id == methodologyId);
+                
+                var savedPublication = await contentDbContext.Publications.SingleAsync(p => p.Id == publication.Id);
+                
+                Assert.NotNull(methodology.MethodologyParent);
+                Assert.Single(methodology.MethodologyParent.Publications);
+                Assert.Equal(savedPublication, methodology.MethodologyParent.Publications[0].Publication);
+            }
+        }
+
         [Fact]
         public async Task GetLatestByPublication()
         {
