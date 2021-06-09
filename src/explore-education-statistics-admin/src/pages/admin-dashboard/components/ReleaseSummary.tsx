@@ -15,6 +15,8 @@ import {
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
 import React, { ReactNode } from 'react';
+import LazyLoad from 'react-lazyload';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   release: Release;
@@ -42,11 +44,18 @@ const ReleaseSummary = ({
             <Tag>{getReleaseStatusLabel(release.status)}</Tag>
           )}
           {release.status === 'Approved' && (
-            <ReleaseServiceStatus
-              exclude="details"
-              releaseId={release.id}
-              isApproved
-            />
+            <LazyLoad
+              once
+              placeholder={
+                <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
+              }
+            >
+              <ReleaseServiceStatus
+                exclude="details"
+                releaseId={release.id}
+                isApproved
+              />
+            </LazyLoad>
           )}
           {release.amendment && <Tag>Amendment</Tag>}
         </TagGroup>

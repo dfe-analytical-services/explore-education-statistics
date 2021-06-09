@@ -5,6 +5,7 @@ import releaseService, {
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Tag from '@common/components/Tag';
+import { forceCheck } from 'react-lazyload';
 
 interface Props {
   releaseId: string;
@@ -26,24 +27,27 @@ const ReleaseServiceStatus = ({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchReleaseServiceStatus = useCallback(() => {
-    return releaseService.getReleaseStatus(releaseId).then(status => {
-      if (!status) {
-        // 204 response waiting for status
-        setCurrentStatus({ overallStage: 'Validating' });
-        timeoutRef.current = setTimeout(
-          fetchReleaseServiceStatus,
-          refreshPeriod,
-        );
-      } else {
-        setCurrentStatus(status);
-        if (status && status.overallStage === 'Started') {
+    return releaseService
+      .getReleaseStatus(releaseId)
+      .then(status => {
+        if (!status) {
+          // 204 response waiting for status
+          setCurrentStatus({ overallStage: 'Validating' });
           timeoutRef.current = setTimeout(
             fetchReleaseServiceStatus,
             refreshPeriod,
           );
+        } else {
+          setCurrentStatus(status);
+          if (status && status.overallStage === 'Started') {
+            timeoutRef.current = setTimeout(
+              fetchReleaseServiceStatus,
+              refreshPeriod,
+            );
+          }
         }
-      }
-    });
+      })
+      .then(forceCheck);
   }, [releaseId, refreshPeriod]);
 
   function cancelTimer() {
