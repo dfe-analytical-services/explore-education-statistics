@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -31,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         };
 
         [Fact]
-        public void Query_LatestRelease_CanViewSubjectData()
+        public async Task Query_LatestRelease_CanViewSubjectData()
         {
-            PermissionTestUtils.PolicyCheckBuilder<DataSecurityPolicies>()
-                .ExpectResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
+            await PolicyCheckBuilder<DataSecurityPolicies>()
+                .SetupResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -81,10 +83,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public void Query_ReleaseId_CanViewSubjectData()
+        public async Task Query_ReleaseId_CanViewSubjectData()
         {
-            PermissionTestUtils.PolicyCheckBuilder<DataSecurityPolicies>()
-                .ExpectResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
+            await PolicyCheckBuilder<DataSecurityPolicies>()
+                .SetupResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
                 .AssertForbidden(
                     async userService =>
                     {

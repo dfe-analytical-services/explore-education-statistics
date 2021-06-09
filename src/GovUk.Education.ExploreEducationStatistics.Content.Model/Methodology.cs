@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -9,6 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         Draft,
         Approved
+    }
+    
+    public enum MethodologyPublishingStrategy
+    {
+        Immediately,
+        WithRelease
     }
 
     public class Methodology
@@ -53,5 +60,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public int Version { get; set; }
 
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
+
+        [NotMapped]
+        public MethodologyPublishingStrategy PublishingStrategy { get; set; }
+
+        [NotMapped]
+        public Release ScheduledWithRelease { get; set; }
+        
+        [NotMapped]
+        public Guid ScheduledWithReleaseId { get; set; }
+
+        public bool Approved => Status == MethodologyStatus.Approved;
+
+        public bool ScheduledForPublishingImmediately => PublishingStrategy == MethodologyPublishingStrategy.Immediately;
+        
+        public bool ScheduledForPublishingWithPublishedRelease
+        {
+            get
+            {
+                if (ScheduledWithReleaseId != null && ScheduledWithRelease == null)
+                {
+                    throw new InvalidOperationException("ScheduledWithRelease field not included in Methodology");
+                }
+                return PublishingStrategy == MethodologyPublishingStrategy.WithRelease
+                       && ScheduledWithRelease.Live;
+            }
+        }
+
+        public bool PubliclyAccessible => Approved &&
+                                          (ScheduledForPublishingImmediately ||
+                                           ScheduledForPublishingWithPublishedRelease);
     }
 }

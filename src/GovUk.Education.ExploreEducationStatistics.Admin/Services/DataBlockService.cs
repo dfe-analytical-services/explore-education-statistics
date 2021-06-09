@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
+                    dataBlock.Created = DateTime.UtcNow;
 
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 

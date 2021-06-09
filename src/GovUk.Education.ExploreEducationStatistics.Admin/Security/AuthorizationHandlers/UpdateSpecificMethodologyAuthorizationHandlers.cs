@@ -9,6 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificMethodologyAuthorizationHandler :
         HasClaimAuthorizationHandler<UpdateSpecificMethodologyRequirement>
     {
+        // TODO: when adding in Publication Owner permissions here:
+        //
+        // In future the approver of the latest release of the publication which the methodology belongs to should be
+        // able to unapprove the methodology as long as it's not publicly accessible yet
         public UpdateSpecificMethodologyAuthorizationHandler() : base(SecurityClaimTypes.UpdateAllMethodologies)
         {
         }

@@ -13,6 +13,7 @@ import dataBlocksService, {
 } from '@admin/services/dataBlockService';
 import permissionService from '@admin/services/permissionService';
 import ButtonText from '@common/components/ButtonText';
+import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -140,6 +141,7 @@ const ReleaseDataBlocksPage = ({
                 >
                   Highlight name
                 </th>
+                <th scope="col">Created date</th>
                 <th scope="col" className="govuk-table__header--actions">
                   Actions
                 </th>
@@ -152,6 +154,15 @@ const ReleaseDataBlocksPage = ({
                   <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
                   <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>
                   <td>{dataBlock.highlightName || 'None'}</td>
+                  <td>
+                    {dataBlock.created ? (
+                      <FormattedDate format="d MMMM yyyy HH:mm">
+                        {dataBlock.created}
+                      </FormattedDate>
+                    ) : (
+                      'Not available'
+                    )}
+                  </td>
                   <td className="govuk-table__cell--actions">
                     <Link
                       unvisited

@@ -1004,7 +1004,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
-                    Type = Ancillary
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary1@test.com"
+                    },
+                    Created = DateTime.UtcNow
                 }
             };
 
@@ -1016,7 +1021,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
-                    Type = Ancillary
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary2@test.com"
+                    },
+                    Created = DateTime.UtcNow
                 }
             };
 
@@ -1027,7 +1037,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart
+                    Type = Chart,
+                    CreatedBy = new User
+                    {
+                        Email = "chart@test.com"
+                    },
+                    Created = DateTime.UtcNow
                 }
             };
 
@@ -1039,7 +1054,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    SubjectId = Guid.NewGuid(),
+                    CreatedBy = new User
+                    {
+                        Email = "dataFile@test.com"
+                    },
+                    Created = DateTime.UtcNow
                 }
             };
 
@@ -1050,7 +1070,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
-                    Type = Image
+                    Type = Image,
+                    CreatedBy = new User
+                    {
+                        Email = "image@test.com"
+                    },
+                    Created = DateTime.UtcNow
                 }
             };
             
@@ -1171,6 +1196,177 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
+        
+        [Fact]
+        public async Task GetAncillaryFiles()
+        {
+            var release = new Release();
+
+            var ancillaryFile1 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Ancillary Test File 1",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary_1.pdf",
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary1@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var ancillaryFile2 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Ancillary Test File 2",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Ancillary 2.pdf",
+                    Type = Ancillary,
+                    CreatedBy = new User
+                    {
+                        Email = "ancillary2@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var chartFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "chart.png",
+                    Type = Chart,
+                    CreatedBy = new User
+                    {
+                        Email = "chart@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var dataFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                    CreatedBy = new User
+                    {
+                        Email = "dataFile@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+
+            var imageFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image.png",
+                    Type = Image,
+                    CreatedBy = new User
+                    {
+                        Email = "image@test.com"
+                    },
+                    Created = DateTime.UtcNow
+                }
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(ancillaryFile1, ancillaryFile2,
+                    chartFile, dataFile, imageFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(),
+                        ancillaryFile2.Path())))
+                .ReturnsAsync(true);
+
+            blobStorageService.Setup(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile1.Path()))
+                .ReturnsAsync(new BlobInfo(
+                    path: ancillaryFile1.Path(),
+                    size: "10 Kb",
+                    contentType: "application/pdf",
+                    contentLength: 0L,
+                    meta: new Dictionary<string, string>(),
+                    created: null));
+
+            blobStorageService.Setup(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile2.Path()))
+                .ReturnsAsync(new BlobInfo(
+                    path: ancillaryFile2.Path(),
+                    size: "10 Kb",
+                    contentType: "application/pdf",
+                    contentLength: 0L,
+                    meta: new Dictionary<string, string>(),
+                    created: null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetAncillaryFiles(release.Id);
+
+                Assert.True(result.IsRight);
+
+                blobStorageService.Verify(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(), ancillaryFile2.Path())),
+                        Times.Exactly(2));
+
+                blobStorageService.Verify(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, It.IsIn(
+                        ancillaryFile1.Path(), ancillaryFile2.Path())),
+                        Times.Exactly(2));
+
+                var fileInfoList = result.Right.ToList();
+                Assert.Equal(2, fileInfoList.Count);
+
+                Assert.Equal(ancillaryFile1.File.Id, fileInfoList[0].Id);
+                Assert.Equal("pdf", fileInfoList[0].Extension);
+                Assert.Equal("ancillary_1.pdf", fileInfoList[0].FileName);
+                Assert.Equal("Ancillary Test File 1", fileInfoList[0].Name);
+                Assert.Equal("10 Kb", fileInfoList[0].Size);
+                Assert.Equal(Ancillary, fileInfoList[0].Type);
+                Assert.Equal(ancillaryFile1.File.Created, fileInfoList[0].Created);
+                Assert.Equal(ancillaryFile1.File.CreatedBy.Email, fileInfoList[0].UserName);
+
+                Assert.Equal(ancillaryFile2.File.Id, fileInfoList[1].Id);
+                Assert.Equal("pdf", fileInfoList[1].Extension);
+                Assert.Equal("Ancillary 2.pdf", fileInfoList[1].FileName);
+                Assert.Equal("Ancillary Test File 2", fileInfoList[1].Name);
+                Assert.Equal("10 Kb", fileInfoList[1].Size);
+                Assert.Equal(Ancillary, fileInfoList[1].Type);
+                Assert.Equal(ancillaryFile2.File.Created, fileInfoList[1].Created);
+                Assert.Equal(ancillaryFile2.File.CreatedBy.Email, fileInfoList[1].UserName);
+            }
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
 
         [Fact]
         public async Task GetFile()
@@ -1609,6 +1805,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test Ancillary File", result.Right.Name);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
+                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

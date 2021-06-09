@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; set; } = "";
 
+        public DateTime? Created { get; set; }
+
         public string? HighlightName { get; set; }
 
         public string? HighlightDescription { get; set; }

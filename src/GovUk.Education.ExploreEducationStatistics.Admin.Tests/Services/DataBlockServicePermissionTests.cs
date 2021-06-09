@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -15,6 +16,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -31,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void Get()
+        public async Task Get()
         {
-            PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -44,10 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetDeletePlan()
+        public async Task GetDeletePlan()
         {
-            PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -57,10 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Create()
+        public async Task Create()
         {
-            PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -70,10 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Update()
+        public async Task Update()
         {
-            PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -83,10 +85,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Delete()
+        public async Task Delete()
         {
-            PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
