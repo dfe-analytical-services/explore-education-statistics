@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid(),
             PublicationId = Publication.Id,
-            Published = DateTime.Now,
+            Published = DateTime.UtcNow,
             TimePeriodCoverage = TimeIdentifier.April
         };
 

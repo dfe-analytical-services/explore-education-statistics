@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             };
 
-            var publishDate = DateTime.Now;
+            var publishDate = DateTime.UtcNow;
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             };
 
-            var publishDate = DateTime.Now;
+            var publishDate = DateTime.UtcNow;
 
             var contextId = Guid.NewGuid().ToString();
 

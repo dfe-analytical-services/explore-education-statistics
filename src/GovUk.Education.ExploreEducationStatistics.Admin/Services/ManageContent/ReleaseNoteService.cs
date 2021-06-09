@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     _context.Update.Add(new Update
                     {
-                        On = saveRequest.On ?? DateTime.Now,
+                        On = saveRequest.On ?? DateTime.UtcNow,
                         Reason = saveRequest.Reason,
                         ReleaseId = release.Id
                     });
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<ReleaseNoteViewModel>>();
                     }
 
-                    releaseNote.On = saveRequest.On ?? DateTime.Now;
+                    releaseNote.On = saveRequest.On ?? DateTime.UtcNow;
                     releaseNote.Reason = saveRequest.Reason;
 
                     _context.Update.Update(releaseNote);

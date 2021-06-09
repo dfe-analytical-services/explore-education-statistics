@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Published = DateTime.Now,
+                Published = DateTime.UtcNow,
                 TimePeriodCoverage = TimeIdentifier.April,
                 PreviousVersionId = Guid.NewGuid(),
                 Publication = new Publication

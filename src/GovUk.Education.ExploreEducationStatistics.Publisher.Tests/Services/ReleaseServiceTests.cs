@@ -633,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
                         meta: GetMetaValuesReleaseDateTime(
-                            releaseDateTime: DateTime.Now),
+                            releaseDateTime: DateTime.UtcNow),
                         created: null
                     ));
 
@@ -788,7 +788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
                         meta: GetMetaValuesReleaseDateTime(
-                            releaseDateTime: DateTime.Now),
+                            releaseDateTime: DateTime.UtcNow),
                         created: null
                     ));
 
@@ -910,7 +910,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
                     meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
+                        releaseDateTime: DateTime.UtcNow),
                     created: null
                 ));
 
@@ -1019,7 +1019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
                     meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
+                        releaseDateTime: DateTime.UtcNow),
                     created: null
                 ));
 
@@ -1087,7 +1087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
                     meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
+                        releaseDateTime: DateTime.UtcNow),
                     created: null
                 ));
 

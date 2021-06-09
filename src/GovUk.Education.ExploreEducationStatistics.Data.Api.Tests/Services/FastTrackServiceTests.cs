@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             const string subjectName = "subject name";
 
             var fastTrackId = Guid.NewGuid();
-            var fastTrackCreated = DateTime.Now.AddDays(-10);
+            var fastTrackCreated = DateTime.UtcNow.AddDays(-10);
             
             var fastTrackAsBlob = new FastTrack(fastTrackId, new TableBuilderConfiguration
             {

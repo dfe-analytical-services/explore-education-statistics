@@ -595,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             Id = Guid.NewGuid()
                         },
                         Status = status,
-                        Published = DateTime.Now
+                        Published = DateTime.UtcNow
                     };
 
                     var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -702,7 +702,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             Id = Guid.NewGuid()
                         },
                         Status = status,
-                        Published = DateTime.Now,
+                        Published = DateTime.UtcNow,
                     };
 
                     var releaseStatusRepository = new Mock<IReleaseStatusRepository>();

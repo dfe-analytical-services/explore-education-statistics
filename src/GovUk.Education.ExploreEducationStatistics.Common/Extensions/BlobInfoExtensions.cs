@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
             {
-                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
+                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.UtcNow) <= 0;
             }
 
             return false;

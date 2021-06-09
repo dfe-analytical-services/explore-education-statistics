@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var internalReleaseNote = "Release note";
             var releaseStatus = ReleaseStatus.Approved;
-            var publishScheduled = DateTime.Now.AddDays(1);
+            var publishScheduled = DateTime.UtcNow.AddDays(1);
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var releaseName = "2035";
             var timePeriodCoverage = TimeIdentifier.March;

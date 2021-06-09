@@ -974,7 +974,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 ReleaseName = "2030",
                 Slug = "2030",
-                Published = DateTime.Now,
+                Published = DateTime.UtcNow,
                 PublishScheduled = DateTime.UtcNow,
                 Version = 0,
             };
@@ -1031,7 +1031,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 ReleaseName = "2030",
                 Slug = "2030",
-                Published = DateTime.Now,
+                Published = DateTime.UtcNow,
                 PublishScheduled = DateTime.UtcNow,
                 Version = 0,
             };
