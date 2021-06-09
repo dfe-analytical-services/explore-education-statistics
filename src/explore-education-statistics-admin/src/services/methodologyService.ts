@@ -1,5 +1,4 @@
 import client from '@admin/services/utils/service';
-import { IdTitlePair } from 'src/services/types/common';
 
 export interface MethodologyStatusListItem {
   id: string;
@@ -28,6 +27,10 @@ export interface BasicMethodology {
 }
 
 const methodologyService = {
+  createMethodology(publicationId: string): Promise<BasicMethodology> {
+    return client.post(`/publication/${publicationId}/methodology`);
+  },
+
   getMethodologies(): Promise<BasicMethodology[]> {
     // TODO EES-2153 This was returning a list of all methodologies but will need removing
     // when the Manage Publication page no longer offers that list
@@ -36,10 +39,6 @@ const methodologyService = {
 
   getMyMethodologies(): Promise<MethodologyStatusListItem[]> {
     return client.get<MethodologyStatusListItem[]>('/me/methodologies');
-  },
-
-  createMethodology(publicationId: string): Promise<IdTitlePair> {
-    return client.post(`/publication/${publicationId}/methodology`);
   },
 
   updateMethodology(

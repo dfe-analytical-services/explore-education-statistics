@@ -6,7 +6,10 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
-import publicationService, { ExternalMethodology, MyPublication } from '@admin/services/publicationService';
+import publicationService, {
+  ExternalMethodology,
+  MyPublication,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
