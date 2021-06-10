@@ -1,6 +1,6 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import {
-  getReleaseStatusLabel,
+  getReleaseApprovalStatusLabel,
   getReleaseSummaryLabel,
 } from '@admin/pages/release/utils/releaseSummaryUtil';
 import { Release } from '@admin/services/releaseService';
@@ -40,10 +40,10 @@ const ReleaseSummary = ({
       summary={getReleaseSummaryLabel(release)}
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
-          {release.status !== 'Approved' && (
-            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+          {release.approvalStatus !== 'Approved' && (
+            <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
           )}
-          {release.status === 'Approved' && (
+          {release.approvalStatus === 'Approved' && (
             <LazyLoad
               once
               placeholder={
@@ -73,7 +73,7 @@ const ReleaseSummary = ({
             <time>{formatPartialDate(release.nextReleaseDate)}</time>
           </SummaryListItem>
         )}
-        {release.status === 'Approved' && (
+        {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleaseServiceStatus releaseId={release.id} />
           </SummaryListItem>

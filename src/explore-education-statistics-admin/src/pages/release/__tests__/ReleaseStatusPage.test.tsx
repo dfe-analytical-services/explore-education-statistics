@@ -64,7 +64,7 @@ describe('ReleaseStatusPage', () => {
 
     renderPage({
       ...testRelease,
-      status: 'Approved',
+      approvalStatus: 'Approved',
       publishScheduled: '2021-01-15',
       nextReleaseDate: {
         month: 10,

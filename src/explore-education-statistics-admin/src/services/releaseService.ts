@@ -7,7 +7,7 @@ import { PartialDate } from '@common/utils/date/partialDate';
 export interface Release {
   id: string;
   slug: string;
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
@@ -48,7 +48,7 @@ export interface ReleaseSummary {
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
   internalReleaseNote: string;
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   yearTitle: string;
 }
 
@@ -66,7 +66,7 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
 }
 
 export interface UpdateReleaseRequest extends BaseReleaseRequest {
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   internalReleaseNote?: string;
   publishScheduled?: string;
   publishMethod?: 'Scheduled' | 'Immediate';
@@ -149,7 +149,7 @@ export interface ReleaseChecklist {
 export interface ReleasePublicationStatus {
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   amendment: boolean;
   live: boolean;
 }
