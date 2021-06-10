@@ -67,16 +67,9 @@ Add key statistics summary content to release
 
 Add accordion sections to release
     [Tags]  HappyPath
-    user waits until button is enabled  Add new section
-    user clicks button  Add new section
-    user waits until button is enabled  Add new section
-    user clicks button  Add new section
-    user waits until button is enabled  Add new section
-    user clicks button  Add new section
-
-    user changes accordion section title  1   Test section one
-    user changes accordion section title  2   Test section two
-    user changes accordion section title  3   Test section three
+    user creates new content section  1   Test section one
+    user creates new content section  2   Test section two
+    user creates new content section  3   Test section three
 
 Add content blocks to Test section one
     [Tags]  HappyPath

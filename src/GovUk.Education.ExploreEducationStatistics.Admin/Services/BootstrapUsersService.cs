@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public BootstrapUsersService(
             IConfiguration configuration,
-            UsersAndRolesDbContext usersAndRolesDbContext, 
+            UsersAndRolesDbContext usersAndRolesDbContext,
             UsersAndRolesDbContext contentDbContext)
         {
             _configuration = configuration;

@@ -42,17 +42,9 @@ Navigate to Absence release
     user waits until h1 is visible  Pupil absence in schools in England
     user waits until h2 is visible  Release summary
 
-
 Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath
-    user checks summary list contains  Publication title  Pupil absence in schools in England
-    user checks summary list contains  Time period  Academic Year
-    user checks summary list contains  Release period  2016/17
-    user checks summary list contains  Release type  Official Statistics
-
-Validate Analyst1 can see Absence release summary Lead statistician
-    [Tags]  HappyPath|
-    user checks summary list contains  Lead statistician  Data Analyst
+    user verifies release summary  Pupil absence in schools in England  Academic Year  2016/17  Data Analyst  Official Statistics
 
 Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath
