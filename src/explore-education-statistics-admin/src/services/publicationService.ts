@@ -2,7 +2,10 @@ import {
   LegacyRelease,
   UpdateLegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import { BasicMethodology } from '@admin/services/methodologyService';
+import {
+  BasicMethodology,
+  MyMethodology,
+} from '@admin/services/methodologyService';
 import { MyRelease } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
@@ -31,7 +34,7 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  methodology?: BasicMethodology;
+  methodology?: MyMethodology;
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact?: PublicationContactDetails;

@@ -20,10 +20,20 @@ export interface BasicMethodology {
   amendment: boolean;
   id: string;
   internalReleaseNote?: string;
+  live: boolean;
+  previousVersionId?: string;
   title: string;
   slug: string;
   status: MethodologyStatus;
   published?: string;
+}
+
+export interface MyMethodology extends BasicMethodology {
+  permissions: {
+    canUpdateMethodology: boolean;
+    canDeleteMethodology: boolean;
+    canMakeAmendmentOfMethodology: boolean;
+  };
 }
 
 const methodologyService = {
@@ -52,6 +62,14 @@ const methodologyService = {
     return client.get<BasicMethodology>(
       `/methodology/${methodologyId}/summary`,
     );
+  },
+
+  createMethodologyAmendment(methodologyId: string): Promise<BasicMethodology> {
+    return client.post(`/methodology/${methodologyId}/amendment`);
+  },
+
+  deleteMethodology(methodologyId: string): Promise<void> {
+    return client.delete(`/methodology/${methodologyId}`);
   },
 };
 
