@@ -373,6 +373,12 @@ export const MapBlockInternal = ({
   const selectedDataSetConfiguration =
     dataSetCategoryConfigs[selectedDataSetKey];
 
+  if (mapRef && mapRef.current) {
+    mapRef.current.leafletElement.setMaxBounds(
+      mapRef.current.leafletElement.getBounds(),
+    );
+  }
+
   // initialise
   useEffect(() => {
     import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
@@ -386,7 +392,6 @@ export const MapBlockInternal = ({
 
   useEffect(() => {
     const { current } = mapRef;
-
     if (current && intersectionEntry) {
       requestAnimationFrame(() => {
         current.leafletElement.invalidateSize();
