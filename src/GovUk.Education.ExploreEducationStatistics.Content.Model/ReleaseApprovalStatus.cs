@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public enum ReleaseStatus
+    public enum ReleaseApprovalStatus
     {
         Draft,
         HigherLevelReview,

@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             Assert.Null(amendment.Published);
             Assert.Null(amendment.PublishScheduled);
-            Assert.Equal(ReleaseStatus.Draft, amendment.Status);
+            Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
 
             Assert.Equal(createdDate, amendment.Created);
             Assert.Equal(createdById, amendment.CreatedById);

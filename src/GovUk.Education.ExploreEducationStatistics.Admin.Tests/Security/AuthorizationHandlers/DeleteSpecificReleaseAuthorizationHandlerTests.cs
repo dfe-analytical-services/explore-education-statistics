@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserPublicationRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = ReleaseStatus.Draft,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 0
                     });
             }
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserPublicationRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = ReleaseStatus.Approved,
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
                         Version = 1
                     });
             }
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserPublicationRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = ReleaseStatus.Draft,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 1
                     },
                     DeleteAllReleaseAmendments);
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = ReleaseStatus.Draft,
+                    ApprovalStatus = ReleaseApprovalStatus.Draft,
                     Version = 0
                 };
                 
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = ReleaseStatus.Approved,
+                    ApprovalStatus = ReleaseApprovalStatus.Approved,
                     Version = 1
                 };
 
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = ReleaseStatus.Draft,
+                    ApprovalStatus = ReleaseApprovalStatus.Draft,
                     Version = 1
                 };
 
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = ReleaseStatus.Draft,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 0
                     });
             }
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = ReleaseStatus.Approved,
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
                         Version = 1
                     });
             }
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = ReleaseStatus.Draft,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 1
                     });
             }

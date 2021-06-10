@@ -211,8 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<Release>()
-                .Property(release => release.Status)
-                .HasConversion(new EnumToStringConverter<ReleaseStatus>());
+                .Property(release => release.ApprovalStatus)
+                .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)

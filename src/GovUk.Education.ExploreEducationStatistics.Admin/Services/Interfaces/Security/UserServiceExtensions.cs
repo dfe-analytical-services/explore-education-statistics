@@ -141,19 +141,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
-            this IUserService userService, Release release, ReleaseStatus status)
+            this IUserService userService, Release release, ReleaseApprovalStatus approvalStatus)
         {
-            switch (status)
+            switch (approvalStatus)
             {
-                case ReleaseStatus.Draft:
+                case ReleaseApprovalStatus.Draft:
                 {
                     return userService.CheckCanMarkReleaseAsDraft(release);
                 }
-                case ReleaseStatus.HigherLevelReview:
+                case ReleaseApprovalStatus.HigherLevelReview:
                 {
                     return userService.CheckCanSubmitReleaseToHigherApproval(release);
                 }
-                case ReleaseStatus.Approved:
+                case ReleaseApprovalStatus.Approved:
                 {
                     return userService.CheckCanApproveRelease(release);
                 }

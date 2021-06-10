@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -56,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 await _publicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
             var releaseRoles = await _releaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
-            if (release.Status == ReleaseStatus.Approved
+            if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)
                 : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {

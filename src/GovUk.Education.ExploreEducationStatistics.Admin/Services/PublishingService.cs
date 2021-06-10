@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _userService.CheckCanPublishRelease(release))
                 .OnSuccess(async release =>
                 {
-                    if (release.Status != ReleaseStatus.Approved)
+                    if (release.ApprovalStatus != ReleaseApprovalStatus.Approved)
                     {
                         return ValidationActionResult(ReleaseNotApproved);
                     }
@@ -66,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         /// <summary>
-        /// <para>Notify the Publisher that there has been a change to the Release status.</para>
+        /// <para>Notify the Publisher that there has been a change to the Release approval status.</para>
         /// <para>This could result in:</para>
         /// <list type="bullet">
         /// <item><term>Scheduling publication of a Release after approval</term></item>
