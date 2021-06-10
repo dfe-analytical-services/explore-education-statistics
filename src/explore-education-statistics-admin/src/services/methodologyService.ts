@@ -21,7 +21,9 @@ export type UpdateMethodology = SaveMethodologySummary;
 export type MethodologyStatus = 'Draft' | 'Approved';
 
 export interface BasicMethodology {
+  amendment: boolean;
   id: string;
+  internalReleaseNote?: string;
   title: string;
   slug: string;
   status: MethodologyStatus;

@@ -2,23 +2,35 @@ import publicationService, {
   ExternalMethodology,
   MyPublication,
 } from '@admin/services/publicationService';
+import { BasicMethodology } from 'src/services/methodologyService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
+import FormattedDate from '@common/components/FormattedDate';
 import { methodologyCreateRoute } from '@admin/routes/routes';
-import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
+import {
+  methodologySummaryRoute,
+  methodologySummaryEditRoute,
+} from '@admin/routes/methodologyRoutes';
+import Details from '@common/components/Details';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
+import TagGroup from '@common/components/TagGroup';
 import React, { useState } from 'react';
 import { generatePath } from 'react-router';
 import MethodologyExternalLinkForm from './MethodologyExternalLinkForm';
 
 export interface Props {
+  canAmendMethodology?: boolean;
   publication: MyPublication;
   topicId: string;
   onChangePublication: () => void;
 }
 
 const MethodologySummary = ({
+  canAmendMethodology = false, // TO DO replace with real permission check
   publication,
   topicId,
   onChangePublication,
@@ -87,14 +99,49 @@ const MethodologySummary = ({
   return (
     <>
       {methodology ? (
-        <Link
-          to={generatePath(methodologySummaryRoute.path, {
-            publicationId,
-            methodologyId: methodology.id,
-          })}
+        <Details
+          open={false}
+          className="govuk-!-margin-bottom-0"
+          summary={methodology.title}
+          summaryAfter={
+            <TagGroup className="govuk-!-margin-left-2">
+              <Tag>{methodology.status}</Tag>
+              {methodology.amendment && <Tag>Amendment</Tag>}
+            </TagGroup>
+          }
         >
-          {methodology.title}
-        </Link>
+          <SummaryList className="govuk-!-margin-bottom-3">
+            <SummaryListItem term="Publish date">
+              <FormattedDate>{methodology.published || ''}</FormattedDate>
+            </SummaryListItem>
+            {methodology.internalReleaseNote && (
+              <SummaryListItem term="Internal release note">
+                {methodology.internalReleaseNote}
+              </SummaryListItem>
+            )}
+          </SummaryList>
+          <ButtonGroup>
+            <ButtonLink
+              to={generatePath(methodologySummaryRoute.path, {
+                publicationId,
+                methodologyId: methodology.id,
+              })}
+            >
+              View methodology
+            </ButtonLink>
+            {canAmendMethodology && (
+              <ButtonLink
+                to={generatePath(methodologySummaryEditRoute.path, {
+                  publicationId,
+                  methodologyId: methodology.id,
+                })}
+                variant="secondary"
+              >
+                Amend methodology
+              </ButtonLink>
+            )}
+          </ButtonGroup>
+        </Details>
       ) : (
         <>
           {externalMethodology?.url ? (
