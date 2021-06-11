@@ -143,13 +143,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.Publication)
-                .WithMany()
+                .WithMany(p => p.Methodologies)
                 .HasForeignKey(pm => pm.PublicationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.MethodologyParent)
-                .WithMany()
+                .WithMany(m => m.Publications)
                 .HasForeignKey(pm => pm.MethodologyParentId)
                 .OnDelete(DeleteBehavior.NoAction);
 

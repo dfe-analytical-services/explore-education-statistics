@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 methodologyRepository
-                    .Setup(mock => mock.GetLatestMethodologiesByRelease(release.Id))
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
                     .ReturnsAsync(new List<Methodology>
                     {
                         methodology
@@ -166,10 +166,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithNoDataFiles()
         {
-            var publication = new Publication();
             var release = new Release
             {
-                Publication = publication,
+                Publication = new Publication()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -187,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 methodologyRepository
-                    .Setup(mock => mock.GetLatestMethodologiesByRelease(release.Id))
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
                     .ReturnsAsync(new List<Methodology>());
 
                 releaseDataFileRepository
@@ -230,10 +229,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithDataFiles()
         {
-            var publication = new Publication();
             var release = new Release
             {
-                Publication = publication,
+                Publication = new Publication()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -262,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 methodologyRepository
-                    .Setup(mock => mock.GetLatestMethodologiesByRelease(release.Id))
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
                     .ReturnsAsync(new List<Methodology>());
 
                 releaseDataFileRepository
@@ -459,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 methodologyRepository
-                    .Setup(mock => mock.GetLatestMethodologiesByRelease(release.Id))
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
                     .ReturnsAsync(new List<Methodology>
                     {
                         methodology
