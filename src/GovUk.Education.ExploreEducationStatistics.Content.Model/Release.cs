@@ -64,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Update> Updates { get; set; }
 
+        public List<ReleaseStatus> ReleaseStatuses { get; set; }
+
         [JsonIgnore]
         public List<ReleaseContentSection> Content { get; set; }
 

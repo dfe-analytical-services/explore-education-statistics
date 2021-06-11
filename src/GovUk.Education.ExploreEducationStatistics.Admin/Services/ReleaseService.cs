@@ -297,11 +297,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
+                    var releaseStatus = new ReleaseStatus
+                    {
+                        Release = release,
+                        InternalReleaseNote = request.InternalReleaseNote,
+                        ApprovalStatus = request.ApprovalStatus,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+
                     return await ValidateReleaseWithChecklist(release)
                         .OnSuccessDo(() => RemoveUnusedImages(release.Id))
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
+                            await _context.AddAsync(releaseStatus);
                             await _context.SaveChangesAsync();
 
                             // Only need to inform Publisher if changing release approval status to or from Approved
@@ -309,6 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 await _publishingService.ReleaseChanged(
                                     releaseId,
+                                    releaseStatus.Id,
                                     request.PublishMethod == PublishMethod.Immediate
                                 );
                             }
