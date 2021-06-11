@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation("{0} triggered at: {1}",
                 executionContext.FunctionName,
-                DateTime.Now);
+                DateTime.UtcNow);
 
             await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
 
