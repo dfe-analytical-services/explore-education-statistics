@@ -102,6 +102,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task GetLatestByPublication_MethodologyHasNoVersions()
+        {
+            var publication = new Publication();
+
+            var methodology = new MethodologyParent
+            {
+                Versions = new List<Methodology>()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.MethodologyParents.AddAsync(methodology);
+                await contentDbContext.PublicationMethodologies.AddRangeAsync(
+                    new PublicationMethodology
+                    {
+                        Publication = publication,
+                        MethodologyParent = methodology,
+                        Owner = true
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Attach(methodology);
+
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                methodologyParentRepository.Setup(mock => mock.GetByPublication(publication.Id))
+                    .ReturnsAsync(AsList(methodology));
+
+                var result = await service.GetLatestByPublication(publication.Id);
+                Assert.Empty(result);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
         public async Task GetLatestByPublication_PublicationNotFoundThrowsException()
         {
             var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
