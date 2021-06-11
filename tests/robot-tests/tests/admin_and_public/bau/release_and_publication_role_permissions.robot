@@ -41,7 +41,6 @@ Assert that test users are present in table
     user checks results table row heading contains  4  1  Bau1 User1
     user checks results table row heading contains  5  1  Bau2 User2
 
-
     user checks results table cell contains  1  1  	ees-analyst1@education.gov.uk
     user checks results table cell contains  1  2  	Analyst
     user checks results table cell contains  1  3  	Manage
@@ -56,7 +55,6 @@ Assert that test users are present in table
 
     user checks results table cell contains  4  1  	ees-bau1@education.gov.uk
     user checks results table cell contains  4  2  	BAU User
-
     user checks results table cell contains  4  3  	Manage
 
     user checks results table cell contains  5  1  	ees-bau2@education.gov.uk
@@ -65,13 +63,11 @@ Assert that test users are present in table
 
 Give Analyst1 User1 publication owner access
     [Tags]  HappyPath
-    # user waits until h1 is visible  Users  60
     user clicks link  Manage  xpath://td[text()="ees-analyst1@education.gov.uk"]/..
     user waits until page does not contain loading spinner
-    # user waits until h1 is visible  Analyst1 User1  60
+
     # stale element exception if you don't wait until it's enabled    
     user waits until button is enabled  Add publication access
-
     user scrolls to element  css:[name="selectedPublicationId"]
     
     user waits until element is enabled  css:[name="selectedPublicationId"]
@@ -84,14 +80,14 @@ Give Analyst1 User1 publication owner access
     
 Sign in as Analyst1 User1 (publication owner) & navigate to publication
     [Tags]  HappyPath
-    user signs in as analyst1
-    user waits until page does not contain loading spinner
+    user changes to analyst1
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
     ...  ${RELEASE_TYPE} (not Live)    
 
 Assert publication owner can upload subject file
     [Tags]  HappyPath
     user clicks link  Data and files
+    user waits until page does not contain loading spinner
     user uploads subject   ${SUBJECT_NAME}  seven_filters.csv  seven_filters.meta.csv
 
 Assert publication owner can add meta guidance to ${SUBJECT_NAME}
@@ -134,23 +130,26 @@ Go to "Sign off" page
 
 Assert publication owner cannot approve release for immediate publication
     [Tags]  HappyPath
-    user waits until page does not contain loading spinner
-    user checks element is disabled  //*[@id="releaseStatusForm-status-Approved"]
+    user waits until h2 is visible  Edit release status  30
+    user waits for page to finish loading
+    user checks element is disabled  //*[@id="releaseStatusForm-approvalStatus-Approved"]
 
 Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
+
     user clicks radio   Ready for higher review
     user enters text into element  id:releaseStatusForm-internalReleaseNote     ready for higher review (publication owner)
     user clicks button  Update status 
-    user checks element is visible  //*[@id="CurrentReleaseStatus-Awaiting higher review" and text()="Awaiting higher review"]
+    
+    user waits until element is visible  //*[@id="CurrentReleaseStatus-Awaiting higher review"]
     
 Assert publication owner can edit release status to "In draft"
     [Tags]  HappyPath
-    user waits until page does not contain loading spinner
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status  30
     user clicks radio   In draft
     user enters text into element  id:releaseStatusForm-internalReleaseNote     Moving back to Draft state (publication owner)
     user clicks button  Update status 
-    user checks element is visible  //*[@id="CurrentReleaseStatus-In Draft" and text()="In Draft"]
 
 User goes back to admin dashboard
     [Tags]  HappyPath
@@ -187,12 +186,13 @@ Go to "Sign off" page as publication owner
 Assert publication owner cannot approve release for immediate publication on new release
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user waits until page does not contain loading spinner
-    user checks element is disabled  //*[@id="releaseStatusForm-status-Approved"]
+    user waits until h2 is visible  Edit release status  60
+    user scrolls to element  //*[@id="releaseStatusForm-approvalStatus-Approved"]
+    user checks element is disabled  //*[@id="releaseStatusForm-approvalStatus-Approved"]
 
 Navigate to administration as bau1 to remove publication owner access
     [Tags]  HappyPath
-    user signs in as bau1
+    user changes to bau1
     user goes to url  %{ADMIN_URL}/administration/users
 
 Navigate to manage users
@@ -218,7 +218,7 @@ Give release approver access to Analyst1
 
 Check release owner can access release
     [Tags]  HappyPath
-    user signs in as analyst1
+    user changes to analyst1
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}  120
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
@@ -267,7 +267,7 @@ Check release owner can publish release
 
 Navigate to administration as bau1 to assign viewer only access
     [Tags]  HappyPath    
-    user signs in as bau1
+    user changes to bau1
     user goes to url  %{ADMIN_URL}/administration/users
 
 Navigate to manage users as bau1
@@ -292,7 +292,7 @@ Assign viewer only access to Analyst1
     
 Sign in as Analyst1 User1 & navigate to publication
     [Tags]  HappyPath
-    user signs in as analyst1
+    user changes to analyst1
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}  120
 
@@ -320,7 +320,7 @@ Check release viewer cannot approve release
 
 Login as bau1 to remove viewer access 
     [Tags]  HappyPath
-    user signs in as bau1
+    user changes to bau1
     user goes to url  %{ADMIN_URL}/administration/users 
 
 Navigate to manage users page to remove viewer access
@@ -330,8 +330,6 @@ Navigate to manage users page to remove viewer access
 
 Give release contributor access to Analyst1
     [Tags]  HappyPath
-    user scrolls to element  //*[text()="Analyst1 User1"]
-        
     user scrolls to element  css:[name="selectedReleaseId"]
     
     user waits until element is enabled  css:[name="selectedReleaseId"]
@@ -344,7 +342,7 @@ Give release contributor access to Analyst1
 
 Login as a release contributor 
     [Tags]  HappyPath
-    user signs in as analyst1
+    user changes to analyst1
 
 Assert release contributor cannot create an amendment
     [Tags]  HappyPath
@@ -352,7 +350,6 @@ Assert release contributor cannot create an amendment
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    # user opens details dropdown   ${RELEASE_NAME} (Live - Latest release)  ${accordion}
     ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
     user checks page does not contain button  Amend this release
