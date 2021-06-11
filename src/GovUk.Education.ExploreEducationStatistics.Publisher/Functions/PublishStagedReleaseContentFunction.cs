@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation("{0} triggered at: {1}",
                 executionContext.FunctionName,
-                DateTime.Now);
+                DateTime.UtcNow);
 
             var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
