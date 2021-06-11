@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             public Guid PublicationId { get; set; }
 
             [JsonConverter(typeof(StringEnumConverter))]
-            public ReleaseStatus Status { get; set; }
+            public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
             public PublicationViewModel Publication { get; set; }
 

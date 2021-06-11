@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
                 Published = new DateTime(2019, 1, 01),
-                Status = Approved
+                ApprovalStatus = Approved
             };
 
             var publicationBRelease1 = new Release
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
                 Published = null,
-                Status = Draft
+                ApprovalStatus = Draft
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
-                Status = Approved
+                ApprovalStatus = Approved
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -321,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
-                Status = Approved
+                ApprovalStatus = Approved
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

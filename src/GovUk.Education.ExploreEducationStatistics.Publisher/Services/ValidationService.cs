@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -82,9 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static Either<IEnumerable<ReleaseStatusLogMessage>, Unit> ValidateApproval(Release release)
         {
-            return release.Status == ReleaseStatus.Approved
+            return release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? Unit.Instance
-                : Failure(ValidationStage.ReleaseMustBeApproved, $"Release status is {release.Status}");
+                : Failure(ValidationStage.ReleaseMustBeApproved, $"Release approval status is {release.ApprovalStatus}");
         }
 
         private static Either<IEnumerable<ReleaseStatusLogMessage>, Unit> ValidateScheduledPublishDate(

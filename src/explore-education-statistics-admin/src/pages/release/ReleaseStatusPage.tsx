@@ -102,11 +102,11 @@ const ReleaseStatusPage = () => {
       <SummaryList>
         <SummaryListItem term="Current status">
           <StatusBlock
-            text={statusMap[release.status]}
-            id={`CurrentReleaseStatus-${statusMap[release.status]}`}
+            text={statusMap[release.approvalStatus]}
+            id={`CurrentReleaseStatus-${statusMap[release.approvalStatus]}`}
           />
         </SummaryListItem>
-        {release.status === 'Approved' && (
+        {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleaseServiceStatus releaseId={releaseId} />
           </SummaryListItem>

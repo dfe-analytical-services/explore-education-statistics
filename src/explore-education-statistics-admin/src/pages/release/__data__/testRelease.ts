@@ -4,7 +4,7 @@ import { Release } from '@admin/services/releaseService';
 export const testRelease: Release = {
   id: 'release-1',
   slug: 'release-1-slug',
-  status: 'Draft',
+  approvalStatus: 'Draft',
   latestRelease: false,
   live: false,
   amendment: false,

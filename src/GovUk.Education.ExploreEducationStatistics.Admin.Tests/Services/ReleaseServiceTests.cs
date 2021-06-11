@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Status = ReleaseStatus.Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -389,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Status = ReleaseStatus.Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -449,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Status = ReleaseStatus.Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -558,7 +558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Status = ReleaseStatus.Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
                         }
                     );
 
@@ -798,7 +798,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
                         }
                     );
 
@@ -877,7 +877,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
                         }
                     );
 
@@ -947,7 +947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Approved
+                            ApprovalStatus = ReleaseApprovalStatus.Approved
                         }
                     );
 
@@ -1005,7 +1005,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
                         }
                     );
 
@@ -1061,7 +1061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Approved,
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
                             PublishMethod = PublishMethod.Scheduled
                         }
                     );
@@ -1177,7 +1177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
 
                         }
                     );
@@ -1314,7 +1314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
 
                         }
                     );

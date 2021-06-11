@@ -14,7 +14,7 @@ using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publis
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -29,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that only users with the "UpdateAllReleases" claim can
                 // update an arbitrary Release if it has not started publishing
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
                         {
                             Id = Guid.NewGuid(),
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
@@ -52,13 +52,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no users can update an arbitrary Release
                 // if it has started publishing
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
                         {
                             Id = Guid.NewGuid(),
-                            Status = status,
+                            ApprovalStatus = status,
                         };
 
                         await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
@@ -74,13 +74,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no users can update an arbitrary
                 // Release if it has been published
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
                         {
                             Id = Guid.NewGuid(),
-                            Status = status,
+                            ApprovalStatus = status,
                             Published = DateTime.UtcNow
                         };
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 Id = Guid.NewGuid()
                             },
                             Published = null,
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         // Assert that a User who has the Publication Owner role on a
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishing()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 Id = Guid.NewGuid()
                             },
                             Published = null,
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         // Assert that no User Publication roles will allow updating a Release once it has started publishing
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status,
+                            ApprovalStatus = status,
                             Published = DateTime.UtcNow
                         };
 
@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 Id = Guid.NewGuid()
                             },
                             Published = null,
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishing()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 Id = Guid.NewGuid()
                             },
                             Published = null,
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         // Assert that no User Release roles will allow updating a Release once it has started publishing
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -273,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status,
+                            ApprovalStatus = status,
                             Published = DateTime.UtcNow
                         };
 

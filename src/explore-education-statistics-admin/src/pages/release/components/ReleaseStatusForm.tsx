@@ -26,7 +26,7 @@ export interface ReleaseStatusFormValues {
   publishMethod?: 'Scheduled' | 'Immediate';
   publishScheduled?: Date;
   nextReleaseDate?: PartialDate;
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   internalReleaseNote: string;
 }
 
@@ -34,7 +34,7 @@ export const formId = 'releaseStatusForm';
 
 const errorMappings = [
   mapFieldErrors<ReleaseStatusFormValues>({
-    target: 'status',
+    target: 'approvalStatus',
     messages: {
       APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
         'Enter a publish scheduled date before approving',
@@ -76,12 +76,12 @@ const ReleaseStatusForm = ({
   onSubmit,
 }: Props) => {
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
-    async ({ status, publishMethod, publishScheduled, ...values }) => {
-      const isApproved = status === 'Approved';
+    async ({ approvalStatus, publishMethod, publishScheduled, ...values }) => {
+      const isApproved = approvalStatus === 'Approved';
 
       await onSubmit({
         ...values,
-        status,
+        approvalStatus,
         publishMethod: isApproved ? publishMethod : undefined,
         publishScheduled:
           isApproved && publishScheduled && publishMethod === 'Scheduled'
@@ -96,7 +96,7 @@ const ReleaseStatusForm = ({
     <Formik<ReleaseStatusFormValues>
       enableReinitialize
       initialValues={{
-        status: release.status,
+        approvalStatus: release.approvalStatus,
         internalReleaseNote: release.internalReleaseNote ?? '',
         publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
         publishScheduled: release.publishScheduled
@@ -106,14 +106,14 @@ const ReleaseStatusForm = ({
       }}
       onSubmit={handleSubmit}
       validationSchema={Yup.object<ReleaseStatusFormValues>({
-        status: Yup.string().required('Choose a status') as StringSchema<
-          ReleaseStatusFormValues['status']
-        >,
-        internalReleaseNote: Yup.string().when('status', {
+        approvalStatus: Yup.string().required(
+          'Choose a status',
+        ) as StringSchema<ReleaseStatusFormValues['approvalStatus']>,
+        internalReleaseNote: Yup.string().when('approvalStatus', {
           is: value => ['Approved', 'HigherLevelReview'].includes(value),
           then: Yup.string().required('Enter an internal note'),
         }),
-        publishMethod: Yup.string().when('status', {
+        publishMethod: Yup.string().when('approvalStatus', {
           is: 'Approved',
           then: Yup.string().required('Choose when to publish'),
         }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
@@ -159,7 +159,7 @@ const ReleaseStatusForm = ({
         <Form id={formId}>
           <FormFieldRadioGroup<ReleaseStatusFormValues>
             legend="Status"
-            name="status"
+            name="approvalStatus"
             order={[]}
             options={[
               {
@@ -188,7 +188,7 @@ const ReleaseStatusForm = ({
             rows={3}
           />
 
-          {form.values.status === 'Approved' && (
+          {form.values.approvalStatus === 'Approved' && (
             <FormFieldRadioGroup<ReleaseStatusFormValues>
               name="publishMethod"
               legend="When to publish"

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 new UserReleaseRoleRepository(contentDbContext)),
                         new Release
                         {
-                            Status = ReleaseStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft
                         });
             }
 
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 new UserReleaseRoleRepository(contentDbContext)),
                         new Release
                         {
-                            Status = ReleaseStatus.Approved
+                            ApprovalStatus = ReleaseApprovalStatus.Approved
                         },
                         UpdateAllReleases);
             }
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = ReleaseStatus.Draft
+                    ApprovalStatus = ReleaseApprovalStatus.Draft
                 };
                 
                 // Assert that no User Publication roles will allow assigning pre release contacts to a release that's not approved
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = ReleaseStatus.Approved
+                    ApprovalStatus = ReleaseApprovalStatus.Approved
                 };
 
                 // Assert that users with the Publication Owner role can assign pre release contacts to a release that's approved
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = ReleaseStatus.Draft
+                        ApprovalStatus = ReleaseApprovalStatus.Draft
                     });
             }
 
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = ReleaseStatus.Approved
+                        ApprovalStatus = ReleaseApprovalStatus.Approved
                     },
                     Approver, Contributor, Lead);
             }
