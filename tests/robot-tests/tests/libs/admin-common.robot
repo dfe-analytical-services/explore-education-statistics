@@ -28,6 +28,7 @@ user signs in as analyst1
     user signs in as  ANALYST
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
+    
     user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
 
     user checks breadcrumb count should be  2
