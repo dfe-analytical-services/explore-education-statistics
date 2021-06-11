@@ -75,7 +75,6 @@ Give Analyst1 User1 publication owner access
 
     user waits until element is enabled  css:[name="selectedPublicationRole"]
     user selects from list by label  css:[name="selectedPublicationRole"]  Owner
-    
     user clicks button  Add publication access
     
 Sign in as Analyst1 User1 (publication owner) & navigate to publication
@@ -136,11 +135,9 @@ Assert publication owner cannot approve release for immediate publication
 
 Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
-
     user clicks radio   Ready for higher review
     user enters text into element  id:releaseStatusForm-internalReleaseNote     ready for higher review (publication owner)
     user clicks button  Update status 
-    
     user waits until element is visible  //*[@id="CurrentReleaseStatus-Awaiting higher review"]
     
 Assert publication owner can edit release status to "In draft"
@@ -207,13 +204,10 @@ Remove publication owner access
 Give release approver access to Analyst1
     [Tags]  HappyPath
     user scrolls to element  css:[name="selectedReleaseId"]
-    
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-
     user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  Approver
-    
     user clicks button  Add release access
 
 Check release owner can access release
@@ -285,7 +279,6 @@ Assign viewer only access to Analyst1
     user waits until page does not contain loading spinner
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-
     user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  Viewer
     user clicks button  Add release access
@@ -331,13 +324,10 @@ Navigate to manage users page to remove viewer access
 Give release contributor access to Analyst1
     [Tags]  HappyPath
     user scrolls to element  css:[name="selectedReleaseId"]
-    
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-
     user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
-    
     user clicks button  Add release access
 
 Login as a release contributor 
