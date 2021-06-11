@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             TopicViewModel topic,
             ContactViewModel contact,
             ExternalMethodologyViewModel externalMethodology,
-            MethodologySummaryViewModel methodology)
+            List<MethodologySummaryViewModel> methodologies)
         {
             Id = id;
             Title = title;
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             Topic = topic;
             Contact = contact;
             ExternalMethodology = externalMethodology;
-            Methodology = methodology;
+            Methodologies = methodologies;
         }
 
         public Guid Id { get; }
@@ -60,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 
         public ExternalMethodologyViewModel ExternalMethodology { get; }
 
-        public MethodologySummaryViewModel Methodology { get; }
+        // TODO SOW4 EES-2375 Change UI to expect more than one Methodology
+        public List<MethodologySummaryViewModel> Methodologies { get; }
     }
 }

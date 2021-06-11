@@ -61,6 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "third contact team name"
         };
 
+        private static readonly MethodologyParent Methodology = new MethodologyParent
+        {
+            Id = Guid.NewGuid(),
+            Slug = "methodology-slug"
+        };
+
         private static readonly Publication PublicationA = new Publication
         {
             Id = Guid.NewGuid(),
@@ -126,11 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "publication-c",
             Summary = "third publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
-        };
-
-        private static readonly List<Publication> Publications = new List<Publication>
-        {
-            PublicationA, PublicationB, PublicationC
         };
 
         private static readonly Release PublicationARelease1V0 = new Release
@@ -243,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 context.Add(Theme);
                 context.Add(Topic);
-                context.AddRange(Publications);
+                context.AddRange(PublicationA, PublicationB, PublicationC);
                 context.AddRange(Releases);
 
                 context.SaveChanges();
@@ -278,18 +279,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetViewModelAsync()
+        public async Task GetViewModel()
         {
             var contextId = Guid.NewGuid().ToString();
 
             using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                context.Add(Theme);
-                context.Add(Topic);
-                context.AddRange(Publications);
-                context.AddRange(Releases);
-
-                context.SaveChanges();
+                await context.AddAsync(Theme);
+                await context.AddAsync(Topic);
+                await context.AddRangeAsync(PublicationA, PublicationB, PublicationC);
+                await context.AddRangeAsync(Releases);
+                await context.AddAsync(new PublicationMethodology
+                {
+                    MethodologyParent = Methodology,
+                    Publication = PublicationA,
+                    Owner = true
+                });
+                await context.SaveChangesAsync();
             }
 
             using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -301,42 +307,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var service = BuildPublicationService(context, releaseService: releaseService.Object);
 
-                var result = service.GetViewModelAsync(PublicationA.Id, Enumerable.Empty<Guid>());
-                Assert.True(result.IsCompleted);
-                var viewModel = result.Result;
+                var result = await service.GetViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
 
-                Assert.Equal(PublicationA.Id, viewModel.Id);
-                Assert.Equal("Publication A", viewModel.Title);
-                Assert.Equal("publication-a", viewModel.Slug);
-                Assert.Equal("first publication description", viewModel.Description);
-                Assert.Equal("first publication data source", viewModel.DataSource);
-                Assert.Equal("first publication summary", viewModel.Summary);
-                Assert.Equal(PublicationARelease1V1.Id, viewModel.LatestReleaseId);
-                Assert.Contains(PublicationARelease1V1.Id, viewModel.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(PublicationARelease1V0.Id, viewModel.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(PublicationARelease1V1Deleted.Id, viewModel.Releases.Select(r => r.Id));
+                Assert.Equal(PublicationA.Id, result.Id);
+                Assert.Equal("Publication A", result.Title);
+                Assert.Equal("publication-a", result.Slug);
+                Assert.Equal("first publication description", result.Description);
+                Assert.Equal("first publication data source", result.DataSource);
+                Assert.Equal("first publication summary", result.Summary);
+                Assert.Equal(PublicationARelease1V1.Id, result.LatestReleaseId);
+                Assert.Contains(PublicationARelease1V1.Id, result.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(PublicationARelease1V0.Id, result.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(PublicationARelease1V1Deleted.Id, result.Releases.Select(r => r.Id));
 
-                Assert.NotNull(viewModel.Topic);
-                var topic = viewModel.Topic;
+                Assert.NotNull(result.Topic);
+                var topic = result.Topic;
 
                 Assert.NotNull(topic.Theme);
                 var theme = topic.Theme;
                 Assert.Equal(Theme.Title, theme.Title);
 
-                Assert.NotNull(viewModel.Contact);
-                var contact = viewModel.Contact;
+                Assert.NotNull(result.Contact);
+                var contact = result.Contact;
                 Assert.Equal("first contact name", contact.ContactName);
                 Assert.Equal("first contact tel no", contact.ContactTelNo);
                 Assert.Equal("first@contact.com", contact.TeamEmail);
                 Assert.Equal("first contact team name", contact.TeamName);
 
-                Assert.NotNull(viewModel.ExternalMethodology);
-                var externalMethodology = viewModel.ExternalMethodology;
+                Assert.NotNull(result.ExternalMethodology);
+                var externalMethodology = result.ExternalMethodology;
                 Assert.Equal("external methodology title", externalMethodology.Title);
                 Assert.Equal("http://external.methodology/", externalMethodology.Url);
 
-                Assert.NotNull(viewModel.LegacyReleases);
-                var legacyReleases = viewModel.LegacyReleases;
+                Assert.NotNull(result.LegacyReleases);
+                var legacyReleases = result.LegacyReleases;
                 Assert.Equal(3, legacyReleases.Count);
                 Assert.Equal("Academic Year 2010/11", legacyReleases[0].Description);
                 Assert.Equal("http://link.three/", legacyReleases[0].Url);
@@ -345,8 +349,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
                 Assert.Equal("http://link.one/", legacyReleases[2].Url);
 
-                Assert.NotNull(viewModel.Releases);
-                var releases = viewModel.Releases;
+                Assert.Single(result.Methodologies);
+                Assert.Equal(Methodology.Id, result.Methodologies[0].Id);
+                Assert.Equal("methodology-slug", result.Methodologies[0].Slug);
+
+                Assert.NotNull(result.Releases);
+                var releases = result.Releases;
                 Assert.Equal(3, releases.Count);
                 Assert.Equal(PublicationARelease2.Id, releases[0].Id);
                 Assert.Equal("publication-a-release-2018-q2", releases[0].Slug);

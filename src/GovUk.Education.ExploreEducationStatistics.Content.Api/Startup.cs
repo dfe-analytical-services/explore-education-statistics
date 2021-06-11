@@ -95,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
+            services.AddTransient<IMethodologyService, MethodologyService>();
 
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);

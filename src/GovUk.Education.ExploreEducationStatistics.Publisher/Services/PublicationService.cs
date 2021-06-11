@@ -38,11 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _contentDbContext.Publications.FindAsync(id);
         }
 
-        public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
+        public async Task<CachedPublicationViewModel> GetViewModel(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
             var publication = await _contentDbContext.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.LegacyReleases)
+                .Include(p => p.Methodologies)
+                .ThenInclude(pm => pm.MethodologyParent)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .SingleOrDefaultAsync(p => p.Id == id);

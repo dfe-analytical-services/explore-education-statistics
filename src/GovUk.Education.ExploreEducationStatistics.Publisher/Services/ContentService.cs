@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CachePublication(Guid publicationId, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = await _publicationService.GetViewModelAsync(publicationId, includedReleaseIds);
+            var viewModel = await _publicationService.GetViewModel(publicationId, includedReleaseIds);
             await Upload(prefix => PublicContentPublicationPath(viewModel.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 

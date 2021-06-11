@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using Microsoft.Azure.Management.DataFactory.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
@@ -26,19 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
-            CreateMap<Methodology, MethodologySummaryViewModel>();
+            CreateMap<PublicationMethodology, MethodologySummaryViewModel>()
+                .IncludeMembers(pm => pm.MethodologyParent);
 
-            CreateMap<Methodology, MethodologyViewModel>()
-                .ForMember(dest => dest.Content,
-                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
-                .ForMember(dest => dest.Annexes,
-                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
+            CreateMap<MethodologyParent, MethodologySummaryViewModel>();
 
             CreateMap<Publication, PublicationTitleViewModel>();
 
             CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.LegacyReleases,
                     m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
+                .ForMember(dest => dest.Methodologies,
+                    m => m.MapFrom(p => p.Methodologies))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Publication, Data.Model.Publication>()

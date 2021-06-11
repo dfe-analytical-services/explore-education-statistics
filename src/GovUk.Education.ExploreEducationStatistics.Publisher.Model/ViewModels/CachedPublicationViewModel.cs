@@ -27,8 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ContactViewModel Contact { get; set; }
 
-        // TODO SOW4 EES-2375 Remove this when Content API returns methodology from Content database
-        public MethodologySummaryViewModel Methodology { get; set; }
+        public List<MethodologySummaryViewModel> Methodologies { get; set; }
 
         public ExternalMethodologyViewModel ExternalMethodology { get; set; }
     }

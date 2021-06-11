@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -183,96 +181,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetViewModel()
-        {
-            var methodology = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Slug = "methodology-slug",
-                Title = "Methodology",
-                Summary = "Methodology summary",
-                Published = new DateTime(2019, 1, 01),
-                Updated = new DateTime(2019, 1, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
-            };
-            
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Methodologies.AddAsync(methodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext);
-
-                var result = await service.GetViewModelAsync(methodology.Id, PublishContext());
-
-                Assert.Equal(methodology.Id, result.Id);
-                Assert.Equal("Methodology", result.Title);
-                Assert.Equal(new DateTime(2019, 1, 01), result.Published);
-                Assert.Equal(new DateTime(2019, 1, 15), result.Updated);
-                Assert.Equal("Methodology summary", result.Summary);
-
-                var annexes = result.Annexes;
-                Assert.NotNull(annexes);
-                Assert.Empty(annexes);
-
-                var content = result.Content;
-                Assert.NotNull(content);
-                Assert.Empty(content);
-            }
-        }
-
-        [Fact]
-        public async Task GetViewModel_NotYetPublished()
-        {
-            var methodology = new Methodology
-            {
-                Slug = "methodology-slug",
-                Title = "Methodology",
-                Summary = "Methodology summary",
-                Published = null,
-                Updated = new DateTime(2019, 6, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
-            };
-            
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Methodologies.AddAsync(methodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext);
-
-                var context = PublishContext();
-                var result = await service.GetViewModelAsync(methodology.Id, context);
-
-                Assert.Equal(methodology.Id, result.Id);
-                Assert.Equal("Methodology", result.Title);
-                Assert.Equal(context.Published, result.Published);
-                Assert.Equal(new DateTime(2019, 6, 15), result.Updated);
-                Assert.Equal("Methodology summary", result.Summary);
-
-                var annexes = result.Annexes;
-                Assert.NotNull(annexes);
-                Assert.Empty(annexes);
-
-                var content = result.Content;
-                Assert.NotNull(content);
-                Assert.Empty(content);
-            }
-        }
-
-        [Fact]
         public async Task GetByRelease()
         {
             var release = new Release
@@ -335,12 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var result = await service.GetByRelease(release.Id);
                 Assert.Empty(result);
             }
-        }
-
-        private static PublishContext PublishContext()
-        {
-            var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-            return new PublishContext(published, true);
         }
 
         private MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
