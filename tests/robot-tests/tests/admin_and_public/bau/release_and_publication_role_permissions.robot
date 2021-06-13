@@ -198,17 +198,23 @@ Navigate to manage users
     user waits until page does not contain loading spinner
 
 Remove publication owner access 
+    [Tags]  HappyPath
+    user waits for page to finish loading    
+    user waits until element is enabled  css:[name="selectedPublicationId"]
     user scrolls to element  css:[name="selectedPublicationId"]
     user clicks element  css:[data-testid="remove-publication-role-${PUBLICATION_NAME}"]
+    user waits until page does not contain loading spinner
 
 Give release approver access to Analyst1
     [Tags]  HappyPath
-    user scrolls to element  css:[name="selectedReleaseId"]
+    user waits for page to finish loading
     user waits until element is enabled  css:[name="selectedReleaseId"]
+    user scrolls to element  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
     user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  Approver
     user clicks button  Add release access
+    user waits until page does not contain loading spinner
 
 Check release owner can access release
     [Tags]  HappyPath
@@ -273,6 +279,7 @@ Remove release owner access from Analyst1
     [Tags]  HappyPath
     user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
     user clicks element  css:[data-testid="remove-release-role-Approver"]
+    user waits until page does not contain loading spinner
 
 Assign viewer only access to Analyst1
     [Tags]  HappyPath
