@@ -9,11 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyService
     {
-        Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync();
+        Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId);
+        
+        Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublications();
 
-        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id);
+        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
 
-        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request);
     }
 }

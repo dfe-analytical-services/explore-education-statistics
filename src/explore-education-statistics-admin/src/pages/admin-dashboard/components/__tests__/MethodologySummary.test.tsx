@@ -1,15 +1,32 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
+import _methodologyService, {
+  BasicMethodology,
+} from '@admin/services/methodologyService';
 import {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
 import React from 'react';
-import { MemoryRouter } from 'react-router';
-import userEvent from '@testing-library/user-event';
-import { BasicMethodology } from 'src/services/methodologyService';
+import { MemoryRouter, Router } from 'react-router';
+
+const createMemoryHistoryWithMockedPush = () => {
+  const history = createMemoryHistory();
+  return {
+    ...history,
+    push: jest.fn(),
+  };
+};
+
+jest.mock('@admin/services/methodologyService');
+
+const methodologyService = _methodologyService as jest.Mocked<
+  typeof _methodologyService
+>;
 
 const testContact: PublicationContactDetails = {
   id: 'contact-1',
@@ -76,7 +93,38 @@ const testPublicationWithExternalMethodology = {
 const testTopicId = 'topic-id';
 
 describe('MethodologySummary', () => {
-  describe('Does not have a methodology', () => {
+  describe('Create Methodology', () => {
+    test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
+      methodologyService.createMethodology.mockResolvedValue(testMethodology);
+
+      const history = createMemoryHistoryWithMockedPush();
+
+      render(
+        <Router history={history}>
+          <MethodologySummary
+            publication={testPublicationNoMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </Router>,
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Create methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(methodologyService.createMethodology).toHaveBeenCalledWith(
+          testPublicationNoMethodology.id,
+        );
+        expect(history.push).toBeCalledWith(
+          `/publication/${testPublicationNoMethodology.id}/methodology/${testMethodology.id}/summary`,
+        );
+      });
+    });
+  });
+
+  describe('renders correctly when no Methodology is supplied', () => {
     test('the create and link methodology buttons are shown', () => {
       render(
         <MemoryRouter>
@@ -89,7 +137,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Create methodology', { selector: 'a' }),
+        screen.queryByTestId('methodology-summary-link'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
       ).toBeInTheDocument();
 
       expect(
@@ -130,7 +182,7 @@ describe('MethodologySummary', () => {
     });
   });
 
-  describe('Has a methodology', () => {
+  describe('renders correctly with a Methodology', () => {
     test('the methodology is shown', () => {
       render(
         <MemoryRouter>

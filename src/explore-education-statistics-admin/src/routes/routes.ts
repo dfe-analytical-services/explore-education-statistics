@@ -4,7 +4,6 @@ import ContactUsPage from '@admin/pages/ContactUsPage';
 import LegacyReleasesPageContainer from '@admin/pages/legacy-releases/LegacyReleasesPageContainer';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
-import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
@@ -114,14 +113,6 @@ export const methodologiesIndexRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-// TODO EES-2153 Remove this route to the Create Methodology page
-export const methodologyCreateRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/create-methodology',
-  component: MethodologyCreatePage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-  exact: true,
-};
-
 export const methodologyRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/methodology/:methodologyId',
   component: MethodologyPage,
@@ -181,7 +172,6 @@ const routes = {
   publicationCreateRoute,
   publicationEditRoute,
   methodologiesIndexRoute,
-  methodologyCreateRoute,
   methodologyRoute,
   preReleaseRoute,
   preReleaseContentRoute,

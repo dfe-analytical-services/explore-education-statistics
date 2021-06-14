@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,15 +30,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMapper _mapper;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
 
-        public MethodologyService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public MethodologyService(
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
             IMapper mapper,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
+            IMethodologyRepository methodologyRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService)
@@ -47,12 +51,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _mapper = mapper;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
+            _methodologyRepository = methodologyRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
+        public Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
+                .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(publicationId))
+                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+        }
+
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(id)
@@ -60,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync()
+        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublications()
         {
             return await _userService
                 .CheckCanViewAllMethodologies()
@@ -92,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
@@ -128,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         await _publishingService.MethodologyChanged(methodology.Id);
                     }
 
-                    return await GetSummaryAsync(id);
+                    return await GetSummary(id);
                 });
         }
 
