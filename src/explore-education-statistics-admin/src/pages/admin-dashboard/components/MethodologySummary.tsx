@@ -197,39 +197,39 @@ const MethodologySummary = ({
         <>
           {externalMethodology?.url ? (
             <>
-              {!showEditExternalMethodologyForm && (
+              {!showEditExternalMethodologyForm ? (
                 <>
                   <Link to={externalMethodology.url} unvisited>
                     {externalMethodology.title} (external methodology)
                   </Link>
-                  <ButtonGroup className="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
-                    <Button
-                      type="button"
-                      onClick={() => setShowEditExternalMethodologyForm(true)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="warning"
-                      onClick={handleRemoveExternalMethodology}
-                    >
-                      Remove
-                    </Button>
-                  </ButtonGroup>
+                  {publication.permissions.canCreateMethodologies && (
+                    <ButtonGroup className="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
+                      <Button
+                        type="button"
+                        onClick={() => setShowEditExternalMethodologyForm(true)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="warning"
+                        onClick={handleRemoveExternalMethodology}
+                      >
+                        Remove
+                      </Button>
+                    </ButtonGroup>
+                  )}
                 </>
+              ) : (
+                <MethodologyExternalLinkForm
+                  initialValues={externalMethodology}
+                  onCancel={() => setShowEditExternalMethodologyForm(false)}
+                  onSubmit={values => {
+                    handleExternalMethodologySubmit(values);
+                    setShowEditExternalMethodologyForm(false);
+                  }}
+                />
               )}
-              {showEditExternalMethodologyForm &&
-                publication.permissions.canCreateMethodologies && (
-                  <MethodologyExternalLinkForm
-                    initialValues={externalMethodology}
-                    onCancel={() => setShowEditExternalMethodologyForm(false)}
-                    onSubmit={values => {
-                      handleExternalMethodologySubmit(values);
-                      setShowEditExternalMethodologyForm(false);
-                    }}
-                  />
-                )}
             </>
           ) : (
             <>
@@ -247,7 +247,6 @@ const MethodologySummary = ({
                           generatePath<MethodologyRouteParams>(
                             methodologySummaryRoute.path,
                             {
-                              publicationId,
                               methodologyId,
                             },
                           ),

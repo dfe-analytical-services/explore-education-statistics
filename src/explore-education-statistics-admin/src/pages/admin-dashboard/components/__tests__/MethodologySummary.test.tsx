@@ -144,7 +144,7 @@ describe('MethodologySummary', () => {
           testPublicationNoMethodology.id,
         );
         expect(history.push).toBeCalledWith(
-          `/publication/${testPublicationNoMethodology.id}/methodology/${testMethodology.id}/summary`,
+          `/methodology/${testMethodology.id}/summary`,
         );
       });
     });
@@ -311,7 +311,7 @@ describe('MethodologySummary', () => {
   });
 
   describe('Has an external methodology', () => {
-    test('the external methodology link and buttons are shown', () => {
+    test('renders the external methodology link and buttons if the user can edit or remove it', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -323,7 +323,9 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Ext methodolology title (external methodology)'),
+        screen.queryByText('Ext methodolology title (external methodology)', {
+          selector: 'a',
+        }),
       ).toBeInTheDocument();
 
       expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
@@ -331,6 +333,36 @@ describe('MethodologySummary', () => {
       expect(
         screen.getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
+    });
+
+    test('does not render the external methodology link and buttons if the user cannot edit or remove it', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationWithExternalMethodology,
+              permissions: {
+                ...testPublicationWithExternalMethodology.permissions,
+                canCreateMethodologies: false,
+              },
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByText('Ext methodolology title (external methodology)'),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Remove' }),
+      ).not.toBeInTheDocument();
     });
   });
 

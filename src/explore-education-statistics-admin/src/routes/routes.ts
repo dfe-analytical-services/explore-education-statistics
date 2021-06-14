@@ -114,7 +114,7 @@ export const methodologiesIndexRoute: ProtectedRouteProps = {
 };
 
 export const methodologyRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/methodology/:methodologyId',
+  path: '/methodology/:methodologyId',
   component: MethodologyPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };
