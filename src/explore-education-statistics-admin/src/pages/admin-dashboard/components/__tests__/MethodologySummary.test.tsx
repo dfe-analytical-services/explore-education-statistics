@@ -82,6 +82,7 @@ const testPublicationNoMethodology: MyPublication = {
   permissions: {
     canCreateReleases: true,
     canUpdatePublication: true,
+    canCreateMethodologies: true,
   },
 };
 
@@ -146,6 +147,34 @@ describe('MethodologySummary', () => {
           `/publication/${testPublicationNoMethodology.id}/methodology/${testMethodology.id}/summary`,
         );
       });
+    });
+
+    test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              permissions: {
+                ...testPublicationNoMethodology.permissions,
+                canCreateMethodologies: false,
+              },
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Link to an externally hosted methodology',
+        }),
+      ).not.toBeInTheDocument();
     });
   });
 
