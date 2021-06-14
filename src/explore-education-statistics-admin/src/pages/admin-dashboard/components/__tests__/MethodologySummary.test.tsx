@@ -1,7 +1,7 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
 import _methodologyService, {
   BasicMethodology,
-  MyMethodology
+  MyMethodology,
 } from '@admin/services/methodologyService';
 import {
   ExternalMethodology,
@@ -9,25 +9,17 @@ import {
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import createMemoryHistoryWithMockedPush from '@admin-test/createMemoryHistoryWithMockedPush';
 
 jest.mock('@admin/services/methodologyService');
 
 const methodologyService = _methodologyService as jest.Mocked<
   typeof _methodologyService
 >;
-
-const createMemoryHistoryWithMockedPush = () => {
-  const history = createMemoryHistory();
-  return {
-    ...history,
-    push: jest.fn(),
-  };
-};
 
 const testContact: PublicationContactDetails = {
   id: 'contact-1',
@@ -302,9 +294,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Ext methodolology title (external methodology)', {
-          selector: 'a',
-        }),
+        screen.queryByText('Ext methodolology title (external methodology)'),
       ).toBeInTheDocument();
 
       expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
@@ -398,16 +388,17 @@ describe('MethodologySummary', () => {
           />
         </Router>,
       );
+
       userEvent.click(
         screen.getByText('Amend methodology', { selector: 'button' }),
       );
       await waitFor(() => {
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByText('Confirm', { selector: 'button' }));
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(
