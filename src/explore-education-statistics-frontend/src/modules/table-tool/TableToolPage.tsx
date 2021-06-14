@@ -41,9 +41,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   themeMeta,
 }) => {
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
+  const [updateStep, setUpdateStep] = useState(false);
   useEffect(() => {
     if (fastTrack && subjectMeta) {
       setLoadingFastTrack(false);
+      setUpdateStep(false);
     }
   }, [fastTrack, subjectMeta]);
 
@@ -118,12 +120,16 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
+        updateStep={updateStep}
         loadingFastTrack={loadingFastTrack}
         renderHighlightLink={highlight => (
           <Link
             to="/data-tables/fast-track/[fastTrackId]"
             as={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {
+              if (fastTrack && fastTrack?.id === highlight.id) {
+                setUpdateStep(true);
+              }
               setLoadingFastTrack(true);
               logEvent({
                 category: 'Table tool',

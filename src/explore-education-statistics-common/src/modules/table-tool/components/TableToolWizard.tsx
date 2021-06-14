@@ -71,6 +71,7 @@ export interface TableToolWizardProps {
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
   loadingFastTrack?: boolean;
+  updateStep?: boolean;
 }
 
 const TableToolWizard = ({
@@ -82,6 +83,7 @@ const TableToolWizard = ({
   finalStep,
   onSubmit,
   loadingFastTrack = false,
+  updateStep = false,
 }: TableToolWizardProps) => {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -281,6 +283,7 @@ const TableToolWizard = ({
             scrollOnMount={scrollOnMount}
             initialStep={state.initialStep}
             id="tableToolWizard"
+            updateStep={updateStep}
             onStepChange={async (nextStep, previousStep) => {
               if (nextStep < previousStep) {
                 const confirmed = await askConfirm();

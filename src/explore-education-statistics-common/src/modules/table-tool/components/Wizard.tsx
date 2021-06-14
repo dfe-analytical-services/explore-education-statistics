@@ -26,6 +26,7 @@ interface Props {
   initialStep?: number;
   id: string;
   scrollOnMount?: boolean;
+  updateStep?: boolean;
   onStepChange?: (
     nextStep: number,
     previousStep: number,
@@ -37,6 +38,7 @@ const Wizard = ({
   initialStep = 1,
   id,
   scrollOnMount = false,
+  updateStep,
   onStepChange,
 }: Props) => {
   const [shouldScroll, setShouldScroll] = useState(scrollOnMount);
@@ -75,7 +77,7 @@ const Wizard = ({
 
   useEffect(() => {
     setCurrentStepState(initialStep);
-  }, [initialStep]);
+  }, [initialStep, updateStep]);
 
   return (
     <ol className={styles.stepNav} id={id}>
