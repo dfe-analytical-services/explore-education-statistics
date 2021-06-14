@@ -478,7 +478,7 @@ describe('MethodologySummary', () => {
           testPublicationWithMethodologyCanAmend.methodology.id,
         );
         expect(history.push).toBeCalledWith(
-          `/publication/${testPublicationWithMethodologyCanAmend.id}/methodology/${mockMethodology.id}/summary`,
+          `/methodology/${mockMethodology.id}/summary`,
         );
       });
     });

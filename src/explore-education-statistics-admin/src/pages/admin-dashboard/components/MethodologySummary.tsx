@@ -291,7 +291,6 @@ const MethodologySummary = ({
               generatePath<MethodologyRouteParams>(
                 methodologySummaryRoute.path,
                 {
-                  publicationId,
                   methodologyId: amendment.id,
                 },
               ),
