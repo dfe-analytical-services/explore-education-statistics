@@ -57,6 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotNull(methodology.MethodologyParent);
                 Assert.Single(methodology.MethodologyParent.Publications);
                 Assert.Equal(savedPublication, methodology.MethodologyParent.Publications[0].Publication);
+                Assert.Equal(savedPublication.Title, methodology.Title);
+                Assert.Equal(savedPublication.Slug, methodology.Slug);
             }
         }
 
