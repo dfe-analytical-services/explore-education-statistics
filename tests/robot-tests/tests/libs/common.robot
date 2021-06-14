@@ -23,7 +23,19 @@ do this on failure
     capture large screenshot and html
     set selenium timeout  3
 
+custom testid locator strategy
+  [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
+  Log to console  ${tag}
+  Log to console  ${constraints}
+  Log to console  ${test_id}
+  ${element}=   Get WebElement  xpath://*[@data-testid="${test_id}"]
+  [Return]  ${element}
+
+set custom locator strategies
+    add location strategy   testid    custom testid locator strategy
+
 user opens the browser
+    set custom locator strategies
     run keyword if    "${browser}" == "chrome"    user opens chrome
     run keyword if    "${browser}" == "firefox"   user opens firefox
     run keyword if    "${browser}" == "ie"        user opens ie
