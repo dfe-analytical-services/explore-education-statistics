@@ -1,5 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Resource    ../../libs/common.robot
+
 Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData  Footnotes
@@ -129,16 +131,15 @@ Go to "Sign off" page
 
 Assert publication owner cannot approve release for immediate publication
     [Tags]  HappyPath
-    user waits until h2 is visible  Edit release status  30
-    user waits for page to finish loading
-    user checks element is disabled  //*[@id="releaseStatusForm-approvalStatus-Approved"]
+    user waits until page contains element  id:releaseStatusForm-approvalStatus-Approved  30
+    user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
 
 Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
     user clicks radio   Ready for higher review
     user enters text into element  id:releaseStatusForm-internalReleaseNote     ready for higher review (publication owner)
     user clicks button  Update status 
-    user waits until element is visible  //*[@id="CurrentReleaseStatus-Awaiting higher review"]
+    user waits until element is visible  id:CurrentReleaseStatus-Awaiting higher review
     
 Assert publication owner can edit release status to "In draft"
     [Tags]  HappyPath
@@ -184,8 +185,8 @@ Assert publication owner cannot approve release for immediate publication on new
     [Tags]  HappyPath
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status  60
-    user scrolls to element  //*[@id="releaseStatusForm-approvalStatus-Approved"]
-    user checks element is disabled  //*[@id="releaseStatusForm-approvalStatus-Approved"]
+    user scrolls to element  id:releaseStatusForm-approvalStatus-Approved
+    user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
 
 Navigate to administration as bau1 to remove publication owner access
     [Tags]  HappyPath
@@ -199,15 +200,13 @@ Navigate to manage users
 
 Remove publication owner access 
     [Tags]  HappyPath
-    user waits for page to finish loading    
     user waits until element is enabled  css:[name="selectedPublicationId"]
     user scrolls to element  css:[name="selectedPublicationId"]
-    user clicks element  css:[data-testid="remove-publication-role-${PUBLICATION_NAME}"]
+    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
 
 Give release approver access to Analyst1
     [Tags]  HappyPath
-    user waits for page to finish loading
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user scrolls to element  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
@@ -278,12 +277,11 @@ Navigate to manage users as bau1
 Remove release owner access from Analyst1 
     [Tags]  HappyPath
     user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
-    user clicks element  css:[data-testid="remove-release-role-Approver"]
+    user clicks testid element  remove-release-role-Approver
     user waits until page does not contain loading spinner
 
 Assign viewer only access to Analyst1
     [Tags]  HappyPath
-    user waits until page does not contain loading spinner
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
     user waits until element is enabled  css:[name="selectedReleaseRole"]
@@ -306,8 +304,8 @@ Navigate to release as a viewer
     ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}
 
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
-    ${edit_button}=  get child element  ${details}  xpath:.//a[text()="View this release"]
-    user clicks element   ${edit_button}
+    ${view_button}=  get child element  ${details}  xpath:.//a[text()="View this release"]
+    user clicks element   ${view_button}
 
     user waits until h2 is visible  Release summary
     user checks summary list contains   Publication title  ${PUBLICATION_NAME}
