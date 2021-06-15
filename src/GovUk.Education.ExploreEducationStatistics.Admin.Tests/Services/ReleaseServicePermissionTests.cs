@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new ReleaseUpdateViewModel
                             {
-                                Status = ReleaseStatus.Draft
+                                ApprovalStatus = ReleaseApprovalStatus.Draft
                             }
                         );
                     }
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new ReleaseUpdateViewModel
                             {
-                                Status = ReleaseStatus.HigherLevelReview
+                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
                             }
                         );
                     }
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new ReleaseUpdateViewModel
                             {
-                                Status = ReleaseStatus.Approved
+                                ApprovalStatus = ReleaseApprovalStatus.Approved
                             }
                         );
                     }
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
+                .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService: userService.Object,
                             releaseRepository: repository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
+                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
 
                         Assert.Equal(list, result.Right);
 
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
+            repository.Verify(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseStatus.Approved))
+                .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService: userService.Object,
                             releaseRepository: repository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
+                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
 
                         Assert.Equal(list, result.Right);
 
@@ -277,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseStatus.Approved));
+            repository.Verify(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
+                        return await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
                     }
                 );
         }
