@@ -28,7 +28,7 @@ custom testid locator strategy
   Log to console  ${tag}
   Log to console  ${constraints}
   Log to console  ${test_id}
-  ${element}=   Get WebElement  xpath://*[@data-testid="${test_id}"]
+  ${element}=   Execute Javascript  let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
   [Return]  ${element}
 
 set custom locator strategies
