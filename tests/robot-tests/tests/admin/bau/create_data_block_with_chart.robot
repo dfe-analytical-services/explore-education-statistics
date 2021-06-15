@@ -195,7 +195,6 @@ Embed data block into release content
 Validate embedded table rows
     [Tags]  HappyPath
     ${table}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
-    
     user scrolls to element   xpath://button[text()="${CONTENT_SECTION_NAME}"]
     # The below is to avoid React lazy-loading the table which causes the test to fail here
     user scrolls down  400
@@ -356,7 +355,6 @@ Validate line chart embeds correctly
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
-
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     # The below is to avoid React lazy-loading the chart which causes the test to fail here
     user scrolls down  400
@@ -459,7 +457,6 @@ Save and validate vertical bar chart embeds correctly
     user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
-
     user waits until element does not contain line chart  ${datablock}
     # below is to prevent React lazy loading the chart
     user scrolls down  400
@@ -644,7 +641,6 @@ Save and validate geographic chart embeds correctly
     user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
-
     user waits until element does not contain bar chart  ${datablock}
     user waits until element contains map chart  ${datablock}
 

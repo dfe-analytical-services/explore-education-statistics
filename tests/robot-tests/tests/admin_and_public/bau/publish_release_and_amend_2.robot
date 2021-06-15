@@ -130,7 +130,6 @@ Add second footnote to ${SECOND_SUBJECT}
     user waits until h2 is visible  Create footnote
     user clicks footnote radio  ${SECOND_SUBJECT}   Applies to specific data
     user opens details dropdown  Indicators   testid:footnote-subject ${SECOND_SUBJECT}
-    
     user clicks footnote checkbox  Admission Numbers
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SECOND_SUBJECT}

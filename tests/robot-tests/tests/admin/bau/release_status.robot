@@ -14,7 +14,6 @@ ${PUBLICATION_NAME}  UI tests - release status %{RUN_IDENTIFIER}
 *** Keywords ***
 user checks checklist errors contains
     [Arguments]  ${text}
-    # user waits until element contains  css:[data-testid="releaseChecklist-errors"]  ${text}
     user waits until element contains  testid:releaseChecklist-errors  ${text}
 
 user checks checklist warnings contains

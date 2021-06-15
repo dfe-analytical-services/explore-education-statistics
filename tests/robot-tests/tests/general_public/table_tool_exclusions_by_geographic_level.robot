@@ -20,13 +20,12 @@ Select Exclusions publication
     user waits until table tool wizard step is available  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
-Validate "Absence in prus" subject details
+Validate "Exclusions by geographic level" subject details
     [Tags]  HappyPath
-    user opens details dropdown  More details  css:[data-testid="Radio item for Absence in prus"]
-    ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Absence in prus"]
+    user opens details dropdown  More details  css:[data-testid="Radio item for Exclusions by geographic level"]
+    ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Exclusions by geographic level"]
     user checks summary list contains  Geographic levels  Local Authority; National; Regional  ${details}
-    user checks summary list contains  Time period  2013/14 to 2016/17  ${details}
-
+    user checks summary list contains  Time period  2006/07 to 2016/17  ${details}
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
     user clicks radio   Exclusions by geographic level
