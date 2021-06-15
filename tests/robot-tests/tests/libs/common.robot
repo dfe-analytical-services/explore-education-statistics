@@ -29,6 +29,7 @@ custom testid locator strategy
   Log to console  ${constraints}
   Log to console  ${test_id}
   ${element}=   Execute Javascript  let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
+  user waits until element is visible  ${element}  30
   [Return]  ${element}
 
 set custom locator strategies

@@ -22,12 +22,9 @@ Select "Pupil absence" publication
 
 Validate "Absence by characteristic" subject details
     [Tags]  HappyPath
-    user opens details dropdown  More details  testid:Radio item for Absence by characteristic
-    # user opens details dropdown  More details  css:[data-testid="Radio item for Absence by characteristic"]
+    user opens details dropdown  More details  css:[data-testid="Radio item for Absence by characteristic"]
 
-    ${details}=  user gets details content element  More details  testid:Radio item for Absence by characteristic
-
-    # ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Absence by characteristic"]
+    ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Absence by characteristic"]
     user checks summary list contains  Geographic levels  Local Authority; Local Authority District; National  ${details}
     user checks summary list contains  Time period  2012/13 to 2016/17  ${details}
 

@@ -454,7 +454,6 @@ Edit data block for amendment
     user waits until h2 is visible  Data block details
 
     user clicks element  testid:wizardStep-4-goToButton
-    # user clicks element  css:[data-testid="wizardStep-4-goToButton"]
     user clicks button  Confirm
 
     user opens details dropdown  Date

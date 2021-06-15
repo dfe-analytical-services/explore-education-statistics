@@ -34,7 +34,6 @@ Add public prerelease access list
     user presses keys  CTRL+a+BACKSPACE
     user presses keys  Test public access list
     user clicks button  Save access list
-    # user waits until element contains  testid:publicPreReleaseAccessListPreview  Test public access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
 Go to "Sign off" page and approve release
