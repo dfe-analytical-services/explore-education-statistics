@@ -101,7 +101,62 @@ user creates release for publication
     user clicks button  Create new release
     user waits until page contains element  xpath://a[text()="Edit release summary"]
     user waits until h2 is visible  Release summary
-
+    
+user creates methodology for publication
+    [Arguments]  ${publication}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Create methodology
+    user waits until h2 is visible  Methodology summary
+    user checks summary list contains   Title   ${publication}
+    user checks summary list contains   Status  Draft
+    user checks summary list contains   Published on  Not yet published
+    
+user links publication to external methodology
+    [Arguments]  ${publication}     ${title}=${publication} external methodology    ${link}=https://example.com
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Link to an externally hosted methodology
+    user waits until legend is visible   Link to an externally hosted methodology
+    user enters text into textfield  Link title   ${title}
+    user enters text into textfield  URL   ${link}
+    user clicks button  Save
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user checks page contains link with text and url  ${title}  ${link}
+    
+user edits an external methodology
+    [Arguments]  ${publication}     ${new_title}=${publication} external methodology (updated)   ${new_link}=https://example.com/updated    ${original_title}=${publication} external methodology    ${original_link}=https://example.com
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Edit
+    user waits until legend is visible   Link to an externally hosted methodology
+    user checks textfield contains  Link title  ${original_title}
+    user checks textfield contains  URL  ${original_link}
+    user enters text into textfield  Link title   ${new_title}
+    user enters text into textfield  URL   ${new_link}
+    user clicks button  Save
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user waits until page contains testid   Methodology for ${publication}
+    user checks page contains link with text and url    ${new_title}   ${new_link}
+    
+user removes an external methodology from publication
+    [Arguments]  ${publication}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Remove
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user waits until page contains button   Create methodology
+                
 user adds basic release content
     [Arguments]  ${publication}
     user clicks button  Add a summary text block

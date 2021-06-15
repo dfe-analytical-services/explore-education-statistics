@@ -384,5 +384,7 @@ finally:
         print("Combining rerun test results with original test results") 
         outputs_to_merge=["test-results/output.xml","test-results/rerun.xml"]
         robot_rebot_cli(outputs_to_merge, exit=False)
+        
+    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html\n")    
 
     print("Tests finished!")
