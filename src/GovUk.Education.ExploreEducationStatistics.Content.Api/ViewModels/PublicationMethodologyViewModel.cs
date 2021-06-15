@@ -1,6 +1,7 @@
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 {
-    // TODO SOW4 EES-2375 move this to Content API?
     public class PublicationMethodologyViewModel
     {
         public ExternalMethodologyViewModel ExternalMethodology { get; set; }

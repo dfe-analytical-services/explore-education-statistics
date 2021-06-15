@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
