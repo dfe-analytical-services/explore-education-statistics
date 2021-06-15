@@ -34,6 +34,7 @@ Add public prerelease access list
     user presses keys  CTRL+a+BACKSPACE
     user presses keys  Test public access list
     user clicks button  Save access list
+    # user waits until element contains  testid:publicPreReleaseAccessListPreview  Test public access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
 Go to "Sign off" page and approve release
@@ -50,7 +51,8 @@ Create another release for the same publication
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
+    user clicks element  testid:Create new release link for ${PUBLICATION_NAME}
+    # user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001
 
 Verify new release summary
@@ -165,7 +167,8 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     [Tags]  HappyPath
-    user clicks testid element   View stats link for ${PUBLICATION_NAME}
+    user clicks element  testid:View stats link for ${PUBLICATION_NAME}  
+    # user clicks testid element   View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible   ${PUBLICATION_NAME}  90
 
 Check latest release is correct
@@ -260,7 +263,8 @@ Validate table
 
 Select table highlight from subjects step
     [Tags]  HappyPath
-    user clicks testid element  wizardStep-2-goToButton
+    user clicks element  testid:wizardStep-2-goToButton
+    # user clicks testid element  wizardStep-2-goToButton
     user waits until h1 is visible  Go back to previous step
     user clicks button  Confirm
 

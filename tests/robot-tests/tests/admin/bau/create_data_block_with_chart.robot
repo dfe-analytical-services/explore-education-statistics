@@ -14,7 +14,6 @@ ${TOPIC_NAME}               %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}         UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}           UI test data block
 ${CONTENT_SECTION_NAME}     Test data block section
-
 *** Keywords ***
 user counts legend form item rows
     [Arguments]  ${number}
@@ -196,6 +195,7 @@ Embed data block into release content
 Validate embedded table rows
     [Tags]  HappyPath
     ${table}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
+    
     user scrolls to element   xpath://button[text()="${CONTENT_SECTION_NAME}"]
     # The below is to avoid React lazy-loading the table which causes the test to fail here
     user scrolls down  400
@@ -456,6 +456,7 @@ Save and validate vertical bar chart embeds correctly
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
+
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element does not contain line chart  ${datablock}

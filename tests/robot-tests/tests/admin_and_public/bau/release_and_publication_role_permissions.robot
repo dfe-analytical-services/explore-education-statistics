@@ -276,7 +276,8 @@ Navigate to manage users as bau1
     
 Remove release owner access from Analyst1 
     [Tags]  HappyPath
-    user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
+    user waits until element is enabled  testid:remove-release-role-Approver
+    # user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
     user clicks testid element  remove-release-role-Approver
     user waits until page does not contain loading spinner
 

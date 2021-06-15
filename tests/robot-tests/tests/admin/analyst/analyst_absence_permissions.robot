@@ -33,7 +33,8 @@ Validate Analyst1 cannot create a release for Pupil absence topic
     [Tags]  HappyPath
     user waits until page contains accordion section  Pupil absence in schools in England
     user opens accordion section  Pupil absence in schools in England
-    user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
+    user checks page does not contain element  testid:Create new release link for Pupil absence in schools in England
+    # user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
 
 Navigate to Absence release
     [Tags]  HappyPath
@@ -66,6 +67,7 @@ Validate Analyst1 can see 'Content' page key stats
     user checks key stat contents    3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
     user checks key stat definition  3  What is unauthorized absence rate?  Number of unauthorised absences as a percentage of the overall school population.
 
+    # user checks element count is x  testid:keyStat  3
     user checks element count is x    css:[data-testid="keyStat"]   3
 
 Validate Analyst1 can see 'Content' page accordion sections
