@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         {
             logger.LogInformation("{0} triggered at: {1}",
                 context.FunctionName,
-                DateTime.Now);
+                DateTime.UtcNow);
 
             var config = LoadAppSettings(context);
             var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);

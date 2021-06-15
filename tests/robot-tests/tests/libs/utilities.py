@@ -167,12 +167,17 @@ def user_should_be_at_top_of_page():
         raise_assertion_error(
             f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
+
+def prompt_to_continue():
+    warn("Continue? (Y/n)")
+    choice = input()
+    if (choice.lower().startswith("n")):
+        raise_assertion_error('Tests stopped!')
+
+
 def capture_large_screenshot_and_prompt_to_continue():
     capture_large_screenshot()
-    warn("Failure encountered - continue? (Y/n)")
-    choice=input()
-    if (choice.lower().startsWith("n")):
-        raise_assertion_error('Test failed and you chose to stop the tests')
+    prompt_to_continue()
 
 
 def capture_large_screenshot_and_html():

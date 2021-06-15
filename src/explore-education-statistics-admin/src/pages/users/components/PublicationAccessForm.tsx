@@ -114,6 +114,7 @@ const PublicationAccessForm = ({
                       <td className="govuk-table__cell">
                         <ButtonText
                           onClick={() => onRemove(userPublicationRole)}
+                          testId={`remove-publication-role-${userPublicationRole.publication}`}
                         >
                           Remove
                         </ButtonText>

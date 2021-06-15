@@ -153,8 +153,8 @@ user waits until page contains element
     wait until page contains element  ${element}  timeout=${wait}  limit=${limit}
 
 user waits until page does not contain
-    [Arguments]    ${pageText}
-    wait until page does not contain   ${pageText}
+    [Arguments]    ${pageText}   ${wait}=${timeout}
+    wait until page does not contain   ${pageText}   timeout=${wait}
 
 user waits until page does not contain element
     [Arguments]    ${element}    ${wait}=${timeout}
@@ -403,7 +403,7 @@ user checks summary list contains
 
 user selects from list by label
     [Arguments]   ${locator}   ${label}
-    user waits until element is visible  ${locator}
+    user waits until page contains element   ${locator}
     select from list by label   ${locator}   ${label}
 
 user chooses file
@@ -413,6 +413,7 @@ user chooses file
 
 user clears element text
     [Arguments]   ${selector}
+    user clicks element   ${selector}
     user presses keys   CTRL+a+BACKSPACE  ${selector}
     sleep  0.1
 
@@ -555,6 +556,21 @@ user checks page contains other release
 user checks page does not contain other release
     [Arguments]   ${other_release_title}
     user checks page does not contain element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+
+user navigates to public frontend
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}
+    user waits until h1 is visible  Explore our statistics and data
+
+user navigates to find statistics page on public frontend
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/find-statistics
+    user waits until h1 is visible  Find statistics and data
+
+user navigates to data tables page on public frontend
+    environment variable should be set  PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}/data-tables
+    user waits until h1 is visible  Create your own tables
 
 check that variable is not empty
     [Arguments]   ${variable_name}  ${variable_value}

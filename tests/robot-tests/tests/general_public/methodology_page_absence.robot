@@ -55,7 +55,7 @@ Search for "pupil"
 
     user clicks element   id:pageSearchForm-input
     user presses keys  pupil
-    user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 127 results
+    user waits until element contains   id:pageSearchForm-resultsLabel    Found 127 results
     user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  1. Overview of absence statistics
@@ -69,7 +69,7 @@ Search for "specific enquiry"
 
     user clears element text    id:pageSearchForm-input
     user presses keys  specific enquiry   id:pageSearchForm-input
-    user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
+    user waits until element contains     id:pageSearchForm-resultsLabel   Found 1 result
     user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  7. Contacts

@@ -13,7 +13,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -27,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-                Status = ReleaseStatus.Approved,
+                ApprovalStatus = ReleaseApprovalStatus.Approved,
                 Version = 0,
                 PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
             };

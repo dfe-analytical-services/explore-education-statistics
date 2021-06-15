@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = createdById
             };
             var internalReleaseNote = "Release note";
-            var releaseStatus = ReleaseStatus.Approved;
+            var releaseApprovalStatus = ReleaseApprovalStatus.Approved;
             var publishScheduled = DateTime.Now.AddDays(1);
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var releaseName = "2035";
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 TimePeriodCoverage = timePeriodCoverage,
                 PublicationId = publicationId,
                 Published = publishedDate,
-                Status = releaseStatus,
+                ApprovalStatus = releaseApprovalStatus,
                 Version = version,
                 PreviousVersionId = previousVersionReleaseId,
                 Created = createdDate,
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(amendment.PublishScheduled);
                 Assert.Null(amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);
-                Assert.Equal(ReleaseStatus.Draft, amendment.Status);
+                Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
                 Assert.Equal(release.Id, amendment.PreviousVersion?.Id);
                 Assert.Equal(release.Id, amendment.PreviousVersionId);
                 Assert.Equal(_userId, amendment.CreatedBy.Id);

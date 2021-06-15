@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -27,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             _userReleaseRoleRepository = userReleaseRoleRepository;
         }
 
-        protected abstract ReleaseStatus TargetStatus { get; }
+        protected abstract ReleaseApprovalStatus TargetApprovalStatus { get; }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
@@ -45,15 +44,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            switch (TargetStatus)
+            switch (TargetApprovalStatus)
             {
-                case ReleaseStatus.Approved:
+                case ReleaseApprovalStatus.Approved:
                     await HandleApproved(context, requirement, release);
                     break;
-                case ReleaseStatus.HigherLevelReview:
+                case ReleaseApprovalStatus.HigherLevelReview:
                     await HandleHigherLevelReview(context, requirement, release);
                     break;
-                case ReleaseStatus.Draft:
+                case ReleaseApprovalStatus.Draft:
                     await HandleDraft(context, requirement, release);
                     break;
                 default:
@@ -95,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
             var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
-            if (release.Status == ReleaseStatus.Approved
+            if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)
                 : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {
@@ -118,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
             var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
-            if (release.Status == ReleaseStatus.Approved
+            if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)
                 : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {
@@ -142,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
         }
 
-        protected override ReleaseStatus TargetStatus => ReleaseStatus.Draft;
+        protected override ReleaseApprovalStatus TargetApprovalStatus => ReleaseApprovalStatus.Draft;
     }
 
     public class MarkReleaseAsHigherLevelReviewRequirement : IAuthorizationRequirement
@@ -160,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
         }
 
-        protected override ReleaseStatus TargetStatus => ReleaseStatus.HigherLevelReview;
+        protected override ReleaseApprovalStatus TargetApprovalStatus => ReleaseApprovalStatus.HigherLevelReview;
     }
 
     public class MarkReleaseAsApprovedRequirement : IAuthorizationRequirement
@@ -179,6 +178,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
         }
 
-        protected override ReleaseStatus TargetStatus => ReleaseStatus.Approved;
+        protected override ReleaseApprovalStatus TargetApprovalStatus => ReleaseApprovalStatus.Approved;
     }
 }

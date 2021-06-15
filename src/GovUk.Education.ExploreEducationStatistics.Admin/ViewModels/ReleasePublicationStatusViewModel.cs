@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class ReleasePublicationStatusViewModel
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatus Status;
+        public ReleaseApprovalStatus ApprovalStatus;
 
         public bool Amendment;
 

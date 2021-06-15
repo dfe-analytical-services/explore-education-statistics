@@ -14,7 +14,7 @@ describe('ReleaseStatusForm', () => {
   const testRelease: Release = {
     id: 'release-1',
     slug: 'release-1-slug',
-    status: 'Draft',
+    approvalStatus: 'Draft',
     latestRelease: false,
     live: false,
     amendment: false,
@@ -173,7 +173,7 @@ describe('ReleaseStatusForm', () => {
       <ReleaseStatusForm
         release={{
           ...testRelease,
-          status: 'HigherLevelReview',
+          approvalStatus: 'HigherLevelReview',
           nextReleaseDate: {
             month: 10,
             year: 2021,
@@ -229,7 +229,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: '',
-        status: 'Draft',
+        approvalStatus: 'Draft',
       };
 
       await waitFor(() => {
@@ -268,7 +268,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
-        status: 'HigherLevelReview',
+        approvalStatus: 'HigherLevelReview',
         nextReleaseDate: {
           month: 5,
           year: 2021,
@@ -287,7 +287,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'HigherLevelReview',
+            approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -312,7 +312,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'HigherLevelReview',
+            approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -339,7 +339,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'HigherLevelReview',
+            approvalStatus: 'HigherLevelReview',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -366,7 +366,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
-        status: 'Draft',
+        approvalStatus: 'Draft',
         nextReleaseDate: {
           month: 5,
           year: 2021,
@@ -385,7 +385,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -418,7 +418,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
             publishScheduled: '2020-12-15',
           }}
           statusPermissions={testStatusPermissions}
@@ -457,7 +457,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -480,7 +480,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -505,7 +505,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -533,7 +533,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -593,7 +593,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             publishScheduled: format(new Date(), 'yyyy-MM-dd'),
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -620,7 +620,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
-        status: 'Draft',
+        approvalStatus: 'Draft',
         nextReleaseDate: {
           month: 5,
           year: 2021,
@@ -639,7 +639,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -675,7 +675,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
-        status: 'Approved',
+        approvalStatus: 'Approved',
         publishScheduled: new Date('2022-10-10'),
         publishMethod: 'Scheduled',
         nextReleaseDate: {
@@ -696,7 +696,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            status: 'Approved',
+            approvalStatus: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -724,7 +724,7 @@ describe('ReleaseStatusForm', () => {
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
-        status: 'Approved',
+        approvalStatus: 'Approved',
         publishMethod: 'Immediate',
         nextReleaseDate: {
           month: 5,

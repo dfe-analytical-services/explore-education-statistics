@@ -9,6 +9,7 @@
 - [How do I backup and restore the test data on my local environment?](#user-content-how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
 - [Directory structure](#user-content-directory-structure)
 - [Guidelines for people writing UI tests](#user-content-guidelines-for-people-writing-ui-tests)
+- [Troubleshooting](#user-content-troubleshooting)
 - [Who should I talk to?](#user-content-who-should-i-talk-to)  
 
 ## What is this?
@@ -182,7 +183,9 @@ IntelliJ also allows you use to External Tools to right click on a file and run 
 
 Alternatively you can use Pycharm CE (https://www.jetbrains.com/pycharm/download/#section=windows) as an IDE and follow the above steps to enable External Tools. 
 
-# Troubleshooting
+In addition to this you can also use VScode and use the "Robot framework intellisense" extension. 
+
+## Troubleshooting
 
 ### The tests are flaky when I run them locally against the public frontend.
 Try running the frontend with `npm run build & npm run start:prod`.

@@ -37,7 +37,7 @@ user clicks select all for category
 
 user checks previous table tool step contains
     [Arguments]  ${step}   ${key}   ${value}   ${wait}=10
-    wait until page contains element  xpath://*[@id="tableToolWizard-step-${step}"]
+    wait until page contains element  id:tableToolWizard-step-${step}
     ...   timeout=${wait}
     ...   error=Previous step wasn't found!
     wait until page contains element  xpath://*[@id="tableToolWizard-step-${step}"]//dt[text()="${key}"]/..//*[text()="${value}"]

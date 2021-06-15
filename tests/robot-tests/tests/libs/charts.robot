@@ -84,14 +84,12 @@ user checks chart y axis tick contains
     [Arguments]  ${locator}  ${tick}  ${text}
     user waits until parent contains element  ${locator}  css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     ${element}=  get child element  ${locator}  css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
-    user waits until element is visible  ${element}
     user waits until element contains  ${element}  ${text}
 
 user checks chart x axis tick contains
     [Arguments]  ${locator}  ${tick}  ${text}
     user waits until parent contains element  ${locator}  css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     ${element}=  get child element  ${locator}  css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
-    user waits until element is visible  ${element}
     user waits until element contains  ${element}  ${text}
 
 user checks chart y axis ticks
@@ -157,3 +155,20 @@ user checks map chart indicator tile contains
 user checks infographic chart contains alt
     [Arguments]  ${locator}  ${text}
     user waits until parent contains element  ${locator}  css:img[alt="${text}"]
+
+user configures basic chart
+    [Arguments]  ${CHART_TYPE}  ${CHART_HEIGHT}  ${CHART_WIDTH}
+    ${CHART_TYPE_LIST}=  create list  Line  Horizontal bar  Vertical bar  Geographic
+    should contain   ${CHART_TYPE_LIST}   ${CHART_TYPE}
+
+    user waits until h3 is visible  Choose chart type
+    user clicks button  ${CHART_TYPE}
+
+    user waits for chart preview to update
+
+    user enters text into element  id:chartConfigurationForm-height     ${CHART_HEIGHT}
+    user enters text into element  id:chartConfigurationForm-width      ${CHART_WIDTH}
+
+    # Prevent intermittent failure when trying to switch to other chart tab
+    # after running this keyword
+    user clicks link  Chart configuration

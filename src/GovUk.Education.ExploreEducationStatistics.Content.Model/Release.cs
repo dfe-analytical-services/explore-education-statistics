@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
-        public ReleaseStatus Status { get; set; }
+        public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public string InternalReleaseNote { get; set; }
 
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.Id = Guid.NewGuid();
             amendment.Published = null;
             amendment.PublishScheduled = null;
-            amendment.Status = ReleaseStatus.Draft;
+            amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
             amendment.Created = createdDate;
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
