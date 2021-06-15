@@ -6,7 +6,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = Draft
+                        ApprovalStatus = Draft
                     }
                 );
             }
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = Approved
+                        ApprovalStatus = Approved
                     },
                     PublishAllReleases
                 );
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = Draft
+                        ApprovalStatus = Draft
                     }
                 );
             }
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {
-                        Status = Approved
+                        ApprovalStatus = Approved
                     },
                     Approver);
             }

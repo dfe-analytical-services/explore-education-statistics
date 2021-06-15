@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DateTime endTime,
             DateTime referenceTime)
         {
-            if (!release.PublishScheduled.HasValue || release.Status != ReleaseStatus.Approved)
+            if (!release.PublishScheduled.HasValue || release.ApprovalStatus != ReleaseApprovalStatus.Approved)
             {
                 return PreReleaseAccess.NoneSet;
             }

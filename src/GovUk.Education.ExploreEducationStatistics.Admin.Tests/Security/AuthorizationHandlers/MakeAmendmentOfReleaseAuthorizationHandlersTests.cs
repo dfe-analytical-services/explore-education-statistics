@@ -7,7 +7,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     Id = Guid.NewGuid(),
                     Publication = new Publication(),
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no users can amend a draft Release that is the only version
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     Id = Guid.NewGuid(),
                     Publication = new Publication(),
-                    Status = Approved,
+                    ApprovalStatus = Approved,
                     Published = DateTime.UtcNow
                 };
 
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     Publication = publication,
                     PreviousVersionId = previousVersion.Id,
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no users can amend an amendment Release if it is not yet approved
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no User Publication roles will allow a draft Release that is the only version to be amended
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = Approved,
+                    ApprovalStatus = Approved,
                     Published = DateTime.UtcNow
                 };
 
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     Publication = publication,
                     PreviousVersionId = previousVersion.Id,
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
@@ -349,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no User Release roles will allow a draft Release that is the only version to be amended
@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         Id = Guid.NewGuid()
                     },
-                    Status = Approved,
+                    ApprovalStatus = Approved,
                     Published = DateTime.UtcNow
                 };
 
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     Publication = publication,
                     PreviousVersionId = previousVersion.Id,
-                    Status = Draft
+                    ApprovalStatus = Draft
                 };
 
                 // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended

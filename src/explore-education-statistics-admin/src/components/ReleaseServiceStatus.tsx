@@ -4,18 +4,21 @@ import releaseService, {
 } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Tag from '@common/components/Tag';
 import { forceCheck } from 'react-lazyload';
 
 interface Props {
   releaseId: string;
   refreshPeriod?: number;
   exclude?: 'status' | 'details';
+  isApproved?: boolean;
 }
 
 const ReleaseServiceStatus = ({
   releaseId,
   refreshPeriod = 10000,
   exclude,
+  isApproved = false,
 }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
@@ -101,19 +104,28 @@ const ReleaseServiceStatus = ({
   return (
     <>
       {exclude !== 'status' && (
-        <StatusBlock
-          color={statusColor}
-          text={
-            currentStatus
-              ? currentStatus.overallStage
-              : 'Waiting to be scheduled...'
-          }
-          id={
-            currentStatus
-              ? `release-process-status-${currentStatus.overallStage}`
-              : 'release-process-status-WaitingToBeScheduled'
-          }
-        />
+        <>
+          {isApproved &&
+            !['Complete', 'Scheduled'].includes(currentStatus.overallStage) && (
+              <Tag>Approved</Tag>
+            )}
+          <StatusBlock
+            color={statusColor}
+            text={
+              currentStatus
+                ? (currentStatus.overallStage === 'Complete' &&
+                    isApproved &&
+                    'Published') ||
+                  currentStatus.overallStage
+                : 'Waiting to be scheduled...'
+            }
+            id={
+              currentStatus
+                ? `release-process-status-${currentStatus.overallStage}`
+                : 'release-process-status-WaitingToBeScheduled'
+            }
+          />
+        </>
       )}
 
       {currentStatus &&

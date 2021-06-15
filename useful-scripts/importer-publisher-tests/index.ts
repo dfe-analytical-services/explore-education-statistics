@@ -1,6 +1,6 @@
 /* eslint-disable */
 import axios from 'axios';
-import dotenv from 'dotenv';
+import 'dotenv-safe/config';
 import { v4 } from 'uuid';
 import fs from 'fs';
 import StreamZip from 'node-stream-zip';
@@ -14,7 +14,6 @@ import Sleep from './utils/Sleep';
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-dotenv.config();
 const { JWT_TOKEN, API_URL, TOPIC_ID } = process.env;
 
 const createPublication = async () => {

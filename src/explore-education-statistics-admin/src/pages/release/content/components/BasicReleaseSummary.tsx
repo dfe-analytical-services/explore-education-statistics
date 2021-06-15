@@ -1,4 +1,4 @@
-import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import metaService from '@admin/services/metaService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import FormattedDate from '@common/components/FormattedDate';
@@ -57,7 +57,7 @@ const BasicReleaseSummary = ({ release }: Props) => {
         <>
           <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
             <div className="dfe-flex govuk-!-margin-bottom-3">
-              <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+              <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
             </div>
             {releaseTypeIdsToIcons[release.type.id] && (
               <div className="dfe-flex">

@@ -17,7 +17,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -54,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -64,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -80,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
-                        if (status != ReleaseStatus.Approved)
+                        if (status != ReleaseApprovalStatus.Approved)
                         {
                             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsDraftRequirement>(
                                 context =>
@@ -127,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -137,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -153,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
-                        if (status != ReleaseStatus.Approved)
+                        if (status != ReleaseApprovalStatus.Approved)
                         {
                             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsDraftRequirement>(
                                 context =>
@@ -241,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -251,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -267,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
-                        if (status != ReleaseStatus.Approved)
+                        if (status != ReleaseApprovalStatus.Approved)
                         {
                             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                                 MarkReleaseAsHigherLevelReviewRequirement>(
@@ -316,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -326,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -342,7 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
-                        if (status != ReleaseStatus.Approved)
+                        if (status != ReleaseApprovalStatus.Approved)
                         {
                             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsHigherLevelReviewRequirement>(
                                 context =>
@@ -430,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_Approver_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseStatus>().ForEachAsync(
+                await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                     async status =>
                     {
                         var release = new Release
@@ -440,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 Id = Guid.NewGuid()
                             },
-                            Status = status
+                            ApprovalStatus = status
                         };
 
                         var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -498,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             params SecurityClaimTypes[] claims)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseStatus>().ForEachAsync(
+            await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                 async status =>
                 {
                     var release = new Release
@@ -508,7 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = status
+                        ApprovalStatus = status
                     };
 
                     var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -535,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseStatus>().ForEachAsync(
+            await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                 async status =>
                 {
                     var release = new Release
@@ -545,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = status
+                        ApprovalStatus = status
                     };
 
                     var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -584,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseStatus>().ForEachAsync(
+            await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                 async status =>
                 {
                     var release = new Release
@@ -594,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = status,
+                        ApprovalStatus = status,
                         Published = DateTime.Now
                     };
 
@@ -629,7 +628,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseStatus>().ForEachAsync(
+            await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                 async status =>
                 {
                     var release = new Release
@@ -639,7 +638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = status
+                        ApprovalStatus = status
                     };
 
                     var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
@@ -691,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseStatus>().ForEachAsync(
+            await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
                 async status =>
                 {
                     var release = new Release
@@ -701,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             Id = Guid.NewGuid()
                         },
-                        Status = status,
+                        ApprovalStatus = status,
                         Published = DateTime.Now,
                     };
 

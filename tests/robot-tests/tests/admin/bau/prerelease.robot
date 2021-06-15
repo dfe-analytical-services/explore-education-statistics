@@ -28,6 +28,7 @@ user chooses location, time period and filters
 
     user waits until table tool wizard step is available    Choose time period  90
 
+    user waits until page contains element  id:timePeriodForm-start
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
     ${timePeriodEndList}=   get list items  id:timePeriodForm-end
     ${expectedList}=   create list   Please select  2005  2007  2008  2010  2011  2012  2016  2017
@@ -94,31 +95,17 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user clicks button  Upload data files
-
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
-
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
-    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
-    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks headed table body row contains  Number of rows   159  ${section}
-    user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   UI test subject  upload-file-test.csv  upload-file-test.meta.csv
 
 Add metadata guidance
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user waits until page contains element  id:metaGuidance-dataFiles
     user waits until page contains accordion section  UI test subject
     user opens accordion section  UI test subject
+
     user checks summary list contains  Filename             upload-file-test.csv
     user checks summary list contains  Geographic levels
     ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
@@ -176,7 +163,6 @@ Add basic release content
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list  Initial test public access list
 
 Update public prerelease access list
@@ -375,6 +361,7 @@ Go to prerelease table tool page
 
 Validate table highlights
     [Tags]  HappyPath
+    user waits until page contains element   id:featuredTables
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
@@ -484,6 +471,7 @@ Go to prerelease table tool page as Analyst user
 
 Validate table highlights as Analyst user
     [Tags]  HappyPath
+    user waits until page contains element  id:featuredTables
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]

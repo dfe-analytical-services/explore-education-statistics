@@ -19,7 +19,7 @@ type ContentSectionViewModel = ContentSection<EditableBlock>;
 
 export interface EditableRelease
   extends Release<EditableContentBlock, EditableDataBlock> {
-  status: ReleaseApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   publishScheduled?: string;
   publicationId: string;
 }

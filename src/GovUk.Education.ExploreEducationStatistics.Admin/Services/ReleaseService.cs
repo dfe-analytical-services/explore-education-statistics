@@ -264,16 +264,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
+                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccess(async release =>
                 {
-                    if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
+                    if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && release.Published.HasValue)
                     {
                         return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
                     }
 
-                    if (request.Status == ReleaseStatus.Approved
+                    if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
                         && request.PublishMethod == PublishMethod.Scheduled
                         && !request.PublishScheduledDate.HasValue)
                     {
@@ -286,14 +286,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     release.PreReleaseAccessList = request.PreReleaseAccessList;
 
-                    var oldStatus = release.Status;
+                    var oldStatus = release.ApprovalStatus;
 
-                    release.Status = request.Status;
+                    release.ApprovalStatus = request.ApprovalStatus;
                     release.InternalReleaseNote = request.InternalReleaseNote;
                     release.NextReleaseDate = request.NextReleaseDate;
 
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
-                                               request.Status == ReleaseStatus.Approved
+                                               request.ApprovalStatus == ReleaseApprovalStatus.Approved
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
@@ -304,8 +304,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _context.Releases.Update(release);
                             await _context.SaveChangesAsync();
 
-                            // Only need to inform Publisher if changing release status to or from Approved
-                            if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
+                            // Only need to inform Publisher if changing release approval status to or from Approved
+                            if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
                             {
                                 await _publishingService.ReleaseChanged(
                                     releaseId,
@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidateReleaseWithChecklist(Release release)
         {
-            if (release.Status != ReleaseStatus.Approved)
+            if (release.ApprovalStatus != ReleaseApprovalStatus.Approved)
             {
                 return Unit.Instance;
             }
@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
-            params ReleaseStatus[] releaseStatuses)
+            params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -366,10 +366,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(releaseStatuses))
+                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(releaseApprovalStatuses))
                         .OrElse(() =>
                             _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
-                                releaseStatuses));
+                                releaseApprovalStatuses));
                 });
         }
 
@@ -381,10 +381,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
+                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved))
                         .OrElse(() =>
                             _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
-                                ReleaseStatus.Approved));
+                                ReleaseApprovalStatus.Approved));
                 })
                 .OnSuccess(approvedReleases =>
                 {
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool CanUpdateDataFiles(Guid releaseId)
         {
             var release = _context.Releases.First(r => r.Id == releaseId);
-            return release.Status != ReleaseStatus.Approved;
+            return release.ApprovalStatus != ReleaseApprovalStatus.Approved;
         }
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId, File file)

@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Release _release = new Release
         {
             Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-            Status = ReleaseStatus.Approved,
+            ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 0,
             PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
         };

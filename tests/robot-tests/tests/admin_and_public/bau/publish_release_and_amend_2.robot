@@ -83,29 +83,12 @@ Create new release
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}seven_filters.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}seven_filters.meta.csv
-    user clicks button  Upload data files
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SUBJECT_NAME}
-    user opens accordion section   ${SUBJECT_NAME}
-    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   ${SUBJECT_NAME}  seven_filters.csv  seven_filters.meta.csv
 
 Upload another subject (for deletion later)
     [Tags]  HappyPath
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SECOND_SUBJECT}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
-    user clicks button  Upload data files
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SECOND_SUBJECT}
-    user opens accordion section   ${SECOND_SUBJECT}
-    ${section}=  user gets accordion section content element  ${SECOND_SUBJECT}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   ${SECOND_SUBJECT}  upload-file-test.csv  upload-file-test.meta.csv
 
 Add meta guidance to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
@@ -181,35 +164,16 @@ Add second footnote to ${SUBJECT_NAME} subject
 Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
-    user waits until h2 is visible  Manage pre-release user access
     user creates public prerelease access list   Test public access list
-
-Go to "Sign off" page
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
 
 Approve release
     [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
+    user clicks link   Sign off
+    user approves release for immediate publication
 
-Wait for release process status to be Complete
+Go to public Table Tool page
     [Tags]  HappyPath
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
-
-Go to Table Tool page
-    [Tags]  HappyPath
-    environment variable should be set  PUBLIC_URL
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
+    user navigates to data tables page on public frontend
 
 Select "Test Topic" publication
     [Tags]  HappyPath
@@ -363,18 +327,16 @@ Go to permalink
 
 Return to Admin
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome Bau1
+    user navigates to admin dashboard  Bau1
 
 Change methodology status to Draft
     [Tags]  HappyPath
     user clicks link  manage methodologies
-    user clicks element  //*[@id="approved-methodologies-tab"]
+    user clicks element  id:approved-methodologies-tab
     user clicks link  ${METHODOLOGY_NAME}
     user clicks link  Sign off
     user clicks button  Edit status
-    user clicks element  //*[@id="methodologyStatusForm-status-Draft"]
+    user clicks element  id:methodologyStatusForm-status-Draft
     user clicks button  Update status
 
 Edit methodology content
@@ -392,34 +354,22 @@ Edit methodology content
     user enters text into element  xpath=//*[@name="heading"]  ${METHODOLOGY_NAME} New and Updated Title -
     user clicks button  Save section title
 
-
 Change methodology status to Approved
     [Tags]  HappyPath
     user clicks link  Sign off
-    user clicks button  Edit status
-    user clicks element  //*[@id="methodologyStatusForm-status-Approved"]
-    user enters text into element  //*[@id="methodologyStatusForm-internalReleaseNote"]  Approved by UI tests
-    user clicks button  Update status
+    user changes methodology status to Approved
 
 Create amendment
     [Tags]  HappyPath
     user clicks link  Home
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown   ${RELEASE_NAME} (Live - Latest release)  ${accordion}
-    ${details}=  user gets details content element  ${RELEASE_NAME} (Live - Latest release)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
-    user clicks button  Amend this release  ${details}
-    user clicks button  Confirm
+    user creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
 
-Replace data files for amendment
+Replace subject data
     [Tags]  HappyPath
-    [Documentation]  EES-1442
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user waits until h2 is visible  Uploaded data files
+
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
@@ -427,10 +377,12 @@ Replace data files for amendment
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
+
     user waits until page contains  Footnotes: ERROR  120
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
+
     #EES-1442: Bug when Confirm data replacement button doesn't show
     user reloads page
     user waits until page contains  Footnotes: OK
@@ -443,16 +395,9 @@ Confirm data replacement
 
 Delete second subject file
     [Tags]  HappyPath
-    user clicks link  Back  # back from data replacement confirmation
-    user clicks link  Back  # second back from data replacement confirmation
-    user clicks link  Back  # third back from data replacement confirmation!
-    user waits until page contains accordion section  ${SECOND_SUBJECT}
-    user opens accordion section  ${SECOND_SUBJECT}
-    user scrolls to accordion section content  ${SECOND_SUBJECT}
-    ${accordion}=  user gets accordion section content element  ${SECOND_SUBJECT}
-    ${button}=  user gets button element  Delete files  ${accordion}
-    user clicks element  ${button}
-    user clicks button  Confirm
+    user clicks link  Footnotes  # to avoid focus issues
+    user clicks link  Data and files
+    user deletes subject file  ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for amendment
     [Tags]  HappyPath
@@ -472,24 +417,7 @@ Add release note to amendment
 Go to "Sign off" page and approve amendment
     [Tags]  HappyPath
     user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
-
-Approve release for amendment
-    [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
-
-Wait for release amendment process status to be Complete
-    [Tags]  HappyPath
-    [Documentation]  EES-1448
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user approves release for immediate publication
 
 Go to permalink page & check for error element to be present
     [Tags]  HappyPath
@@ -565,47 +493,20 @@ Check amended release doesn't contain deleted subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     user checks page does not contain  ${SECOND_SUBJECT}
 
-Return to admin to modify footnotes
+Create amendment to modify release
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome Bau1
+    user navigates to admin dashboard  Bau1
+    user creates amendment for release  ${PUBLICATION_NAME}  ${RELEASE_NAME}  (Live - Latest release)
 
-Create amendment to add and modify footnotes
-    [Tags]  HappyPath
-    user clicks link  Home
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown   ${RELEASE_NAME} (Live - Latest release)  ${accordion}
-    ${details}=  user gets details content element  ${RELEASE_NAME} (Live - Latest release)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
-    user clicks button  Amend this release  ${details}
-    user clicks button  Confirm
-
-Add "upload file test with filter" subject file
+Add subject to release
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   ${THIRD_SUBJECT}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
-    user clicks button  Upload data files
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${THIRD_SUBJECT}
-    user opens accordion section   ${THIRD_SUBJECT}
-    ${section}=  user gets accordion section content element  ${THIRD_SUBJECT}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user uploads subject   ${THIRD_SUBJECT}  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
 Add meta guidance to ${THIRD_SUBJECT} subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
-    user waits until h2 is visible  Public metadata guidance document  90
-    user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
-    user waits until page contains accordion section  ${THIRD_SUBJECT}
-    user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}
-    ...  meta guidance content
+    user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}  meta content
     user clicks button  Save guidance
 
 Navigate to 'Footnotes' Tab
@@ -634,39 +535,18 @@ Update Seven filters footnote
     user clicks button  Save footnote
     user waits until page contains testid  footnote Updating ${SUBJECT_NAME} footnote
 
-Go to "Sign off" page for amendment
+Go to "Sign off" to approve release for immedate publication
     [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
+    user clicks link  Sign off
+    user approves release for immediate publication
 
-Approve the release for amendment
-    [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
-
-Wait for release process status to be Complete again
-    [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
-
-Go to Table Tool page for amendment
+Go to public Table Tool page for amendment
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables
 
-Go to amended release & create table
+Select publication ${PUBLICATION_NAME}
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
@@ -675,7 +555,8 @@ Go to amended release & create table
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select ${SUBJECT_NAME} subject
+Select subject ${SUBJECT_NAME}
+    [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
@@ -718,10 +599,7 @@ Select the date cateogory
 Generate table
     [Tags]  HappyPath
     user clicks element     id:filtersForm-submit
-
-Wait until the table is generated
-    [Tags]  HappyPath
-    user clicks button  Share your table
+    user waits until page contains    Share your table
 
 Validate generated table
     [Tags]   HappyPath
@@ -730,6 +608,7 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
+    user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL_TWO}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}
