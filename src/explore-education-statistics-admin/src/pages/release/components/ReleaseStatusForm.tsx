@@ -77,7 +77,9 @@ const ReleaseStatusForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const [showScheduledConfirmModal, setShowScheduledConfirmModal] = useState<
+    boolean
+  >(false);
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
     async ({ approvalStatus, publishMethod, publishScheduled, ...values }) => {
@@ -97,198 +99,194 @@ const ReleaseStatusForm = ({
   );
 
   return (
-    <>
-      <Formik<ReleaseStatusFormValues>
-        enableReinitialize
-        initialValues={{
-          approvalStatus: release.approvalStatus,
-          internalReleaseNote: release.internalReleaseNote ?? '',
-          publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
-          publishScheduled: release.publishScheduled
-            ? parseISO(release.publishScheduled)
-            : undefined,
-          nextReleaseDate: release.nextReleaseDate,
-        }}
-        onSubmit={handleSubmit}
-        validationSchema={Yup.object<ReleaseStatusFormValues>({
-          approvalStatus: Yup.string().required(
-            'Choose a status',
-          ) as StringSchema<ReleaseStatusFormValues['approvalStatus']>,
-          internalReleaseNote: Yup.string().when('approvalStatus', {
-            is: value => ['Approved', 'HigherLevelReview'].includes(value),
-            then: Yup.string().required('Enter an internal note'),
-          }),
-          publishMethod: Yup.string().when('approvalStatus', {
-            is: 'Approved',
-            then: Yup.string().required('Choose when to publish'),
-          }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
-          publishScheduled: Yup.date().when('publishMethod', {
-            is: 'Scheduled',
-            then: Yup.date()
-              .required('Enter a valid publish date')
-              .test({
-                name: 'validDateIfAfterToday',
-                message: `Publish date can't be before ${format(
-                  new Date(),
-                  'do MMMM yyyy',
-                )}`,
-                test(value) {
-                  return endOfDay(value) >= endOfDay(new Date());
-                },
-              }),
-          }),
-          nextReleaseDate: Yup.object<PartialDate>({
-            day: Yup.number().notRequired(),
-            month: Yup.number(),
-            year: Yup.number(),
-          })
-            .notRequired()
+    <Formik<ReleaseStatusFormValues>
+      enableReinitialize
+      initialValues={{
+        approvalStatus: release.approvalStatus,
+        internalReleaseNote: release.internalReleaseNote ?? '',
+        publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
+        publishScheduled: release.publishScheduled
+          ? parseISO(release.publishScheduled)
+          : undefined,
+        nextReleaseDate: release.nextReleaseDate,
+      }}
+      onSubmit={handleSubmit}
+      validationSchema={Yup.object<ReleaseStatusFormValues>({
+        approvalStatus: Yup.string().required(
+          'Choose a status',
+        ) as StringSchema<ReleaseStatusFormValues['approvalStatus']>,
+        internalReleaseNote: Yup.string().when('approvalStatus', {
+          is: value => ['Approved', 'HigherLevelReview'].includes(value),
+          then: Yup.string().required('Enter an internal note'),
+        }),
+        publishMethod: Yup.string().when('approvalStatus', {
+          is: 'Approved',
+          then: Yup.string().required('Choose when to publish'),
+        }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
+        publishScheduled: Yup.date().when('publishMethod', {
+          is: 'Scheduled',
+          then: Yup.date()
+            .required('Enter a valid publish date')
             .test({
-              name: 'validDate',
-              message: 'Enter a valid next release date',
-              test(value: PartialDate) {
-                if (isPartialDateEmpty(value)) {
-                  return true;
-                }
-
-                if (!isValidPartialDate(value)) {
-                  return false;
-                }
-
-                return isValid(parsePartialDateToLocalDate(value));
+              name: 'validDateIfAfterToday',
+              message: `Publish date can't be before ${format(
+                new Date(),
+                'do MMMM yyyy',
+              )}`,
+              test(value) {
+                return endOfDay(value) >= endOfDay(new Date());
               },
             }),
-        })}
-      >
-        {form => (
-          <>
-            <Form id={formId}>
+        }),
+        nextReleaseDate: Yup.object<PartialDate>({
+          day: Yup.number().notRequired(),
+          month: Yup.number(),
+          year: Yup.number(),
+        })
+          .notRequired()
+          .test({
+            name: 'validDate',
+            message: 'Enter a valid next release date',
+            test(value: PartialDate) {
+              if (isPartialDateEmpty(value)) {
+                return true;
+              }
+
+              if (!isValidPartialDate(value)) {
+                return false;
+              }
+
+              return isValid(parsePartialDateToLocalDate(value));
+            },
+          }),
+      })}
+    >
+      {form => (
+        <>
+          <Form id={formId}>
+            <FormFieldRadioGroup<ReleaseStatusFormValues>
+              legend="Status"
+              name="approvalStatus"
+              order={[]}
+              options={[
+                {
+                  label: 'In draft',
+                  value: 'Draft',
+                  disabled: !statusPermissions?.canMarkDraft,
+                },
+                {
+                  label: 'Ready for higher review',
+                  value: 'HigherLevelReview',
+                  disabled: !statusPermissions?.canMarkHigherLevelReview,
+                },
+                {
+                  label: 'Approved for publication',
+                  value: 'Approved',
+                  disabled: !statusPermissions?.canMarkApproved,
+                },
+              ]}
+            />
+
+            <FormFieldTextArea<ReleaseStatusFormValues>
+              name="internalReleaseNote"
+              className="govuk-!-width-one-half"
+              label="Internal note"
+              hint="Please include your name and any relevant information"
+              rows={3}
+            />
+
+            {form.values.approvalStatus === 'Approved' && (
               <FormFieldRadioGroup<ReleaseStatusFormValues>
-                legend="Status"
-                name="approvalStatus"
+                name="publishMethod"
+                legend="When to publish"
+                legendSize="m"
+                hint="Do you want to publish this release on a specific date or as soon as possible?"
                 order={[]}
                 options={[
                   {
-                    label: 'In draft',
-                    value: 'Draft',
-                    disabled: !statusPermissions?.canMarkDraft,
+                    label: 'On a specific date',
+                    value: 'Scheduled',
+                    conditional: (
+                      <FormFieldDateInput<ReleaseStatusFormValues>
+                        name="publishScheduled"
+                        legend="Publish date"
+                        legendSize="s"
+                      />
+                    ),
                   },
                   {
-                    label: 'Ready for higher review',
-                    value: 'HigherLevelReview',
-                    disabled: !statusPermissions?.canMarkHigherLevelReview,
-                  },
-                  {
-                    label: 'Approved for publication',
-                    value: 'Approved',
-                    disabled: !statusPermissions?.canMarkApproved,
+                    label: 'As soon as possible',
+                    value: 'Immediate',
+                    conditional: (
+                      <WarningMessage className="govuk-!-width-two-thirds">
+                        This will start the release process immediately and make
+                        statistics available to the public. Make sure this is
+                        okay before continuing.
+                      </WarningMessage>
+                    ),
                   },
                 ]}
               />
-
-              <FormFieldTextArea<ReleaseStatusFormValues>
-                name="internalReleaseNote"
-                className="govuk-!-width-one-half"
-                label="Internal note"
-                hint="Please include your name and any relevant information"
-                rows={3}
-              />
-
-              {form.values.approvalStatus === 'Approved' && (
-                <FormFieldRadioGroup<ReleaseStatusFormValues>
-                  name="publishMethod"
-                  legend="When to publish"
-                  legendSize="m"
-                  hint="Do you want to publish this release on a specific date or as soon as possible?"
-                  order={[]}
-                  options={[
-                    {
-                      label: 'On a specific date',
-                      value: 'Scheduled',
-                      conditional: (
-                        <FormFieldDateInput<ReleaseStatusFormValues>
-                          name="publishScheduled"
-                          legend="Publish date"
-                          legendSize="s"
-                        />
-                      ),
-                    },
-                    {
-                      label: 'As soon as possible',
-                      value: 'Immediate',
-                      conditional: (
-                        <WarningMessage className="govuk-!-width-two-thirds">
-                          This will start the release process immediately and
-                          make statistics available to the public. Make sure
-                          this is okay before continuing.
-                        </WarningMessage>
-                      ),
-                    },
-                  ]}
-                />
-              )}
-
-              <FormFieldDateInput<ReleaseStatusFormValues>
-                name="nextReleaseDate"
-                legend="Next release expected (optional)"
-                legendSize="m"
-                type="partialDate"
-                partialDateType="monthYear"
-              />
-
-              <ButtonGroup>
-                <Button
-                  type="submit"
-                  disabled={form.isSubmitting}
-                  onClick={e => {
-                    e.preventDefault();
-                    if (
-                      form.values.approvalStatus === 'Approved' &&
-                      form.values.publishMethod === 'Scheduled' &&
-                      form.values.publishScheduled
-                    ) {
-                      return setShowConfirmModal(true);
-                    }
-                    return form.submitForm();
-                  }}
-                >
-                  Update status
-                </Button>
-                <ButtonText
-                  onClick={() => {
-                    form.resetForm();
-                    onCancel();
-                  }}
-                >
-                  Cancel
-                </ButtonText>
-              </ButtonGroup>
-            </Form>
-            {showConfirmModal && (
-              <ModalConfirm
-                title="Confirm publish date"
-                onConfirm={() => {
-                  form.submitForm();
-                  setShowConfirmModal(false);
-                }}
-                onExit={() => setShowConfirmModal(false)}
-                onCancel={() => setShowConfirmModal(false)}
-                open
-              >
-                <p>
-                  This release will be published at 09:30 on{' '}
-                  <FormattedDate format="EEEE d MMMM yyyy">
-                    {form.values.publishScheduled || ''}
-                  </FormattedDate>
-                  .
-                </p>
-                <p>Are you sure?</p>
-              </ModalConfirm>
             )}
-          </>
-        )}
-      </Formik>
-    </>
+
+            <FormFieldDateInput<ReleaseStatusFormValues>
+              name="nextReleaseDate"
+              legend="Next release expected (optional)"
+              legendSize="m"
+              type="partialDate"
+              partialDateType="monthYear"
+            />
+
+            <ButtonGroup>
+              <Button
+                type="submit"
+                disabled={form.isSubmitting}
+                onClick={e => {
+                  e.preventDefault();
+                  if (
+                    form.values.approvalStatus === 'Approved' &&
+                    form.values.publishMethod === 'Scheduled' &&
+                    form.values.publishScheduled
+                  ) {
+                    return setShowScheduledConfirmModal(true);
+                  }
+                  return form.submitForm();
+                }}
+              >
+                Update status
+              </Button>
+              <ButtonText
+                onClick={() => {
+                  form.resetForm();
+                  onCancel();
+                }}
+              >
+                Cancel
+              </ButtonText>
+            </ButtonGroup>
+          </Form>
+          <ModalConfirm
+            title="Confirm publish date"
+            onConfirm={() => {
+              form.submitForm();
+              setShowScheduledConfirmModal(false);
+            }}
+            onExit={() => setShowScheduledConfirmModal(false)}
+            onCancel={() => setShowScheduledConfirmModal(false)}
+            open={showScheduledConfirmModal}
+          >
+            <p>
+              This release will be published at 09:30 on{' '}
+              <FormattedDate format="EEEE d MMMM yyyy">
+                {form.values.publishScheduled || ''}
+              </FormattedDate>
+              .
+            </p>
+            <p>Are you sure?</p>
+          </ModalConfirm>
+        </>
+      )}
+    </Formik>
   );
 };
 
