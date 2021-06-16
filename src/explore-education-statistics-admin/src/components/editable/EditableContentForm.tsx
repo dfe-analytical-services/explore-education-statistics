@@ -20,6 +20,7 @@ export interface Props {
   content: string;
   id: string;
   hideLabel?: boolean;
+  handleBlur?: (isDirty: boolean) => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onCancel: () => void;
@@ -31,6 +32,7 @@ const EditableContentForm = ({
   content,
   label,
   hideLabel = false,
+  handleBlur,
   onImageUpload,
   onImageUploadCancel,
   onCancel,
@@ -73,6 +75,7 @@ const EditableContentForm = ({
           validateElements={validateElements}
           onImageUpload={onImageUpload}
           onImageUploadCancel={onImageUploadCancel}
+          handleBlur={handleBlur}
         />
 
         <ButtonGroup>

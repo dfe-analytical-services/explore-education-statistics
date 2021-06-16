@@ -9,8 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId);
 
-        Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUserAsync(Guid topicId, Guid userId);
+        Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(Guid topicId, Guid userId);
+
         Task<MyPublicationViewModel> GetPublicationForUser(Guid publicationId, Guid userId);
+
         Task<MyPublicationViewModel> GetPublicationWithAllReleases(Guid publicationId);
     }
 }

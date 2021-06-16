@@ -103,8 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 1,
                             Content = new List<ContentBlock>
                             {
-                                new HtmlBlock(),
-                                new HtmlBlock(),
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2001, 1, 1)
+                                },
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2002, 2, 2)
+                                },
                                 new DataBlock()
                             }
                         }
@@ -117,8 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 2,
                             Content = new List<ContentBlock>
                             {
-                                new HtmlBlock(),
-                                new HtmlBlock(),
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2003, 3, 3)
+                                },
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2004, 4, 4)
+                                },
                                 new DataBlock()
                             }
                         }
@@ -149,6 +161,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Content[0].ContentSection.Content[1].Id, contentBlocks[1].Id);
                 Assert.Equal(release.Content[1].ContentSection.Content[0].Id, contentBlocks[2].Id);
                 Assert.Equal(release.Content[1].ContentSection.Content[1].Id, contentBlocks[3].Id);
+
+                Assert.Equal(new DateTime(2001, 1, 1), contentBlocks[0].Created);
+                Assert.Equal(new DateTime(2002, 2, 2), contentBlocks[1].Created);
+                Assert.Equal(new DateTime(2003, 3, 3), contentBlocks[2].Created);
+                Assert.Equal(new DateTime(2004, 4, 4), contentBlocks[3].Created);
             }
         }
 

@@ -21,6 +21,7 @@ type Props<FormValues> = {
   validateElements?: (
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
+  handleBlur?: (isDirty: boolean) => void;
 } & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange'>;
 
 function FormFieldEditor<T>({
@@ -31,6 +32,7 @@ function FormFieldEditor<T>({
   formGroupClass,
   testId,
   validateElements,
+  handleBlur,
   ...props
 }: Props<T>) {
   const { prefixFormId, fieldId } = useFormContext();
@@ -65,6 +67,9 @@ function FormFieldEditor<T>({
               id={id ? prefixFormId(id) : fieldId(name as string)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);
+                if (handleBlur) {
+                  handleBlur(form.dirty);
+                }
               }}
               onElementsChange={handleElements}
               onElementsReady={handleElements}

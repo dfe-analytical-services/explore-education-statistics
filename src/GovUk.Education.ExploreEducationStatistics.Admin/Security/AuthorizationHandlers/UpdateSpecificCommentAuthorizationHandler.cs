@@ -19,11 +19,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-        public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext, IReleaseStatusRepository releaseStatusRepository)
+        public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
+            IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository userPublicationRoleRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             _contentDbContext = contentDbContext;
             _releaseStatusRepository = releaseStatusRepository;
+            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _userReleaseRoleRepository = userReleaseRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -33,8 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var release = GetRelease(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
-            await new UpdateSpecificReleaseAuthorizationHandler(_contentDbContext, _releaseStatusRepository).HandleAsync(
-                updateSpecificReleaseContext);
+            await new UpdateSpecificReleaseAuthorizationHandler(_releaseStatusRepository,
+                _userPublicationRoleRepository,
+                _userReleaseRoleRepository)
+                .HandleAsync(updateSpecificReleaseContext);
 
             if (!updateSpecificReleaseContext.HasSucceeded)
             {

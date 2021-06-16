@@ -55,13 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanManageAllTaxonomy,
 
         /**
-         * Topic / Theme management
-         */
-        CanViewAllTopics,
-        CanViewSpecificTheme,
-        CanViewSpecificTopic,
-
-        /**
          * Methodology management
          */
         CanCreateMethodologies,
@@ -69,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewSpecificMethodology,
         CanUpdateSpecificMethodology,
         CanMarkSpecificMethodologyAsDraft,
-        CanApproveSpecificMethodology
+        CanApproveSpecificMethodology,
+        CanMakeAmendmentOfSpecificMethodology
     }
 }

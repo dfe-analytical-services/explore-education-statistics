@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -20,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         };
 
         [Fact]
-        public void GetSubjectsMeta()
+        public async Task GetSubjectsMeta()
         {
-            PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {

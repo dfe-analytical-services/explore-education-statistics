@@ -22,7 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             },
             Slug = "2018-19-q1",
             Published = new DateTime(2019, 1, 1),
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null,
             SoftDeleted = false
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             },
             Slug = "2018-19-q1",
             Published = new DateTime(2019, 2, 1),
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 1,
             PreviousVersionId = new Guid("36725e6b-8682-480b-a04a-0564253b7160"),
             SoftDeleted = false
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             },
             Slug = "2018-19-q1",
             Published = null,
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 2,
             PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
             SoftDeleted = true
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             RelatedInformation = new List<Link>(),
             Slug = "2018-19-q1",
             Published = null,
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 3,
             PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
             SoftDeleted = false
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             },
             Slug = "2018-19-q2",
             Published = new DateTime(2019, 3, 1),
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null
         };
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             RelatedInformation = new List<Link>(),
             Slug = "2018-19-q3",
             Published = null,
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null
         };
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 TimePeriodCoverage = AcademicYearQ4,
                 Slug = "2017-18-q4",
                 Published = new DateTime(2019, 4, 1),
-                Status = Approved,
+                ApprovalStatus = Approved,
                 Version = 0,
                 PreviousVersionId = null
             },
@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 TimePeriodCoverage = AcademicYearQ4,
                 Slug = "2018-19-q4",
                 Published = null,
-                Status = Draft,
+                ApprovalStatus = Draft,
                 Version = 0,
                 PreviousVersionId = null
             }

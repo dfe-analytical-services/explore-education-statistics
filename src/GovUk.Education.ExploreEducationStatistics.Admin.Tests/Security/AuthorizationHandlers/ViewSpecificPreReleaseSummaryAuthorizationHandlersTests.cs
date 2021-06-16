@@ -1,44 +1,46 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
     ViewSpecificPreReleaseSummaryAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         [Fact]
-        public void CanSeeAllReleasesAuthorizationHandler()
+        public async Task CanSeeAllReleasesAuthorizationHandler()
         {
             // Assert that any users with the "AccessAllReleases" claim can view an arbitrary PreRelease Summary
             // (and no other claim allows this)
-            AssertReleaseHandlerSucceedsWithCorrectClaims<ViewSpecificPreReleaseSummaryRequirement>(
+            await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewSpecificPreReleaseSummaryRequirement>(
                 new CanSeeAllReleasesAuthorizationHandler(), AccessAllReleases);
         }
 
         [Fact]
-        public void HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler()
+        public async Task HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler()
         {
             // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
-                contentDbContext => new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(contentDbContext),
-                ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver);
+            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
+                contentDbContext =>
+                    new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
+                        new UserReleaseRoleRepository(contentDbContext)),
+                Viewer, Lead, Contributor, Approver);
         }
 
         [Fact]
-        public void HasPreReleaseRoleWithinAccessWindowAuthorizationHandler()
+        public async Task HasPreReleaseRoleWithinAccessWindowAuthorizationHandler()
         {
-            var release = new Release();
-
             // Assert that a User who specifically has the Pre Release role on a Release can view the PreRelease Summary
-            AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
-                contentDbContext => new HasPreReleaseRoleOnReleaseAuthorizationHandler(contentDbContext),
-                release,
-                ReleaseRole.PrereleaseViewer);
+            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
+                contentDbContext =>
+                    new HasPreReleaseRoleOnReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
+                PrereleaseViewer);
         }
     }
 }

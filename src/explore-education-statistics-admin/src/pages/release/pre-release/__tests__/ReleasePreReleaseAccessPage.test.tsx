@@ -13,7 +13,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 const releaseData: Release = {
   id: 'release-1',
   slug: 'release-1-slug',
-  status: 'Draft',
+  approvalStatus: 'Draft',
   latestRelease: false,
   live: false,
   amendment: false,

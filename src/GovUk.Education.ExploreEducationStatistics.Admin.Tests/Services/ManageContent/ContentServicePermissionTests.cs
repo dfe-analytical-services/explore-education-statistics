@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -53,10 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         };
 
         [Fact]
-        public void AddComment()
+        public async Task AddComment()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -71,10 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void DeleteComment()
+        public async Task DeleteComment()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_comment, CanUpdateSpecificComment)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
                 .AssertForbidden(
                     userService =>
                     {
@@ -86,10 +87,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void UpdateComment()
+        public async Task UpdateComment()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_comment, CanUpdateSpecificComment)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
                 .AssertForbidden(
                     userService =>
                     {
@@ -102,10 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void AddContentBlock()
+        public async Task AddContentBlock()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -119,10 +120,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void AddContentSection()
+        public async Task AddContentSection()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -135,10 +136,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void AttachDataBlock()
+        public async Task AttachDataBlock()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -152,10 +153,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void GetContentBlocks()
+        public async Task GetContentBlocks()
         {
-            PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanViewRelease)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -166,10 +167,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void RemoveContentBlock()
+        public async Task RemoveContentBlock()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -183,10 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void RemoveContentSection()
+        public async Task RemoveContentSection()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -199,10 +200,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void ReorderContentBlocks()
+        public async Task ReorderContentBlocks()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -216,10 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void ReorderContentSections()
+        public async Task ReorderContentSections()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -232,10 +233,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void UpdateContentSectionHeading()
+        public async Task UpdateContentSectionHeading()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -249,10 +250,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void UpdateTextBasedContentBlock()
+        public async Task UpdateTextBasedContentBlock()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -267,10 +268,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void UpdateDataBlock()
+        public async Task UpdateDataBlock()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

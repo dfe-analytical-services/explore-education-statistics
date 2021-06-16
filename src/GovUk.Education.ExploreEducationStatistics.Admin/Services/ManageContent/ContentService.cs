@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -574,7 +575,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private static ContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            return (ContentBlock) Activator.CreateInstance(classType);
+            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
+            newContentBlock.Created = DateTime.UtcNow;
+            return newContentBlock;
         }
 
         private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)

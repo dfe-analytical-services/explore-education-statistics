@@ -18,6 +18,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         releaseId="release-1"
+        sectionId="section-1"
         block={testHtmlBlock}
         onSave={noop}
         onDelete={noop}
@@ -47,6 +48,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseEditableBlock
         releaseId="release-1"
+        sectionId="section-1"
         block={{
           ...testHtmlBlock,
           body: `

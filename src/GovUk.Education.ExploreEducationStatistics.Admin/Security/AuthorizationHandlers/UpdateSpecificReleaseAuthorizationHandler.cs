@@ -1,12 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -17,15 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
-        private readonly ContentDbContext _context;
         private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IUserPublicationRoleRepository _publicationRoleRepository;
+        private readonly IUserReleaseRoleRepository _releaseRoleRepository;
 
-        public UpdateSpecificReleaseAuthorizationHandler(
-            ContentDbContext context,
-            IReleaseStatusRepository releaseStatusRepository)
+        public UpdateSpecificReleaseAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+            IUserPublicationRoleRepository publicationRoleRepository,
+            IUserReleaseRoleRepository releaseRoleRepository)
         {
-            _context = context;
             _releaseStatusRepository = releaseStatusRepository;
+            _publicationRoleRepository = publicationRoleRepository;
+            _releaseRoleRepository = releaseRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -50,11 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var roles = GetReleaseRoles(context.User, release, _context);
+            var publicationRoles =
+                await _publicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _releaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
 
-            if (release.Status == ReleaseStatus.Approved
-                ? ContainsApproverRole(roles)
-                : ContainsEditorRole(roles))
+            if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
+                ? ContainsApproverRole(releaseRoles)
+                : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
             {
                 context.Succeed(requirement);
             }

@@ -10,7 +10,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     role="group"
   >
     <summary
-      aria-controls="details-content-16"
+      aria-controls="details-content-29"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -26,7 +26,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-16"
+      id="details-content-29"
     >
       <p
         class="govuk-hint"
@@ -495,7 +495,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         role="group"
       >
         <summary
-          aria-controls="details-content-17"
+          aria-controls="details-content-30"
           aria-expanded="true"
           class="govuk-details__summary"
           role="button"
@@ -511,7 +511,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         <div
           aria-hidden="false"
           class="govuk-details__text"
-          id="details-content-17"
+          id="details-content-30"
         >
           <ul
             class="govuk-list"
@@ -540,7 +540,60 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
+            
           </ul>
+        </div>
+      </details>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-36"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Contact us"
+          >
+            Contact us
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-36"
+        >
+          <p>
+            If you have a question about the data or methods used to create this table contact the named statistician:
+          </p>
+          <h4
+            class="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            The team name
+          </h4>
+          <p
+            class="govuk-!-margin-top-0"
+          >
+            Email 
+            <br />
+            <a
+              href="mailto:team@name.com"
+            >
+              team@name.com
+            </a>
+          </p>
+          <p>
+            Telephone: 
+            A person
+             
+            <br />
+             
+            012345
+          </p>
         </div>
       </details>
     </div>
@@ -555,13 +608,6 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       </button>
     </div>
   </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
-  </div>
 </div>
 `;
 
@@ -575,7 +621,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     role="group"
   >
     <summary
-      aria-controls="details-content-11"
+      aria-controls="details-content-20"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -591,7 +637,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-11"
+      id="details-content-20"
     >
       <p
         class="govuk-hint"
@@ -1077,7 +1123,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         role="group"
       >
         <summary
-          aria-controls="details-content-12"
+          aria-controls="details-content-21"
           aria-expanded="true"
           class="govuk-details__summary"
           role="button"
@@ -1093,7 +1139,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         <div
           aria-hidden="false"
           class="govuk-details__text"
-          id="details-content-12"
+          id="details-content-21"
         >
           <ul
             class="govuk-list"
@@ -1122,7 +1168,60 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
+            
           </ul>
+        </div>
+      </details>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-27"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Contact us"
+          >
+            Contact us
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-27"
+        >
+          <p>
+            If you have a question about the data or methods used to create this table contact the named statistician:
+          </p>
+          <h4
+            class="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            The team name
+          </h4>
+          <p
+            class="govuk-!-margin-top-0"
+          >
+            Email 
+            <br />
+            <a
+              href="mailto:team@name.com"
+            >
+              team@name.com
+            </a>
+          </p>
+          <p>
+            Telephone: 
+            A person
+             
+            <br />
+             
+            012345
+          </p>
         </div>
       </details>
     </div>
@@ -1137,13 +1236,6 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       </button>
     </div>
   </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
-  </div>
 </div>
 `;
 
@@ -1157,7 +1249,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     role="group"
   >
     <summary
-      aria-controls="details-content-25"
+      aria-controls="details-content-45"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -1173,7 +1265,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-25"
+      id="details-content-45"
     >
       <p
         class="govuk-hint"
@@ -1659,7 +1751,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         role="group"
       >
         <summary
-          aria-controls="details-content-26"
+          aria-controls="details-content-46"
           aria-expanded="true"
           class="govuk-details__summary"
           role="button"
@@ -1675,7 +1767,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         <div
           aria-hidden="false"
           class="govuk-details__text"
-          id="details-content-26"
+          id="details-content-46"
         >
           <ul
             class="govuk-list"
@@ -1704,7 +1796,60 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
+            
           </ul>
+        </div>
+      </details>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-52"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Contact us"
+          >
+            Contact us
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-52"
+        >
+          <p>
+            If you have a question about the data or methods used to create this table contact the named statistician:
+          </p>
+          <h4
+            class="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            The team name
+          </h4>
+          <p
+            class="govuk-!-margin-top-0"
+          >
+            Email 
+            <br />
+            <a
+              href="mailto:team@name.com"
+            >
+              team@name.com
+            </a>
+          </p>
+          <p>
+            Telephone: 
+            A person
+             
+            <br />
+             
+            012345
+          </p>
         </div>
       </details>
     </div>
@@ -1719,13 +1864,6 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
       </button>
     </div>
   </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
-  </div>
 </div>
 `;
 
@@ -1739,7 +1877,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
     role="group"
   >
     <summary
-      aria-controls="details-content-21"
+      aria-controls="details-content-38"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -1755,7 +1893,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-21"
+      id="details-content-38"
     >
       <p
         class="govuk-hint"
@@ -2223,7 +2361,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
         role="group"
       >
         <summary
-          aria-controls="details-content-22"
+          aria-controls="details-content-39"
           aria-expanded="false"
           class="govuk-details__summary"
           role="button"
@@ -2239,7 +2377,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
         <div
           aria-hidden="true"
           class="govuk-details__text"
-          id="details-content-22"
+          id="details-content-39"
         >
           <ul
             class="govuk-list"
@@ -2282,13 +2420,6 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
         Share your table
       </button>
     </div>
-  </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
   </div>
 </div>
 `;
@@ -2908,7 +3039,61 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
+            
           </ul>
+        </div>
+      </details>
+      <details
+        class="govuk-details"
+        open=""
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-8"
+          aria-expanded="true"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Contact us"
+          >
+            Contact us
+          </span>
+        </summary>
+        <div
+          aria-hidden="false"
+          class="govuk-details__text"
+          id="details-content-8"
+        >
+          <p>
+            If you have a question about the data or methods used to create this table contact the named statistician:
+          </p>
+          <h4
+            class="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            The team name
+          </h4>
+          <p
+            class="govuk-!-margin-top-0"
+          >
+            Email 
+            <br />
+            <a
+              href="mailto:team@name.com"
+            >
+              team@name.com
+            </a>
+          </p>
+          <p>
+            Telephone: 
+            A person
+             
+            <br />
+             
+            012345
+          </p>
         </div>
       </details>
     </div>
@@ -2922,13 +3107,6 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
         Share your table
       </button>
     </div>
-  </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
   </div>
 </div>
 `;
@@ -2944,7 +3122,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
     role="group"
   >
     <summary
-      aria-controls="details-content-6"
+      aria-controls="details-content-11"
       aria-expanded="true"
       class="govuk-details__summary"
       role="button"
@@ -2960,7 +3138,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
     <div
       aria-hidden="false"
       class="govuk-details__text"
-      id="details-content-6"
+      id="details-content-11"
     >
       <p
         class="govuk-hint"
@@ -3428,7 +3606,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
         role="group"
       >
         <summary
-          aria-controls="details-content-7"
+          aria-controls="details-content-12"
           aria-expanded="false"
           class="govuk-details__summary"
           role="button"
@@ -3444,7 +3622,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
         <div
           aria-hidden="true"
           class="govuk-details__text"
-          id="details-content-7"
+          id="details-content-12"
         >
           <ul
             class="govuk-list"
@@ -3473,7 +3651,60 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
+            
           </ul>
+        </div>
+      </details>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-18"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="summaryText govuk-details__summary-text"
+            data-testid="Expand Details Section Contact us"
+          >
+            Contact us
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-18"
+        >
+          <p>
+            If you have a question about the data or methods used to create this table contact the named statistician:
+          </p>
+          <h4
+            class="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            The team name
+          </h4>
+          <p
+            class="govuk-!-margin-top-0"
+          >
+            Email 
+            <br />
+            <a
+              href="mailto:team@name.com"
+            >
+              team@name.com
+            </a>
+          </p>
+          <p>
+            Telephone: 
+            A person
+             
+            <br />
+             
+            012345
+          </p>
         </div>
       </details>
     </div>
@@ -3487,13 +3718,6 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
         Share your table
       </button>
     </div>
-  </div>
-  <div
-    class="govuk-inset-text"
-  >
-    <p>
-      If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
-    </p>
   </div>
 </div>
 `;

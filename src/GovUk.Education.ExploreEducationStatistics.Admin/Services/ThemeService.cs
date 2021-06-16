@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -103,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Theme>(id)
-                .OnSuccess(_userService.CheckCanViewTheme)
+                .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
 
@@ -113,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanAccessSystem()
                 .OnSuccess(
                     async _ => await _userService
-                        .CheckCanViewAllTopics()
+                        .CheckCanManageAllTaxonomy()
                         .OnSuccess(
                             async () => await _context.Themes
                                 .Include(theme => theme.Topics)
@@ -169,14 +170,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userId = _userService.GetUserId();
 
-            var topics = await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .ThenInclude(release => release.Publication)
-                .ThenInclude(publication => publication.Topic)
-                .ThenInclude(topic => topic.Theme)
-                .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
-                .Select(r => r.Release.Publication.Topic)
+            var topics = await (
+                    from userReleaseRole in _context.UserReleaseRoles
+                    where userReleaseRole.UserId == userId 
+                          && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
+                    select userReleaseRole.Release.Publication
+                ).Concat(
+                    from userPublicationRole in _context.UserPublicationRoles
+                    where userPublicationRole.UserId == userId 
+                          && userPublicationRole.Role == Owner
+                    select userPublicationRole.Publication
+                ).Include(publication => publication.Topic)
+                .ThenInclude(topic => topic.Theme).Select(publication => publication.Topic)
                 .Distinct()
                 .ToListAsync();
 

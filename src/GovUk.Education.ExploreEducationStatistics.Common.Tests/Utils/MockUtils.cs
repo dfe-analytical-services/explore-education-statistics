@@ -122,14 +122,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return userService;
         }
 
-        public static void VerifyAllMocks(params object[] mocks)
+        public static void VerifyAllMocks(params Mock[] mocks)
         {
             mocks
                 .ToList()
-                .ForEach(m =>
+                .ForEach(mock =>
                 {
-                    m.GetType().GetMethod("VerifyAll", Type.EmptyTypes).Invoke(m, null);
-                    m.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes).Invoke(m, null);
+                    mock.VerifyAll();
+
+                    // We can't cast from the non-generic Mock Type to the generic Mock<?> Type which has the
+                    // VerifyNoOtherCalls() method on it, so we need to look it up with reflection.
+                    var verifyNoOtherCallsMethod = mock.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes);
+
+                    if (verifyNoOtherCallsMethod != null)
+                    {
+                        verifyNoOtherCallsMethod.Invoke(mock, null);
+                    }
                 });
         }
     }

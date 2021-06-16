@@ -9,9 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    environment variable should be set  PUBLIC_URL
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables
+    user navigates to data tables page on public frontend
 
 Go to permalink
     [Tags]  HappyPath
@@ -29,7 +27,7 @@ Validate breadcrumbs
 Validate miscellaneous
     [Tags]  HappyPath
     user checks summary list contains  Created  7 April 2020
-    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing 'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
+    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing 'Exclusions by geographic level' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
     user waits until page contains button   Print this page
 
 Validate table
@@ -69,13 +67,10 @@ Validate footnotes
 
 Validate download files
     [Tags]  HappyPath
-    user checks page contains element  xpath://button[text()="Download the underlying data of this table (CSV)"]
+    user checks page contains element  xpath://button[text()="Download the data of this table (CSV)"]
     user checks page contains element  xpath://button[text()="Download table as Excel spreadsheet (XLSX)"]
     # TODO: More / Check CSV?
 
 Use Create tables button
     [Tags]  HappyPath
-    user waits until h2 is visible  Create your own tables
-    user clicks link    Create tables
-
-    user waits until h1 is visible  Create your own tables
+    user navigates to data tables page on public frontend

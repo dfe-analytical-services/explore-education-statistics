@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -28,6 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var created = (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
             await _contentDbContext.SaveChangesAsync();
             return created;
+        }
+
+        public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)
+        {
+            return await _contentDbContext.UserReleaseRoles.Where(r =>
+                    r.UserId == userId &&
+                    r.ReleaseId == releaseId)
+                .Select(r => r.Role)
+                .ToListAsync();
         }
 
         public async Task<UserReleaseRole> GetByUserAndRole(Guid userId, Guid releaseId, ReleaseRole role)

@@ -162,6 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
+                Created = new DateTime(2000, 1, 1),
                 ContentSectionId = Guid.NewGuid(),
                 Query = new ObservationQueryContext
                 {
@@ -207,6 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 HighlightDescription = "Test highlight description 2",
                 Source = "Test source 2",
                 Order = 7,
+                Created = new DateTime(2001, 2, 2),
                 Query = new ObservationQueryContext
                 {
                     Filters = new List<Guid>
@@ -265,6 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
+                Assert.Equal(dataBlock1.Created, result.Right[0].Created);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
                 Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
@@ -273,6 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(dataBlock2.Heading, result.Right[1].Heading);
                 Assert.Equal(dataBlock2.Name, result.Right[1].Name);
+                Assert.Equal(dataBlock2.Created, result.Right[1].Created);
                 Assert.Equal(dataBlock2.HighlightName, result.Right[1].HighlightName);
                 Assert.Equal(dataBlock2.HighlightDescription, result.Right[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, result.Right[1].Source);
@@ -294,6 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
+                Created = new DateTime(2000, 1, 1),
                 ContentSectionId = Guid.NewGuid(),
                 Query = new ObservationQueryContext
                 {
@@ -366,6 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
+                Assert.Equal(dataBlock1.Created, result.Right[0].Created);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
                 Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
@@ -706,6 +712,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Create(release.Id, createRequest);
 
                 Assert.True(result.IsRight);
+
+                // Validate Created date is in the DB, even if not returned in result
+                var dataBlock = await context.DataBlocks.FindAsync(result.Right.Id);
+                Assert.True(dataBlock.Created.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
 
                 Assert.Equal(createRequest.Heading, result.Right.Heading);
                 Assert.Equal(createRequest.Name, result.Right.Name);

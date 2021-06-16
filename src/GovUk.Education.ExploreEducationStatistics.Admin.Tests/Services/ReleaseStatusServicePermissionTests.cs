@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -10,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -21,10 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void GetReleaseStatusesAsync()
+        public async Task GetReleaseStatusesAsync()
         {
-            PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
-                .ExpectResourceCheck(_release, ContentSecurityPolicies.CanViewRelease, false)
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheck(_release, ContentSecurityPolicies.CanViewRelease, false)
                 .AssertForbidden(
                     async userService =>
                     {

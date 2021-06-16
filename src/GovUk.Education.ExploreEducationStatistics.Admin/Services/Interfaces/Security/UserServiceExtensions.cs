@@ -70,26 +70,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodology, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanViewAllTopics(this IUserService userService)
+        public static Task<Either<ActionResult, Methodology>> CheckCanMakeAmendmentOfMethodology(
+            this IUserService userService, Methodology methodology)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanViewAllTopics);
+            return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanViewAllReleases);
-        }
-
-        public static Task<Either<ActionResult, Theme>> CheckCanViewTheme(
-            this IUserService userService, Theme theme)
-        {
-            return userService.CheckPolicy(theme, SecurityPolicies.CanViewSpecificTheme);
-        }
-
-        public static Task<Either<ActionResult, Topic>> CheckCanViewTopic(
-            this IUserService userService, Topic topic)
-        {
-            return userService.CheckPolicy(topic, SecurityPolicies.CanViewSpecificTopic);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllTaxonomy(this IUserService userService)
@@ -152,19 +141,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
-            this IUserService userService, Release release, ReleaseStatus status)
+            this IUserService userService, Release release, ReleaseApprovalStatus approvalStatus)
         {
-            switch (status)
+            switch (approvalStatus)
             {
-                case ReleaseStatus.Draft:
+                case ReleaseApprovalStatus.Draft:
                 {
                     return userService.CheckCanMarkReleaseAsDraft(release);
                 }
-                case ReleaseStatus.HigherLevelReview:
+                case ReleaseApprovalStatus.HigherLevelReview:
                 {
                     return userService.CheckCanSubmitReleaseToHigherApproval(release);
                 }
-                case ReleaseStatus.Approved:
+                case ReleaseApprovalStatus.Approved:
                 {
                     return userService.CheckCanApproveRelease(release);
                 }

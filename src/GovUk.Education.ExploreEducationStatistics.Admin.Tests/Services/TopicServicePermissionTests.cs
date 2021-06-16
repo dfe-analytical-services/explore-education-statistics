@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreateTopic()
         {
             PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UpdateTopic()
         {
             PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetTopic()
         {
             PolicyCheckBuilder()
-                .ExpectResourceCheck(_topic, SecurityPolicies.CanViewSpecificTopic, false)
+                .SetupResourceCheck(_topic, SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteTopic()
         {
             PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {

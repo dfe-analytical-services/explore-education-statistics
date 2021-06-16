@@ -1,12 +1,11 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import {
-  getReleaseStatusLabel,
+  getReleaseApprovalStatusLabel,
   getReleaseSummaryLabel,
 } from '@admin/pages/release/utils/releaseSummaryUtil';
 import { Release } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
@@ -17,6 +16,7 @@ import {
 } from '@common/utils/date/partialDate';
 import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   release: Release;
@@ -40,21 +40,24 @@ const ReleaseSummary = ({
       summary={getReleaseSummaryLabel(release)}
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
-          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
-
-          {release.amendment && <Tag>Amendment</Tag>}
-
-          {release.status === 'Approved' && (
+          {release.approvalStatus !== 'Approved' && (
+            <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+          )}
+          {release.approvalStatus === 'Approved' && (
             <LazyLoad
               once
-              scroll={false}
               placeholder={
                 <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
               }
             >
-              <ReleaseServiceStatus exclude="details" releaseId={release.id} />
+              <ReleaseServiceStatus
+                exclude="details"
+                releaseId={release.id}
+                isApproved
+              />
             </LazyLoad>
           )}
+          {release.amendment && <Tag>Amendment</Tag>}
         </TagGroup>
       }
     >
@@ -70,7 +73,7 @@ const ReleaseSummary = ({
             <time>{formatPartialDate(release.nextReleaseDate)}</time>
           </SummaryListItem>
         )}
-        {release.status === 'Approved' && (
+        {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleaseServiceStatus releaseId={release.id} />
           </SummaryListItem>

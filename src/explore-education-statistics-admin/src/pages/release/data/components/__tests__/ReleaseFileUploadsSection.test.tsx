@@ -30,6 +30,8 @@ describe('ReleaseFileUploadsSection', () => {
         size: 50,
         unit: 'Kb',
       },
+      userName: 'test@test.com',
+      created: '2021-05-26T00:00:00',
     },
     {
       id: 'file-2',
@@ -39,6 +41,8 @@ describe('ReleaseFileUploadsSection', () => {
         size: 100,
         unit: 'Kb',
       },
+      userName: 'test@test.com',
+      created: '2021-05-27T00:00:00',
     },
   ];
 
@@ -77,6 +81,12 @@ describe('ReleaseFileUploadsSection', () => {
       expect(section1.getByTestId('Name')).toHaveTextContent('Test file 1');
       expect(section1.getByTestId('File')).toHaveTextContent('file-1.docx');
       expect(section1.getByTestId('File size')).toHaveTextContent('50 Kb');
+      expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
+        'test@test.com',
+      );
+      expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
+        '26 May 2021 00:00',
+      );
 
       const section2 = within(sections[1]);
 
@@ -87,6 +97,12 @@ describe('ReleaseFileUploadsSection', () => {
       expect(section2.getByTestId('Name')).toHaveTextContent('Test file 2');
       expect(section2.getByTestId('File')).toHaveTextContent('file-2.docx');
       expect(section2.getByTestId('File size')).toHaveTextContent('100 Kb');
+      expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
+        'test@test.com',
+      );
+      expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
+        '27 May 2021 00:00',
+      );
     });
   });
 
@@ -301,6 +317,8 @@ describe('ReleaseFileUploadsSection', () => {
           size: 150,
           unit: 'Kb',
         },
+        userName: 'test@test.com',
+        created: '2021-05-25T00:00:00',
       });
 
       renderPage();
@@ -335,6 +353,8 @@ describe('ReleaseFileUploadsSection', () => {
           size: 150,
           unit: 'Kb',
         },
+        userName: 'test@test.com',
+        created: '2021-05-25T00:00:00',
       });
 
       renderPage();
@@ -385,6 +405,12 @@ describe('ReleaseFileUploadsSection', () => {
           'test-file.docx',
         );
         expect(section3.getByTestId('File size')).toHaveTextContent('150 Kb');
+        expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+          'test@test.com',
+        );
+        expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+          '25 May 2021 00:00',
+        );
       });
     });
   });

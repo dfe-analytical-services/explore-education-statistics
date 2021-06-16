@@ -46,11 +46,12 @@ const TableToolFinalStep = ({
     setPermalinkId('');
   }, [tableHeaders]);
 
-  const { value: pubMethodology } = useAsyncRetry(
+  const { value: fullPublication } = useAsyncRetry(
     async () =>
-      publicationService.getPublicationMethodology(selectedPublication.slug),
+      publicationService.getLatestPublicationRelease(selectedPublication.slug),
     [selectedPublication],
   );
+  const publication = fullPublication?.publication;
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders) {
@@ -199,24 +200,45 @@ const TableToolFinalStep = ({
                     }
                   />
                 </li>
-                {pubMethodology?.methodology?.slug && (
+                {publication?.methodology?.slug && (
                   <li>
                     <Link
                       to="/methodology/[methodology]"
-                      as={`/methodology/${pubMethodology.methodology.slug}`}
+                      as={`/methodology/${publication.methodology.slug}`}
                     >
                       Go to methodology
                     </Link>
                   </li>
                 )}
-                {pubMethodology?.externalMethodology?.url && (
+                {publication?.externalMethodology?.url && (
                   <li>
-                    <a href={pubMethodology.externalMethodology.url}>
+                    <a href={publication.externalMethodology.url}>
                       Go to methodology
                     </a>
                   </li>
                 )}
               </ul>
+            </Details>
+          )}
+          {publication?.contact && (
+            <Details summary="Contact us">
+              <p>
+                If you have a question about the data or methods used to create
+                this table contact the named statistician:
+              </p>
+              <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                {publication?.contact.teamName}
+              </h4>
+              <p className="govuk-!-margin-top-0">
+                Email <br />
+                <a href={`mailto:${publication?.contact.teamEmail}`}>
+                  {publication?.contact.teamEmail}
+                </a>
+              </p>
+              <p>
+                Telephone: {publication?.contact.contactName} <br />{' '}
+                {publication?.contact.contactTelNo}
+              </p>
             </Details>
           )}
         </div>
@@ -272,13 +294,6 @@ const TableToolFinalStep = ({
             </LoadingSpinner>
           )}
         </div>
-      </div>
-
-      <div className="govuk-inset-text">
-        <p>
-          If you have a question about the data or methods used to create this
-          table contact the named statistician via the relevant release page.
-        </p>
       </div>
     </div>
   );

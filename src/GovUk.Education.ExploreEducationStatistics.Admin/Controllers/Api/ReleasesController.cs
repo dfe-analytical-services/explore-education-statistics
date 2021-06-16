@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<MyReleaseViewModel>>> GetDraftReleasesAsync()
         {
             return await _releaseService
-                .GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview)
+                .GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
                 .HandleFailuresOrOk();
         }
 

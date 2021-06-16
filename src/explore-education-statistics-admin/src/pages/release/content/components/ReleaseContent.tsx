@@ -127,6 +127,7 @@ const ReleaseContent = () => {
                     <ReleaseEditableBlock
                       block={block}
                       releaseId={release.id}
+                      sectionId={release.summarySection.id}
                       onSave={updateBlock}
                       onDelete={removeBlock}
                     />

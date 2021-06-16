@@ -3,8 +3,6 @@ import { FileInfo } from '@common/services/types/file';
 import downloadFile from './utils/file/downloadFile';
 
 interface AncillaryFileInfo extends FileInfo {
-  metaFileName: string;
-  rows: number;
   userName: string;
   created: string;
 }
@@ -17,6 +15,8 @@ export interface AncillaryFile {
     size: number;
     unit: string;
   };
+  userName: string;
+  created: string;
   isDeleting?: boolean;
 }
 
@@ -29,7 +29,7 @@ function mapFile(file: AncillaryFileInfo): AncillaryFile {
   const [size, unit] = file.size.split(' ');
 
   return {
-    id: file.id,
+    ...file,
     title: file.name,
     filename: file.fileName,
     fileSize: {

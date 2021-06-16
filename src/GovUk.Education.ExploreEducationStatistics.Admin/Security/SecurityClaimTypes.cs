@@ -43,11 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         ManageAllTaxonomy,
 
         /**
-         * Topic / Theme management
-         */
-        AccessAllTopics,
-        
-        /**
          * Methodology management
          */
         CreateAnyMethodology,
@@ -55,5 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         UpdateAllMethodologies,
         ApproveAllMethodologies,
         MarkAllMethodologiesDraft,
+        MakeAmendmentsOfAllMethodologies
     }
 }

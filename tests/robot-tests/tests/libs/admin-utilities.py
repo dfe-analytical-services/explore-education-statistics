@@ -79,5 +79,6 @@ def user_waits_for_release_process_status_to_be(status, timeout):
             sl.driver.find_element_by_css_selector(f'#release-process-status-{status}')
             return
         except:
+            sl.reload_page()  # Necessary if release previously scheduled
             time.sleep(1)
     raise_assertion_error(f'Release process status wasn\'t {status} after {timeout} seconds!')

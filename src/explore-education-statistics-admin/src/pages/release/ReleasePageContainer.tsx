@@ -4,7 +4,7 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
-import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   releaseContentRoute,
   releaseDataBlockCreateRoute,
@@ -144,7 +144,7 @@ const ReleasePageContainer = ({
             </div>
           </div>
 
-          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+          <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
 
           {release.amendment && (
             <Tag className="govuk-!-margin-left-2">Amendment</Tag>
