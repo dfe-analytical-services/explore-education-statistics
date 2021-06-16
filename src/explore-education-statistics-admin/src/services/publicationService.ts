@@ -41,6 +41,7 @@ export interface MyPublication {
   permissions: {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
+    canCreateMethodologies: boolean;
   };
 }
 

@@ -88,10 +88,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('link', {
         name: 'Methodology must be approved',
       }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/methodology/methodology-1/status',
-    );
+    ).toHaveAttribute('href', '/methodology/methodology-1/status');
 
     expect(
       screen.getByRole('link', {

@@ -73,7 +73,6 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               methodologyStatusRoute.path,
               {
                 methodologyId: error.methodologyId,
-                publicationId: release.publicationId,
               },
             ),
           };
@@ -117,7 +116,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
       }
     });
-  }, [checklist.errors, releaseRouteParams, release.publicationId]);
+  }, [checklist.errors, releaseRouteParams]);
 
   const warnings = useMemo<ChecklistMessage[]>(() => {
     return checklist.warnings.map(warning => {

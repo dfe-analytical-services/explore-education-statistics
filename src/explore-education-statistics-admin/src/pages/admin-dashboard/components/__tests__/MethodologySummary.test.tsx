@@ -82,6 +82,7 @@ const testPublicationNoMethodology: MyPublication = {
   permissions: {
     canCreateReleases: true,
     canUpdatePublication: true,
+    canCreateMethodologies: true,
   },
 };
 
@@ -143,9 +144,37 @@ describe('MethodologySummary', () => {
           testPublicationNoMethodology.id,
         );
         expect(history.push).toBeCalledWith(
-          `/publication/${testPublicationNoMethodology.id}/methodology/${testMethodology.id}/summary`,
+          `/methodology/${testMethodology.id}/summary`,
         );
       });
+    });
+
+    test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              permissions: {
+                ...testPublicationNoMethodology.permissions,
+                canCreateMethodologies: false,
+              },
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Link to an externally hosted methodology',
+        }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -282,27 +311,69 @@ describe('MethodologySummary', () => {
   });
 
   describe('Has an external methodology', () => {
-    test('the external methodology link and buttons are shown', () => {
-      render(
-        <MemoryRouter>
-          <MethodologySummary
-            publication={testPublicationWithExternalMethodology}
-            topicId={testTopicId}
-            onChangePublication={noop}
-          />
-        </MemoryRouter>,
-      );
+    test(
+      'renders the external methodology link, and renders the Edit and Remove buttons if the user has ' +
+        'permission',
+      () => {
+        render(
+          <MemoryRouter>
+            <MethodologySummary
+              publication={testPublicationWithExternalMethodology}
+              topicId={testTopicId}
+              onChangePublication={noop}
+            />
+          </MemoryRouter>,
+        );
 
-      expect(
-        screen.queryByText('Ext methodolology title (external methodology)'),
-      ).toBeInTheDocument();
+        expect(
+          screen.queryByText('Ext methodolology title (external methodology)', {
+            selector: 'a',
+          }),
+        ).toBeInTheDocument();
 
-      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'Edit' }),
+        ).toBeInTheDocument();
 
-      expect(
-        screen.getByRole('button', { name: 'Remove' }),
-      ).toBeInTheDocument();
-    });
+        expect(
+          screen.getByRole('button', { name: 'Remove' }),
+        ).toBeInTheDocument();
+      },
+    );
+
+    test(
+      'renders the external methodology link, but not the Edit or Remove buttons if the user does not have ' +
+        'permission',
+      () => {
+        render(
+          <MemoryRouter>
+            <MethodologySummary
+              publication={{
+                ...testPublicationWithExternalMethodology,
+                permissions: {
+                  ...testPublicationWithExternalMethodology.permissions,
+                  canCreateMethodologies: false,
+                },
+              }}
+              topicId={testTopicId}
+              onChangePublication={noop}
+            />
+          </MemoryRouter>,
+        );
+
+        expect(
+          screen.queryByText('Ext methodolology title (external methodology)'),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByRole('button', { name: 'Edit' }),
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole('button', { name: 'Remove' }),
+        ).not.toBeInTheDocument();
+      },
+    );
   });
 
   describe('Amending a methodology', () => {
@@ -407,7 +478,7 @@ describe('MethodologySummary', () => {
           testPublicationWithMethodologyCanAmend.methodology.id,
         );
         expect(history.push).toBeCalledWith(
-          `/publication/${testPublicationWithMethodologyCanAmend.id}/methodology/${mockMethodology.id}/summary`,
+          `/methodology/${mockMethodology.id}/summary`,
         );
       });
     });

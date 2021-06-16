@@ -1,5 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
+import {
+  MethodologyRouteParams,
+  methodologySummaryEditRoute,
+} from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -9,7 +12,7 @@ import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps } from 'react-router';
 
 const MethodologySummaryPage = ({
   match,
@@ -44,7 +47,14 @@ const MethodologySummaryPage = ({
             </SummaryList>
 
             {currentMethodology.status !== 'Approved' && (
-              <ButtonLink to={`/methodologies/${methodologyId}/summary/edit`}>
+              <ButtonLink
+                to={generatePath<MethodologyRouteParams>(
+                  methodologySummaryEditRoute.path,
+                  {
+                    methodologyId,
+                  },
+                )}
+              >
                 Edit summary
               </ButtonLink>
             )}

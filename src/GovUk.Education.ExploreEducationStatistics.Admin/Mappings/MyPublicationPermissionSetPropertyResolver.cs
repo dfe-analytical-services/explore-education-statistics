@@ -27,15 +27,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 CanUpdatePublication = _userService
                     .CheckCanUpdatePublication(source)
                     .Result
-                    .OnSuccess(_ => true)
-                    .OrElse(() => false)
-                    .Right,
+                    .IsRight,
                 CanCreateReleases = _userService
                     .CheckCanCreateReleaseForPublication(source)
                     .Result
-                    .OnSuccess(_ => true)
-                    .OrElse(() => false)
-                    .Right
+                    .IsRight,
+                CanCreateMethodologies = _userService
+                    .CheckCanCreateMethodologyForPublication(source)
+                    .Result
+                    .IsRight
             };
         }
     }
