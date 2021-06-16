@@ -25,9 +25,6 @@ do this on failure
 
 custom testid locator strategy
   [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
-  Log to console  ${tag}
-  Log to console  ${constraints}
-  Log to console  ${test_id}
   ${element}=   Execute Javascript  let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
   user waits until element is visible  ${element}  30
   [Return]  ${element}

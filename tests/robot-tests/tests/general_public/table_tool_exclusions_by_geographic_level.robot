@@ -26,6 +26,7 @@ Validate "Exclusions by geographic level" subject details
     ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Exclusions by geographic level"]
     user checks summary list contains  Geographic levels  Local Authority; National; Regional  ${details}
     user checks summary list contains  Time period  2006/07 to 2016/17  ${details}
+
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
     user clicks radio   Exclusions by geographic level
