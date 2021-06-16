@@ -1377,8 +1377,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2035",
                 Slug = "2035-1",
                 Version = 0,
-                InternalReleaseNote = "Test release note",
                 PreReleaseAccessList = "Test access list",
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Release note null Created date",
+                       Created = null
+                    },
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Latest release note - 1 day ago",
+                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
+                    },
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Release note 2 days ago",
+                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
+                    }
+                }
             };
 
             var publication = new Publication
@@ -1392,11 +1409,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var publication2 = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new Release
+                    {
+                        ReleaseStatuses = new List<ReleaseStatus>
+                        {
+                            new ReleaseStatus
+                            {
+                                InternalReleaseNote = "Different release",
+                                Created = DateTime.UtcNow
+                            }
+                        }
+                    }
+                }
+            };
 
+            var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                await context.AddRangeAsync(publication, publication2);
                 await context.SaveChangesAsync();
             }
 
@@ -1413,7 +1447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
                 Assert.Equal("test-publication", viewModel.PublicationSlug);
-                Assert.Equal("Test release note", viewModel.InternalReleaseNote);
+                Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
                 Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
                 Assert.Equal("Test access list", viewModel.PreReleaseAccessList);

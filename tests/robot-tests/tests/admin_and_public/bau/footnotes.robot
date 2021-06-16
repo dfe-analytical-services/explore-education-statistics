@@ -220,7 +220,7 @@ Approve release
     user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001

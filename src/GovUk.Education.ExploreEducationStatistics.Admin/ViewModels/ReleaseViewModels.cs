@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         public bool Amendment { get; set; }
 
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PublishMethod? PublishMethod { get; set; }

@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var oldStatus = release.ApprovalStatus;
 
                     release.ApprovalStatus = request.ApprovalStatus;
-                    release.InternalReleaseNote = request.InternalReleaseNote;
+                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
                     release.NextReleaseDate = request.NextReleaseDate;
 
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
-                        InternalReleaseNote = request.InternalReleaseNote,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
                         ApprovalStatus = request.ApprovalStatus,
                         Created = DateTime.UtcNow,
                         CreatedById = _userService.GetUserId()
@@ -573,7 +573,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Type);
+                .Include(r => r.Type)
+                .Include(r => r.ReleaseStatuses);
         }
 
         private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)

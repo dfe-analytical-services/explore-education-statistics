@@ -39,7 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null));
+                            : (DateTime?) null))
+                .ForMember(dest => dest.LatestInternalReleaseNote,
+                    m => m.MapFrom(r =>
+                        r.ReleaseStatuses
+                            .OrderBy(rs => rs.Created)
+                            .LastOrDefault()
+                            .InternalReleaseNote));
 
             CreateMap<Release, MyReleaseViewModel>()
                 .ForMember(
@@ -58,6 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null))
+                .ForMember(dest => dest.LatestInternalReleaseNote,
+                    m => m.MapFrom(r =>
+                        r.ReleaseStatuses
+                            .OrderBy(rs => rs.Created)
+                            .LastOrDefault()
+                            .InternalReleaseNote))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
             CreateMap<ReleaseCreateViewModel, Release>()
@@ -193,6 +205,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.HasPreReleaseAccessList,
                     m => m.MapFrom(r => !r.PreReleaseAccessList.IsNullOrEmpty()))
+                .ForMember(dest => dest.LatestReleaseStatus,
+                    m => m.MapFrom(r =>
+                        r.ReleaseStatuses
+                            .OrderBy(rs => rs.Created)
+                            .LastOrDefault()
+                            .InternalReleaseNote))
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
