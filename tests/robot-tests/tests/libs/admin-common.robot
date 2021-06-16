@@ -418,3 +418,36 @@ user changes methodology status to Approved
     user clicks element  id:methodologyStatusForm-status-Approved
     user enters text into element  id:methodologyStatusForm-internalReleaseNote  Approved by UI tests
     user clicks button  Update status
+
+user gives analyst publication owner access
+    [Arguments]  ${ANALYST_EMAIL}  ${PUBLICATION_NAME}
+    user clicks link  Manage  xpath://td[text()="${ANALYST_EMAIL}"]/..
+    user waits until page does not contain loading spinner
+
+    # stale element exception if you don't wait until it's enabled    
+    user waits until button is enabled  Add publication access
+    user scrolls to element  css:[name="selectedPublicationId"]
+    
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+
+    user waits until element is enabled  css:[name="selectedPublicationRole"]
+    user selects from list by label  css:[name="selectedPublicationRole"]  Owner
+    user clicks button  Add publication access
+
+user removes publication owner access from analyst 
+    [Arguments]  ${PUBLICATION_NAME}
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user scrolls to element  css:[name="selectedPublicationId"]
+    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
+    user waits until page does not contain loading spinner
+
+user gives analyst release access 
+    [Arguments]    ${RELEASE_NAME}  ${ROLE}
+    user waits until element is enabled  css:[name="selectedReleaseId"]
+    user scrolls to element  css:[name="selectedReleaseId"]
+    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
+    user selects from list by label  css:[name="selectedReleaseRole"]  ${ROLE}
+    user clicks button  Add release access
+    user waits until page does not contain loading spinner
