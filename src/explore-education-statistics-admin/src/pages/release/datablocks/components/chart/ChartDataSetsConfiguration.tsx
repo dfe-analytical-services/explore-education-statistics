@@ -145,9 +145,7 @@ const ChartDataSetsConfiguration = ({
                 timePeriod,
               });
             });
-          }
-
-          if (selectedFilters.length) {
+          } else {
             selectedFilters.forEach(filter => {
               selectedIndicators.forEach(option => {
                 selectedDataSets.push({
