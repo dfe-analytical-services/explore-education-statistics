@@ -147,6 +147,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("releases/{releaseId}/internal-notes")]
+        public async Task<ActionResult<List<ReleaseInternalNoteViewModel>>> GetInternalReleaseNotes(Guid releaseId)
+        {
+            return await _releaseService
+                .GetInternalReleaseNotes(releaseId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("releases/{releaseId}/publication-status")]
         public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(
             Guid releaseId)

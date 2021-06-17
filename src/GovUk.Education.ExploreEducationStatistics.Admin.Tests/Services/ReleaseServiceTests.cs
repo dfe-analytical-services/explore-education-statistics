@@ -1464,6 +1464,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetInternalReleaseNotes()
+        {
+            var release = new Release();
+            var ignoredRelease = new Release();
+            var releaseStatuses = new List<ReleaseStatus>
+            {
+                new ReleaseStatus
+                {
+                    Release = release,
+                    InternalReleaseNote = "Note1 - old",
+                    ApprovalStatus = ReleaseApprovalStatus.Draft,
+                    Created = new DateTime(2001, 1, 1),
+                    CreatedBy = new User { Email = "note1@test.com" }
+                },
+                new ReleaseStatus
+                {
+                    Release = release,
+                    InternalReleaseNote = "Note2 - latest",
+                    ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                    Created = new DateTime(2002, 2, 2),
+                    CreatedBy = new User { Email = "note2@test.com" }
+                },
+                new ReleaseStatus
+                {
+                    Release = release,
+                    InternalReleaseNote = "Note3 - null created",
+                    ApprovalStatus = ReleaseApprovalStatus.Approved,
+                    Created = null, // Migrated ReleaseStatus has null Created and CreatedBy
+                    CreatedBy = null
+                },
+                new ReleaseStatus
+                {
+                    Release = ignoredRelease,
+                    InternalReleaseNote = "Note4 - different release",
+                    ApprovalStatus = ReleaseApprovalStatus.Approved,
+                    Created = new DateTime(2012, 12, 12),
+                    CreatedBy = new User { Email = "note4@test.com" }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(release, ignoredRelease,
+                    releaseStatuses[0], releaseStatuses[1],
+                    releaseStatuses[2], releaseStatuses[3]);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext);
+                var result = await releaseService.GetInternalReleaseNotes(release.Id);
+                Assert.True(result.IsRight);
+
+                var internalNotes = result.Right;
+                Assert.Equal(3, internalNotes.Count);
+
+                releaseStatuses = releaseStatuses
+                    .Where(rs => rs.ReleaseId == release.Id)
+                    .OrderByDescending(rs => rs.Created)
+                    .ToList();
+
+                Assert.Equal(releaseStatuses[0].InternalReleaseNote, internalNotes[0].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[0].ApprovalStatus,internalNotes[0].ApprovalStatus);
+                Assert.Equal(releaseStatuses[0].Created, internalNotes[0].Created);
+                Assert.Equal(releaseStatuses[0].CreatedBy?.Email, internalNotes[0].CreatedByEmail);
+
+                Assert.Equal(releaseStatuses[1].InternalReleaseNote, internalNotes[1].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[1].ApprovalStatus,internalNotes[1].ApprovalStatus);
+                Assert.Equal(releaseStatuses[1].Created, internalNotes[1].Created);
+                Assert.Equal(releaseStatuses[1].CreatedBy?.Email, internalNotes[1].CreatedByEmail);
+
+                Assert.Equal(releaseStatuses[2].InternalReleaseNote, internalNotes[2].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[2].ApprovalStatus,internalNotes[2].ApprovalStatus);
+                Assert.Equal(releaseStatuses[2].Created, internalNotes[2].Created);
+                Assert.Equal(releaseStatuses[2].CreatedBy?.Email, internalNotes[2].CreatedByEmail);
+            }
+        }
+
+        [Fact]
         public async Task GetLatestReleaseAsync()
         {
             var publication = new Publication
