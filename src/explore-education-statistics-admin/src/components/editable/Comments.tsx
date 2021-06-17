@@ -67,20 +67,19 @@ const Comments = ({
     }
   };
 
-  const removeComment = (index: number) => {
-    const commentId = comments[index].id;
-
+  const removeComment = (commentId: string) => {
+    const index = comments.findIndex(comment => comment.id === commentId);
     releaseContentCommentService
       .deleteContentSectionComment(commentId)
       .then(() => {
         const newComments = [...comments];
         newComments.splice(index, 1);
-
         onChange(blockId, newComments);
       });
   };
 
-  const updateComment = (index: number, content: string) => {
+  const updateComment = (commentId: string, content: string) => {
+    const index = comments.findIndex(comment => comment.id === commentId);
     const editedComment: UpdateComment = {
       ...comments[index],
       content,
@@ -133,7 +132,7 @@ const Comments = ({
         )}
 
         <ul className={styles.commentsContainer}>
-          {orderBy(comments, ['created'], ['desc']).map((comment, index) => {
+          {orderBy(comments, ['created'], ['desc']).map(comment => {
             const { createdBy } = comment;
 
             return (
@@ -159,7 +158,7 @@ const Comments = ({
                       content: Yup.string().required('Enter a comment'),
                     })}
                     onSubmit={values => {
-                      updateComment(index, values.content);
+                      updateComment(comment.id, values.content);
                     }}
                   >
                     <Form
@@ -201,7 +200,7 @@ const Comments = ({
 
                         <ButtonText
                           onClick={() => {
-                            removeComment(index);
+                            removeComment(comment.id);
                           }}
                         >
                           Delete
