@@ -111,7 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 Id = methodology.Id,
                 Slug = methodology.Slug,
-                Summary = methodology.Summary,
                 Title = methodology.Title
             };
         }

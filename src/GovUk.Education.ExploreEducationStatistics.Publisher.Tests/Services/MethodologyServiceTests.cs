@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        // TODO SOW4 EES-2375 Update for new model after moving to Content API
+        // TODO SOW4 EES-2378 Update for new model after moving to Content API
         // [Fact]
         // public async Task GetTree()
         // {

@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
@@ -61,12 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "third contact team name"
         };
 
-        private static readonly MethodologyParent Methodology = new MethodologyParent
-        {
-            Id = Guid.NewGuid(),
-            Slug = "methodology-slug"
-        };
-
         private static readonly Publication PublicationA = new Publication
         {
             Id = Guid.NewGuid(),
@@ -77,33 +72,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Description = "first publication description",
             ExternalMethodology = new ExternalMethodology
             {
-              Title  = "external methodology title",
-              Url = "http://external.methodology/"
+                Title = "external methodology title",
+                Url = "http://external.methodology/"
             },
-            LegacyReleases = new List<LegacyRelease>
-            {
-              new LegacyRelease
-              {
-                  Id = Guid.NewGuid(),
-                  Description = "Academic Year 2008/09",
-                  Order = 0,
-                  Url = "http://link.one/"
-              },
-              new LegacyRelease
-              {
-                  Id = Guid.NewGuid(),
-                  Description = "Academic Year 2010/11",
-                  Order = 2,
-                  Url = "http://link.three/"
-              },
-              new LegacyRelease
-              {
-                  Id = Guid.NewGuid(),
-                  Description = "Academic Year 2009/10",
-                  Order = 1,
-                  Url = "http://link.two/"
-              }
-            },
+            LegacyReleases = AsList(
+                new LegacyRelease
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Academic Year 2008/09",
+                    Order = 0,
+                    Url = "http://link.one/"
+                },
+                new LegacyRelease
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Academic Year 2010/11",
+                    Order = 2,
+                    Url = "http://link.three/"
+                },
+                new LegacyRelease
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Academic Year 2009/10",
+                    Order = 1,
+                    Url = "http://link.two/"
+                }
+            ),
             Slug = "publication-a",
             Summary = "first publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
@@ -213,8 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = null
         };
 
-        private static readonly List<Release> Releases = new List<Release>
-        {
+        private static readonly List<Release> Releases = AsList(
             PublicationARelease1V0,
             PublicationARelease1V1Deleted,
             PublicationARelease1V1,
@@ -233,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PreviousVersionId = null
             },
             PublicationBRelease1
-        };
+        );
 
         [Fact]
         public void GetTree()
@@ -289,12 +282,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await context.AddAsync(Topic);
                 await context.AddRangeAsync(PublicationA, PublicationB, PublicationC);
                 await context.AddRangeAsync(Releases);
-                await context.AddAsync(new PublicationMethodology
-                {
-                    MethodologyParent = Methodology,
-                    Publication = PublicationA,
-                    Owner = true
-                });
                 await context.SaveChangesAsync();
             }
 
@@ -348,10 +335,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("http://link.two/", legacyReleases[1].Url);
                 Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
                 Assert.Equal("http://link.one/", legacyReleases[2].Url);
-
-                Assert.Single(result.Methodologies);
-                Assert.Equal(Methodology.Id, result.Methodologies[0].Id);
-                Assert.Equal("methodology-slug", result.Methodologies[0].Slug);
 
                 Assert.NotNull(result.Releases);
                 var releases = result.Releases;

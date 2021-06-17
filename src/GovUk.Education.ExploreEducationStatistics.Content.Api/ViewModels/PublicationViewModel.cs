@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             List<LegacyReleaseViewModel> legacyReleases,
             TopicViewModel topic,
             ContactViewModel contact,
-            ExternalMethodologyViewModel externalMethodology,
-            List<MethodologySummaryViewModel> methodologies)
+            ExternalMethodologyViewModel externalMethodology)
         {
             Id = id;
             Title = title;
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             Topic = topic;
             Contact = contact;
             ExternalMethodology = externalMethodology;
-            Methodologies = methodologies;
         }
 
         public Guid Id { get; }
@@ -60,7 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 
         public ExternalMethodologyViewModel ExternalMethodology { get; }
 
-        // TODO SOW4 EES-2375 Change UI to expect more than one Methodology
-        public List<MethodologySummaryViewModel> Methodologies { get; }
+        public List<MethodologySummaryViewModel> Methodologies { get; set; }
     }
 }

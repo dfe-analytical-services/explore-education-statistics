@@ -27,18 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
-            CreateMap<PublicationMethodology, MethodologySummaryViewModel>()
-                .IncludeMembers(pm => pm.MethodologyParent);
-
-            CreateMap<MethodologyParent, MethodologySummaryViewModel>();
-
             CreateMap<Publication, PublicationTitleViewModel>();
 
             CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.LegacyReleases,
                     m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
-                .ForMember(dest => dest.Methodologies,
-                    m => m.MapFrom(p => p.Methodologies))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Publication, Data.Model.Publication>()

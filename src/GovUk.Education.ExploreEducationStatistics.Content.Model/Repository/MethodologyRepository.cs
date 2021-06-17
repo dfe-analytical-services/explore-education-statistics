@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using IMethodologyRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
     public class MethodologyRepository : IMethodologyRepository
     {
@@ -22,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyParentRepository = methodologyParentRepository;
         }
 
-        public async Task<List<Methodology>> GetLatestByPublication(Guid publicationId)
+        public async Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId)
         {
             // First check the publication exists
             var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
@@ -34,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .Collection(m => m.Versions)
                         .Load();
 
-                    return methodology.LatestVersion();
+                    return methodology.LatestPublishedVersion();
                 })
                 .Where(version => version != null)
                 .ToList();

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Repository
 {
     public class MethodologyParentRepositoryTests
     {
@@ -19,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.PublicationMethodologies.AddRangeAsync(
                     new PublicationMethodology
@@ -44,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyParentRepository(contentDbContext);
 
@@ -61,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 // Add a methodology linked to a different publication to check its not returned
                 await contentDbContext.PublicationMethodologies.AddAsync(new PublicationMethodology
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyParentRepository(contentDbContext);
 
@@ -88,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
 
@@ -102,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyParentRepository(contentDbContext);
 

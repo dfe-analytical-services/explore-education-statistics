@@ -89,8 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
                 publication.LegacyReleases,
                 publication.Topic,
                 publication.Contact,
-                publication.ExternalMethodology,
-                publication.Methodologies
+                publication.ExternalMethodology
             );
         }
 

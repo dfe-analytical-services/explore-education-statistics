@@ -440,7 +440,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IMethodologyContentService methodologyContentService = null,
-            IMethodologyRepository methodologyRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IMethodologyImageService methodologyImageService = null,
             IPublishingService publishingService = null,
