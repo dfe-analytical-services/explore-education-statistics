@@ -168,7 +168,6 @@ user waits until page contains link
     [Arguments]    ${link_text}   ${wait}=${timeout}
     wait until page contains element  xpath://a[.="${link_text}"]   timeout=${wait}
 
-
 user waits until element contains link
     [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
     user waits until parent contains element  ${element}  link:${link_text}  timeout=${wait}
@@ -381,7 +380,7 @@ user waits until legend is visible
 
 user waits until page contains title
     [Arguments]   ${text}  ${wait}=${timeout}
-    user waits until page contains element   xpath://h1[@data-testid="page-title ${text}" and text()="${text}"]   ${wait}
+    user waits until page contains element   xpath://h1[@data-testid="page-title" and text()="${text}"]   ${wait}
 
 user waits until page contains title caption
     [Arguments]  ${text}  ${wait}=${timeout}

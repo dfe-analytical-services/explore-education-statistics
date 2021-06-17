@@ -8,8 +8,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    teardown suite
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create methodology publication %{RUN_IDENTIFIER}
 
 *** Keywords ***

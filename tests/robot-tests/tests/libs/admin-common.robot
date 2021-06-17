@@ -114,7 +114,11 @@ user creates methodology for publication
     user checks summary list contains   Published on  Not yet published
     
 user links publication to external methodology
-    [Arguments]  ${publication}     ${title}=${publication} external methodology    ${link}=https://example.com
+    [Arguments]  
+... ${publication}     
+... ${title}=${publication} external methodology
+... ${link}=https://example.com
+
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${publication}
     user opens accordion section  ${publication}
@@ -129,7 +133,13 @@ user links publication to external methodology
     user checks page contains link with text and url  ${title}  ${link}
     
 user edits an external methodology
-    [Arguments]  ${publication}     ${new_title}=${publication} external methodology (updated)   ${new_link}=https://example.com/updated    ${original_title}=${publication} external methodology    ${original_link}=https://example.com
+    [Arguments]  
+... ${publication}
+... ${new_title}=${publication} external methodology (updated)
+... ${new_link}=https://example.com/updated
+... ${original_title}=${publication} external methodology
+... ${original_link}=https://example.com
+    
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${publication}
     user opens accordion section  ${publication}
