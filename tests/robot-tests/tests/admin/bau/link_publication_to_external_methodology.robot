@@ -5,7 +5,7 @@ Library  ../../libs/admin_api.py
 Force Tags  Admin  Local  Dev  AltersData
 
 Suite Setup       user signs in as bau1
-Suite Teardown    teardown suite
+Suite Teardown    user closes the browser
 
 *** Variables ***
 ${PUBLICATION_NAME}  UI tests - create methodology publication %{RUN_IDENTIFIER}

@@ -115,9 +115,9 @@ user creates methodology for publication
     
 user links publication to external methodology
     [Arguments]  
-... ${publication}     
-... ${title}=${publication} external methodology
-... ${link}=https://example.com
+    ...  ${publication}     
+    ...  ${title}=${publication} external methodology
+    ...  ${link}=https://example.com
 
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${publication}
@@ -134,11 +134,11 @@ user links publication to external methodology
     
 user edits an external methodology
     [Arguments]  
-... ${publication}
-... ${new_title}=${publication} external methodology (updated)
-... ${new_link}=https://example.com/updated
-... ${original_title}=${publication} external methodology
-... ${original_link}=https://example.com
+    ...  ${publication}
+    ...  ${new_title}=${publication} external methodology (updated)
+    ...  ${new_link}=https://example.com/updated
+    ...  ${original_title}=${publication} external methodology
+    ...  ${original_link}=https://example.com
     
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${publication}
