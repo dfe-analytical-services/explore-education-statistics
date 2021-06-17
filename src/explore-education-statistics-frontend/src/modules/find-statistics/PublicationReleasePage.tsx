@@ -41,10 +41,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     release.publication.legacyReleases.length;
 
   let methodologyUrl = '';
-  let methodologySummary = '';
   if (release.publication.methodology) {
     methodologyUrl = `/methodology/${release.publication.methodology.slug}`;
-    methodologySummary = release.publication.methodology.summary;
   } else if (release.publication.externalMethodology) {
     methodologyUrl = release.publication.externalMethodology.url;
   }
@@ -422,7 +420,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         accordionId="help-and-support"
         publicationTitle={release.publication.title}
         methodologyUrl={methodologyUrl}
-        methodologySummary={methodologySummary}
         publicationContact={release.publication.contact}
         releaseType={release.type.title}
       />
