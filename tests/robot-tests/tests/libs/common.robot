@@ -26,7 +26,6 @@ do this on failure
 custom testid locator strategy
   [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
   ${element}=   Execute Javascript  let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
-  user waits until element is visible  ${element}  30
   [Return]  ${element}
 
 set custom locator strategies
@@ -325,10 +324,6 @@ user clicks element
     user scrolls to element  ${element}
     wait until element is enabled   ${element}
     click element   ${element}
-
-user clicks testid element
-    [Arguments]  ${id}
-    user clicks element  css:[data-testid="${id}"]
 
 user clicks link
     [Arguments]   ${text}  ${parent}=css:body

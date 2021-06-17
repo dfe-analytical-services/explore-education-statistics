@@ -204,7 +204,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     [Tags]  HappyPath
-    user clicks testid element  View stats link for ${PUBLICATION_NAME}
+    user clicks element  testid:View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Verify release URL and page caption
@@ -545,7 +545,7 @@ Verify amendment is on Find Statistics page again
 
 Navigate to amendment release page
     [Tags]  HappyPath
-    user clicks testid element  View stats link for ${PUBLICATION_NAME}
+    user clicks element  testid:View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
     user waits until page contains title caption  ${RELEASE_NAME}
 
