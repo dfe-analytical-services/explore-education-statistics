@@ -677,5 +677,60 @@ describe('PublicationForm', () => {
         });
       });
     });
+
+    test('shows a confirmation modal on submit if the confirmOnSubmit flag is set', async () => {
+      themeService.getThemes.mockResolvedValue(testThemes);
+      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
+
+      const initialValues: PublicationFormValues = {
+        title: 'Test title',
+        topicId: 'topic-4',
+        methodologyId: 'methodology-2',
+        teamName: 'Test team',
+        teamEmail: 'team@test.com',
+        contactTelNo: '0123456789',
+        contactName: 'John Smith',
+      };
+
+      const handleSubmit = jest.fn();
+
+      render(
+        <PublicationForm
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          confirmOnSubmit
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select topic')).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'Save publication' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+        'topic-3',
+      ]);
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+
+      await waitFor(() => {
+        const modal = within(screen.getByRole('dialog'));
+        expect(modal.getByRole('heading')).toHaveTextContent(
+          'Confirm publication changes',
+        );
+        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      });
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith({
+          ...initialValues,
+          topicId: 'topic-3',
+        });
+      });
+    });
   });
 });
