@@ -4,6 +4,7 @@ import { Comment, EditableBlock } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';
+import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
@@ -234,6 +235,8 @@ export const releaseReducer: Reducer<
       } else {
         matchingBlock.comments = comments;
       }
+
+      draft.unresolvedComments = getUnresolvedComments(draft.release);
       return draft;
     }
     default: {

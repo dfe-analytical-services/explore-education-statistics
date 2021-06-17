@@ -748,7 +748,7 @@ describe('ReleaseContentContext', () => {
     expect(release?.content[0].heading).toEqual('updated heading');
   });
 
-  test("UPDATE_BLOCK_COMMENTS updates a block's comments", () => {
+  test("UPDATE_BLOCK_COMMENTS updates a block's comments and the unresolved comments list", () => {
     const sectionKey = 'content';
 
     const newComment: Comment = {
@@ -768,7 +768,7 @@ describe('ReleaseContentContext', () => {
       newComment,
     ];
 
-    const { release } = releaseReducer(
+    const { release, unresolvedComments } = releaseReducer(
       {
         release: basicRelease,
         canUpdateRelease: true,
@@ -789,6 +789,42 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release?.content[0].content[0].comments).toEqual<Comment[]>([
+      {
+        id: 'comment-1',
+        content: 'A comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-09T09:39:53.736',
+      },
+      {
+        id: 'comment-2',
+        content: 'another comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-09T09:40:16.534',
+      },
+      {
+        id: 'comment-3',
+        content: 'a third comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-10T12:00:00.000',
+      },
+    ]);
+
+    expect(unresolvedComments).toEqual([
       {
         id: 'comment-1',
         content: 'A comment',

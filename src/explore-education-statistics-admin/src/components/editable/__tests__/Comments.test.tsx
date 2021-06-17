@@ -549,5 +549,79 @@ describe('Comments', () => {
         ] as Comment[]);
       });
     });
+
+    test('deleting comment calls the `onChange` handler with it removed from comments when selecting one of multiple comments', async () => {
+      const handleChange = jest.fn();
+
+      const testCommentsMultiple = [
+        ...testComments,
+        {
+          id: 'comment-3',
+          content: 'Test comment 3',
+          createdBy: {
+            id: 'user-2',
+            email: 'test2@test.com',
+            firstName: 'Jane',
+            lastName: 'Roberts',
+          },
+          created: '2020-06-08T11:00:00',
+        },
+      ];
+
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser,
+          }}
+        >
+          <ReleaseContextProvider release={testRelease}>
+            <Comments
+              blockId="test-block"
+              sectionId="section-1"
+              comments={testCommentsMultiple}
+              onChange={handleChange}
+            />
+          </ReleaseContextProvider>
+        </AuthContext.Provider>,
+      );
+
+      releaseContentCommentService.deleteContentSectionComment.mockImplementation(
+        () => Promise.resolve(),
+      );
+
+      fireEvent.click(
+        screen.getAllByRole('button', {
+          name: 'Delete',
+          hidden: true,
+        })[0],
+      );
+
+      await waitFor(() => {
+        expect(handleChange).toHaveBeenCalledWith('test-block', [
+          {
+            id: 'comment-1',
+            content: 'Test comment 1',
+            createdBy: {
+              id: 'user-1',
+              email: 'test@test.com',
+              firstName: 'John',
+              lastName: 'Smith',
+            },
+            created: '2020-06-06T12:00:00',
+          },
+          {
+            id: 'comment-2',
+            content: 'Test comment 2',
+            createdBy: {
+              id: 'user-2',
+              email: 'test2@test.com',
+              firstName: 'Jane',
+              lastName: 'Roberts',
+            },
+            created: '2020-06-06T11:00:00',
+          },
+        ] as Comment[]);
+      });
+    });
   });
 });
