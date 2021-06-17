@@ -7,7 +7,9 @@ import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService from '@admin/services/releaseService';
+import releaseService, {
+  ReleaseInternalNote,
+} from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -54,6 +56,11 @@ const ReleaseStatusPage = () => {
         ? releaseService.getRelease(releaseId)
         : contextRelease,
     [releaseId],
+  );
+
+  const { value: internalNotes } = useAsyncRetry<ReleaseInternalNote[]>(
+    () => releaseService.getReleaseInternalNotes(releaseId),
+    [releaseId, release],
   );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
@@ -131,6 +138,55 @@ const ReleaseStatusPage = () => {
         <Button className="govuk-!-margin-top-2" onClick={toggleEditing.on}>
           Edit release status
         </Button>
+      )}
+
+      {internalNotes && internalNotes.length > 0 && (
+        <>
+          <h3>Internal note history</h3>
+          <LoadingSpinner
+            loading={!internalNotes}
+            text="Loading internal note history"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Internal note</th>
+                  <th scope="col">By user</th>
+                </tr>
+              </thead>
+              {internalNotes && (
+                <tbody>
+                  {internalNotes.map(note => (
+                    <tr key={note.releaseStatusId}>
+                      <td>
+                        {note.created ? (
+                          <FormattedDate format="d MMMM yyyy HH:mm">
+                            {note.created}
+                          </FormattedDate>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                      <td>{note.approvalStatus}</td>
+                      <td>{note.internalReleaseNote}</td>
+                      <td>
+                        {note.createdByEmail ? (
+                          <a href={`mailto:${note.createdByEmail}`}>
+                            {note.createdByEmail}
+                          </a>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </LoadingSpinner>
+        </>
       )}
     </>
   );

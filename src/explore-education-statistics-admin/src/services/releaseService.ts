@@ -154,6 +154,14 @@ export interface ReleasePublicationStatus {
   live: boolean;
 }
 
+export interface ReleaseInternalNote {
+  releaseStatusId: string;
+  internalReleaseNote: string;
+  approvalStatus: ReleaseApprovalStatus;
+  created: string;
+  createdByEmail: string;
+}
+
 const releaseService = {
   createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseSummary> {
     return client.post(
@@ -164,6 +172,10 @@ const releaseService = {
 
   getRelease(releaseId: string): Promise<Release> {
     return client.get(`/releases/${releaseId}`);
+  },
+
+  getReleaseInternalNotes(releaseId: string): Promise<ReleaseInternalNote[]> {
+    return client.get(`/releases/${releaseId}/internal-notes`);
   },
 
   updateRelease(
