@@ -8,7 +8,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -192,7 +191,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
-                Status = Approved
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -225,7 +223,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ1,
-                Status = Approved
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

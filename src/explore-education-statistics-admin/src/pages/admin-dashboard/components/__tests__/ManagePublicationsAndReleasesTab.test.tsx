@@ -88,6 +88,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
       permissions: {
         canCreateReleases: true,
         canUpdatePublication: true,
+        canCreateMethodologies: true,
       },
     },
     {
@@ -98,6 +99,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
       permissions: {
         canCreateReleases: true,
         canUpdatePublication: true,
+        canCreateMethodologies: true,
       },
     },
   ];

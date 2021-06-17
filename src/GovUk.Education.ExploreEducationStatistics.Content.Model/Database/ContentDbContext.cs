@@ -136,7 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     p => new Uri(p));
 
             modelBuilder.Entity<Publication>()
-                .OwnsOne(p => p.ExternalMethodology).ToTable("ExternalMethodology");
+                .OwnsOne(p => p.ExternalMethodology)
+                .ToTable("ExternalMethodology");
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyParentId});
@@ -145,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(pm => pm.Publication)
                 .WithMany(p => p.Methodologies)
                 .HasForeignKey(pm => pm.PublicationId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.MethodologyParent)
@@ -239,8 +240,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<Release>()
-                .Property(release => release.Status)
-                .HasConversion(new EnumToStringConverter<ReleaseStatus>());
+                .Property(release => release.ApprovalStatus)
+                .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)

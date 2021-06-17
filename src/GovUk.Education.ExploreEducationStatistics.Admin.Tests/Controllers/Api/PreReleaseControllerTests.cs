@@ -2,7 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Moq;
 using Xunit;
 
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new PreReleaseController(preReleaseContactsService.Object, preReleaseSummaryService.Object);
 
             var result = await controller.GetPreReleaseSummaryAsync(releaseId);
-            AssertOkResult(result);
+            result.AssertOkResult();
         }
 
         private static (Mock<IPreReleaseUserService> PreReleaseContactsService,
@@ -34,12 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             return (new Mock<IPreReleaseUserService>(),
                 new Mock<IPreReleaseSummaryService>());
-        }
-
-        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<T>(result.Value);
-            return result.Value;
         }
     }
 }

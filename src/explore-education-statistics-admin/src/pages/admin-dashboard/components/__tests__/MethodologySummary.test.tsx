@@ -1,4 +1,8 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
+import _methodologyService, {
+  BasicMethodology,
+  MyMethodology,
+} from '@admin/services/methodologyService';
 import {
   ExternalMethodology,
   MyPublication,
@@ -7,9 +11,15 @@ import {
 import { render, screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import { BasicMethodology } from 'src/services/methodologyService';
+import createMemoryHistoryWithMockedPush from '@admin-test/createMemoryHistoryWithMockedPush';
+
+jest.mock('@admin/services/methodologyService');
+
+const methodologyService = _methodologyService as jest.Mocked<
+  typeof _methodologyService
+>;
 
 const testContact: PublicationContactDetails = {
   id: 'contact-1',
@@ -19,22 +29,44 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testMethodology: BasicMethodology = {
+const testMethodology: MyMethodology = {
   amendment: false,
+  live: true,
   id: '1234',
   internalReleaseNote: 'this is the release note',
+  previousVersionId: 'lfkjdlfj',
   published: '2021-06-08T09:04:17.9805585',
   slug: 'meth-1',
   status: 'Approved',
   title: 'I am a methodology',
+  permissions: {
+    canUpdateMethodology: false,
+    canDeleteMethodology: false,
+    canMakeAmendmentOfMethodology: false,
+  },
 };
-const testDraftMethodology: BasicMethodology = {
+const testDraftMethodology: MyMethodology = {
   ...testMethodology,
   status: 'Draft',
 };
-const testAmendmentMethodology: BasicMethodology = {
+const testAmendmentMethodology: MyMethodology = {
   ...testMethodology,
   amendment: true,
+};
+const testMethodologyCanAmend: MyMethodology = {
+  ...testMethodology,
+  permissions: {
+    ...testMethodology.permissions,
+    canMakeAmendmentOfMethodology: true,
+  },
+};
+const testMethodologyCanCancelAmend: MyMethodology = {
+  ...testMethodology,
+  amendment: true,
+  permissions: {
+    ...testMethodology.permissions,
+    canDeleteMethodology: true,
+  },
 };
 
 const externalMethodology: ExternalMethodology = {
@@ -50,6 +82,7 @@ const testPublicationNoMethodology: MyPublication = {
   permissions: {
     canCreateReleases: true,
     canUpdatePublication: true,
+    canCreateMethodologies: true,
   },
 };
 
@@ -73,10 +106,79 @@ const testPublicationWithExternalMethodology = {
   externalMethodology,
 };
 
+const testPublicationWithMethodologyCanAmend = {
+  ...testPublicationWithMethodology,
+  methodology: testMethodologyCanAmend,
+};
+
+const testPublicationWithMethodologyCanCancelAmend = {
+  ...testPublicationWithMethodology,
+  methodology: testMethodologyCanCancelAmend,
+};
+
 const testTopicId = 'topic-id';
 
 describe('MethodologySummary', () => {
-  describe('Does not have a methodology', () => {
+  describe('Create Methodology', () => {
+    test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
+      methodologyService.createMethodology.mockResolvedValue(testMethodology);
+
+      const history = createMemoryHistoryWithMockedPush();
+
+      render(
+        <Router history={history}>
+          <MethodologySummary
+            publication={testPublicationNoMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </Router>,
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Create methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(methodologyService.createMethodology).toHaveBeenCalledWith(
+          testPublicationNoMethodology.id,
+        );
+        expect(history.push).toBeCalledWith(
+          `/methodology/${testMethodology.id}/summary`,
+        );
+      });
+    });
+
+    test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              permissions: {
+                ...testPublicationNoMethodology.permissions,
+                canCreateMethodologies: false,
+              },
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Link to an externally hosted methodology',
+        }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('renders correctly when no Methodology is supplied', () => {
     test('the create and link methodology buttons are shown', () => {
       render(
         <MemoryRouter>
@@ -89,7 +191,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Create methodology', { selector: 'a' }),
+        screen.queryByTestId('methodology-summary-link'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
       ).toBeInTheDocument();
 
       expect(
@@ -130,7 +236,7 @@ describe('MethodologySummary', () => {
     });
   });
 
-  describe('Has a methodology', () => {
+  describe('renders correctly with a Methodology', () => {
     test('the methodology is shown', () => {
       render(
         <MemoryRouter>
@@ -151,42 +257,8 @@ describe('MethodologySummary', () => {
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByText('View methodology', { selector: 'a' }),
+        screen.queryByText('View this methodology', { selector: 'a' }),
       ).toBeInTheDocument();
-    });
-
-    test('the amend methodology link is shown if user has permission', () => {
-      render(
-        <MemoryRouter>
-          <MethodologySummary
-            canAmendMethodology
-            publication={testPublicationWithMethodology}
-            topicId={testTopicId}
-            onChangePublication={noop}
-          />
-        </MemoryRouter>,
-      );
-
-      expect(
-        screen.queryByText('Amend methodology', { selector: 'a' }),
-      ).toBeInTheDocument();
-    });
-
-    test('the amend methodology link is not shown if user does not have permission', () => {
-      render(
-        <MemoryRouter>
-          <MethodologySummary
-            canAmendMethodology={false}
-            publication={testPublicationWithMethodology}
-            topicId={testTopicId}
-            onChangePublication={noop}
-          />
-        </MemoryRouter>,
-      );
-
-      expect(
-        screen.queryByText('Amend methodology', { selector: 'a' }),
-      ).not.toBeInTheDocument();
     });
 
     test('the approved tag is shown', () => {
@@ -239,11 +311,77 @@ describe('MethodologySummary', () => {
   });
 
   describe('Has an external methodology', () => {
-    test('the external methodology link and buttons are shown', () => {
+    test(
+      'renders the external methodology link, and renders the Edit and Remove buttons if the user has ' +
+        'permission',
+      () => {
+        render(
+          <MemoryRouter>
+            <MethodologySummary
+              publication={testPublicationWithExternalMethodology}
+              topicId={testTopicId}
+              onChangePublication={noop}
+            />
+          </MemoryRouter>,
+        );
+
+        expect(
+          screen.queryByText('Ext methodolology title (external methodology)', {
+            selector: 'a',
+          }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByRole('button', { name: 'Edit' }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByRole('button', { name: 'Remove' }),
+        ).toBeInTheDocument();
+      },
+    );
+
+    test(
+      'renders the external methodology link, but not the Edit or Remove buttons if the user does not have ' +
+        'permission',
+      () => {
+        render(
+          <MemoryRouter>
+            <MethodologySummary
+              publication={{
+                ...testPublicationWithExternalMethodology,
+                permissions: {
+                  ...testPublicationWithExternalMethodology.permissions,
+                  canCreateMethodologies: false,
+                },
+              }}
+              topicId={testTopicId}
+              onChangePublication={noop}
+            />
+          </MemoryRouter>,
+        );
+
+        expect(
+          screen.queryByText('Ext methodolology title (external methodology)'),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByRole('button', { name: 'Edit' }),
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole('button', { name: 'Remove' }),
+        ).not.toBeInTheDocument();
+      },
+    );
+  });
+
+  describe('Amending a methodology', () => {
+    test('the amend methodology button is shown if user has permission', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
-            publication={testPublicationWithExternalMethodology}
+            publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
             onChangePublication={noop}
           />
@@ -251,16 +389,171 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Ext methodolology title (external methodology)', {
-          selector: 'a',
-        }),
+        screen.getByText('Amend methodology', { selector: 'button' }),
       ).toBeInTheDocument();
+    });
 
-      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+    test('the amend methodology button is not shown if user does not have permission', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
 
       expect(
-        screen.getByRole('button', { name: 'Remove' }),
+        screen.queryByText('Amend methodology', { selector: 'button' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('shows the confirm modal when click the amend button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanAmend}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByText('Amend methodology', { selector: 'button' }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Confirm you want to amend this live methodology'),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText('Confirm', { selector: 'button' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('calls the service to amend the methodology when the confirm button is clicked', async () => {
+      const history = createMemoryHistoryWithMockedPush();
+      const mockMethodology: BasicMethodology = {
+        amendment: true,
+        live: false,
+        id: '12345',
+        internalReleaseNote: 'this is the release note',
+        previousVersionId: 'lfkjdlfj',
+        published: '2021-06-08T09:04:17.9805585',
+        slug: 'meth-1',
+        status: 'Approved',
+        title: 'I am a methodology amendment',
+      };
+      methodologyService.createMethodologyAmendment.mockImplementation(() =>
+        Promise.resolve(mockMethodology),
+      );
+      render(
+        <Router history={history}>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanAmend}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </Router>,
+      );
+
+      userEvent.click(
+        screen.getByText('Amend methodology', { selector: 'button' }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.getByRole('button', { name: 'Confirm' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(
+          methodologyService.createMethodologyAmendment,
+        ).toHaveBeenCalledWith(
+          testPublicationWithMethodologyCanAmend.methodology.id,
+        );
+        expect(history.push).toBeCalledWith(
+          `/methodology/${mockMethodology.id}/summary`,
+        );
+      });
+    });
+  });
+
+  describe('Cancelling an amendment', () => {
+    test('the cancel amendment button is shown if user has permission', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanCancelAmend}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.getByText('Cancel amendment', { selector: 'button' }),
       ).toBeInTheDocument();
+    });
+
+    test('shows the confirm modal when click the cancel amendment  button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanCancelAmend}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByText('Cancel amendment', { selector: 'button' }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.queryByText(
+            'Confirm you want to cancel this amended methodology',
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText('Confirm', { selector: 'button' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('calls the service to cancel the amendment when the confirm button is clicked', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanCancelAmend}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+      userEvent.click(
+        screen.getByText('Cancel amendment', { selector: 'button' }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm', { selector: 'button' }),
+        ).toBeInTheDocument();
+
+        userEvent.click(screen.getByText('Confirm', { selector: 'button' }));
+      });
+
+      await waitFor(() => {
+        expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
+          testPublicationWithMethodologyCanAmend.methodology.id,
+        );
+      });
     });
   });
 });

@@ -171,6 +171,7 @@
     "moduleNameMapper": {
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@admin/(.*)$": "<rootDir>/src/$1",
+      "^@admin-test/(.*)$": "<rootDir>/../explore-education-statistics-admin/test/$1",
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
       "^react$": "<rootDir>/node_modules/react",

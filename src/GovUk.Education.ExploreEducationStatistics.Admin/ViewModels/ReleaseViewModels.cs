@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Contact Contact { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatus Status { get; set; }
+        public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public string InternalReleaseNote { get; set; }
 
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string PreReleaseAccessList { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatus Status { get; set; }
+        public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public string InternalReleaseNote { get; set; }
 

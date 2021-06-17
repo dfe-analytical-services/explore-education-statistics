@@ -13,7 +13,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null
         };
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 1,
             PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
             SoftDeleted = true
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 1,
             PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
         };
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ2,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q2",
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null
         };
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ4,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2017-q4",
-            Status = Approved,
+            ApprovalStatus = Approved,
             Version = 0,
             PreviousVersionId = null
         };
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ1,
             Published = null,
             Slug = "publication-b-release-2018-q1",
-            Status = Draft,
+            ApprovalStatus = Draft,
             Version = 0,
             PreviousVersionId = null
         };
@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 TimePeriodCoverage = AcademicYearQ3,
                 Published = null,
                 Slug = "publication-a-release-2018-q3",
-                Status = Draft,
+                ApprovalStatus = Draft,
                 Version = 0,
                 PreviousVersionId = null
             },

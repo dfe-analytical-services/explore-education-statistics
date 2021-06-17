@@ -8,7 +8,7 @@ describe('ReleaseStatusChecklist', () => {
   const testRelease: Release = {
     id: 'release-1',
     slug: 'release-1-slug',
-    status: 'Draft',
+    approvalStatus: 'Draft',
     latestRelease: false,
     live: false,
     amendment: false,
@@ -88,10 +88,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('link', {
         name: 'Methodology must be approved',
       }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/methodology/methodology-1/status',
-    );
+    ).toHaveAttribute('href', '/methodology/methodology-1/status');
 
     expect(
       screen.getByRole('link', {

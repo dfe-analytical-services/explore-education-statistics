@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -17,14 +17,57 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
     public class MethodologyServiceTests
     {
         [Fact]
-        public async Task GetSummaryAsync()
+        public async Task CreateMethodology()
+        {
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = new Mock<IMethodologyRepository>(Strict);
+            
+                var service = SetupMethodologyService(
+                    context, 
+                    methodologyRepository: repository.Object);
+
+                var createdMethodology = new Methodology
+                {
+                    Id = Guid.NewGuid()
+                };
+            
+                repository
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id))
+                    .ReturnsAsync(createdMethodology);
+
+                var result = await service.CreateMethodology(publication.Id);
+                VerifyAllMocks(repository);
+            
+                var viewModel = result.AssertRight();
+                Assert.Equal(createdMethodology.Id, viewModel.Id);
+            }
+        }
+        
+        [Fact]
+        public async Task GetSummary()
         {
             var methodology = new Methodology
             {
@@ -48,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
-                var viewModel = (await service.GetSummaryAsync(methodology.Id)).Right;
+                var viewModel = (await service.GetSummary(methodology.Id)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
@@ -59,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task UpdateAsync()
+        public async Task UpdateMethodology()
         {
             var methodology = new Methodology
             {
@@ -84,8 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IMethodologyContentService>(MockBehavior.Strict);
-            var imageService = new Mock<IMethodologyImageService>(MockBehavior.Strict);
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -97,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object);
 
-                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -116,11 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            MockUtils.VerifyAllMocks(contentService, imageService);
+            VerifyAllMocks(contentService, imageService);
         }
 
         [Fact]
-        public async Task UpdateAsync_MethodologyHasImages()
+        public async Task UpdateMethodology_MethodologyHasImages()
         {
             var methodology = new Methodology
             {
@@ -168,8 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IMethodologyContentService>(MockBehavior.Strict);
-            var imageService = new Mock<IMethodologyImageService>(MockBehavior.Strict);
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -189,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object);
 
-                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -208,11 +251,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            MockUtils.VerifyAllMocks(contentService, imageService);
+            VerifyAllMocks(contentService, imageService);
         }
 
         [Fact]
-        public async Task UpdateAsync_MethodologyHasUnusedImages()
+        public async Task UpdateMethodology_MethodologyHasUnusedImages()
         {
             var methodology = new Methodology
             {
@@ -260,8 +303,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IMethodologyContentService>(MockBehavior.Strict);
-            var imageService = new Mock<IMethodologyImageService>(MockBehavior.Strict);
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -281,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object);
 
-                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 imageService.Verify(mock =>
                     mock.Delete(methodology.Id, new List<Guid>
@@ -307,11 +350,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            MockUtils.VerifyAllMocks(contentService, imageService);
+            VerifyAllMocks(contentService, imageService);
         }
 
         [Fact]
-        public async Task UpdateAsync_AlreadyPublished()
+        public async Task UpdateMethodology_AlreadyPublished()
         {
             var methodology = new Methodology
             {
@@ -338,8 +381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IMethodologyContentService>(MockBehavior.Strict);
-            var imageService = new Mock<IMethodologyImageService>(MockBehavior.Strict);
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -351,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object);
 
-                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
@@ -373,11 +416,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            MockUtils.VerifyAllMocks(contentService, imageService);
+            VerifyAllMocks(contentService, imageService);
         }
 
         [Fact]
-        public async Task UpdateAsync_SlugNotUnique()
+        public async Task UpdateMethodology_SlugNotUnique()
         {
             var methodology1 = new Methodology
             {
@@ -415,8 +458,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IMethodologyContentService>(MockBehavior.Strict);
-            var imageService = new Mock<IMethodologyImageService>(MockBehavior.Strict);
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology1.Id))
@@ -428,17 +471,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object);
 
-                var result = await service.UpdateMethodologyAsync(methodology1.Id, request);
+                var result = await service.UpdateMethodology(methodology1.Id, request);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
 
-            MockUtils.VerifyAllMocks(contentService, imageService);
+            VerifyAllMocks(contentService, imageService);
         }
 
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
+            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IMethodologyContentService methodologyContentService = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IMethodologyImageService methodologyImageService = null,
@@ -446,14 +490,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IUserService userService = null)
         {
             return new MethodologyService(
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object);
+                userService ?? AlwaysTrueUserService().Object);
         }
     }
 }

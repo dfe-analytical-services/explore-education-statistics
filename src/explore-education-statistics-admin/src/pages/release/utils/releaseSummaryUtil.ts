@@ -1,7 +1,7 @@
 import { Release } from '@admin/services/releaseService';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 
-export const getReleaseStatusLabel = (
+export const getReleaseApprovalStatusLabel = (
   approvalStatus: ReleaseApprovalStatus,
 ) => {
   switch (approvalStatus) {

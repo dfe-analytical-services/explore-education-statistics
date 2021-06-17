@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             PublishSpecificReleaseRequirement requirement,
             Release release)
         {
-            if (release.Status != ReleaseStatus.Approved)
+            if (release.ApprovalStatus != ReleaseApprovalStatus.Approved)
             {
                 return;
             }

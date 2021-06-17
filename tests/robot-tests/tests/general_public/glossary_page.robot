@@ -30,7 +30,7 @@ Search for Pupil referral unit
     user verifies accordion is closed  P
 
     user enters text into element  id:pageSearchForm-input  Pupil referral unit
-    user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
+    user waits until element contains   id:pageSearchForm-resultsLabel   Found 1 result
     user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  P

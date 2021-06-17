@@ -31,18 +31,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<List<MyReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
-            params ReleaseStatus[] releaseStatuses)
+            params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var releases = await 
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
-                .Where(r => releaseStatuses.Contains(r.Status))
+                .Where(r => releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
             
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
         public async Task<List<MyReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUserAsync(Guid userId,
-            params ReleaseStatus[] releaseStatuses)
+            params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var userReleaseIds = await _contentDbContext
                 .UserReleaseRoles
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             var releases = await 
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
-                .Where(r => userReleaseIds.Contains(r.Id) && releaseStatuses.Contains(r.Status))
+                .Where(r => userReleaseIds.Contains(r.Id) && releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
             
             return _mapper.Map<List<MyReleaseViewModel>>(releases);

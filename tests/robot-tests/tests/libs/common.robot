@@ -153,8 +153,8 @@ user waits until page contains element
     wait until page contains element  ${element}  timeout=${wait}  limit=${limit}
 
 user waits until page does not contain
-    [Arguments]    ${pageText}
-    wait until page does not contain   ${pageText}
+    [Arguments]    ${pageText}   ${wait}=${timeout}
+    wait until page does not contain   ${pageText}   timeout=${wait}
 
 user waits until page does not contain element
     [Arguments]    ${element}    ${wait}=${timeout}
@@ -352,6 +352,11 @@ user gets button element
      user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
      ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
      [Return]  ${button}
+     
+user clicks button when available
+    [Arguments]   ${text}
+    user waits until page contains button   ${text}     
+    user clicks button  ${text}
 
 user checks page contains tag
     [Arguments]   ${text}
@@ -368,6 +373,10 @@ user waits until h2 is visible
 user waits until h3 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
+
+user waits until legend is visible
+    [Arguments]   ${text}  ${wait}=${timeout}
+    user waits until element is visible  xpath://legend[text()="${text}"]  ${wait}
 
 user waits until page contains title
     [Arguments]   ${text}  ${wait}=${timeout}
@@ -403,7 +412,7 @@ user checks summary list contains
 
 user selects from list by label
     [Arguments]   ${locator}   ${label}
-    user waits until element is visible  ${locator}
+    user waits until page contains element   ${locator}
     select from list by label   ${locator}   ${label}
 
 user chooses file
@@ -413,6 +422,7 @@ user chooses file
 
 user clears element text
     [Arguments]   ${selector}
+    user clicks element   ${selector}
     user presses keys   CTRL+a+BACKSPACE  ${selector}
     sleep  0.1
 
@@ -431,7 +441,15 @@ user enters text into element
     [Arguments]   ${selector}   ${text}
     user clears element text  ${selector}
     user presses keys   ${text}   ${selector}
+    
+user enters text into textfield
+    [Arguments]   ${label}   ${text}
+    user enters text into element   xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
 
+user checks textfield contains
+    [Arguments]   ${label}   ${text}
+    user checks input field contains    xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
+    
 user checks element count is x
     [Arguments]   ${locator}   ${amount}
     page should contain element   ${locator}   limit=${amount}
@@ -555,6 +573,21 @@ user checks page contains other release
 user checks page does not contain other release
     [Arguments]   ${other_release_title}
     user checks page does not contain element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+
+user navigates to public frontend
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}
+    user waits until h1 is visible  Explore our statistics and data
+
+user navigates to find statistics page on public frontend
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/find-statistics
+    user waits until h1 is visible  Find statistics and data
+
+user navigates to data tables page on public frontend
+    environment variable should be set  PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}/data-tables
+    user waits until h1 is visible  Create your own tables
 
 check that variable is not empty
     [Arguments]   ${variable_name}  ${variable_value}

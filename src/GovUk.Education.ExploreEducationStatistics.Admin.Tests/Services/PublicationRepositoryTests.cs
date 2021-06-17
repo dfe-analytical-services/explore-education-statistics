@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 User = user,
                 Role = Owner
             });
-            
+
             // Set up a publication and release related to the topic that will be granted solely via the PrereleaseViewer role
 
             userReleaseRoles.Add(new UserReleaseRole
@@ -174,8 +174,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Related publication 3 is excluded because it's only granted via the PrereleaseViewer release role
                 // Unrelated publications are excluded since they are for different topics
                 Assert.Equal(2, result.Count);
+
                 Assert.Equal("Related publication 1", result[0].Title);
+                Assert.Equal(2, result[0].Releases.Count);
+                Assert.Equal("Academic Year 2012/13", result[0].Releases[0].Title);
+                Assert.Equal("Academic Year 2011/12", result[0].Releases[1].Title);
+
                 Assert.Equal("Related publication 2", result[1].Title);
+                Assert.Equal(2, result[1].Releases.Count);
+                Assert.Equal("Academic Year 2016/17", result[1].Releases[0].Title);
+                Assert.Equal("Academic Year 2015/16", result[1].Releases[1].Title);
             }
         }
 
@@ -362,6 +370,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Result should contain the publication related to this topic
                 Assert.Single(result);
                 Assert.Equal("Related publication 1", result[0].Title);
+                Assert.Empty(result[0].Releases);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsForTopicRelatedToUser_PublicationGrantedByBothPublicationAndReleaseRoles()
+        {
+            var user = new User();
+            var topic = new Topic();
+
+            // Check a Publication granted via the owner role is only returned once where it has a Release
+            // also granted with roles to the same user
+            // Set up a publication and releases related to the topic that will be granted via different roles
+
+            var userReleaseRoles = new List<UserReleaseRole>();
+            var userPublicationRoles = new List<UserPublicationRole>();
+
+            var publication = new Publication
+            {
+                Title = "Publication",
+                Topic = topic
+            };
+
+            var release = new Release
+            {
+                ReleaseName = "2011",
+                TimePeriodCoverage = AcademicYear,
+                Publication = publication
+            };
+
+            userReleaseRoles.AddRange(new List<UserReleaseRole>
+            {
+                new UserReleaseRole
+                {
+                    Release = release,
+                    User = user,
+                    Role = Contributor
+                },
+                new UserReleaseRole
+                {
+                    Release = release,
+                    User = user,
+                    Role = Lead
+                }
+            });
+
+            userPublicationRoles.Add(new UserPublicationRole
+            {
+                Publication = publication,
+                User = user,
+                Role = Owner
+            });
+
+            var contextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupPublicationRepository(contentDbContext);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
+
+                Assert.Single(result);
+                Assert.Equal("Publication", result[0].Title);
+                Assert.Single(result[0].Releases);
+                Assert.Equal("Academic Year 2011/12", result[0].Releases[0].Title);
             }
         }
 
@@ -504,7 +587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
             }
         }
-        
+
         private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
         {
             return new PublicationRepository(contentDbContext, AdminMapper());

@@ -1,17 +1,14 @@
 ## importer / publisher test suite
-#
 
-Test suite to test the importing / publishing functionality of EES
+* Test suite to test the importing / publishing functionality of EES
+
 
 ## Project structure 
 * index.ts - main entrypoint / script responsible for running the test suite
 * ~/utils - Contains helper functions that are used in `index.ts`
 
-
 ## Dependencies: 
-
-* Dependencies are managed via npm 
-
+ Dependencies are managed via npm 
   * Globby - handles file globs 
   * node-stream-zip - handles reading & extraction of zip files 
   * uuid - generates unique uuids 
@@ -24,12 +21,9 @@ Test suite to test the importing / publishing functionality of EES
 
 * `npm run clean` - removes various directories, test files & compiled javascript files 
 
-
 * `npm run watch` - Watches any typescript files for changes and compiles typescript files down to common js 
 
-
 * `npm run build` - compiles the `index.ts` file down to Common JS. This is the command you should use if you want to run the test and are not adding new features to the test suite. 
-
 
 * `npm run test:importer` - runs the importer test 
 
@@ -37,9 +31,9 @@ Test suite to test the importing / publishing functionality of EES
 
 ## Getting started 
 * Ensure you have Node v12 or higher installed
-* Install dependencies by running `npm i` in ~/importer-publisher-tests
+* Install dependencies by running `npm ci` in ~/importer-publisher-tests
 * Place an zip file containing both a data file & a meta file with the name `archive.zip` in the root of the project
-* copy the .env.example file to .env `cp .env .env.example`
+* copy the .env.example file to .env `cp .env.example .env`
 * Fill out the .env file with the values based on what environment you are testing against (you can get these values from Admin EES)
 * Run `npm run watch` to watch typescript files for changes (useful when adding new functionality)
 * Run `npm run build` to compile typescript down to common JS

@@ -22,6 +22,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyParentRepository = methodologyParentRepository;
         }
 
+        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId)
+        {
+            var publication = await _contentDbContext
+                .Publications
+                .SingleAsync(p => p.Id == publicationId);
+            
+            var methodology = (await _contentDbContext.Methodologies.AddAsync(new Methodology
+            {
+                Slug = publication.Slug,
+                Title = publication.Title,
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = new List<PublicationMethodology>
+                    {
+                        new PublicationMethodology
+                        {
+                            Owner = true,
+                            PublicationId = publicationId
+                        }
+                    }
+                }
+            })).Entity;
+
+            await _contentDbContext.SaveChangesAsync();
+            return methodology;
+        }
+
         public async Task<List<Methodology>> GetLatestByPublication(Guid publicationId)
         {
             // First check the publication exists

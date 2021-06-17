@@ -26,9 +26,9 @@ user signs in as analyst1
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible    Sign in
     user signs in as  ANALYST
-
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
+    
     user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
 
     user checks breadcrumb count should be  2
@@ -101,13 +101,79 @@ user creates release for publication
     user clicks button  Create new release
     user waits until page contains element  xpath://a[text()="Edit release summary"]
     user waits until h2 is visible  Release summary
+    
+user creates methodology for publication
+    [Arguments]  ${publication}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Create methodology
+    user waits until h2 is visible  Methodology summary
+    user checks summary list contains   Title   ${publication}
+    user checks summary list contains   Status  Draft
+    user checks summary list contains   Published on  Not yet published
+    
+user links publication to external methodology
+    [Arguments]  
+    ...  ${publication}     
+    ...  ${title}=${publication} external methodology
+    ...  ${link}=https://example.com
 
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Link to an externally hosted methodology
+    user waits until legend is visible   Link to an externally hosted methodology
+    user enters text into textfield  Link title   ${title}
+    user enters text into textfield  URL   ${link}
+    user clicks button  Save
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user checks page contains link with text and url  ${title}  ${link}
+    
+user edits an external methodology
+    [Arguments]  
+    ...  ${publication}
+    ...  ${new_title}=${publication} external methodology (updated)
+    ...  ${new_link}=https://example.com/updated
+    ...  ${original_title}=${publication} external methodology
+    ...  ${original_link}=https://example.com
+    
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Edit
+    user waits until legend is visible   Link to an externally hosted methodology
+    user checks textfield contains  Link title  ${original_title}
+    user checks textfield contains  URL  ${original_link}
+    user enters text into textfield  Link title   ${new_title}
+    user enters text into textfield  URL   ${new_link}
+    user clicks button  Save
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user waits until page contains testid   Methodology for ${publication}
+    user checks page contains link with text and url    ${new_title}   ${new_link}
+    
+user removes an external methodology from publication
+    [Arguments]  ${publication}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user clicks button when available   Remove
+    user waits until page contains title    Dashboard
+    user waits until page contains accordion section   ${publication}
+    user opens accordion section  ${publication}
+    user waits until page contains button   Create methodology
+                
 user adds basic release content
     [Arguments]  ${publication}
     user clicks button  Add a summary text block
     user waits until element contains  id:releaseSummary  This section is empty
     user clicks button   Edit block  id:releaseSummary
     user presses keys  Test summary text for ${publication}
+    user clicks element   css:body  # To ensure Save button gets clicked
     user clicks button   Save  id:releaseSummary
     user waits until element contains  id:releaseSummary  Test summary text for ${publication}
 
@@ -310,3 +376,110 @@ user enters text into meta guidance data file content editor
     user clicks element  ${editor}
     user waits until page contains testid   fileGuidanceContent-focused
     user enters text into element  ${editor}  ${text}
+
+user creates amendment for release
+    [Arguments]  ${PUBLICATION_NAME}  ${RELEASE_NAME}  ${RELEASE_STATUS}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
+    user opens details dropdown   ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}
+    ${details}=  user gets details content element  ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}
+    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
+    user clicks button  Amend this release  ${details}
+    user clicks button  Confirm
+
+user deletes subject file
+    [Arguments]  ${SUBJECT_NAME}
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    user opens accordion section  ${SUBJECT_NAME}
+    user scrolls to accordion section content  ${SUBJECT_NAME}
+    ${accordion}=  user gets accordion section content element  ${SUBJECT_NAME}
+    ${button}=  user gets button element  Delete files  ${accordion}
+    user clicks element  ${button}
+    user clicks button  Confirm
+
+user approves release for immediate publication
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+    user clicks radio   Approved for publication
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user clicks radio   As soon as possible
+    user clicks button   Update status
+    user waits until h2 is visible  Sign off
+    user checks summary list contains  Current status  Approved
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
+    user checks page does not contain button  Edit release status
+
+user navigates to admin dashboard 
+    [Arguments]  ${USER}
+    user goes to url  %{ADMIN_URL}
+    user waits until h1 is visible   Dashboard
+    user waits until page contains title caption  Welcome ${USER}
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
+
+user uploads subject 
+    [Arguments]  ${SUBJECT_NAME}  ${SUBJECT_FILE}  ${META_FILE}
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}${SUBJECT_FILE}
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}${META_FILE}
+    user clicks button  Upload data files
+    user waits until h2 is visible  Uploaded data files
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user checks headed table body row contains  Status  Complete  ${section}  180
+
+user approves release for scheduled release
+    [Arguments]  ${DAYS_TILL_RELEASE}  ${RELEASE_MONTH}  ${RELEASE_YEAR}
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_TILL_RELEASE}
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_TILL_RELEASE}
+    set suite variable  ${PUBLISH_DATE_DAY}
+    set suite variable  ${PUBLISH_DATE_MONTH}
+    set suite variable  ${PUBLISH_DATE_MONTH_WORD}
+    set suite variable  ${PUBLISH_DATE_YEAR}
+
+    user waits until h2 is visible  Sign off
+    user waits until page contains button  Edit release status
+
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+
+    user clicks radio   Approved for publication
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user clicks radio  On a specific date
+    user waits until page contains   Publish date
+    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${RELEASE_MONTH}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
+
+    user clicks button   Update status
+
+user creates new content section
+    [Arguments]   ${SECTION_NUMBER}  ${CONTENT_SECTION_NAME}
+    user waits until button is enabled  Add new section
+    user clicks button  Add new section
+    user changes accordion section title  ${SECTION_NUMBER}   ${CONTENT_SECTION_NAME}
+
+user verifies release summary
+    [Arguments]  ${PUBLICATION_NAME}  ${TIME_PERIOD}  ${RELEASE_PERIOD}  ${LEAD_STATISTICIAN}  ${RELEASE_TYPE}
+    user waits until h2 is visible     Release summary
+    user checks summary list contains  Publication title      ${PUBLICATION_NAME}
+    user checks summary list contains  Time period            ${TIME_PERIOD}
+    user checks summary list contains  Release period         ${RELEASE_PERIOD}
+    user checks summary list contains  Lead statistician      ${LEAD_STATISTICIAN}
+    user checks summary list contains  Release type           ${RELEASE_TYPE}
+
+user changes methodology status to Approved
+    user clicks button  Edit status
+    user clicks element  id:methodologyStatusForm-status-Approved
+    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Approved by UI tests
+    user clicks button  Update status

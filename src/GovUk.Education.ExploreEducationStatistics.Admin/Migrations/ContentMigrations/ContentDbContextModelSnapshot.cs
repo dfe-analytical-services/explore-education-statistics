@@ -452,6 +452,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -496,10 +500,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TimePeriodCoverage")
                         .IsRequired()
@@ -946,7 +946,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyParent", "MethodologyParent")
-                        .WithMany()
+                        .WithMany("Versions")
                         .HasForeignKey("MethodologyParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1008,15 +1008,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationMethodology", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyParent", "MethodologyParent")
-                        .WithMany()
+                        .WithMany("Publications")
                         .HasForeignKey("MethodologyParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
-                        .WithMany()
+                        .WithMany("Methodologies")
                         .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

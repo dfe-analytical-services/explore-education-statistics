@@ -21,21 +21,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [Produces("application/json")]
+        [ProducesResponseType(typeof(MethodologySummaryViewModel), 200)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+        [HttpPost("api/publication/{publicationId}/methodology")]
+        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
+        {
+            return _methodologyService
+                .CreateMethodology(publicationId)
+                .HandleFailuresOrOk();
+        }
+        
+        [Produces("application/json")]
         [HttpGet("api/methodology/{methodologyId}/summary")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
+        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummary(Guid methodologyId)
         {
             return await _methodologyService
-                .GetSummaryAsync(methodologyId)
+                .GetSummary(methodologyId)
                 .HandleFailuresOrOk();
         }
 
         [Produces("application/json")]
         [HttpPut("api/methodology/{methodologyId}")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid methodologyId,
+        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodology(Guid methodologyId,
             MethodologyUpdateRequest request)
         {
             return await _methodologyService
-                .UpdateMethodologyAsync(methodologyId, request)
+                .UpdateMethodology(methodologyId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -43,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public async Task<ActionResult<List<MethodologyPublicationsViewModel>>> GetMyMethodologyList()
         {
             return await _methodologyService
-                .ListWithPublicationsAsync()
+                .ListWithPublications()
                 .HandleFailuresOrOk();
         }
     }

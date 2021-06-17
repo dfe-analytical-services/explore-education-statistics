@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _publication,
                 mocks.UserService,
                 BuildPublicationService(mocks),
-                SecurityPolicies.CanUpdatePublication);
+                SecurityPolicies.CanUpdateSpecificPublication);
         }
 
         [Fact]

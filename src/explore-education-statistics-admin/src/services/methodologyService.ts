@@ -1,5 +1,4 @@
 import client from '@admin/services/utils/service';
-import { IdTitlePair } from 'src/services/types/common';
 
 export interface MethodologyStatusListItem {
   id: string;
@@ -11,12 +10,9 @@ export interface MethodologyStatusListItem {
   }[];
 }
 
-interface SaveMethodologySummary {
+export type UpdateMethodology = {
   title: string;
-}
-
-export type CreateMethodology = SaveMethodologySummary;
-export type UpdateMethodology = SaveMethodologySummary;
+};
 
 export type MethodologyStatus = 'Draft' | 'Approved';
 
@@ -24,13 +20,27 @@ export interface BasicMethodology {
   amendment: boolean;
   id: string;
   internalReleaseNote?: string;
+  live: boolean;
+  previousVersionId?: string;
   title: string;
   slug: string;
   status: MethodologyStatus;
   published?: string;
 }
 
+export interface MyMethodology extends BasicMethodology {
+  permissions: {
+    canUpdateMethodology: boolean;
+    canDeleteMethodology: boolean;
+    canMakeAmendmentOfMethodology: boolean;
+  };
+}
+
 const methodologyService = {
+  createMethodology(publicationId: string): Promise<BasicMethodology> {
+    return client.post(`/publication/${publicationId}/methodology`);
+  },
+
   getMethodologies(): Promise<BasicMethodology[]> {
     // TODO EES-2153 This was returning a list of all methodologies but will need removing
     // when the Manage Publication page no longer offers that list
@@ -39,10 +49,6 @@ const methodologyService = {
 
   getMyMethodologies(): Promise<MethodologyStatusListItem[]> {
     return client.get<MethodologyStatusListItem[]>('/me/methodologies');
-  },
-
-  createMethodology(data: CreateMethodology): Promise<IdTitlePair> {
-    return client.post(`/methodologies/`, data);
   },
 
   updateMethodology(
@@ -56,6 +62,14 @@ const methodologyService = {
     return client.get<BasicMethodology>(
       `/methodology/${methodologyId}/summary`,
     );
+  },
+
+  createMethodologyAmendment(methodologyId: string): Promise<BasicMethodology> {
+    return client.post(`/methodology/${methodologyId}/amendment`);
+  },
+
+  deleteMethodology(methodologyId: string): Promise<void> {
+    return client.delete(`/methodology/${methodologyId}`);
   },
 };
 

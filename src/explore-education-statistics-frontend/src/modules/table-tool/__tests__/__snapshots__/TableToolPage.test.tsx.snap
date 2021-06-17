@@ -14,7 +14,7 @@ exports[`TableToolPage renders the Table Tool page correctly when Publication is
   </span>
   <h1
     class="govuk-heading-xl"
-    data-testid="page-title Create your own tables"
+    data-testid="page-title"
   >
     Create your own tables
   </h1>
@@ -507,7 +507,7 @@ exports[`TableToolPage renders the Table Tool page correctly when Theme metadata
   </span>
   <h1
     class="govuk-heading-xl"
-    data-testid="page-title Create your own tables"
+    data-testid="page-title"
   >
     Create your own tables
   </h1>
@@ -965,7 +965,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
   </span>
   <h1
     class="govuk-heading-xl"
-    data-testid="page-title Create your own tables"
+    data-testid="page-title"
   >
     Create your own tables
   </h1>
@@ -1978,7 +1978,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
   </span>
   <h1
     class="govuk-heading-xl"
-    data-testid="page-title Create your own tables"
+    data-testid="page-title"
   >
     Create your own tables
   </h1>
@@ -2974,7 +2974,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
   </span>
   <h1
     class="govuk-heading-xl"
-    data-testid="page-title Create your own tables"
+    data-testid="page-title"
   >
     Create your own tables
   </h1>

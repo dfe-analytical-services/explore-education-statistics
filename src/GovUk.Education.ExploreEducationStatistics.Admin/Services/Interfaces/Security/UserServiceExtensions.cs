@@ -40,10 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanViewAllMethodologies);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanCreateMethodology(
-            this IUserService userService)
+        public static Task<Either<ActionResult, Publication>> CheckCanCreateMethodologyForPublication(
+            this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanCreateMethodologies);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanCreateMethodologyForSpecificPublication);
         }
 
         public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublication(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdatePublication);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
             this IUserService userService, Release release)
         {
-            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewRelease);
+            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewSpecificRelease);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
@@ -141,19 +141,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
-            this IUserService userService, Release release, ReleaseStatus status)
+            this IUserService userService, Release release, ReleaseApprovalStatus approvalStatus)
         {
-            switch (status)
+            switch (approvalStatus)
             {
-                case ReleaseStatus.Draft:
+                case ReleaseApprovalStatus.Draft:
                 {
                     return userService.CheckCanMarkReleaseAsDraft(release);
                 }
-                case ReleaseStatus.HigherLevelReview:
+                case ReleaseApprovalStatus.HigherLevelReview:
                 {
                     return userService.CheckCanSubmitReleaseToHigherApproval(release);
                 }
-                case ReleaseStatus.Approved:
+                case ReleaseApprovalStatus.Approved:
                 {
                     return userService.CheckCanApproveRelease(release);
                 }

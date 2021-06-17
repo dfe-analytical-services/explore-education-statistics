@@ -45,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(userPublicationRole => userPublicationRole.Publication)
                 .ToListAsync();
 
+            var publicationIdsGrantedByPublicationOwnerRole = publicationsGrantedByPublicationOwnerRole
+                .Select(publication => publication.Id)
+                .ToList();
+
             var releasesGrantedByReleaseRoles = await _context.UserReleaseRoles
                 .Include(userReleaseRole => userReleaseRole.Release.Publication)
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
@@ -55,14 +59,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var publicationViewModels = new List<MyPublicationViewModel>();
 
+            // Add publication view models for the Publications granted by the Publication Owner role
             publicationViewModels.AddRange(await publicationsGrantedByPublicationOwnerRole
-                .SelectAsync(async publication => await GetPublicationWithAllReleases(publication.Id)));
+                .SelectAsync(async publication =>
+                    // Include all Releases of the Publication unconditionally
+                    await GetPublicationWithAllReleases(publication.Id)));
 
+            // Add publication view models for the Publications granted indirectly via Release roles
             publicationViewModels.AddRange(await releasesGrantedByReleaseRoles
                 .GroupBy(release => release.Publication)
+                .Where(publicationWithReleases =>
+                {
+                    // Don't include a publication that's already been included by Publication Owner role 
+                    var publication = publicationWithReleases.Key;
+                    return !publicationIdsGrantedByPublicationOwnerRole.Contains(publication.Id);
+                })
                 .SelectAsync(async publicationWithReleases =>
                 {
                     var publication = publicationWithReleases.Key;
+                    // Only include Releases of the Publication that the user has access to
                     var releaseIds = publicationWithReleases.Select(r => r.Id);
                     return await GetPublicationWithFilteredReleases(publication.Id, releaseIds);
                 }));
