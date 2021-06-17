@@ -65,11 +65,6 @@ export interface PublicationTitle {
   title: string;
 }
 
-export interface PublicationMethodology {
-  methodology?: Methodology;
-  externalMethodology?: ExternalMethodology;
-}
-
 export interface BasicLink {
   id: string;
   description: string;
@@ -155,11 +150,6 @@ export interface PreReleaseAccessListSummary extends ReleaseSummary {
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
-  },
-  getPublicationMethodology(
-    publicationSlug: string,
-  ): Promise<PublicationMethodology> {
-    return contentApi.get(`/publications/${publicationSlug}/methodology`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
