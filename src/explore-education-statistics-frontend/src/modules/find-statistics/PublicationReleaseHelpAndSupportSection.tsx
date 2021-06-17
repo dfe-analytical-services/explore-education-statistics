@@ -15,7 +15,6 @@ interface Props {
   accordionId: string;
   publicationTitle: string;
   methodologyUrl?: string;
-  methodologySummary?: string;
   releaseType?: string;
   publicationContact: PublicationContact;
 }
@@ -25,7 +24,6 @@ const PublicationReleaseHelpAndSupportSection = ({
   includeAnalytics = false,
   publicationTitle,
   methodologyUrl = '',
-  methodologySummary,
   releaseType,
   publicationContact,
 }: Props) => {
@@ -45,10 +43,7 @@ const PublicationReleaseHelpAndSupportSection = ({
         {methodologyUrl !== '' && (
           <AccordionSection
             heading="Methodology"
-            caption={
-              methodologySummary ||
-              'Find out how and why we collect, process and publish these statistics'
-            }
+            caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
             <p className="govuk-!-margin-bottom-9">

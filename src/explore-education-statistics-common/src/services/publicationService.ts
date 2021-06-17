@@ -8,7 +8,6 @@ export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 export interface Methodology {
   id: string;
   slug: string;
-  summary: string;
   title: string;
 }
 

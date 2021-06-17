@@ -41,7 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = slug,
                         Status = Approved,
-                        Summary = "Methodology 1 summary",
                         Title = "Methodology 1 title",
                         Version = 0
                     },
@@ -54,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = slug,
                         Status = Approved,
-                        Summary = "Methodology 1 summary updated",
                         Title = "Methodology 1 title updated",
                         Version = 1
                     },
@@ -68,7 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = slug,
                         Status = Draft,
-                        Summary = "Methodology 1 summary draft",
                         Title = "Methodology 1 title draft",
                         Version = 2
                     }
@@ -88,7 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = "methodology-2",
                         Status = Approved,
-                        Summary = "Methodology 2 summary",
                         Title = "Methodology 2 title",
                         Version = 0
                     }
@@ -143,7 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = slug,
                         Status = Draft,
-                        Summary = "Methodology 1 summary",
                         Title = "Methodology 1 title",
                         Version = 0
                     }
@@ -164,7 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = "methodology-2",
                         Status = Approved,
-                        Summary = "Methodology 2 summary",
                         Title = "Methodology 2 title",
                         Version = 0
                     }
@@ -206,7 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         PublishingStrategy = Immediately,
                         Slug = "some-other-slug",
                         Status = Approved,
-                        Summary = "Methodology summary",
                         Title = "Methodology title",
                         Version = 0
                     }

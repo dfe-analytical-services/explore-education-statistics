@@ -29,8 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug { get; set; }
 
-        public string? Summary { get; set; }
-
         public MethodologyStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
