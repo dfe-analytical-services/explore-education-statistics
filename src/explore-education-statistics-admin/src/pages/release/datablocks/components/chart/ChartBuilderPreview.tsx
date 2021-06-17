@@ -1,7 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartBuilder.module.scss';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useDebouncedEffect from '@common/hooks/useDebouncedEffect';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
@@ -10,7 +9,7 @@ import {
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 interface Props {
   axes: AxesConfiguration;
@@ -22,23 +21,6 @@ interface Props {
 const ChartBuilderPreview = ({ axes, chart, definition, loading }: Props) => {
   const renderCount = useRef(0);
 
-  const [currentChart, setCurrentChart] = useState<
-    ChartRendererProps | undefined
-  >(chart);
-
-  useDebouncedEffect(
-    () => {
-      // We need to force re-rendering as the chart
-      // won't always resize correctly, causing
-      // things like labels to overlap with the axes.
-      renderCount.current += 1;
-
-      setCurrentChart(chart);
-    },
-    300,
-    [chart],
-  );
-
   return (
     <Details summary="Chart preview" open>
       <div
@@ -46,10 +28,10 @@ const ChartBuilderPreview = ({ axes, chart, definition, loading }: Props) => {
         id="chartBuilderPreviewContainer"
         data-render-count={renderCount.current}
       >
-        {isChartRenderable(currentChart) ? (
+        {isChartRenderable(chart) ? (
           <LoadingSpinner loading={loading} text="Loading chart data">
             <ChartRenderer
-              {...currentChart}
+              {...chart}
               key={renderCount.current}
               id="chartBuilderPreview"
             />
