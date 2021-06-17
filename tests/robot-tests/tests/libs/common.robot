@@ -352,6 +352,11 @@ user gets button element
      user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
      ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
      [Return]  ${button}
+     
+user clicks button when available
+    [Arguments]   ${text}
+    user waits until page contains button   ${text}     
+    user clicks button  ${text}
 
 user checks page contains tag
     [Arguments]   ${text}
@@ -368,6 +373,10 @@ user waits until h2 is visible
 user waits until h3 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
+
+user waits until legend is visible
+    [Arguments]   ${text}  ${wait}=${timeout}
+    user waits until element is visible  xpath://legend[text()="${text}"]  ${wait}
 
 user waits until page contains title
     [Arguments]   ${text}  ${wait}=${timeout}
@@ -432,7 +441,15 @@ user enters text into element
     [Arguments]   ${selector}   ${text}
     user clears element text  ${selector}
     user presses keys   ${text}   ${selector}
+    
+user enters text into textfield
+    [Arguments]   ${label}   ${text}
+    user enters text into element   xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
 
+user checks textfield contains
+    [Arguments]   ${label}   ${text}
+    user checks input field contains    xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
+    
 user checks element count is x
     [Arguments]   ${locator}   ${amount}
     page should contain element   ${locator}   limit=${amount}

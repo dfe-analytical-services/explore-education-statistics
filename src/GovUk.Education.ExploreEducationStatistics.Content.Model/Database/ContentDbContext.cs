@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(pm => pm.Publication)
                 .WithMany(p => p.Methodologies)
                 .HasForeignKey(pm => pm.PublicationId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.MethodologyParent)

@@ -14,7 +14,7 @@ const PageTitle = ({ caption, title }: Props) => {
         </span>
       )}
 
-      <h1 className="govuk-heading-xl" data-testid={`page-title ${title}`}>
+      <h1 className="govuk-heading-xl" data-testid="page-title">
         {title}
       </h1>
     </>
