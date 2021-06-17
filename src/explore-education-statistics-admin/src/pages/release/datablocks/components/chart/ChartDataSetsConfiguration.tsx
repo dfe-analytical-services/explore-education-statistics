@@ -46,7 +46,6 @@ const ChartDataSetsConfiguration = ({
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
   ]);
-
   const locationOptions = useMemo(
     () =>
       meta.locations.map(location => ({
@@ -68,6 +67,21 @@ const ChartDataSetsConfiguration = ({
     });
     return !units.every(unit => unit === units[0]);
   }, [dataSets, meta.indicators]);
+
+  const getSelectedFilters = (values: FormValues) => {
+    const filterTypes = Object.keys(meta.filters);
+    const newFilters: string[] = [];
+    filterTypes.forEach(filterType => {
+      if (!values.filters[filterType]) {
+        meta.filters[filterType].options.forEach(option => {
+          newFilters.push(option.value);
+        });
+      } else {
+        newFilters.push(values.filters[filterType]);
+      }
+    });
+    return newFilters;
+  };
 
   useEffect(() => {
     updateForm({
@@ -101,18 +115,17 @@ const ChartDataSetsConfiguration = ({
         validateOnBlur={false}
         validateOnChange={false}
         validationSchema={Yup.object<FormValues>({
-          indicator: Yup.string().required('Choose indicator'),
-          filters: Yup.object(
-            mapValues(meta.filters, (filter, category) =>
-              Yup.string().required(`Choose ${category.toLowerCase()}`),
-            ),
-          ),
+          indicator: Yup.string(),
+          filters: Yup.object(mapValues(meta.filters, () => Yup.string())),
           location: Yup.string(),
           timePeriod: Yup.string(),
         })}
         onSubmit={values => {
-          const { indicator } = values;
-          const filters = Object.values(values.filters);
+          const selectedDataSets: DataSet[] = [];
+          const selectedIndicators = values.indicator
+            ? [values.indicator]
+            : indicatorOptions.map(indicator => indicator.value);
+          const selectedFilters = getSelectedFilters(values);
 
           // Convert empty strings from form values to undefined
           const timePeriod: DataSet['timePeriod'] = values.timePeriod
@@ -123,31 +136,49 @@ const ChartDataSetsConfiguration = ({
             ? LocationFilter.parseCompositeId(values.location)
             : undefined;
 
-          if (
-            dataSets.find(dataSet => {
-              return (
-                dataSet.indicator === indicator &&
-                difference(dataSet.filters, filters).length === 0 &&
-                dataSet.location?.level === location?.level &&
-                dataSet.location?.value === location?.value &&
-                dataSet.timePeriod === timePeriod
-              );
-            })
-          ) {
-            throw new Error(
-              'The selected options have already been added to the chart',
-            );
+          if (!selectedFilters.length) {
+            selectedIndicators.forEach(option => {
+              selectedDataSets.push({
+                filters: [],
+                indicator: option,
+                location,
+                timePeriod,
+              });
+            });
+          } else {
+            selectedFilters.forEach(filter => {
+              selectedIndicators.forEach(option => {
+                selectedDataSets.push({
+                  filters: [filter],
+                  indicator: option,
+                  location,
+                  timePeriod,
+                });
+              });
+            });
           }
 
-          if (onChange) {
-            const dataSet: DataSet = {
-              filters,
-              indicator,
-              location,
-              timePeriod,
-            };
+          selectedDataSets.forEach(newDataSet => {
+            if (
+              dataSets.find(dataSet => {
+                return (
+                  dataSet.indicator === newDataSet.indicator &&
+                  difference(dataSet.filters, newDataSet.filters).length ===
+                    0 &&
+                  dataSet.location?.level === newDataSet.location?.level &&
+                  dataSet.location?.value === newDataSet.location?.value &&
+                  dataSet.timePeriod === newDataSet.timePeriod
+                );
+              })
+            ) {
+              throw new Error(
+                'The selected options have already been added to the chart',
+              );
+            }
+          });
 
-            onChange([...dataSets, dataSet]);
+          if (onChange) {
+            onChange([...dataSets, ...selectedDataSets]);
           }
         }}
       >
@@ -164,9 +195,7 @@ const ChartDataSetsConfiguration = ({
                     formGroupClass={styles.formSelectGroup}
                     className="govuk-!-width-full"
                     placeholder={
-                      filters.options.length > 1
-                        ? `Select ${categoryName.toLowerCase()}`
-                        : undefined
+                      filters.options.length > 1 ? 'All options' : undefined
                     }
                     options={filters.options}
                   />
@@ -178,7 +207,7 @@ const ChartDataSetsConfiguration = ({
                   label="Indicator"
                   formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
-                  placeholder="Select indicator"
+                  placeholder="All indicators"
                   options={indicatorOptions}
                 />
               )}
