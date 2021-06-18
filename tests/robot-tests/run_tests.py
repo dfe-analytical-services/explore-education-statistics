@@ -107,6 +107,9 @@ parser.add_argument("--implicit-wait",
                     default="5",
                     dest="implicit_wait",
                     help="default robot implicit wait in seconds (default is 5)")
+parser.add_argument("--print-keywords"
+                    dest="print_keywords",
+                    help="choose to print out keywords as they are started")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -160,6 +163,10 @@ if args.rerun_failed_suites:
 
 if args.tags:
     robotArgs += ["--include", args.tags]
+
+if args.print_keywords:
+    os.environ['ANALYST_PASSWORD'] = args.analyst_pass
+    robotArgs += ["--listener", 'listeners/KeywordListener.py']
 
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
