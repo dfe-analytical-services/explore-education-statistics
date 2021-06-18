@@ -193,6 +193,25 @@ public class Either<Tl, Tr> {
             });
         }
 
+        /**
+         * Allows 3 OnSuccess(...) calls to be chained and the next OnSuccess() to receive a Tuple containing all 3 of
+         * the results.  If any OnSuccess(...) fails, the entire result fails and additionally, if the first result
+         * fails, the subsequent OnSuccess(...) will not be called.
+         *
+         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better. 
+         */
+        public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>>
+            OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2, TSuccess3>(
+                this Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> task,
+                Func<Tuple<TSuccess1, TSuccess2>, Task<Either<TFailure, TSuccess3>>> func)
+        {
+            return await task.OnSuccess(success =>
+            {
+                return func(success).OnSuccess(combinator =>
+                    new Tuple<TSuccess1, TSuccess2, TSuccess3>(success.Item1, success.Item2, combinator));
+            });
+        }
+
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(this Task<Either<TFailure, TSuccess1>> task, Func<TSuccess1, Task<TSuccess2>> func)
         {
             var firstResult = await task;
