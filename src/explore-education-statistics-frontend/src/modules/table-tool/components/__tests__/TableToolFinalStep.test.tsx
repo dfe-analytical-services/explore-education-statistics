@@ -302,12 +302,13 @@ describe('TableToolFinalStep', () => {
         contactName: 'A person',
         contactTelNo: '012345',
       },
-      methodology: {
-        id: '',
-        slug: '',
-        summary: '',
-        title: '',
-      },
+      methodologies: [
+        {
+          id: '',
+          title: '',
+          slug: '',
+        },
+      ],
     },
     latestRelease: true,
     relatedInformation: [],
