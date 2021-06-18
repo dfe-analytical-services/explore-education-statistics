@@ -141,6 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Summary = r.Publication.Summary,
                         DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
+                        // TODO SOW4 EES-2395 Populate latest methodologies for Admin Manage Content page 
+                        Methodologies = new List<MethodologyTitleViewModel>(),
                         Topic = new ManageContentPageViewModel.TopicViewModel
                         {
                             Theme = new ManageContentPageViewModel.ThemeViewModel
