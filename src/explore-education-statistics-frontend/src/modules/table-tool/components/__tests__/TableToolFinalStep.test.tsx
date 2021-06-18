@@ -304,9 +304,9 @@ describe('TableToolFinalStep', () => {
       },
       methodologies: [
         {
-          id: '',
-          title: '',
-          slug: '',
+          id: '4798e8c8-8bb5-4fb9-b4a1-f04ef1a44a16',
+          title: 'Test Publication: methodology',
+          slug: 'test-publication',
         },
       ],
     },
