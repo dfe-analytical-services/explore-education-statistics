@@ -200,16 +200,16 @@ const TableToolFinalStep = ({
                     }
                   />
                 </li>
-                {publication?.methodology?.slug && (
-                  <li>
+                {publication?.methodologies.map(methodology => (
+                  <li key={methodology.id}>
                     <Link
                       to="/methodology/[methodology]"
-                      as={`/methodology/${publication.methodology.slug}`}
+                      as={`/methodology/${methodology.slug}`}
                     >
-                      Go to methodology
+                      Go to {methodology.title}
                     </Link>
                   </li>
-                )}
+                ))}
                 {publication?.externalMethodology?.url && (
                   <li>
                     <a href={publication.externalMethodology.url}>

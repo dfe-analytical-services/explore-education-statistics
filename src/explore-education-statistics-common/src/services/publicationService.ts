@@ -1,20 +1,13 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
+import {
+  MethodologySummary,
+  ExternalMethodology,
+} from '@common/services/types/methodology';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
-
-export interface Methodology {
-  id: string;
-  slug: string;
-  title: string;
-}
-
-export interface ExternalMethodology {
-  title: string;
-  url: string;
-}
 
 export interface Publication {
   id: string;
@@ -39,7 +32,7 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
-  methodology?: Methodology;
+  methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
 }
 

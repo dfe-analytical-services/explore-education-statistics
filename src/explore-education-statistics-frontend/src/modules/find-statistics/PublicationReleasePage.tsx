@@ -40,13 +40,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     release.publication.otherReleases.length +
     release.publication.legacyReleases.length;
 
-  let methodologyUrl = '';
-  if (release.publication.methodology) {
-    methodologyUrl = `/methodology/${release.publication.methodology.slug}`;
-  } else if (release.publication.externalMethodology) {
-    methodologyUrl = release.publication.externalMethodology.url;
-  }
-
   return (
     <Page
       title={release.publication.title}
@@ -189,16 +182,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     View data and files
                   </a>
                 </li>
-                {release.publication.methodology && (
-                  <li>
+                {release.publication.methodologies.map(methodology => (
+                  <li key={methodology.id}>
                     <Link
                       to="/methodology/[methodology]"
-                      as={`/methodology/${release.publication.methodology.slug}`}
+                      as={`/methodology/${methodology.slug}`}
                     >
-                      Methodology
+                      {methodology.title}
                     </Link>
                   </li>
-                )}
+                ))}
                 {release.publication.externalMethodology && (
                   <li>
                     <a
@@ -419,7 +412,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       <PublicationReleaseHelpAndSupportSection
         accordionId="help-and-support"
         publicationTitle={release.publication.title}
-        methodologyUrl={methodologyUrl}
+        methodologies={release.publication.methodologies}
+        externalMethodology={release.publication.externalMethodology}
         publicationContact={release.publication.contact}
         releaseType={release.type.title}
       />

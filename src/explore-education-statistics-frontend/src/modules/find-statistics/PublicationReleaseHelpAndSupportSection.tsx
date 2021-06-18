@@ -9,12 +9,17 @@ import React, { ReactNode } from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import {
+  ExternalMethodology,
+  MethodologySummary,
+} from '@common/services/types/methodology';
 
 interface Props {
   includeAnalytics?: boolean;
   accordionId: string;
   publicationTitle: string;
-  methodologyUrl?: string;
+  methodologies: MethodologySummary[];
+  externalMethodology?: ExternalMethodology;
   releaseType?: string;
   publicationContact: PublicationContact;
 }
@@ -23,7 +28,8 @@ const PublicationReleaseHelpAndSupportSection = ({
   accordionId,
   includeAnalytics = false,
   publicationTitle,
-  methodologyUrl = '',
+  methodologies,
+  externalMethodology,
   releaseType,
   publicationContact,
 }: Props) => {
@@ -40,20 +46,35 @@ const PublicationReleaseHelpAndSupportSection = ({
         includeAnalytics={includeAnalytics}
         publicationTitle={publicationTitle}
       >
-        {methodologyUrl !== '' && (
-          <AccordionSection
-            heading="Methodology"
-            caption="Find out how and why we collect, process and publish these statistics"
-            headingTag="h3"
-          >
-            <p className="govuk-!-margin-bottom-9">
-              <Link to="/methodology/[methodology]" as={methodologyUrl}>
-                View methodology
-              </Link>{' '}
-              for {publicationTitle}.
-            </p>
-          </AccordionSection>
-        )}
+        {methodologies.length > 0 ||
+          (externalMethodology && (
+            <AccordionSection
+              heading="Methodology"
+              caption="Find out how and why we collect, process and publish these statistics"
+              headingTag="h3"
+            >
+              {methodologies.map(methodology => (
+                <p key={methodology.id} className="govuk-!-margin-bottom-9">
+                  <Link
+                    to="/methodology/[methodology]"
+                    as={`/methodology/${methodology.slug}`}
+                  >
+                    {methodology.title}
+                  </Link>
+                </p>
+              ))}
+              {externalMethodology && (
+                <p className="govuk-!-margin-bottom-9">
+                  <Link
+                    to="/methodology/[methodology]"
+                    as={externalMethodology.url}
+                  >
+                    {externalMethodology.title}
+                  </Link>
+                </p>
+              )}
+            </AccordionSection>
+          ))}
         {releaseType === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />
