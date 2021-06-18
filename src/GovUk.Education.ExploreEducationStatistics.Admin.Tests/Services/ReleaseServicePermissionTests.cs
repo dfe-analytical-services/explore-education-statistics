@@ -22,6 +22,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
@@ -179,8 +180,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseAmendmentAsync(_release.Id);
+                        using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync"))
+                        {
+                            contentDbContext.Attach(_release);
+                            var service = BuildReleaseService(contentDbContext,
+                                userService: userService.Object);
+                            return service.CreateReleaseAmendmentAsync(_release.Id);
+                        }
                     }
                 );
         }
