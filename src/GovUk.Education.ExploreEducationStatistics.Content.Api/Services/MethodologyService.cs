@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _methodologyRepository = methodologyRepository;
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> Get(string slug)
+        public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
             // TODO SOW4 EES-2375 lookup the MethodologyParent by slug when slug is moved to the parent
             // For now, this does a lookup on the parent via any Methodology with the slug

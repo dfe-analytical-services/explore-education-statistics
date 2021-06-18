@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             {
                 TopicId = topicId
             });
-            
+
             Assert.IsType<PublicationViewModel>(result.Value);
             Assert.Equal(topicId, result.Value.TopicId);
         }

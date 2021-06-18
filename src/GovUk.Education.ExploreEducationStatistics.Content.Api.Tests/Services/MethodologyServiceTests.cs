@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
     public class MethodologyServiceTests
     {
         [Fact]
-        public async Task Get()
+        public async Task GetLatestMethodologyBySlug()
         {
             const string slug = "methodology-1";
 
@@ -103,9 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
 
-                var result = await service.Get(slug);
+                var result = await service.GetLatestMethodologyBySlug(slug);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 Assert.Equal(Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"), result.Right.Id);
                 Assert.Equal("Methodology 1 title updated", result.Right.Title);
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_MethodologyHasNoPublishedVersion()
+        public async Task GetLatestMethodologyBySlug_MethodologyHasNoPublishedVersion()
         {
             const string slug = "methodology-1";
 
@@ -176,14 +176,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
 
-                var result = await service.Get(slug);
+                var result = await service.GetLatestMethodologyBySlug(slug);
 
                 result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task Get_SlugNotFound()
+        public async Task GetLatestMethodologyBySlug_SlugNotFound()
         {
             // Set up a different methodology with a different slug to make sure it's not returned
             var methodology = new MethodologyParent
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
 
-                var result = await service.Get("methodology-slug");
+                var result = await service.GetLatestMethodologyBySlug("methodology-slug");
 
                 result.AssertNotFound();
             }
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 var result = await service.GetSummariesByPublication(publication.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 Assert.Equal(2, result.Right.Count);
 
@@ -304,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 var result = await service.GetSummariesByPublication(publication.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 Assert.Empty(result.Right);
             }

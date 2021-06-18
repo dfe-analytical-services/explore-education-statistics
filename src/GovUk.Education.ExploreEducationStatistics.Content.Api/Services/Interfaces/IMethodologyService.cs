@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IMethodologyService
     {
-        public Task<Either<ActionResult, MethodologyViewModel>> Get(string slug);
+        public Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug);
 
         public Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
     }

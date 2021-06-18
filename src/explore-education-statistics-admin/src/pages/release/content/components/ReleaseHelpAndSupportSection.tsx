@@ -30,7 +30,7 @@ const ReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {publication.methodologies.length > 0 ||
+          {publication.methodologies.length ||
           publication.externalMethodology ? (
             <>
               {publication.methodologies.map(methodology => (

@@ -46,7 +46,7 @@ const PublicationReleaseHelpAndSupportSection = ({
         includeAnalytics={includeAnalytics}
         publicationTitle={publicationTitle}
       >
-        {(methodologies.length > 0 || externalMethodology) && (
+        {(methodologies.length || externalMethodology) && (
           <AccordionSection
             heading="Methodology"
             caption="Find out how and why we collect, process and publish these statistics"

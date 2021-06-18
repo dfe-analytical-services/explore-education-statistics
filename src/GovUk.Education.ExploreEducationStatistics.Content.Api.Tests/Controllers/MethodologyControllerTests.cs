@@ -13,13 +13,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     public class MethodologyControllerTests
     {
         [Fact]
-        public async Task Get()
+        public async Task GetLatestMethodologyBySlug()
         {
             var methodologyId = Guid.NewGuid();
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.Get("test-slug"))
+            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
                 .ReturnsAsync(new MethodologyViewModel
                 {
                     Id = methodologyId
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.Get("test-slug");
+            var result = await controller.GetLatestMethodologyBySlug("test-slug");
             var methodologyViewModel = result.Value;
 
             Assert.Equal(methodologyId, methodologyViewModel.Id);
@@ -36,16 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public async Task Get_NotFound()
+        public async Task GetLatestMethodologyBySlug_NotFound()
         {
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.Get(It.IsAny<string>()))
+            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.Get("unknown-slug");
+            var result = await controller.GetLatestMethodologyBySlug("unknown-slug");
 
             Assert.IsType<NotFoundResult>(result.Result);
 
