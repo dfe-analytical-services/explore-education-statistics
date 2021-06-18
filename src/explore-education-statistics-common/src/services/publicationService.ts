@@ -1,8 +1,11 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
+import {
+  MethodologySummary,
+  ExternalMethodology,
+} from '@common/services/types/methodology';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
-import { ExternalMethodology, MethodologySummary } from './types/methodology';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
