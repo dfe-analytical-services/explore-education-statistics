@@ -13,7 +13,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('ChartDataSetsConfiguration', () => {
-  const testSubjectMeta: FullTableMeta = mapFullTableMeta({
+  const testMeta = {
     publicationName: '',
     subjectName: '',
     geoJsonAvailable: false,
@@ -80,7 +80,41 @@ describe('ChartDataSetsConfiguration', () => {
         },
       },
     },
-  });
+  };
+  const testSubjectMeta: FullTableMeta = mapFullTableMeta(testMeta);
+
+  const testtMetaMultipleFilters = {
+    ...testMeta,
+    filters: {
+      ...testMeta.filters,
+      SchoolType: {
+        legend: 'School Type',
+        name: 'School Type',
+        options: {
+          CategoryFilter: {
+            label: 'Category filter',
+            options: [
+              {
+                value: 'secondary',
+                label: 'Secondary',
+              },
+              {
+                value: 'primary',
+                label: 'Primary',
+              },
+              {
+                value: 'special',
+                label: 'Special',
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+  const testSubjectMetaMultipleFilters: FullTableMeta = mapFullTableMeta(
+    testtMetaMultipleFilters,
+  );
 
   const testFormState: ChartBuilderForms = {
     options: {
@@ -192,9 +226,7 @@ describe('ChartDataSetsConfiguration', () => {
         'option',
       );
       expect(characteristicOptions).toHaveLength(3);
-      expect(characteristicOptions[0]).toHaveTextContent(
-        'Select characteristic',
-      );
+      expect(characteristicOptions[0]).toHaveTextContent('All options');
       expect(characteristicOptions[1]).toHaveTextContent('Female');
       expect(characteristicOptions[2]).toHaveTextContent('Male');
 
@@ -203,7 +235,7 @@ describe('ChartDataSetsConfiguration', () => {
 
       const indicatorOptions = within(indicator).getAllByRole('option');
       expect(indicatorOptions).toHaveLength(3);
-      expect(indicatorOptions[0]).toHaveTextContent('Select indicator');
+      expect(indicatorOptions[0]).toHaveTextContent('All indicators');
       expect(indicatorOptions[1]).toHaveTextContent(
         'Number of authorised absence sessions',
       );
@@ -324,38 +356,6 @@ describe('ChartDataSetsConfiguration', () => {
       );
 
       expect(screen.queryByLabelText('Time period')).not.toBeInTheDocument();
-    });
-
-    test('shows validation errors when no values have been selected', async () => {
-      const handleChange = jest.fn();
-
-      render(
-        <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartDataSetsConfiguration
-            meta={testSubjectMeta}
-            onChange={handleChange}
-          />
-        </ChartBuilderFormsContextProvider>,
-      );
-
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
-
-      expect(handleChange).not.toHaveBeenCalled();
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: 'Choose indicator' }),
-        ).toHaveAttribute('href', '#chartDataSetsConfigurationForm-indicator');
-
-        expect(
-          screen.getByRole('link', { name: 'Choose characteristic' }),
-        ).toHaveAttribute(
-          'href',
-          '#chartDataSetsConfigurationForm-filtersCharacteristic',
-        );
-
-        expect(handleChange).not.toHaveBeenCalled();
-      });
     });
 
     test('shows submit error if data set already exists', async () => {
@@ -507,6 +507,264 @@ describe('ChartDataSetsConfiguration', () => {
           {
             filters: [],
             indicator: 'unauthorised-absence-sessions',
+          },
+        ];
+
+        expect(handleChange).toHaveBeenCalledWith(expected);
+      });
+    });
+
+    test('successfully submits when select all indicators', async () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        LocationFilter.createId({
+          value: 'barnsley',
+          level: 'localAuthority',
+        }),
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+
+      await waitFor(() => {
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'authorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+        ];
+
+        expect(handleChange).toHaveBeenCalledWith(expected);
+      });
+    });
+
+    test('successfully submits when select all filters', async () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.selectOptions(
+        screen.getByLabelText('Indicator'),
+        'unauthorised-absence-sessions',
+      );
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        LocationFilter.createId({
+          value: 'barnsley',
+          level: 'localAuthority',
+        }),
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+
+      await waitFor(() => {
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['female'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+        ];
+
+        expect(handleChange).toHaveBeenCalledWith(expected);
+      });
+    });
+
+    test('successfully submits when select all filters of multiple filters', async () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMetaMultipleFilters}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.selectOptions(
+        screen.getByLabelText('Indicator'),
+        'unauthorised-absence-sessions',
+      );
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        LocationFilter.createId({
+          value: 'barnsley',
+          level: 'localAuthority',
+        }),
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+
+      await waitFor(() => {
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['female'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['secondary'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['primary'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['special'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+        ];
+
+        expect(handleChange).toHaveBeenCalledWith(expected);
+      });
+    });
+
+    test('successfully submits when select all indicators and filters', async () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        LocationFilter.createId({
+          value: 'barnsley',
+          level: 'localAuthority',
+        }),
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+
+      await waitFor(() => {
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'authorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['female'],
+            indicator: 'authorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['female'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
           },
         ];
 

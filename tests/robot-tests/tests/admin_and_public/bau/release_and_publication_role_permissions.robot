@@ -190,6 +190,7 @@ Remove publication owner access
     [Tags]  HappyPath
     user removes publication owner access from analyst  ${PUBLICATION_NAME}
 
+
 Give release approver access to Analyst1
     [Tags]  HappyPath
     user gives analyst release access  ${RELEASE_NAME}  Approver
@@ -256,7 +257,7 @@ Navigate to manage users as bau1
 Remove release owner access from Analyst1 
     [Tags]  HappyPath
     user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
-    user clicks testid element  remove-release-role-Approver
+    user clicks element  testid:remove-release-role-Approver
     user waits until page does not contain loading spinner
 
 Assign viewer only access to Analyst1

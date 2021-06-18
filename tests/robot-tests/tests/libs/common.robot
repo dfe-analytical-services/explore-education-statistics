@@ -23,7 +23,16 @@ do this on failure
     capture large screenshot and html
     set selenium timeout  3
 
+custom testid locator strategy
+  [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
+  ${element}=   Execute Javascript  let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
+  [Return]  ${element}
+
+set custom locator strategies
+    add location strategy   testid    custom testid locator strategy
+
 user opens the browser
+    set custom locator strategies
     run keyword if    "${browser}" == "chrome"    user opens chrome
     run keyword if    "${browser}" == "firefox"   user opens firefox
     run keyword if    "${browser}" == "ie"        user opens ie
@@ -315,10 +324,6 @@ user clicks element
     user scrolls to element  ${element}
     wait until element is enabled   ${element}
     click element   ${element}
-
-user clicks testid element
-    [Arguments]  ${id}
-    user clicks element  css:[data-testid="${id}"]
 
 user clicks link
     [Arguments]   ${text}  ${parent}=css:body

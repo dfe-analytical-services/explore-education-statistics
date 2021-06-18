@@ -129,7 +129,7 @@ Add second footnote to ${SECOND_SUBJECT}
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio  ${SECOND_SUBJECT}   Applies to specific data
-    user opens details dropdown  Indicators   xpath://*[@data-testid="footnote-subject ${SECOND_SUBJECT}"]
+    user opens details dropdown  Indicators   testid:footnote-subject ${SECOND_SUBJECT}
     user clicks footnote checkbox  Admission Numbers
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SECOND_SUBJECT}
@@ -153,7 +153,7 @@ Add second footnote to ${SUBJECT_NAME} subject
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio   ${SUBJECT_NAME}   Applies to specific data
-    user opens details dropdown  Cheese    xpath://*[@data-testid="footnote-subject ${SUBJECT_NAME}"]
+    user opens details dropdown  Cheese    testid:footnote-subject ${SUBJECT_NAME}
     user clicks footnote checkbox  Stilton
     user clicks footnote checkbox  Feta
     user clicks element  id:footnoteForm-content
@@ -315,7 +315,7 @@ Generate the permalink
     [Documentation]  EES-214
     user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL}
 
 Go to permalink
@@ -343,7 +343,6 @@ Edit methodology content
     [Tags]  HappyPath
     user clicks link  Manage content
     user clicks button  ${METHODOLOGY_NAME}
-
     user scrolls to element  xpath://button[text()="Add text block"]
     user waits until button is enabled  Add text block
     user clicks button  Add text block
@@ -528,7 +527,7 @@ Add footnote to "upload file test filter" subject file
 
 Update Seven filters footnote
     [Tags]  HappyPath
-    user clicks link   Edit footnote   xpath://*[@data-testid="footnote Footnote 1 ${SUBJECT_NAME}"]
+    user clicks link   Edit footnote   testid:footnote Footnote 1 ${SUBJECT_NAME}
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     textarea should contain  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
@@ -610,7 +609,7 @@ Generate the new permalink
     [Documentation]  EES-214
     user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL_TWO}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL_TWO}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink

@@ -19,7 +19,7 @@ Navigate to Absence publication
 
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
-    user clicks testid element  View stats link for Pupil absence in schools in England
+    user clicks element  testid:View stats link for Pupil absence in schools in England
     user waits until h1 is visible  Pupil absence in schools in England  90
     user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 

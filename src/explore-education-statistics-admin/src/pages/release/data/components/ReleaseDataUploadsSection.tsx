@@ -69,6 +69,7 @@ const ReleaseDataUploadsSection = ({
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [cancelDataFile, setCancelDataFile] = useState<DataFile>();
+  const [activeFileId, setActiveFileId] = useState<string>();
 
   const {
     value: dataFiles = [],
@@ -137,6 +138,7 @@ const ReleaseDataUploadsSection = ({
       dataFile.id,
     );
 
+    setActiveFileId('');
     setDataFiles(
       dataFiles.map(file =>
         file.fileName !== dataFile.fileName
@@ -167,7 +169,7 @@ const ReleaseDataUploadsSection = ({
         });
         file.isQueuedZipUpload = true;
       }
-
+      setActiveFileId(file.id);
       setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));
     },
     [dataFiles, releaseId, setDataFiles],
@@ -260,9 +262,11 @@ const ReleaseDataUploadsSection = ({
           <Accordion id="uploadedDataFiles">
             {dataFiles.map(dataFile => (
               <AccordionSection
+                id={dataFile.id}
                 key={dataFile.title}
                 heading={dataFile.title}
                 headingTag="h3"
+                open={dataFile.id === activeFileId}
               >
                 <div style={{ position: 'relative' }}>
                   {dataFile.isDeleting && (

@@ -685,6 +685,13 @@ describe('ReleaseStatusForm', () => {
       };
 
       await waitFor(() => {
+        const modal = within(screen.getByRole('dialog'));
+        expect(modal.getByRole('heading')).toHaveTextContent(
+          'Confirm publish date',
+        );
+        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      });
+      await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
       });
     });

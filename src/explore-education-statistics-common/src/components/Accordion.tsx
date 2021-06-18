@@ -115,7 +115,8 @@ const Accordion = ({
     // Changing `openAll` prop toggles all sections.
     updateOpenSections(draft => {
       sections.forEach(section => {
-        draft[section.id] = openAll ?? draft[section.id] ?? false;
+        draft[section.id] =
+          openAll || section.element.props.open || draft[section.id] || false;
       });
     });
   }, [sections, updateOpenSections, openAll]);

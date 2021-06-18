@@ -34,6 +34,11 @@ const projects = {
     command: 'dotnet build && dotnet run',
     colour: chalk.green,
   },
+  frontend: {
+    path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
+    command: 'npm run start:local',
+    colour: chalk.greenBright,
+  },
   content: {
     path: path.join(
       projectRoot,
