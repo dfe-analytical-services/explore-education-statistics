@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
-            CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
+            CreateMap<ReleaseStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
             CreateMap<Methodology, MethodologySummaryViewModel>();

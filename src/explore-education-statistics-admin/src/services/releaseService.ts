@@ -154,7 +154,7 @@ export interface ReleasePublicationStatus {
   live: boolean;
 }
 
-export interface ReleaseInternalNote {
+export interface ReleaseStatus {
   releaseStatusId: string;
   internalReleaseNote: string;
   approvalStatus: ReleaseApprovalStatus;
@@ -174,8 +174,8 @@ const releaseService = {
     return client.get(`/releases/${releaseId}`);
   },
 
-  getReleaseInternalNotes(releaseId: string): Promise<ReleaseInternalNote[]> {
-    return client.get(`/releases/${releaseId}/internal-notes`);
+  getReleaseStatuses(releaseId: string): Promise<ReleaseStatus[]> {
+    return client.get(`/releases/${releaseId}/status`);
   },
 
   updateRelease(
@@ -205,7 +205,9 @@ const releaseService = {
   },
 
   getReleaseStatus(releaseId: string): Promise<ReleaseStageStatuses> {
-    return client.get<ReleaseStageStatuses>(`/releases/${releaseId}/status`);
+    return client.get<ReleaseStageStatuses>(
+      `/releases/${releaseId}/stage-status`,
+    );
   },
 
   getReleaseChecklist(releaseId: string): Promise<ReleaseChecklist> {

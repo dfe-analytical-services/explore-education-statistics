@@ -101,24 +101,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, List<ReleaseInternalNoteViewModel>>> GetInternalReleaseNotes(
+        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
             Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<Release>(releaseId, release =>
+                    release.Include(r => r.ReleaseStatuses)
+                        .ThenInclude(rs => rs.CreatedBy))
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ =>
-                    _context.ReleaseStatus
-                        .Include(rs => rs.CreatedBy)
-                        .Where(rs => rs.ReleaseId == releaseId)
+                .OnSuccess(release =>
+                    release.ReleaseStatuses
                         .Select(rs =>
-                            new ReleaseInternalNoteViewModel
+                            new ReleaseStatusViewModel
                             {
                                 ReleaseStatusId = rs.Id,
                                 InternalReleaseNote = rs.InternalReleaseNote,
                                 ApprovalStatus = rs.ApprovalStatus,
                                 Created = rs.Created,
-                                CreatedByEmail = rs.CreatedBy.Email
+                                CreatedByEmail = rs.CreatedBy?.Email
                             })
                         .OrderByDescending(vm => vm.Created)
                         .ToList()

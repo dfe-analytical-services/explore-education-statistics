@@ -7,9 +7,7 @@ import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService, {
-  ReleaseInternalNote,
-} from '@admin/services/releaseService';
+import releaseService, { ReleaseStatus } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -58,8 +56,8 @@ const ReleaseStatusPage = () => {
     [releaseId],
   );
 
-  const { value: internalNotes } = useAsyncRetry<ReleaseInternalNote[]>(
-    () => releaseService.getReleaseInternalNotes(releaseId),
+  const { value: releaseStatuses } = useAsyncRetry<ReleaseStatus[]>(
+    () => releaseService.getReleaseStatuses(releaseId),
     [releaseId, release],
   );
 
@@ -140,12 +138,12 @@ const ReleaseStatusPage = () => {
         </Button>
       )}
 
-      {internalNotes && internalNotes.length > 0 && (
+      {releaseStatuses && releaseStatuses.length > 0 && (
         <>
-          <h3>Internal note history</h3>
+          <h3>Release status history</h3>
           <LoadingSpinner
-            loading={!internalNotes}
-            text="Loading internal note history"
+            loading={!releaseStatuses}
+            text="Loading release status history"
           >
             <table>
               <thead>
@@ -156,25 +154,25 @@ const ReleaseStatusPage = () => {
                   <th scope="col">By user</th>
                 </tr>
               </thead>
-              {internalNotes && (
+              {releaseStatuses && (
                 <tbody>
-                  {internalNotes.map(note => (
-                    <tr key={note.releaseStatusId}>
+                  {releaseStatuses.map(status => (
+                    <tr key={status.releaseStatusId}>
                       <td>
-                        {note.created ? (
+                        {status.created ? (
                           <FormattedDate format="d MMMM yyyy HH:mm">
-                            {note.created}
+                            {status.created}
                           </FormattedDate>
                         ) : (
                           'Not available'
                         )}
                       </td>
-                      <td>{note.approvalStatus}</td>
-                      <td>{note.internalReleaseNote}</td>
+                      <td>{status.approvalStatus}</td>
+                      <td>{status.internalReleaseNote}</td>
                       <td>
-                        {note.createdByEmail ? (
-                          <a href={`mailto:${note.createdByEmail}`}>
-                            {note.createdByEmail}
+                        {status.createdByEmail ? (
+                          <a href={`mailto:${status.createdByEmail}`}>
+                            {status.createdByEmail}
                           </a>
                         ) : (
                           'Not available'

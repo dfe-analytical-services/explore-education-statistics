@@ -59,6 +59,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetReleaseStatuses()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.GetReleaseStatuses(_release.Id);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task CreateReleaseAsync()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
