@@ -1,21 +1,13 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
+import {
+  MethodologySummary,
+  ExternalMethodology,
+} from '@common/services/types/methodology';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
-
-export interface Methodology {
-  id: string;
-  slug: string;
-  summary: string;
-  title: string;
-}
-
-export interface ExternalMethodology {
-  title: string;
-  url: string;
-}
 
 export interface Publication {
   id: string;
@@ -40,7 +32,7 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
-  methodology?: Methodology;
+  methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
 }
 
@@ -63,11 +55,6 @@ export interface PublicationContact {
 export interface PublicationTitle {
   id: string;
   title: string;
-}
-
-export interface PublicationMethodology {
-  methodology?: Methodology;
-  externalMethodology?: ExternalMethodology;
 }
 
 export interface BasicLink {
@@ -155,11 +142,6 @@ export interface PreReleaseAccessListSummary extends ReleaseSummary {
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
-  },
-  getPublicationMethodology(
-    publicationSlug: string,
-  ): Promise<PublicationMethodology> {
-    return contentApi.get(`/publications/${publicationSlug}/methodology`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);

@@ -9,7 +9,6 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import {
   MethodologyRouteParams,
-  methodologySummaryEditRoute,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import Details from '@common/components/Details';

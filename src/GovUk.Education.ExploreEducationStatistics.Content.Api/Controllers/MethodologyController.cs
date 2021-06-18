@@ -1,6 +1,8 @@
 ﻿using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -9,15 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class MethodologyController : ControllerBase
     {
-        public MethodologyController()
+        private readonly IMethodologyService _methodologyService;
+
+        public MethodologyController(IMethodologyService methodologyService)
         {
+            _methodologyService = methodologyService;
         }
 
         [HttpGet("methodologies/{slug}")]
-        public async Task<ActionResult<MethodologyViewModel>> Get(string slug)
+        public async Task<ActionResult<MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
-            // TODO SOW4 EES-2375 Return methodology from content database
-            return new NotFoundResult();
+            return await _methodologyService.GetLatestMethodologyBySlug(slug)
+                .HandleFailuresOrOk();
         }
     }
 }

@@ -30,28 +30,32 @@ const ReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {publication.methodology || publication.externalMethodology ? (
-            <p>
-              Read our{' '}
-              {publication.methodology &&
-                (isEditing ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={`/methodologies/${publication.methodology.id}`}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}
-              {!publication.methodology &&
-                publication.externalMethodology &&
-                (isEditing ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={publication.externalMethodology.url}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}{' '}
-              guidance.
-            </p>
+          {publication.methodologies.length ||
+          publication.externalMethodology ? (
+            <>
+              {publication.methodologies.map(methodology => (
+                <p key={methodology.id} className="govuk-!-margin-bottom-9">
+                  {isEditing ? (
+                    <a>{`${methodology.title}`}</a>
+                  ) : (
+                    <Link to={`/methodologies/${methodology.id}`}>
+                      {methodology.title}
+                    </Link>
+                  )}
+                </p>
+              ))}
+              {publication.externalMethodology && (
+                <p className="govuk-!-margin-bottom-9">
+                  {isEditing ? (
+                    <a>{`${publication.externalMethodology.title}`}</a>
+                  ) : (
+                    <Link to={publication.externalMethodology.url}>
+                      {publication.externalMethodology.title}
+                    </Link>
+                  )}
+                </p>
+              )}
+            </>
           ) : (
             <p>No methodology added.</p>
           )}

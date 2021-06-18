@@ -23,7 +23,6 @@ export interface PublicationMethodologySummary extends BasePublicationSummary {
   methodology: {
     id: string;
     slug: string;
-    summary: string;
     title: string;
   };
 }

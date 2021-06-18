@@ -484,8 +484,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IMethodologyContentService methodologyContentService = null,
-            IMethodologyRepository methodologyRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
+            IMethodologyRepository methodologyRepository = null,
             IMethodologyImageService methodologyImageService = null,
             IPublishingService publishingService = null,
             IUserService userService = null)

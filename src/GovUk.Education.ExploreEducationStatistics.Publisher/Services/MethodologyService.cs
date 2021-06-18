@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
@@ -45,19 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Select(mf => mf.File)
                 .Where(file => types.Contains(file.Type))
                 .ToListAsync();
-        }
-
-        // TODO SOW4 EES-2375 Move to Content API
-        public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)
-        {
-            var methodology = await Get(id);
-
-            var methodologyViewModel =  _mapper.Map<MethodologyViewModel>(methodology);
-
-            // If the methodology isn't live yet set the published date based on what we expect it to be
-            methodologyViewModel.Published ??= context.Published;
-
-            return methodologyViewModel;
         }
 
         // TODO SOW4 EES-2378 Move to Content API
@@ -125,7 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 Id = methodology.Id,
                 Slug = methodology.Slug,
-                Summary = methodology.Summary,
                 Title = methodology.Title
             };
         }

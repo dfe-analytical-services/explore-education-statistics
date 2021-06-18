@@ -50,12 +50,13 @@ const basicRelease: EditableRelease = {
       contactName: 'Cameron Race',
       contactTelNo: '07780991976',
     },
-    methodology: {
-      id: '8807af2b-d9a7-4efa-a376-08d7b451a98e',
-      title: 'First methodology',
-      slug: '',
-      summary: '',
-    },
+    methodologies: [
+      {
+        id: '8807af2b-d9a7-4efa-a376-08d7b451a98e',
+        title: 'First methodology',
+        slug: 'my-pub-methodology',
+      },
+    ],
   },
   latestRelease: false,
   type: {

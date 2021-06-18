@@ -540,7 +540,15 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
-            
+            <li>
+              <a
+                class="govuk-link"
+                href="/methodology/test-publication"
+              >
+                Go to 
+                Test Publication: methodology
+              </a>
+            </li>
           </ul>
         </div>
       </details>
@@ -1168,7 +1176,15 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
-            
+            <li>
+              <a
+                class="govuk-link"
+                href="/methodology/test-publication"
+              >
+                Go to 
+                Test Publication: methodology
+              </a>
+            </li>
           </ul>
         </div>
       </details>
@@ -1249,7 +1265,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     role="group"
   >
     <summary
-      aria-controls="details-content-45"
+      aria-controls="details-content-46"
       aria-expanded="false"
       class="govuk-details__summary"
       role="button"
@@ -1265,7 +1281,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
     <div
       aria-hidden="true"
       class="govuk-details__text"
-      id="details-content-45"
+      id="details-content-46"
     >
       <p
         class="govuk-hint"
@@ -1751,7 +1767,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         role="group"
       >
         <summary
-          aria-controls="details-content-46"
+          aria-controls="details-content-47"
           aria-expanded="true"
           class="govuk-details__summary"
           role="button"
@@ -1767,7 +1783,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         <div
           aria-hidden="false"
           class="govuk-details__text"
-          id="details-content-46"
+          id="details-content-47"
         >
           <ul
             class="govuk-list"
@@ -1796,7 +1812,15 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
-            
+            <li>
+              <a
+                class="govuk-link"
+                href="/methodology/test-publication"
+              >
+                Go to 
+                Test Publication: methodology
+              </a>
+            </li>
           </ul>
         </div>
       </details>
@@ -1805,7 +1829,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         role="group"
       >
         <summary
-          aria-controls="details-content-52"
+          aria-controls="details-content-53"
           aria-expanded="false"
           class="govuk-details__summary"
           role="button"
@@ -1821,7 +1845,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         <div
           aria-hidden="true"
           class="govuk-details__text"
-          id="details-content-52"
+          id="details-content-53"
         >
           <p>
             If you have a question about the data or methods used to create this table contact the named statistician:
@@ -3039,7 +3063,15 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
-            
+            <li>
+              <a
+                class="govuk-link"
+                href="/methodology/test-publication"
+              >
+                Go to 
+                Test Publication: methodology
+              </a>
+            </li>
           </ul>
         </div>
       </details>
@@ -3651,7 +3683,15 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
                 Download table as Excel spreadsheet (XLSX)
               </button>
             </li>
-            
+            <li>
+              <a
+                class="govuk-link"
+                href="/methodology/test-publication"
+              >
+                Go to 
+                Test Publication: methodology
+              </a>
+            </li>
           </ul>
         </div>
       </details>

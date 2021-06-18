@@ -7,7 +7,6 @@ export interface Methodology {
   title: string;
   published: string;
   lastUpdated: string;
-  summary: string;
   slug: string;
   publicationId: string;
   publication: Publication;
