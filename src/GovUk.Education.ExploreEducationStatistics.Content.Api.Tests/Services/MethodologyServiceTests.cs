@@ -109,7 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 Assert.Equal(Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"), result.Right.Id);
                 Assert.Equal("Methodology 1 title updated", result.Right.Title);
-                Assert.Equal("Methodology 1 summary updated", result.Right.Summary);
 
                 var annexes = result.Right.Annexes;
                 Assert.NotNull(annexes);
