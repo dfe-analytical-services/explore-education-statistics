@@ -165,7 +165,6 @@ if args.tags:
     robotArgs += ["--include", args.tags]
 
 if args.print_keywords:
-    os.environ['ANALYST_PASSWORD'] = args.analyst_pass
     robotArgs += ["--listener", 'listeners/KeywordListener.py']
 
 if args.ci:
