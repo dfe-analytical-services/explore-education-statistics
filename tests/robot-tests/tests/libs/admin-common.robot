@@ -81,7 +81,6 @@ user creates publication
     user waits until h1 is visible  Create new publication
     user waits until page contains element  id:publicationForm-title
     user enters text into element  id:publicationForm-title   ${title}
-    user clicks radio     No methodology
     user enters text into element  id:publicationForm-teamName        Attainment statistics team
     user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
     user enters text into element  id:publicationForm-contactName     Tingting Shu

@@ -11,7 +11,6 @@ Suite Teardown    teardown suite
 ${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
-${METHODOLOGY_NAME}  UI test methodology
 
 ${CREATED_THEME_ID}    ${EMPTY}
 ${CREATED_THEME_NAME}  UI test theme - create publication %{RUN_IDENTIFIER}
@@ -23,12 +22,6 @@ teardown suite
     user closes the browser
 
 *** Test Cases ***
-Create approved 'Test methodology'
-    [Tags]  HappyPath
-    user clicks link  manage methodologies
-    user creates approved methodology  ${METHODOLOGY_NAME}
-    user clicks link  Home
-
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
@@ -37,11 +30,6 @@ Go to Create publication page for "UI tests topic" topic
     user clicks link  Create new publication
     user waits until page contains title caption  ${TOPIC_NAME}
     user waits until h1 is visible    Create new publication
-
-Selects no methodology
-    [Tags]  HappyPath
-    user waits until page contains element   xpath://label[text()="No methodology"]
-    user clicks radio  No methodology
 
 Enters contact details
     [Tags]  HappyPath
@@ -95,14 +83,14 @@ Update publication
     user enters text into element  id:publicationForm-title  ${PUBLICATION_NAME}
     user selects from list by label  id:publicationForm-themeId  ${CREATED_THEME_NAME}
     user selects from list by label  id:publicationForm-topicId  ${CREATED_TOPIC_NAME}
-    user clicks radio  Choose an existing methodology
-    user waits until page contains element  xpath://option[text()="${METHODOLOGY_NAME} [Approved]"]
-    user selects from list by label  id:publicationForm-methodologyId   ${METHODOLOGY_NAME} [Approved]
     user enters text into element  id:publicationForm-teamName      Special educational needs statistics team
     user enters text into element  id:publicationForm-teamEmail     sen.statistics@education.gov.uk
     user enters text into element  id:publicationForm-contactName   Sean Gibson
     user enters text into element  id:publicationForm-contactTelNo  0987654321
     user clicks button   Save publication
+
+Add a methodology
+    user creates methodology for publication    ${PUBLICATION_NAME}
 
 Verify publication has been updated
     [Tags]  HappyPath
@@ -114,7 +102,7 @@ Verify publication has been updated
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson
     user checks testid element contains  Contact phone number for ${PUBLICATION_NAME}  0987654321
-    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  ${METHODOLOGY_NAME}
+    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  ${PUBLICATION_NAME}
     user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
 
 Create new release
