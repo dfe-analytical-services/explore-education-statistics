@@ -17,19 +17,7 @@ ${THIRD_SUBJECT}  upload file test with filter subject
 *** Test Cases ***
 Create publication
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user clicks link  Create new publication
-    user waits until h1 is visible  Create new publication
-    user waits until page contains element  id:publicationForm-title
-    user enters text into element  id:publicationForm-title   ${PUBLICATION_NAME}
-    user selects from list by label  id:publicationForm-methodologyId  ${PUBLICATION_NAME} [Approved]
-    user enters text into element  id:publicationForm-teamName        Attainment statistics team
-    user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
-    user enters text into element  id:publicationForm-contactName     Tingting Shu
-    user enters text into element  id:publicationForm-contactTelNo    0123456789
-    user clicks button   Save publication
-    user waits until h1 is visible  Dashboard
+    user creates publication  ${PUBLICATION_NAME}
 
 Create new methodology
     [Tags]  HappyPath
