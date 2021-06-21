@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId, release =>
                     release.Include(r => r.ReleaseStatuses)
                         .ThenInclude(rs => rs.CreatedBy))
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
                 .OnSuccess(release =>
                     release.ReleaseStatuses
                         .Select(rs =>
