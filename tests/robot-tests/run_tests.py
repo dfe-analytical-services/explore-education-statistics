@@ -107,6 +107,14 @@ parser.add_argument("--implicit-wait",
                     default="5",
                     dest="implicit_wait",
                     help="default robot implicit wait in seconds (default is 5)")
+parser.add_argument("--print-keywords",
+                    dest="print_keywords",
+                    action='store_true',
+                    help="choose to print out keywords as they are started")
+parser.add_argument("--prompt-to-continue",
+                    dest="prompt_to_continue",
+                    action='store_true',
+                    help="get prompted to continue with test execution upon a failure")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -160,6 +168,9 @@ if args.rerun_failed_suites:
 
 if args.tags:
     robotArgs += ["--include", args.tags]
+
+if args.print_keywords:
+    robotArgs += ["--listener", 'listeners/KeywordListener.py']
 
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
@@ -326,6 +337,9 @@ else:
 
 if os.getenv('RELEASE_COMPLETE_WAIT'):
     robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
+
+if args.prompt_to_continue:
+    robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
 
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]

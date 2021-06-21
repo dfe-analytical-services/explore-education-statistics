@@ -1,26 +1,26 @@
-import publicationService, {
-  ExternalMethodology,
-  MyPublication,
-} from '@admin/services/publicationService';
-import methodologyService from '@admin/services/methodologyService';
-import ButtonGroup from '@common/components/ButtonGroup';
-import Button from '@common/components/Button';
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
+import MethodologyExternalLinkForm from '@admin/pages/admin-dashboard/components/MethodologyExternalLinkForm';
 import {
   MethodologyRouteParams,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
+import methodologyService from '@admin/services/methodologyService';
+import publicationService, {
+  ExternalMethodology,
+  MyPublication,
+} from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
-import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
-import MethodologyExternalLinkForm from '@admin/pages/admin-dashboard/components/MethodologyExternalLinkForm';
 
 export interface Props {
   publication: MyPublication;
