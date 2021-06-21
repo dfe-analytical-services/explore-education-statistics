@@ -46,6 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanCreateMethodologyForSpecificPublication);
         }
 
+        public static Task<Either<ActionResult, Publication>> CheckCanManageExternalMethodologyForPublication(
+            this IUserService userService, Publication publication)
+        {
+            return userService.CheckPolicy(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication);
+        }
+
         public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
             this IUserService userService, Methodology methodology)
         {

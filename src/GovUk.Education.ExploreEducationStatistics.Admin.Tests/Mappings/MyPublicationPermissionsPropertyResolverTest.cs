@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             userService.Setup(s => s.MatchesPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(publication, SecurityPolicies.CanCreateReleaseForSpecificPublication)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(publication, SecurityPolicies.CanCreateMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
 
             var permissionsSet = resolver.Resolve(publication, null, null, null);
             VerifyAllMocks(userService);
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             Assert.True(permissionsSet.CanUpdatePublication);
             Assert.True(permissionsSet.CanCreateReleases);
             Assert.False(permissionsSet.CanCreateMethodologies);
+            Assert.False(permissionsSet.CanManageExternalMethodology);
         }
     }
 }

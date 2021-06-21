@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          * Methodology management
          */
         CanCreateMethodologyForSpecificPublication,
+        CanManageExternalMethodologyForSpecificPublication,
         CanViewAllMethodologies,
         CanViewSpecificMethodology,
         CanUpdateSpecificMethodology,

@@ -42,6 +42,7 @@ export interface MyPublication {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
     canCreateMethodologies: boolean;
+    canManageExternalMethodology: boolean;
   };
 }
 

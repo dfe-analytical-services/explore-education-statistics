@@ -8,27 +8,27 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
+    public class ManageExternalMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
     {
     }
 
-    public class CreateMethodologyForSpecificPublicationAuthorizationHandler 
-        : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
+    public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler 
+        : AuthorizationHandler<ManageExternalMethodologyForSpecificPublicationRequirement, Publication>
     {
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public CreateMethodologyForSpecificPublicationAuthorizationHandler(
+        public ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
             IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            CreateMethodologyForSpecificPublicationRequirement requirement,
+            ManageExternalMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            // If a Publication is linked to an External Methodology, this should be unlinked first.
-            if (publication.ExternalMethodology != null)
+            // If a Publication is linked to a Methodology, this should be unlinked first.
+            if (publication.Methodologies?.Count > 0)
             {
                 return;
             }
