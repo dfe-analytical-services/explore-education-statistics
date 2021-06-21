@@ -15,9 +15,10 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { OmitStrict } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+import ModalConfirm from '@common/components/ModalConfirm';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 interface FormValues {
   title: string;
@@ -63,6 +64,7 @@ interface Props {
   cancelButton?: ReactNode;
   id?: string;
   initialValues?: PublicationFormValues;
+  confirmOnSubmit?: boolean;
   onSubmit: (values: PublicationFormValues) => void;
 }
 
@@ -70,6 +72,7 @@ const PublicationForm = ({
   cancelButton,
   id = 'publicationForm',
   initialValues,
+  confirmOnSubmit = false,
   onSubmit,
 }: Props) => {
   const {
@@ -86,6 +89,10 @@ const PublicationForm = ({
     value: themes = [],
     isLoading: isThemesLoading,
   } = useAsyncHandledRetry(themeService.getThemes);
+
+  const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState<boolean>(
+    false,
+  );
 
   const initialMethodologyChoice = useMemo<
     FormValues['methodologyChoice']
@@ -201,140 +208,169 @@ const PublicationForm = ({
       onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={id}>
-          <FormFieldTextInput<FormValues>
-            label="Publication title"
-            name="title"
-            className="govuk-!-width-two-thirds"
-          />
+        <>
+          <Form id={id}>
+            <FormFieldTextInput<FormValues>
+              label="Publication title"
+              name="title"
+              className="govuk-!-width-two-thirds"
+            />
 
-          {initialValues?.topicId && (
-            <FormFieldThemeTopicSelect<FormValues>
-              name="topicId"
-              legend="Choose a topic for this publication"
+            {initialValues?.topicId && (
+              <FormFieldThemeTopicSelect<FormValues>
+                name="topicId"
+                legend="Choose a topic for this publication"
+                legendSize="m"
+                id={id}
+                themes={themes}
+              />
+            )}
+
+            <FormFieldRadioGroup<FormValues, FormValues['methodologyChoice']>
+              legend="Choose a methodology for this publication"
               legendSize="m"
-              id={id}
-              themes={themes}
+              name="methodologyChoice"
+              options={[
+                {
+                  value: 'existing',
+                  label: 'Choose an existing methodology',
+                  conditional: (
+                    <FormFieldSelect<FormValues>
+                      name="methodologyId"
+                      label="Select methodology"
+                      placeholder="Choose a methodology"
+                      options={orderBy(
+                        approvedMethodologies.map(methodology => ({
+                          label: `${methodology.title} [${methodology.status}]`,
+                          value: methodology.id,
+                        })),
+                        'label',
+                      )}
+                      order={[]}
+                    />
+                  ),
+                },
+                {
+                  value: 'external',
+                  label: 'Link to an externally hosted methodology',
+                  conditional: (
+                    <FormGroup>
+                      <FormFieldTextInput
+                        label="Link title"
+                        name="externalMethodology.title"
+                        className="govuk-!-width-two-thirds"
+                      />
+                      <FormFieldTextInput
+                        label="URL"
+                        name="externalMethodology.url"
+                        className="govuk-!-width-two-thirds"
+                      />
+                    </FormGroup>
+                  ),
+                },
+                {
+                  value: 'none',
+                  label: 'No methodology',
+                },
+              ]}
+              onChange={e => {
+                switch (e.target.value) {
+                  case 'existing':
+                    form.setValues({
+                      ...form.values,
+                      methodologyId: orderBy(
+                        approvedMethodologies,
+                        methodology => methodology.title,
+                      )[0]?.id,
+                      externalMethodology: {
+                        title: '',
+                        url: '',
+                      },
+                    });
+                    break;
+                  case 'external':
+                    form.setValues({
+                      ...form.values,
+                      methodologyId: '',
+                    });
+                    break;
+                  default:
+                    form.setValues({
+                      ...form.values,
+                      methodologyId: '',
+                      externalMethodology: {
+                        title: '',
+                        url: '',
+                      },
+                    });
+                    break;
+                }
+              }}
             />
-          )}
+            <FormFieldset
+              id="contact"
+              legend="Contact for this publication"
+              legendSize="m"
+              hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+            >
+              <FormFieldTextInput<FormValues>
+                name="teamName"
+                label="Team name"
+                className="govuk-!-width-one-half"
+              />
 
-          <FormFieldRadioGroup<FormValues, FormValues['methodologyChoice']>
-            legend="Choose a methodology for this publication"
-            legendSize="m"
-            name="methodologyChoice"
-            options={[
-              {
-                value: 'existing',
-                label: 'Choose an existing methodology',
-                conditional: (
-                  <FormFieldSelect<FormValues>
-                    name="methodologyId"
-                    label="Select methodology"
-                    placeholder="Choose a methodology"
-                    options={orderBy(
-                      approvedMethodologies.map(methodology => ({
-                        label: `${methodology.title} [${methodology.status}]`,
-                        value: methodology.id,
-                      })),
-                      'label',
-                    )}
-                    order={[]}
-                  />
-                ),
-              },
-              {
-                value: 'external',
-                label: 'Link to an externally hosted methodology',
-                conditional: (
-                  <FormGroup>
-                    <FormFieldTextInput
-                      label="Link title"
-                      name="externalMethodology.title"
-                      className="govuk-!-width-two-thirds"
-                    />
-                    <FormFieldTextInput
-                      label="URL"
-                      name="externalMethodology.url"
-                      className="govuk-!-width-two-thirds"
-                    />
-                  </FormGroup>
-                ),
-              },
-              {
-                value: 'none',
-                label: 'No methodology',
-              },
-            ]}
-            onChange={e => {
-              switch (e.target.value) {
-                case 'existing':
-                  form.setValues({
-                    ...form.values,
-                    methodologyId: orderBy(
-                      approvedMethodologies,
-                      methodology => methodology.title,
-                    )[0]?.id,
-                    externalMethodology: {
-                      title: '',
-                      url: '',
-                    },
-                  });
-                  break;
-                case 'external':
-                  form.setValues({
-                    ...form.values,
-                    methodologyId: '',
-                  });
-                  break;
-                default:
-                  form.setValues({
-                    ...form.values,
-                    methodologyId: '',
-                    externalMethodology: {
-                      title: '',
-                      url: '',
-                    },
-                  });
-                  break;
-              }
+              <FormFieldTextInput<FormValues>
+                name="teamEmail"
+                label="Team email address"
+                className="govuk-!-width-one-half"
+              />
+
+              <FormFieldTextInput<FormValues>
+                name="contactName"
+                label="Contact name"
+                className="govuk-!-width-one-half"
+              />
+
+              <FormFieldTextInput<FormValues>
+                name="contactTelNo"
+                label="Contact telephone number"
+                width={10}
+              />
+            </FormFieldset>
+
+            <ButtonGroup>
+              <Button
+                type="submit"
+                onClick={e => {
+                  e.preventDefault();
+                  if (confirmOnSubmit && form.isValid) {
+                    setShowConfirmSubmitModal(true);
+                  } else {
+                    form.submitForm();
+                  }
+                }}
+              >
+                Save publication
+              </Button>
+              {cancelButton}
+            </ButtonGroup>
+          </Form>
+          <ModalConfirm
+            title="Confirm publication changes"
+            onConfirm={() => {
+              form.submitForm();
+              setShowConfirmSubmitModal(false);
             }}
-          />
-          <FormFieldset
-            id="contact"
-            legend="Contact for this publication"
-            legendSize="m"
-            hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+            onExit={() => setShowConfirmSubmitModal(false)}
+            onCancel={() => setShowConfirmSubmitModal(false)}
+            open={showConfirmSubmitModal}
           >
-            <FormFieldTextInput<FormValues>
-              name="teamName"
-              label="Team name"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="teamEmail"
-              label="Team email address"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="contactName"
-              label="Contact name"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="contactTelNo"
-              label="Contact telephone number"
-              width={10}
-            />
-          </FormFieldset>
-
-          <ButtonGroup>
-            <Button type="submit">Save publication</Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
+            <p>
+              Any changes made here will appear on the public site immediately.
+            </p>
+            <p>Are you sure you want to save the changes?</p>
+          </ModalConfirm>
+        </>
       )}
     </Formik>
   );
