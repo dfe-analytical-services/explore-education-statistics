@@ -197,6 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
             services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
+            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver, MyMethodologyPermissionSetPropertyResolver>();
 
             services.AddMvc(options =>
                 {

@@ -84,6 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
+            
+            CreateMap<Methodology, MyMethodologyViewModel>()
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyMethodologyPermissionSetPropertyResolver>());
 
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(
@@ -94,6 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
+                .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
+                    p.Methodologies
+                        .Select(methodology => methodology.MethodologyParent.LatestVersion())
+                        .OrderBy(methodologyParent => methodologyParent.Slug)))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateMap<Contact, ContactViewModel>();

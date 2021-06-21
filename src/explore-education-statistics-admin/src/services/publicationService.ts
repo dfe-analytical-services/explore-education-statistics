@@ -34,7 +34,7 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  methodology?: MyMethodology;
+  methodologies: MyMethodology[];
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact?: PublicationContactDetails;

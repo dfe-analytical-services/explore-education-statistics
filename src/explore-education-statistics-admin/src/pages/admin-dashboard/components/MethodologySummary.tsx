@@ -51,10 +51,12 @@ const MethodologySummary = ({
   const {
     contact,
     externalMethodology,
-    methodology,
+    methodologies,
     id: publicationId,
     title,
   } = publication;
+
+  const methodology = methodologies.length ? methodologies[0] : undefined;
 
   const handleExternalMethodologySubmit = async (
     values: ExternalMethodology,
@@ -178,7 +180,7 @@ const MethodologySummary = ({
               )}
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {methodology.permissions.canDeleteMethodology &&
+              {methodology.permissions.canRemoveMethodology &&
                 methodology.amendment && (
                   <Button
                     onClick={() =>
