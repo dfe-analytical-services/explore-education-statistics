@@ -89,7 +89,7 @@ const PublicationSummary = ({
             </td>
           </tr>
           <tr>
-            <th>Methodology</th>
+            <th>Methodologies</th>
             <td data-testid={`Methodology for ${publication.title}`}>
               <MethodologySummary
                 publication={publication}
