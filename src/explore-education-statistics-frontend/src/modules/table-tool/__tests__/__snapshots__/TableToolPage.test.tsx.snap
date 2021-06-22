@@ -2042,6 +2042,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       Test Publication
                       ,
                        
+                      Selected Release Title
                     </a>
                   </li>
                 </ul>
@@ -3139,6 +3140,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       Test Publication
                       ,
                        
+                      Latest Release Title
                     </a>
                   </li>
                 </ul>
@@ -4236,6 +4238,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       Test Publication
                       ,
                        
+                      Latest Release Title
                     </a>
                   </li>
                 </ul>
