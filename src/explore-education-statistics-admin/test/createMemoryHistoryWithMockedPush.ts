@@ -1,4 +1,4 @@
-import createMemoryHistory from 'history/createMemoryHistory';
+import { createMemoryHistory } from 'history';
 
 export default function createMemoryHistoryWithMockedPush() {
   const history = createMemoryHistory();
