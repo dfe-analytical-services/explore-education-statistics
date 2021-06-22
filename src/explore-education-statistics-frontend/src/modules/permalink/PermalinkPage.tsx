@@ -1,7 +1,8 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
+import DownloadTable, {
+  FileFormat,
+} from '@common/modules/table-tool/components/DownloadTable';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -75,47 +76,29 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       </div>
 
       <div className={styles.hidePrint}>
-        <ul className="govuk-list">
-          <li>
-            <DownloadCsvButton
-              fileName={`permalink-${data.id}`}
-              fullTable={fullTable}
-              onClick={() =>
-                logEvent({
-                  category: 'Permalink page',
-                  action: 'CSV download button clicked',
-                  label: `${fullTable.subjectMeta.publicationName} between ${
-                    fullTable.subjectMeta.timePeriodRange[0].label
-                  } and ${
-                    fullTable.subjectMeta.timePeriodRange[
-                      fullTable.subjectMeta.timePeriodRange.length - 1
-                    ].label
-                  }`,
-                })
-              }
-            />
-          </li>
-          <li>
-            <DownloadExcelButton
-              tableRef={tableRef}
-              fileName={`permalink-${data.id}`}
-              subjectMeta={fullTable.subjectMeta}
-              onClick={() =>
-                logEvent({
-                  category: 'Permalink page',
-                  action: 'Excel download button clicked',
-                  label: `${fullTable.subjectMeta.publicationName} between ${
-                    fullTable.subjectMeta.timePeriodRange[0].label
-                  } and ${
-                    fullTable.subjectMeta.timePeriodRange[
-                      fullTable.subjectMeta.timePeriodRange.length - 1
-                    ].label
-                  }`,
-                })
-              }
-            />
-          </li>
-        </ul>
+        <DownloadTable
+          fullTable={fullTable}
+          fileName={`permalink-${data.id}`}
+          headingSize="m"
+          headingTag="h2"
+          tableRef={tableRef}
+          onSubmit={(fileFormat: FileFormat) =>
+            logEvent({
+              category: 'Permalink page',
+              action:
+                fileFormat === 'csv'
+                  ? 'CSV download button clicked'
+                  : 'ODS download button clicked',
+              label: `${fullTable.subjectMeta.publicationName} between ${
+                fullTable.subjectMeta.timePeriodRange[0].label
+              } and ${
+                fullTable.subjectMeta.timePeriodRange[
+                  fullTable.subjectMeta.timePeriodRange.length - 1
+                ].label
+              }`,
+            })
+          }
+        />
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables
