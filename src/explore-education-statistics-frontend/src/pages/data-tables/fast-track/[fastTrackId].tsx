@@ -57,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
           id: fastTrack.releaseId,
           slug: fastTrack.releaseSlug,
           latestData: fastTrack.latestData,
+          title: fastTrack.latestReleaseTitle,
         },
         latestRelease: {
           title: fastTrack.latestReleaseTitle,

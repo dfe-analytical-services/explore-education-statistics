@@ -138,6 +138,7 @@ const TableToolWizard = ({
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,
           slug: latestRelease.slug,
+          title: latestRelease.title,
         },
         latestRelease: {
           title: latestRelease.title,
