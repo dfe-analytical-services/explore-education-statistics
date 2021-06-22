@@ -1,11 +1,12 @@
 @import '~govuk-frontend/govuk/base';
-
+/* stylelint-disable max-nesting-depth */
 .toggle {
   background: $govuk-brand-colour;
   bottom: 0;
   left: 0;
-  padding: 0 6px 6px;
+  padding: 6px;
   position: fixed;
+  width: 390px;
   z-index: 10000;
 
   @media print {
@@ -17,11 +18,53 @@
     min-height: 100px;
     padding: 6px 6px 0;
   }
+
+  &.open {
+    border-top: 0;
+  }
 }
 
-.fieldset legend {
+.button {
   background: $govuk-brand-colour;
+  border: 4px solid transparent;
   color: govuk-colour('white');
-  margin-bottom: 0;
-  padding: 5px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  text-align: left;
+  width: 100%;
+
+  &:focus,
+  &:focus-visible {
+    border-color: govuk-colour('yellow');
+    outline: none;
+  }
+
+  :global(.govuk-accordion__icon) {
+    &::before,
+    &::after {
+      background-color: govuk-colour('white');
+    }
+  }
+
+  .open & {
+    margin-bottom: 6px;
+
+    :global(.govuk-accordion__icon) {
+      &::after {
+        content: none;
+      }
+    }
+  }
+}
+.content {
+  background-color: govuk-colour('white');
+  display: none;
+  .open & {
+    display: block;
+  }
 }
