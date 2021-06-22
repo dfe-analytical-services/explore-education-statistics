@@ -230,6 +230,7 @@ describe('TableToolFinalStep', () => {
       id: 'latest-release-id',
       latestData: true,
       slug: 'latest-release-slug',
+      title: 'Latest Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -244,6 +245,7 @@ describe('TableToolFinalStep', () => {
       id: 'selected-release-id',
       latestData: false,
       slug: 'selected-release-slug',
+      title: 'Selected Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -472,7 +474,7 @@ describe('TableToolFinalStep', () => {
 
     await waitFor(() => {
       const viewReleaseLink = screen.getByRole('link', {
-        name: 'Test publication, Latest Release Title',
+        name: 'Test publication, Selected Release Title',
       }) as HTMLAnchorElement;
       expect(viewReleaseLink.href).toEqual(
         'http://localhost/find-statistics/test-publication/selected-release-slug',
@@ -581,7 +583,7 @@ describe('TableToolFinalStep', () => {
 
     await waitFor(() => {
       const viewReleaseLink = screen.getByRole('link', {
-        name: 'Test publication, Latest Release Title',
+        name: 'Test publication, Selected Release Title',
       }) as HTMLAnchorElement;
 
       expect(viewReleaseLink.href).toEqual(

@@ -228,7 +228,7 @@ const TableToolFinalStep = ({
                     as={`/find-statistics/${selectedPublication.slug}`}
                   >
                     {selectedPublication.title},{' '}
-                    {selectedPublication.latestRelease.title}
+                    {selectedPublication.selectedRelease.title}
                   </Link>
                 </li>
               ) : (
@@ -239,7 +239,7 @@ const TableToolFinalStep = ({
                     as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
                   >
                     {selectedPublication.title},{' '}
-                    {selectedPublication.latestRelease.title}
+                    {selectedPublication.selectedRelease.title}
                   </Link>
                 </li>
               )}

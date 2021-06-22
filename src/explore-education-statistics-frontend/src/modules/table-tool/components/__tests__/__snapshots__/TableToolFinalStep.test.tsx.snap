@@ -1384,7 +1384,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
               Test publication
               ,
                
-              Latest Release Title
+              Selected Release Title
             </a>
           </li>
           
@@ -2129,7 +2129,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
               Test publication
               ,
                
-              Latest Release Title
+              Selected Release Title
             </a>
           </li>
           

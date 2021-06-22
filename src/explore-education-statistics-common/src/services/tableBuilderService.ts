@@ -188,6 +188,7 @@ export interface SelectedPublication {
     id: string;
     slug: string;
     latestData: boolean;
+    title: string;
   };
   latestRelease: {
     title: string;
