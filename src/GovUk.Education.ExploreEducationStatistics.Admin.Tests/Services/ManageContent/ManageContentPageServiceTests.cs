@@ -4,9 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -19,6 +19,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -44,13 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     {
                         Description = "Legacy 2017/18",
                         Order = 0,
-                        Url = "http://legacy-2017-18"
+                        Url = "https://legacy-2017-18"
                     },
                     new LegacyRelease
                     {
                         Description = "Legacy 2018/19",
                         Order = 1,
-                        Url = "http://legacy-2018-19"
+                        Url = "https://legacy-2018-19"
                     }
                 },
                 Slug = "test-publication",
@@ -84,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new Link
                     {
                         Description = "Related 1",
-                        Url = "http://related-1"
+                        Url = "https://related-1"
                     }
                 },
                 Slug = "2020-21",
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     FileName = "ancillary.pdf",
                     Name = "Ancillary File",
                     Size = "10 Kb",
-                    Type = Ancillary,
+                    Type = Ancillary
                 },
                 new FileInfo
                 {
@@ -128,9 +129,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     FileName = "data.csv",
                     Name = "Subject File",
                     Size = "20 Kb",
-                    Type = FileType.Data,
+                    Type = FileType.Data
                 }
             };
+
+            var methodologies = AsList(
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Methodology 1 title"
+                },
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Methodology 2 title"
+                }
+            );
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -183,11 +197,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             }
 
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
                     mock.GetUnattachedContentBlocksAsync<DataBlock>(release.Id))
                 .ReturnsAsync(availableDataBlocks);
+
+            methodologyRepository.Setup(mock => mock.GetLatestByPublication(publication.Id))
+                .ReturnsAsync(methodologies);
 
             releaseFileService.Setup(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data))
@@ -197,6 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 var service = SetupManageContentPageService(contentDbContext: contentDbContext,
                     contentService: contentService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
@@ -255,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 var contentRelatedInformation = contentRelease.RelatedInformation;
                 Assert.Single(contentRelatedInformation);
                 Assert.Equal("Related 1", contentRelatedInformation[0].Description);
-                Assert.Equal("http://related-1", contentRelatedInformation[0].Url);
+                Assert.Equal("https://related-1", contentRelatedInformation[0].Url);
 
                 var contentReleaseContent = contentRelease.Content;
                 Assert.Single(contentReleaseContent);
@@ -272,7 +291,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Data Source", contentPublication.DataSource);
                 Assert.Equal("Description", contentPublication.Description);
                 Assert.Null(contentPublication.ExternalMethodology);
-                // TODO SOW4 EES-2395 Test Manage Content page view model has linked Methodology
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal("Summary", contentPublication.Summary);
                 Assert.Equal("Publication", contentPublication.Title);
@@ -280,34 +298,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentPublication.Topic);
                 Assert.NotNull(contentPublication.Topic.Theme);
 
-                var contentPublicationLegacyReleases = contentPublication.LegacyReleases.ToList();
+                var contentPublicationLegacyReleases = contentPublication.LegacyReleases;
                 Assert.Equal(2, contentPublicationLegacyReleases.Count);
                 Assert.Equal("Legacy 2018/19", contentPublicationLegacyReleases[0].Description);
-                Assert.Equal("http://legacy-2018-19", contentPublicationLegacyReleases[0].Url);
+                Assert.Equal("https://legacy-2018-19", contentPublicationLegacyReleases[0].Url);
                 Assert.Equal("Legacy 2017/18", contentPublicationLegacyReleases[1].Description);
-                Assert.Equal("http://legacy-2017-18", contentPublicationLegacyReleases[1].Url);
+                Assert.Equal("https://legacy-2017-18", contentPublicationLegacyReleases[1].Url);
 
                 var contentPublicationOtherReleases = contentPublication.OtherReleases;
                 Assert.Single(contentPublicationOtherReleases);
                 Assert.Equal(otherRelease.Id, contentPublicationOtherReleases[0].Id);
                 Assert.Equal("2019-20", contentPublicationOtherReleases[0].Slug);
                 Assert.Equal("Academic Year 2019/20", contentPublicationOtherReleases[0].Title);
+
+                Assert.Equal(2, contentPublication.Methodologies.Count);
+                Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);
+                Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
+                Assert.Equal(methodologies[1].Id, contentPublication.Methodologies[1].Id);
+                Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
             }
+
+            MockUtils.VerifyAllMocks(contentService, methodologyRepository, releaseFileService);
         }
 
         private static ManageContentPageService SetupManageContentPageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IContentService contentService = null,
             IMapper mapper = null,
+            IContentService contentService = null,
+            IMethodologyRepository methodologyRepository = null,
             IReleaseFileService releaseFileService = null,
             IUserService userService = null)
         {
             return new ManageContentPageService(
-                mapper ?? MapperUtils.AdminMapper(),
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                contentService ?? new Mock<IContentService>().Object,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                mapper ?? MapperUtils.AdminMapper(),
+                contentService ?? new Mock<IContentService>().Object,
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
+                releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
