@@ -149,6 +149,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<ReleaseStatus>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);

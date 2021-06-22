@@ -721,8 +721,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var saved = await context.Releases
                     .Include(r => r.ReleaseStatuses)
-                    .Where(r => r.Id == releaseId)
-                    .FirstAsync();
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
@@ -740,7 +739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);
+                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_userId, savedStatus.CreatedById);
             }
 
@@ -1214,8 +1213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var saved = await context.Releases
                     .Include(r => r.ReleaseStatuses)
-                    .Where(r => r.Id == releaseId)
-                    .FirstAsync();
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
@@ -1232,7 +1230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);
+                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_userId, savedStatus.CreatedById);
             }
 
@@ -1370,8 +1368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var saved = await context.Releases
                     .Include(r => r.ReleaseStatuses)
-                    .Where(r => r.Id == releaseId)
-                    .FirstAsync();
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
@@ -1504,7 +1501,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetInternalReleaseNotes()
+        async Task GetRelease_NoLatestInternalReleaseNote()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetRelease(release.Id);
+                Assert.True(result.IsRight);
+                Assert.Null(result.Right.LatestInternalReleaseNote);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseStatuses()
         {
             var release = new Release
             {
@@ -1560,27 +1591,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService.GetReleaseStatuses(release.Id);
                 Assert.True(result.IsRight);
 
-                var internalNotes = result.Right;
-                Assert.Equal(3, internalNotes.Count);
+                var resultStatuses = result.Right;
+                Assert.Equal(3, resultStatuses.Count);
 
                 var releaseStatuses = release.ReleaseStatuses
                     .OrderByDescending(rs => rs.Created)
                     .ToList();
 
-                Assert.Equal(releaseStatuses[0].InternalReleaseNote, internalNotes[0].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[0].ApprovalStatus,internalNotes[0].ApprovalStatus);
-                Assert.Equal(releaseStatuses[0].Created, internalNotes[0].Created);
-                Assert.Equal(releaseStatuses[0].CreatedBy?.Email, internalNotes[0].CreatedByEmail);
+                Assert.Equal(releaseStatuses[0].InternalReleaseNote, resultStatuses[0].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[0].ApprovalStatus,resultStatuses[0].ApprovalStatus);
+                Assert.Equal(releaseStatuses[0].Created, resultStatuses[0].Created);
+                Assert.Equal(releaseStatuses[0].CreatedBy?.Email, resultStatuses[0].CreatedByEmail);
 
-                Assert.Equal(releaseStatuses[1].InternalReleaseNote, internalNotes[1].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[1].ApprovalStatus,internalNotes[1].ApprovalStatus);
-                Assert.Equal(releaseStatuses[1].Created, internalNotes[1].Created);
-                Assert.Equal(releaseStatuses[1].CreatedBy?.Email, internalNotes[1].CreatedByEmail);
+                Assert.Equal(releaseStatuses[1].InternalReleaseNote, resultStatuses[1].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[1].ApprovalStatus,resultStatuses[1].ApprovalStatus);
+                Assert.Equal(releaseStatuses[1].Created, resultStatuses[1].Created);
+                Assert.Equal(releaseStatuses[1].CreatedBy?.Email, resultStatuses[1].CreatedByEmail);
 
-                Assert.Equal(releaseStatuses[2].InternalReleaseNote, internalNotes[2].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[2].ApprovalStatus,internalNotes[2].ApprovalStatus);
-                Assert.Equal(releaseStatuses[2].Created, internalNotes[2].Created);
-                Assert.Equal(releaseStatuses[2].CreatedBy?.Email, internalNotes[2].CreatedByEmail);
+                Assert.Equal(releaseStatuses[2].InternalReleaseNote, resultStatuses[2].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[2].ApprovalStatus,resultStatuses[2].ApprovalStatus);
+                Assert.Equal(releaseStatuses[2].Created, resultStatuses[2].Created);
+                Assert.Equal(releaseStatuses[2].CreatedBy?.Email, resultStatuses[2].CreatedByEmail);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseStatuses_NoResults()
+        {
+            var release = new Release();
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext);
+                var result = await releaseService.GetReleaseStatuses(release.Id);
+                Assert.True(result.IsRight);
+
+                var resultStatuses = result.Right;
+                Assert.Empty(resultStatuses);
             }
         }
 

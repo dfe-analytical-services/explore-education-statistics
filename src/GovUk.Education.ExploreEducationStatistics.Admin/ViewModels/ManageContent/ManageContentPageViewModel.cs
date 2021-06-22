@@ -37,8 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-            public ReleaseStatus LatestReleaseStatus { get; set; }
-
             public PublicationViewModel Publication { get; set; }
 
             public bool LatestRelease { get; set; }
