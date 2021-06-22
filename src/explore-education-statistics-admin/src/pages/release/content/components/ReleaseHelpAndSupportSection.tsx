@@ -38,7 +38,7 @@ const ReleaseHelpAndSupportSection = ({
                   {isEditing ? (
                     <a>{`${methodology.title}`}</a>
                   ) : (
-                    <Link to={`/methodologies/${methodology.id}`}>
+                    <Link to={`/methodology/${methodology.id}/summary`}>
                       {methodology.title}
                     </Link>
                   )}

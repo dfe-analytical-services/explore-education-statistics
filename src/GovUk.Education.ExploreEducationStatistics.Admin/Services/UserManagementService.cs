@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .OnSuccessCombineWith(globalAndPublicationRoles => _userRoleService.GetReleaseRoles(id))
                                 .OnSuccess(tuple =>
                                 {
-                                    var ((globalRoles, publicationRoles), releaseRoles) = tuple;
+                                    var (globalRoles, publicationRoles, releaseRoles) = tuple;
 
                                     // Currently we only allow a user to have a maximum of one global role
                                     var globalRole = globalRoles.First();
