@@ -89,10 +89,10 @@ const ReleaseSummary = ({
             </span>
           )}
         </SummaryListItem>
-        {release.internalReleaseNote && (
+        {release.latestInternalReleaseNote && (
           <SummaryListItem term="Internal note">
             <span className="dfe-multiline-content">
-              {release.internalReleaseNote}
+              {release.latestInternalReleaseNote}
             </span>
           </SummaryListItem>
         )}

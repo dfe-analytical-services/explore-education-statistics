@@ -230,6 +230,7 @@ describe('TableToolFinalStep', () => {
       id: 'latest-release-id',
       latestData: true,
       slug: 'latest-release-slug',
+      title: 'Latest Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -244,6 +245,7 @@ describe('TableToolFinalStep', () => {
       id: 'selected-release-id',
       latestData: false,
       slug: 'selected-release-slug',
+      title: 'Selected Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -360,30 +362,37 @@ describe('TableToolFinalStep', () => {
 
     // test the permalink controls are present
     expect(
-      screen.queryByRole('button', { name: 'Share your table' }),
+      screen.queryByRole('button', { name: 'Generate shareable link' }),
     ).toBeInTheDocument();
 
-    // test that the additional options are rendered correctly
-    const additionalOptionsRevealButton = screen.getByRole('button', {
-      name: 'Additional options',
+    // test that the related information is rendered correctly
+    const relatedInfoRevealButton = screen.getByRole('button', {
+      name: 'Related information',
     });
 
-    expect(additionalOptionsRevealButton).toBeInTheDocument();
+    expect(relatedInfoRevealButton).toBeInTheDocument();
 
-    userEvent.click(additionalOptionsRevealButton);
+    userEvent.click(relatedInfoRevealButton);
 
     await waitFor(() => {
       expect(
-        screen.queryByRole('link', { name: 'View the release for this data' }),
+        screen.queryByRole('link', {
+          name: 'Test publication, Latest Release Title',
+        }),
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole('button', {
-          name: 'Download the data of this table (CSV)',
+        screen.queryByRole('radio', {
+          name: 'Table in ODS format (spreadsheet, with title and footnotes)',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('radio', {
+          name: 'Table in CSV format (flat file, with location codes)',
         }),
       ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', {
-          name: 'Download table as Excel spreadsheet (XLSX)',
+          name: 'Download table',
         }),
       ).toBeInTheDocument();
     });
@@ -458,17 +467,16 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const additionalOptionsRevealButton = screen.getByRole('button', {
-      name: 'Additional options',
+    const relatedInfoRevealButton = screen.getByRole('button', {
+      name: 'Related information',
     });
 
-    userEvent.click(additionalOptionsRevealButton);
+    userEvent.click(relatedInfoRevealButton);
 
     await waitFor(() => {
       const viewReleaseLink = screen.getByRole('link', {
-        name: 'View the release for this data',
+        name: 'Test publication, Selected Release Title',
       }) as HTMLAnchorElement;
-
       expect(viewReleaseLink.href).toEqual(
         'http://localhost/find-statistics/test-publication/selected-release-slug',
       );
@@ -492,15 +500,15 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const additionalOptionsRevealButton = screen.getByRole('button', {
-      name: 'Additional options',
+    const relatedInfoRevealButton = screen.getByRole('button', {
+      name: 'Related information',
     });
 
-    userEvent.click(additionalOptionsRevealButton);
+    userEvent.click(relatedInfoRevealButton);
 
     await waitFor(() => {
       const viewReleaseLink = screen.getByRole('link', {
-        name: 'View the release for this data',
+        name: 'Test publication, Latest Release Title',
       }) as HTMLAnchorElement;
 
       expect(viewReleaseLink.href).toEqual(
@@ -568,15 +576,15 @@ describe('TableToolFinalStep', () => {
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');
 
-    const additionalOptionsRevealButton = screen.getByRole('button', {
-      name: 'Additional options',
+    const relatedInfoRevealButton = screen.getByRole('button', {
+      name: 'Related information',
     });
 
-    userEvent.click(additionalOptionsRevealButton);
+    userEvent.click(relatedInfoRevealButton);
 
     await waitFor(() => {
       const viewReleaseLink = screen.getByRole('link', {
-        name: 'View the release for this data',
+        name: 'Test publication, Selected Release Title',
       }) as HTMLAnchorElement;
 
       expect(viewReleaseLink.href).toEqual(

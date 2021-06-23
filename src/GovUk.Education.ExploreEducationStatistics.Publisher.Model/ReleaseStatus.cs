@@ -29,11 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public ReleaseStatus(string publicationSlug,
             DateTime? publish,
             Guid releaseId,
+            Guid releaseStatusId,
             string releaseSlug,
             ReleaseStatusState state,
             bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
+            RowKey = releaseStatusId.ToString();
+            PartitionKey = releaseId.ToString();
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
@@ -41,8 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Immediate = immediate;
             Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
             State = state;
-            RowKey = Guid.NewGuid().ToString();
-            PartitionKey = releaseId.ToString();
         }
 
         public Guid Id => Guid.Parse(RowKey);

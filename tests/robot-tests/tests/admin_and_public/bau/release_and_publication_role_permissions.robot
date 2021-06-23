@@ -65,19 +65,7 @@ Assert that test users are present in table
 
 Give Analyst1 User1 publication owner access
     [Tags]  HappyPath
-    user clicks link  Manage  xpath://td[text()="ees-analyst1@education.gov.uk"]/..
-    user waits until page does not contain loading spinner
-
-    # stale element exception if you don't wait until it's enabled    
-    user waits until button is enabled  Add publication access
-    user scrolls to element  css:[name="selectedPublicationId"]
-    
-    user waits until element is enabled  css:[name="selectedPublicationId"]
-    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
-
-    user waits until element is enabled  css:[name="selectedPublicationRole"]
-    user selects from list by label  css:[name="selectedPublicationRole"]  Owner
-    user clicks button  Add publication access
+    user gives analyst publication owner access  ees-analyst1@education.gov.uk  ${PUBLICATION_NAME}
     
 Sign in as Analyst1 User1 (publication owner) & navigate to publication
     [Tags]  HappyPath
@@ -200,20 +188,11 @@ Navigate to manage users
 
 Remove publication owner access 
     [Tags]  HappyPath
-    user waits until element is enabled  css:[name="selectedPublicationId"]
-    user scrolls to element  css:[name="selectedPublicationId"]
-    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
-    user waits until page does not contain loading spinner
+    user removes publication owner access from analyst  ${PUBLICATION_NAME}
 
 Give release approver access to Analyst1
     [Tags]  HappyPath
-    user waits until element is enabled  css:[name="selectedReleaseId"]
-    user scrolls to element  css:[name="selectedReleaseId"]
-    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-    user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Approver
-    user clicks button  Add release access
-    user waits until page does not contain loading spinner
+    user gives analyst release access  ${RELEASE_NAME}  Approver
 
 Check release owner can access release
     [Tags]  HappyPath
@@ -277,7 +256,7 @@ Navigate to manage users as bau1
 Remove release owner access from Analyst1 
     [Tags]  HappyPath
     user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
-    user clicks testid element  remove-release-role-Approver
+    user clicks element  testid:remove-release-role-Approver
     user waits until page does not contain loading spinner
 
 Assign viewer only access to Analyst1
@@ -328,12 +307,7 @@ Navigate to manage users page to remove viewer access
 
 Give release contributor access to Analyst1
     [Tags]  HappyPath
-    user scrolls to element  css:[name="selectedReleaseId"]
-    user waits until element is enabled  css:[name="selectedReleaseId"]
-    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-    user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Contributor
-    user clicks button  Add release access
+    user gives analyst release access   ${RELEASE_NAME}  Contributor
 
 Login as a release contributor 
     [Tags]  HappyPath

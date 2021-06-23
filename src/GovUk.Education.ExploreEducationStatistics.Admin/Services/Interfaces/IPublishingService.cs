@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IPublishingService
     {
         Task<Either<ActionResult, Unit>> RetryReleaseStage(Guid releaseId, RetryStage stage);
-        Task<Either<ActionResult, Unit>> ReleaseChanged(Guid id, bool immediate = false);
+        Task<Either<ActionResult, Unit>> ReleaseChanged(Guid releaseId, Guid releaseStatusId, bool immediate = false);
         Task<Either<ActionResult, Unit>> MethodologyChanged(Guid id);
         Task<Either<ActionResult, Unit>> PublicationChanged(Guid id);
         Task<Either<ActionResult, Unit>> TaxonomyChanged();

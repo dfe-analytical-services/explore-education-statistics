@@ -225,6 +225,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
           id: selectedRelease.id,
           latestData: selectedRelease.latestRelease,
           slug: selectedRelease.slug,
+          title: selectedRelease.title,
         },
         latestRelease: {
           title: latestRelease.title,

@@ -74,7 +74,7 @@ Create new test theme and topic
 
 Go to edit publication
     [Tags]  HappyPath
-    user clicks testid element  Edit publication link for ${PUBLICATION_NAME} (created)
+    user clicks element  testid:Edit publication link for ${PUBLICATION_NAME} (created)
     user waits until page contains title caption  ${PUBLICATION_NAME} (created)
     user waits until h1 is visible  Manage publication
 
@@ -107,7 +107,7 @@ Verify publication has been updated
 
 Create new release
     [Tags]   HappyPath
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
+    user clicks element  testid:Create new release link for ${PUBLICATION_NAME}
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverageCode  Spring Term

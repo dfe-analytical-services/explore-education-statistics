@@ -243,7 +243,7 @@ const getFinalReleaseDetails = async (releaseId: string) => {
       },
       status: 'Approved',
       amendment: 'false',
-      internalReleaseNote: 'Approved by publisher testing',
+      latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
     return obj;

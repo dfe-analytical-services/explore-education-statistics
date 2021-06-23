@@ -33,12 +33,12 @@ Validate Analyst1 cannot create a release for Pupil absence topic
     [Tags]  HappyPath
     user waits until page contains accordion section  Pupil absence in schools in England
     user opens accordion section  Pupil absence in schools in England
-    user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
+    user checks page does not contain element  testid:Create new release link for Pupil absence in schools in England
 
 Navigate to Absence release
     [Tags]  HappyPath
     user opens details dropdown  Academic Year 2016/17 (Live - Latest release)
-    user clicks testid element   Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)
+    user clicks element  testid:Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)
     user waits until h1 is visible  Pupil absence in schools in England
     user waits until h2 is visible  Release summary
 

@@ -56,6 +56,15 @@
     "autoPauseDelayStatisticsDb": {
       "value": -1
     },
+    "minCapacityContentDb": {
+      "value": "2"
+    },
+    "maxCapacityContentDb": {
+      "value": 5
+    },
+    "autoPauseDelayContentDb": {
+      "value": -1
+    },
     "enableAlerts": {
       "value": true
     }

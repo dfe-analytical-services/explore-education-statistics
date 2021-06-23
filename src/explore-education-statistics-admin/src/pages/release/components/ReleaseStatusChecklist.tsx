@@ -52,7 +52,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
       switch (error.code) {
         case 'DataFileImportsMustBeCompleted':
           return {
-            message: 'All data file imports must be completed',
+            message: 'All data imports must be completed',
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
@@ -78,7 +78,8 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'PublicMetaGuidanceRequired':
           return {
-            message: 'All public metadata guidance must be populated',
+            message:
+              'All summary information must be completed on the metadata guidance page',
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
@@ -86,7 +87,8 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'ReleaseNoteRequired':
           return {
-            message: 'Public release note for this amendment is required',
+            message:
+              'A public release note for this amendment is required, add this near the top of the content page',
             link: generatePath<ReleaseRouteParams>(
               releaseContentRoute.path,
               releaseRouteParams,
@@ -131,8 +133,10 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'NoFootnotesOnSubjects':
           return {
-            message: `No footnotes for ${warning.totalSubjects} ${
-              warning.totalSubjects === 1 ? 'subject' : 'subjects'
+            message: `${
+              warning.totalSubjects === 1
+                ? '1 data file does not have any footnotes'
+                : `${warning.totalSubjects} data files don't have any footnotes`
             }`,
             link: generatePath<ReleaseRouteParams>(
               releaseFootnotesRoute.path,
@@ -141,7 +145,8 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'NoMethodology':
           return {
-            message: 'No methodology attached to publication',
+            message:
+              'An in-EES methodology page has not been linked to this publication',
             link: generatePath<PublicationRouteParams>(
               publicationEditRoute.path,
               { publicationId: release.publicationId },
@@ -149,12 +154,12 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'NoNextReleaseDate':
           return {
-            message: 'No next release expected date',
+            message: 'No next expected release date has been added',
             link: `#${formId}-nextReleaseDate-month`,
           };
         case 'NoTableHighlights':
           return {
-            message: 'No table highlights',
+            message: 'No data blocks have been saved as featured tables',
             link: generatePath<ReleaseRouteParams>(
               releaseDataBlocksRoute.path,
               releaseRouteParams,
@@ -162,7 +167,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'NoPublicPreReleaseAccessList':
           return {
-            message: 'No public pre-release access list',
+            message: 'A public pre-release access list has not been created',
             link: `${generatePath<ReleaseRouteParams>(
               releasePreReleaseAccessRoute.path,
               releaseRouteParams,
@@ -223,11 +228,12 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
 
           <p>
             <strong>
-              {`${warnings.length} potential ${
-                warnings.length === 1 ? 'issue' : 'issues'
+              {`${warnings.length} ${
+                warnings.length === 1 ? 'thing' : 'things'
               }`}
             </strong>{' '}
-            that do not need to be resolved to publish this release.
+            you may have forgotten, but do not need to be resolved to publish
+            this release.
           </p>
 
           <ul>

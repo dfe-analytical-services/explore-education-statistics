@@ -64,6 +64,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Update> Updates { get; set; }
 
+        public List<ReleaseStatus> ReleaseStatuses { get; set; }
+
+        public string LatestInternalReleaseNote
+        {
+            get
+            {
+                return ReleaseStatuses?.Count > 0
+                    ? ReleaseStatuses.OrderBy(rs => rs.Created).Last().InternalReleaseNote
+                    : null;
+            }
+        }
+
         [JsonIgnore]
         public List<ReleaseContentSection> Content { get; set; }
 
