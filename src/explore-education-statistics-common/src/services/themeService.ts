@@ -1,5 +1,6 @@
 import { contentApi } from '@common/services/api';
 import { FileInfo } from '@common/services/types/file';
+import { MethodologySummary } from '@common/services/types/methodology';
 
 interface BasePublicationSummary {
   id: string;
@@ -20,11 +21,7 @@ export interface PublicationDownloadSummary extends BasePublicationSummary {
 }
 
 export interface PublicationMethodologySummary extends BasePublicationSummary {
-  methodology: {
-    id: string;
-    slug: string;
-    title: string;
-  };
+  methodologies: MethodologySummary[];
 }
 
 export interface Topic<Publication = PublicationSummary> {
