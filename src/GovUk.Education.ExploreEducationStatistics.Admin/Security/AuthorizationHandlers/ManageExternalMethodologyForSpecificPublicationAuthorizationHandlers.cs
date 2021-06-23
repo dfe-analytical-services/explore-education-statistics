@@ -1,27 +1,25 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
+    public class ManageExternalMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
     {
     }
 
-    public class CreateMethodologyForSpecificPublicationAuthorizationHandler 
-        : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
+    public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler 
+        : AuthorizationHandler<ManageExternalMethodologyForSpecificPublicationRequirement, Publication>
     {
         private readonly ContentDbContext _context;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public CreateMethodologyForSpecificPublicationAuthorizationHandler(
+        public ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
             IUserPublicationRoleRepository userPublicationRoleRepository, 
             ContentDbContext context)
         {
@@ -30,22 +28,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            CreateMethodologyForSpecificPublicationRequirement requirement,
+            ManageExternalMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            // If a Publication is linked to an External Methodology, this should be unlinked first.
-            if (publication.ExternalMethodology != null)
-            {
-                return;
-            }
-            
             await _context
                 .Entry(publication)
                 .Collection(p => p.Methodologies)
                 .LoadAsync();
             
-            // If a Publication owns a Methodology already, they cannot own another.
-            if (publication.Methodologies.Any(m => m.Owner))
+            // If a Publication is linked to a Methodology, this should be unlinked first.
+            if (publication.Methodologies.Count > 0)
             {
                 return;
             }

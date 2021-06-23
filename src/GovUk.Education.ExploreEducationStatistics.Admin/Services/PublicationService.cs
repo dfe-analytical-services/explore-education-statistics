@@ -47,33 +47,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
             Guid topicId)
         {
+            var userId = _userService.GetUserId();
+            
             return await _userService
                 .CheckCanAccessSystem()
-                .OnSuccess(_ =>
-                {
-                    return _userService
-                        .CheckCanViewAllReleases()
-                        .OnSuccess(() =>
-                            _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
-                        .OrElse(() =>
-                            _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId,
-                                _userService.GetUserId()));
-                });
+                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
+                    .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
+                    .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
+                );
         }
 
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
         {
+            var userId = _userService.GetUserId();
+            
             return await _userService
                 .CheckCanAccessSystem()
-                .OnSuccess(_ =>
-                {
-                    return _userService
-                        .CheckCanViewAllReleases()
-                        .OnSuccess(() =>
-                            _publicationRepository.GetPublicationWithAllReleases(publicationId))
-                        .OrElse(() =>
-                            _publicationRepository.GetPublicationForUser(publicationId, _userService.GetUserId()));
-                });
+                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
+                    .OnSuccess(() => _publicationRepository.GetPublicationWithAllReleases(publicationId))
+                    .OrElse(() => _publicationRepository.GetPublicationForUser(publicationId, userId)));
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
@@ -255,7 +247,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.LegacyReleases)
-                .Include(p => p.Topic);
+                .Include(p => p.Topic)
+                .Include(p => p.Methodologies)
+                .ThenInclude(p => p.MethodologyParent)
+                .ThenInclude(p => p.Versions);
         }
     }
 }

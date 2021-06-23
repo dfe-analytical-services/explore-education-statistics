@@ -56,6 +56,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
 
+                // does this user have permission to manage the external methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
+
                 /**
                  * Release management
                  */
@@ -199,6 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();
 
             /**
              * Release management

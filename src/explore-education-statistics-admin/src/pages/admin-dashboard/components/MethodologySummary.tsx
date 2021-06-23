@@ -35,12 +35,8 @@ const MethodologySummary = ({
 }: Props) => {
   const history = useHistory();
   const [
-    showAddExternalMethodologyForm,
-    setShowAddExternalMethodologyForm,
-  ] = useState<boolean>();
-  const [
-    showEditExternalMethodologyForm,
-    setShowEditExternalMethodologyForm,
+    showAddEditExternalMethodologyForm,
+    setShowAddEditExternalMethodologyForm,
   ] = useState<boolean>();
   const [amendMethodologyId, setAmendMethodologyId] = useState<string>();
   const [
@@ -51,7 +47,7 @@ const MethodologySummary = ({
   const {
     contact,
     externalMethodology,
-    methodology,
+    methodologies,
     id: publicationId,
     title,
   } = publication;
@@ -102,8 +98,81 @@ const MethodologySummary = ({
 
   return (
     <>
-      {methodology ? (
+      {publication.permissions.canCreateMethodologies && (
+        <ButtonGroup className="govuk-!-margin-bottom-2">
+          <Button
+            onClick={async () => {
+              const {
+                id: methodologyId,
+              } = await methodologyService.createMethodology(publicationId);
+              history.push(
+                generatePath<MethodologyRouteParams>(
+                  methodologySummaryRoute.path,
+                  {
+                    methodologyId,
+                  },
+                ),
+              );
+            }}
+            data-testid={`Create methodology for ${title}`}
+            disabled={showAddEditExternalMethodologyForm}
+          >
+            Create methodology
+          </Button>
+
+          {publication.permissions.canManageExternalMethodology && (
+            <Button
+              type="button"
+              data-testid={`Link methodology for ${title}`}
+              variant="secondary"
+              onClick={() => setShowAddEditExternalMethodologyForm(true)}
+              disabled={showAddEditExternalMethodologyForm}
+            >
+              Link to an externally hosted methodology
+            </Button>
+          )}
+        </ButtonGroup>
+      )}
+
+      {externalMethodology?.url && (
+        <>
+          <Link to={externalMethodology.url} unvisited>
+            {externalMethodology.title} (external methodology)
+          </Link>
+          {publication.permissions.canManageExternalMethodology && (
+            <ButtonGroup className="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
+              <Button
+                type="button"
+                onClick={() => setShowAddEditExternalMethodologyForm(true)}
+              >
+                Edit
+              </Button>
+              <Button
+                type="button"
+                variant="warning"
+                onClick={handleRemoveExternalMethodology}
+              >
+                Remove
+              </Button>
+            </ButtonGroup>
+          )}
+        </>
+      )}
+
+      {showAddEditExternalMethodologyForm && (
+        <MethodologyExternalLinkForm
+          initialValues={externalMethodology}
+          onCancel={() => setShowAddEditExternalMethodologyForm(false)}
+          onSubmit={values => {
+            handleExternalMethodologySubmit(values);
+            setShowAddEditExternalMethodologyForm(false);
+          }}
+        />
+      )}
+
+      {methodologies.map(methodology => (
         <Details
+          key={methodology.id}
           open={false}
           className="govuk-!-margin-bottom-0"
           summary={methodology.title}
@@ -178,7 +247,7 @@ const MethodologySummary = ({
               )}
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {methodology.permissions.canDeleteMethodology &&
+              {methodology.permissions.canCancelMethodologyAmendment &&
                 methodology.amendment && (
                   <Button
                     onClick={() =>
@@ -192,92 +261,7 @@ const MethodologySummary = ({
             </div>
           </div>
         </Details>
-      ) : (
-        <>
-          {externalMethodology?.url ? (
-            <>
-              {!showEditExternalMethodologyForm ? (
-                <>
-                  <Link to={externalMethodology.url} unvisited>
-                    {externalMethodology.title} (external methodology)
-                  </Link>
-                  {publication.permissions.canCreateMethodologies && (
-                    <ButtonGroup className="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
-                      <Button
-                        type="button"
-                        onClick={() => setShowEditExternalMethodologyForm(true)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="warning"
-                        onClick={handleRemoveExternalMethodology}
-                      >
-                        Remove
-                      </Button>
-                    </ButtonGroup>
-                  )}
-                </>
-              ) : (
-                <MethodologyExternalLinkForm
-                  initialValues={externalMethodology}
-                  onCancel={() => setShowEditExternalMethodologyForm(false)}
-                  onSubmit={values => {
-                    handleExternalMethodologySubmit(values);
-                    setShowEditExternalMethodologyForm(false);
-                  }}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              {!showAddExternalMethodologyForm &&
-                publication.permissions.canCreateMethodologies && (
-                  <ButtonGroup className="govuk-!-margin-bottom-2">
-                    <Button
-                      onClick={async () => {
-                        const {
-                          id: methodologyId,
-                        } = await methodologyService.createMethodology(
-                          publicationId,
-                        );
-                        history.push(
-                          generatePath<MethodologyRouteParams>(
-                            methodologySummaryRoute.path,
-                            {
-                              methodologyId,
-                            },
-                          ),
-                        );
-                      }}
-                      data-testid={`Create methodology for ${title}`}
-                    >
-                      Create methodology
-                    </Button>
-                    <Button
-                      type="button"
-                      data-testid={`Link methodology for ${title}`}
-                      variant="secondary"
-                      onClick={() => setShowAddExternalMethodologyForm(true)}
-                    >
-                      Link to an externally hosted methodology
-                    </Button>
-                  </ButtonGroup>
-                )}
-              {showAddExternalMethodologyForm && (
-                <MethodologyExternalLinkForm
-                  onCancel={() => setShowAddExternalMethodologyForm(false)}
-                  onSubmit={values => {
-                    handleExternalMethodologySubmit(values);
-                    setShowAddExternalMethodologyForm(false);
-                  }}
-                />
-              )}
-            </>
-          )}
-        </>
-      )}
+      ))}
 
       {amendMethodologyId && (
         <ModalConfirm

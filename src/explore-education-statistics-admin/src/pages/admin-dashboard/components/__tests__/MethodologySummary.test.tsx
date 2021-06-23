@@ -41,7 +41,7 @@ const testMethodology: MyMethodology = {
   title: 'I am a methodology',
   permissions: {
     canUpdateMethodology: false,
-    canDeleteMethodology: false,
+    canCancelMethodologyAmendment: false,
     canMakeAmendmentOfMethodology: false,
   },
 };
@@ -65,7 +65,7 @@ const testMethodologyCanCancelAmend: MyMethodology = {
   amendment: true,
   permissions: {
     ...testMethodology.permissions,
-    canDeleteMethodology: true,
+    canCancelMethodologyAmendment: true,
   },
 };
 
@@ -79,26 +79,28 @@ const testPublicationNoMethodology: MyPublication = {
   title: 'Publication 1',
   contact: testContact,
   releases: [],
+  methodologies: [],
   permissions: {
     canCreateReleases: true,
     canUpdatePublication: true,
     canCreateMethodologies: true,
+    canManageExternalMethodology: true,
   },
 };
 
 const testPublicationWithMethodology = {
   ...testPublicationNoMethodology,
-  methodology: testMethodology,
+  methodologies: [testMethodology],
 };
 
 const testPublicationWithDraftMethodology = {
   ...testPublicationWithMethodology,
-  methodology: testDraftMethodology,
+  methodologies: [testDraftMethodology],
 };
 
 const testPublicationWithAmendmentMethodology = {
   ...testPublicationWithMethodology,
-  methodology: testAmendmentMethodology,
+  methodologies: [testAmendmentMethodology],
 };
 
 const testPublicationWithExternalMethodology = {
@@ -108,12 +110,12 @@ const testPublicationWithExternalMethodology = {
 
 const testPublicationWithMethodologyCanAmend = {
   ...testPublicationWithMethodology,
-  methodology: testMethodologyCanAmend,
+  methodologies: [testMethodologyCanAmend],
 };
 
 const testPublicationWithMethodologyCanCancelAmend = {
   ...testPublicationWithMethodology,
-  methodology: testMethodologyCanCancelAmend,
+  methodologies: [testMethodologyCanCancelAmend],
 };
 
 const testTopicId = 'topic-id';
@@ -352,7 +354,7 @@ describe('MethodologySummary', () => {
                 ...testPublicationWithExternalMethodology,
                 permissions: {
                   ...testPublicationWithExternalMethodology.permissions,
-                  canCreateMethodologies: false,
+                  canManageExternalMethodology: false,
                 },
               }}
               topicId={testTopicId}
@@ -475,7 +477,7 @@ describe('MethodologySummary', () => {
         expect(
           methodologyService.createMethodologyAmendment,
         ).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodology.id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].id,
         );
         expect(history.push).toBeCalledWith(
           `/methodology/${mockMethodology.id}/summary`,
@@ -551,7 +553,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodology.id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].id,
         );
       });
     });

@@ -35,6 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 CanCreateMethodologies = _userService
                     .CheckCanCreateMethodologyForPublication(source)
                     .Result
+                    .IsRight,
+                CanManageExternalMethodology = _userService
+                    .CheckCanManageExternalMethodologyForPublication(source)
+                    .Result
                     .IsRight
             };
         }
