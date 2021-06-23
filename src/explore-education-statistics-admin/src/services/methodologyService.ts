@@ -31,7 +31,7 @@ export interface BasicMethodology {
 export interface MyMethodology extends BasicMethodology {
   permissions: {
     canUpdateMethodology: boolean;
-    canRemoveMethodology: boolean;
+    canCancelMethodologyAmendment: boolean;
     canMakeAmendmentOfMethodology: boolean;
   };
 }

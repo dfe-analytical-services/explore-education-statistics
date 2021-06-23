@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public class PermissionsSet
         {
             public bool CanUpdateMethodology { get; set; }
-            public bool CanRemoveMethodology { get; set; }
+            public bool CanCancelMethodologyAmendment { get; set; }
             public bool CanMakeAmendmentOfMethodology { get; set; }
         }
     }

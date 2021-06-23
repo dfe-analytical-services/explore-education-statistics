@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             return new MyMethodologyViewModel.PermissionsSet
             {
                 CanUpdateMethodology = CheckResult(_userService.CheckCanUpdateMethodology(methodology)),
-                CanRemoveMethodology = CheckResult(_userService.CheckCanUpdateMethodology(methodology)), //TODO
+                CanCancelMethodologyAmendment = CheckResult(_userService.CheckCanCancelMethodologyAmendment(methodology)),
                 CanMakeAmendmentOfMethodology = CheckResult(_userService.CheckCanMakeAmendmentOfMethodology(methodology))
             };
         }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
@@ -17,12 +18,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class CreateMethodologyForSpecificPublicationAuthorizationHandler 
         : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
     {
+        private readonly ContentDbContext _context;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
         public CreateMethodologyForSpecificPublicationAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository)
+            IUserPublicationRoleRepository userPublicationRoleRepository, 
+            ContentDbContext context)
         {
             _userPublicationRoleRepository = userPublicationRoleRepository;
+            _context = context;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -35,8 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
+            await _context
+                .Entry(publication)
+                .Collection(p => p.Methodologies)
+                .LoadAsync();
+            
             // If a Publication owns a Methodology already, they cannot own another.
-            if (!publication.Methodologies.IsNullOrEmpty() && publication.Methodologies.Any(m => m.Owner))
+            if (publication.Methodologies.Any(m => m.Owner))
             {
                 return;
             }

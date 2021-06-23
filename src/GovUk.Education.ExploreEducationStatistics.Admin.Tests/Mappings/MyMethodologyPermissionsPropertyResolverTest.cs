@@ -19,14 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             var userService = new Mock<IUserService>(Strict);
             var resolver = new MyMethodologyPermissionSetPropertyResolver(userService.Object);
             
-            userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanUpdateSpecificMethodology)).ReturnsAsync(true); //TODO
+            userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanUpdateSpecificMethodology)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology)).ReturnsAsync(false);
             
             var permissionsSet = resolver.Resolve(methodology, null, null, null);
             VerifyAllMocks(userService);
             
             Assert.True(permissionsSet.CanUpdateMethodology);
-            Assert.True(permissionsSet.CanRemoveMethodology);
+            Assert.False(permissionsSet.CanCancelMethodologyAmendment);
             Assert.False(permissionsSet.CanMakeAmendmentOfMethodology);
         }
     }

@@ -247,7 +247,7 @@ const MethodologySummary = ({
               )}
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {methodology.permissions.canRemoveMethodology &&
+              {methodology.permissions.canCancelMethodologyAmendment &&
                 methodology.amendment && (
                   <Button
                     onClick={() =>

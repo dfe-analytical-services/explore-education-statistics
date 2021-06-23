@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -38,7 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim => {
                     
-                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                    context.Attach(Publication);
+                    
+                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
                     
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext = CreateAuthContext(user, Publication);
@@ -66,7 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim => {
                     
-                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                    context.Attach(PublicationWithMethodology);
+                    
+                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
                     
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext = CreateAuthContext(user, PublicationWithMethodology);
@@ -84,7 +92,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCanManageExternalMethodologyForPublicationWithPublicationOwnerRole()
             {
-                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                context.Attach(Publication);
+                    
+                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
                 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, Publication);
@@ -104,7 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCannotManageExternalMethodologyForPublicationWithoutPublicationOwnerRole()
             {
-                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                context.Attach(Publication);
+                    
+                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
                 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, Publication);
@@ -124,7 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCannotManageExternalMethodologyForPublication_LinkedToMethodology()
             {
-                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                context.Attach(PublicationWithMethodology);
+                    
+                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
                 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, PublicationWithMethodology);
@@ -145,12 +162,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static (ManageExternalMethodologyForSpecificPublicationAuthorizationHandler, Mock<IUserPublicationRoleRepository>)
-            CreateHandlerAndDependencies()
+            CreateHandlerAndDependencies(ContentDbContext context)
         {
             var publicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
             var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
-                publicationRoleRepository.Object);
+                publicationRoleRepository.Object, context);
 
             return (handler, publicationRoleRepository);
         }

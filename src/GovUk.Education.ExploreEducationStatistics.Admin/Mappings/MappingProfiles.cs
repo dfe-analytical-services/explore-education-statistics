@@ -99,8 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .ThenByDescending(r => r.TimePeriodCoverage)))
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
                     p.Methodologies
-                        .Select(methodology => methodology.MethodologyParent.LatestVersion())
-                        .OrderBy(methodologyParent => methodologyParent.Slug)))
+                        .Select(methodologyLink => methodologyLink.MethodologyParent.LatestVersion())
+                        .OrderBy(methodology => methodology.Title)))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateMap<Contact, ContactViewModel>();

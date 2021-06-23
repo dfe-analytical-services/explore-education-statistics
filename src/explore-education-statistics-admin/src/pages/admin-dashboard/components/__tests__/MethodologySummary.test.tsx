@@ -41,7 +41,7 @@ const testMethodology: MyMethodology = {
   title: 'I am a methodology',
   permissions: {
     canUpdateMethodology: false,
-    canRemoveMethodology: false,
+    canCancelMethodologyAmendment: false,
     canMakeAmendmentOfMethodology: false,
   },
 };
@@ -65,7 +65,7 @@ const testMethodologyCanCancelAmend: MyMethodology = {
   amendment: true,
   permissions: {
     ...testMethodology.permissions,
-    canRemoveMethodology: true,
+    canCancelMethodologyAmendment: true,
   },
 };
 
