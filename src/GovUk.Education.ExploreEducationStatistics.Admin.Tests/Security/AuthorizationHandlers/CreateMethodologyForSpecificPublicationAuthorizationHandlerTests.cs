@@ -125,23 +125,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCanCreateMethodologyForPublicationWithPublicationOwnerRole()
             {
-                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                
-                var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, Publication);
-                
-                publicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
-                    .ReturnsAsync(AsList(PublicationRole.Owner));
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(publicationRoleRepository);
-
-                // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
-                // Owner role on the Publication
-                Assert.True(authContext.HasSucceeded);
-            }
+                await AssertPublicationOwnerCanCreateMethodology(Publication);
+            }            
             
+            [Fact]
+            public async Task UserCanCreateMethodologyForPublicationWithPublicationOwnerRole_AdoptedAnotherMethodologyButNotOwned()
+            {
+                await AssertPublicationOwnerCanCreateMethodology(PublicationWithAdoptedMethodology);
+            }
+
             [Fact]
             public async Task UserCannotCreateMethodologyForPublicationWithoutPublicationOwnerRole()
             {
@@ -165,11 +157,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCannotCreateMethodologyForPublication_LinkedToExternalMethodology()
             {
+                await AssertPublicationOwnerCannotCreateMethodology(PublicationWithExternalMethodology);
+            }
+            
+            [Fact]
+            public async Task UserCannotCreateMethodologyForPublication_OwnsAnotherMethodology()
+            {
+                await AssertPublicationOwnerCannotCreateMethodology(PublicationWithOwnedMethodology);
+            }
+
+            private static async Task AssertPublicationOwnerCanCreateMethodology(Publication publication)
+            {
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                
+
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, PublicationWithExternalMethodology);
-                
+                var authContext = CreateAuthContext(user, publication);
+
+                publicationRoleRepository
+                    .Setup(s => s.GetAllRolesByUser(UserId, publication.Id))
+                    .ReturnsAsync(AsList(PublicationRole.Owner));
+
+                await handler.HandleAsync(authContext);
+                VerifyAllMocks(publicationRoleRepository);
+
+                // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
+                // Owner role on the Publication
+                Assert.True(authContext.HasSucceeded);
+            }
+
+            private static async Task AssertPublicationOwnerCannotCreateMethodology(Publication publication)
+            {
+                var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
+
+                var user = CreateClaimsPrincipal(UserId);
+                var authContext = CreateAuthContext(user, publication);
+
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(publicationRoleRepository);
 
