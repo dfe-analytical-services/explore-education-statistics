@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
                 var result = await service.GetLatestMethodologyBySlug(slug);
 
@@ -151,7 +152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Versions = AsList(
                     new Methodology
                     {
-                        Id = Guid.NewGuid(),
                         Annexes = new List<ContentSection>(),
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
                 var result = await service.GetLatestMethodologyBySlug(slug);
 
@@ -192,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Versions = AsList(
                     new Methodology
                     {
-                        Id = Guid.NewGuid(),
                         Annexes = new List<ContentSection>(),
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
@@ -215,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
                 var result = await service.GetLatestMethodologyBySlug("methodology-slug");
 
@@ -258,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetSummariesByPublication(publication.Id);
@@ -299,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetSummariesByPublication(publication.Id);
@@ -319,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext())
             {
-                var service = SetupMethodologyServiceTests(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetSummariesByPublication(Guid.NewGuid());
@@ -330,13 +329,558 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
-        private static MethodologyService SetupMethodologyServiceTests(
+        [Fact]
+        public async Task GetTree()
+        {
+            // Publication with a published Release
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Summary = "Publication summary",
+                Releases = AsList(
+                    new Release
+                    {
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = AcademicYearQ1,
+                        Published = new DateTime(2019, 1, 01),
+                        ApprovalStatus = ReleaseApprovalStatus.Approved
+                    }
+                )
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = AsList(publication)
+                    }
+                )
+            };
+
+            var publicationMethodologies = AsList(
+                new PublicationMethodology
+                {
+                    Publication = publication,
+                    MethodologyParent = new MethodologyParent
+                    {
+                        Slug = "methodology-1-slug",
+                        Versions = AsList(
+                            new Methodology
+                            {
+                                Id = Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"),
+                                Annexes = new List<ContentSection>(),
+                                Content = new List<ContentSection>(),
+                                PreviousVersionId = null,
+                                PublishingStrategy = Immediately,
+                                Slug = "methodology-1-slug",
+                                Status = Approved,
+                                Title = "Methodology 1 v0 title",
+                                Version = 0
+                            },
+                            new Methodology
+                            {
+                                Id = Guid.Parse("481bb64c-3b87-44fe-aa62-b3ff6f1ab6d7"),
+                                Annexes = new List<ContentSection>(),
+                                Content = new List<ContentSection>(),
+                                PreviousVersionId = Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"),
+                                PublishingStrategy = Immediately,
+                                Slug = "methodology-1-slug",
+                                Status = Draft,
+                                Title = "Methodology 1 v1 title",
+                                Version = 1
+                            }
+                        )
+                    },
+                    Owner = true
+                },
+                new PublicationMethodology
+                {
+                    Publication = publication,
+                    MethodologyParent = new MethodologyParent
+                    {
+                        Slug = "methodology-2-slug",
+                        Versions = AsList(
+                            new Methodology
+                            {
+                                Id = Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"),
+                                Annexes = new List<ContentSection>(),
+                                Content = new List<ContentSection>(),
+                                PreviousVersionId = null,
+                                PublishingStrategy = Immediately,
+                                Slug = "methodology-2-slug",
+                                Status = Approved,
+                                Title = "Methodology 2 v0 title",
+                                Version = 0
+                            },
+                            new Methodology
+                            {
+                                Id = Guid.Parse("8f02ec7b-fa52-4d8f-84e9-f04fa096d4d2"),
+                                Annexes = new List<ContentSection>(),
+                                Content = new List<ContentSection>(),
+                                PreviousVersionId = Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"),
+                                PublishingStrategy = Immediately,
+                                Slug = "methodology-2-slug",
+                                Status = Draft,
+                                Title = "Methodology 2 v1 title",
+                                Version = 1
+                            }
+                        )
+                    },
+                    Owner = false
+                }
+            );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.PublicationMethodologies.AddRangeAsync(publicationMethodologies);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                var themes = result.Right;
+                Assert.Single(themes);
+
+                Assert.Equal(theme.Id, themes[0].Id);
+                Assert.Null(themes[0].Summary);
+                Assert.Equal("Theme title", themes[0].Title);
+
+                var topics = themes[0].Topics;
+                Assert.Single(topics);
+
+                Assert.Equal(theme.Topics[0].Id, topics[0].Id);
+                Assert.Null(topics[0].Summary);
+                Assert.Equal("Topic title", topics[0].Title);
+
+                var publications = topics[0].Publications;
+                Assert.Single(publications);
+
+                Assert.Equal(publication.Id, publications[0].Id);
+                Assert.Equal("publication-slug", publications[0].Slug);
+                Assert.Equal("Publication summary", publications[0].Summary);
+                Assert.Equal("Publication title", publications[0].Title);
+
+                var methodologies = publications[0].Methodologies;
+                Assert.Equal(2, methodologies.Count);
+
+                Assert.Equal(Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"), methodologies[0].Id);
+                Assert.Equal("methodology-1-slug", methodologies[0].Slug);
+                Assert.Equal("Methodology 1 v0 title", methodologies[0].Title);
+                
+                Assert.Equal(Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"), methodologies[1].Id);
+                Assert.Equal("methodology-2-slug", methodologies[1].Slug);
+                Assert.Equal("Methodology 2 v0 title", methodologies[1].Title);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutTopicsIsNotIncluded()
+        {
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = new List<Topic>()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutPublicationsIsNotIncluded()
+        {
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = new List<Publication>()
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutReleasesIsNotIncluded()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Summary = "Publication summary",
+                Releases = new List<Release>()
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = AsList(publication)
+                    }
+                )
+            };
+
+            var publicationMethodology = new PublicationMethodology
+            {
+                Publication = publication,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug",
+                    Versions = AsList(
+                        new Methodology
+                        {
+                            Annexes = new List<ContentSection>(),
+                            Content = new List<ContentSection>(),
+                            PreviousVersionId = null,
+                            PublishingStrategy = Immediately,
+                            Slug = "methodology-slug",
+                            Status = Approved,
+                            Title = "Methodology title",
+                            Version = 0
+                        }
+                    )
+                },
+                Owner = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutMethodologiesIsNotIncluded()
+        {
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = AsList(
+                            new Publication
+                            {
+                                Title = "Publication title",
+                                Slug = "publication-slug",
+                                Summary = "Publication summary",
+                                Releases = AsList(
+                                    new Release
+                                    {
+                                        ReleaseName = "2018",
+                                        TimePeriodCoverage = AcademicYearQ1,
+                                        Published = new DateTime(2019, 1, 01),
+                                        ApprovalStatus = ReleaseApprovalStatus.Approved
+                                    }
+                                )
+                            }
+                        )
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutApprovedReleasesIsNotIncluded()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Summary = "Publication summary",
+                Releases = AsList(
+                    new Release
+                    {
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = AcademicYearQ1,
+                        Published = null,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft
+                    }
+                )
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = AsList(publication)
+                    }
+                )
+            };
+
+            var publicationMethodology = new PublicationMethodology
+            {
+                Publication = publication,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug",
+                    Versions = AsList(
+                        new Methodology
+                        {
+                            Annexes = new List<ContentSection>(),
+                            Content = new List<ContentSection>(),
+                            PreviousVersionId = null,
+                            PublishingStrategy = Immediately,
+                            Slug = "methodology-slug",
+                            Status = Approved,
+                            Title = "Methodology title",
+                            Version = 0
+                        }
+                    )
+                },
+                Owner = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task GetTree_ThemeWithoutApprovedMethodologiesIsNotIncluded()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Summary = "Publication summary",
+                Releases = AsList(
+                    new Release
+                    {
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = AcademicYearQ1,
+                        Published = null,
+                        ApprovalStatus = ReleaseApprovalStatus.Approved
+                    }
+                )
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Slug = "theme-slug",
+                Summary = "Theme summary",
+                Topics = AsList(
+                    new Topic
+                    {
+                        Title = "Topic title",
+                        Slug = "topic-slug",
+                        Publications = AsList(publication)
+                    }
+                )
+            };
+
+            var publicationMethodology = new PublicationMethodology
+            {
+                Publication = publication,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug",
+                    Versions = AsList(
+                        new Methodology
+                        {
+                            Annexes = new List<ContentSection>(),
+                            Content = new List<ContentSection>(),
+                            PreviousVersionId = null,
+                            PublishingStrategy = Immediately,
+                            Slug = "methodology-slug",
+                            Status = Draft,
+                            Title = "Methodology title",
+                            Version = 0
+                        }
+                    )
+                },
+                Owner = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddAsync(theme);
+                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetTree();
+
+                result.AssertRight();
+
+                Assert.Empty(result.Right);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMethodologyRepository methodologyRepository = null,
             IMapper mapper = null)
         {
             return new MethodologyService(
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object
