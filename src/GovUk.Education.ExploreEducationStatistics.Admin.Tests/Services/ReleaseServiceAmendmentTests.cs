@@ -440,7 +440,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(amendment.Created).Milliseconds, 0, 1500);
-                Assert.Null(amendment.InternalReleaseNote);
 
                 Assert.Equal(releaseType, amendment.Type);
                 Assert.Equal(releaseType.Id, amendment.TypeId);
