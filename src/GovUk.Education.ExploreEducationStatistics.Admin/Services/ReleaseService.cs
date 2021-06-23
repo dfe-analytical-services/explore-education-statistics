@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -204,7 +205,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(HydrateReleaseForAmendment)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
@@ -601,19 +603,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.ReleaseStatuses);
         }
 
-        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        private async Task<Release> HydrateReleaseForAmendment(Release release)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest
             // The contact
             // The type
-            return values.Include(r => r.Publication)
-                .Include(r => r.Content)
-                .ThenInclude(c => c.ContentSection)
-                .ThenInclude(c => c.Content)
-                .Include(r => r.Updates)
-                .Include(r => r.ContentBlocks)
-                .ThenInclude(r => r.ContentBlock);
+            await _context.Entry(release)
+                .Reference(r => r.Publication)
+                .LoadAsync();
+            await _context.Entry(release)
+                .Collection(r => r.Content)
+                .LoadAsync();
+            await release.Content.ForEachAsync(async cs =>
+            {
+                await _context.Entry(cs)
+                    .Reference(rcs => rcs.ContentSection)
+                    .LoadAsync();
+                await _context.Entry(cs.ContentSection)
+                    .Collection(s => s.Content)
+                    .LoadAsync();
+            });
+            await _context.Entry(release)
+                .Collection(r => r.Updates)
+                .LoadAsync();
+            await _context.Entry(release)
+                .Collection(r => r.ContentBlocks)
+                .LoadAsync();
+            await release.ContentBlocks.ForEachAsync(async rcb =>
+                await _context.Entry(rcb)
+                    .Reference(cb => cb.ContentBlock)
+                    .LoadAsync()
+            );
+            return release;
         }
     }
 
