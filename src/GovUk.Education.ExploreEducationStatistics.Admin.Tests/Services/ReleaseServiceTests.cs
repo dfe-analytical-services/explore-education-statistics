@@ -733,14 +733,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("New access list", saved.PreReleaseAccessList);
 
-                Assert.Single(saved.ReleaseStatuses);
-                var savedStatus = saved.ReleaseStatuses[0];
-                Assert.Equal(ReleaseApprovalStatus.Draft, savedStatus.ApprovalStatus);
-                Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
-                Assert.NotNull(savedStatus.Created);
-                Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
-                Assert.Equal(_userId, savedStatus.CreatedById);
+                // No ReleaseStatus created if the ApprovalStatus hasn't changed
+                Assert.Empty(saved.ReleaseStatuses);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1191,7 +1185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             LatestInternalReleaseNote = "Internal note"
 
                         }
@@ -1226,7 +1220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(saved.ReleaseStatuses);
                 var savedStatus = saved.ReleaseStatuses[0];
-                Assert.Equal(ReleaseApprovalStatus.Draft, savedStatus.ApprovalStatus);
+                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
@@ -1340,7 +1334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             LatestInternalReleaseNote = "Test internal note"
                         }
                     );
@@ -1381,7 +1375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(saved.ReleaseStatuses);
                 var savedStatus = saved.ReleaseStatuses[0];
-                Assert.Equal(ReleaseApprovalStatus.Draft, savedStatus.ApprovalStatus);
+                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow

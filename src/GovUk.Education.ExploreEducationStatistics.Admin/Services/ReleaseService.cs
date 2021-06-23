@@ -325,6 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var releaseStatus = new ReleaseStatus
                     {
+                        Id = Guid.NewGuid(),
                         Release = release,
                         InternalReleaseNote = request.LatestInternalReleaseNote,
                         ApprovalStatus = request.ApprovalStatus,
@@ -337,7 +338,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
-                            await _context.AddAsync(releaseStatus);
+
+                            if (oldStatus != request.ApprovalStatus)
+                            {
+                                await _context.AddAsync(releaseStatus);
+                            }
+
                             await _context.SaveChangesAsync();
 
                             // Only need to inform Publisher if changing release approval status to or from Approved
