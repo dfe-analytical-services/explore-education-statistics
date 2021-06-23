@@ -66,9 +66,7 @@ user selects theme and topic from admin dashboard
 
 user navigates to release summary from admin dashboard
     [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  60
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
@@ -114,8 +112,9 @@ user opens publication on the admin dashboard
     
     user navigates to admin dashboard
     user selects theme and topic from admin dashboard  ${theme}  ${topic}
-    user waits until page contains accordion section   ${publication}
+    user waits until page contains accordion section   ${publication}   120
     user opens accordion section  ${publication}
+    user waits until page does not contain loading spinner
         
 user creates methodology for publication
     [Arguments]  ${publication}
@@ -145,9 +144,7 @@ user links publication to external methodology
     user enters text into textfield  Link title   ${title}
     user enters text into textfield  URL   ${link}
     user clicks button  Save
-    user waits until page contains title    Dashboard
-    user waits until page contains accordion section   ${publication}
-    user opens accordion section  ${publication}
+    user opens publication on the admin dashboard   ${publication}
     user checks page contains link with text and url  ${title}  ${link}
     
 user edits an external methodology
@@ -166,9 +163,7 @@ user edits an external methodology
     user enters text into textfield  Link title   ${new_title}
     user enters text into textfield  URL   ${new_link}
     user clicks button  Save
-    user waits until page contains title    Dashboard
-    user waits until page contains accordion section   ${publication}
-    user opens accordion section  ${publication}
+    user opens publication on the admin dashboard   ${publication}
     user waits until page contains testid   Methodology for ${publication}
     user checks page contains link with text and url    ${new_title}   ${new_link}
     
@@ -176,9 +171,7 @@ user removes an external methodology from publication
     [Arguments]  ${publication}
     user opens publication on the admin dashboard   ${publication}
     user clicks button when available   Remove
-    user waits until page contains title    Dashboard
-    user waits until page contains accordion section   ${publication}
-    user opens accordion section  ${publication}
+    user opens publication on the admin dashboard   ${publication}
     user waits until page contains button   Create methodology
                 
 user adds basic release content
@@ -394,9 +387,7 @@ user enters text into meta guidance data file content editor
 
 user creates amendment for release
     [Arguments]  ${PUBLICATION_NAME}  ${RELEASE_NAME}  ${RELEASE_STATUS}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     user opens details dropdown   ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}
     ${details}=  user gets details content element  ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}

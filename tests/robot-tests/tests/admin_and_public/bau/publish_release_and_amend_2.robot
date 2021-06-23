@@ -55,8 +55,7 @@ Check methodology is approved
 
 Create new release
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020
     user clicks link  Data and files
@@ -309,9 +308,7 @@ Return to Admin
 
 Change methodology status to Draft
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks link  ${PUBLICATION_NAME}
+    user views methodology for publication   ${PUBLICATION_NAME}
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks element  id:methodologyStatusForm-status-Draft

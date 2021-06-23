@@ -94,10 +94,7 @@ Add a methodology
 
 Verify publication has been updated
     [Tags]  HappyPath
-    user waits until h1 is visible  Dashboard
-    user selects theme and topic from admin dashboard  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson
