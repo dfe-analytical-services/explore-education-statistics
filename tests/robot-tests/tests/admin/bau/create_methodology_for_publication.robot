@@ -18,4 +18,14 @@ teardown suite
 Create Methodology for Publication
     [Tags]  HappyPath
     user creates test publication via api   ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+    user waits until page contains button   Create methodology
+    user waits until page contains button   Link to an externally hosted methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+    user checks page does not contain button    Create methodology
+    user checks page does not contain button    Link to an externally hosted methodology
+    user views methodology for publication    ${PUBLICATION_NAME}
+    user checks summary list contains   Title   ${PUBLICATION_NAME}
+    user checks summary list contains   Status  Draft
+    user checks summary list contains   Published on  Not yet published   

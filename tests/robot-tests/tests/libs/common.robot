@@ -227,7 +227,10 @@ user gets accordion header button element
     [Return]  ${button}
 
 user opens accordion section
-    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    [Arguments]  
+    ...  ${heading_text}  
+    ...  ${parent}=css:[data-testid="accordion"]
+    
     ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
     ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
     run keyword if  '${is_expanded}' != 'true'  user clicks element  ${header_button}
@@ -341,6 +344,11 @@ user clicks link
     user waits until parent contains element  ${parent}  link:${text}
     ${element}=  get child element  ${parent}  link:${text}
     user clicks element  ${element}
+
+user clicks link when available
+    [Arguments]   ${text}  ${parent}=css:body
+    user waits until page contains link  ${text}
+    user clicks link  ${text}
 
 user clicks button
     [Arguments]   ${text}  ${parent}=css:body

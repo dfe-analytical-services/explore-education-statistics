@@ -56,9 +56,7 @@ User redirects to the dashboard after saving publication
 
 Verify that new publication has been created
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME} (created)
-    user opens accordion section  ${PUBLICATION_NAME} (created)
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME} (created)
     user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME} (created)  Suzanne Wallace

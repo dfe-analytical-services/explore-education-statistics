@@ -19,7 +19,11 @@ Link Publication to External Methodology
     [Tags]  HappyPath
     user creates test publication via api   ${PUBLICATION_NAME}
     user links publication to external methodology    ${PUBLICATION_NAME}
-    
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+    user waits until page contains button   Edit
+    user waits until page contains button   Remove
+    user checks page does not contain button    Create methodology
+        
 Edit the External Methodology of the Publication
     user edits an external methodology    ${PUBLICATION_NAME}
     
