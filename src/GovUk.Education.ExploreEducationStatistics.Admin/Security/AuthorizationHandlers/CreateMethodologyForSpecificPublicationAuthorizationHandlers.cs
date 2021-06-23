@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -29,6 +31,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             // If a Publication is linked to an External Methodology, this should be unlinked first.
             if (publication.ExternalMethodology != null)
+            {
+                return;
+            }
+            
+            // If a Publication owns a Methodology already, they cannot own another.
+            if (!publication.Methodologies.IsNullOrEmpty() && publication.Methodologies.Any(m => m.Owner))
             {
                 return;
             }

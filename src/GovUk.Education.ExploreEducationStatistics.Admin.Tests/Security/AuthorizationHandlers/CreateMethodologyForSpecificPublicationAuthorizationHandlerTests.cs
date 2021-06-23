@@ -30,25 +30,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid(),
             ExternalMethodology = new ExternalMethodology()
         };
+            
+        private static readonly Publication PublicationWithOwnedMethodology = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Methodologies = AsList(new PublicationMethodology
+            {
+                Owner = true
+            })
+        };
+            
+        private static readonly Publication PublicationWithAdoptedMethodology = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Methodologies = AsList(new PublicationMethodology
+            {
+                Owner = false
+            })
+        };
 
         public class CreateMethodologyForSpecificPublicationAuthorizationHandlerClaimTests
         {
             [Fact]
             public async Task UserWithCorrectClaimCanCreateMethodologyForAnyPublication()
             {
-                await ForEachSecurityClaimAsync(async claim => {
-                    
+                await AssertUserWithCorrectClaimCanCreateMethodology(Publication);
+            }
+
+            [Fact]
+            public async Task UserWithCorrectClaimCanCreateMethodologyForAnyPublication_AdoptedAnotherMethodologyButNotOwned()
+            {
+                await AssertUserWithCorrectClaimCanCreateMethodology(PublicationWithAdoptedMethodology);
+            }
+            
+            [Fact]
+            public async Task UserWithCorrectClaimCannotCreateMethodologyForAnyPublication_LinkedToExternalMethodology()
+            {
+                await AssertUserWithCorrectClaimCannotCreateMethodology(PublicationWithExternalMethodology);
+            }
+
+            [Fact]
+            public async Task UserWithCorrectClaimCannotCreateMethodologyForAnyPublication_OwnsAnotherMethodology()
+            {
+                await AssertUserWithCorrectClaimCannotCreateMethodology(PublicationWithOwnedMethodology);
+            }
+
+            private static async Task AssertUserWithCorrectClaimCanCreateMethodology(Publication publication)
+            {
+                await ForEachSecurityClaimAsync(async claim =>
+                {
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                    
+
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, Publication);
+                    var authContext = CreateAuthContext(user, publication);
 
                     var expectedToPassByClaimAlone = claim == CreateAnyMethodology;
 
                     if (!expectedToPassByClaimAlone)
                     {
                         publicationRoleRepository
-                            .Setup(s => s.GetAllRolesByUser(UserId, Publication.Id))
+                            .Setup(s => s.GetAllRolesByUser(UserId, publication.Id))
                             .ReturnsAsync(AsList<PublicationRole>());
                     }
 
@@ -60,16 +101,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
             }
-            
-            [Fact]
-            public async Task UserWithCorrectClaimCannotCreateMethodologyForAnyPublication_LinkedToExternalMethodology()
+
+            private static async Task AssertUserWithCorrectClaimCannotCreateMethodology(
+                Publication publication)
             {
-                await ForEachSecurityClaimAsync(async claim => {
-                    
+                await ForEachSecurityClaimAsync(async claim =>
+                {
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
-                    
+
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, PublicationWithExternalMethodology);
+                    var authContext = CreateAuthContext(user, publication);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(publicationRoleRepository);
