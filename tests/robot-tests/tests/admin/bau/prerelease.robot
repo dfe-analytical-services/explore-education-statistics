@@ -48,7 +48,7 @@ user chooses location, time period and filters
 
 user validates table rows
     user waits until results table appears     180
-    user waits until element contains  css:[data-testid="dataTableCaption"]
+    user waits until element contains  testid:dataTableCaption
     ...  Table showing Admission Numbers for 'UI test subject' in Nailsea Youngwood and Syon between 2005 and 2017
 
     user checks table column heading contains  1  1  Admission Numbers
@@ -184,7 +184,7 @@ Approve release and wait for it to be Scheduled
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by prerelease UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Approved by prerelease UI tests
     user waits until page contains element   xpath://label[text()="On a specific date"]/../input
     user clicks radio   On a specific date
     user waits until page contains   Publish date

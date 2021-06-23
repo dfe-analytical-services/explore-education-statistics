@@ -228,6 +228,9 @@ const ReleaseContent = () => {
                   </Link>
                 </li>
               )}
+              <li>
+                <a href="#contact-us">Contact us</a>
+              </li>
             </ul>
 
             <dl className="dfe-meta-content">

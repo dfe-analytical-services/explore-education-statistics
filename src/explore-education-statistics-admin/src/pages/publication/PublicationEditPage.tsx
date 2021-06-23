@@ -92,6 +92,7 @@ const PublicationEditPage = ({
                 }),
               );
             }}
+            confirmOnSubmit
           />
         </div>
         <div className="govuk-grid-column-one-quarter">

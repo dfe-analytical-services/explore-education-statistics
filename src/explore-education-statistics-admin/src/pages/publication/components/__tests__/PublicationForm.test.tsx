@@ -3,9 +3,9 @@ import PublicationForm, {
 } from '@admin/pages/publication/components/PublicationForm';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
-import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
+import React from 'react';
 
 jest.mock('@admin/services/themeService');
 
@@ -331,6 +331,59 @@ describe('PublicationForm', () => {
       expect(handleSubmit).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith({
+          ...initialValues,
+          topicId: 'topic-3',
+        });
+      });
+    });
+
+    test('shows a confirmation modal on submit if the confirmOnSubmit flag is set', async () => {
+      themeService.getThemes.mockResolvedValue(testThemes);
+
+      const initialValues: FormValues = {
+        title: 'Test title',
+        topicId: 'topic-4',
+        teamName: 'Test team',
+        teamEmail: 'team@test.com',
+        contactTelNo: '0123456789',
+        contactName: 'John Smith',
+      };
+
+      const handleSubmit = jest.fn();
+
+      render(
+        <PublicationForm
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          confirmOnSubmit
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select topic')).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'Save publication' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+        'topic-3',
+      ]);
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+
+      await waitFor(() => {
+        const modal = within(screen.getByRole('dialog'));
+        expect(modal.getByRole('heading')).toHaveTextContent(
+          'Confirm publication changes',
+        );
+        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      });
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith({

@@ -12,6 +12,7 @@ export interface FormFieldsetProps {
   id: string;
   legend: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
+  legendWeight?: 'strong' | 'regular';
   legendHidden?: boolean;
   /**
    * Set to false to disable default prefixing
@@ -30,6 +31,7 @@ const FormFieldset = ({
   id,
   legend,
   legendSize = 'l',
+  legendWeight = 'strong',
   legendHidden = false,
   useFormId = true,
   onBlur,
@@ -58,6 +60,7 @@ const FormFieldset = ({
             `govuk-fieldset__legend--${legendSize}`,
             {
               'govuk-visually-hidden': legendHidden,
+              'govuk-!-font-weight-regular': legendWeight === 'regular',
             },
           )}
         >

@@ -32,6 +32,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode } from 'react';
 import { useImmer } from 'use-immer';
+import { useRouter } from 'next/router';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -83,6 +84,7 @@ const TableToolWizard = ({
   onSubmit,
   loadingFastTrack = false,
 }: TableToolWizardProps) => {
+  const router = useRouter();
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
@@ -105,6 +107,10 @@ const TableToolWizard = ({
     },
     ...initialState,
   });
+
+  const handlePublicationStepBack = () => {
+    router.push('/data-tables', undefined, { shallow: true });
+  };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -132,6 +138,7 @@ const TableToolWizard = ({
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,
           slug: latestRelease.slug,
+          title: latestRelease.title,
         },
         latestRelease: {
           title: latestRelease.title,
@@ -291,7 +298,7 @@ const TableToolWizard = ({
             }}
           >
             {!hidePublicationSelectionStage && (
-              <WizardStep>
+              <WizardStep onBack={handlePublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}

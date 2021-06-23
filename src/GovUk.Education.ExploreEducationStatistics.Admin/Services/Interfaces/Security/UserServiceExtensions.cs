@@ -140,6 +140,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(release, SecurityPolicies.CanDeleteSpecificRelease);
         }
 
+        public static Task<Either<ActionResult, Release>> CheckCanViewReleaseStatusHistory(
+            this IUserService userService, Release release)
+        {
+            return userService.CheckPolicy(release, SecurityPolicies.CanViewReleaseStatusHistory);
+        }
+
         public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
             this IUserService userService, Release release, ReleaseApprovalStatus approvalStatus)
         {

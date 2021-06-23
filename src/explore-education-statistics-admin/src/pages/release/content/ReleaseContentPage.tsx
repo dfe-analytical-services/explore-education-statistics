@@ -9,15 +9,12 @@ import {
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
-import releaseContentService, {
-  EditableRelease,
-} from '@admin/services/releaseContentService';
-import { Comment, EditableBlock } from '@admin/services/types/content';
+import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { ContentSection } from '@common/services/publicationService';
 import { getNumberOfUnSavedBlocks } from '@admin/pages/release/content/components/utils/unSavedEdits';
+import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -58,13 +55,12 @@ const ReleaseContentPageLoaded = () => {
                       : `${numOfEdits} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
                   </WarningMessage>
                 )}
-                {unresolvedComments.length > 0 &&
-                unresolvedComments.length > 1 ? (
+                {unresolvedComments.length > 0 && (
                   <WarningMessage>
-                    There are {unresolvedComments.length} unresolved comments
+                    {unresolvedComments.length === 1
+                      ? 'There is 1 unresolved comment'
+                      : `There are ${unresolvedComments.length} unresolved comments`}
                   </WarningMessage>
-                ) : (
-                  <WarningMessage>There is 1 unresolved comment</WarningMessage>
                 )}
 
                 <EditablePageModeToggle />
@@ -94,39 +90,6 @@ const ReleaseContentPageLoaded = () => {
     </EditingContextProvider>
   );
 };
-
-const contentSectionComments = (
-  contentSection: ContentSection<EditableBlock>,
-): Comment[] => {
-  if (contentSection.content?.length) {
-    return contentSection.content.reduce<Comment[]>(
-      (allCommentsForSection, content) => {
-        content.comments.forEach(comment =>
-          allCommentsForSection.push(comment),
-        );
-        return allCommentsForSection;
-      },
-      [],
-    );
-  }
-
-  return [];
-};
-
-const getUnresolvedComments = (release: EditableRelease) =>
-  [
-    ...contentSectionComments(release.summarySection),
-    ...contentSectionComments(release.keyStatisticsSection),
-    ...release.content
-      .filter(_ => _.content !== undefined)
-      .reduce<Comment[]>(
-        (allComments, contentSection) => [
-          ...allComments,
-          ...contentSectionComments(contentSection),
-        ],
-        [],
-      ),
-  ].filter(comment => comment !== undefined);
 
 const ReleaseContentPage = ({
   match,

@@ -81,18 +81,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// A future schedule for publishing a Release that's not yet started will be cancelled.
         /// </remarks>
         /// <param name="releaseId"></param>
+        /// <param name="releaseStatusId"></param>
         /// <param name="immediate">If true, runs all of the stages of the publishing workflow except that they are combined to act immediately.</param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> ReleaseChanged(Guid releaseId, bool immediate = false)
+        public async Task<Either<ActionResult, Unit>> ReleaseChanged(Guid releaseId, Guid releaseStatusId, bool immediate = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
                     await _storageQueueService.AddMessageAsync(
-                        NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id));
+                        NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id, releaseStatusId));
 
-                    _logger.LogTrace("Sent message for Release: {0}", releaseId);
+                    _logger.LogTrace("Sent message for Release: {0}, ReleaseStatusId: {1}", releaseId, releaseStatusId);
                     return Unit.Instance;
                 });
         }

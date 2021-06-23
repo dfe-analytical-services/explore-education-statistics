@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusAsync(Guid releaseId)
+        public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
                     var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
-                    return _mapper.Map<ReleaseStatusViewModel>(first);
+                    return _mapper.Map<ReleasePublishingStatusViewModel>(first);
                 });
         }
     }

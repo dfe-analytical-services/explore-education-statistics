@@ -353,13 +353,18 @@ describe('PreReleaseTableToolPage', () => {
       expect(screen.getAllByRole('cell')).toHaveLength(5);
 
       expect(
-        screen.getByRole('button', {
-          name: 'Download the data of this table (CSV)',
+        screen.queryByRole('radio', {
+          name: 'Table in ODS format (spreadsheet, with title and footnotes)',
         }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', {
-          name: 'Download table as Excel spreadsheet (XLSX)',
+        screen.queryByRole('radio', {
+          name: 'Table in CSV format (flat file, with location codes)',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {
+          name: 'Download table',
         }),
       ).toBeInTheDocument();
     });

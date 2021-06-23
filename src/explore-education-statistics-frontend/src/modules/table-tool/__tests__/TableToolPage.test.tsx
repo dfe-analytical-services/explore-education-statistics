@@ -304,6 +304,7 @@ describe('TableToolPage', () => {
       id: 'latest-release-id',
       latestData: true,
       slug: 'latest-release-slug',
+      title: 'Latest Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -318,6 +319,7 @@ describe('TableToolPage', () => {
       id: 'selected-release-id',
       latestData: false,
       slug: 'selected-release-slug',
+      title: 'Selected Release Title',
     },
     latestRelease: {
       title: 'Latest Release Title',

@@ -11,7 +11,8 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 export interface FormValues {
   title: string;
@@ -35,18 +36,24 @@ interface Props {
   id?: string;
   initialValues?: FormValues;
   onSubmit: (values: FormValues) => void;
+  confirmOnSubmit?: boolean;
 }
 
 const PublicationForm = ({
   cancelButton,
   id = 'publicationForm',
   initialValues,
+  confirmOnSubmit = false,
   onSubmit,
 }: Props) => {
   const {
     value: themes = [],
     isLoading: isThemesLoading,
   } = useAsyncHandledRetry(themeService.getThemes);
+
+  const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState<boolean>(
+    false,
+  );
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({
@@ -91,59 +98,89 @@ const PublicationForm = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {() => (
-        <Form id={id}>
-          <FormFieldTextInput<FormValues>
-            label="Publication title"
-            name="title"
-            className="govuk-!-width-two-thirds"
-          />
+      {form => (
+        <>
+          <Form id={id}>
+            <FormFieldTextInput<FormValues>
+              label="Publication title"
+              name="title"
+              className="govuk-!-width-two-thirds"
+            />
 
-          {initialValues?.topicId && (
-            <FormFieldThemeTopicSelect<FormValues>
-              name="topicId"
-              legend="Choose a topic for this publication"
+            {initialValues?.topicId && (
+              <FormFieldThemeTopicSelect<FormValues>
+                name="topicId"
+                legend="Choose a topic for this publication"
+                legendSize="m"
+                id={id}
+                themes={themes}
+              />
+            )}
+
+            <FormFieldset
+              id="contact"
+              legend="Contact for this publication"
               legendSize="m"
-              id={id}
-              themes={themes}
-            />
-          )}
-          <FormFieldset
-            id="contact"
-            legend="Contact for this publication"
-            legendSize="m"
-            hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+              hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+            >
+              <FormFieldTextInput<FormValues>
+                name="teamName"
+                label="Team name"
+                className="govuk-!-width-one-half"
+              />
+
+              <FormFieldTextInput<FormValues>
+                name="teamEmail"
+                label="Team email address"
+                className="govuk-!-width-one-half"
+              />
+
+              <FormFieldTextInput<FormValues>
+                name="contactName"
+                label="Contact name"
+                className="govuk-!-width-one-half"
+              />
+
+              <FormFieldTextInput<FormValues>
+                name="contactTelNo"
+                label="Contact telephone number"
+                width={10}
+              />
+            </FormFieldset>
+
+            <ButtonGroup>
+              <Button
+                type="submit"
+                onClick={e => {
+                  e.preventDefault();
+                  if (confirmOnSubmit && form.isValid) {
+                    setShowConfirmSubmitModal(true);
+                  } else {
+                    form.submitForm();
+                  }
+                }}
+              >
+                Save publication
+              </Button>
+              {cancelButton}
+            </ButtonGroup>
+          </Form>
+          <ModalConfirm
+            title="Confirm publication changes"
+            onConfirm={() => {
+              form.submitForm();
+              setShowConfirmSubmitModal(false);
+            }}
+            onExit={() => setShowConfirmSubmitModal(false)}
+            onCancel={() => setShowConfirmSubmitModal(false)}
+            open={showConfirmSubmitModal}
           >
-            <FormFieldTextInput<FormValues>
-              name="teamName"
-              label="Team name"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="teamEmail"
-              label="Team email address"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="contactName"
-              label="Contact name"
-              className="govuk-!-width-one-half"
-            />
-
-            <FormFieldTextInput<FormValues>
-              name="contactTelNo"
-              label="Contact telephone number"
-              width={10}
-            />
-          </FormFieldset>
-
-          <ButtonGroup>
-            <Button type="submit">Save publication</Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
+            <p>
+              Any changes made here will appear on the public site immediately.
+            </p>
+            <p>Are you sure you want to save the changes?</p>
+          </ModalConfirm>
+        </>
       )}
     </Formik>
   );

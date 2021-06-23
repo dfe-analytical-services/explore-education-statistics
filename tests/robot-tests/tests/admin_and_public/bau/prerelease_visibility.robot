@@ -31,7 +31,7 @@ Go to 'Sign Off' page
     [Tags]  HappyPath
     user clicks link  Sign off
     user waits for page to finish loading
-    user waits until page contains testid  public-release-url
+    user waits until page contains element  testid:public-release-url
     ${PUBLIC_RELEASE_LINK}=  Get Value  xpath://*[@data-testid="public-release-url"]
     check that variable is not empty  PUBLIC_RELEASE_LINK   ${PUBLIC_RELEASE_LINK}
     Set Suite Variable  ${PUBLIC_RELEASE_LINK}
@@ -96,7 +96,7 @@ Approve release and wait for it to be Scheduled
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Approved by UI tests
     user waits until page contains element   xpath://label[text()="On a specific date"]/../input
     user clicks radio   On a specific date
     user waits until page contains   Publish date
@@ -140,7 +140,7 @@ Approve release for immediate publication but don't wait to finish
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   As soon as possible
     user clicks button   Update status
     user waits until h2 is visible  Sign off

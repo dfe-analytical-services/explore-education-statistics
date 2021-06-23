@@ -68,7 +68,7 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'All data file imports must be completed',
+        name: 'All data imports must be completed',
       }),
     ).toHaveAttribute(
       'href',
@@ -92,7 +92,8 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'All public metadata guidance must be populated',
+        name:
+          'All summary information must be completed on the metadata guidance page',
       }),
     ).toHaveAttribute(
       'href',
@@ -101,7 +102,8 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Public release note for this amendment is required',
+        name:
+          'A public release note for this amendment is required, add this near the top of the content page',
       }),
     ).toHaveAttribute(
       'href',
@@ -140,23 +142,24 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('6 potential issues')).toBeInTheDocument();
+    expect(screen.getByText('6 things')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'No methodology attached to publication',
+        name:
+          'An in-EES methodology page has not been linked to this publication',
       }),
     ).toHaveAttribute('href', '/publication/publication-1/edit');
 
     expect(
       screen.getByRole('link', {
-        name: 'No next release expected date',
+        name: 'No next expected release date has been added',
       }),
     ).toHaveAttribute('href', '#releaseStatusForm-nextReleaseDate-month');
 
     expect(
       screen.getByRole('link', {
-        name: 'No footnotes for 3 subjects',
+        name: "3 data files don't have any footnotes",
       }),
     ).toHaveAttribute(
       'href',
@@ -165,7 +168,7 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'No table highlights',
+        name: 'No data blocks have been saved as featured tables',
       }),
     ).toHaveAttribute(
       'href',
@@ -183,7 +186,7 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'No public pre-release access list',
+        name: 'A public pre-release access list has not been created',
       }),
     ).toHaveAttribute(
       'href',
@@ -214,17 +217,19 @@ describe('ReleaseStatusChecklist', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByText('1 issue')).toBeInTheDocument();
-    expect(screen.getByText('1 potential issue')).toBeInTheDocument();
+    expect(screen.getByText('1 thing')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'All public metadata guidance must be populated',
+        name:
+          'All summary information must be completed on the metadata guidance page',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'No methodology attached to publication',
+        name:
+          'An in-EES methodology page has not been linked to this publication',
       }),
     ).toBeInTheDocument();
   });

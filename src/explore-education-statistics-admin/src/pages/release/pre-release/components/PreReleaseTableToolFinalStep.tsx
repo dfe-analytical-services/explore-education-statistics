@@ -1,20 +1,19 @@
 import Link from '@admin/components/Link';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
+import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface TableToolFinalStepProps {
-  publication?: {
-    id: string;
-    slug: string;
-  };
+  publication?: BasicPublicationDetails;
   releaseId: string;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
@@ -61,41 +60,57 @@ const PreReleaseTableToolFinalStep = ({
       <h3>Additional options</h3>
 
       {publication && table && (
-        <ul className="govuk-list">
-          <li>
-            <Link
-              to={generatePath<ReleaseRouteParams>(
-                preReleaseContentRoute.path,
-                {
-                  publicationId: publication.id,
-                  releaseId,
-                },
-              )}
-            >
-              View the release for this data
-            </Link>
-          </li>
-          <li>
-            <DownloadCsvButton
-              fileName={`data-${publication.slug}`}
-              fullTable={table}
-            />
-          </li>
-          <li>
-            <DownloadExcelButton
-              fileName={`data-${publication.slug}`}
-              tableRef={dataTableRef}
-              subjectMeta={table.subjectMeta}
-            />
-          </li>
-          {/* TODO: EES-209 Add methodology page link for pre-release users */}
-        </ul>
-      )}
+        <>
+          <DownloadTable
+            fullTable={table}
+            fileName={`data-${publication.slug}`}
+            tableRef={dataTableRef}
+          />
 
-      <p>
-        If you have a question about the data or methods used to create this
-        table contact the named statistician via the relevant release page.
-      </p>
+          <Accordion id="TableToolInfo">
+            <AccordionSection heading="Related information">
+              <ul className="govuk-list">
+                <li>
+                  <>
+                    Publication:{' '}
+                    <Link
+                      to={generatePath<ReleaseRouteParams>(
+                        preReleaseContentRoute.path,
+                        {
+                          publicationId: publication.id,
+                          releaseId,
+                        },
+                      )}
+                    >
+                      {publication.title}
+                    </Link>
+                  </>
+                </li>
+                {/* TODO: EES-209 Add methodology page link for pre-release users */}
+              </ul>
+            </AccordionSection>
+            {publication?.contact && (
+              <AccordionSection heading="Contact us">
+                <p>
+                  If you have a question about the data or methods used to
+                  create this table contact the named statistician:
+                </p>
+                <h4 className="govuk-heading-s govuk-!-font-weight-bold">
+                  {publication?.contact.teamName}
+                </h4>
+                <p>Named statistician: {publication?.contact.contactName}</p>
+                <p>
+                  Email:{' '}
+                  <a href={`mailto:${publication?.contact.teamEmail}`}>
+                    {publication?.contact.teamEmail}
+                  </a>
+                </p>
+                <p>Telephone: {publication?.contact.contactTelNo}</p>
+              </AccordionSection>
+            )}
+          </Accordion>
+        </>
+      )}
     </div>
   );
 };

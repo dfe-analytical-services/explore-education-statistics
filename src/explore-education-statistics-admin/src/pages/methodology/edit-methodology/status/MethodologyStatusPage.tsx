@@ -22,7 +22,7 @@ import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   status: MethodologyStatus;
-  internalReleaseNote: string;
+  latestInternalReleaseNote: string;
 }
 
 const statusMap: Dictionary<string> = {
@@ -113,12 +113,12 @@ const MethodologyStatusPage = ({
               <Formik<FormValues>
                 initialValues={{
                   status: model.summary.status,
-                  internalReleaseNote: '',
+                  latestInternalReleaseNote: '',
                 }}
                 onSubmit={handleSubmit}
                 validationSchema={Yup.object<FormValues>({
                   status: Yup.mixed().required('Choose a status'),
-                  internalReleaseNote: Yup.string().when('status', {
+                  latestInternalReleaseNote: Yup.string().when('status', {
                     is: 'Approved',
                     then: Yup.string().required('Enter an internal note'),
                   }),
@@ -146,10 +146,10 @@ const MethodologyStatusPage = ({
                             value: 'Approved',
                             conditional: (
                               <FormFieldTextArea<FormValues>
-                                name="internalReleaseNote"
+                                name="latestInternalReleaseNote"
                                 className="govuk-!-width-one-half"
                                 label="Internal note"
-                                hint="Please include your name and any relevant information"
+                                hint="Please include any relevant information"
                                 rows={2}
                               />
                             ),
