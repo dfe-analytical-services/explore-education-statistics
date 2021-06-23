@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public DbSet<LegacyRelease> LegacyReleases { get; set; }
         public DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public DbSet<File> Files { get; set; }
@@ -146,6 +147,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.ApprovalStatus)
+                .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
 
             modelBuilder.Entity<ReleaseFile>()
                 .HasOne(rf => rf.Release)

@@ -340,7 +340,7 @@ user approves release for immediate publication
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   As soon as possible
     user clicks button   Update status
     user waits until h2 is visible  Sign off
@@ -387,7 +387,7 @@ user approves release for scheduled release
     user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio  On a specific date
     user waits until page contains   Publish date
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}

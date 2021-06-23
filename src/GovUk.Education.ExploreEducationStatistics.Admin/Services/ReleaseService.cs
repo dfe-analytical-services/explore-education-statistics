@@ -101,6 +101,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
+        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
+            Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, release =>
+                    release.Include(r => r.ReleaseStatuses)
+                        .ThenInclude(rs => rs.CreatedBy))
+                .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
+                .OnSuccess(release =>
+                    release.ReleaseStatuses
+                        .Select(rs =>
+                            new ReleaseStatusViewModel
+                            {
+                                ReleaseStatusId = rs.Id,
+                                InternalReleaseNote = rs.InternalReleaseNote,
+                                ApprovalStatus = rs.ApprovalStatus,
+                                Created = rs.Created,
+                                CreatedByEmail = rs.CreatedBy?.Email
+                            })
+                        .OrderByDescending(vm => vm.Created)
+                        .ToList()
+                );
+        }
+
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel releaseCreate)
         {
             return await _persistenceHelper
@@ -289,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var oldStatus = release.ApprovalStatus;
 
                     release.ApprovalStatus = request.ApprovalStatus;
-                    release.InternalReleaseNote = request.InternalReleaseNote;
+                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
                     release.NextReleaseDate = request.NextReleaseDate;
 
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
@@ -297,11 +321,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
+                    var releaseStatus = new ReleaseStatus
+                    {
+                        Release = release,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        ApprovalStatus = request.ApprovalStatus,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+
                     return await ValidateReleaseWithChecklist(release)
                         .OnSuccessDo(() => RemoveUnusedImages(release.Id))
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
+                            await _context.AddAsync(releaseStatus);
                             await _context.SaveChangesAsync();
 
                             // Only need to inform Publisher if changing release approval status to or from Approved
@@ -309,6 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 await _publishingService.ReleaseChanged(
                                     releaseId,
+                                    releaseStatus.Id,
                                     request.PublishMethod == PublishMethod.Immediate
                                 );
                             }
@@ -562,7 +597,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Type);
+                .Include(r => r.Type)
+                .Include(r => r.ReleaseStatuses);
         }
 
         private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)

@@ -52,7 +52,7 @@ Approve methodology
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks radio  Approved for publication
-    user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
+    user enters text into element  xpath=//*[@name="latestInternalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
 
 Check methodology is approved
