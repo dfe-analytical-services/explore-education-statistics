@@ -1,11 +1,9 @@
 import json
-
 import pytz
 import time
 import re
 import datetime
 from logging import warn
-
 from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary import ElementFinder
@@ -18,7 +16,6 @@ import os
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = ElementFinder(sl)
 waiting = WaitingKeywords(sl)
-
 
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
