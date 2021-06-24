@@ -13,5 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyPublishingStrategy PublishingStrategy { get; set; }
     }
 }

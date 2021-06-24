@@ -100,6 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(async methodology =>
                 {
                     methodology.InternalReleaseNote = request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
+                    methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Updated = DateTime.UtcNow;
