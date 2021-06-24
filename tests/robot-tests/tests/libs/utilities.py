@@ -33,7 +33,6 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
             return element_finder.find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(limit):
-
             return waiting._wait_until(
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
@@ -73,7 +72,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
-                    parent_locator, child_locator),
+                parent_locator, child_locator),
                 timeout, error
             )
 
