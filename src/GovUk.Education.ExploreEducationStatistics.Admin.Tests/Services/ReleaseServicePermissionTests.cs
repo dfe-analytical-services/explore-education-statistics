@@ -173,6 +173,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateReleaseStatus_Draft()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.Draft
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_HigherLevelReview()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_Approve()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanApproveSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.Approved
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
         public async Task GetLatestReleaseAsync()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
