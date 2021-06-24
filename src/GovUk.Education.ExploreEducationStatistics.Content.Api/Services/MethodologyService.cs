@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 .ThenInclude(m => m.Versions)
                 .ToListAsync();
 
-            return themesWithMethodologies.Where(IsThemePublished)
+            return themesWithMethodologies.Where(IsThemeIncluded)
                 .Select(BuildThemeTree)
                 .OrderBy(theme => theme.Title)
                 .ToList();
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 Summary = null,
                 Title = theme.Title,
                 Topics = theme.Topics
-                    .Where(IsTopicPublished)
+                    .Where(IsTopicIncluded)
                     .Select(BuildTopicTree)
                     .OrderBy(topic => topic.Title)
                     .ToList()
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 Summary = null,
                 Title = topic.Title,
                 Publications = topic.Publications
-                    .Where(IsPublicationPublished)
+                    .Where(IsPublicationIncluded)
                     .Select(BuildPublicationNode)
                     .OrderBy(publication => publication.Title)
                     .ToList()
@@ -131,17 +131,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             };
         }
 
-        private static bool IsThemePublished(Theme theme)
+        private static bool IsThemeIncluded(Theme theme)
         {
-            return theme.Topics.Any(IsTopicPublished);
+            return theme.Topics.Any(IsTopicIncluded);
         }
 
-        private static bool IsTopicPublished(Topic topic)
+        private static bool IsTopicIncluded(Topic topic)
         {
-            return topic.Publications.Any(IsPublicationPublished);
+            return topic.Publications.Any(IsPublicationIncluded);
         }
 
-        private static bool IsPublicationPublished(Publication publication)
+        private static bool IsPublicationIncluded(Publication publication)
         {
             // TODO SOW4 Potentially remove this check on Releases in future
             var hasReleases = publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
