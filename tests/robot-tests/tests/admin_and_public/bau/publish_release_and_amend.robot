@@ -177,7 +177,6 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next release expected  December 3001
@@ -192,12 +191,12 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}  180
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  120
     user opens accordion section  %{TEST_THEME_NAME}
-    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}  120
 
     user opens details dropdown  %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   10
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   120
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
@@ -341,7 +340,7 @@ Return to Admin and Create amendment
 Navigate to data replacement page
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Uploaded data files
+    user waits until h2 is visible  Uploaded data files  120
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
 
@@ -358,7 +357,7 @@ Navigate to data replacement page
 
 Upload replacement data
     [Tags]  HappyPath
-    user waits until h2 is visible  Upload replacement data
+    user waits until h2 is visible  Upload replacement data  120
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates-replacement.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates-replacement.meta.csv
     user clicks button  Upload data files

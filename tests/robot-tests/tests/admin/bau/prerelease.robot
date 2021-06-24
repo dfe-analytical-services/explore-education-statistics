@@ -195,7 +195,6 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
 
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
@@ -210,7 +209,7 @@ Navigate to prerelease page
 
 Validate prerelease has not started
     [Tags]  HappyPath
-    user waits until h1 is visible  Pre-release access is not yet available
+    user waits until h1 is visible  Pre-release access is not yet available  60
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
@@ -246,7 +245,7 @@ Validate prerelease has not started for Analyst user
     user changes to analyst1
     user goes to url   ${RELEASE_URL}/prerelease/content
 
-    user waits until h1 is visible  Pre-release access is not yet available
+    user waits until h1 is visible  Pre-release access is not yet available  60
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
@@ -272,7 +271,6 @@ Start prerelease
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user clicks button   Update status
 
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user waits for release process status to be  Scheduled  90
@@ -288,23 +286,23 @@ Validate prerelease has started
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60 
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
-    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
-    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}  60
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}  60
 
 Validate metadata guidance page
     [Tags]  HappyPath
     user clicks link  Metadata guidance document
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
-    user waits until h2 is visible  Metadata guidance document
-    user waits until page contains  Test metadata guidance content
+    user waits until h2 is visible  Metadata guidance document  60
+    user waits until page contains  Test metadata guidance content  60
 
-    user waits until page contains accordion section  UI test subject
+    user waits until page contains accordion section  UI test subject  60
     user checks there are x accordion sections  1
 
     user opens accordion section  UI test subject
@@ -329,18 +327,18 @@ Go back to prerelease content page
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
 Validate public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access list
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
-    user waits until h2 is visible  Pre-release access list
-    user waits until page contains  Updated test public access list
+    user waits until h2 is visible  Pre-release access list  60
+    user waits until page contains  Updated test public access list  60
 
 Go back to prerelease content page again
     [Tags]  HappyPath
@@ -349,15 +347,15 @@ Go back to prerelease content page again
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
 Go to prerelease table tool page
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables
-    user waits until table tool wizard step is available  Choose a subject
+    user waits until h1 is visible  Create your own tables  60
+    user waits until table tool wizard step is available  Choose a subject  60
 
 Validate table highlights
     [Tags]  HappyPath
@@ -376,12 +374,12 @@ Create and validate custom table
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables
+    user waits until h1 is visible  Create your own tables  60
 
     user clicks link  Create your own table
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    Choose a subject  60
 
-    user waits until page contains   UI test subject
+    user waits until page contains   UI test subject  60
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
 
@@ -397,8 +395,8 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
@@ -407,13 +405,13 @@ Validate public metdata guidance for Analyst user
     [Tags]  HappyPath
     user clicks link  Metadata guidance document
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
-    user waits until h2 is visible  Metadata guidance document
-    user waits until page contains  Test metadata guidance content
-
-    user waits until page contains accordion section  UI test subject
+    user waits until h2 is visible  Metadata guidance document  60
+    user waits until page contains  Test metadata guidance content  60
+  
+    user waits until page contains accordion section  UI test subject  60
     user checks there are x accordion sections  1
 
     user opens accordion section  UI test subject
@@ -438,18 +436,18 @@ Go back to prerelease content page as Analyst user
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
 Validate public prerelease access list as Analyst user
     [Tags]  HappyPath
     user clicks link  Pre-release access list
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
-    user waits until h2 is visible  Pre-release access list
-    user waits until page contains  Updated test public access list
+    user waits until h2 is visible  Pre-release access list  60
+    user waits until page contains  Updated test public access list  60
 
 Go back to prerelease content page again as Analyst user
     [Tags]  HappyPath
@@ -459,19 +457,19 @@ Go back to prerelease content page again as Analyst user
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Calendar Year 2000  60
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
 
 Go to prerelease table tool page as Analyst user
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables
-    user waits until table tool wizard step is available  Choose a subject
+    user waits until h1 is visible  Create your own tables  60
+    user waits until table tool wizard step is available  Choose a subject  60
 
 Validate table highlights as Analyst user
     [Tags]  HappyPath
-    user waits until page contains element  id:featuredTables
+    user waits until page contains element  id:featuredTables  60
     user checks element count is x  css:#featuredTables li  1
     user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
@@ -486,12 +484,12 @@ Create and validate custom table as Analyst user
     [Tags]  HappyPath
     user clicks link  Table tool
 
-    user waits until h1 is visible  Create your own tables
+    user waits until h1 is visible  Create your own tables  60
 
     user clicks link  Create your own table
-    user waits until table tool wizard step is available    Choose a subject
-
-    user waits until page contains   UI test subject
+    user waits until table tool wizard step is available    Choose a subject  60
+ 
+    user waits until page contains   UI test subject  60
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
 

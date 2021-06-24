@@ -3,7 +3,6 @@ Resource    ../../libs/admin-common.robot
 Resource    ../../libs/common.robot
 
 Library     ../../libs/admin_api.py
-
 Force Tags  Admin  Local  Dev  AltersData  Footnotes
 
 Suite Setup       user signs in as bau1
@@ -70,6 +69,7 @@ Give Analyst1 User1 publication owner access
 Sign in as Analyst1 User1 (publication owner) & navigate to publication
     [Tags]  HappyPath
     user changes to analyst1
+    user waits for page to finish loading 
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
     ...  ${RELEASE_TYPE} (not Live)    
 
@@ -91,6 +91,7 @@ Assert publication owner can add meta guidance to ${SUBJECT_NAME}
 
 Navigate to 'Footnotes' page
     [Tags]  HappyPath
+    user waits for page to finish loading
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
@@ -103,7 +104,7 @@ Assert publication owner can add a footnote to ${SUBJECT_NAME}
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  test footnote from the publication owner! (analyst)
     user clicks button  Save footnote
-    user waits until h2 is visible  Footnotes
+    user waits until h2 is visible  Footnotes  60
 
 Add public prerelease access list
     [Tags]  HappyPath
@@ -188,16 +189,32 @@ Navigate to manage users
 
 Remove publication owner access 
     [Tags]  HappyPath
-    user removes publication owner access from analyst  ${PUBLICATION_NAME}
-
+    user scrolls to element  css:[name="selectedPublicationId"]
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user scrolls to element  css:[name="selectedPublicationId"]
+    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which 
+    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
+    Sleep  1  
+    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
 
 Give release approver access to Analyst1
     [Tags]  HappyPath
-    user gives analyst release access  ${RELEASE_NAME}  Approver
+    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which 
+    # causes issues with getting the 'selectedReleaseId' selector (staleElementException)
+    Sleep  1
+    user scrolls to element  css:[name="selectedReleaseId"]
+    user waits until element is enabled  css:[name="selectedReleaseId"]
+    user scrolls to element  css:[name="selectedReleaseId"]
+    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
+    user selects from list by label  css:[name="selectedReleaseRole"]  Approver
+    user clicks button  Add release access
+    user waits until page does not contain loading spinner
 
 Check release owner can access release
     [Tags]  HappyPath
     user changes to analyst1
+    user waits for page to finish loading
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}  120
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
@@ -210,7 +227,7 @@ Navigate to 'Footnotes' section
 
 Add a Footnote as a release owner
     [Tags]  HappyPath
-    user waits until page contains link   Create footnote
+    user waits until page contains link  Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio   ${SUBJECT_NAME}   Applies to all data
@@ -229,20 +246,9 @@ Assert release owner can create a release note
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
-Assert release owner can go to sign off page as contributor
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
-
-Check release owner can publish release
-    [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by release owner
-    user clicks radio   As soon as possible
-    user clicks button   Update status
+Assert release owner can publish a release  
+    user clicks link  Sign off
+    user approves release for immediate publication
 
 Navigate to administration as bau1 to assign viewer only access
     [Tags]  HappyPath    
@@ -262,6 +268,7 @@ Remove release owner access from Analyst1
 
 Assign viewer only access to Analyst1
     [Tags]  HappyPath
+    user waits for page to finish loading 
     user waits until element is enabled  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
     user waits until element is enabled  css:[name="selectedReleaseRole"]
@@ -276,7 +283,7 @@ Sign in as Analyst1 User1 & navigate to publication
 
 Navigate to release as a viewer
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user goes to url  %{ADMIN_URL}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
 
@@ -317,9 +324,9 @@ Login as a release contributor
 Assert release contributor cannot create an amendment
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  60 
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
+    ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}  30
+    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]  30
     user checks page does not contain button  Amend this release

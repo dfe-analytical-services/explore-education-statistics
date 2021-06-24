@@ -52,19 +52,19 @@ Enters contact details
 
 Error message appears when submitting and title is empty
     [Tags]  HappyPath
-    user checks element is not visible  id:publicationForm-title-error
+    user checks element is not visible  id:publicationForm-title-error  30
     user clicks button   Save publication
-    user waits until element is visible  id:publicationForm-title-error
+    user waits until element is visible  id:publicationForm-title-error  30
 
 Enter new publication title
     [Tags]  HappyPath
     user enters text into element  id:publicationForm-title  ${PUBLICATION_NAME} (created)
-    user checks element is not visible  id:publicationForm-title-error
+    user checks element is not visible  id:publicationForm-title-error  60
 
 User redirects to the dashboard after saving publication
     [Tags]  HappyPath
     user clicks button   Save publication
-    user waits until h1 is visible  Dashboard
+    user waits until h1 is visible  Dashboard  60
 
 Verify that new publication has been created
     [Tags]  HappyPath
@@ -86,8 +86,8 @@ Create new test theme and topic
 
 Go to edit publication
     [Tags]  HappyPath
-    user clicks element  testid:Edit publication link for ${PUBLICATION_NAME} (created)
-    user waits until page contains title caption  ${PUBLICATION_NAME} (created)
+    user clicks testid element  Edit publication link for ${PUBLICATION_NAME} (created)
+    user waits until page contains title caption  ${PUBLICATION_NAME} (created)  60
     user waits until h1 is visible  Manage publication
 
 Update publication

@@ -39,6 +39,8 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--ignore-certificate-errors')
+        chrome_options.add_argument('--disable-logging')
+        chrome_options.add_argument('--log-level=\3')
         driver = webdriver.Chrome(options=chrome_options)
 
     try:

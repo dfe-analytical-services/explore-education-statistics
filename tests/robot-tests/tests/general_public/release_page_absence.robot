@@ -13,7 +13,6 @@ Navigate to Absence publication
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}
     user waits until page contains  Explore our statistics and data
-
     user clicks link  Explore
     user waits until page contains  Browse to find the statistics and data you’re looking for
     user waits for page to finish loading
@@ -205,7 +204,7 @@ Validate accordion sections order
     user checks accordion is in position  Contact us                        2  id:help-and-support
 
 Validate Regional and local authority (LA) breakdown table
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath  NotAgainstDev  NotAgainstLocal
     [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown  id:content
     user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]
@@ -244,7 +243,7 @@ Validate Regional and local authority (LA) breakdown table
     user checks row cell contains text  ${row}   1    1.7%
 
 Validate Regional and local authority (LA) breakdown chart
-    [Tags]  HappyPath
+    [Tags]  HappyPath  NotAgainstDev  NotAgainstLocal
     user opens accordion section  Regional and local authority (LA) breakdown  id:content
     user scrolls to accordion section content  Regional and local authority (LA) breakdown  id:content
 
@@ -295,7 +294,7 @@ Validate Regional and local authority (LA) breakdown chart
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
     [Tags]  HappyPath
-    user clicks link    Create tables
+    user clicks link  Create tables
     user waits until h1 is visible  Create your own tables   60
     user waits for page to finish loading
 
