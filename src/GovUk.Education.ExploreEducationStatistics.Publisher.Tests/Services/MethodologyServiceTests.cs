@@ -6,123 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        // TODO SOW4 EES-2378 Update for new model after moving to Content API
-        // [Fact]
-        // public async Task GetTree()
-        // {
-        //     var topicA = new Topic
-        //     {
-        //         Title = "Topic A",
-        //         Theme = new Theme
-        //         {
-        //             Title = "Theme A",
-        //             Slug = "theme-a",
-        //             Summary = "The first theme"
-        //         },
-        //         Slug = "topic-a"
-        //     };
-        //
-        //     var methodologyA = new Methodology
-        //     {
-        //         Slug = "methodology-a",
-        //         Title = "Methodology A",
-        //         Summary = "first methodology",
-        //         Published = new DateTime(2019, 1, 01),
-        //         Updated = new DateTime(2019, 1, 15),
-        //         Annexes = new List<ContentSection>(),
-        //         Content = new List<ContentSection>()
-        //     };
-        //
-        //     var methodologyB = new Methodology
-        //     {
-        //         Slug = "methodology-b",
-        //         Title = "Methodology B",
-        //         Summary = "second methodology",
-        //         Published = new DateTime(2019, 3, 01),
-        //         Updated = new DateTime(2019, 3, 15),
-        //         Annexes = new List<ContentSection>(),
-        //         Content = new List<ContentSection>()
-        //     };
-        //
-        //     var publicationA = new Publication
-        //     {
-        //         Title = "Publication A",
-        //         Topic = topicA,
-        //         Slug = "publication-a",
-        //         Summary = "first publication",
-        //         Methodology = methodologyA
-        //     };
-        //
-        //     var publicationB = new Publication
-        //     {
-        //         Title = "Publication B",
-        //         Topic = topicA,
-        //         Slug = "publication-b",
-        //         Summary = "second publication",
-        //         Methodology = methodologyB
-        //     };
-        //
-        //     var publicationARelease1 = new Release
-        //     {
-        //         Publication = publicationA,
-        //         ReleaseName = "2018",
-        //         TimePeriodCoverage = AcademicYearQ1,
-        //         Published = new DateTime(2019, 1, 01),
-        //         Status = Approved
-        //     };
-        //
-        //     var publicationBRelease1 = new Release
-        //     {
-        //         Publication = publicationB,
-        //         ReleaseName = "2018",
-        //         TimePeriodCoverage = AcademicYearQ1,
-        //         Published = null,
-        //         Status = Draft
-        //     };
-        //
-        //     var contentDbContextId = Guid.NewGuid().ToString();
-        //
-        //     await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        //     {
-        //         await contentDbContext.Topics.AddAsync(topicA);
-        //         await contentDbContext.Methodologies.AddRangeAsync(methodologyA, methodologyB);
-        //         await contentDbContext.Publications.AddRangeAsync(publicationA, publicationB);
-        //         await contentDbContext.Releases.AddRangeAsync(publicationARelease1, publicationBRelease1);
-        //         await contentDbContext.SaveChangesAsync();
-        //     }
-        //
-        //     await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        //     {
-        //         var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
-        //
-        //         var result = service.GetTree(Enumerable.Empty<Guid>());
-        //
-        //         Assert.Single(result);
-        //         var theme = result.First();
-        //         Assert.Equal("Theme A", theme.Title);
-        //
-        //         Assert.Single(theme.Topics);
-        //         var topic = theme.Topics.First();
-        //         Assert.Equal("Topic A", topic.Title);
-        //
-        //         Assert.Single(topic.Publications);
-        //         var publication = topic.Publications.First();
-        //         Assert.Equal("Publication A", publication.Title);
-        //
-        //         var methodology = publication.Methodology;
-        //         Assert.Equal("methodology-a", methodology.Slug);
-        //         Assert.Equal("first methodology", methodology.Summary);
-        //         Assert.Equal("Methodology A", methodology.Title);
-        //     }
-        // }
-
         [Fact]
         public async Task GetFiles()
         {
@@ -242,11 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        private MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
+        private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
         {
-            return new MethodologyService(
-                contentDbContext,
-                MapperForProfile<MappingProfiles>());
+            return new MethodologyService(contentDbContext);
         }
     }
 }

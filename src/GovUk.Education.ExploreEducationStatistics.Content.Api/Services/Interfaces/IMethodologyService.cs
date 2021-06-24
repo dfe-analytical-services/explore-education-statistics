@@ -13,5 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
         public Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug);
 
         public Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
+
+        public Task<Either<ActionResult, List<ThemeTree<PublicationMethodologiesTreeNode>>>> GetTree();
     }
 }
