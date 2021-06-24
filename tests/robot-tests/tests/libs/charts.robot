@@ -7,7 +7,7 @@ user waits for chart preview to update
     # there is no other good way to check that the DOM has actually changed.
     ${count}=  get element attribute  id:chartBuilderPreviewContainer  data-render-count
     ${next_count}=  evaluate  int(${count}) + 1
-    user waits until page contains element  css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]
+    user waits until page contains element  css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]  90
 
 user waits until element contains line chart
     [Arguments]  ${locator}
@@ -158,10 +158,11 @@ user checks infographic chart contains alt
 
 user configures basic chart
     [Arguments]  ${CHART_TYPE}  ${CHART_HEIGHT}  ${CHART_WIDTH}
+    user waits for page to finish loading
     ${CHART_TYPE_LIST}=  create list  Line  Horizontal bar  Vertical bar  Geographic
     should contain   ${CHART_TYPE_LIST}   ${CHART_TYPE}
 
-    user waits until h3 is visible  Choose chart type
+    user waits until h3 is visible  Choose chart type  60
     user clicks button  ${CHART_TYPE}
 
     user waits for chart preview to update

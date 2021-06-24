@@ -58,9 +58,17 @@ user opens ie
 user opens chrome headless
     ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}   add_argument    headless
+    Call Method    ${c_opts}   add_argument    start-maximized
+    Call Method    ${c_opts}   add_argument    disable-extensions
+    Call Method    ${c_opts}   add_argument    disable-infobars
     Call Method    ${c_opts}   add_argument    disable-gpu
     Call Method    ${c_opts}   add_argument    window-size\=1920,1080
+    Call Method    ${c_opts}   add_argument    no-first-run
+    Call Method    ${c_opts}   add_argument    no-default-browser-check
     Call Method    ${c_opts}   add_argument    ignore-certificate-errors
+    Call Method    ${c_opts}   add_argument    log-level\=3
+    Call Method    ${c_opts}   add_argument    disable-logging
+
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
 
 user opens chrome with xvfb
@@ -148,7 +156,8 @@ user waits for page to finish loading
     sleep  0.2
 
 user waits until page does not contain loading spinner
-    user waits until page does not contain element  css:[class^="LoadingSpinner"]
+    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not disappear in 30 seconds.')
+    user waits until page does not contain element  css:[class^="LoadingSpinner"]  60
 
 user sets focus to element
     [Arguments]  ${selector}
@@ -276,8 +285,8 @@ user checks element is visible
     element should be visible   ${element}
 
 user checks element is not visible
-    [Arguments]   ${element}
-    element should not be visible   ${element}
+    [Arguments]   ${element}  ${wait}=${timeout}
+    element should not be visible   ${element}  ${wait}
 
 user waits until element is enabled
     [Arguments]   ${element}
@@ -339,8 +348,8 @@ user clicks button
     user clicks element  ${button}
 
 user waits until page contains button
-    [Arguments]  ${text}
-    user waits until page contains element  xpath://button[text()="${text}"]
+    [Arguments]  ${text}  ${wait}=${timeout}
+    user waits until page contains element  xpath://button[text()="${text}"]  ${wait}
 
 user checks page does not contain button
     [Arguments]  ${text}
@@ -401,8 +410,8 @@ user checks element attribute value should be
     element attribute value should be  ${locator}  ${attribute}  ${expected}
 
 user checks element value should be
-    [Arguments]  ${locator}  ${value}
-    element attribute value should be  ${locator}  value  ${value}
+    [Arguments]  ${locator}  ${value}  ${wait}=${timeout}
+    element attribute value should be  ${locator}  value  ${value}  ${wait}
 
 user checks textarea contains
     [Arguments]   ${selector}   ${text}
@@ -413,9 +422,9 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 
 user checks summary list contains
     [Arguments]  ${term}    ${description}   ${parent}=css:body  ${wait}=${timeout}
-    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    timeout=${wait}
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]  120
     ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible  ${element}
+    user waits until element is visible  ${element}  120
 
 user selects from list by label
     [Arguments]   ${locator}   ${label}
@@ -445,8 +454,9 @@ user presses keys
     sleep  0.1
 
 user enters text into element
-    [Arguments]   ${selector}   ${text}
-    user clears element text  ${selector}
+    [Arguments]   ${selector}   ${text} 
+    user waits until element is visible  ${selector}  60
+    user clears element text  ${selector}  
     user presses keys   ${text}   ${selector}
     
 user enters text into textfield
@@ -493,8 +503,8 @@ user closes details dropdown
     user checks element attribute value should be  ${summary}  aria-expanded  false
 
 user gets details content element
-    [Arguments]  ${text}  ${parent}=css:body
-    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]  ${text}  ${parent}=css:body  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]  timeout=${wait}
     ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
     ${content_id}=  get element attribute  ${summary}  aria-controls
     ${content}=  get child element  ${parent}  id:${content_id}

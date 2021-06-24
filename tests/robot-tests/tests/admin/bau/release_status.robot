@@ -38,12 +38,12 @@ Go to release sign off page
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
     user clicks link  Sign off
-    user waits until h2 is visible  Sign off
+    user waits until h2 is visible  Sign off  60
 
 Verify initial release checklist
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
+    user waits until h2 is visible  Edit release status  60
 
     # EES-1807 May be re-instated as error pending further decisions on release types
 #    user waits until page contains testid  releaseChecklist-errors
@@ -51,10 +51,11 @@ Verify initial release checklist
 #    user checks checklist errors contains link  Public pre-release access list is required
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains  4 potential issues that do not need to be resolved to publish this release
+    user checks checklist warnings contains link  4 potential issues that do not need to be resolved to publish this release.
     user checks checklist warnings contains link  No methodology attached to publication
     user checks checklist warnings contains link  No next release expected date
     user checks checklist warnings contains link  No data files uploaded
+    user checks checklist warnings contains link  No public pre-release access list
 
     user checks page does not contain testid  releaseChecklist-errors
     user checks page does not contain testid  releaseChecklist-success
@@ -69,7 +70,6 @@ Submit release for Higher Review
 
 Verify release status is Higher Review
     [Tags]  HappyPath
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Awaiting higher review
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  December 3001
@@ -77,7 +77,7 @@ Verify release status is Higher Review
 Verify release checklist has not been updated by status
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
+    user waits until h2 is visible  Edit release status  60
 
     # EES-1807 May be re-instated as error pending further decisions on release types
 #    user waits until page contains testid  releaseChecklist-errors
@@ -130,7 +130,6 @@ Approve release
 
 Verify release status is Approved
     [Tags]  HappyPath
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  1 December 3000
     user checks summary list contains  Next release expected  March 3002
@@ -150,7 +149,6 @@ Move release status back to Draft
 
 Verify release status is Draft
     [Tags]  HappyPath
-    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Draft
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  January 3001

@@ -47,7 +47,7 @@ Approve methodology
     user clicks radio  Approved for publication
     user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
-
+    
 Check methodology is approved
     [Tags]  HappyPath
     user waits until page contains element  xpath://strong[text()="Approved"]
@@ -290,6 +290,7 @@ Validate table cells
 Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
+    user waits until page contains button  Share your table  60
     user clicks button  Share your table
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL}=  Get Value  testid:permalink-generated-url
@@ -575,8 +576,8 @@ Select the date cateogory
 
 Generate table
     [Tags]  HappyPath
-    user clicks element     id:filtersForm-submit
-    user waits until page contains    Share your table
+    user clicks element  id:filtersForm-submit
+    user waits until page contains  Share your table  60
 
 Validate generated table
     [Tags]   HappyPath
