@@ -94,29 +94,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Content)
+                .Property(m => m.Content)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Annexes)
+                .Property(m => m.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Status)
+                .Property(m => m.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
             modelBuilder.Entity<Methodology>()
-                .Property(r => r.Created)
+                .Property(m => m.PublishingStrategy)
+                .HasConversion(new EnumToStringConverter<MethodologyPublishingStrategy>());
+
+            modelBuilder.Entity<Methodology>()
+                .Property(m => m.Created)
                 .HasConversion(
                     v => v, 
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<Methodology>()
-                .HasOne(r => r.CreatedBy)
+                .HasOne(m => m.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
