@@ -362,6 +362,7 @@ Upload replacement data
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates-replacement.meta.csv
     user clicks button  Upload data files
 
+    user waits until page contains element  testid:Replacement Subject title
     user checks table column heading contains  1  1  Original file
     user checks table column heading contains  1  2  Replacement file
 

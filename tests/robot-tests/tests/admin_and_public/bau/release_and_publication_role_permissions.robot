@@ -126,7 +126,7 @@ Assert publication owner cannot approve release for immediate publication
 Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
     user clicks radio   Ready for higher review
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     ready for higher review (publication owner)
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     ready for higher review (publication owner)
     user clicks button  Update status 
     user waits until element is visible  id:CurrentReleaseStatus-Awaiting higher review
     
@@ -135,7 +135,7 @@ Assert publication owner can edit release status to "In draft"
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status  30
     user clicks radio   In draft
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Moving back to Draft state (publication owner)
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Moving back to Draft state (publication owner)
     user clicks button  Update status 
 
 User goes back to admin dashboard
@@ -195,7 +195,7 @@ Remove publication owner access
     # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which 
     # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
     Sleep  1  
-    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
+    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
 
 Give release approver access to Analyst1
     [Tags]  HappyPath

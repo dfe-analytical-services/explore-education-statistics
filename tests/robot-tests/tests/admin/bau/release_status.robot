@@ -51,11 +51,11 @@ Verify initial release checklist
 #    user checks checklist errors contains link  Public pre-release access list is required
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains link  4 potential issues that do not need to be resolved to publish this release.
-    user checks checklist warnings contains link  No methodology attached to publication
-    user checks checklist warnings contains link  No next release expected date
+    user checks checklist warnings contains  4 things you may have forgotten, but do not need to be resolved to publish this release.
+    user checks checklist warnings contains link  An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link  No next expected release date has been added
     user checks checklist warnings contains link  No data files uploaded
-    user checks checklist warnings contains link  No public pre-release access list
+    user checks checklist warnings contains link  A public pre-release access list has not been created
 
     user checks page does not contain testid  releaseChecklist-errors
     user checks page does not contain testid  releaseChecklist-success
@@ -85,18 +85,18 @@ Verify release checklist has not been updated by status
 #    user checks checklist errors contains link  Public pre-release access list is required
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains  3 potential issues that do not need to be resolved to publish this release
-    user checks checklist warnings contains link  No methodology attached to publication
+    user checks checklist warnings contains  3 things you may have forgotten, but do not need to be resolved to publish this release.
+    user checks checklist warnings contains link  An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link  No data files uploaded
     # EES-1807 May be re-instated as error pending further decisions on release types
-    user checks checklist warnings contains link  No public pre-release access list
+    user checks checklist warnings contains link  A public pre-release access list has not been created
 
     user checks page does not contain testid  releaseChecklist-errors
     user checks page does not contain testid  releaseChecklist-success
 
 Add public prerelease access list via release checklist
     [Tags]  HappyPath
-    user clicks link  No public pre-release access list
+    user clicks link  A public pre-release access list has not been created
     user creates public prerelease access list   Test public access list
 
 Verify release checklist has been updated
@@ -106,8 +106,8 @@ Verify release checklist has been updated
     user waits until h2 is visible  Edit release status
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains  2 potential issues that do not need to be resolved to publish this release
-    user checks checklist warnings contains link  No methodology attached to publication
+    user checks checklist warnings contains  2 things you may have forgotten, but do not need to be resolved to publish this release.
+    user checks checklist warnings contains link  An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link  No data files uploaded
 
     user checks page does not contain testid  releaseChecklist-errors
@@ -127,6 +127,8 @@ Approve release
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3002
 
     user clicks button   Update status
+    user waits until h1 is visible  Confirm publish date
+    user clicks button  Confirm
 
 Verify release status is Approved
     [Tags]  HappyPath

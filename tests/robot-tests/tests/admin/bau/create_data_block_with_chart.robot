@@ -391,7 +391,7 @@ Validate line chart embeds correctly
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 4,198
 
 Configure basic vertical bar chart
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     user goes to url  ${DATABLOCK_URL}
 
     user waits until h2 is visible  ${DATABLOCK_NAME}  120
@@ -401,7 +401,7 @@ Configure basic vertical bar chart
     user configures basic chart   Vertical bar  500  800
 
 Change vertical bar chart legend
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     user clicks link  Legend
     user waits until h3 is visible  Legend  60
 
@@ -413,7 +413,7 @@ Change vertical bar chart legend
     user waits for chart preview to update  
 
 Validate basic vertical bar chart preview
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     ${preview}=  set variable  id:chartBuilderPreview
     user waits until element does not contain line chart  ${preview}
     user waits until element contains bar chart  ${preview}
@@ -448,7 +448,7 @@ Validate basic vertical bar chart preview
     user checks chart tooltip item contains  ${preview}  1  Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
-    [Tags]  HappyPath  NotAgainstLocal  NotAgainstDev  Failing  
+    [Tags]  HappyPath  Failing
     # Transient React error that happens locally & on dev sometimes: TypeError: Cannot read property '_leaflet_pos' of undefined
     user clicks link  Chart configuration
     user clicks button  Save chart options
@@ -494,7 +494,7 @@ Save and validate vertical bar chart embeds correctly
     user checks chart tooltip item contains  ${datablock}  1  Admissions: 4,198
 
 Configure basic horizontal bar chart
-    [Tags]  HappyPath  Failing  NotAgainstDev  NotAgainstLocal
+    [Tags]  HappyPath  Failing
     user goes to url  ${DATABLOCK_URL}
     user waits until h2 is visible  ${DATABLOCK_NAME}  60
     user waits until page does not contain loading spinner
@@ -503,7 +503,7 @@ Configure basic horizontal bar chart
     user configures basic chart   Horizontal bar  600  700
 
 Validate basic horizontal bar chart preview
-    [Tags]  HappyPath  Failing  NotAgainstDev  NotAgainstLocal
+    [Tags]  HappyPath  Failing
     ${preview}=  set variable  id:chartBuilderPreview
     user waits until element contains bar chart  ${preview}
     
@@ -538,7 +538,7 @@ Validate basic horizontal bar chart preview
     user checks chart tooltip item contains  ${preview}  1  Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
-    [Tags]  HappyPath  Failing  NotAgainstDev  NotAgainstLocal
+    [Tags]  HappyPath  Failing
     user clicks link  Chart configuration
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
@@ -580,7 +580,7 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart tooltip item contains  ${datablock}  1  Admissions: 4,198
 
 Configure basic geographic chart
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     user goes to url  ${DATABLOCK_URL}    
     user waits until h2 is visible  ${DATABLOCK_NAME}  60
     user waits until page does not contain loading spinner
@@ -589,7 +589,7 @@ Configure basic geographic chart
     user configures basic chart   Geographic  700  600
 
 Change geographic chart legend
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     user clicks link  Legend
     user waits until h3 is visible  Legend  90
 
@@ -609,7 +609,7 @@ Change geographic chart legend
     user waits for chart preview to update
 
 Validate basic geographic chart preview
-    [Tags]  HappyPath  NotAgainstDev
+    [Tags]  HappyPath  Failing
     ${preview}=  set variable  id:chartBuilderPreview
     user waits until element does not contain bar chart  ${preview}
     user waits until element contains map chart  ${preview}
