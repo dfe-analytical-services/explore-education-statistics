@@ -10,4 +10,4 @@ class CheckForAtLeastOnePassingRunPrerebotModifier(SuiteVisitor):
         if test.status == 'PASS' and 'Test has been re-executed and results merged.' in test.message:
             info(f"CheckForAtLeastOnePassingRunPrerebotModifier - marking test \"{test}\" as PASS because it passed in at least one of the test runs.")
             test.status = 'PASS'
-            test.message = 'Test passed because it passed at least once.'
+            test.message = f'Marking test \"{test}\" as PASS because it passed in at least one of the test runs.  Previous message is {test.message}'
