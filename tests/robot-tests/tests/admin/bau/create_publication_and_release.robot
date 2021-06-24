@@ -61,7 +61,6 @@ Verify that new publication has been created
     user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME} (created)  Suzanne Wallace
     user checks testid element contains  Contact phone number for ${PUBLICATION_NAME} (created)  0123456789
-    user checks testid element contains  Methodology for ${PUBLICATION_NAME} (created)  No methodology assigned
     user checks testid element contains  Releases for ${PUBLICATION_NAME} (created)  No releases created
 
 Create new test theme and topic

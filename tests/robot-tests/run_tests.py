@@ -115,6 +115,10 @@ parser.add_argument("--prompt-to-continue",
                     dest="prompt_to_continue",
                     action='store_true',
                     help="get prompted to continue with test execution upon a failure")
+parser.add_argument("--fail-fast",
+                    dest="fail_fast",
+                    action='store_true',
+                    help="stop test execution on failure")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -159,6 +163,9 @@ robotArgs = ["--outputdir", "test-results/",
              "--exclude", "UnderConstruction"]
 
 robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
+
+if args.fail_fast:
+    robotArgs += ["--exitonfailure"]
 
 if args.rerun_failed_tests:
     robotArgs += ["--rerunfailed", "test-results/output.xml"]
