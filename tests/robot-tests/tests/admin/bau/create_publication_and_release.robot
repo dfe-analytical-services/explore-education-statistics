@@ -104,7 +104,6 @@ Update publication
     user enters text into element  id:publicationForm-contactTelNo  0987654321
     user clicks button   Save publication
     user waits until h1 is visible  Confirm publication changes
-    user waits until page contains button  Confirm
     user clicks button  Confirm
 
 Verify publication has been updated
