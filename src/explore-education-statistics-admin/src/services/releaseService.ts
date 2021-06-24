@@ -74,6 +74,14 @@ export interface UpdateReleaseRequest extends BaseReleaseRequest {
   preReleaseAccessList?: string;
 }
 
+export interface UpdateReleaseStatusRequest {
+  approvalStatus: ReleaseApprovalStatus;
+  latestInternalReleaseNote?: string;
+  publishMethod?: 'Scheduled' | 'Immediate';
+  publishScheduled?: string;
+  nextReleaseDate?: PartialDate;
+}
+
 type PublishingStage =
   | 'Validating'
   | 'Cancelled'
@@ -183,6 +191,13 @@ const releaseService = {
     updateRequest: UpdateReleaseRequest,
   ): Promise<Release> {
     return client.put(`/releases/${releaseId}`, updateRequest);
+  },
+
+  updateReleaseStatus(
+    releaseId: string,
+    updateRequest: UpdateReleaseStatusRequest,
+  ): Promise<Release> {
+    return client.put(`/releases/${releaseId}/status`, updateRequest);
   },
 
   deleteRelease(releaseId: string): Promise<void> {
