@@ -2,11 +2,11 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class PublishMethodologyMessage
+    public class PublishMethodologyFilesMessage
     {
         public Guid MethodologyId { get; set; }
 
-        public PublishMethodologyMessage(Guid methodologyId)
+        public PublishMethodologyFilesMessage(Guid methodologyId)
         {
             MethodologyId = methodologyId;
         }

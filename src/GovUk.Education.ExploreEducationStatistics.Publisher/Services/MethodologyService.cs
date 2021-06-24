@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class MethodologyService : IMethodologyService
     {
         private readonly ContentDbContext _context;
-
-        public MethodologyService(ContentDbContext context)
+        private readonly IMethodologyRepository _methodologyRepository;
+        
+        public MethodologyService(ContentDbContext context,
+            IMethodologyRepository methodologyRepository)
         {
             _context = context;
+            _methodologyRepository = methodologyRepository;
         }
 
         public async Task<Methodology> Get(Guid id)
@@ -24,10 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.Methodologies.FindAsync(id);
         }
 
-        public async Task<List<Methodology>> GetByRelease(Guid releaseId)
+        public async Task<List<Methodology>> GetLatestByRelease(Guid releaseId)
         {
-            // TODO SOW4 EES-2385 Get the latest methodologies related to this release
-            return await Task.FromResult(new List<Methodology>());
+            var release = await _context.Releases.FindAsync(releaseId);
+            return await _methodologyRepository.GetLatestByPublication(release.PublicationId);
         }
 
         public async Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types)

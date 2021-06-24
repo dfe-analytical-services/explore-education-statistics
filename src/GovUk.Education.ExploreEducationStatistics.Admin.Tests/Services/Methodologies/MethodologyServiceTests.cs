@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -153,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
-                Assert.False(model.Live);
+                Assert.Equal(Draft, model.Status);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
@@ -245,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
-                Assert.False(model.Live);
+                Assert.Equal(Draft, model.Status);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
@@ -344,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
-                Assert.False(model.Live);
+                Assert.Equal(Draft, model.Status);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
@@ -354,6 +355,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        // TODO SOW4 EES-2166 EES-2200:
+        // Once amendments are available updating an approved methodology shouldn't be possible
+        // but un-approving should be provided the Methodology is not publicly accessible
         public async Task UpdateMethodology_AlreadyPublished()
         {
             var methodology = new Methodology
@@ -362,14 +366,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 Slug = "pupil-absence-statistics-methodology",
-                Status = Draft,
+                Status = Approved,
                 Title = "Pupil absence statistics: methodology"
             };
 
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                Status = Draft,
+                Status = Approved,
                 Title = "Pupil absence statistics (updated): methodology"
             };
 
@@ -397,7 +401,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                // TODO EES-331 is this correct?
                 // Original release note is not cleared if the update is not altering it
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
@@ -409,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
-                Assert.True(model.Live);
+                Assert.Equal(Approved,model.Status);
                 // Slug remains unchanged
                 Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
                 Assert.True(model.Updated.HasValue);

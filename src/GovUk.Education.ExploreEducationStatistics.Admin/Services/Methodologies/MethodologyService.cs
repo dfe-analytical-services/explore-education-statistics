@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -80,7 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
                 .OnSuccess(async methodology =>
                 {
-                    if (methodology.Live)
+                    // TODO SOW4 EES-2166 EES-2200:
+                    // In future it probably won't be necessary to do this,
+                    // since it won't be possible to change the title of a methodology that's already publicly accessible.
+                    // Prevent the slug from being changed on amendments instead.
+                    if (methodology.PubliclyAccessible)
                     {
                         // Leave slug
                         return methodology;
@@ -102,9 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
 
-                    if (methodology.Status == MethodologyStatus.Approved && methodology.Live)
+                    if (methodology.PubliclyAccessible)
                     {
-                        await _publishingService.MethodologyChanged(methodology.Id);
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
                     }
 
                     return await GetSummary(id);

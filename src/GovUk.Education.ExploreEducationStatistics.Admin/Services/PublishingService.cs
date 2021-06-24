@@ -88,32 +88,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(async release =>
+                .OnSuccessVoid(async release =>
                 {
                     await _storageQueueService.AddMessageAsync(
                         NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id, releaseStatusId));
 
                     _logger.LogTrace("Sent message for Release: {0}, ReleaseStatusId: {1}", releaseId, releaseStatusId);
-                    return Unit.Instance;
                 });
         }
 
         /// <summary>
-        /// Notify the Publisher that there has been a change to the Methodology.
+        /// Notify the Publisher that it should publish the Methodology files.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="methodologyId"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> MethodologyChanged(Guid id)
+        public async Task<Either<ActionResult, Unit>> PublishMethodologyFiles(Guid methodologyId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
-                .OnSuccess(async release =>
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccessVoid(async release =>
                 {
-                    await _storageQueueService.AddMessageAsync(PublishMethodologyQueue,
-                        new PublishMethodologyMessage(id));
+                    await _storageQueueService.AddMessageAsync(PublishMethodologyFilesQueue,
+                        new PublishMethodologyFilesMessage(methodologyId));
 
-                    _logger.LogTrace("Sent message for Methodology: {0}", id);
-                    return Unit.Instance;
+                    _logger.LogTrace("Sent message for Methodology: {0}", methodologyId);
                 });
         }
 
@@ -127,13 +125,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(id)
-                .OnSuccess(async release =>
+                .OnSuccessVoid(async release =>
                 {
                     await _storageQueueService.AddMessageAsync(
                         PublishPublicationQueue, new PublishPublicationMessage(id));
 
                     _logger.LogTrace("Sent message for Publication: {0}", id);
-                    return Unit.Instance;
                 });
         }
 
