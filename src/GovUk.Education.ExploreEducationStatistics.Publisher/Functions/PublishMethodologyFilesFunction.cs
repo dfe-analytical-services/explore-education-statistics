@@ -8,20 +8,20 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class PublishMethodologyFunction
+    public class PublishMethodologyFilesFunction
     {
         private readonly IPublishingService _publishingService;
 
-        public PublishMethodologyFunction(IPublishingService publishingService)
+        public PublishMethodologyFilesFunction(IPublishingService publishingService)
         {
             _publishingService = publishingService;
         }
 
-        [FunctionName("PublishMethodology")]
+        [FunctionName("PublishMethodologyFiles")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishMethodology(
-            [QueueTrigger(PublishMethodologyQueue)]
-            PublishMethodologyMessage message,
+        public async Task PublishMethodologyFiles(
+            [QueueTrigger(PublishMethodologyFilesQueue)]
+            PublishMethodologyFilesMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

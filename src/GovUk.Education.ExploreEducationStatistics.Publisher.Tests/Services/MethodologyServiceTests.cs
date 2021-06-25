@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -69,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetByRelease()
+        public async Task GetLatestByRelease()
         {
             var release = new Release
             {
@@ -79,61 +85,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Slug = "publication-slug"
                 },
                 ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
+                TimePeriodCoverage = AcademicYearQ1
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-        
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext);
-
-                var result = await service.GetByRelease(release.Id);
-                //TODO SOW4 EES-2385 Get the latest methodologies related to this release
-                Assert.Empty(result);
-            }
-        }
-
-        [Fact]
-        public async Task GetByRelease_PublicationHasNoMethodology()
-        {
-            var release = new Release
-            {
-                Publication = new Publication
+            var methodologies = AsList(
+                new Methodology
                 {
-                    Title = "Publication",
-                    Slug = "publication-slug",
+                    Id = Guid.NewGuid(),
+                    PreviousVersionId = null,
+                    PublishingStrategy = Immediately,
+                    Status = Approved,
+                    Version = 0
                 },
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
-            };
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PreviousVersionId = null,
+                    PublishingStrategy = Immediately,
+                    Status = Approved,
+                    Version = 0
+                });
 
             var contentDbContextId = Guid.NewGuid().ToString();
-        
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                .ReturnsAsync(methodologies);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext);
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
 
-                var result = await service.GetByRelease(release.Id);
-                Assert.Empty(result);
+                var result = await service.GetLatestByRelease(release.Id);
+
+                Assert.Equal(methodologies, result);
             }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
-        private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
+        private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext,
+            IMethodologyRepository methodologyRepository = null)
         {
-            return new MethodologyService(contentDbContext);
+            return new MethodologyService(
+                contentDbContext,
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object);
         }
     }
 }

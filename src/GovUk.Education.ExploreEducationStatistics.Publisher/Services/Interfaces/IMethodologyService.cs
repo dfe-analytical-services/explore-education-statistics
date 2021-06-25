@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<Methodology> Get(Guid id);
 
-        Task<List<Methodology>> GetByRelease(Guid releaseId);
+        Task<List<Methodology>> GetLatestByRelease(Guid releaseId);
 
         Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types);
     }

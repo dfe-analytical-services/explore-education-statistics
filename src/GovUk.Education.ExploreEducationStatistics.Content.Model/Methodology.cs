@@ -57,9 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int Version { get; set; }
 
-        public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
-
-        [NotMapped]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
         [NotMapped]
