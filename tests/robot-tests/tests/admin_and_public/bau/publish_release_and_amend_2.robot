@@ -220,7 +220,7 @@ Click submit button
 
 Wait until table is generated
     [Tags]  HappyPath
-    user waits until page contains button  Share your table
+    user waits until page contains button  Generate shareable link
 
 Wait until new footnote is visible
     [Tags]  HappyPath
@@ -290,8 +290,8 @@ Validate table cells
 Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user waits until page contains button  Share your table  60
-    user clicks button  Share your table
+    user waits until page contains button  Generate shareable link  60
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL}
@@ -577,7 +577,7 @@ Select the date cateogory
 Generate table
     [Tags]  HappyPath
     user clicks element  id:filtersForm-submit
-    user waits until page contains  Share your table  60
+    user waits until page contains  Generate shareable link  60
 
 Validate generated table
     [Tags]   HappyPath
@@ -586,7 +586,7 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Share your table
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL_TWO}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}

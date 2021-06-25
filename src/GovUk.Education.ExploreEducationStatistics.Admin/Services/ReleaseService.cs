@@ -337,6 +337,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
+
+                            if (oldStatus != request.ApprovalStatus)
+                            {
+                                await _context.AddAsync(releaseStatus);
+                            }
+
+                            await _context.SaveChangesAsync();
+
+                            // Only need to inform Publisher if changing release approval status to or from Approved
+                            if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                            {
+                                await _publishingService.ReleaseChanged(
+                                    releaseId,
+                                    releaseStatus.Id,
+                                    request.PublishMethod == PublishMethod.Immediate
+                                );
+                            }
+
+                            _context.Update(release);
+                            await _context.SaveChangesAsync();
+
+                            return await GetRelease(releaseId);
+                        });
+                });
+        }
+
+        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseStatus(
+            Guid releaseId, ReleaseStatusUpdateViewModel request)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
+                .OnSuccess(async release =>
+                {
+                    if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && release.Published.HasValue)
+                    {
+                        return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
+                    }
+
+                    if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                        && request.PublishMethod == PublishMethod.Scheduled
+                        && !request.PublishScheduledDate.HasValue)
+                    {
+                        return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
+                    }
+
+                    var oldStatus = release.ApprovalStatus;
+
+                    release.ApprovalStatus = request.ApprovalStatus;
+                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
+                    release.NextReleaseDate = request.NextReleaseDate;
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
+                                               request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                        ? DateTime.UtcNow
+                        : request.PublishScheduledDate;
+
+                    var releaseStatus = new ReleaseStatus
+                    {
+                        Release = release,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        ApprovalStatus = request.ApprovalStatus,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+
+                    return await ValidateReleaseWithChecklist(release)
+                        .OnSuccessDo(() => RemoveUnusedImages(release.Id))
+                        .OnSuccess(async () =>
+                        {
+                            _context.Releases.Update(release);
                             await _context.AddAsync(releaseStatus);
                             await _context.SaveChangesAsync();
 

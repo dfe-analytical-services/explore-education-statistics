@@ -396,9 +396,15 @@ finally:
 
     if args.rerun_failed_tests or args.rerun_failed_suites:
         print("Combining rerun test results with original test results") 
-        outputs_to_merge=["test-results/output.xml","test-results/rerun.xml"]
-        robot_rebot_cli(outputs_to_merge, exit=False)
+        merge_options=[
+            "--outputdir","test-results/",
+            "-o","output.xml",
+            "--prerebotmodifier", "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
+            "--merge","test-results/output.xml","test-results/rerun.xml"
+        ]
+        robot_rebot_cli(merge_options, exit=False)
         
-    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html\n")    
+    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html\n")
+    print(f"\Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html\n")
 
     print("Tests finished!")

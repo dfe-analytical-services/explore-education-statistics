@@ -74,7 +74,7 @@ Create new test theme and topic
 
 Go to edit publication
     [Tags]  HappyPath
-    user clicks testid element  Edit publication link for ${PUBLICATION_NAME} (created)
+    user clicks element  testid:Edit publication link for ${PUBLICATION_NAME} (created)
     user waits until page contains title caption  ${PUBLICATION_NAME} (created)  60
     user waits until h1 is visible  Manage publication
 
@@ -88,6 +88,8 @@ Update publication
     user enters text into element  id:publicationForm-contactName   Sean Gibson
     user enters text into element  id:publicationForm-contactTelNo  0987654321
     user clicks button   Save publication
+    user waits until h1 is visible  Confirm publication changes
+    user clicks button  Confirm
 
 Add a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}

@@ -240,15 +240,15 @@ Validate rows after reordering
 
 User generates a permanent link
     [Tags]   HappyPath
-    user waits until page contains button  Share your table 
-    user clicks button  Share your table
+    user waits until page contains button  Generate shareable link 
+    user clicks button  Generate shareable link
     user waits until page contains element  xpath://a[text()="View share link"]  60
     user checks generated permalink is valid
 
 User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View share link
-    select window    NEW
+    user selects newly opened window
     user waits until h1 is visible  'Absence by characteristic' from 'Pupil absence in schools in England'
 
 User validates permalink table

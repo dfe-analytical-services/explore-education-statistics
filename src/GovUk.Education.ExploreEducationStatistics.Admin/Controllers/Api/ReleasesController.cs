@@ -173,6 +173,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPut("releases/{releaseId}/status")]
+        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseStatus(ReleaseStatusUpdateViewModel request,
+            Guid releaseId)
+        {
+            return await _releaseService
+                .UpdateReleaseStatus(releaseId, request)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("publications/{publicationId}/releases/template")]
         public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateReleaseAsync(
             [Required] Guid publicationId)

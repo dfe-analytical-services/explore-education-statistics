@@ -217,9 +217,9 @@ user checks accordion is in position
     user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="accordionSection"][${position}]
 
 user waits until accordion section contains text
-    [Arguments]  ${section_text}   ${text}
+    [Arguments]  ${section_text}   ${text}   ${wait}=${timeout}
     ${section}=  user gets accordion section content element  ${section_text}
-    user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
+    user waits until parent contains element   ${section}   xpath://*[text()="${text}"]     timeout=${wait}
 
 user gets accordion header button element
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
@@ -403,7 +403,7 @@ user waits until page contains title caption
     user waits until page contains element  xpath://span[@data-testid="page-title-caption" and text()="${text}"]  ${wait}
 
 user selects newly opened window
-    select window   NEW
+    switch window   locator=NEW
 
 user checks element attribute value should be
     [Arguments]   ${locator}  ${attribute}    ${expected}

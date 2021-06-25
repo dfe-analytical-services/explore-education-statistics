@@ -96,7 +96,7 @@ Approve release and wait for it to be Scheduled
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Approved by UI tests
     
     user waits until page contains element   xpath://label[text()="On a specific date"]/../input  60
     user clicks radio   On a specific date
@@ -108,6 +108,8 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
+    user waits until h1 is visible  Confirm publish date
+    user clicks button  Confirm
     # the below fails on dev
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
