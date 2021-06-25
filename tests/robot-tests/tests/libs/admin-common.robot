@@ -53,6 +53,8 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]  ${theme}  ${topic}
+    ${current_url}=  Get Location
+    run keyword if  "${current_url}" != "%{ADMIN_URL}"  user navigates to admin dashboard
     user waits until page contains link  Manage publications and releases  90
     user clicks link   Manage publications and releases
     user waits until page contains element   id:publicationsReleases-themeTopic-themeId  60 
@@ -163,7 +165,7 @@ user approves methodology
     user clicks button  Edit status
     user waits until h2 is visible  Edit methodology status
     user clicks radio  Approved for publication
-    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Test release note
+    user enters text into element  id:methodologyStatusForm-latestInternalReleaseNote  Test release note
     user clicks button  Update status
 
     user waits until h2 is visible  Methodology status
@@ -354,10 +356,10 @@ user approves release for immediate publication
     user checks page does not contain button  Edit release status
 
 user navigates to admin dashboard 
-    [Arguments]  ${USER}
+    [Arguments]  ${USER}=
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome ${USER}
+    Run keyword if  "${USER}" != ""  user waits until page contains title caption  Welcome ${USER}
     user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
 
 user uploads subject 
@@ -401,6 +403,8 @@ user approves release for scheduled release
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
 
     user clicks button   Update status
+    user waits until h1 is visible  Confirm publish date
+    user clicks button  Confirm
 
 user creates new content section
     [Arguments]   ${SECTION_NUMBER}  ${CONTENT_SECTION_NAME}
@@ -420,7 +424,7 @@ user verifies release summary
 user changes methodology status to Approved
     user clicks button  Edit status
     user clicks element  id:methodologyStatusForm-status-Approved
-    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:methodologyStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks button  Update status
 
 user gives analyst publication owner access
@@ -443,7 +447,7 @@ user removes publication owner access from analyst
     [Arguments]  ${PUBLICATION_NAME}
     user waits until element is enabled  css:[name="selectedPublicationId"]
     user scrolls to element  css:[name="selectedPublicationId"]
-    user clicks testid element  remove-publication-role-${PUBLICATION_NAME}
+    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
 
 user gives analyst release access 
