@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                InternalReleaseNote = null,
+                LatestInternalReleaseNote = null,
                 Status = Draft,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                InternalReleaseNote = null,
+                LatestInternalReleaseNote = null,
                 Status = Draft,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                InternalReleaseNote = null,
+                LatestInternalReleaseNote = null,
                 Status = Draft,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -368,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                InternalReleaseNote = null,
+                LatestInternalReleaseNote = null,
                 Status = Draft,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                InternalReleaseNote = null,
+                LatestInternalReleaseNote = null,
                 Status = Draft,
                 Title = "Pupil exclusion statistics: methodology"
             };
