@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,8 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IMethodologyService
     {
         Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId);
-        
-        Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublications();
 
         Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
 

@@ -121,8 +121,7 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
       </li>
     )}
 
-    {(user.permissions.canAccessUserAdministrationPages ||
-      user.permissions.canAccessMethodologyAdministrationPages) && (
+    {user.permissions.canAccessUserAdministrationPages && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/administration">
           Platform administration

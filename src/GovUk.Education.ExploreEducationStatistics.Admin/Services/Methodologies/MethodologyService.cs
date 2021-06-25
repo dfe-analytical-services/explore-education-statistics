@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -7,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -71,38 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
-        }
-
-        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublications()
-        {
-            return await _userService
-                .CheckCanViewAllMethodologies()
-                .OnSuccess(async () =>
-                {
-                    return (await _context.PublicationMethodologies
-                        .Include(pm => pm.Publication)
-                        .ToList()
-                        .GroupBy(pm => pm.MethodologyParentId)
-                        .SelectAsync(async grouping =>
-                    {
-                        // TODO EES-2156 This intentionally only selects the first Methodology found
-                        // It will need updating when Methodology amendments are introduced
-                        // but it's likely the Methodology Dashboard will be removed before then
-                        var methodology = await _context.Methodologies.FirstAsync(m => m.MethodologyParentId == grouping.Key);
-
-                        return new MethodologyPublicationsViewModel
-                        {
-                            Id = methodology.Id,
-                            Title = methodology.Title,
-                            Status = methodology.Status.ToString(),
-                            Publications = grouping.Select(publicationMethodology => new IdTitlePair
-                            {
-                                Id = publicationMethodology.Publication.Id,
-                                Title = publicationMethodology.Publication.Title
-                            }).ToList()
-                        };
-                    })).ToList();
-                });
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
