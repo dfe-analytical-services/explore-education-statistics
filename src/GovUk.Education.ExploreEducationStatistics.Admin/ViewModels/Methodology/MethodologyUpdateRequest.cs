@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 {
     public class MethodologyUpdateRequest
     {
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         [Required] public string Title { get; set; }
 
