@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -47,14 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             return await _methodologyService
                 .UpdateMethodology(methodologyId, request)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("api/me/methodologies")]
-        public async Task<ActionResult<List<MethodologyPublicationsViewModel>>> GetMyMethodologyList()
-        {
-            return await _methodologyService
-                .ListWithPublications()
                 .HandleFailuresOrOk();
         }
     }

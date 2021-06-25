@@ -85,20 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     }
                 );
         }
-        
-        [Fact]
-        public async Task ListWithPublications()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupCheck(SecurityPolicies.CanViewAllMethodologies, false)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyService(userService: userService.Object);
-                        return service.ListWithPublications();
-                    }
-                );
-        }
 
         private MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext = null,

@@ -43,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             public bool CanAccessAnalystPages { get; set; }
             public bool CanAccessAllImports { get; set; }
             public bool CanAccessUserAdministrationPages { get; set; }
-            public bool CanAccessMethodologyAdministrationPages { get; set; }
             public bool CanManageAllTaxonomy { get; set; }
         }
 
