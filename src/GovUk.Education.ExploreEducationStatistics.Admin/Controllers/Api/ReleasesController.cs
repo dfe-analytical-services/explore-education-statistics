@@ -147,6 +147,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("releases/{releaseId}/status")]
+        public async Task<ActionResult<List<ReleaseStatusViewModel>>> GetReleaseStatuses(Guid releaseId)
+        {
+            return await _releaseService
+                .GetReleaseStatuses(releaseId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("releases/{releaseId}/publication-status")]
         public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(
             Guid releaseId)
@@ -162,6 +170,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .UpdateRelease(releaseId, request)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("releases/{releaseId}/status")]
+        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseStatus(ReleaseStatusUpdateViewModel request,
+            Guid releaseId)
+        {
+            return await _releaseService
+                .UpdateReleaseStatus(releaseId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -222,8 +239,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(result => new AcceptedResult());
         }
 
-        [HttpGet("releases/{releaseId}/status")]
-        public async Task<ActionResult<ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
+        [HttpGet("releases/{releaseId}/stage-status")]
+        public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
         {
             return await _releaseStatusService
                 .GetReleaseStatusAsync(releaseId)

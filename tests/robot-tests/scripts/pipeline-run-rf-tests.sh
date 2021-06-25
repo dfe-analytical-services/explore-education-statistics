@@ -11,4 +11,4 @@ google-chrome-stable --version
 python -m pip install --upgrade pip
 pip install pipenv
 pipenv install
-pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4
+pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4 --processes 4

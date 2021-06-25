@@ -50,7 +50,7 @@ Create another release for the same publication
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
+    user clicks element  testid:Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001
 
 Verify new release summary
@@ -165,12 +165,12 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     [Tags]  HappyPath
-    user clicks testid element   View stats link for ${PUBLICATION_NAME}
+    user clicks element  testid:View stats link for ${PUBLICATION_NAME}  
     user waits until h1 is visible   ${PUBLICATION_NAME}  90
 
 Check latest release is correct
     [Tags]  HappyPath
-    user waits until page contains title caption  Financial Year 3001-02
+    user waits until page contains title caption  Financial Year 3001-02  90
     user checks page contains   This is the latest data
     user checks page contains   See other releases (1)
 
@@ -260,7 +260,7 @@ Validate table
 
 Select table highlight from subjects step
     [Tags]  HappyPath
-    user clicks testid element  wizardStep-2-goToButton
+    user clicks element  testid:wizardStep-2-goToButton
     user waits until h1 is visible  Go back to previous step
     user clicks button  Confirm
 

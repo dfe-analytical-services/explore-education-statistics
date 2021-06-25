@@ -7,7 +7,7 @@ import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService from '@admin/services/releaseService';
+import releaseService, { ReleaseStatus } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -54,6 +54,11 @@ const ReleaseStatusPage = () => {
         ? releaseService.getRelease(releaseId)
         : contextRelease,
     [releaseId],
+  );
+
+  const { value: releaseStatuses } = useAsyncRetry<ReleaseStatus[]>(
+    () => releaseService.getReleaseStatuses(releaseId),
+    [releaseId, release],
   );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
@@ -131,6 +136,55 @@ const ReleaseStatusPage = () => {
         <Button className="govuk-!-margin-top-2" onClick={toggleEditing.on}>
           Edit release status
         </Button>
+      )}
+
+      {releaseStatuses && releaseStatuses.length > 0 && (
+        <>
+          <h3>Release status history</h3>
+          <LoadingSpinner
+            loading={!releaseStatuses}
+            text="Loading release status history"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Internal note</th>
+                  <th scope="col">By user</th>
+                </tr>
+              </thead>
+              {releaseStatuses && (
+                <tbody>
+                  {releaseStatuses.map(status => (
+                    <tr key={status.releaseStatusId}>
+                      <td>
+                        {status.created ? (
+                          <FormattedDate format="d MMMM yyyy HH:mm">
+                            {status.created}
+                          </FormattedDate>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                      <td>{status.approvalStatus}</td>
+                      <td>{status.internalReleaseNote}</td>
+                      <td>
+                        {status.createdByEmail ? (
+                          <a href={`mailto:${status.createdByEmail}`}>
+                            {status.createdByEmail}
+                          </a>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </LoadingSpinner>
+        </>
       )}
     </>
   );

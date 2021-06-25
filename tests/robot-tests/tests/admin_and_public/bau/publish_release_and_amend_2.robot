@@ -52,9 +52,9 @@ Approve methodology
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks radio  Approved for publication
-    user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
+    user enters text into element  xpath=//*[@name="latestInternalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
-
+    
 Check methodology is approved
     [Tags]  HappyPath
     user waits until page contains element  xpath://strong[text()="Approved"]
@@ -129,7 +129,7 @@ Add second footnote to ${SECOND_SUBJECT}
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio  ${SECOND_SUBJECT}   Applies to specific data
-    user opens details dropdown  Indicators   xpath://*[@data-testid="footnote-subject ${SECOND_SUBJECT}"]
+    user opens details dropdown  Indicators   testid:footnote-subject ${SECOND_SUBJECT}
     user clicks footnote checkbox  Admission Numbers
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SECOND_SUBJECT}
@@ -153,7 +153,7 @@ Add second footnote to ${SUBJECT_NAME} subject
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio   ${SUBJECT_NAME}   Applies to specific data
-    user opens details dropdown  Cheese    xpath://*[@data-testid="footnote-subject ${SUBJECT_NAME}"]
+    user opens details dropdown  Cheese    testid:footnote-subject ${SUBJECT_NAME}
     user clicks footnote checkbox  Stilton
     user clicks footnote checkbox  Feta
     user clicks element  id:footnoteForm-content
@@ -243,7 +243,7 @@ Click submit button
 
 Wait until table is generated
     [Tags]  HappyPath
-    user waits until page contains button  Share your table
+    user waits until page contains button  Generate shareable link
 
 Wait until new footnote is visible
     [Tags]  HappyPath
@@ -313,9 +313,10 @@ Validate table cells
 Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Share your table
+    user waits until page contains button  Generate shareable link  60
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL}
 
 Go to permalink
@@ -343,7 +344,6 @@ Edit methodology content
     [Tags]  HappyPath
     user clicks link  Manage content
     user clicks button  ${METHODOLOGY_NAME}
-
     user scrolls to element  xpath://button[text()="Add text block"]
     user waits until button is enabled  Add text block
     user clicks button  Add text block
@@ -528,7 +528,7 @@ Add footnote to "upload file test filter" subject file
 
 Update Seven filters footnote
     [Tags]  HappyPath
-    user clicks link   Edit footnote   xpath://*[@data-testid="footnote Footnote 1 ${SUBJECT_NAME}"]
+    user clicks link   Edit footnote   testid:footnote Footnote 1 ${SUBJECT_NAME}
     user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     textarea should contain  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
@@ -598,8 +598,8 @@ Select the date cateogory
 
 Generate table
     [Tags]  HappyPath
-    user clicks element     id:filtersForm-submit
-    user waits until page contains    Share your table
+    user clicks element  id:filtersForm-submit
+    user waits until page contains  Generate shareable link  60
 
 Validate generated table
     [Tags]   HappyPath
@@ -608,9 +608,9 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Share your table
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL_TWO}=  Get Value  xpath://*[@data-testid="permalink-generated-url"]
+    ${PERMA_LOCATION_URL_TWO}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink

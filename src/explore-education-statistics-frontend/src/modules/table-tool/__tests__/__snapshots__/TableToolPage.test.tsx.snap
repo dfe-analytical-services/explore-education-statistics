@@ -1432,7 +1432,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             role="group"
           >
             <summary
-              aria-controls="details-content-11"
+              aria-controls="details-content-7"
               aria-expanded="false"
               class="govuk-details__summary"
               role="button"
@@ -1448,7 +1448,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             <div
               aria-hidden="true"
               class="govuk-details__text"
-              id="details-content-11"
+              id="details-content-7"
             >
               <p
                 class="govuk-hint"
@@ -1887,74 +1887,176 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             </div>
           </figure>
           <div
-            class="govuk-grid-row"
+            class="govuk-!-margin-bottom-7"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Save table
+            </h3>
+            <button
+              class="button"
+              type="button"
+            >
+              Generate shareable link
+            </button>
+          </div>
+          <form
+            id="downloadTableForm"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Download Table
+            </h3>
+            <div
+              class="govuk-form-group"
+            >
+              <div
+                class="govuk-form-group"
+              >
+                <fieldset
+                  class="govuk-fieldset"
+                  id="downloadTableForm-fileFormat"
+                >
+                  <legend
+                    class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular"
+                  >
+                    Select file format:
+                  </legend>
+                  
+                  <div
+                    class="govuk-radios govuk-radios--small"
+                  >
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in ODS format (spreadsheet, with title and footnotes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-ods"
+                        name="fileFormat"
+                        type="radio"
+                        value="ods"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-ods"
+                      >
+                        Table in ODS format (spreadsheet, with title and footnotes)
+                      </label>
+                    </div>
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in CSV format (flat file, with location codes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-csv"
+                        name="fileFormat"
+                        type="radio"
+                        value="csv"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-csv"
+                      >
+                        Table in CSV format (flat file, with location codes)
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <button
+              aria-disabled="false"
+              class="govuk-button"
+              type="submit"
+            >
+              Download table
+            </button>
+          </form>
+          <div
+            class="govuk-accordion accordion"
+            data-testid="accordion"
+            id="TableToolInfo"
+            role="none"
           >
             <div
-              class="govuk-grid-column-one-half"
-            >
-              <details
-                class="govuk-details"
-                role="group"
-              >
-                <summary
-                  aria-controls="details-content-12"
-                  aria-expanded="false"
-                  class="govuk-details__summary"
-                  role="button"
-                  tabindex="0"
-                >
-                  <span
-                    class="summaryText govuk-details__summary-text"
-                    data-testid="Expand Details Section Additional options"
-                  >
-                    Additional options
-                  </span>
-                </summary>
-                <div
-                  aria-hidden="true"
-                  class="govuk-details__text"
-                  id="details-content-12"
-                >
-                  <ul
-                    class="govuk-list"
-                  >
-                    <li>
-                      <a
-                        class="govuk-link"
-                        href="/find-statistics/test-publication/selected-release-slug"
-                      >
-                        View the release for this data
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download the data of this table (CSV)
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download table as Excel spreadsheet (XLSX)
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </details>
-            </div>
-            <div
-              class="govuk-grid-column-one-half dfe-align--right"
+              class="govuk-accordion__controls"
             >
               <button
-                class="button"
+                aria-expanded="false"
+                class="govuk-accordion__open-all"
                 type="button"
               >
-                Share your table
+                Open all 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  sections
+                </span>
               </button>
+            </div>
+            <div
+              class="govuk-accordion__section section"
+              data-testid="accordionSection"
+              id="TableToolInfo-1"
+              role="presentation"
+            >
+              <div
+                class="govuk-accordion__section-header"
+              >
+                <h2
+                  class="govuk-accordion__section-heading"
+                >
+                  <button
+                    aria-expanded="false"
+                    class="govuk-accordion__section-button"
+                    id="TableToolInfo-1-heading"
+                    type="button"
+                  >
+                    Related information
+                    <span
+                      aria-hidden="true"
+                      class="govuk-accordion__icon"
+                    />
+                  </button>
+                </h2>
+              </div>
+              <div
+                aria-labelledby="TableToolInfo-1-heading"
+                class="govuk-accordion__section-content sectionContentCollapsed"
+                id="TableToolInfo-1-content"
+              >
+                <ul
+                  class="govuk-list"
+                >
+                  <li>
+                    Publication:
+                     
+                    <a
+                      class="govuk-link"
+                      href="/find-statistics/test-publication/selected-release-slug"
+                    >
+                      Test Publication
+                      ,
+                       
+                      Selected Release Title
+                    </a>
+                  </li>
+                </ul>
+                <div
+                  class="dfe-print-hidden"
+                >
+                  <a
+                    class="govuk-link govuk-link--no-visited-state"
+                    href="#"
+                  >
+                    Go to top
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2445,7 +2547,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             role="group"
           >
             <summary
-              aria-controls="details-content-7"
+              aria-controls="details-content-5"
               aria-expanded="false"
               class="govuk-details__summary"
               role="button"
@@ -2461,7 +2563,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             <div
               aria-hidden="true"
               class="govuk-details__text"
-              id="details-content-7"
+              id="details-content-5"
             >
               <p
                 class="govuk-hint"
@@ -2883,74 +2985,176 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             </div>
           </figure>
           <div
-            class="govuk-grid-row"
+            class="govuk-!-margin-bottom-7"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Save table
+            </h3>
+            <button
+              class="button"
+              type="button"
+            >
+              Generate shareable link
+            </button>
+          </div>
+          <form
+            id="downloadTableForm"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Download Table
+            </h3>
+            <div
+              class="govuk-form-group"
+            >
+              <div
+                class="govuk-form-group"
+              >
+                <fieldset
+                  class="govuk-fieldset"
+                  id="downloadTableForm-fileFormat"
+                >
+                  <legend
+                    class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular"
+                  >
+                    Select file format:
+                  </legend>
+                  
+                  <div
+                    class="govuk-radios govuk-radios--small"
+                  >
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in ODS format (spreadsheet, with title and footnotes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-ods"
+                        name="fileFormat"
+                        type="radio"
+                        value="ods"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-ods"
+                      >
+                        Table in ODS format (spreadsheet, with title and footnotes)
+                      </label>
+                    </div>
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in CSV format (flat file, with location codes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-csv"
+                        name="fileFormat"
+                        type="radio"
+                        value="csv"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-csv"
+                      >
+                        Table in CSV format (flat file, with location codes)
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <button
+              aria-disabled="false"
+              class="govuk-button"
+              type="submit"
+            >
+              Download table
+            </button>
+          </form>
+          <div
+            class="govuk-accordion accordion"
+            data-testid="accordion"
+            id="TableToolInfo"
+            role="none"
           >
             <div
-              class="govuk-grid-column-one-half"
-            >
-              <details
-                class="govuk-details"
-                role="group"
-              >
-                <summary
-                  aria-controls="details-content-8"
-                  aria-expanded="false"
-                  class="govuk-details__summary"
-                  role="button"
-                  tabindex="0"
-                >
-                  <span
-                    class="summaryText govuk-details__summary-text"
-                    data-testid="Expand Details Section Additional options"
-                  >
-                    Additional options
-                  </span>
-                </summary>
-                <div
-                  aria-hidden="true"
-                  class="govuk-details__text"
-                  id="details-content-8"
-                >
-                  <ul
-                    class="govuk-list"
-                  >
-                    <li>
-                      <a
-                        class="govuk-link"
-                        href="/find-statistics/test-publication"
-                      >
-                        View the release for this data
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download the data of this table (CSV)
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download table as Excel spreadsheet (XLSX)
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </details>
-            </div>
-            <div
-              class="govuk-grid-column-one-half dfe-align--right"
+              class="govuk-accordion__controls"
             >
               <button
-                class="button"
+                aria-expanded="false"
+                class="govuk-accordion__open-all"
                 type="button"
               >
-                Share your table
+                Open all 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  sections
+                </span>
               </button>
+            </div>
+            <div
+              class="govuk-accordion__section section"
+              data-testid="accordionSection"
+              id="TableToolInfo-1"
+              role="presentation"
+            >
+              <div
+                class="govuk-accordion__section-header"
+              >
+                <h2
+                  class="govuk-accordion__section-heading"
+                >
+                  <button
+                    aria-expanded="false"
+                    class="govuk-accordion__section-button"
+                    id="TableToolInfo-1-heading"
+                    type="button"
+                  >
+                    Related information
+                    <span
+                      aria-hidden="true"
+                      class="govuk-accordion__icon"
+                    />
+                  </button>
+                </h2>
+              </div>
+              <div
+                aria-labelledby="TableToolInfo-1-heading"
+                class="govuk-accordion__section-content sectionContentCollapsed"
+                id="TableToolInfo-1-content"
+              >
+                <ul
+                  class="govuk-list"
+                >
+                  <li>
+                    Publication:
+                     
+                    <a
+                      class="govuk-link"
+                      href="/find-statistics/test-publication"
+                    >
+                      Test Publication
+                      ,
+                       
+                      Latest Release Title
+                    </a>
+                  </li>
+                </ul>
+                <div
+                  class="dfe-print-hidden"
+                >
+                  <a
+                    class="govuk-link govuk-link--no-visited-state"
+                    href="#"
+                  >
+                    Go to top
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -3879,74 +4083,176 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
             </div>
           </figure>
           <div
-            class="govuk-grid-row"
+            class="govuk-!-margin-bottom-7"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Save table
+            </h3>
+            <button
+              class="button"
+              type="button"
+            >
+              Generate shareable link
+            </button>
+          </div>
+          <form
+            id="downloadTableForm"
+          >
+            <h3
+              class="govuk-heading-s"
+            >
+              Download Table
+            </h3>
+            <div
+              class="govuk-form-group"
+            >
+              <div
+                class="govuk-form-group"
+              >
+                <fieldset
+                  class="govuk-fieldset"
+                  id="downloadTableForm-fileFormat"
+                >
+                  <legend
+                    class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular"
+                  >
+                    Select file format:
+                  </legend>
+                  
+                  <div
+                    class="govuk-radios govuk-radios--small"
+                  >
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in ODS format (spreadsheet, with title and footnotes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-ods"
+                        name="fileFormat"
+                        type="radio"
+                        value="ods"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-ods"
+                      >
+                        Table in ODS format (spreadsheet, with title and footnotes)
+                      </label>
+                    </div>
+                    <div
+                      class="govuk-radios__item"
+                      data-testid="Radio item for Table in CSV format (flat file, with location codes)"
+                    >
+                      <input
+                        class="govuk-radios__input"
+                        id="downloadTableForm-fileFormat-csv"
+                        name="fileFormat"
+                        type="radio"
+                        value="csv"
+                      />
+                      <label
+                        class="govuk-label govuk-radios__label"
+                        for="downloadTableForm-fileFormat-csv"
+                      >
+                        Table in CSV format (flat file, with location codes)
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <button
+              aria-disabled="false"
+              class="govuk-button"
+              type="submit"
+            >
+              Download table
+            </button>
+          </form>
+          <div
+            class="govuk-accordion accordion"
+            data-testid="accordion"
+            id="TableToolInfo"
+            role="none"
           >
             <div
-              class="govuk-grid-column-one-half"
-            >
-              <details
-                class="govuk-details"
-                role="group"
-              >
-                <summary
-                  aria-controls="details-content-4"
-                  aria-expanded="false"
-                  class="govuk-details__summary"
-                  role="button"
-                  tabindex="0"
-                >
-                  <span
-                    class="summaryText govuk-details__summary-text"
-                    data-testid="Expand Details Section Additional options"
-                  >
-                    Additional options
-                  </span>
-                </summary>
-                <div
-                  aria-hidden="true"
-                  class="govuk-details__text"
-                  id="details-content-4"
-                >
-                  <ul
-                    class="govuk-list"
-                  >
-                    <li>
-                      <a
-                        class="govuk-link"
-                        href="/find-statistics/test-publication"
-                      >
-                        View the release for this data
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download the data of this table (CSV)
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        class="button"
-                        type="button"
-                      >
-                        Download table as Excel spreadsheet (XLSX)
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </details>
-            </div>
-            <div
-              class="govuk-grid-column-one-half dfe-align--right"
+              class="govuk-accordion__controls"
             >
               <button
-                class="button"
+                aria-expanded="false"
+                class="govuk-accordion__open-all"
                 type="button"
               >
-                Share your table
+                Open all 
+                <span
+                  class="govuk-visually-hidden"
+                >
+                  sections
+                </span>
               </button>
+            </div>
+            <div
+              class="govuk-accordion__section section"
+              data-testid="accordionSection"
+              id="TableToolInfo-1"
+              role="presentation"
+            >
+              <div
+                class="govuk-accordion__section-header"
+              >
+                <h2
+                  class="govuk-accordion__section-heading"
+                >
+                  <button
+                    aria-expanded="false"
+                    class="govuk-accordion__section-button"
+                    id="TableToolInfo-1-heading"
+                    type="button"
+                  >
+                    Related information
+                    <span
+                      aria-hidden="true"
+                      class="govuk-accordion__icon"
+                    />
+                  </button>
+                </h2>
+              </div>
+              <div
+                aria-labelledby="TableToolInfo-1-heading"
+                class="govuk-accordion__section-content sectionContentCollapsed"
+                id="TableToolInfo-1-content"
+              >
+                <ul
+                  class="govuk-list"
+                >
+                  <li>
+                    Publication:
+                     
+                    <a
+                      class="govuk-link"
+                      href="/find-statistics/test-publication"
+                    >
+                      Test Publication
+                      ,
+                       
+                      Latest Release Title
+                    </a>
+                  </li>
+                </ul>
+                <div
+                  class="dfe-print-hidden"
+                >
+                  <a
+                    class="govuk-link govuk-link--no-visited-state"
+                    href="#"
+                  >
+                    Go to top
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

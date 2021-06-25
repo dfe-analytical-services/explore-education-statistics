@@ -22,7 +22,7 @@ export interface Release {
   publishScheduled?: string;
   published?: string;
   nextReleaseDate?: PartialDate;
-  internalReleaseNote?: string;
+  latestInternalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
   yearTitle?: string;
@@ -47,7 +47,7 @@ export interface ReleaseSummary {
   type: IdTitlePair;
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
-  internalReleaseNote: string;
+  latestInternalReleaseNote: string;
   approvalStatus: ReleaseApprovalStatus;
   yearTitle: string;
 }
@@ -67,11 +67,19 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
 
 export interface UpdateReleaseRequest extends BaseReleaseRequest {
   approvalStatus: ReleaseApprovalStatus;
-  internalReleaseNote?: string;
+  latestInternalReleaseNote?: string;
   publishScheduled?: string;
   publishMethod?: 'Scheduled' | 'Immediate';
   nextReleaseDate?: PartialDate;
   preReleaseAccessList?: string;
+}
+
+export interface UpdateReleaseStatusRequest {
+  approvalStatus: ReleaseApprovalStatus;
+  latestInternalReleaseNote?: string;
+  publishMethod?: 'Scheduled' | 'Immediate';
+  publishScheduled?: string;
+  nextReleaseDate?: PartialDate;
 }
 
 type PublishingStage =
@@ -154,6 +162,14 @@ export interface ReleasePublicationStatus {
   live: boolean;
 }
 
+export interface ReleaseStatus {
+  releaseStatusId: string;
+  internalReleaseNote: string;
+  approvalStatus: ReleaseApprovalStatus;
+  created: string;
+  createdByEmail: string;
+}
+
 const releaseService = {
   createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseSummary> {
     return client.post(
@@ -166,11 +182,22 @@ const releaseService = {
     return client.get(`/releases/${releaseId}`);
   },
 
+  getReleaseStatuses(releaseId: string): Promise<ReleaseStatus[]> {
+    return client.get(`/releases/${releaseId}/status`);
+  },
+
   updateRelease(
     releaseId: string,
     updateRequest: UpdateReleaseRequest,
   ): Promise<Release> {
     return client.put(`/releases/${releaseId}`, updateRequest);
+  },
+
+  updateReleaseStatus(
+    releaseId: string,
+    updateRequest: UpdateReleaseStatusRequest,
+  ): Promise<Release> {
+    return client.put(`/releases/${releaseId}/status`, updateRequest);
   },
 
   deleteRelease(releaseId: string): Promise<void> {
@@ -193,7 +220,9 @@ const releaseService = {
   },
 
   getReleaseStatus(releaseId: string): Promise<ReleaseStageStatuses> {
-    return client.get<ReleaseStageStatuses>(`/releases/${releaseId}/status`);
+    return client.get<ReleaseStageStatuses>(
+      `/releases/${releaseId}/stage-status`,
+    );
   },
 
   getReleaseChecklist(releaseId: string): Promise<ReleaseChecklist> {

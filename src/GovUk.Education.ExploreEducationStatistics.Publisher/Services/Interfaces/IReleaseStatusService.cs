@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleaseStatusService
     {
-        Task<ReleaseStatus> CreateAsync(Guid releaseId, ReleaseStatusState state, bool immediate,
+        Task<ReleaseStatus> CreateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state, bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null);
 
         Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId);

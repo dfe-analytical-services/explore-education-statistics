@@ -22,6 +22,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
@@ -54,6 +55,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.GetRelease(_release.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task GetReleaseStatuses()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanViewReleaseStatusHistory)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.GetReleaseStatuses(_release.Id);
                     }
                 );
         }
@@ -158,6 +173,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateReleaseStatus_Draft()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.Draft
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_HigherLevelReview()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_Approve()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanApproveSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.UpdateReleaseStatus(
+                            _release.Id,
+                            new ReleaseStatusUpdateViewModel
+                            {
+                                ApprovalStatus = ReleaseApprovalStatus.Approved
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
         public async Task GetLatestReleaseAsync()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -179,8 +257,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseAmendmentAsync(_release.Id);
+                        using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync"))
+                        {
+                            contentDbContext.Attach(_release);
+                            var service = BuildReleaseService(contentDbContext,
+                                userService: userService.Object);
+                            return service.CreateReleaseAmendmentAsync(_release.Id);
+                        }
                     }
                 );
         }

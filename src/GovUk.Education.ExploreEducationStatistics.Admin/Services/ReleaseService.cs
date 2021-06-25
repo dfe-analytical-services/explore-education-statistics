@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -101,6 +102,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
+        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
+            Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, release =>
+                    release.Include(r => r.ReleaseStatuses)
+                        .ThenInclude(rs => rs.CreatedBy))
+                .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
+                .OnSuccess(release =>
+                    release.ReleaseStatuses
+                        .Select(rs =>
+                            new ReleaseStatusViewModel
+                            {
+                                ReleaseStatusId = rs.Id,
+                                InternalReleaseNote = rs.InternalReleaseNote,
+                                ApprovalStatus = rs.ApprovalStatus,
+                                Created = rs.Created,
+                                CreatedByEmail = rs.CreatedBy?.Email
+                            })
+                        .OrderByDescending(vm => vm.Created)
+                        .ToList()
+                );
+        }
+
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel releaseCreate)
         {
             return await _persistenceHelper
@@ -180,7 +205,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(HydrateReleaseForAmendment)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
@@ -289,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var oldStatus = release.ApprovalStatus;
 
                     release.ApprovalStatus = request.ApprovalStatus;
-                    release.InternalReleaseNote = request.InternalReleaseNote;
+                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
                     release.NextReleaseDate = request.NextReleaseDate;
 
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
@@ -297,11 +323,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
+                    var releaseStatus = new ReleaseStatus
+                    {
+                        Release = release,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        ApprovalStatus = request.ApprovalStatus,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+
                     return await ValidateReleaseWithChecklist(release)
                         .OnSuccessDo(() => RemoveUnusedImages(release.Id))
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
+
+                            if (oldStatus != request.ApprovalStatus)
+                            {
+                                await _context.AddAsync(releaseStatus);
+                            }
+
                             await _context.SaveChangesAsync();
 
                             // Only need to inform Publisher if changing release approval status to or from Approved
@@ -309,6 +350,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 await _publishingService.ReleaseChanged(
                                     releaseId,
+                                    releaseStatus.Id,
+                                    request.PublishMethod == PublishMethod.Immediate
+                                );
+                            }
+
+                            _context.Update(release);
+                            await _context.SaveChangesAsync();
+
+                            return await GetRelease(releaseId);
+                        });
+                });
+        }
+
+        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseStatus(
+            Guid releaseId, ReleaseStatusUpdateViewModel request)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
+                .OnSuccess(async release =>
+                {
+                    if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && release.Published.HasValue)
+                    {
+                        return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
+                    }
+
+                    if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                        && request.PublishMethod == PublishMethod.Scheduled
+                        && !request.PublishScheduledDate.HasValue)
+                    {
+                        return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
+                    }
+
+                    var oldStatus = release.ApprovalStatus;
+
+                    release.ApprovalStatus = request.ApprovalStatus;
+                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
+                    release.NextReleaseDate = request.NextReleaseDate;
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
+                                               request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                        ? DateTime.UtcNow
+                        : request.PublishScheduledDate;
+
+                    var releaseStatus = new ReleaseStatus
+                    {
+                        Release = release,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        ApprovalStatus = request.ApprovalStatus,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+
+                    return await ValidateReleaseWithChecklist(release)
+                        .OnSuccessDo(() => RemoveUnusedImages(release.Id))
+                        .OnSuccess(async () =>
+                        {
+                            _context.Releases.Update(release);
+                            await _context.AddAsync(releaseStatus);
+                            await _context.SaveChangesAsync();
+
+                            // Only need to inform Publisher if changing release approval status to or from Approved
+                            if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                            {
+                                await _publishingService.ReleaseChanged(
+                                    releaseId,
+                                    releaseStatus.Id,
                                     request.PublishMethod == PublishMethod.Immediate
                                 );
                             }
@@ -562,22 +670,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Type);
+                .Include(r => r.Type)
+                .Include(r => r.ReleaseStatuses);
         }
 
-        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        private async Task<Release> HydrateReleaseForAmendment(Release release)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest
             // The contact
             // The type
-            return values.Include(r => r.Publication)
-                .Include(r => r.Content)
-                .ThenInclude(c => c.ContentSection)
-                .ThenInclude(c => c.Content)
-                .Include(r => r.Updates)
-                .Include(r => r.ContentBlocks)
-                .ThenInclude(r => r.ContentBlock);
+            await _context.Entry(release)
+                .Reference(r => r.Publication)
+                .LoadAsync();
+            await _context.Entry(release)
+                .Collection(r => r.Content)
+                .LoadAsync();
+            await release.Content.ForEachAsync(async cs =>
+            {
+                await _context.Entry(cs)
+                    .Reference(rcs => rcs.ContentSection)
+                    .LoadAsync();
+                await _context.Entry(cs.ContentSection)
+                    .Collection(s => s.Content)
+                    .LoadAsync();
+            });
+            await _context.Entry(release)
+                .Collection(r => r.Updates)
+                .LoadAsync();
+            await _context.Entry(release)
+                .Collection(r => r.ContentBlocks)
+                .LoadAsync();
+            await release.ContentBlocks.ForEachAsync(async rcb =>
+                await _context.Entry(rcb)
+                    .Reference(cb => cb.ContentBlock)
+                    .LoadAsync()
+            );
+            return release;
         }
     }
 

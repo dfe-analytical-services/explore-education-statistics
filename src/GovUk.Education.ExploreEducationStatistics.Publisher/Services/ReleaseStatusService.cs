@@ -32,14 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task<ReleaseStatus> CreateAsync(Guid releaseId, ReleaseStatusState state, bool immediate,
+        public async Task<ReleaseStatus> CreateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state, bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
             var publish = immediate ? null : release.PublishScheduled;
             var releaseStatus = new ReleaseStatus(release.Publication.Slug, publish, release.Id,
-                release.Slug, state, immediate, logMessages);
+                releaseStatusId, release.Slug, state, immediate, logMessages);
             var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
             return tableResult.Result as ReleaseStatus;
         }

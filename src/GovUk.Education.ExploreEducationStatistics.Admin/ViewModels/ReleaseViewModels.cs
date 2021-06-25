@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         public bool Amendment { get; set; }
 
@@ -123,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PublishMethod? PublishMethod { get; set; }
@@ -160,5 +161,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         private string Title => Format(Year, TimePeriodCoverage);
 
         private int Year => int.Parse(ReleaseName);
+    }
+
+    public class ReleaseStatusUpdateViewModel
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseApprovalStatus ApprovalStatus { get; set; }
+
+        public string LatestInternalReleaseNote { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PublishMethod? PublishMethod { get; set; }
+
+        [DateTimeFormatValidator("yyyy-MM-dd")]
+        public string PublishScheduled { get; set; }
+
+        public DateTime? PublishScheduledDate
+        {
+            get
+            {
+                if (PublishScheduled.IsNullOrEmpty())
+                {
+                    return null;
+                }
+
+                DateTime.TryParseExact(
+                    PublishScheduled,
+                    "yyyy-MM-dd",
+                    InvariantCulture,
+                    DateTimeStyles.None,
+                    out var dateTime
+                );
+                return dateTime.AsStartOfDayUtcForTimeZone();
+            }
+        }
+
+        [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
     }
 }

@@ -59,7 +59,7 @@ Verify created theme
 
 Edit theme
     [Tags]  HappyPath
-    user clicks testid element  Edit link for ${CREATED_THEME_NAME}
+    user clicks element  testid:Edit link for ${CREATED_THEME_NAME}
     user waits until h1 is visible  Edit theme
 
     # Used in teardown
@@ -82,7 +82,7 @@ Verify updated theme
 
 Create topic
     [Tags]  HappyPath
-    user clicks testid element  Create topic link for ${THEME_NAME}
+    user clicks element  testid:Create topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
     user waits until h1 is visible  Create topic
     user enters text into element  id:topicForm-title   ${CREATED_TOPIC_NAME}
@@ -96,7 +96,7 @@ Verify created topic
 
 Edit topic
     [Tags]  HappyPath
-    user clicks testid element  Edit ${CREATED_TOPIC_NAME} topic link for ${THEME_NAME}
+    user clicks element  testid:Edit ${CREATED_TOPIC_NAME} topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
     user waits until h1 is visible  Edit topic
     user waits until page contains element   id:topicForm-title

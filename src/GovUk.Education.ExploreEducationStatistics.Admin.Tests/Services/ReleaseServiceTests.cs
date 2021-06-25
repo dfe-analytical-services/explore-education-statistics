@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -699,7 +700,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            LatestInternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -717,16 +719,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases.FindAsync(releaseId);
+                var saved = await context.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
-                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
+                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
+                    saved.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
                 Assert.Equal(officialStatisticsReleaseType.Id, saved.TypeId);
                 Assert.Equal("2035-march", saved.Slug);
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("New access list", saved.PreReleaseAccessList);
+
+                // No ReleaseStatus created if the ApprovalStatus hasn't changed
+                Assert.Empty(saved.ReleaseStatuses);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1075,6 +1083,276 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateReleaseStatus()
+        {
+            var releaseId = Guid.NewGuid();
+            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = adHocReleaseType,
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                TimePeriodCoverage = TimeIdentifier.March,
+                Slug = "2030-march",
+                PublishScheduled = DateTime.UtcNow,
+                NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
+                PreReleaseAccessList = "Access list",
+                Version = 0,
+                PreviousVersionId = releaseId
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(adHocReleaseType, release);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateReleaseStatus(
+                        releaseId,
+                        new ReleaseStatusUpdateViewModel
+                        {
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = nextReleaseDateEdited,
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            LatestInternalReleaseNote = "Test internal note"
+                        }
+                    );
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(release.Publication.Id, result.Right.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
+                    result.Right.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
+                Assert.Equal(adHocReleaseType, result.Right.Type);
+                Assert.Equal("2030", result.Right.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
+                Assert.Equal("Access list", result.Right.PreReleaseAccessList);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .FirstAsync(r => r.Id == releaseId);
+
+                Assert.Equal(release.Publication.Id, saved.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
+                    saved.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
+                Assert.Equal(adHocReleaseType.Id, saved.TypeId);
+                Assert.Equal("2030-march", saved.Slug);
+                Assert.Equal("2030", saved.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
+                Assert.Equal("Access list", saved.PreReleaseAccessList);
+
+                Assert.Single(saved.ReleaseStatuses);
+                var status = saved.ReleaseStatuses[0];
+                Assert.InRange(DateTime.UtcNow
+                    .Subtract(status.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(release.Id, status.ReleaseId);
+                Assert.Equal(ReleaseApprovalStatus.Draft, status.ApprovalStatus);
+                Assert.Equal(_userId, status.CreatedById);
+                Assert.Equal("Test internal note", status.InternalReleaseNote);
+            }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_Approved_FailsOnChecklistErrors()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                releaseChecklistService
+                    .Setup(s =>
+                            s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(
+                        new List<ReleaseChecklistIssue>
+                        {
+                            new ReleaseChecklistIssue(DataFileImportsMustBeCompleted),
+                            new ReleaseChecklistIssue(DataFileReplacementsMustBeCompleted),
+                        }
+                    );
+
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusUpdateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, DataFileImportsMustBeCompleted);
+                AssertValidationProblem(result.Left, DataFileReplacementsMustBeCompleted);
+            }
+
+            MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService);
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_Approved_FailsNoPublishScheduledDate()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType
+                {
+                    Title = "Ad Hoc"
+                },
+                Publication = new Publication
+                {
+                    Title = "Old publication",
+                },
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusUpdateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+
+                AssertValidationProblem(result.Left, ApprovedReleaseMustHavePublishScheduledDate);
+            }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        }
+
+        [Fact]
+        public async Task UpdateReleaseStatus_Approved_FailsChangingToDraft()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType
+                {
+                    Title = "Ad Hoc"
+                },
+                Publication = new Publication
+                {
+                    Title = "Old publication",
+                },
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusUpdateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, PublishedReleaseCannotBeUnapproved);
+            }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        }
+
+        [Fact]
         public async Task UpdateAsync_ReleaseHasImages()
         {
             var releaseId = Guid.NewGuid();
@@ -1177,8 +1455,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft
-
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                            LatestInternalReleaseNote = "Internal note"
                         }
                     );
 
@@ -1196,7 +1474,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases.FindAsync(releaseId);
+                var saved = await context.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
@@ -1206,6 +1486,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("New access list", saved.PreReleaseAccessList);
+
+                Assert.Single(saved.ReleaseStatuses);
+                var savedStatus = saved.ReleaseStatuses[0];
+                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
+                Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
+                Assert.NotNull(savedStatus.Created);
+                Assert.InRange(DateTime.UtcNow
+                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_userId, savedStatus.CreatedById);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1314,8 +1603,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft
-
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                            LatestInternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -1340,7 +1629,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases.FindAsync(releaseId);
+                var saved = await context.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .FirstAsync(r => r.Id == releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
@@ -1350,6 +1641,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("New access list", saved.PreReleaseAccessList);
+
+                Assert.Single(saved.ReleaseStatuses);
+                var savedStatus = saved.ReleaseStatuses[0];
+                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
+                Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
+                Assert.NotNull(savedStatus.Created);
+                Assert.InRange(DateTime.UtcNow
+                    .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);
+                Assert.Equal(_userId, savedStatus.CreatedById);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1377,8 +1677,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2035",
                 Slug = "2035-1",
                 Version = 0,
-                InternalReleaseNote = "Test release note",
                 PreReleaseAccessList = "Test access list",
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Release note null Created date",
+                       Created = null
+                    },
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Latest release note - 1 day ago",
+                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
+                    },
+                    new ReleaseStatus
+                    {
+                       InternalReleaseNote = "Release note 2 days ago",
+                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
+                    }
+                }
             };
 
             var publication = new Publication
@@ -1392,11 +1709,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var publication2 = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new Release
+                    {
+                        ReleaseStatuses = new List<ReleaseStatus>
+                        {
+                            new ReleaseStatus
+                            {
+                                InternalReleaseNote = "Different release",
+                                Created = DateTime.UtcNow
+                            }
+                        }
+                    }
+                }
+            };
 
+            var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                await context.AddRangeAsync(publication, publication2);
                 await context.SaveChangesAsync();
             }
 
@@ -1413,7 +1747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
                 Assert.Equal("test-publication", viewModel.PublicationSlug);
-                Assert.Equal("Test release note", viewModel.InternalReleaseNote);
+                Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
                 Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
                 Assert.Equal("Test access list", viewModel.PreReleaseAccessList);
@@ -1426,6 +1760,143 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(viewModel.LatestRelease);
                 Assert.True(viewModel.Live);
                 Assert.False(viewModel.Amendment);
+            }
+        }
+
+        [Fact]
+        async Task GetRelease_NoLatestInternalReleaseNote()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetRelease(release.Id);
+                Assert.True(result.IsRight);
+                Assert.Null(result.Right.LatestInternalReleaseNote);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseStatuses()
+        {
+            var release = new Release
+            {
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new ReleaseStatus
+                    {
+                        InternalReleaseNote = "Note1 - old",
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
+                        Created = new DateTime(2001, 1, 1),
+                        CreatedBy = new User { Email = "note1@test.com" }
+                    },
+                    new ReleaseStatus
+                    {
+                        InternalReleaseNote = "Note2 - latest",
+                        ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                        Created = new DateTime(2002, 2, 2),
+                        CreatedBy = new User { Email = "note2@test.com" }
+                    },
+                    new ReleaseStatus
+                    {
+                        InternalReleaseNote = "Note3 - null created",
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        Created = null, // A migrated ReleaseStatus has null Created and CreatedBy
+                        CreatedBy = null
+                    }
+                }
+            };
+            var ignoredRelease = new Release
+            {
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new ReleaseStatus
+                    {
+                        InternalReleaseNote = "Note4 - different release",
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        Created = new DateTime(2012, 12, 12),
+                        CreatedBy = new User { Email = "note4@test.com" }
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(release, ignoredRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext);
+                var result = await releaseService.GetReleaseStatuses(release.Id);
+                Assert.True(result.IsRight);
+
+                var resultStatuses = result.Right;
+                Assert.Equal(3, resultStatuses.Count);
+
+                var releaseStatuses = release.ReleaseStatuses
+                    .OrderByDescending(rs => rs.Created)
+                    .ToList();
+
+                Assert.Equal(releaseStatuses[0].InternalReleaseNote, resultStatuses[0].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[0].ApprovalStatus,resultStatuses[0].ApprovalStatus);
+                Assert.Equal(releaseStatuses[0].Created, resultStatuses[0].Created);
+                Assert.Equal(releaseStatuses[0].CreatedBy?.Email, resultStatuses[0].CreatedByEmail);
+
+                Assert.Equal(releaseStatuses[1].InternalReleaseNote, resultStatuses[1].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[1].ApprovalStatus,resultStatuses[1].ApprovalStatus);
+                Assert.Equal(releaseStatuses[1].Created, resultStatuses[1].Created);
+                Assert.Equal(releaseStatuses[1].CreatedBy?.Email, resultStatuses[1].CreatedByEmail);
+
+                Assert.Equal(releaseStatuses[2].InternalReleaseNote, resultStatuses[2].InternalReleaseNote);
+                Assert.Equal(releaseStatuses[2].ApprovalStatus,resultStatuses[2].ApprovalStatus);
+                Assert.Equal(releaseStatuses[2].Created, resultStatuses[2].Created);
+                Assert.Equal(releaseStatuses[2].CreatedBy?.Email, resultStatuses[2].CreatedByEmail);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseStatuses_NoResults()
+        {
+            var release = new Release();
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext);
+                var result = await releaseService.GetReleaseStatuses(release.Id);
+                Assert.True(result.IsRight);
+
+                var resultStatuses = result.Right;
+                Assert.Empty(resultStatuses);
             }
         }
 

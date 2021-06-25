@@ -220,7 +220,7 @@ Approve release
     user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
@@ -258,7 +258,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     [Tags]  HappyPath
-    user clicks testid element  View stats link for ${PUBLICATION_NAME}
+    user clicks element  testid:View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Check footnote appears on data block
