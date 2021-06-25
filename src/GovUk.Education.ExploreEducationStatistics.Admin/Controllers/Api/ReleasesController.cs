@@ -164,12 +164,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateViewModel request,
+        [HttpPut("releases/{releaseId}/info")]
+        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseInfo(ReleaseInfoUpdateViewModel request,
             Guid releaseId)
         {
             return await _releaseService
-                .UpdateRelease(releaseId, request)
+                .UpdateReleaseInfo(releaseId, request)
                 .HandleFailuresOrOk();
         }
 

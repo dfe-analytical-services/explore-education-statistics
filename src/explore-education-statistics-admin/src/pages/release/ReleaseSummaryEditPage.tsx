@@ -48,13 +48,13 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       throw new Error('Could not update missing release');
     }
 
-    const nextRelease = await releaseService.updateRelease(releaseId, {
-      ...release,
+    const nextRelease = await releaseService.updateReleaseInfo(releaseId, {
+      releaseName: values.timePeriodCoverageStartYear,
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
-      releaseName: values.timePeriodCoverageStartYear,
       typeId: values.releaseTypeId,
+      preReleaseAccessList: release.preReleaseAccessList,
     });
 
     onReleaseChange(nextRelease);

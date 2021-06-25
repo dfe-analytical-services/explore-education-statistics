@@ -65,12 +65,12 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseRequest extends BaseReleaseRequest {
-  approvalStatus: ReleaseApprovalStatus;
-  latestInternalReleaseNote?: string;
-  publishScheduled?: string;
-  publishMethod?: 'Scheduled' | 'Immediate';
-  nextReleaseDate?: PartialDate;
+export interface UpdateReleaseInfoRequest {
+  releaseName: string;
+  timePeriodCoverage: {
+    value: string;
+  };
+  typeId: string;
   preReleaseAccessList?: string;
 }
 
@@ -186,11 +186,11 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/status`);
   },
 
-  updateRelease(
+  updateReleaseInfo(
     releaseId: string,
-    updateRequest: UpdateReleaseRequest,
+    updateRequest: UpdateReleaseInfoRequest,
   ): Promise<Release> {
-    return client.put(`/releases/${releaseId}`, updateRequest);
+    return client.put(`/releases/${releaseId}/info`, updateRequest);
   },
 
   updateReleaseStatus(

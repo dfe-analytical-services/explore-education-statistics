@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? TemplateReleaseId { get; set; }
     }
 
-    public class ReleaseUpdateViewModel
+    public class ReleaseInfoUpdateViewModel
     {
         [Required] public Guid TypeId { get; set; }
 
@@ -120,39 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public string PreReleaseAccessList { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus { get; set; }
-
-        public string LatestInternalReleaseNote { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public PublishMethod? PublishMethod { get; set; }
-
-        [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string PublishScheduled { get; set; }
-
-        public DateTime? PublishScheduledDate
-        {
-            get
-            {
-                if (PublishScheduled.IsNullOrEmpty())
-                {
-                    return null;
-                }
-
-                DateTime.TryParseExact(
-                    PublishScheduled,
-                    "yyyy-MM-dd",
-                    InvariantCulture,
-                    DateTimeStyles.None,
-                    out var dateTime
-                );
-                return dateTime.AsStartOfDayUtcForTimeZone();
-            }
-        }
-
-        [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
 
         [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
 

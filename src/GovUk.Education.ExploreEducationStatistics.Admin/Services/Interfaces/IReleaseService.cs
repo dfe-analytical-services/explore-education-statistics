@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateViewModel request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseInfo(Guid releaseId, ReleaseInfoUpdateViewModel request);
 
         Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseStatus(Guid releaseId, ReleaseStatusUpdateViewModel request);
 
