@@ -54,7 +54,7 @@ user signs out
 user selects theme and topic from admin dashboard
     [Arguments]  ${theme}  ${topic}
     ${current_url}=  Get Location
-    run keyword if  ${current_url} != %{ADMIN_URL} user navigates to admin dashboard
+    run keyword if  "${current_url}" != "%{ADMIN_URL}"  user navigates to admin dashboard
     user waits until page contains link  Manage publications and releases  90
     user clicks link   Manage publications and releases
     user waits until page contains element   id:publicationsReleases-themeTopic-themeId  60 
@@ -356,10 +356,10 @@ user approves release for immediate publication
     user checks page does not contain button  Edit release status
 
 user navigates to admin dashboard 
-    [Arguments]  ${USER}
+    [Arguments]  ${USER}=
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome ${USER}
+    Run keyword if  "${USER}" != ""  user waits until page contains title caption  Welcome ${USER}
     user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
 
 user uploads subject 
