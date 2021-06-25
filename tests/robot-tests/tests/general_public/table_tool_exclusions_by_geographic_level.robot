@@ -109,7 +109,7 @@ User generates a permanent link
 User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View share link
-    switch window   locator=NEW
+    user selects newly opened window
     user waits until h1 is visible  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'  60
 
 User validates permalink contains correct date

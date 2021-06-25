@@ -290,7 +290,3 @@ def remove_substring_from_right_of_string(string, substring):
 def user_clicks_element_if_exists(selector):
     if element_finder.find(selector, required=False) is not None:
         sl.click_element(selector)
-
-def user_chooses_what_to_do_on_step_failure(selector):
-    if element_finder.find(selector, required=False) is not None:
-        sl.click_element(selector)

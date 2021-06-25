@@ -53,7 +53,8 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]  ${theme}  ${topic}
-    user goes to url  %{ADMIN_URL}
+    ${current_url}=  Get Location
+    run keyword if  ${current_url} != %{ADMIN_URL} user navigates to admin dashboard
     user waits until page contains link  Manage publications and releases  90
     user clicks link   Manage publications and releases
     user waits until page contains element   id:publicationsReleases-themeTopic-themeId  60 

@@ -248,7 +248,7 @@ User generates a permanent link
 User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View share link
-    switch window   locator=NEW
+    user selects newly opened window
     user waits until h1 is visible  'Absence by characteristic' from 'Pupil absence in schools in England'
 
 User validates permalink table
