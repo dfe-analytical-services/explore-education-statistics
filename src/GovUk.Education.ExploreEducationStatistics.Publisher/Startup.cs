@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -70,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         contentDbContext: provider.GetService<ContentDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         tableStorageService: new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
+                .AddScoped<IMethodologyRepository, MethodologyRepository>()
+                .AddScoped<IMethodologyParentRepository, MethodologyParentRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>(provider =>
                     new NotificationsService(
