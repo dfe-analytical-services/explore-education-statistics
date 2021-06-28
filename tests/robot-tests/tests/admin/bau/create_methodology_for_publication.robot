@@ -28,4 +28,20 @@ Create Methodology for Publication
     user views methodology for open publication accordion  ${accordion}  ${PUBLICATION_NAME}
     user checks summary list contains   Title   ${PUBLICATION_NAME}
     user checks summary list contains   Status  Draft
-    user checks summary list contains   Published on  Not yet published   
+    user checks summary list contains   Published on  Not yet published
+
+Update Methodology for Publication
+  [Tags]  HappyPath
+  ${accordion}=  user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+  user views methodology for open publication accordion  ${accordion}  ${PUBLICATION_NAME}
+  user clicks link  Edit summary
+  user enters text into textfield  Enter methodology title  New methodology title
+  user clicks button  Update methodology
+  user waits until h2 is visible  Methodology summary
+  user clicks link  Sign off
+  user changes methodology status to Approved
+  user waits until h2 is visible  Methodology status
+  user clicks link  Summary
+  user checks summary list contains   Title   New methodology title
+  user checks summary list contains   Status  Approved
+  user checks summary list contains   Published on  Not yet published
