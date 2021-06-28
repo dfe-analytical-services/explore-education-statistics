@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? TemplateReleaseId { get; set; }
     }
 
-    public class ReleaseInfoUpdateViewModel
+    public class ReleaseUpdateViewModel
     {
         [Required] public Guid TypeId { get; set; }
 

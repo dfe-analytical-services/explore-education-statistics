@@ -65,7 +65,7 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseInfoRequest {
+export interface UpdateReleaseRequest {
   releaseName: string;
   timePeriodCoverage: {
     value: string;
@@ -186,11 +186,11 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/status`);
   },
 
-  updateReleaseInfo(
+  updateRelease(
     releaseId: string,
-    updateRequest: UpdateReleaseInfoRequest,
+    updateRequest: UpdateReleaseRequest,
   ): Promise<Release> {
-    return client.put(`/releases/${releaseId}/info`, updateRequest);
+    return client.put(`/releases/${releaseId}`, updateRequest);
   },
 
   updateReleaseStatus(

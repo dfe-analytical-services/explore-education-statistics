@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseInfo()
+        public async Task UpdateRelease()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
@@ -101,9 +101,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseInfo(
+                        return service.UpdateRelease(
                             _release.Id,
-                            new ReleaseInfoUpdateViewModel()
+                            new ReleaseUpdateViewModel()
                         );
                     }
                 );

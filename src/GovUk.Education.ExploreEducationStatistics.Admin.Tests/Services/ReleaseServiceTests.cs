@@ -626,7 +626,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseInfo()
+        public async Task UpdateRelease()
         {
             var releaseId = Guid.NewGuid();
 
@@ -665,9 +665,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseInfo(
+                    .UpdateRelease(
                         releaseId,
-                        new ReleaseInfoUpdateViewModel
+                        new ReleaseUpdateViewModel
                         {
                             TypeId = officialStatisticsReleaseType.Id,
                             ReleaseName = "2035",
@@ -706,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseInfo_FailsNonUniqueSlug()
+        public async Task UpdateRelease_FailsNonUniqueSlug()
         {
             var releaseType = new ReleaseType {Title = "Ad Hoc"};
 
@@ -755,9 +755,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseInfo(
+                    .UpdateRelease(
                         releaseId,
-                        new ReleaseInfoUpdateViewModel
+                        new ReleaseUpdateViewModel
                         {
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
