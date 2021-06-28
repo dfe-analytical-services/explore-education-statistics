@@ -55,7 +55,6 @@ Approve methodology
 Check methodology is approved
     [Tags]  HappyPath
     user waits until page contains element  xpath://strong[text()="Approved"]
-    user checks page contains element       xpath://strong[text()="Approved"]
 
 Create new release
     [Tags]  HappyPath
@@ -70,7 +69,7 @@ Upload another subject (for deletion later)
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user uploads subject   ${SECOND_SUBJECT}  upload-file-test.csv  upload-file-test.meta.csv
 
-Add meta guidance to ${SUBJECT_NAME} subject
+Add meta guidance to subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document  90
@@ -93,7 +92,7 @@ Navigate to 'Footnotes' page
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
-Add footnote to ${SECOND_SUBJECT}
+Add footnote to second Subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -104,7 +103,7 @@ Add footnote to ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add second footnote to ${SECOND_SUBJECT}
+Add second footnote to second Subject
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
@@ -116,7 +115,7 @@ Add second footnote to ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add footnote to ${SUBJECT_NAME} subject
+Add footnote to subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -127,7 +126,7 @@ Add footnote to ${SUBJECT_NAME} subject
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add second footnote to ${SUBJECT_NAME} subject
+Add second footnote to subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -166,7 +165,7 @@ Select "Test Topic" publication
     user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
-Select "${SUBJECT_NAME}" subject
+Select subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit

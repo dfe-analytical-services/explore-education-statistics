@@ -133,8 +133,6 @@ user views methodology for publication
     [Arguments]  ${publication}     ${methodology_title}=${publication}
     ${accordion}=  user opens publication on the admin dashboard   ${publication}
     user views methodology for open publication accordion  ${accordion}  ${methodology_title}
-    user clicks link   Edit this methodology
-    user waits until h2 is visible  Methodology summary 
 
 user views methodology for open publication accordion
     [Arguments]  ${accordion}     ${methodology_title}
