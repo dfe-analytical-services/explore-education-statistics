@@ -10,6 +10,8 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${RELEASE_NAME}  Academic Year Q1 2020/21
 ${PUBLICATION_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
+${THEME_NAME}        %{TEST_THEME_NAME}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Seven filters
 ${SECOND_SUBJECT}  upload file test
 ${THIRD_SUBJECT}  upload file test with filter subject
@@ -17,6 +19,10 @@ ${THIRD_SUBJECT}  upload file test with filter subject
 *** Test Cases ***
 Create publication
     [Tags]  HappyPath
+    user navigates to admin dashboard
+    user selects theme and topic from admin dashboard    ${THEME_NAME}  ${TOPIC_NAME}
+    user clicks link  Create new publication
+    user waits until h1 is visible  Create new publication
     user creates publication  ${PUBLICATION_NAME}
 
 Create new methodology
@@ -45,7 +51,7 @@ Approve methodology
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks radio  Approved for publication
-    user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
+    user enters text into element  xpath=//*[@name="latestInternalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
     
 Check methodology is approved
@@ -353,7 +359,7 @@ Replace subject data
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains  Footnotes: ERROR  120
+    user waits until page contains  Footnotes: ERROR  %{WAIT_120_SECONDS}
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
@@ -478,7 +484,7 @@ Add subject to release
     user clicks link  Data and files
     user uploads subject   ${THIRD_SUBJECT}  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
-Add meta guidance to ${THIRD_SUBJECT} subject
+Add meta guidance to third subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}  meta content
@@ -520,7 +526,7 @@ Go to public Table Tool page for amendment
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables
 
-Select publication ${PUBLICATION_NAME}
+Select publication
     [Tags]  HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -530,7 +536,7 @@ Select publication ${PUBLICATION_NAME}
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select subject ${SUBJECT_NAME}
+Select subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit

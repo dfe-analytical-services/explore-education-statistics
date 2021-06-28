@@ -18,7 +18,6 @@ def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
 
-
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
@@ -26,8 +25,12 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
         if isinstance(parent_locator, str):
             sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
             parent_el = sl.find_element(parent_locator)
+            if (child_locator.startswith("xpath:.//")):
+                child_locator = child_locator.replace("xpath:.//", "xpath://")
         else:
             parent_el = parent_locator
+            if (child_locator.startswith("xpath://")):
+                child_locator = child_locator.replace("xpath://", "xpath:.//")
 
         def parent_contains_matching_element() -> bool:
             return element_finder.find(child_locator, required=False, parent=parent_el) is not None
@@ -58,6 +61,17 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
 def user_waits_until_parent_does_not_contain_element(parent_locator: object, child_locator: str,
                                                      timeout: int = None, error: str = None,
                                                      limit: int = None):
+
+    if isinstance(parent_locator, str):
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+        parent_el = sl.find_element(parent_locator)
+        if (child_locator.startswith("xpath:.//")):
+            child_locator = child_locator.replace("xpath:.//", "xpath://")
+    else:
+        parent_el = parent_locator
+        if (child_locator.startswith("xpath://")):
+            child_locator = child_locator.replace("xpath://", "xpath:.//")
+
     try:
         if isinstance(parent_locator, str):
             sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)

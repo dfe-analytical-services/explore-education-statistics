@@ -20,7 +20,7 @@ class KeywordListener:
             
             logging_colour = KeywordListener.COMMON_KEYWORD_COLOUR if source.endswith('common.robot') else KeywordListener.TEST_SUITE_KEYWORD_COLOUR
             
-            print(f'{logging_colour}\tfile://{attributes["source"]} line {attributes["lineno"]}\t{attributes["kwname"]}\t\t{args_and_value_string}')
+            print(f'{logging_colour}\t{attributes["kwname"]}\t\t{args_and_value_string}\t\t\t(from file://{attributes["source"]} line {attributes["lineno"]})')
 
     def end_keyword(self, name, attributes):
         if attributes["status"] == "FAIL":

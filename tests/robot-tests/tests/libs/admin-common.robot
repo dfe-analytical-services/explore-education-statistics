@@ -13,7 +13,7 @@ user signs in as bau1
 
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   %{WAIT_180_SECONDS}
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -32,7 +32,7 @@ user signs in as analyst1
 
     # @TODO: Luke - See if this test id is being stripped out of the DOM by React
     # no selector with this data-test id is present 
-    # user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']  180
+    # user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']  %{WAIT_180_SECONDS}
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -112,14 +112,18 @@ user opens publication on the admin dashboard
     
     user navigates to admin dashboard
     user selects theme and topic from admin dashboard  ${theme}  ${topic}
-    user waits until page contains accordion section   ${publication}   120
-    user opens accordion section  ${publication}
-    user waits until page does not contain loading spinner
+    user waits until page contains accordion section   ${publication}   %{WAIT_120_SECONDS}
+    ${accordion}=  user opens accordion section  ${publication}
+    [Return]  ${accordion}
         
 user creates methodology for publication
-    [Arguments]  ${publication}
-    user opens publication on the admin dashboard   ${publication}
-    user clicks button when available   Create methodology
+    [Arguments]
+    ...  ${publication}
+    ...  ${theme}=%{TEST_THEME_NAME}
+    ...  ${topic}=%{TEST_TOPIC_NAME}
+
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}  ${theme}  ${topic}
+    user clicks button   Create methodology  ${accordion}
     user waits until h2 is visible  Methodology summary
     user checks summary list contains   Title   ${publication}
     user checks summary list contains   Status  Draft
@@ -127,52 +131,45 @@ user creates methodology for publication
     
 user views methodology for publication
     [Arguments]  ${publication}     ${methodology_title}=${publication}
-    user opens publication on the admin dashboard   ${publication}
-    user opens details dropdown  ${publication}    css:[data-testid='Methodology for ${publication}']
-    user clicks link when available   Edit this methodology
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user opens details dropdown  ${publication}  ${accordion}
+    user clicks link   Edit this methodology
     user waits until h2 is visible  Methodology summary 
     
 user links publication to external methodology
     [Arguments]  
-    ...  ${publication}     
-    ...  ${title}=${publication} external methodology
+    ...  ${publication}
+    ...  ${title}=${publication}
     ...  ${link}=https://example.com
     
-    user opens publication on the admin dashboard   ${publication}
-    user clicks button when available   Link to an externally hosted methodology
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Link to an externally hosted methodology  ${accordion}
     user waits until legend is visible   Link to an externally hosted methodology
     user enters text into textfield  Link title   ${title}
     user enters text into textfield  URL   ${link}
     user clicks button  Save
-    user opens publication on the admin dashboard   ${publication}
-    user checks page contains link with text and url  ${title}  ${link}
     
 user edits an external methodology
     [Arguments]  
     ...  ${publication}
-    ...  ${new_title}=${publication} external methodology (updated)
+    ...  ${new_title}=${publication} updated
     ...  ${new_link}=https://example.com/updated
-    ...  ${original_title}=${publication} external methodology
+    ...  ${original_title}=${publication}
     ...  ${original_link}=https://example.com
     
-    user opens publication on the admin dashboard   ${publication}
-    user clicks button when available   Edit
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Edit  ${accordion}
     user waits until legend is visible   Link to an externally hosted methodology
     user checks textfield contains  Link title  ${original_title}
     user checks textfield contains  URL  ${original_link}
     user enters text into textfield  Link title   ${new_title}
     user enters text into textfield  URL   ${new_link}
     user clicks button  Save
-    user opens publication on the admin dashboard   ${publication}
-    user waits until page contains testid   Methodology for ${publication}
-    user checks page contains link with text and url    ${new_title}   ${new_link}
     
 user removes an external methodology from publication
     [Arguments]  ${publication}
-    user opens publication on the admin dashboard   ${publication}
-    user clicks button when available   Remove
-    user opens publication on the admin dashboard   ${publication}
-    user waits until page contains button   Create methodology
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Remove  ${accordion}
                 
 user adds basic release content
     [Arguments]  ${publication}
@@ -289,7 +286,7 @@ user clicks footnote radio
 
 user clicks footnote checkbox
     [Arguments]  ${label}    ${parent}=css:body
-    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user waits until parent contains element  ${parent}   xpath:.//*[@id="footnoteForm"]//label[text()="${label}"]/../input
     ${checkbox}=  get child element  ${parent}    xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
     page should contain checkbox  ${checkbox}
     user scrolls to element   ${checkbox}
@@ -298,7 +295,7 @@ user clicks footnote checkbox
 
 user checks footnote checkbox is selected
     [Arguments]  ${label}   ${parent}=css:body
-    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    user waits until parent contains element  ${parent}   xpath:.//*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
     ${checkbox}=  get child element   ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
     wait until element is enabled   ${checkbox}
     checkbox should be selected     ${checkbox}
@@ -414,7 +411,7 @@ user approves release for immediate publication
     user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   As soon as possible
     user clicks button   Update status
-    user waits until h2 is visible  Sign off  120
+    user waits until h2 is visible  Sign off  %{WAIT_120_SECONDS}
     user checks summary list contains  Current status  Approved
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
@@ -438,7 +435,7 @@ user uploads subject
     user waits until page contains accordion section   ${SUBJECT_NAME}  60
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Status  Complete  ${section}  180
+    user checks headed table body row contains  Status  Complete  ${section}  %{WAIT_180_SECONDS}
 
 user approves release for scheduled release
     [Arguments]  ${DAYS_TILL_RELEASE}  ${RELEASE_MONTH}  ${RELEASE_YEAR}

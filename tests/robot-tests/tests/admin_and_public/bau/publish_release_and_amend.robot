@@ -106,7 +106,7 @@ Create data block table
     user checks category checkbox is checked  Date  23/03/2020
 
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_180_SECONDS}
 
     user checks table column heading contains  1  1  2020 Week 13
     user checks headed table body row cell contains  Number of open settings        1  22,900
@@ -191,12 +191,12 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}  120
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  %{WAIT_120_SECONDS}
     user opens accordion section  %{TEST_THEME_NAME}
-    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}  120
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   %{TEST_TOPIC_NAME}  %{WAIT_120_SECONDS}
 
     user opens details dropdown  %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   120
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}  ${PUBLICATION_NAME}   %{WAIT_120_SECONDS}
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
@@ -340,7 +340,7 @@ Return to Admin and Create amendment
 Navigate to data replacement page
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Uploaded data files  120
+    user waits until h2 is visible  Uploaded data files  %{WAIT_120_SECONDS}
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
 
@@ -353,11 +353,11 @@ Navigate to data replacement page
     user checks headed table body row contains  Metadata file    dates.meta.csv
     user checks headed table body row contains  Number of rows   119
     user checks headed table body row contains  Data file size   17 Kb
-    user checks headed table body row contains  Status           Complete   wait=180
+    user checks headed table body row contains  Status           Complete   wait=%{WAIT_180_SECONDS}
 
 Upload replacement data
     [Tags]  HappyPath
-    user waits until h2 is visible  Upload replacement data  120
+    user waits until h2 is visible  Upload replacement data  %{WAIT_120_SECONDS}
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates-replacement.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates-replacement.meta.csv
     user clicks button  Upload data files
@@ -371,14 +371,14 @@ Upload replacement data
     user checks headed table body row cell contains  Metadata file   1  dates.meta.csv
     user checks headed table body row cell contains  Number of rows  1  119
     user checks headed table body row cell contains  Data file size  1  17 Kb
-    user checks headed table body row cell contains  Status          1  Data replacement in progress   wait=180
+    user checks headed table body row cell contains  Status          1  Data replacement in progress   wait=%{WAIT_180_SECONDS}
 
     user checks headed table body row cell contains  Subject title   2  Dates test subject
     user checks headed table body row cell contains  Data file       2  dates-replacement.csv
     user checks headed table body row cell contains  Metadata file   2  dates-replacement.meta.csv
     user checks headed table body row cell contains  Number of rows  2  119
     user checks headed table body row cell contains  Data file size  2  17 Kb
-    user checks headed table body row cell contains  Status          2  Complete   wait=180
+    user checks headed table body row cell contains  Status          2  Complete   wait=%{WAIT_180_SECONDS}
 
 Confirm data replacement
     [Tags]  HappyPath
@@ -461,7 +461,7 @@ Edit data block for amendment
     user checks category checkbox is checked  Date  24/03/2020
 
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_180_SECONDS}
 
     user checks table column heading contains  1  1  2020 Week 13
     user checks headed table body row cell contains  Number of open settings        1  23,000

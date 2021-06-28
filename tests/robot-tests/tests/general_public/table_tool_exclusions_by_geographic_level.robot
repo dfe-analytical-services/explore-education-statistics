@@ -82,7 +82,7 @@ User clicks Create table button
 User waits for table to appear
     [Tags]  HappyPath
     # Extra timeout until EES-234
-    user waits until results table appears    180
+    user waits until results table appears    %{WAIT_180_SECONDS}
     user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing 'Exclusions by geographic level' for State-funded secondary in Bury, Sheffield and York between 2006/07 and 2008/09"]
 
 Validate results table column headings

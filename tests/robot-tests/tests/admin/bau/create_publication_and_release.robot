@@ -89,11 +89,11 @@ Update publication
     user clicks button  Confirm
 
 Add a methodology
-    user creates methodology for publication    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
 
 Verify publication has been updated
     [Tags]  HappyPath
-    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson

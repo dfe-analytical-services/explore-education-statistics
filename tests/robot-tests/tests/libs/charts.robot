@@ -51,7 +51,7 @@ user waits until element does not contain chart tooltip
 
 user checks chart title contains
     [Arguments]  ${locator}  ${text}
-    user waits until parent contains element  ${locator}  xpath://figcaption[text()="${text}"]
+    user waits until parent contains element  ${locator}  xpath:.//figcaption[text()="${text}"]
 
 user checks chart height
     [Arguments]  ${locator}  ${height}

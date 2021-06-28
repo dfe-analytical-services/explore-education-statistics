@@ -25,7 +25,7 @@ Navigate to admin dashboard and assert publication is present
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_120_SECONDS}
 
 Navigate to manage users page as bau1
     [Tags]  HappyPath
@@ -216,7 +216,7 @@ Check release owner can access release
     user changes to analyst1
     user waits for page to finish loading
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_120_SECONDS}
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
     ...  ${RELEASE_TYPE} (not Live)
 

@@ -129,7 +129,7 @@ Select category filters (data block)
 Create table (data block)
     [Tags]  HappyPath
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_180_SECONDS}
 
 Check footnotes in table preview (data block)
     user checks page contains  ${FOOTNOTE_TEXT_1}
@@ -179,9 +179,9 @@ Edit footnote
 Check footnote was updated
     [Tags]  HappyPath
     user clicks link  Content
-    user waits until page contains element  id:releaseHeadlines  120
+    user waits until page contains element  id:releaseHeadlines  %{WAIT_120_SECONDS}
     user scrolls to element  id:releaseHeadlines
-    user waits until page contains link  Table  180
+    user waits until page contains link  Table  %{WAIT_180_SECONDS}
     user clicks link  Table
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
@@ -246,7 +246,7 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}  120
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  %{WAIT_120_SECONDS}
     user opens accordion section  %{TEST_THEME_NAME}
     user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
@@ -265,7 +265,7 @@ Check footnote appears on data block
     [Tags]  HappyPath
     user waits until page contains element  id:releaseHeadlines-tables-tab
     user clicks element  id:releaseHeadlines-tables-tab
-    user waits until parent contains element  id:releaseHeadlines-tables-tab  xpath://h3[text()="Footnotes"]
+    user waits until parent contains element  id:releaseHeadlines-tables  xpath:.//h3[text()="Footnotes"]
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
@@ -318,7 +318,7 @@ Select category filters (table tool)
 Create table (table tool)
     [Tags]  HappyPath
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_180_SECONDS}
 
 Check footnotes in table preview (table tool)
     user checks page contains  ${FOOTNOTE_TEXT_3}

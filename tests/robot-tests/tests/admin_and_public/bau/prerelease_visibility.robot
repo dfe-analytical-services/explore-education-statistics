@@ -67,7 +67,7 @@ Update public prerelease access list
     [Tags]  HappyPath
     user updates public prerelease access list  Updated test public access list
 
-Add meta guidance to ${PUBLICATION_NAME} subject
+Add meta guidance to subject
     [Tags]  HappyPath
     user clicks link  Data and files
     user clicks link  Metadata guidance

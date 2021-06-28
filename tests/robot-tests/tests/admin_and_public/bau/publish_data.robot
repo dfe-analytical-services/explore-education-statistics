@@ -121,7 +121,7 @@ Select indicators
 Create table
     [Tags]  HappyPath
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_180_SECONDS}
 
 Save data block as a highlight
     [Tags]  HappyPath
@@ -237,7 +237,7 @@ Select indicators in table tool
 
 Validate table
     [Tags]  HappyPath
-    user waits until results table appears  180
+    user waits until results table appears  %{WAIT_180_SECONDS}
     user checks table column heading contains   1  1  2014
     user checks table column heading contains   1  2  2015
     user checks table column heading contains   1  3  2016
@@ -275,7 +275,7 @@ Select table highlight from subjects step
     ...  Test highlight description
 
     user clicks link  Test highlight name
-    user waits until results table appears  180
+    user waits until results table appears  %{WAIT_180_SECONDS}
     user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
