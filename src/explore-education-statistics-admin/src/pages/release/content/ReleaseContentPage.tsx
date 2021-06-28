@@ -14,6 +14,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { getNumberOfUnSavedBlocks } from '@admin/pages/release/content/components/utils/unSavedEdits';
+import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
 import React from 'react';
@@ -32,7 +33,7 @@ const ReleaseContentPageLoaded = () => {
         isEditing: canUpdateRelease,
       }}
     >
-      {({ isEditing, unSavedEdits }) => {
+      {({ isEditing, isTablePreview, unSavedEdits }) => {
         const numOfEdits = getNumberOfUnSavedBlocks(unSavedEdits);
         return (
           <>
@@ -68,20 +69,31 @@ const ReleaseContentPageLoaded = () => {
             )}
 
             <div
-              className={classNames('govuk-width-container', {
+              className={classNames({
                 'govuk-!-margin-right-0': isEditing,
+                'govuk-width-container': !isTablePreview,
               })}
             >
               <div
                 className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
               >
-                <span className="govuk-caption-l">{release.title}</span>
+                {!isTablePreview && (
+                  <>
+                    <span className="govuk-caption-l">{release.title}</span>
 
-                <h2 className="govuk-heading-l dfe-print-break-before">
-                  {release.publication.title}
-                </h2>
+                    <h2 className="govuk-heading-l dfe-print-break-before">
+                      {release.publication.title}
+                    </h2>
 
-                <ReleaseContent />
+                    <ReleaseContent />
+                  </>
+                )}
+                {isTablePreview && (
+                  <ReleasePreviewTableTool
+                    releaseId={release.id}
+                    publication={release.publication}
+                  />
+                )}
               </div>
             </div>
           </>

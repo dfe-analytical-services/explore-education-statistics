@@ -3,12 +3,20 @@ import {
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
+import _releaseContentService from '@admin/services/releaseContentService';
+import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
+jest.mock('@admin/services/releaseContentService');
+jest.mock('@admin/services/permissionService');
 jest.mock('@common/services/tableBuilderService');
+
+const releaseContentService = _releaseContentService as jest.Mocked<
+  typeof _releaseContentService
+>;
 
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
@@ -16,6 +24,11 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 
 describe('ReleaseTableToolPage', () => {
   test('renders correctly on step 1', async () => {
+    releaseContentService.getContent.mockResolvedValue({
+      release: testEditableRelease,
+      availableDataBlocks: [],
+    });
+
     tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
       subjects: [
         {

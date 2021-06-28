@@ -630,8 +630,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
@@ -642,7 +641,15 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
               Latest Release Title
             </a>
           </li>
-          
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
+            </a>
+          </li>
         </ul>
         <div
           class="dfe-print-hidden"
@@ -1375,8 +1382,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication/selected-release-slug"
@@ -1387,7 +1393,15 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
               Selected Release Title
             </a>
           </li>
-          
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
+            </a>
+          </li>
         </ul>
         <div
           class="dfe-print-hidden"
@@ -2120,8 +2134,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication/selected-release-slug"
@@ -2132,7 +2145,15 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
               Selected Release Title
             </a>
           </li>
-          
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
+            </a>
+          </li>
         </ul>
         <div
           class="dfe-print-hidden"
@@ -2848,8 +2869,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
@@ -3582,8 +3602,7 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
@@ -3594,7 +3613,15 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
               Latest Release Title
             </a>
           </li>
-          
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
+            </a>
+          </li>
         </ul>
         <div
           class="dfe-print-hidden"
@@ -4311,8 +4338,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
@@ -4323,7 +4349,15 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
               Latest Release Title
             </a>
           </li>
-          
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
+            </a>
+          </li>
         </ul>
         <div
           class="dfe-print-hidden"

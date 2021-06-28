@@ -1,13 +1,15 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import useToggle from '@common/hooks/useToggle';
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import styles from './EditablePageModeToggle.module.scss';
 
 const EditablePageModeToggle = () => {
-  const { isEditing, setEditing } = useEditingContext();
+  const { setEditing } = useEditingContext();
+  const { setTablePreview } = useEditingContext();
   const [isOpen, toggleOpen] = useToggle(true);
+  const [pageMode, setPageMode] = useState<string>('edit');
 
   return (
     <div
@@ -30,7 +32,7 @@ const EditablePageModeToggle = () => {
           id="pageMode"
           name="pageMode"
           className={styles.fieldset}
-          value={isEditing ? 'edit' : 'preview'}
+          value={pageMode}
           legend="Set page view"
           legendHidden
           small
@@ -40,12 +42,18 @@ const EditablePageModeToggle = () => {
               value: 'edit',
             },
             {
-              label: 'Preview content',
+              label: 'Preview release page',
               value: 'preview',
+            },
+            {
+              label: 'Preview table tool',
+              value: 'table',
             },
           ]}
           onChange={event => {
+            setPageMode(event.target.value);
             setEditing(event.target.value === 'edit');
+            setTablePreview(event.target.value === 'table');
           }}
         />
       </div>
