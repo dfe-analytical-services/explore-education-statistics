@@ -8,8 +8,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    teardown suite
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}    ${EMPTY}
@@ -24,11 +22,11 @@ teardown suite
 *** Test Cases ***
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains link    Create new publication
     user checks page does not contain button  ${PUBLICATION_NAME}
     user clicks link  Create new publication
-    user waits until page contains title caption  ${TOPIC_NAME}
+    user waits until page contains title caption  %{TEST_TOPIC_NAME}
     user waits until h1 is visible    Create new publication
 
 Enters contact details

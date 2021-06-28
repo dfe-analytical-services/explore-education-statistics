@@ -8,8 +8,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - legacy releases %{RUN_IDENTIFIER}
 
 *** Keywords ***
@@ -30,7 +28,7 @@ Create new publication for topic
 
 Verify new publication
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains button  ${PUBLICATION_NAME}
 
 Go to legacy releases page

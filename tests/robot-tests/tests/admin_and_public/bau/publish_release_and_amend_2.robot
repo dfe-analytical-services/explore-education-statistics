@@ -10,8 +10,6 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${RELEASE_NAME}  Academic Year Q1 2020/21
 ${PUBLICATION_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Seven filters
 ${SECOND_SUBJECT}  upload file test
 ${THIRD_SUBJECT}  upload file test with filter subject
@@ -20,7 +18,7 @@ ${THIRD_SUBJECT}  upload file test with filter subject
 Create publication
     [Tags]  HappyPath
     user navigates to admin dashboard
-    user selects theme and topic from admin dashboard    ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user clicks link  Create new publication
     user waits until h1 is visible  Create new publication
     user creates publication  ${PUBLICATION_NAME}
