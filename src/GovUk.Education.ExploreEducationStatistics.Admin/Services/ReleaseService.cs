@@ -329,7 +329,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var oldStatus = release.ApprovalStatus;
 
                     release.ApprovalStatus = request.ApprovalStatus;
-                    release.InternalReleaseNote = request.LatestInternalReleaseNote;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
                                                request.ApprovalStatus == ReleaseApprovalStatus.Approved
