@@ -73,12 +73,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             get
             {
+                if (PublishingStrategy != MethodologyPublishingStrategy.WithRelease)
+                {
+                    return false;
+                }
+                
                 if (ScheduledWithReleaseId != null && ScheduledWithRelease == null)
                 {
                     throw new InvalidOperationException("ScheduledWithRelease field not included in Methodology");
                 }
-                return PublishingStrategy == MethodologyPublishingStrategy.WithRelease
-                       && ScheduledWithRelease.Live;
+                
+                return ScheduledWithRelease.Live;
             }
         }
 

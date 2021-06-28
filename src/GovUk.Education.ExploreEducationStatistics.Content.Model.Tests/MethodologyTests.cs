@@ -82,5 +82,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             
             Assert.Throws<InvalidOperationException>(() => methodology.PubliclyAccessible);
         }
+
+        [Fact] 
+        public void ScheduledForPublishingWithPublishedRelease_ScheduledWithReleaseNotIncluded()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = WithRelease,
+                ScheduledWithReleaseId = Guid.NewGuid()
+            };
+            
+            Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);
+        }
+
+        [Fact] 
+        public void ScheduledForPublishingImmediately_ButCheckingScheduledForPublishingWithPublishedRelease_ScheduledWithReleaseNotIncluded()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = Immediately,
+            };
+            
+            Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
+        }
     }
 }
