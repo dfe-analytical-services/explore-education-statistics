@@ -357,7 +357,7 @@ Replace subject data
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains  Footnotes: ERROR  %{WAIT_120_SECONDS}
+    user waits until page contains  Footnotes: ERROR  %{WAIT_MEDIUM}
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm

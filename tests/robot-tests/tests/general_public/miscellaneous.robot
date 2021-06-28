@@ -152,7 +152,7 @@ Validate Feedback page
     [Tags]  HappyPath
     user clicks link  feedback
     user selects newly opened window
-    user waits until page contains element      xpath://span[text()="Explore Education Statistics"]     %{WAIT_120_SECONDS}
+    user waits until page contains element      xpath://span[text()="Explore Education Statistics"]     %{WAIT_MEDIUM}
     user waits until page contains element      xpath://span[text()="Beta Feedback Survey"]
 
     user checks url contains    forms.office.com/Pages/ResponsePage.aspx

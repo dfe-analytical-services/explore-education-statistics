@@ -135,7 +135,7 @@ Verify release status is Approved
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  1 December 3000
     user checks summary list contains  Next release expected  March 3002
-    user waits for release process status to be  Scheduled  %{WAIT_180_SECONDS}
+    user waits for release process status to be  Scheduled  %{WAIT_LONG}
 
 Move release status back to Draft
     [Tags]  HappyPath

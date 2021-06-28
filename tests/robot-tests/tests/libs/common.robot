@@ -450,9 +450,9 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 
 user checks summary list contains
     [Arguments]  ${term}    ${description}   ${parent}=css:body  ${wait}=${timeout}
-    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]  %{WAIT_120_SECONDS}
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]  %{WAIT_MEDIUM}
     ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible  ${element}  %{WAIT_120_SECONDS}
+    user waits until element is visible  ${element}  %{WAIT_MEDIUM}
 
 user selects from list by label
     [Arguments]   ${locator}   ${label}

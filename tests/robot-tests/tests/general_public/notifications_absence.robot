@@ -27,7 +27,7 @@ Go to Notify me page for Absence publication
     [Tags]  HappyPath  Local
     user clicks link  Sign up for email alerts
 
-    user waits until page contains title caption  Notify me     %{WAIT_180_SECONDS}
+    user waits until page contains title caption  Notify me     %{WAIT_LONG}
     user waits until h1 is visible  Pupil absence in schools in England
 
     user checks breadcrumb count should be  4
@@ -44,5 +44,5 @@ Sign up for email alerts
     user clicks button   Subscribe
 
     # EES-1265
-    user waits until h1 is visible   Subscribed     %{WAIT_180_SECONDS}
+    user waits until h1 is visible   Subscribed     %{WAIT_LONG}
     user checks page contains  Thank you. Check your email to confirm your subscription.

@@ -19,8 +19,15 @@ Navigate to Pupil absence in schools in England methodology page
 
 User navigates to absence methodology page
     [Tags]  HappyPath
-    user checks page contains methodology link   Pupil absence   Pupil absence in schools in England     /methodology/pupil-absence-in-schools-in-england
-    user clicks methodology link   Pupil absence   Pupil absence in schools in England
+    user checks page contains methodology link
+    ...  Pupil absence
+    ...  Pupil absence in schools in England
+    ...  Pupil absence statistics: methodology
+    ...  %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
+    user clicks methodology link
+    ...  Pupil absence
+    ...  Pupil absence in schools in England
+    ...  Pupil absence statistics: methodology
     user waits until h1 is visible   Pupil absence statistics: methodology
 
 Validate Published date, Last updated date

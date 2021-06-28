@@ -49,7 +49,7 @@ Validate Analyst1 can see Absence release summary
 Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath
     user clicks link  Content
-    user waits until h2 is visible   Pupil absence in schools in England  %{WAIT_120_SECONDS}
+    user waits until h2 is visible   Pupil absence in schools in England  %{WAIT_MEDIUM}
     user waits for page to finish loading
 
 Validate Analyst1 can see 'Content' page key stats

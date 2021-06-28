@@ -85,7 +85,7 @@ Create table
     [Tags]  HappyPath
     [Documentation]   EES-615
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     %{WAIT_180_SECONDS}
+    user waits until results table appears     %{WAIT_LONG}
     user waits until element contains  css:[data-testid="dataTableCaption"]
     ...  Table showing Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
 
@@ -394,7 +394,7 @@ Configure basic vertical bar chart
     [Tags]  HappyPath  Failing
     user goes to url  ${DATABLOCK_URL}
 
-    user waits until h2 is visible  ${DATABLOCK_NAME}  %{WAIT_120_SECONDS}
+    user waits until h2 is visible  ${DATABLOCK_NAME}  %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
 
     user clicks link  Chart
