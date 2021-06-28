@@ -132,7 +132,13 @@ user creates methodology for publication
 user views methodology for publication
     [Arguments]  ${publication}     ${methodology_title}=${publication}
     ${accordion}=  user opens publication on the admin dashboard   ${publication}
-    user opens details dropdown  ${publication}  ${accordion}
+    user views methodology for open publication accordion  ${accordion}  ${methodology_title}
+    user clicks link   Edit this methodology
+    user waits until h2 is visible  Methodology summary 
+
+user views methodology for open publication accordion
+    [Arguments]  ${accordion}     ${methodology_title}
+    user opens details dropdown  ${methodology_title}  ${accordion}
     user clicks link   Edit this methodology
     user waits until h2 is visible  Methodology summary 
     

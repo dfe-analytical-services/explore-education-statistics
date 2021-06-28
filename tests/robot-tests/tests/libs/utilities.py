@@ -2,7 +2,7 @@ import json
 import pytz
 import time
 import datetime
-from logging import warn
+from logging import warning
 from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary import ElementFinder
@@ -25,12 +25,14 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
         if isinstance(parent_locator, str):
             sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
             parent_el = sl.find_element(parent_locator)
-            if (child_locator.startswith("xpath:.//")):
-                child_locator = child_locator.replace("xpath:.//", "xpath://")
+            # the below substitution is necessary if the parent is an xpath expression in order
+            # to correctly find the parent's descendants  
+            child_locator = child_locator.replace("xpath:.//", "xpath://")
         else:
             parent_el = parent_locator
-            if (child_locator.startswith("xpath://")):
-                child_locator = child_locator.replace("xpath://", "xpath:.//")
+            # the below substitution is necessary if the parent is a Selenium WebElement in order
+            # to correctly find the parent's descendants
+            child_locator = child_locator.replace("xpath://", "xpath:.//")
 
         def parent_contains_matching_element() -> bool:
             return element_finder.find(child_locator, required=False, parent=parent_el) is not None
@@ -54,7 +56,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
             timeout, error
         )
     except Exception as err:
-        warn(f"Error whilst executing utilities.py user_waits_until_parent_contains_element() with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(f"Error whilst executing utilities.py user_waits_until_parent_contains_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
@@ -102,7 +104,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             timeout, error
         )
     except Exception as err:
-        warn(f"Error whilst executing utilities.py user_waits_until_parent_does_not_contain_element() with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(f"Error whilst executing utilities.py user_waits_until_parent_does_not_contain_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
@@ -117,11 +119,11 @@ def get_child_element(parent_locator: object, child_locator: str):
 
         return sl.find_element(child_locator, parent=parent_el)
     except ElementNotFound as err:
-        warn(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(
             f"Could not find child '{child_locator}' within parent '{parent_locator}'")
     except Exception as err:
-        warn(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
@@ -135,7 +137,7 @@ def get_child_elements(parent_locator: object, child_locator: str):
 
         return sl.find_elements(child_locator, parent=parent_el)
     except Exception as err:
-        error(f"Error whilst executing utilities.py get_child_elements() - {err}")
+        warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
 
 
@@ -190,7 +192,7 @@ def user_should_be_at_top_of_page():
 
 
 def prompt_to_continue():
-    warn("Continue? (Y/n)")
+    warning("Continue? (Y/n)")
     choice = input()
     if (choice.lower().startswith("n")):
         raise_assertion_error('Tests stopped!')
@@ -218,7 +220,7 @@ def capture_large_screenshot():
     screenshot_location = sl.capture_page_screenshot()
     sl.set_window_size(page_width, original_height)
 
-    warn(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
+    warning(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
 
 
 def capture_html():
@@ -227,7 +229,7 @@ def capture_html():
     html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
     html_file.write(html)
     html_file.close()
-    warn(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
+    warning(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')

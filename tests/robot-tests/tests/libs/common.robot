@@ -287,28 +287,24 @@ user checks element does not contain
 
 user checks element contains child element
     [Arguments]
-
     ...  ${element}
     ...  ${child_element}
     user waits until parent contains element  ${element}  ${child_element}
 
 user checks element does not contain child element
     [Arguments]
-
     ...  ${element}
     ...  ${child_element}
     user waits until parent does not contain element  ${element}  ${child_element}
 
 user checks element contains button
     [Arguments]
-
     ...  ${element}
     ...  ${button_text}
     user waits until parent contains element  ${element}  xpath:.//button[text()="${button_text}"]
 
 user checks element does not contain button
     [Arguments]
-
     ...  ${element}
     ...  ${button_text}
     user waits until parent does not contain element  ${element}  xpath:.//button[text()="${button_text}"]
