@@ -1,10 +1,44 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class StringExtensions
     {
+        /// <summary>
+        /// Convert a string into an enumerable of its constituent lines.
+        /// </summary>
+        public static IEnumerable<string> ToLines(this string value)
+        {
+            var reader = new StringReader(value);
+
+            var currentLine = reader.ReadLine();
+
+            while (currentLine != null)
+            {
+                yield return currentLine;
+                currentLine = reader.ReadLine();
+            }
+
+            reader.Close();
+        }
+
+        /// <summary>
+        /// Convert a string into a list of its constituent lines.
+        /// </summary>
+        public static IList<string> ToLinesList(this string value)
+        {
+            return value.ToLines().ToList();
+        }
+
+        public static string StripLines(this string value)
+        {
+            return Regex.Replace(value, "(\n|\r)", string.Empty);
+        }
+
         public static string AppendTrailingSlash(this string input)
         {
             if (input == null)
@@ -14,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return input.EndsWith("/") ? input : input + "/";
         }
-        
+
         public static string CamelCase(this string input)
         {
             if (input.IsNullOrEmpty())
