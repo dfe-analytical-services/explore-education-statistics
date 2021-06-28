@@ -411,8 +411,6 @@ finally:
         ]
         robot_rebot_cli(merge_options, exit=False)
 
-    print("")
-    print(f"Log available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html\n")
-    print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html\n")
-
-    print("Tests finished!")
+    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
+    print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
+    print("\nTests finished!")
