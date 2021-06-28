@@ -774,7 +774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_Amendment_NoUniqueSlugFailure()
+        public async Task CreateReleaseStatus_Amendment_NoUniqueSlugFailure()
         {
             var releaseType = new ReleaseType {Title = "Ad Hoc"};
 
@@ -829,9 +829,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -849,7 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus()
+        public async Task CreateReleaseStatus()
         {
             var releaseId = Guid.NewGuid();
             var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
@@ -892,9 +892,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -946,7 +946,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_Approved_FailsOnChecklistErrors()
+        public async Task CreateReleaseStatus_Approved_FailsOnChecklistErrors()
         {
             var release = new Release
             {
@@ -989,9 +989,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -1010,7 +1010,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_Approved_FailsNoPublishScheduledDate()
+        public async Task CreateReleaseStatus_Approved_FailsNoPublishScheduledDate()
         {
             var release = new Release
             {
@@ -1046,9 +1046,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -1066,7 +1066,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_Approved_FailsChangingToDraft()
+        public async Task CreateReleaseStatus_Approved_FailsChangingToDraft()
         {
             var release = new Release
             {
@@ -1103,9 +1103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                         }
@@ -1119,7 +1119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_ReleaseHasImages()
+        public async Task CreateReleaseStatus_ReleaseHasImages()
         {
             var releaseId = Guid.NewGuid();
 
@@ -1194,9 +1194,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
@@ -1249,7 +1249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateReleaseStatus_ReleaseHasUnusedImages()
+        public async Task CreateReleaseStatus_ReleaseHasUnusedImages()
         {
             var releaseId = Guid.NewGuid();
 
@@ -1323,9 +1323,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
-                    .UpdateReleaseStatus(
+                    .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusUpdateViewModel
+                        new ReleaseStatusCreateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,

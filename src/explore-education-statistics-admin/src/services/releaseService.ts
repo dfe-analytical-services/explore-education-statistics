@@ -74,7 +74,7 @@ export interface UpdateReleaseRequest {
   preReleaseAccessList?: string;
 }
 
-export interface UpdateReleaseStatusRequest {
+export interface CreateReleaseStatusRequest {
   approvalStatus: ReleaseApprovalStatus;
   latestInternalReleaseNote?: string;
   publishMethod?: 'Scheduled' | 'Immediate';
@@ -193,11 +193,11 @@ const releaseService = {
     return client.put(`/releases/${releaseId}`, updateRequest);
   },
 
-  updateReleaseStatus(
+  createReleaseStatus(
     releaseId: string,
-    updateRequest: UpdateReleaseStatusRequest,
+    createRequest: CreateReleaseStatusRequest,
   ): Promise<Release> {
-    return client.put(`/releases/${releaseId}/status`, updateRequest);
+    return client.post(`/releases/${releaseId}/status`, createRequest);
   },
 
   deleteRelease(releaseId: string): Promise<void> {

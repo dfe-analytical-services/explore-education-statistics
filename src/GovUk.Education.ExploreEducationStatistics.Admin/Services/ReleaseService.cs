@@ -305,8 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseStatus(
-            Guid releaseId, ReleaseStatusUpdateViewModel request)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseStatus(
+            Guid releaseId, ReleaseStatusCreateViewModel request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)

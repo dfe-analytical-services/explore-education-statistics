@@ -119,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Draft
                             }
@@ -140,9 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
                             }
@@ -161,9 +161,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Approved
                             }

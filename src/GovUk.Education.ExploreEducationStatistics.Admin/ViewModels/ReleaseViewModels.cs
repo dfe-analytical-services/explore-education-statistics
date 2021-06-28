@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         private int Year => int.Parse(ReleaseName);
     }
 
-    public class ReleaseStatusUpdateViewModel
+    public class ReleaseStatusCreateViewModel
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
