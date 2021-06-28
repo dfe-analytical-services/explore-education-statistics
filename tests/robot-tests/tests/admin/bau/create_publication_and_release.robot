@@ -8,8 +8,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    teardown suite
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
-${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}    ${EMPTY}
@@ -24,11 +22,11 @@ teardown suite
 *** Test Cases ***
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains link    Create new publication
     user checks page does not contain button  ${PUBLICATION_NAME}
     user clicks link  Create new publication
-    user waits until page contains title caption  ${TOPIC_NAME}
+    user waits until page contains title caption  %{TEST_TOPIC_NAME}
     user waits until h1 is visible    Create new publication
 
 Enters contact details
@@ -56,14 +54,11 @@ User redirects to the dashboard after saving publication
 
 Verify that new publication has been created
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME} (created)
-    user opens accordion section  ${PUBLICATION_NAME} (created)
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME} (created)
     user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME} (created)  Suzanne Wallace
     user checks testid element contains  Contact phone number for ${PUBLICATION_NAME} (created)  0123456789
-    user checks testid element contains  Methodology for ${PUBLICATION_NAME} (created)  No methodology assigned
     user checks testid element contains  Releases for ${PUBLICATION_NAME} (created)  No releases created
 
 Create new test theme and topic
@@ -92,14 +87,11 @@ Update publication
     user clicks button  Confirm
 
 Add a methodology
-    user creates methodology for publication    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
 
 Verify publication has been updated
     [Tags]  HappyPath
-    user waits until h1 is visible  Dashboard
-    user selects theme and topic from admin dashboard  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson

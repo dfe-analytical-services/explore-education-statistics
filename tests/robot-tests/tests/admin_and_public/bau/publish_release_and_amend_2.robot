@@ -17,6 +17,10 @@ ${THIRD_SUBJECT}  upload file test with filter subject
 *** Test Cases ***
 Create publication
     [Tags]  HappyPath
+    user navigates to admin dashboard
+    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user clicks link  Create new publication
+    user waits until h1 is visible  Create new publication
     user creates publication  ${PUBLICATION_NAME}
 
 Create new methodology
@@ -45,7 +49,7 @@ Approve methodology
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks radio  Approved for publication
-    user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
+    user enters text into element  xpath=//*[@name="latestInternalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
     
 Check methodology is approved
@@ -55,8 +59,7 @@ Check methodology is approved
 
 Create new release
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020
     user clicks link  Data and files
@@ -309,9 +312,7 @@ Return to Admin
 
 Change methodology status to Draft
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks link  ${PUBLICATION_NAME}
+    user views methodology for publication   ${PUBLICATION_NAME}
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks element  id:methodologyStatusForm-status-Draft
@@ -356,7 +357,7 @@ Replace subject data
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains  Footnotes: ERROR  120
+    user waits until page contains  Footnotes: ERROR  %{WAIT_MEDIUM}
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
@@ -481,7 +482,7 @@ Add subject to release
     user clicks link  Data and files
     user uploads subject   ${THIRD_SUBJECT}  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
-Add meta guidance to ${THIRD_SUBJECT} subject
+Add meta guidance to third subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}  meta content
@@ -523,7 +524,7 @@ Go to public Table Tool page for amendment
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables
 
-Select publication ${PUBLICATION_NAME}
+Select publication
     [Tags]  HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -533,7 +534,7 @@ Select publication ${PUBLICATION_NAME}
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select subject ${SUBJECT_NAME}
+Select subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit

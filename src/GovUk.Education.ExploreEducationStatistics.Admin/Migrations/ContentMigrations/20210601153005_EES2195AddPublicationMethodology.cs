@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("UPDATE Methodologies SET Content = '[]' WHERE Content IS NULL");
             migrationBuilder.Sql("UPDATE Methodologies SET Annexes = '[]' WHERE Annexes IS NULL");
 
             migrationBuilder.AlterColumn<string>(

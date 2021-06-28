@@ -25,7 +25,7 @@ Navigate to admin dashboard and assert publication is present
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_MEDIUM}
 
 Navigate to manage users page as bau1
     [Tags]  HappyPath
@@ -145,8 +145,7 @@ User goes back to admin dashboard
 
 Assert that a publication owner can make a new release 
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020
@@ -217,7 +216,7 @@ Check release owner can access release
     user changes to analyst1
     user waits for page to finish loading
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_MEDIUM}
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
     ...  ${RELEASE_TYPE} (not Live)
 
@@ -279,14 +278,11 @@ Assign viewer only access to Analyst1
 Sign in as Analyst1 User1 & navigate to publication
     [Tags]  HappyPath
     user changes to analyst1
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
 
 Navigate to release as a viewer
     [Tags]  HappyPath
-    user navigates to admin dashboard
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}
@@ -324,9 +320,7 @@ Login as a release contributor
 
 Assert release contributor cannot create an amendment
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  60 
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}  30
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]  30
