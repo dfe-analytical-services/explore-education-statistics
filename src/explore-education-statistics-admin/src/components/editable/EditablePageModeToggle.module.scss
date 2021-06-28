@@ -1,12 +1,13 @@
 @import '~govuk-frontend/govuk/base';
-/* stylelint-disable max-nesting-depth */
+
 .toggle {
   background: $govuk-brand-colour;
   bottom: 0;
   left: 0;
+  max-width: 390px;
   padding: 6px;
   position: fixed;
-  width: 390px;
+  width: 100%;
   z-index: 10000;
 
   @media print {
@@ -43,24 +44,27 @@
     border-color: govuk-colour('yellow');
     outline: none;
   }
+}
 
-  :global(.govuk-accordion__icon) {
-    &::before,
-    &::after {
-      background-color: govuk-colour('white');
-    }
-  }
-
-  .open & {
-    margin-bottom: 6px;
-
-    :global(.govuk-accordion__icon) {
-      &::after {
-        content: none;
-      }
-    }
+.button :global(.govuk-accordion__icon) {
+  &::before,
+  &::after {
+    background-color: govuk-colour('white');
   }
 }
+
+.open :global(.govuk-accordion__icon) {
+  &::after {
+    content: none;
+  }
+}
+
+.open {
+  .button {
+    margin-bottom: 6px;
+  }
+}
+
 .content {
   background-color: govuk-colour('white');
   display: none;

@@ -1,12 +1,13 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
-import React, { useState } from 'react';
+import useToggle from '@common/hooks/useToggle';
+import React from 'react';
 import classNames from 'classnames';
 import styles from './EditablePageModeToggle.module.scss';
 
 const EditablePageModeToggle = () => {
   const { isEditing, setEditing } = useEditingContext();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, toggleOpen] = useToggle(true);
 
   return (
     <div
@@ -17,7 +18,7 @@ const EditablePageModeToggle = () => {
       <button
         type="button"
         id="pageViewToggleButton"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         className={styles.button}
         aria-expanded={isOpen}
       >
