@@ -49,12 +49,12 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     }
 
     const nextRelease = await releaseService.updateRelease(releaseId, {
-      ...release,
+      releaseName: values.timePeriodCoverageStartYear,
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
-      releaseName: values.timePeriodCoverageStartYear,
       typeId: values.releaseTypeId,
+      preReleaseAccessList: release.preReleaseAccessList,
     });
 
     onReleaseChange(nextRelease);

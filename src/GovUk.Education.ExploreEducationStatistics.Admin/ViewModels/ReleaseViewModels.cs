@@ -121,39 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PreReleaseAccessList { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus { get; set; }
-
-        public string LatestInternalReleaseNote { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public PublishMethod? PublishMethod { get; set; }
-
-        [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string PublishScheduled { get; set; }
-
-        public DateTime? PublishScheduledDate
-        {
-            get
-            {
-                if (PublishScheduled.IsNullOrEmpty())
-                {
-                    return null;
-                }
-
-                DateTime.TryParseExact(
-                    PublishScheduled,
-                    "yyyy-MM-dd",
-                    InvariantCulture,
-                    DateTimeStyles.None,
-                    out var dateTime
-                );
-                return dateTime.AsStartOfDayUtcForTimeZone();
-            }
-        }
-
-        [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
-
         [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
 
         public string Slug => SlugFromTitle(Title);
@@ -163,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         private int Year => int.Parse(ReleaseName);
     }
 
-    public class ReleaseStatusUpdateViewModel
+    public class ReleaseStatusCreateViewModel
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }

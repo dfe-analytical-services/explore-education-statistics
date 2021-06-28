@@ -38,7 +38,7 @@ const ReleaseStatusEditPage = ({
         statusPermissions={statusPermissions}
         onCancel={onCancel}
         onSubmit={async values => {
-          const nextRelease = await releaseService.updateReleaseStatus(
+          const nextRelease = await releaseService.createReleaseStatus(
             release.id,
             {
               ...values,
