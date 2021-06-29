@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         contentDbContext: provider.GetService<ContentDbContext>(),
                         statisticsDbContext: provider.GetService<StatisticsDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        methodologyService: provider.GetService<IMethodologyService>(),
                         releaseSubjectService: provider.GetService<IReleaseSubjectService>(),
                         logger: provider.GetRequiredService<ILogger<ReleaseService>>(),
                         mapper: provider.GetRequiredService<IMapper>()

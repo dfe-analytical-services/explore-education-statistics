@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 destinationDirectoryPath: string.Empty
             );
 
-            await _releaseService.SetPublishedDatesAsync(releaseId, DateTime.UtcNow);
+            await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
         }
 
         public async Task PublishMethodologyFiles(Guid methodologyId)

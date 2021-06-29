@@ -43,5 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(file => types.Contains(file.Type))
                 .ToListAsync();
         }
+
+        public async Task SetPublishedDatesByPublication(Guid publicationId, DateTime published)
+        {
+            var methodologies = await _methodologyRepository.GetLatestPublishedByPublication(publicationId);
+
+            _context.UpdateRange(methodologies);
+
+            methodologies.ForEach(methodology => { methodology.Published ??= published; });
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

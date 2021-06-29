@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -1133,12 +1134,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext = null,
             IBlobStorageService publicBlobStorageService = null,
+            IMethodologyService methodologyService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             return new ReleaseService(
                 contentDbContext,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
+                methodologyService ?? new Mock<IMethodologyService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new Mock<ILogger<ReleaseService>>().Object,
                 MapperForProfile<MappingProfiles>());
