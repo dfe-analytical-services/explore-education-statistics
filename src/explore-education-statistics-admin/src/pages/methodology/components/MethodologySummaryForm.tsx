@@ -3,6 +3,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
@@ -11,6 +12,7 @@ import React from 'react';
 
 export interface MethodologySummaryFormValues {
   title: string;
+  titleType?: 'publication' | 'alternative';
 }
 
 const errorMappings = [
@@ -23,6 +25,7 @@ const errorMappings = [
 ];
 
 interface Props {
+  canUpdateTitle?: boolean;
   id: string;
   initialValues?: MethodologySummaryFormValues;
   submitText: string;
@@ -31,6 +34,7 @@ interface Props {
 }
 
 const MethodologySummaryForm = ({
+  canUpdateTitle = false, // EES-2159 - flip to true to test. Replace with actual permission or remove.
   id,
   initialValues,
   submitText,
@@ -44,6 +48,62 @@ const MethodologySummaryForm = ({
     errorMappings,
   );
 
+  // EES-2159 - new version of the form. The form values will probably need to be changed when the BE is done.
+  if (canUpdateTitle) {
+    return (
+      <Formik<MethodologySummaryFormValues>
+        enableReinitialize
+        initialValues={
+          initialValues ??
+          ({
+            title: '',
+            titleType: 'publication',
+          } as MethodologySummaryFormValues)
+        }
+        validationSchema={Yup.object<MethodologySummaryFormValues>({
+          titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
+            .oneOf(['publication', 'alternative'])
+            .required('Choose a title type'),
+          title: Yup.string().when('titleType', {
+            is: 'alternative',
+            then: Yup.string().required('Enter a methodology title'),
+            otherwise: Yup.string(),
+          }),
+        })}
+        onSubmit={handleSubmit}
+      >
+        <Form id={id}>
+          <FormFieldRadioGroup<MethodologySummaryFormValues>
+            legend="Methodology title"
+            name="titleType"
+            order={[]}
+            options={[
+              {
+                label: 'Use publication title',
+                value: 'publication',
+              },
+              {
+                label: 'Set an  alternative title',
+                value: 'alternative',
+                conditional: (
+                  <FormFieldTextInput<MethodologySummaryFormValues>
+                    label="Enter methodology title"
+                    name="title"
+                  />
+                ),
+              },
+            ]}
+          />
+          <ButtonGroup>
+            <Button type="submit">{submitText}</Button>
+            <ButtonText onClick={onCancel}>Cancel</ButtonText>
+          </ButtonGroup>
+        </Form>
+      </Formik>
+    );
+  }
+
+  // EES-2159 - remove this version of the form
   return (
     <Formik<MethodologySummaryFormValues>
       enableReinitialize
