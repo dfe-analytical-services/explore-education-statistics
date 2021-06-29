@@ -200,7 +200,7 @@ const ReleaseStatusForm = ({
                 name="publishMethod"
                 legend="When to publish"
                 legendSize="m"
-                hint="Do you want to publish this release on a specific date or as soon as possible?"
+                hint="Do you want to publish this release on a specific date or immediately?"
                 order={[]}
                 options={[
                   {
@@ -215,13 +215,13 @@ const ReleaseStatusForm = ({
                     ),
                   },
                   {
-                    label: 'As soon as possible',
+                    label: 'Immediately',
                     value: 'Immediate',
                     conditional: (
                       <WarningMessage className="govuk-!-width-two-thirds">
-                        This will start the release process immediately and make
-                        statistics available to the public. Make sure this is
-                        okay before continuing.
+                        The time taken by the release process will vary. Contact
+                        us if the release has not been published within one
+                        hour.
                       </WarningMessage>
                     ),
                   },
