@@ -1401,7 +1401,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2035",
                 Slug = "2035-1",
                 Version = 0,
-                InternalReleaseNote = "Test release note",
                 PreReleaseAccessList = "Test access list",
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
