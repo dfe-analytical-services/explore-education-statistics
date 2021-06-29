@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q2",
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
@@ -672,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -680,7 +680,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext);
 
@@ -699,14 +699,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext);
 
@@ -722,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -735,7 +735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
@@ -884,7 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -915,7 +915,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -993,7 +993,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -1024,7 +1024,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -1061,7 +1061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -1092,7 +1092,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
