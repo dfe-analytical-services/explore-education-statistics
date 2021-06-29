@@ -99,19 +99,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 })
                 .OnSuccess(async methodology =>
                 {
+                    _context.Methodologies.Update(methodology);
+
                     methodology.InternalReleaseNote = request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Updated = DateTime.UtcNow;
 
-                    _context.Methodologies.Update(methodology);
-                    await _context.SaveChangesAsync();
-
                     if (methodology.PubliclyAccessible)
                     {
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
+
+                        // TODO SOW4 EES-2166 EES-2200
+                        // Until it's possible to create an amendment we still allow un-approving and re-approving.
+                        // This means the methodology may already have a published date that it was first published on,
+                        // so don't overwrite it. Later this can be changed to:
+                        // methodology.Published = DateTime.UtcNow;
+
+                        methodology.Published ??= DateTime.UtcNow;
                     }
+
+                    await _context.SaveChangesAsync();
 
                     return await GetSummary(id);
                 });

@@ -43,28 +43,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = new Mock<IMethodologyRepository>(Strict);
-            
+
                 var service = SetupMethodologyService(
-                    context, 
+                    context,
                     methodologyRepository: repository.Object);
 
                 var createdMethodology = new Methodology
                 {
                     Id = Guid.NewGuid()
                 };
-            
+
                 repository
                     .Setup(s => s.CreateMethodologyForPublication(publication.Id))
                     .ReturnsAsync(createdMethodology);
 
                 var result = await service.CreateMethodology(publication.Id);
                 VerifyAllMocks(repository);
-            
+
                 var viewModel = result.AssertRight();
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
             }
         }
-        
+
         [Fact]
         public async Task GetSummary()
         {
@@ -155,6 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
+                Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
@@ -251,6 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
+                Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
@@ -354,6 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
+                Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
@@ -413,7 +416,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
-                Assert.Null(viewModel.Published);
+                Assert.True(viewModel.Published.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published.Value).Milliseconds, 0, 1500);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -422,6 +426,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
+                Assert.True(model.Published.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Published.Value).Milliseconds, 0, 1500);
                 Assert.Equal(Approved, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
@@ -487,6 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
+                Assert.Null(model.Published);
                 Assert.Equal(Approved, model.Status);
                 Assert.Equal(WithRelease, model.PublishingStrategy);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
@@ -561,7 +568,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var model = await context.Methodologies.FindAsync(methodology.Id);
 
-                Assert.Equal(Approved,model.Status);
+                Assert.Equal(methodology.Published, model.Published);
+                Assert.Equal(Approved, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 // Slug remains unchanged
                 Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
