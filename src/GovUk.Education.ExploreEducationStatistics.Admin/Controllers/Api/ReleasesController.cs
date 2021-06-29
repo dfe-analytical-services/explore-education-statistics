@@ -173,12 +173,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId}/status")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseStatus(ReleaseStatusUpdateViewModel request,
+        [HttpPost("releases/{releaseId}/status")]
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseStatus(ReleaseStatusCreateViewModel request,
             Guid releaseId)
         {
             return await _releaseService
-                .UpdateReleaseStatus(releaseId, request)
+                .CreateReleaseStatus(releaseId, request)
                 .HandleFailuresOrOk();
         }
 

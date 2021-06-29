@@ -204,8 +204,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
-
         private PartialDate _nextReleaseDate;
 
         public PartialDate NextReleaseDate
@@ -242,7 +240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
             amendment.PreviousVersionId = Id;
-            amendment.InternalReleaseNote = null;
 
             var context = new CloneContext();
 

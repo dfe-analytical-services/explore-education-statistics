@@ -143,7 +143,7 @@ Approve release for immediate publication but don't wait to finish
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
+    user clicks radio   Immediately
     user clicks button   Update status
     user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved

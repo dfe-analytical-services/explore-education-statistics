@@ -411,9 +411,7 @@ describe('ReleaseStatusForm', () => {
       expect(
         whenToPublish.getByLabelText('On a specific date'),
       ).not.toBeChecked();
-      expect(
-        whenToPublish.getByLabelText('As soon as possible'),
-      ).not.toBeChecked();
+      expect(whenToPublish.getByLabelText('Immediately')).not.toBeChecked();
     });
 
     test('renders correctly with published date', () => {
@@ -722,7 +720,7 @@ describe('ReleaseStatusForm', () => {
         'Test release note',
       );
 
-      userEvent.click(screen.getByLabelText('As soon as possible'));
+      userEvent.click(screen.getByLabelText('Immediately'));
 
       const nextReleaseDate = within(
         screen.getByRole('group', { name: 'Next release expected (optional)' }),

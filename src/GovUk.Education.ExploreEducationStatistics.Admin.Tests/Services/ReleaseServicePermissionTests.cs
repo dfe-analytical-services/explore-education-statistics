@@ -110,69 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_Draft()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateRelease(
-                            _release.Id,
-                            new ReleaseUpdateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.Draft
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateRelease_SubmitForHigherLevelReview()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateRelease(
-                            _release.Id,
-                            new ReleaseUpdateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateRelease_Approve()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanApproveSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateRelease(
-                            _release.Id,
-                            new ReleaseUpdateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.Approved
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
         public async Task UpdateReleaseStatus_Draft()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -182,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Draft
                             }
@@ -203,9 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
                             }
@@ -224,9 +161,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateReleaseStatus(
+                        return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusUpdateViewModel
+                            new ReleaseStatusCreateViewModel
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Approved
                             }
