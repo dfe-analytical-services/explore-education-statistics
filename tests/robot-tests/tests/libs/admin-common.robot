@@ -529,7 +529,7 @@ user removes release access from analyst
     # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
     # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
     Sleep  1
-    user clicks element  testid:remove-release-role-${RELEASE_NAME}
+    user clicks element  testid:remove-release-role-${ROLE}
     user waits until page does not contain loading spinner
 
 user goes to manage user
