@@ -142,8 +142,7 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
-output_file="output.xml" if args.rerun_failed_tests or args.rerun_failed_suites or args.ci else "output.xml"
-
+output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
@@ -164,8 +163,6 @@ if args.tags:
 
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
-    robotArgs += ["--rerunfailedsuites", "test-results/xunit.xml"]
-
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
     robotArgs += ['--removekeywords',
