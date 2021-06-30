@@ -15,6 +15,6 @@ pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --fi
 
 if [ $? -ne 0 ]
 then
-  echo "Tests failed, so rerunning test"
+  echo "Tests failed, so rerunning test suites"
   pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4 --rerun-failed-suites
 fi
