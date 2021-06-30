@@ -65,7 +65,7 @@ Assert that test users are present in table
 
 Give Analyst1 User1 publication owner access
     [Tags]  HappyPath
-    user gives analyst publication owner access  ees-analyst1@education.gov.uk  ${PUBLICATION_NAME}
+    user gives analyst publication owner access  ${PUBLICATION_NAME}
 
 Sign in as Analyst1 User1 (publication owner) & navigate to publication
     [Tags]  HappyPath
@@ -177,66 +177,34 @@ Assert publication owner cannot approve release for immediate publication on new
     user scrolls to element  id:releaseStatusForm-approvalStatus-Approved
     user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
 
-Navigate to administration as bau1 to remove publication owner access
+Navigate to administration as bau1 and swap publication owner role for release approver
     [Tags]  HappyPath
     user changes to bau1
-    user goes to url  %{ADMIN_URL}/administration/users
+    user removes publication owner access from analyst  ${PUBLICATION_NAME}
+    user gives release access to analyst  ${RELEASE_NAME}  Approver
 
-Navigate to manage users
-    [Tags]  HappyPath    
-    user clicks link  Manage  xpath://td[text()="ees-analyst1@education.gov.uk"]/..
-    user waits until page does not contain loading spinner
-
-Remove publication owner access 
-    [Tags]  HappyPath
-    user scrolls to element  css:[name="selectedPublicationId"]
-    user waits until element is enabled  css:[name="selectedPublicationId"]
-    user scrolls to element  css:[name="selectedPublicationId"]
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which 
-    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
-    Sleep  1  
-    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
-
-Give release approver access to Analyst1
-    [Tags]  HappyPath
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which 
-    # causes issues with getting the 'selectedReleaseId' selector (staleElementException)
-    Sleep  1
-    user scrolls to element  css:[name="selectedReleaseId"]
-    user waits until element is enabled  css:[name="selectedReleaseId"]
-    user scrolls to element  css:[name="selectedReleaseId"]
-    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-    user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Approver
-    user clicks button  Add release access
-    user waits until page does not contain loading spinner
-
-Check release owner can access release
+Check release approver can access release
     [Tags]  HappyPath
     user changes to analyst1
-    user waits for page to finish loading
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_MEDIUM}
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
-    ...  ${RELEASE_TYPE} (not Live)
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${RELEASE_TYPE} (not Live)
 
 Navigate to 'Footnotes' section
     [Tags]  HappyPath
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
-Add a Footnote as a release owner
+Add a Footnote as a release approver
     [Tags]  HappyPath
     user waits until page contains link  Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user clicks footnote radio   ${SUBJECT_NAME}   Applies to all data
     user clicks element  id:footnoteForm-content
-    user enters text into element  id:footnoteForm-content  A footnote as analyst1 User1 with the release owner role
+    user enters text into element  id:footnoteForm-content  A footnote as analyst1 User1 with the release approver role
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Assert release owner can create a release note
+Assert release approver can create a release note
     [Tags]  HappyPath
     user clicks link  Content
     user clicks button   Add note
@@ -246,42 +214,18 @@ Assert release owner can create a release note
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
-Assert release owner can publish a release  
+Assert release approver can publish a release  
     user clicks link  Sign off
     user approves release for immediate publication
 
-Navigate to administration as bau1 to assign viewer only access
-    [Tags]  HappyPath    
+Navigate to administration as bau1 and swap release approver role for viewer only
     user changes to bau1
-    user goes to url  %{ADMIN_URL}/administration/users
-
-Navigate to manage users as bau1
-    [Tags]  HappyPath
-    user clicks link  Manage  xpath://td[text()="ees-analyst1@education.gov.uk"]/..
-    user waits until page does not contain loading spinner
-    
-Remove release owner access from Analyst1 
-    [Tags]  HappyPath
-    user waits until element is enabled  css:[data-testid="remove-release-role-Approver"]
-    user clicks element  testid:remove-release-role-Approver
-    user waits until page does not contain loading spinner
-
-Assign viewer only access to Analyst1
-    [Tags]  HappyPath
-    user waits for page to finish loading 
-    user waits until element is enabled  css:[name="selectedReleaseId"]
-    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
-    user waits until element is enabled  css:[name="selectedReleaseRole"]
-    user selects from list by label  css:[name="selectedReleaseRole"]  Viewer
-    user clicks button  Add release access
-    
-Sign in as Analyst1 User1 & navigate to publication
-    [Tags]  HappyPath
-    user changes to analyst1
-    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+    user removes release access from analyst  ${RELEASE_NAME}  Approver
+    user gives release access to analyst  ${RELEASE_NAME}  Viewer
 
 Navigate to release as a viewer
     [Tags]  HappyPath
+    user changes to analyst1
     user opens publication on the admin dashboard   ${PUBLICATION_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
@@ -300,26 +244,15 @@ Check release viewer cannot approve release
     user waits until page does not contain loading spinner
     user checks page does not contain  Edit release status
 
-Login as bau1 to remove viewer access 
+Login as bau1 and swap viewer role for contributor role for analyst
     [Tags]  HappyPath
     user changes to bau1
-    user goes to url  %{ADMIN_URL}/administration/users 
+    user removes release access from analyst   ${RELEASE_NAME}  Viewer
+    user gives release access to analyst   ${RELEASE_NAME}  Contributor
 
-Navigate to manage users page to remove viewer access
-    [Tags]  HappyPath    
-    user clicks link  Manage  xpath://td[text()="ees-analyst1@education.gov.uk"]/..
-    user waits until page does not contain loading spinner
-
-Give release contributor access to Analyst1
-    [Tags]  HappyPath
-    user gives analyst release access   ${RELEASE_NAME}  Contributor
-
-Login as a release contributor 
+Check release contributor cannot create an amendment
     [Tags]  HappyPath
     user changes to analyst1
-
-Assert release contributor cannot create an amendment
-    [Tags]  HappyPath
     user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}  30
