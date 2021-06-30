@@ -405,14 +405,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Add(topic);
-                contentDbContext.Add(methodology);
-                contentDbContext.Add(publication);
-
+                await contentDbContext.AddRangeAsync(topic, methodology, publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Add(new Data.Model.Publication
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    TopicId = publication.TopicId
+                });
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -437,20 +446,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.Equal("New title", result.Right.Title);
+                Assert.True(result.IsRight);
+                var viewModel = result.Right;
 
-                Assert.Equal("John Smith", result.Right.Contact.ContactName);
-                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
-                Assert.Equal("Test team", result.Right.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+                Assert.Equal("New title", viewModel.Title);
 
-                Assert.Equal(topic.Id, result.Right.TopicId);
+                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Test team", viewModel.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
-                Assert.Equal("New methodology", result.Right.Methodology.Title);
+                Assert.Equal(topic.Id, viewModel.TopicId);
 
-                // Do an in depth check of the saved release
-                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
+                Assert.Equal(methodology.Id, viewModel.Methodology.Id);
+                Assert.Equal("New methodology", viewModel.Methodology.Title);
+
+                var updatedPublication = await contentDbContext.Publications.FindAsync(viewModel.Id);
                 Assert.False(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
@@ -467,6 +478,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
                 Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+
+                var updatedStatsPublication = await statisticsDbContext.Publication.FindAsync(viewModel.Id);
+                Assert.NotNull(updatedStatsPublication);
+                Assert.Equal("New title", updatedStatsPublication.Title);
+                Assert.Equal("new-title", updatedStatsPublication.Slug);
+                Assert.Equal(topic.Id, updatedStatsPublication.TopicId);
             }
         }
 
@@ -507,14 +524,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Add(topic);
-                contentDbContext.Add(methodology);
-                contentDbContext.Add(publication);
-
+                await contentDbContext.AddRangeAsync(topic, methodology, publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Add(new Data.Model.Publication
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    TopicId = publication.TopicId
+                });
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -539,25 +565,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.Equal("New title", result.Right.Title);
+                Assert.True(result.IsRight);
+                var viewModel = result.Right;
 
-                Assert.Equal("John Smith", result.Right.Contact.ContactName);
-                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
-                Assert.Equal("Test team", result.Right.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+                Assert.Equal("New title", viewModel.Title);
+                Assert.Equal("old-title", viewModel.Slug);
+                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Test team", viewModel.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, result.Right.TopicId);
+                Assert.Equal(topic.Id, viewModel.TopicId);
 
-                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
-                Assert.Equal("New methodology", result.Right.Methodology.Title);
+                Assert.Equal(methodology.Id, viewModel.Methodology.Id);
+                Assert.Equal("New methodology", viewModel.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await contentDbContext.Publications.FindAsync(viewModel.Id);
                 Assert.True(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
-                // Slug remains unchanged
-                Assert.Equal("old-title", updatedPublication.Slug);
+                Assert.Equal("old-title", updatedPublication.Slug); // Slug remains unchanged
                 Assert.Equal("New title", updatedPublication.Title);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
@@ -570,6 +598,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
                 Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+
+                var updatedStatPublication = await statisticsDbContext.Publication.FindAsync(viewModel.Id);
+                Assert.NotNull(updatedStatPublication);
+                Assert.Equal("New title", updatedStatPublication.Title);
+                Assert.Equal("old-title", updatedStatPublication.Slug); // Slug remains unchanged
+                Assert.Equal(topic.Id, updatedStatPublication.TopicId);
             }
         }
 
@@ -694,13 +728,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
+                Assert.True(result.IsRight);
+                var viewModel = result.Right;
+
+                var updatedPublication = await contentDbContext.Publications.FindAsync(viewModel.Id);
 
                 Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
                 Assert.Equal("Test team", updatedPublication.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+
+                var updatedStatsPublication = await statisticsDbContext.Publication.FindAsync(viewModel.Id);
+                Assert.Null(updatedStatsPublication); // If no existing stats db pub, don't create one
             }
         }
 
@@ -856,8 +896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Add(methodology);
-                contentDbContext.Add(publication);
+                await contentDbContext.AddRangeAsync(methodology, publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -984,6 +1023,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                Assert.True(result.IsRight);
                 var legacyReleases = result.Right;
 
                 Assert.Equal(2, legacyReleases.Count);
