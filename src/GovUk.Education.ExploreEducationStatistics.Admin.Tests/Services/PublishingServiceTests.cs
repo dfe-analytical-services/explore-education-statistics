@@ -13,6 +13,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -57,26 +58,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var mocks = Mocks();
 
-            var release = new Release
+            var release = new Release();
+            var releaseStatus = new ReleaseStatus
             {
-                Id = Guid.NewGuid()
+                Release = release
             };
 
             using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
             {
-                context.Add(release);
+                context.Add(releaseStatus);
                 context.SaveChanges();
             }
 
             using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
             {
                 var publishingService = BuildPublishingService(context, mocks);
-                var result = publishingService.ReleaseChanged(release.Id, true).Result;
+                var result = publishingService
+                    .ReleaseChanged(release.Id, releaseStatus.Id, true)
+                    .Result;
 
                 mocks.StorageQueueService.Verify(
                     mock => mock.AddMessageAsync(NotifyChangeQueue,
                         It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseId == release.Id && message.Immediate)), Times.Once());
+                            message.ReleaseId == release.Id 
+                            && message.ReleaseStatusId == releaseStatus.Id
+                            && message.Immediate)), Times.Once());
 
                 Assert.True(result.IsRight);
             }

@@ -61,7 +61,12 @@ const ReleaseHelpAndSupportSection = ({
             <NationalStatisticsSection />
           </AccordionSection>
         )}
-        <AccordionSection heading="Contact us" headingTag="h3">
+        <AccordionSection
+          heading="Contact us"
+          headingTag="h3"
+          id="contact-us"
+          caption="Ask questions and provide feedback"
+        >
           <ContactUsSection
             publicationContact={publication.contact}
             publicationTitle={publication.title}

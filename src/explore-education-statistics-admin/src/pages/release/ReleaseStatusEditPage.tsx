@@ -38,17 +38,17 @@ const ReleaseStatusEditPage = ({
         statusPermissions={statusPermissions}
         onCancel={onCancel}
         onSubmit={async values => {
-          const nextRelease = await releaseService.updateRelease(release.id, {
-            ...release,
-            typeId: release.type.id,
-            ...values,
-            publishScheduled: values.publishScheduled
-              ? formatISO(values.publishScheduled, {
-                  representation: 'date',
-                })
-              : undefined,
-          });
-
+          const nextRelease = await releaseService.createReleaseStatus(
+            release.id,
+            {
+              ...values,
+              publishScheduled: values.publishScheduled
+                ? formatISO(values.publishScheduled, {
+                    representation: 'date',
+                  })
+                : undefined,
+            },
+          );
           onUpdate(nextRelease);
         }}
       />

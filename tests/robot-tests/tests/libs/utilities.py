@@ -1,38 +1,35 @@
 import json
-
 import pytz
 import time
-import re
 import datetime
 from logging import warn
-
 from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary import ElementFinder
 from SeleniumLibrary.errors import ElementNotFound
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = ElementFinder(sl)
 waiting = WaitingKeywords(sl)
 
-
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
 
 
-def user_waits_until_parent_contains_element(parent_locator: str, child_locator: str,
+def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
     try:
-        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+        if isinstance(parent_locator, str):
+            sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+            parent_el = sl.find_element(parent_locator)
+        else:
+            parent_el = parent_locator
 
         def parent_contains_matching_element() -> bool:
-            parent_el = sl.find_element(parent_locator)
             return element_finder.find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(limit):
@@ -45,7 +42,6 @@ def user_waits_until_parent_contains_element(parent_locator: str, child_locator:
         limit = int(limit)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = sl.find_element(parent_locator)
             return len(sl.find_elements(child_locator, parent=parent_el)) == limit
 
         waiting._wait_until(
@@ -55,18 +51,21 @@ def user_waits_until_parent_contains_element(parent_locator: str, child_locator:
             timeout, error
         )
     except Exception as err:
+        warn(f"Error whilst executing utilities.py user_waits_until_parent_contains_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
-def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_locator: str,
+def user_waits_until_parent_does_not_contain_element(parent_locator: object, child_locator: str,
                                                      timeout: int = None, error: str = None,
                                                      limit: int = None):
     try:
-        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
-                                            limit=limit)
+        if isinstance(parent_locator, str):
+            sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+            parent_el = sl.find_element(parent_locator)
+        else:
+            parent_el = parent_locator
 
         def parent_does_not_contain_matching_element() -> bool:
-            parent_el = sl.find_element(parent_locator)
             return element_finder.find(child_locator, required=False, parent=parent_el) is None
 
         if is_noney(limit):
@@ -80,7 +79,6 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_
         limit = int(limit)
 
         def parent_does_not_contain_matching_elements() -> bool:
-            parent_el = sl.find_element(parent_locator)
             return len(sl.find_elements(child_locator, parent=parent_el)) != limit
 
         waiting._wait_until(
@@ -90,31 +88,40 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_
             timeout, error
         )
     except Exception as err:
+        warn(f"Error whilst executing utilities.py user_waits_until_parent_does_not_contain_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
-def get_child_element(parent_locator: str, child_locator: str):
-    parent_el = None
+def get_child_element(parent_locator: object, child_locator: str):
 
     try:
-        parent_el = sl.find_element(parent_locator)
-    except Exception as err:
-        raise_assertion_error(err)
+        if isinstance(parent_locator, str):
+            sl.wait_until_page_contains_element(parent_locator)
+            parent_el = sl.find_element(parent_locator)
+        else:
+            parent_el = parent_locator
 
-    try:
         return sl.find_element(child_locator, parent=parent_el)
-    except ElementNotFound:
+    except ElementNotFound as err:
+        warn(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(
             f"Could not find child '{child_locator}' within parent '{parent_locator}'")
     except Exception as err:
+        warn(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
-def get_child_elements(parent_locator: str, child_locator: str):
+def get_child_elements(parent_locator: object, child_locator: str):
     try:
-        parent_el = sl.find_element(parent_locator)
+        if isinstance(parent_locator, str):
+            sl.wait_until_page_contains_element(parent_locator)
+            parent_el = sl.find_element(parent_locator)
+        else:
+            parent_el = parent_locator
+
         return sl.find_elements(child_locator, parent=parent_el)
     except Exception as err:
+        error(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
 
 
@@ -281,9 +288,5 @@ def remove_substring_from_right_of_string(string, substring):
 
 
 def user_clicks_element_if_exists(selector):
-    if element_finder.find(selector, required=False) is not None:
-        sl.click_element(selector)
-
-def user_chooses_what_to_do_on_step_failure(selector):
     if element_finder.find(selector, required=False) is not None:
         sl.click_element(selector)

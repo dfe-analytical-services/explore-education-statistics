@@ -513,6 +513,18 @@
       "type": "int",
       "defaultValue": -1
     },
+    "minCapacityContentDb": {
+      "type": "string",
+      "defaultValue": "0.75"
+    },
+    "maxCapacityContentDb": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "autoPauseDelayContentDb": {
+      "type": "int",
+      "defaultValue": -1
+    },
     "deploySlotName": {
       "type": "string",
       "defaultValue": "deploy"
@@ -2021,11 +2033,22 @@
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityContentDb')]"
+          },
+          "kind": "v12.0,user,vcore,serverless",
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "S1"
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": "[parameters('autoPauseDelayContentDb')]",
+            "storageAccountType": "GRS",
+            "minCapacity": "[parameters('minCapacityContentDb')]"
           }
         },
         {

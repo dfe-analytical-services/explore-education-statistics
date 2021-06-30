@@ -64,6 +64,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Update> Updates { get; set; }
 
+        public List<ReleaseStatus> ReleaseStatuses { get; set; }
+
+        public string LatestInternalReleaseNote
+        {
+            get
+            {
+                return ReleaseStatuses?.Count > 0
+                    ? ReleaseStatuses.OrderBy(rs => rs.Created).Last().InternalReleaseNote
+                    : null;
+            }
+        }
+
         [JsonIgnore]
         public List<ReleaseContentSection> Content { get; set; }
 
@@ -192,8 +204,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
-
         private PartialDate _nextReleaseDate;
 
         public PartialDate NextReleaseDate
@@ -230,7 +240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
             amendment.PreviousVersionId = Id;
-            amendment.InternalReleaseNote = null;
 
             var context = new CloneContext();
 

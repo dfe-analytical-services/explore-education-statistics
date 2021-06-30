@@ -101,20 +101,21 @@ Validate Bury Number of fixed period exclusions row
 
 User generates a permanent link
     [Tags]   HappyPath
-    user clicks button    Share your table
+    user waits until page contains button  Generate shareable link  60
+    user clicks button    Generate shareable link
     user waits until page contains testid  permalink-generated-url
     user checks generated permalink is valid
 
 User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View share link
-    select window    NEW
-    user waits until h1 is visible  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
+    user selects newly opened window
+    user waits until h1 is visible  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'  60
 
 User validates permalink contains correct date
     [Tags]  HappyPath
     ${date}=  get current datetime  %-d %B %Y
-    user checks page contains element   xpath://*[@data-testid="created-date"]//time[text()="${date}"]
+    user checks page contains element  xpath://*[@data-testid="created-date"]//strong//time[text()="${date}"]
 
 User validates permalink table headers
     [Tags]   HappyPath

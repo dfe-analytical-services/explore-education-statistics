@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = createdById
             };
-            var internalReleaseNote = "Release note";
+            var latestInternalReleaseNote = "Release note";
             var releaseApprovalStatus = ReleaseApprovalStatus.Approved;
             var publishScheduled = DateTime.Now.AddDays(1);
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
@@ -101,7 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = createdDate,
                 CreatedBy = createdBy,
                 CreatedById = createdById,
-                InternalReleaseNote = internalReleaseNote,
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new ReleaseStatus
+                    {
+                        ReleaseId = releaseId,
+                        InternalReleaseNote = latestInternalReleaseNote,
+                        Created = DateTime.UtcNow
+                    }
+                },
                 RelatedInformation = new List<Link>
                 {
                     new Link
@@ -432,7 +440,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(amendment.Created).Milliseconds, 0, 1500);
-                Assert.Null(amendment.InternalReleaseNote);
 
                 Assert.Equal(releaseType, amendment.Type);
                 Assert.Equal(releaseType.Id, amendment.TypeId);

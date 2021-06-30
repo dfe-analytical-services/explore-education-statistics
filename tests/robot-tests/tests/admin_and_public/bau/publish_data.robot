@@ -170,7 +170,7 @@ Navigate to published release page
 
 Check latest release is correct
     [Tags]  HappyPath
-    user waits until page contains title caption  Financial Year 3001-02
+    user waits until page contains title caption  Financial Year 3001-02  90
     user checks page contains   This is the latest data
     user checks page contains   See other releases (1)
 

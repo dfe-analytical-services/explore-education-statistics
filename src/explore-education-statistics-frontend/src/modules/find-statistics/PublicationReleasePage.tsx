@@ -248,6 +248,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </Link>
                   </li>
                 )}
+                <li>
+                  <a href="#contact-us">Contact us</a>
+                </li>
                 {!!releaseCount && (
                   <>
                     <p className="govuk-!-margin-bottom-0">

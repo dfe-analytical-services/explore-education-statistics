@@ -28,8 +28,11 @@ user signs in as analyst1
     user signs in as  ANALYST
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
-    
-    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
+    user waits until page contains element  css:[id="publicationsReleases-themeTopic-themeId"]  60 
+
+    # @TODO: Luke - See if this test id is being stripped out of the DOM by React
+    # no selector with this data-test id is present 
+    # user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']  180
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -50,36 +53,38 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]  ${theme}  ${topic}
-    user waits until page contains link  Manage publications and releases  120
+    ${current_url}=  Get Location
+    run keyword if  "${current_url}" != "%{ADMIN_URL}"  user navigates to admin dashboard
+    user waits until page contains link  Manage publications and releases  90
     user clicks link   Manage publications and releases
-    user waits until page contains element   id:publicationsReleases-themeTopic-themeId
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId  60 
     user selects from list by label  id:publicationsReleases-themeTopic-themeId  ${theme}
-    user waits until page contains element   id:publicationsReleases-themeTopic-topicId
+    user waits until page contains element   id:publicationsReleases-themeTopic-topicId  60 
     user selects from list by label  id:publicationsReleases-themeTopic-topicId  ${topic}
-    user waits until h2 is visible  ${theme}
-    user waits until h3 is visible  ${topic}
+    user waits until h2 is visible  ${theme}  60 
+    user waits until h3 is visible  ${topic}  60
 
 user navigates to release summary from admin dashboard
     [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  60
     user opens accordion section  ${PUBLICATION_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
     ${details}=  user gets details content element   ${DETAILS_HEADING}  ${accordion}
 
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
+    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]  60
     ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
     user clicks element   ${edit_button}
 
-    user waits until h2 is visible  Release summary
+    user waits until h2 is visible  Release summary  60
     user checks summary list contains   Publication title  ${PUBLICATION_NAME}
 
 user creates publication
     [Arguments]   ${title}
-    user waits until h1 is visible  Create new publication
-    user waits until page contains element  id:publicationForm-title
+    user waits until h1 is visible  Create new publication  60
+    user waits until page contains element  id:publicationForm-title  60
     user enters text into element  id:publicationForm-title   ${title}
     user clicks radio     No methodology
     user enters text into element  id:publicationForm-teamName        Attainment statistics team
@@ -87,37 +92,37 @@ user creates publication
     user enters text into element  id:publicationForm-contactName     Tingting Shu
     user enters text into element  id:publicationForm-contactTelNo    0123456789
     user clicks button   Save publication
-    user waits until h1 is visible  Dashboard
+    user waits until h1 is visible  Dashboard  60
 
 user creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
     user waits until page contains title caption  ${publication}
-    user waits until h1 is visible  Create new release
-    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
+    user waits until h1 is visible  Create new release  60
+    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage  60
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverageCode  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
     user clicks radio   National Statistics
     user clicks radio if exists  Create new template
     user clicks button  Create new release
-    user waits until page contains element  xpath://a[text()="Edit release summary"]
-    user waits until h2 is visible  Release summary
+    user waits until page contains element  xpath://a[text()="Edit release summary"]  60
+    user waits until h2 is visible  Release summary  60
 
 user adds basic release content
     [Arguments]  ${publication}
     user clicks button  Add a summary text block
-    user waits until element contains  id:releaseSummary  This section is empty
+    user waits until element contains  id:releaseSummary  This section is empty  60
     user clicks button   Edit block  id:releaseSummary
     user presses keys  Test summary text for ${publication}
     user clicks element   css:body  # To ensure Save button gets clicked
     user clicks button   Save  id:releaseSummary
-    user waits until element contains  id:releaseSummary  Test summary text for ${publication}
+    user waits until element contains  id:releaseSummary  Test summary text for ${publication}  60
 
     user clicks button  Add a headlines text block  id:releaseHeadlines
-    user waits until element contains  id:releaseHeadlines  This section is empty
+    user waits until element contains  id:releaseHeadlines  This section is empty  60
     user clicks button  Edit block  id:releaseHeadlines
     user presses keys   Test headlines summary text for ${publication}
     user clicks button  Save  id:releaseHeadlines
-    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${publication}
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${publication}  60
 
     user waits until button is enabled  Add new section
     user clicks button  Add new section
@@ -160,7 +165,7 @@ user approves methodology
     user clicks button  Edit status
     user waits until h2 is visible  Edit methodology status
     user clicks radio  Approved for publication
-    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Test release note
+    user enters text into element  id:methodologyStatusForm-latestInternalReleaseNote  Test release note
     user clicks button  Update status
 
     user waits until h2 is visible  Methodology status
@@ -266,6 +271,7 @@ user adds text block to editable accordion section
 user adds data block to editable accordion section
     [Arguments]   ${section_name}   ${block_name}   ${parent}=css:[data-testid="accordion"]
     ${section}=  user gets accordion section content element  ${section_name}   ${parent}
+    user waits for page to finish loading
     user clicks button  Add data block   ${section}
     ${block_list}=  get child element  ${section}  css:select[name="selectedDataBlock"]
     user selects from list by label  ${block_list}  Dates data block name
@@ -340,31 +346,31 @@ user approves release for immediate publication
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
+    user clicks radio   Immediately
     user clicks button   Update status
-    user waits until h2 is visible  Sign off
+    user waits until h2 is visible  Sign off  120
     user checks summary list contains  Current status  Approved
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
 user navigates to admin dashboard 
-    [Arguments]  ${USER}
+    [Arguments]  ${USER}=
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains title caption  Welcome ${USER}
+    Run keyword if  "${USER}" != ""  user waits until page contains title caption  Welcome ${USER}
     user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
 
 user uploads subject 
     [Arguments]  ${SUBJECT_NAME}  ${SUBJECT_FILE}  ${META_FILE}
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle  60
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}${SUBJECT_FILE}
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}${META_FILE}
     user clicks button  Upload data files
-    user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user waits until h2 is visible  Uploaded data files  60
+    user waits until page contains accordion section   ${SUBJECT_NAME}  60
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks headed table body row contains  Status  Complete  ${section}  180
@@ -387,7 +393,7 @@ user approves release for scheduled release
     user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio  On a specific date
     user waits until page contains   Publish date
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
@@ -397,6 +403,8 @@ user approves release for scheduled release
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
 
     user clicks button   Update status
+    user waits until h1 is visible  Confirm publish date
+    user clicks button  Confirm
 
 user creates new content section
     [Arguments]   ${SECTION_NUMBER}  ${CONTENT_SECTION_NAME}
@@ -416,5 +424,38 @@ user verifies release summary
 user changes methodology status to Approved
     user clicks button  Edit status
     user clicks element  id:methodologyStatusForm-status-Approved
-    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Approved by UI tests
+    user enters text into element  id:methodologyStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks button  Update status
+
+user gives analyst publication owner access
+    [Arguments]  ${ANALYST_EMAIL}  ${PUBLICATION_NAME}
+    user clicks link  Manage  xpath://td[text()="${ANALYST_EMAIL}"]/..
+    user waits until page does not contain loading spinner
+
+    # stale element exception if you don't wait until it's enabled    
+    user waits until button is enabled  Add publication access
+    user scrolls to element  css:[name="selectedPublicationId"]
+    
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
+
+    user waits until element is enabled  css:[name="selectedPublicationRole"]
+    user selects from list by label  css:[name="selectedPublicationRole"]  Owner
+    user clicks button  Add publication access
+
+user removes publication owner access from analyst 
+    [Arguments]  ${PUBLICATION_NAME}
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user scrolls to element  css:[name="selectedPublicationId"]
+    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
+    user waits until page does not contain loading spinner
+
+user gives analyst release access 
+    [Arguments]    ${RELEASE_NAME}  ${ROLE}
+    user waits until element is enabled  css:[name="selectedReleaseId"]
+    user scrolls to element  css:[name="selectedReleaseId"]
+    user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
+    user waits until element is enabled  css:[name="selectedReleaseRole"]
+    user selects from list by label  css:[name="selectedReleaseRole"]  ${ROLE}
+    user clicks button  Add release access
+    user waits until page does not contain loading spinner

@@ -52,9 +52,9 @@ Approve methodology
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks radio  Approved for publication
-    user enters text into element  xpath=//*[@name="internalReleaseNote"]  Approved by UI tests
+    user enters text into element  xpath=//*[@name="latestInternalReleaseNote"]  Approved by UI tests
     user clicks button  Update status
-
+    
 Check methodology is approved
     [Tags]  HappyPath
     user waits until page contains element  xpath://strong[text()="Approved"]
@@ -243,7 +243,7 @@ Click submit button
 
 Wait until table is generated
     [Tags]  HappyPath
-    user waits until page contains button  Share your table
+    user waits until page contains button  Generate shareable link
 
 Wait until new footnote is visible
     [Tags]  HappyPath
@@ -313,7 +313,8 @@ Validate table cells
 Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Share your table
+    user waits until page contains button  Generate shareable link  60
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL}
@@ -597,8 +598,8 @@ Select the date cateogory
 
 Generate table
     [Tags]  HappyPath
-    user clicks element     id:filtersForm-submit
-    user waits until page contains    Share your table
+    user clicks element  id:filtersForm-submit
+    user waits until page contains  Generate shareable link  60
 
 Validate generated table
     [Tags]   HappyPath
@@ -607,7 +608,7 @@ Validate generated table
 Generate the new permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
-    user clicks button  Share your table
+    user clicks button  Generate shareable link
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL_TWO}=  Get Value  testid:permalink-generated-url
     Set Suite Variable  ${PERMA_LOCATION_URL_TWO}

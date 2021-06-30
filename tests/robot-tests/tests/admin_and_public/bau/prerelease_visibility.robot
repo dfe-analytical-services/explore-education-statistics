@@ -84,11 +84,11 @@ Add meta guidance to ${PUBLICATION_NAME} subject
 Go to "Sign off" page
     [Tags]  HappyPath
     user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-    user waits until page contains button  Edit release status
+    user waits until h2 is visible  Sign off  90
+    user waits until page contains button  Edit release status  60
 
 Approve release and wait for it to be Scheduled
-    [Tags]  HappyPath
+    [Tags]  HappyPath  NotAgainstDev
     ${day}=         get current datetime  %-d  2
     ${month}=       get current datetime  %-m  2
     ${month_word}=  get current datetime  %B  2
@@ -96,9 +96,11 @@ Approve release and wait for it to be Scheduled
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by UI tests
-    user waits until page contains element   xpath://label[text()="On a specific date"]/../input
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Approved by UI tests
+    
+    user waits until page contains element   xpath://label[text()="On a specific date"]/../input  60
     user clicks radio   On a specific date
+
     user waits until page contains   Publish date
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}
     user enters text into element  id:releaseStatusForm-publishScheduled-month  ${month}
@@ -106,12 +108,14 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
-
-    user waits until h2 is visible  Sign off
-    user checks summary list contains  Current status  Approved
+    user waits until h1 is visible  Confirm publish date
+    user clicks button  Confirm
+    # the below fails on dev
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
-    user waits for release process status to be  Scheduled  90
+    user checks summary list contains  Current status  Approved
+
+    user waits for release process status to be  Scheduled  60
 
 Check scheduled release isn't visible on public Table Tool
     [Tags]  HappyPath
@@ -140,8 +144,8 @@ Approve release for immediate publication but don't wait to finish
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
+    user clicks radio   Immediately
     user clicks button   Update status
     user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         public bool Amendment { get; set; }
 
@@ -120,10 +121,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PreReleaseAccessList { get; set; }
 
+        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
+
+        public string Slug => SlugFromTitle(Title);
+
+        private string Title => Format(Year, TimePeriodCoverage);
+
+        private int Year => int.Parse(ReleaseName);
+    }
+
+    public class ReleaseStatusCreateViewModel
+    {
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PublishMethod? PublishMethod { get; set; }
@@ -152,13 +164,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         }
 
         [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
-
-        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
-
-        public string Slug => SlugFromTitle(Title);
-
-        private string Title => Format(Year, TimePeriodCoverage);
-
-        private int Year => int.Parse(ReleaseName);
     }
 }

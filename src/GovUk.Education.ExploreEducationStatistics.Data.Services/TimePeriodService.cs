@@ -24,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(observation => observation.SubjectId == subjectId)
                 .Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
                 .AsNoTracking()
                 .ToList()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
         
@@ -53,10 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return observations.Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
                 .AsNoTracking()
                 .ToList()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
     }

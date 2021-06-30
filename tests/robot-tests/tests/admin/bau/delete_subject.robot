@@ -160,18 +160,18 @@ Navigate back to 'Data and files' page
 Delete UI test subject
     [Tags]  HappyPath
     user clicks link  Data uploads
-    user waits until h2 is visible  Add data file to release
-    user waits until page contains accordion section  UI test subject
+    user waits until h2 is visible  Add data file to release  60
+    user waits until page contains accordion section  UI test subject  60
     user opens accordion section   UI test subject
     user clicks button   Delete files
 
-    user waits until h1 is visible   Confirm deletion of selected data files
-    user checks page contains   4 footnotes will be removed or updated.
-    user checks page contains   The following data blocks will also be deleted:
-    user checks page contains   UI test table name
-    user checks page contains   The following infographic files will also be removed:
-    user checks page contains   dfe-logo.jpg
+    user waits until h1 is visible   Confirm deletion of selected data files  60
+    user checks page contains   4 footnotes will be removed or updated.  
+    user checks page contains   The following data blocks will also be deleted:  
+    user checks page contains   UI test table name  
+    user checks page contains   The following infographic files will also be removed:  
+    user checks page contains   dfe-logo.jpg  
     user clicks button  Confirm
 
     user waits until page does not contain accordion section   UI test subject
-    user waits until h2 is visible  Add data file to release
+    user waits until h2 is visible  Add data file to release  30

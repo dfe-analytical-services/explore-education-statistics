@@ -91,7 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task<ReleaseStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
             ReleaseStatusState state, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
-            return await _releaseStatusService.CreateAsync(message.ReleaseId, state, message.Immediate, logMessages);
+            return await _releaseStatusService.CreateAsync(message.ReleaseId, message.ReleaseStatusId, state,
+                message.Immediate, logMessages);
         }
 
         private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)
