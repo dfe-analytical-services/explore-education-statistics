@@ -164,6 +164,8 @@ if args.tags:
 
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
+    robotArgs += ["--rerunfailedsuites", "test-results/xunit.xml"]
+
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
     robotArgs += ['--removekeywords',
