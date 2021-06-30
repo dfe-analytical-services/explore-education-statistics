@@ -274,30 +274,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Where(predicateBuilder)
                 .ToList();
 
-            foreach(var location in locations)
-            {
-                if (location.Country_Name == country?.Name
-                    && location.EnglishDevolvedArea_Name == englishDevolvedArea?.Name
-                    && location.Institution_Name == institution?.Name
-                    && location.LocalAuthority_Name == localAuthority?.Name
-                    && location.LocalAuthorityDistrict_Name == localAuthorityDistrict?.Name
-                    && location.LocalEnterprisePartnership_Name == localEnterprisePartnership?.Name
-                    && location.MayoralCombinedAuthority_Name == mayoralCombinedAuthority?.Name
-                    && location.MultiAcademyTrust_Name == multiAcademyTrust?.Name
-                    && location.OpportunityArea_Name == opportunityArea?.Name
-                    && location.ParliamentaryConstituency_Name == parliamentaryConstituency?.Name
-                    && location.Region_Name == region?.Name
-                    && location.RscRegion_Code == rscRegion?.Code // RscRegion codes function as the name
-                    && location.Sponsor_Name == sponsor?.Name
-                    && location.Ward_Name == ward?.Name
-                    && location.PlanningArea_Name == planningArea?.Name)
-                {
-                    // If case-sensitive match, return it
-                    return location;
-                }
-            }
-
-            return null;
+            return locations.FirstOrDefault(location =>
+                location.Country_Name == country?.Name
+                && location.EnglishDevolvedArea_Name == englishDevolvedArea?.Name
+                && location.Institution_Name == institution?.Name
+                && location.LocalAuthority_Name == localAuthority?.Name
+                && location.LocalAuthorityDistrict_Name == localAuthorityDistrict?.Name
+                && location.LocalEnterprisePartnership_Name == localEnterprisePartnership?.Name
+                && location.MayoralCombinedAuthority_Name == mayoralCombinedAuthority?.Name
+                && location.MultiAcademyTrust_Name == multiAcademyTrust?.Name
+                && location.OpportunityArea_Name == opportunityArea?.Name
+                && location.ParliamentaryConstituency_Name == parliamentaryConstituency?.Name
+                && location.Region_Name == region?.Name
+                && location.RscRegion_Code == rscRegion?.Code // RscRegion codes function as the name
+                && location.Sponsor_Name == sponsor?.Name
+                && location.Ward_Name == ward?.Name
+                && location.PlanningArea_Name == planningArea?.Name
+            );
         }
     }
 }
