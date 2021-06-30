@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context);
 
-        Task SetPublishedDatesAsync(Guid id, DateTime published);
+        Task SetPublishedDates(Guid id, DateTime published);
 
         Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds);
     }

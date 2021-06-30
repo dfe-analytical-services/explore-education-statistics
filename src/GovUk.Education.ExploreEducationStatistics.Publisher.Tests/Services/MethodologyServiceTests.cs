@@ -132,6 +132,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
+        [Fact]
+        public async Task SetPublishedDatesByPublication_PublishedMethodologyHasPublishedDateSet()
+        {
+            var publicationId = Guid.NewGuid();
+            var published = DateTime.UtcNow;
+
+            var methodology = new Methodology
+            {
+                Published = null,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publicationId))
+                .ReturnsAsync(AsList(methodology));
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
+
+                await service.SetPublishedDatesByPublication(publicationId, published);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actual = await contentDbContext.Methodologies.FindAsync(methodology.Id);
+                Assert.NotNull(actual);
+                Assert.Equal(published, actual.Published);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
+        [Fact]
+        public async Task SetPublishedDatesByPublication_MethodologyWithAPublishedDateRemainsUntouched()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var methodology = new Methodology
+            {
+                Published = DateTime.UtcNow.AddDays(-1),
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publicationId))
+                .ReturnsAsync(AsList(methodology));
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
+
+                await service.SetPublishedDatesByPublication(publicationId, DateTime.UtcNow);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actual = await contentDbContext.Methodologies.FindAsync(methodology.Id);
+                Assert.NotNull(actual);
+                Assert.Equal(methodology.Published, actual.Published);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
+        }
+
         private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext,
             IMethodologyRepository methodologyRepository = null)
         {

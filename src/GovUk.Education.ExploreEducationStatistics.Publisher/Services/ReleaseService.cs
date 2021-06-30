@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
@@ -34,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IBlobStorageService publicBlobStorageService,
+            IMethodologyService methodologyService,
             IReleaseSubjectService releaseSubjectService,
             ILogger<ReleaseService> logger,
             IMapper mapper)
@@ -41,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _publicBlobStorageService = publicBlobStorageService;
+            _methodologyService = methodologyService;
             _releaseSubjectService = releaseSubjectService;
             _logger = logger;
             _mapper = mapper;
@@ -136,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await GetReleaseViewModel(latestRelease.Id, context);
         }
 
-        public async Task SetPublishedDatesAsync(Guid id, DateTime published)
+        public async Task SetPublishedDates(Guid id, DateTime published)
         {
             var contentRelease = await _contentDbContext.Releases
                 .Include(release => release.Publication)
@@ -170,6 +173,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             // Update the Publication published date since we always generate the Publication when generating Release Content
             contentRelease.Publication.Published = published;
+
+            // Set the published date on any methodologies used by this publication that are now publicly accessible
+            // as a result of this release being published
+            await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
 

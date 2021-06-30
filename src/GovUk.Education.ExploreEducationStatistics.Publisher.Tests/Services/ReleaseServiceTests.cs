@@ -13,6 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -23,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -85,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -109,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -133,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q1",
@@ -173,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Id = new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"),
                     Description = "Related Information",
-                    Url = "http://example.com"
+                    Url = "https://example.com"
                 }
             },
             Slug = "2018-19-q2",
@@ -569,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -579,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
@@ -671,7 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -679,7 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext);
 
@@ -698,14 +701,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext);
 
@@ -721,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -734,7 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
@@ -883,7 +886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -914,7 +917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -992,7 +995,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -1023,7 +1026,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -1060,7 +1063,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
@@ -1091,7 +1094,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     created: null
                 ));
 
-            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -1123,6 +1126,211 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task SetPublishedDates()
+        {
+            var contentRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                Publication = new Publication(),
+                Version = 0
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = contentRelease.Id
+            };
+
+            var published = DateTime.UtcNow;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(contentRelease);
+                await contentDbContext.SaveChangesAsync();
+
+                await statisticsDbContext.Release.AddAsync(statisticsRelease);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+
+            methodologyService.Setup(mock =>
+                    mock.SetPublishedDatesByPublication(contentRelease.PublicationId, published))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    methodologyService: methodologyService.Object);
+
+                await service.SetPublishedDates(contentRelease.Id, published);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var actualContentRelease = await contentDbContext.Releases
+                    .Include(r => r.Publication)
+                    .SingleAsync(r => r.Id == contentRelease.Id);
+                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
+
+                Assert.NotNull(actualContentRelease);
+                Assert.NotNull(actualStatisticsRelease);
+
+                Assert.Equal(published, actualContentRelease.Published);
+                Assert.Equal(published, actualContentRelease.Publication.Published);
+                Assert.Equal(published, actualStatisticsRelease.Published);
+
+                Assert.True(actualContentRelease.DataLastPublished.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                    1500);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyService);
+        }
+
+        [Fact] public async Task SetPublishedDates_ReleaseHasNoStatisticsData()
+        {
+            var contentRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                Publication = new Publication(),
+                Version = 0
+            };
+
+            var published = DateTime.UtcNow;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(contentRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+
+            methodologyService.Setup(mock =>
+                    mock.SetPublishedDatesByPublication(contentRelease.PublicationId, published))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext())
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    methodologyService: methodologyService.Object);
+
+                await service.SetPublishedDates(contentRelease.Id, published);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actualContentRelease = await contentDbContext.Releases
+                    .Include(r => r.Publication)
+                    .SingleAsync(r => r.Id == contentRelease.Id);
+
+                Assert.NotNull(actualContentRelease);
+
+                Assert.Equal(published, actualContentRelease.Published);
+                Assert.Equal(published, actualContentRelease.Publication.Published);
+
+                Assert.True(actualContentRelease.DataLastPublished.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                    1500);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyService);
+        }
+
+        [Fact]
+        public async Task SetPublishedDates_AmendedReleaseHasPublishedDateOfPreviousVersion()
+        {
+            var publication = new Publication();
+
+            var previousContentRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
+            var contentRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = previousContentRelease.Id,
+                Publication = publication,
+                Version = 1
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = contentRelease.Id
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(previousContentRelease, contentRelease);
+                await contentDbContext.SaveChangesAsync();
+
+                await statisticsDbContext.Release.AddAsync(statisticsRelease);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+
+            methodologyService.Setup(mock =>
+                    mock.SetPublishedDatesByPublication(contentRelease.PublicationId, previousContentRelease.Published.Value))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    methodologyService: methodologyService.Object);
+
+                await service.SetPublishedDates(contentRelease.Id, DateTime.UtcNow);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var actualContentRelease = await contentDbContext.Releases
+                    .Include(r => r.Publication)
+                    .SingleAsync(r => r.Id == contentRelease.Id);
+                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
+
+                Assert.NotNull(actualContentRelease);
+                Assert.NotNull(actualStatisticsRelease);
+
+                Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Published);
+                Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Publication.Published);
+                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease.Published);
+
+                Assert.True(actualContentRelease.DataLastPublished.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                    1500);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyService);
+        }
+        
         private static PublishContext PublishContext()
         {
             var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
@@ -1133,12 +1341,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext = null,
             IBlobStorageService publicBlobStorageService = null,
+            IMethodologyService methodologyService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             return new ReleaseService(
                 contentDbContext,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
+                methodologyService ?? new Mock<IMethodologyService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new Mock<ILogger<ReleaseService>>().Object,
                 MapperForProfile<MappingProfiles>());
