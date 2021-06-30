@@ -65,8 +65,12 @@ user selects theme and topic from admin dashboard
     user waits until h3 is visible  ${topic}  60
 
 user navigates to release summary from admin dashboard
-    [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
-    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}  ${THEME_NAME}  ${TOPIC_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
@@ -407,6 +411,8 @@ user deletes subject file
     user clicks button  Confirm
 
 user approves release for immediate publication
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
     user clicks button  Edit release status
@@ -441,17 +447,30 @@ user uploads subject
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks headed table body row contains  Status  Complete  ${section}  %{WAIT_LONG}
 
+user puts release into higher level review
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
+    user waits until h2 is visible  Sign off
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status  60
+    user clicks radio   Ready for higher review
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Ready for higher review
+    user clicks button  Update status
+    user waits until element is visible  id:CurrentReleaseStatus-Awaiting higher review
+
 user approves release for scheduled release
-    [Arguments]  ${DAYS_TILL_RELEASE}  ${RELEASE_MONTH}  ${RELEASE_YEAR}
-    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_TILL_RELEASE}
+    [Arguments]  ${DAYS_UNTIL_RELEASE}  ${NEXT_RELEASE_MONTH}=01  ${NEXT_RELEASE_YEAR}=2200
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_UNTIL_RELEASE}
     set suite variable  ${PUBLISH_DATE_DAY}
     set suite variable  ${PUBLISH_DATE_MONTH}
     set suite variable  ${PUBLISH_DATE_MONTH_WORD}
     set suite variable  ${PUBLISH_DATE_YEAR}
 
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
@@ -465,8 +484,8 @@ user approves release for scheduled release
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
     user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${RELEASE_MONTH}
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${NEXT_RELEASE_MONTH}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
 
     user clicks button   Update status
     user waits until h1 is visible  Confirm publish date

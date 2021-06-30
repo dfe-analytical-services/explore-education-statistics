@@ -6,7 +6,7 @@ Library     OperatingSystem
 Library    file_operations.py
 Library    utilities.py
 
-Resource   ./tables.robot
+Resource   ./tables-common.robot
 Resource   ./table_tool.robot
 
 *** Variables ***

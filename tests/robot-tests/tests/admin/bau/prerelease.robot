@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Resource    ../../libs/tables.robot
+Resource    ../../libs/tables-common.robot
 Library     ../../libs/admin_api.py
 Library     Collections
 

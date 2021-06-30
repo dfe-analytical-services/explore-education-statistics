@@ -172,7 +172,6 @@ Add public prerelease access list
 
 Approve release
     [Tags]  HappyPath
-    user clicks link   Sign off
     user approves release for scheduled release  2  12  3001
 
 Verify release is scheduled
