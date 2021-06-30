@@ -142,7 +142,7 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
-output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+output_file="output.xml" if args.rerun_failed_tests or args.rerun_failed_suites or args.ci else "output.xml"
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
