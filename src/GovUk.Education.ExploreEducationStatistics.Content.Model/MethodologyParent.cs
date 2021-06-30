@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -11,8 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<PublicationMethodology> Publications { get; set; }
 
-        // TODO SOW4 EES-2375 Move slug to parent
-        // Need to sort migration for this field
+        [Required]
+        public string Title { get; set; }
+
         [NotMapped]
         public string Slug { get; set; }
 

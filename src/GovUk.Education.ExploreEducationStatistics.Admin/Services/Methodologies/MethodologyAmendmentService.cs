@@ -18,15 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ContentDbContext _context;
 
         public MethodologyAmendmentService(
             IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService,
-            IMapper mapper)
+            IMapper mapper, 
+            ContentDbContext context)
         {
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAmendment(
@@ -34,7 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(originalMethodologyId)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
-                .OnSuccessDo(() => throw new NotImplementedException())
+                .OnSuccess(async methodology =>
+                {
+                    var amendment = methodology.CreateAmendment();
+                    var savedAmendment = await _context.Methodologies.AddAsync(amendment);
+                    await _context.SaveChangesAsync();
+                    return savedAmendment;
+                })
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
     }
