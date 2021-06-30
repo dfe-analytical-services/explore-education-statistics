@@ -11,17 +11,59 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const MethodologySummaryPage = ({
   match,
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value: currentMethodology, isLoading } = useAsyncHandledRetry(() =>
+  const { value: realMethodology, isLoading } = useAsyncHandledRetry(() =>
     methodologyService.getMethodology(methodologyId),
   );
+
+  const myFakeMethodology = {
+    id: 'm1',
+    live: false,
+    title: 'My fake methodology',
+    slug: 'my-fake-methodology',
+    status: 'Draft',
+    publication: {
+      id: 'p1',
+      title: 'owner publication title',
+      releaseId: 'r1',
+    },
+    published: '',
+    otherPublications: [
+      {
+        id: 'op1',
+        title: 'other publication title 1',
+        releaseId: 'r1',
+      },
+      {
+        id: 'op2',
+        title: 'other publication title 2',
+        releaseId: 'r1',
+      },
+      {
+        id: 'op3',
+        title: 'other publication title 3',
+        releaseId: 'r1',
+      },
+    ],
+  };
+
+  // EES-2161 - flip showPublications to see the publications. Remove when BE done and change to alsways use real methodology.
+  const showPublications = false;
+  const currentMethodology = showPublications
+    ? myFakeMethodology
+    : realMethodology;
 
   return (
     <>
@@ -44,6 +86,45 @@ const MethodologySummaryPage = ({
                   'Not yet published'
                 )}
               </SummaryListItem>
+              {currentMethodology.publication && (
+                <SummaryListItem term="Publication">
+                  <Link
+                    to={generatePath<ReleaseRouteParams>(
+                      releaseSummaryRoute.path,
+                      {
+                        publicationId: currentMethodology.publication.id,
+                        releaseId: currentMethodology.publication.releaseId,
+                      },
+                    )}
+                  >
+                    {currentMethodology.publication.title}
+                  </Link>
+                </SummaryListItem>
+              )}
+              {currentMethodology.otherPublications &&
+                currentMethodology.otherPublications.length > 0 && (
+                  <SummaryListItem term="Other publications using this methodology">
+                    <ul className="govuk-!-margin-top-0">
+                      {currentMethodology.otherPublications?.map(
+                        publication => (
+                          <li key={publication.id}>
+                            <Link
+                              to={generatePath<ReleaseRouteParams>(
+                                releaseSummaryRoute.path,
+                                {
+                                  publicationId: publication.id,
+                                  releaseId: publication.releaseId,
+                                },
+                              )}
+                            >
+                              {publication.title}
+                            </Link>
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </SummaryListItem>
+                )}
             </SummaryList>
 
             {currentMethodology.status !== 'Approved' && (
