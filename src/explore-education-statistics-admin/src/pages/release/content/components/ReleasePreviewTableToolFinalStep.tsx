@@ -6,10 +6,11 @@ import { Publication } from '@common/services/publicationService';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import Link from '@admin/components/Link';
+import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
-  publication?: Publication;
+  publication?: Publication | BasicPublicationDetails;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
 }

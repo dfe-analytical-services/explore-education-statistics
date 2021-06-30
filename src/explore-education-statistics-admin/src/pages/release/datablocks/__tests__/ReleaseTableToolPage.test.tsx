@@ -3,31 +3,38 @@ import {
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
-import _releaseContentService from '@admin/services/releaseContentService';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
+import _publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseContentService');
+jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');
 jest.mock('@common/services/tableBuilderService');
 
-const releaseContentService = _releaseContentService as jest.Mocked<
-  typeof _releaseContentService
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
+const testPublication: BasicPublicationDetails = {
+  id: 'publication-1',
+  title: 'Pupil absence',
+  slug: 'pupil-absence',
+  themeId: 'theme-1',
+  topicId: 'topic-1',
+  legacyReleases: [],
+};
+
 describe('ReleaseTableToolPage', () => {
   test('renders correctly on step 1', async () => {
-    releaseContentService.getContent.mockResolvedValue({
-      release: testEditableRelease,
-      availableDataBlocks: [],
-    });
+    publicationService.getPublication.mockResolvedValue(testPublication);
 
     tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
       subjects: [

@@ -11,12 +11,13 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import tableBuilderService from '@common/services/tableBuilderService';
 import ButtonText from '@common/components/ButtonText';
 import ReleasePreviewTableToolFinalStep from '@admin/pages/release/content/components/ReleasePreviewTableToolFinalStep';
+import { BasicPublicationDetails } from '@admin/services/publicationService';
 import { Publication } from '@common/services/publicationService';
 import React, { useState } from 'react';
 
 interface Props {
   releaseId: string;
-  publication: Publication;
+  publication: Publication | BasicPublicationDetails;
 }
 const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
   const [highlightId, setHighlightId] = useState<string>();
