@@ -94,6 +94,7 @@ parser.add_argument("--disable-teardown",
 parser.add_argument("--rerun-failed-tests",
                     dest="rerun_failed_tests",
                     action='store_true',
+
                     help="rerun individual failed tests and merge results into original run results")
 parser.add_argument("--rerun-failed-suites",
                     dest="rerun_failed_suites",
