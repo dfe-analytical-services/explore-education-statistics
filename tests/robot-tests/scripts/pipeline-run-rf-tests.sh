@@ -16,5 +16,5 @@ if [ $? -eq 0 ]
 then
   echo "finished"
 else
-  pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4 --rerun-failed-tests
+  pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4 --rerun-failed-suites
 fi
