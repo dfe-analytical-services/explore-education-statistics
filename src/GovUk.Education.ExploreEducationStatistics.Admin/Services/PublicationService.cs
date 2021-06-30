@@ -148,12 +148,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(_ =>
                     {
+                        var statisticsDbPublication = _statisticsDbContext.Publication.Find(publication.Id);
+                        if (statisticsDbPublication != null)
+                        {
+                            _statisticsDbContext.Update(statisticsDbPublication);
+                            statisticsDbPublication.Slug = updatedPublication.Slug;
+                            _statisticsDbContext.SaveChanges();
+                        }
+
                         publication.Slug = updatedPublication.Slug;
                         return publication;
                     });
                 })
                 .OnSuccess(async publication =>
-                {
+                { 
+                    var statisticsDbPublication = await _statisticsDbContext.Publication.FindAsync(publication.Id);
+                    if (statisticsDbPublication != null)
+                    {
+                        _statisticsDbContext.Update(statisticsDbPublication);
+                        statisticsDbPublication.Title = updatedPublication.Title;
+                        statisticsDbPublication.TopicId = updatedPublication.TopicId;
+                        await _statisticsDbContext.SaveChangesAsync();
+                    }
+
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.MethodologyId = updatedPublication.MethodologyId;
