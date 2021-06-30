@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -49,17 +50,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.AddAsync(publication);
-                await context.SaveChangesAsync();
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 var result = await publicationService.GetPublication(publication.Id);
 
@@ -86,13 +89,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetPublication_NotFound()
         {
-            await using var context = InMemoryApplicationDbContext();
-            var publicationService = BuildPublicationService(context, Mocks());
-
-            var result = await publicationService.GetPublication(Guid.NewGuid());
-
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext())
+            {
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
+                var result = await publicationService.GetPublication(Guid.NewGuid());
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
         }
 
         [Fact]
@@ -108,18 +112,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Approved,
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(topic);
+                contentDbContext.Add(methodology);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -152,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
+                var createdPublication = await contentDbContext.Publications.FindAsync(publicationViewModel.Id);
                 Assert.False(createdPublication.Live);
                 Assert.Equal("test-publication", createdPublication.Slug);
                 Assert.False(createdPublication.Updated.HasValue);
@@ -174,9 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithNonExistingTopic()
         {
-            await using var context = InMemoryApplicationDbContext();
+            await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+            await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var publicationService = BuildPublicationService(context, Mocks());
+            var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
             // Service method under test
             var result = await publicationService.CreatePublication(
@@ -198,17 +205,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test topic"
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(topic);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -238,18 +246,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Approved,
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(topic);
+                contentDbContext.Add(methodology);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -285,18 +296,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Draft,
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(topic);
+                contentDbContext.Add(methodology);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -321,12 +334,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test topic"
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(
+                contentDbContext.Add(topic);
+                contentDbContext.Add(
                     new Publication
                     {
                         Title = "Test publication",
@@ -334,13 +346,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                await context.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             }
 
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -388,20 +402,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(methodology);
-                context.Add(publication);
+                contentDbContext.Add(topic);
+                contentDbContext.Add(methodology);
+                contentDbContext.Add(publication);
 
-                await context.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -434,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New methodology", result.Right.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
                 Assert.False(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
@@ -488,20 +504,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Published = new DateTime(2020, 8, 12),
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(topic);
-                context.Add(methodology);
-                context.Add(publication);
+                contentDbContext.Add(topic);
+                contentDbContext.Add(methodology);
+                contentDbContext.Add(publication);
 
-                await context.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -534,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New methodology", result.Right.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
                 Assert.True(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
@@ -572,17 +590,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -602,7 +622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
@@ -642,17 +662,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Contact = sharedContact
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.AddRangeAsync(publication, otherPublication);
-                await context.SaveChangesAsync();
+                await contentDbContext.AddRangeAsync(publication, otherPublication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -672,7 +694,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await contentDbContext.Publications.FindAsync(result.Right.Id);
 
                 Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
@@ -698,17 +720,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -736,17 +761,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -775,17 +802,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -824,19 +853,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(methodology);
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(methodology);
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -874,18 +903,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = topic
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                context.Add(otherPublication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                contentDbContext.Add(otherPublication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext,
+                    Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -924,17 +956,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,
@@ -982,17 +1016,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(publication);
-                await context.SaveChangesAsync();
+                contentDbContext.Add(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationService = BuildPublicationService(context, Mocks());
+                var publicationService = BuildPublicationService(contentDbContext, statisticsDbContext, Mocks());
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,
@@ -1017,7 +1053,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static PublicationService BuildPublicationService(ContentDbContext context,
+        private static PublicationService BuildPublicationService(ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
             (Mock<IUserService> userService,
                 Mock<IPublicationRepository> publicationRepository,
                 Mock<IPublishingService> publishingService) mocks)
@@ -1025,12 +1062,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (userService, publicationRepository, publishingService) = mocks;
 
             return new PublicationService(
-                context,
+                contentDbContext,
+                statisticsDbContext,
                 AdminMapper(),
                 userService.Object,
                 publicationRepository.Object,
                 publishingService.Object,
-                new PersistenceHelper<ContentDbContext>(context));
+                new PersistenceHelper<ContentDbContext>(contentDbContext));
         }
 
         private static (Mock<IUserService> UserService,

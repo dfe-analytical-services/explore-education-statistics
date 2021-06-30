@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -241,16 +242,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static PublicationService BuildPublicationService((Mock<ContentDbContext>,
+            Mock<StatisticsDbContext>,
             Mock<IMapper>,
             Mock<IUserService> userService,
             Mock<IPublicationRepository> publicationRepository,
             Mock<IPublishingService> publishingService,
             Mock<IPersistenceHelper<ContentDbContext>>) mocks)
         {
-            var (context, mapper, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
+            var (contentDbContext, statisticsDbContext, mapper, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
 
             return new PublicationService(
-                context.Object,
+                contentDbContext.Object,
+                statisticsDbContext.Object,
                 mapper.Object,
                 userService.Object,
                 publicationRepository.Object,
@@ -260,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private (
             Mock<ContentDbContext> ContentDbContext,
+            Mock<StatisticsDbContext> StatisticsDbContext,
             Mock<IMapper> Mapper,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
@@ -272,6 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return (
                 new Mock<ContentDbContext>(),
+                new Mock<StatisticsDbContext>(),
                 new Mock<IMapper>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
