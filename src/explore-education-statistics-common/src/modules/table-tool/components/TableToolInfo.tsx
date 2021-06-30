@@ -1,32 +1,27 @@
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React, { ReactNode } from 'react';
-import { PublicationContact } from '@common/services/publicationService';
+import { BasicPublicationContact } from '@common/services/publicationService';
 
 interface Props {
-  table?: FullTable;
-  contactDetails?: PublicationContact;
+  contactDetails?: BasicPublicationContact;
   methodologyLink?: ReactNode;
   releaseLink?: ReactNode;
 }
 
 const TableToolInfo = ({
-  table,
   contactDetails,
   methodologyLink,
   releaseLink,
 }: Props) => {
   return (
     <Accordion id="TableToolInfo">
-      {table && (
-        <AccordionSection heading="Related information">
-          <ul className="govuk-list">
-            {releaseLink && <li>Publication: {releaseLink}</li>}
-            {methodologyLink && <li>Methodology: {methodologyLink}</li>}
-          </ul>
-        </AccordionSection>
-      )}
+      <AccordionSection heading="Related information">
+        <ul className="govuk-list">
+          {releaseLink && <li>Publication: {releaseLink}</li>}
+          {methodologyLink && <li>Methodology: {methodologyLink}</li>}
+        </ul>
+      </AccordionSection>
       {contactDetails && (
         <AccordionSection heading="Contact us">
           <p>

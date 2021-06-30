@@ -65,13 +65,7 @@ const PreReleaseTableToolFinalStep = ({
           />
 
           <TableToolInfo
-            table={table}
-            contactDetails={{
-              contactName: publication?.contact?.contactName || '',
-              contactTelNo: publication?.contact?.contactTelNo || '',
-              teamEmail: publication?.contact?.teamEmail || '',
-              teamName: publication?.contact?.teamName || '',
-            }}
+            contactDetails={publication.contact}
             releaseLink={
               <Link
                 to={generatePath<ReleaseRouteParams>(

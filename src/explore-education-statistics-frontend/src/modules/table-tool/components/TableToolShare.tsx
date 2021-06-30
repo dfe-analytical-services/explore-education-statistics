@@ -1,4 +1,6 @@
 import ButtonText from '@common/components/ButtonText';
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import UrlContainer from '@common/components/UrlContainer';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
@@ -8,17 +10,17 @@ import {
   SelectedPublication,
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import Link from '@frontend/components/Link';
+import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
 
 interface Props {
-  currentTableHeaders?: TableHeadersConfig;
+  tableHeaders?: TableHeadersConfig;
   query: TableDataQuery;
   selectedPublication: SelectedPublication;
 }
 
 const TableToolShare = ({
-  currentTableHeaders,
+  tableHeaders,
   query,
   selectedPublication,
 }: Props) => {
@@ -27,10 +29,10 @@ const TableToolShare = ({
 
   useEffect(() => {
     setPermalinkId('');
-  }, [currentTableHeaders]);
+  }, [tableHeaders]);
 
   const handlePermalinkClick = async () => {
-    if (!currentTableHeaders) {
+    if (!tableHeaders) {
       return;
     }
     setPermalinkLoading(true);
@@ -39,7 +41,7 @@ const TableToolShare = ({
       {
         query,
         configuration: {
-          tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
         },
       },
       selectedPublication.selectedRelease.id,
@@ -57,61 +59,55 @@ const TableToolShare = ({
     document.execCommand('copy');
   };
 
+  if (!permalinkId) {
+    return (
+      <>
+        <h3 className="govuk-heading-s">Save table</h3>
+        <LoadingSpinner
+          alert
+          inline
+          loading={permalinkLoading}
+          size="sm"
+          text="Generating permanent link"
+        >
+          <ButtonText onClick={handlePermalinkClick}>
+            Generate shareable link
+          </ButtonText>
+        </LoadingSpinner>
+      </>
+    );
+  }
+
   return (
-    <>
-      {permalinkId ? (
-        <div className="dfe-align--left">
-          <h3 className="govuk-heading-s">Generated share link</h3>
+    <div className="dfe-align--left">
+      <h3 className="govuk-heading-s">Generated share link</h3>
 
-          <div className="govuk-inset-text">
-            Use the link below to see a version of this page that you can
-            bookmark for future reference, or copy the link to send on to
-            somebody else to view.
-          </div>
+      <div className="govuk-inset-text">
+        Use the link below to see a version of this page that you can bookmark
+        for future reference, or copy the link to send on to somebody else to
+        view.
+      </div>
 
-          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
-            <UrlContainer
-              data-testid="permalink-generated-url"
-              url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
-            />
-          </p>
+      <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
+        <UrlContainer
+          data-testid="permalink-generated-url"
+          url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
+        />
+      </p>
 
-          <button
-            type="button"
-            className="govuk-button govuk-button--secondary govuk-!-margin-right-3"
-            onClick={handleCopyClick}
-          >
-            Copy link
-          </button>
+      <ButtonGroup>
+        <Button variant="secondary" onClick={handleCopyClick}>
+          Copy link
+        </Button>
 
-          <Link
-            className="govuk-!-margin-top-0 govuk-button"
-            to="/data-tables/permalink/[permalink]"
-            as={`/data-tables/permalink/${permalinkId}`}
-            title="View created table permalink"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View share link
-          </Link>
-        </div>
-      ) : (
-        <>
-          <h3 className="govuk-heading-s">Save table</h3>
-          <LoadingSpinner
-            alert
-            inline
-            loading={permalinkLoading}
-            size="sm"
-            text="Generating permanent link"
-          >
-            <ButtonText onClick={handlePermalinkClick}>
-              Generate shareable link
-            </ButtonText>
-          </LoadingSpinner>
-        </>
-      )}
-    </>
+        <ButtonLink
+          to="/data-tables/permalink/[permalink]"
+          as={`/data-tables/permalink/${permalinkId}`}
+        >
+          View share link
+        </ButtonLink>
+      </ButtonGroup>
+    </div>
   );
 };
 

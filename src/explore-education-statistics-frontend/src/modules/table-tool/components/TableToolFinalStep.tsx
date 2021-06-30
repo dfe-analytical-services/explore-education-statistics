@@ -60,9 +60,9 @@ const TableToolFinalStep = ({
     }
     if (publication?.externalMethodology) {
       return (
-        <a href={publication.externalMethodology.url}>
+        <Link to={publication.externalMethodology.url}>
           {publication.externalMethodology.title}
-        </a>
+        </Link>
       );
     }
     return null;
@@ -125,7 +125,7 @@ const TableToolFinalStep = ({
       )}
       <div className="govuk-!-margin-bottom-7">
         <TableToolShare
-          currentTableHeaders={currentTableHeaders}
+          tableHeaders={currentTableHeaders}
           query={query}
           selectedPublication={selectedPublication}
         />
@@ -154,7 +154,6 @@ const TableToolFinalStep = ({
       />
 
       <TableToolInfo
-        table={table}
         contactDetails={publication?.contact}
         methodologyLink={getMethodologyLink()}
         releaseLink={
@@ -164,16 +163,14 @@ const TableToolFinalStep = ({
                 to="/find-statistics/[publication]"
                 as={`/find-statistics/${selectedPublication.slug}`}
               >
-                {selectedPublication.title},{' '}
-                {selectedPublication.selectedRelease.title}
+                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>
             ) : (
               <Link
                 to="/find-statistics/[publication]/[releaseSlug]"
                 as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
-                {selectedPublication.title},{' '}
-                {selectedPublication.selectedRelease.title}
+                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>
             )}
           </>

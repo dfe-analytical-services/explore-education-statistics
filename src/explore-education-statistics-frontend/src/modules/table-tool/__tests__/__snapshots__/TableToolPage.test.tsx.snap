@@ -2038,10 +2038,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       class="govuk-link"
                       href="/find-statistics/test-publication/selected-release-slug"
                     >
-                      Test Publication
-                      ,
-                       
-                      Selected Release Title
+                      Test Publication, Selected Release Title
                     </a>
                   </li>
                 </ul>
@@ -3135,10 +3132,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       class="govuk-link"
                       href="/find-statistics/test-publication"
                     >
-                      Test Publication
-                      ,
-                       
-                      Latest Release Title
+                      Test Publication, Latest Release Title
                     </a>
                   </li>
                 </ul>
@@ -4232,10 +4226,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                       class="govuk-link"
                       href="/find-statistics/test-publication"
                     >
-                      Test Publication
-                      ,
-                       
-                      Latest Release Title
+                      Test Publication, Latest Release Title
                     </a>
                   </li>
                 </ul>

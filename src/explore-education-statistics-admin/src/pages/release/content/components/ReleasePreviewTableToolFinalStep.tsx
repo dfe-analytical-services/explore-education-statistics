@@ -5,6 +5,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import { Publication } from '@common/services/publicationService';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
+import Link from '@admin/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
@@ -32,9 +33,9 @@ const ReleasePreviewTableToolFinalStep = ({
     }
     if (publication?.externalMethodology) {
       return (
-        <a href={publication.externalMethodology.url}>
+        <Link to={publication.externalMethodology.url}>
           {publication.externalMethodology.title}
-        </a>
+        </Link>
       );
     }
     return null;
@@ -71,7 +72,6 @@ const ReleasePreviewTableToolFinalStep = ({
           />
 
           <TableToolInfo
-            table={table}
             contactDetails={publication.contact}
             methodologyLink={getMethodologyLink()}
             releaseLink={<span>{publication.title}</span>}
