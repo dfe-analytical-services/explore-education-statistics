@@ -2,6 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.Extensions.Logging.Abstractions;
+using static System.DateTime;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -22,11 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [Key] 
         [Required] 
         public Guid Id { get; set; }
-
-        [Required]
-        public string Title { get; set; }
-
-        public string Slug { get; set; }
 
         public MethodologyStatus Status { get; set; }
 
@@ -82,6 +82,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 
                 return ScheduledWithRelease.Live;
             }
+        }
+
+        public Methodology CreateAmendment(DateTime createdDate, User createdByUser)
+        {
+            var copy = MemberwiseClone() as Methodology;
+            copy.Id = Guid.NewGuid();
+            copy.Status = Draft;
+            copy.Published = null;
+            copy.Updated = null;
+            copy.Version = Version++;
+            copy.Created = createdDate;
+            copy.CreatedBy = createdByUser;
+            copy.PreviousVersion = this;
+            copy.PublishingStrategy = Immediately;
+            copy.ScheduledWithRelease = null;
+            copy.ScheduledWithReleaseId = Guid.Empty;
+            return copy;
         }
     }
 }
