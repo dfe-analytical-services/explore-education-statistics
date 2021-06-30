@@ -13,9 +13,10 @@ import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { getNumberOfUnSavedBlocks } from '@admin/pages/release/content/components/utils/unSavedEdits';
+import { getNumberOfUnsavedBlocks } from '@admin/pages/release/content/components/utils/unsavedEdits';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
+
 import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -30,14 +31,14 @@ const ReleaseContentPageLoaded = () => {
   return (
     <EditingContextProvider
       value={{
-        isEditing: canUpdateRelease,
+        editingMode: canUpdateRelease ? 'edit' : 'preview',
       }}
     >
-      {({ isEditing, isTablePreview, unSavedEdits }) => {
-        const numOfEdits = getNumberOfUnSavedBlocks(unSavedEdits);
+      {({ editingMode, unsavedEdits }) => {
+        const numOfEdits = getNumberOfUnsavedBlocks(unsavedEdits);
         return (
           <>
-            {isEditing && (
+            {editingMode === 'edit' && (
               <BrowserWarning>
                 <ul>
                   <li>Editing key statistic guidance text</li>
@@ -64,20 +65,27 @@ const ReleaseContentPageLoaded = () => {
                   </WarningMessage>
                 )}
 
-                <EditablePageModeToggle />
+                <EditablePageModeToggle
+                  previewLabel="Preview release page"
+                  showTablePreviewOption
+                />
               </div>
             )}
 
             <div
               className={classNames({
-                'govuk-!-margin-right-0': isEditing,
-                'govuk-width-container': !isTablePreview,
+                'govuk-!-margin-right-0': editingMode === 'edit',
+                'govuk-width-container': editingMode !== 'table-preview',
               })}
             >
               <div
-                className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+                className={
+                  editingMode === 'edit'
+                    ? 'dfe-page-editing'
+                    : 'dfe-page-preview'
+                }
               >
-                {!isTablePreview && (
+                {editingMode !== 'table-preview' && (
                   <>
                     <span className="govuk-caption-l">{release.title}</span>
 
@@ -88,7 +96,7 @@ const ReleaseContentPageLoaded = () => {
                     <ReleaseContent />
                   </>
                 )}
-                {isTablePreview && (
+                {editingMode === 'table-preview' && (
                   <ReleasePreviewTableTool
                     releaseId={release.id}
                     publication={release.publication}
