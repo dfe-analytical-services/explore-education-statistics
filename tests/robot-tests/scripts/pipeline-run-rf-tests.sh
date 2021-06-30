@@ -12,9 +12,9 @@ python -m pip install --upgrade pip
 pip install pipenv
 pipenv install
 pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4
-if [ $? -eq 0 ]
+
+if [ $? -ne 0 ]
 then
-  echo "finished"
-else
+  echo "Tests failed, so rerunning test"
   pipenv run python run_tests.py --admin-pass $1 --analyst-pass $2 -e $3 --ci --file $4 --rerun-failed-suites
 fi
