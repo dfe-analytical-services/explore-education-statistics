@@ -52,6 +52,12 @@ describe('TableToolShare', () => {
     );
 
     await waitFor(() => {
+      expect(
+        screen.queryByRole('button', {
+          name: 'Generate shareable link',
+        }),
+      ).not.toBeInTheDocument();
+
       expect(screen.getByText('Generated share link')).toBeInTheDocument();
 
       const urlInput = screen.getByTestId('permalink-generated-url');

@@ -8,7 +8,7 @@ import {
   testQuery,
   testSelectedPublicationWithLatestRelease,
   testSelectedPublicationWithNonLatestRelease,
-  testPublication,
+  testPublicationRelease,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -22,7 +22,7 @@ const publicationService = _publicationService as jest.Mocked<
 describe('TableToolFinalStep', () => {
   test('renders the final step successfully', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
 
     render(
@@ -115,7 +115,7 @@ describe('TableToolFinalStep', () => {
 
   test('shows and hides table header re-ordering controls successfully', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
 
     render(
@@ -150,7 +150,7 @@ describe('TableToolFinalStep', () => {
 
   test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
     render(
       <TableToolFinalStep
@@ -183,7 +183,7 @@ describe('TableToolFinalStep', () => {
 
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
     render(
       <TableToolFinalStep
@@ -217,7 +217,7 @@ describe('TableToolFinalStep', () => {
 
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
     render(
       <TableToolFinalStep
@@ -242,7 +242,7 @@ describe('TableToolFinalStep', () => {
   });
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
     render(
       <TableToolFinalStep
@@ -293,7 +293,7 @@ describe('TableToolFinalStep', () => {
 
   test('renders the methodology link correctly', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublication,
+      testPublicationRelease,
     );
     render(
       <TableToolFinalStep
@@ -321,9 +321,9 @@ describe('TableToolFinalStep', () => {
 
   test('renders the external methodology link correctly', async () => {
     const testPublicationWithExternalMethodology = {
-      ...testPublication,
+      ...testPublicationRelease,
       publication: {
-        ...testPublication.publication,
+        ...testPublicationRelease.publication,
         methodology: undefined,
         externalMethodology: {
           url: 'http://somewhere.com',

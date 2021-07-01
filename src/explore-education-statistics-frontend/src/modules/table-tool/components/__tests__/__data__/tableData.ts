@@ -6,14 +6,11 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableDataQuery } from '@common/services/tableBuilderService';
-
-// eslint-disable-next-line no-shadow
-enum ReleaseType {
-  AdHoc = 'Ad Hoc',
-  NationalStatistics = 'National Statistics',
-  OfficialStatistics = 'Official Statistics',
-}
+import {
+  TableDataQuery,
+  SelectedPublication,
+} from '@common/services/tableBuilderService';
+import { Release, ReleaseType } from '@common/services/publicationService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -209,7 +206,7 @@ export const testTableHeaders: TableHeadersConfig = {
   ],
 };
 
-export const testSelectedPublicationWithLatestRelease = {
+export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
   id: '536154f5-7f82-4dc7-060a-08d9097c1945',
   title: 'Test publication',
   slug: 'test-publication',
@@ -224,7 +221,7 @@ export const testSelectedPublicationWithLatestRelease = {
   },
 };
 
-export const testSelectedPublicationWithNonLatestRelease = {
+export const testSelectedPublicationWithNonLatestRelease: SelectedPublication = {
   id: '536154f5-7f82-4dc7-060a-08d9097c1945',
   title: 'Test publication',
   slug: 'test-publication',
@@ -239,7 +236,7 @@ export const testSelectedPublicationWithNonLatestRelease = {
   },
 };
 
-export const testPublication = {
+export const testPublicationRelease: Release = {
   id: '',
   title: '',
   yearTitle: '',
@@ -302,7 +299,7 @@ export const testPublication = {
   relatedInformation: [],
   type: {
     id: '',
-    title: ReleaseType.NationalStatistics,
+    title: 'National Statistics' as ReleaseType,
   },
   updates: [],
   content: [],
