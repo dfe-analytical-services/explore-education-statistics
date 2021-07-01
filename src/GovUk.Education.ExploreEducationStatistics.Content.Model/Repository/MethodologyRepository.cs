@@ -84,5 +84,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Where(version => version != null)
                 .ToList();
         }
+
+        public async Task<bool> IsPubliclyAccessible(Guid methodologyId)
+        {
+            var methodology = await _contentDbContext.Methodologies
+                .Include(m => m.ScheduledWithRelease)
+                .SingleAsync(m => m.Id == methodologyId);
+
+            return methodology.Approved &&
+                   (methodology.ScheduledForPublishingImmediately ||
+                    methodology.ScheduledForPublishingWithPublishedRelease);
+        }
     }
 }

@@ -526,6 +526,183 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
+        [Fact]
+        public async Task PubliclyAccessible_ApprovedAndPublishedImmediately()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = Immediately
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                Assert.True(await service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+        
+        [Fact]
+        public async Task PubliclyAccessible_ApprovedAndScheduledWithLiveRelease()
+        {
+            var liveRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow
+            };
+            
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = liveRelease,
+                ScheduledWithReleaseId = liveRelease.Id
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(liveRelease);
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                Assert.True(await service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+
+        [Fact]
+        public async Task PubliclyAccessible_PublishedImmediatelyButNotApprovedIsNotAccessible()
+        {
+            var methodology = new Methodology
+            {
+                Status = Draft,
+                PublishingStrategy = Immediately
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                Assert.False(await service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+
+        [Fact]
+        public async Task PubliclyAccessible_ScheduledWithLiveReleaseButNotApprovedIsNotAccessible()
+        {
+            var liveRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow
+            };
+            
+            var methodology = new Methodology
+            {
+                Status = Draft,
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = liveRelease,
+                ScheduledWithReleaseId = liveRelease.Id
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(liveRelease);
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                Assert.False(await service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+
+        [Fact]
+        public async Task PubliclyAccessible_ApprovedButScheduledWithNonLiveReleaseIsNotAccessible()
+        {
+            var nonLiveRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = nonLiveRelease,
+                ScheduledWithReleaseId = nonLiveRelease.Id
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(nonLiveRelease);
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                Assert.False(await service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+
+        [Fact] 
+        public async Task PubliclyAccessible_ScheduledWithReleaseNotIncluded()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = WithRelease,
+                ScheduledWithReleaseId = Guid.NewGuid()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext);
+
+                await Assert.ThrowsAsync<InvalidOperationException>(() => service.IsPubliclyAccessible(methodology.Id));
+            }
+        }
+
         private static MethodologyRepository BuildMethodologyRepository(ContentDbContext contentDbContext,
             IMethodologyParentRepository methodologyParentRepository = null)
         {
