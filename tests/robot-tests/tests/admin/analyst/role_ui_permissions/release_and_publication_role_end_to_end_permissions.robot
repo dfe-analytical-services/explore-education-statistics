@@ -1,8 +1,8 @@
 *** Settings ***
-Resource    ../../libs/admin-common.robot
-Resource    ../../libs/common.robot
+Resource    ../../../libs/admin-common.robot
+Resource    ../../../libs/common.robot
 
-Library     ../../libs/admin_api.py
+Library     ../../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData  Footnotes
 
