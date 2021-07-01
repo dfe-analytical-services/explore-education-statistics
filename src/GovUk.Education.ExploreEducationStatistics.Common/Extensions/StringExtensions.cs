@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AngleSharp.Text;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static string StripLines(this string value)
         {
-            return Regex.Replace(value, "(\n|\r)", string.Empty);
+            return value.StripLineBreaks();
         }
 
         public static string AppendTrailingSlash(this string input)
