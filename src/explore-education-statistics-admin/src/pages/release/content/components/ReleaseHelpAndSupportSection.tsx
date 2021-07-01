@@ -57,7 +57,7 @@ const ReleaseHelpAndSupportSection = ({
               )}
             </>
           ) : (
-            <p>No methodology added.</p>
+            <p>No methodologies added.</p>
           )}
         </AccordionSection>
         {release.type && release.type.title === ReleaseType.NationalStatistics && (

@@ -67,15 +67,17 @@ Give Analyst1 User1 publication owner access
     [Tags]  HappyPath
     user gives analyst publication owner access  ${PUBLICATION_NAME}
 
-Sign in as Analyst1 User1 (publication owner) & navigate to publication
+Sign in as Analyst1 User1 (publication owner)
     [Tags]  HappyPath
     user changes to analyst1
-    user waits for page to finish loading 
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}
-    ...  ${RELEASE_TYPE} (not Live)    
+
+Assert publication owner can create methodology for publication
+    user creates methodology for publication  ${PUBLICATION_NAME}
 
 Assert publication owner can upload subject file
     [Tags]  HappyPath
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}
+    ...  ${RELEASE_TYPE} (not Live)
     user clicks link  Data and files
     user waits until page does not contain loading spinner
     user uploads subject   ${SUBJECT_NAME}  seven_filters.csv  seven_filters.meta.csv
@@ -128,22 +130,22 @@ Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
     user clicks radio   Ready for higher review
     user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     ready for higher review (publication owner)
-    user clicks button  Update status 
+    user clicks button  Update status
     user waits until element is visible  id:CurrentReleaseStatus-Awaiting higher review
-    
+
 Assert publication owner can edit release status to "In draft"
     [Tags]  HappyPath
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status  30
     user clicks radio   In draft
     user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Moving back to Draft state (publication owner)
-    user clicks button  Update status 
+    user clicks button  Update status
 
 User goes back to admin dashboard
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
 
-Assert that a publication owner can make a new release 
+Assert that a publication owner can make a new release
     [Tags]  HappyPath
     user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
@@ -154,7 +156,7 @@ Assert publication owner can upload subject file on new release
     [Tags]  HappyPath
     user clicks link  Data and files
     user uploads subject   ${SUBJECT_NAME}  seven_filters.csv  seven_filters.meta.csv
-    
+
 Assert publication owner can add meta guidance to ${SUBJECT_NAME} on new release
     [Tags]  HappyPath
     user clicks link  Metadata guidance
@@ -164,12 +166,12 @@ Assert publication owner can add meta guidance to ${SUBJECT_NAME} on new release
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  meta guidance content
     user clicks button  Save guidance
-  
-Go to "Sign off" page as publication owner 
+
+Go to "Sign off" page as publication owner
     [Tags]  HappyPath
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
-     
+
 Assert publication owner cannot approve release for immediate publication on new release
     [Tags]  HappyPath
     user clicks button  Edit release status
@@ -186,7 +188,7 @@ Navigate to administration as bau1 and swap publication owner role for release a
 Check release approver can access release
     [Tags]  HappyPath
     user changes to analyst1
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${RELEASE_TYPE} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  ${RELEASE_TYPE} (not Live)
 
 Navigate to 'Footnotes' section
     [Tags]  HappyPath
@@ -214,47 +216,6 @@ Assert release approver can create a release note
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
-Assert release approver can publish a release  
+Assert release approver can publish a release
     user clicks link  Sign off
     user approves release for immediate publication
-
-Navigate to administration as bau1 and swap release approver role for viewer only
-    user changes to bau1
-    user removes release access from analyst  ${RELEASE_NAME}  Approver
-    user gives release access to analyst  ${RELEASE_NAME}  Viewer
-
-Navigate to release as a viewer
-    [Tags]  HappyPath
-    user changes to analyst1
-    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
-
-    ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
-    ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}
-
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
-    ${view_button}=  get child element  ${details}  xpath:.//a[text()="View this release"]
-    user clicks element   ${view_button}
-
-    user waits until h2 is visible  Release summary
-    user checks summary list contains   Publication title  ${PUBLICATION_NAME}
-
-Check release viewer cannot approve release 
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until page does not contain loading spinner
-    user checks page does not contain  Edit release status
-
-Login as bau1 and swap viewer role for contributor role for analyst
-    [Tags]  HappyPath
-    user changes to bau1
-    user removes release access from analyst   ${RELEASE_NAME}  Viewer
-    user gives release access to analyst   ${RELEASE_NAME}  Contributor
-
-Check release contributor cannot create an amendment
-    [Tags]  HappyPath
-    user changes to analyst1
-    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    ${details}=  user gets details content element  ${RELEASE_TYPE} (Live - Latest release)  ${accordion}  30
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]  30
-    user checks page does not contain button  Amend this release

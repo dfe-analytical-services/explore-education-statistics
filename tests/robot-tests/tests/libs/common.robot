@@ -191,6 +191,8 @@ user waits until page contains link
 user waits until element contains link
     [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
     user waits until parent contains element  ${element}  link:${link_text}  timeout=${wait}
+    ${link}=  get child element  ${element}  xpath:.//a[.="${link_text}"]
+    [Return]  ${link}
 
 user waits until element contains testid
     [Arguments]  ${element}  ${testid}  ${wait}=${timeout}

@@ -19,7 +19,7 @@ Create test publication and release via API
 
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
     user verifies release summary  ${PUBLICATION_NAME}  Calendar Year  2000  UI test contact name  National Statistics
 
 Upload subject
@@ -132,7 +132,7 @@ Check "Page not found" appears
 Go to admin release summary
     [Tags]  HappyPath
     user navigates to admin dashboard  Bau1
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
 
 Approve release for immediate publication but don't wait to finish
     [Tags]  HappyPath

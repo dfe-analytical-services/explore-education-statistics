@@ -36,7 +36,7 @@ Create new publication and release via API
 
 Go to release sign off page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
     user clicks link  Sign off
     user waits until h2 is visible  Sign off  60
 

@@ -64,21 +64,47 @@ user selects theme and topic from admin dashboard
     user waits until h2 is visible  ${theme}  60 
     user waits until h3 is visible  ${topic}  60
 
+user navigates to editable release summary from admin dashboard
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release summary from admin dashboard
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}
+    ...  ${TOPIC_NAME}
+    ...  Edit this release
+
+user navigates to readonly release summary from admin dashboard
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release summary from admin dashboard
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}
+    ...  ${TOPIC_NAME}
+    ...  View this release
+
 user navigates to release summary from admin dashboard
     [Arguments]
     ...  ${PUBLICATION_NAME}
     ...  ${DETAILS_HEADING}
     ...  ${THEME_NAME}=%{TEST_THEME_NAME}
     ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    ...  ${RELEASE_SUMMARY_LINK_TEXT}=Edit this release
     user opens publication on the admin dashboard  ${PUBLICATION_NAME}  ${THEME_NAME}  ${TOPIC_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
     ${details}=  user gets details content element   ${DETAILS_HEADING}  ${accordion}
 
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]  60
-    ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
-    user clicks element   ${edit_button}
+    ${summary_button}=  user waits until element contains link  ${details}  ${RELEASE_SUMMARY_LINK_TEXT}  60
+    user clicks element   ${summary_button}
 
     user waits until h2 is visible  Release summary  60
     user checks summary list contains   Publication title  ${PUBLICATION_NAME}

@@ -22,7 +22,7 @@ Create new publication for "UI tests topic" topic
 
 Go to "Release summary" page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
 
 Verify release summary
     [Tags]  HappyPath

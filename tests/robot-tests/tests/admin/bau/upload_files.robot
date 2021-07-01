@@ -20,7 +20,7 @@ Create test publication and release via api
 
 Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
 
     user clicks link  Data and files
     user waits until h1 is visible  ${PUBLICATION_NAME}
