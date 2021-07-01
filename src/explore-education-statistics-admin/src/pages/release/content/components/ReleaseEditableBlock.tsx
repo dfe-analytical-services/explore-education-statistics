@@ -12,7 +12,7 @@ import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/relea
 import {
   addUnsavedEdit,
   removeUnsavedEdit,
-} from '@admin/pages/release/content/components/utils/unsavedEdits';
+} from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 
 interface Props {
   allowImages?: boolean;

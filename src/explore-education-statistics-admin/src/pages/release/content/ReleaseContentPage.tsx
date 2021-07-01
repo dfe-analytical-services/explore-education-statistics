@@ -13,7 +13,7 @@ import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { getNumberOfUnsavedBlocks } from '@admin/pages/release/content/components/utils/unsavedEdits';
+import { getNumberOfUnsavedBlocks } from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 
