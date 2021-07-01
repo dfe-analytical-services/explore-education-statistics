@@ -127,6 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return rightResults;
         }
 
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> list)
+        {
+            if (list == null)
+            {
+                return true;
+            }
+
+            return !list.Any();
+        }
+
         public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
             this IEnumerable<TSource> source, Func<TSource, TResult> selector)
         {
