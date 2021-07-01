@@ -224,9 +224,9 @@ Verify publish and update dates
 
 Verify release associated files
     [Tags]  HappyPath
-    user opens accordion section  Download data and files
-    ${downloads}=  user gets accordion section content element  Download data and files
-    user checks element should contain  ${downloads}  All files (zip, 3 Kb)
+    user opens accordion section  Explore data and files
+    ${downloads}=  user gets accordion section content element  Explore data and files
+    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
@@ -569,9 +569,9 @@ Verify amendment is published
 
 Verify amendment files
     [Tags]  HappyPath
-    user opens accordion section  Download data and files
-    ${downloads}=  user gets accordion section content element  Download data and files
-    user checks element should contain  ${downloads}  All files (zip, 3 Kb)
+    user opens accordion section  Explore data and files
+    ${downloads}=  user gets accordion section content element  Explore data and files
+    user checks element should contain  ${downloads} Download all data and files for this release (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
