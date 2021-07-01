@@ -34,5 +34,5 @@ Check ${ROLE_NAME_UNDER_TEST} cannot create an amendment of a published release
 
 Check ${ROLE_NAME_UNDER_TEST} cannot approve a draft release
     [Tags]  HappyPath
-    user navigates to readonly release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
     user cannot see the enabled approve release controls for release

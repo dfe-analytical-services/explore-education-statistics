@@ -34,7 +34,18 @@ Assert publication owner can create methodology for publication
     user checks summary list contains   Title   ${PUBLICATION_NAME}
     user checks summary list contains   Status  Draft
     user checks summary list contains   Published on  Not yet published
-
+    
+Assert publication owner can approve methodology for publication
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
+    user clicks button  Edit status
+    user waits until page contains element  id:methodologyStatusForm-status-Approved
+    user clicks element  id:methodologyStatusForm-status-Approved
+    user waits until page contains element  id:methodologyStatusForm-latestInternalReleaseNote
+    user enters text into element  id:methodologyStatusForm-latestInternalReleaseNote  Approved by UI tests
+    user clicks button  Update status
+    user waits until h2 is visible  Methodology status
+    
 Assert publication owner can upload subject file
     [Tags]  HappyPath
     user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}

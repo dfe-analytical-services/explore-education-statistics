@@ -32,10 +32,7 @@ Check ${ROLE_NAME_UNDER_TEST} cannot create an amendment of a published release
     ${details}=  user gets details content element  ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)  ${publication_accordion}  30
     user cannot see the create amendment controls for release  ${details}
 
-${ROLE_NAME_UNDER_TEST} visits Draft Release
-    [Tags]  HappyPath
-    user navigates to readonly release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
-
 Check ${ROLE_NAME_UNDER_TEST} cannot edit the release status of a Draft Release
     [Tags]  HappyPath
+    user navigates to readonly release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
     user cannot see the edit release status controls for release
