@@ -4,26 +4,12 @@ Resource    ../../libs/common.robot
 
 Library     ../../libs/admin_api.py
 
-Force Tags  Admin  Local  Dev  AltersData  Footnotes
+Force Tags  Admin  Local  Dev
 
 Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
-*** Variables ***
-${PUBLICATION_NAME}  UI tests - publication_owner %{RUN_IDENTIFIER}
-
 *** Test Cases ***
-Create new publication and release via API
-    [Tags]  HappyPath
-    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
-    user create test release via api  ${PUBLICATION_ID}   AY    2025
-
-Navigate to admin dashboard and assert publication is present
-    [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_MEDIUM}
-
 Navigate to manage users page as bau1
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}/administration/users

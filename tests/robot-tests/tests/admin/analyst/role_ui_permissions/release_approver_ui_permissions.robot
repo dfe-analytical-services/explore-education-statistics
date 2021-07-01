@@ -4,7 +4,7 @@ Resource    ../../../libs/common.robot
 Resource    ../../../bootstrap_data/bootstrap_data_constants.robot
 Resource    role_ui_permissions_common.robot
 
-Force Tags  Admin  Local  Dev  AltersData  Footnotes
+Force Tags  Admin  Local  Dev
 
 Suite Setup       user signs in as analyst1
 Suite Teardown    user closes the browser

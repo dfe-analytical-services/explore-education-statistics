@@ -44,4 +44,5 @@ Update Methodology for Publication
     user clicks link  Summary
     user checks summary list contains   Title   New methodology title
     user checks summary list contains   Status  Approved
-    user checks summary list contains   Published on  Not yet published
+    ${date}=  get current datetime   %-d %B %Y
+    user checks summary list contains   Published on  ${date}
