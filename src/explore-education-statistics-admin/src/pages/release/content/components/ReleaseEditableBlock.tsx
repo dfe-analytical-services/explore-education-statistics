@@ -10,9 +10,9 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import React, { useCallback } from 'react';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import {
-  addUnSavedEdit,
-  removeUnSavedEdit,
-} from '@admin/pages/release/content/components/utils/unSavedEdits';
+  addUnsavedEdit,
+  removeUnsavedEdit,
+} from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 
 interface Props {
   allowImages?: boolean;
@@ -45,15 +45,15 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
-  const { unSavedEdits, setUnSavedEdits } = useEditingContext();
+  const { unsavedEdits, setUnsavedEdits } = useEditingContext();
 
   const handleSave = useCallback(
     (content: string) => {
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
       onSave(block.id, contentWithPlaceholders);
-      setUnSavedEdits(removeUnSavedEdit(unSavedEdits, sectionId, block.id));
+      setUnsavedEdits(removeUnsavedEdit(unsavedEdits, sectionId, block.id));
     },
-    [block.id, sectionId, onSave, unSavedEdits, setUnSavedEdits],
+    [block.id, sectionId, onSave, unsavedEdits, setUnsavedEdits],
   );
 
   const handleDelete = useCallback(() => {
@@ -62,12 +62,12 @@ const ReleaseEditableBlock = ({
 
   const handleBlur = (isDirty: boolean) => {
     if (isDirty) {
-      setUnSavedEdits(addUnSavedEdit(unSavedEdits, sectionId, block.id));
+      setUnsavedEdits(addUnsavedEdit(unsavedEdits, sectionId, block.id));
     }
   };
 
   const handleCancel = () => {
-    setUnSavedEdits(removeUnSavedEdit(unSavedEdits, sectionId, block.id));
+    setUnsavedEdits(removeUnsavedEdit(unsavedEdits, sectionId, block.id));
   };
 
   switch (block.type) {

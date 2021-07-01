@@ -20,7 +20,7 @@ const MethodologyAccordion = ({
   id = `methodologyAccordion-${sectionKey}`,
   title,
 }: MethodologyAccordionProps) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
   const {
     addContentSection,
     updateContentSectionsOrder,
@@ -55,7 +55,11 @@ const MethodologyAccordion = ({
     [id, methodology.id, sectionKey, updateContentSectionsOrder],
   );
 
-  if (sectionKey === 'annexes' && !isEditing && methodology.annexes.length < 1)
+  if (
+    sectionKey === 'annexes' &&
+    editingMode !== 'edit' &&
+    methodology.annexes.length < 1
+  )
     return null;
   return (
     <EditableAccordion

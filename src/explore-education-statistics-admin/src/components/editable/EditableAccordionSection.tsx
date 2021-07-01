@@ -45,7 +45,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
   const { index, isReordering } = restProps as DraggableAccordionSectionProps;
 
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const [showRemoveModal, toggleRemoveModal] = useToggle(false);
   const [isEditingHeading, toggleEditingHeading] = useToggle(false);
@@ -118,7 +118,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
     toggleEditingHeading,
   ]);
 
-  if (!isEditing) {
+  if (editingMode !== 'edit') {
     return <AccordionSection {...props} />;
   }
 

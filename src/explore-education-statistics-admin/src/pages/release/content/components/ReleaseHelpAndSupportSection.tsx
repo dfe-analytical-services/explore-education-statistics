@@ -13,7 +13,7 @@ const ReleaseHelpAndSupportSection = ({
 }: {
   release: EditableRelease;
 }) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
   const { publication } = release;
   return (
     <>
@@ -34,7 +34,7 @@ const ReleaseHelpAndSupportSection = ({
             <p>
               Read our{' '}
               {publication.methodology &&
-                (isEditing ? (
+                (editingMode === 'edit' ? (
                   <a>{`${publication.title}: methodology`}</a>
                 ) : (
                   <Link to={`/methodologies/${publication.methodology.id}`}>
@@ -43,7 +43,7 @@ const ReleaseHelpAndSupportSection = ({
                 ))}
               {!publication.methodology &&
                 publication.externalMethodology &&
-                (isEditing ? (
+                (editingMode === 'edit' ? (
                   <a>{`${publication.title}: methodology`}</a>
                 ) : (
                   <Link to={publication.externalMethodology.url}>

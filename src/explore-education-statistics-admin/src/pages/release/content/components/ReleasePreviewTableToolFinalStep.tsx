@@ -1,29 +1,24 @@
-import Link from '@admin/components/Link';
-import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import { Publication } from '@common/services/publicationService';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
+import Link from '@admin/components/Link';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import { generatePath } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 
-interface TableToolFinalStepProps {
-  publication?: BasicPublicationDetails;
-  releaseId: string;
+interface ReleasePreviewTableToolFinalStepProps {
+  publication?: Publication | BasicPublicationDetails;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
 }
-
-const PreReleaseTableToolFinalStep = ({
+const ReleasePreviewTableToolFinalStep = ({
   publication,
-  releaseId,
   table,
   tableHeaders,
-}: TableToolFinalStepProps) => {
+}: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
@@ -32,6 +27,20 @@ const PreReleaseTableToolFinalStep = ({
   useEffect(() => {
     setCurrentTableHeaders(tableHeaders);
   }, [tableHeaders]);
+
+  const getMethodologyLink = () => {
+    if (publication?.methodology) {
+      return publication.methodology.title;
+    }
+    if (publication?.externalMethodology) {
+      return (
+        <Link to={publication.externalMethodology.url}>
+          {publication.externalMethodology.title}
+        </Link>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="govuk-!-margin-bottom-4">
@@ -55,7 +64,6 @@ const PreReleaseTableToolFinalStep = ({
           tableHeadersConfig={currentTableHeaders}
         />
       )}
-
       {publication && table && (
         <>
           <DownloadTable
@@ -66,19 +74,8 @@ const PreReleaseTableToolFinalStep = ({
 
           <TableToolInfo
             contactDetails={publication.contact}
-            releaseLink={
-              <Link
-                to={generatePath<ReleaseRouteParams>(
-                  preReleaseContentRoute.path,
-                  {
-                    publicationId: publication.id,
-                    releaseId,
-                  },
-                )}
-              >
-                {publication.title}
-              </Link>
-            }
+            methodologyLink={getMethodologyLink()}
+            releaseLink={<span>{publication.title}</span>}
           />
         </>
       )}
@@ -86,4 +83,4 @@ const PreReleaseTableToolFinalStep = ({
   );
 };
 
-export default memo(PreReleaseTableToolFinalStep);
+export default ReleasePreviewTableToolFinalStep;
