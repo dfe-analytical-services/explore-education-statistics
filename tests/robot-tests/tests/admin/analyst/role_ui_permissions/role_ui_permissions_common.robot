@@ -15,6 +15,14 @@ user cannot see the edit release status controls for release
     user waits until page does not contain loading spinner
     user checks page does not contain  Edit release status
 
+user cannot see the enabled approve release controls for release
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status  60
+    user scrolls to element  id:releaseStatusForm-approvalStatus-Approved
+    user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
+
 user can see the create methodologies controls for publication
     [Arguments]  ${PUBLICATION_ACCORDION}
     user checks element contains button  ${PUBLICATION_ACCORDION}  Create methodology

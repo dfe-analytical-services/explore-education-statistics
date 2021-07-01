@@ -21,48 +21,6 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   AY    2025
 
-Navigate to admin dashboard and assert publication is present
-    [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  %{WAIT_MEDIUM}
-
-Navigate to manage users page as bau1
-    [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}/administration/users
-    user checks table column heading contains  1  1  Name
-    user checks table column heading contains  1  2  Email
-    user checks table column heading contains  1  3  Role
-    user checks table column heading contains  1  4  Actions
-
-Assert that test users are present in table
-    [Tags]  HappyPath
-    user checks results table row heading contains  1  1  Analyst1 User1
-    user checks results table row heading contains  2  1  Analyst2 User2
-    user checks results table row heading contains  3  1  Analyst3 User3
-    user checks results table row heading contains  4  1  Bau1 User1
-    user checks results table row heading contains  5  1  Bau2 User2
-
-    user checks results table cell contains  1  1  	ees-analyst1@education.gov.uk
-    user checks results table cell contains  1  2  	Analyst
-    user checks results table cell contains  1  3  	Manage
-
-    user checks results table cell contains  2  1  	ees-analyst2@education.gov.uk
-    user checks results table cell contains  2  2  	Analyst
-    user checks results table cell contains  2  3  	Manage
-
-    user checks results table cell contains  3  1  	ees-analyst3@education.gov.uk
-    user checks results table cell contains  3  2  	Analyst
-    user checks results table cell contains  3  3  	Manage
-
-    user checks results table cell contains  4  1  	ees-bau1@education.gov.uk
-    user checks results table cell contains  4  2  	BAU User
-    user checks results table cell contains  4  3  	Manage
-
-    user checks results table cell contains  5  1  	ees-bau2@education.gov.uk
-    user checks results table cell contains  5  2  	BAU User
-    user checks results table cell contains  5  3  	Manage
-
 Give Analyst1 User1 publication owner access
     [Tags]  HappyPath
     user gives analyst publication owner access  ${PUBLICATION_NAME}
@@ -73,6 +31,9 @@ Sign in as Analyst1 User1 (publication owner)
 
 Assert publication owner can create methodology for publication
     user creates methodology for publication  ${PUBLICATION_NAME}
+    user checks summary list contains   Title   ${PUBLICATION_NAME}
+    user checks summary list contains   Status  Draft
+    user checks summary list contains   Published on  Not yet published
 
 Assert publication owner can upload subject file
     [Tags]  HappyPath
@@ -121,11 +82,6 @@ Go to "Sign off" page
     user waits until page does not contain loading spinner
     user clicks button  Edit release status
 
-Assert publication owner cannot approve release for immediate publication
-    [Tags]  HappyPath
-    user waits until page contains element  id:releaseStatusForm-approvalStatus-Approved  30
-    user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
-
 Assert publication owner can edit release status to "Ready for higher review"
     [Tags]  HappyPath
     user clicks radio   Ready for higher review
@@ -166,18 +122,6 @@ Assert publication owner can add meta guidance to ${SUBJECT_NAME} on new release
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  meta guidance content
     user clicks button  Save guidance
-
-Go to "Sign off" page as publication owner
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user waits until h2 is visible  Sign off
-
-Assert publication owner cannot approve release for immediate publication on new release
-    [Tags]  HappyPath
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status  60
-    user scrolls to element  id:releaseStatusForm-approvalStatus-Approved
-    user checks element is disabled  id:releaseStatusForm-approvalStatus-Approved
 
 Navigate to administration as bau1 and swap publication owner role for release approver
     [Tags]  HappyPath

@@ -31,3 +31,8 @@ Check ${ROLE_NAME_UNDER_TEST} can create an amendment of a published release
     [Tags]  HappyPath
     ${details}=  user gets details content element  ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)  ${publication_accordion}  30
     user can see the create amendment controls for release  ${details}
+
+Check ${ROLE_NAME_UNDER_TEST} cannot approve a draft release
+    [Tags]  HappyPath
+    user navigates to readonly release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
+    user cannot see the enabled approve release controls for release

@@ -36,6 +36,6 @@ ${ROLE_NAME_UNDER_TEST} visits Draft Release
     [Tags]  HappyPath
     user navigates to readonly release summary from admin dashboard  ${PUBLICATION_NAME}  ${DRAFT_RELEASE_TYPE} (not Live)  ${THEME_NAME}  ${TOPIC_NAME}
 
-Check ${ROLE_NAME_UNDER_TEST} cannot edit the release status of the Draft Release
+Check ${ROLE_NAME_UNDER_TEST} cannot edit the release status of a Draft Release
     [Tags]  HappyPath
     user cannot see the edit release status controls for release
