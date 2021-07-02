@@ -40,6 +40,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         }
 
         [Fact]
+        public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = WithRelease
+            };
+
+            Assert.True(methodology.ScheduledForPublishingWithRelease);
+        }
+
+        [Fact]
+        public void ScheduledForPublishingWithRelease_FalseWhenPublishingStrategyIsImmediately()
+        {
+            var methodology = new Methodology
+            {
+                Status = Approved,
+                PublishingStrategy = Immediately
+            };
+
+            Assert.False(methodology.ScheduledForPublishingImmediately);
+        }
+
+        [Fact]
         public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
         {
             var liveRelease = new Release

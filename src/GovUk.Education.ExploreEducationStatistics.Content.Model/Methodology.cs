@@ -65,7 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool Approved => Status == MethodologyStatus.Approved;
 
         public bool ScheduledForPublishingImmediately => PublishingStrategy == MethodologyPublishingStrategy.Immediately;
-        
+
+        public bool ScheduledForPublishingWithRelease => PublishingStrategy == MethodologyPublishingStrategy.WithRelease;
+
         public bool ScheduledForPublishingWithPublishedRelease
         {
             get
