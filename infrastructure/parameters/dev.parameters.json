@@ -70,15 +70,6 @@
     },
     "maxDbSizeBytes": {
       "value": 322122547200
-    },
-    "minCapacityContentDb": {
-      "value": "2"
-    },
-    "maxCapacityContentDb": {
-      "value": 6
-    },
-    "autoPauseDelayContentDb": {
-      "value": -1
     }
   }
 }
