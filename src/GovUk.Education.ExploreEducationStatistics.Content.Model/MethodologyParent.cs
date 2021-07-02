@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -13,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<PublicationMethodology> Publications { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public string OwningPublicationTitle { get; set; }
 
-        [NotMapped]
+        [Required]
         public string Slug { get; set; }
 
         public List<Methodology> Versions { get; set; }

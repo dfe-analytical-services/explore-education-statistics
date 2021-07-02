@@ -71,13 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                MethodologyParent = new MethodologyParent(),
+                MethodologyParent = new MethodologyParent {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Owning publication"
+                },
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
                 Status = Approved,
-                Title = "Pupil absence statistics: methodology"
+                AlternativeTitle = "Alternative title"
             };
 
             var owningPublication = new Publication
@@ -148,6 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
+        // TODO DW - add test for updating AlternativeTitles explicitly
         [Fact]
         public async Task UpdateMethodology()
         {
@@ -160,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = "pupil-absence-statistics-methodology",
                     Publications = AsList(
                         new PublicationMethodology
                         {
@@ -169,9 +173,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     )
                 },
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                AlternativeTitle = "Pupil absence statistics: methodology"
             };
 
             var request = new MethodologyUpdateRequest
@@ -245,7 +248,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
-                    Publications = AsList(
+                   OwningPublicationTitle = "Pupil absence statistics: methodology",
+                   Slug = "pupil-absence-statistics-methodology"
+                   Publications = AsList(
                         new PublicationMethodology
                         {
                             Publication = new Publication
@@ -257,9 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     )
                 },
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
-                Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Status = Draft
             };
 
             var imageFile1 = new MethodologyFile
@@ -361,6 +364,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
                     Publications = AsList(
                         new PublicationMethodology
                         {
@@ -373,9 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     )
                 },
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
-                Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Status = Draft
             };
 
             var imageFile1 = new MethodologyFile
@@ -484,6 +487,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
                     Publications = AsList(
                         new PublicationMethodology
                         {
@@ -496,9 +501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     )
                 },
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
-                Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Status = Draft
             };
 
             var request = new MethodologyUpdateRequest
@@ -580,6 +583,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
                     Publications = AsList(
                         new PublicationMethodology
                         {
@@ -592,9 +597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     )
                 },
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
-                Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Status = Draft
             };
 
             var request = new MethodologyUpdateRequest
@@ -676,6 +679,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
                     Publications = AsList(
                         new PublicationMethodology
                         {
@@ -690,9 +695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
-                Status = Approved,
-                Title = "Pupil absence statistics: methodology"
+                Status = Approved
             };
 
             var request = new MethodologyUpdateRequest
@@ -767,9 +770,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodology1 = new Methodology
             {
                 PublishingStrategy = Immediately,
-                Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
-                Title = "Methodology title"
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
             };
 
             var methodology2 = new Methodology
@@ -777,9 +783,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
-                Slug = "pupil-exclusion-statistics-methodology",
                 Status = Draft,
-                Title = "Pupil exclusion statistics: methodology"
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-exclusion-statistics-methodology",
+                    OwningPublicationTitle = "Pupil exclusion statistics: methodology"
+                }
             };
 
             var request = new MethodologyUpdateRequest

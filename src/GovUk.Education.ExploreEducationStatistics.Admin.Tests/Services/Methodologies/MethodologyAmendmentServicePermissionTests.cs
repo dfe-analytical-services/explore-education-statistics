@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new MethodologyAmendmentService(
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 userService ?? new Mock<IUserService>().Object,
-                MapperUtils.AdminMapper()
+                MapperUtils.AdminMapper(),
+                null
             );
         }
 

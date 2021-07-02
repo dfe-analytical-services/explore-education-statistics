@@ -32,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             var methodology = (await _contentDbContext.Methodologies.AddAsync(new Methodology
             {
                 PublishingStrategy = Immediately,
-                Slug = publication.Slug,
-                Title = publication.Title,
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = publication.Slug,
+                    OwningPublicationTitle = publication.Title,
                     Publications = new List<PublicationMethodology>
                     {
                         new PublicationMethodology
