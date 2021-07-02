@@ -41,9 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = slug,
                         Status = Approved,
-                        Title = "Methodology 1 title",
+                        AlternativeTitle = "Methodology 1 title",
                         Version = 0
                     }
                 )
@@ -60,9 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = "methodology-2",
                         Status = Approved,
-                        Title = "Methodology 2 title",
+                        AlternativeTitle = "Methodology 2 title",
                         Version = 0
                     }
                 )
@@ -120,9 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = slug,
                         Status = Draft,
-                        Title = "Methodology 1 title",
+                        AlternativeTitle = "Methodology 1 title",
                         Version = 0
                     }
                 )
@@ -139,9 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = "methodology-2",
                         Status = Approved,
-                        Title = "Methodology 2 title",
+                        AlternativeTitle = "Methodology 2 title",
                         Version = 0
                     }
                 )
@@ -187,9 +183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = "some-other-slug",
                         Status = Approved,
-                        Title = "Methodology title",
+                        AlternativeTitle = "Methodology title",
                         Version = 0
                     }
                 )
@@ -223,18 +218,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var publication = new Publication();
 
+            var methodologyParent = new MethodologyParent
+            {
+                Slug = "methodology-1",
+                OwningPublicationTitle = "Methodology 1 title"
+            };
+            
             var methodologies = AsList(
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Slug = "methodology-1",
-                    Title = "Methodology 1 title"
+                    MethodologyParent = methodologyParent
                 },
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Slug = "methodology-2",
-                    Title = "Methodology 2 title"
+                    MethodologyParent = methodologyParent,
+                    AlternativeTitle = "Methodology 2 title",
                 }
             );
 
@@ -263,12 +263,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Equal(2, result.Right.Count);
 
                 Assert.Equal(methodologies[0].Id, result.Right[0].Id);
-                Assert.Equal(methodologies[0].Slug, result.Right[0].Slug);
-                Assert.Equal(methodologies[0].Title, result.Right[0].Title);
+                Assert.Equal(methodologyParent.Slug, result.Right[0].Slug);
+                Assert.Equal(methodologyParent.OwningPublicationTitle, result.Right[0].Title);
 
                 Assert.Equal(methodologies[1].Id, result.Right[1].Id);
-                Assert.Equal(methodologies[1].Slug, result.Right[1].Slug);
-                Assert.Equal(methodologies[1].Title, result.Right[1].Title);
+                Assert.Equal(methodologyParent.Slug, result.Right[1].Slug);
+                Assert.Equal(methodologies[1].AlternativeTitle, result.Right[1].Title);
             }
 
             MockUtils.VerifyAllMocks(methodologyRepository);
@@ -358,10 +358,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
-                    Slug = "methodology-1-slug",
                     Status = Approved,
-                    Title = "Methodology 1 v0 title",
-                    Version = 0
+                    AlternativeTitle = "Methodology 1 v0 title",
+                    Version = 0,
+                    MethodologyParent = new MethodologyParent 
+                    {
+                        Slug = 'methodology-1-slug'
+                    }
                 },
                 new Methodology
                 {
@@ -370,10 +373,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
-                    Slug = "methodology-2-slug",
                     Status = Approved,
-                    Title = "Methodology 2 v0 title",
-                    Version = 0
+                    AlternativeTitle = "Methodology 2 v0 title",
+                    Version = 0,
+                    MethodologyParent = new MethodologyParent 
+                    {
+                        Slug = 'methodology-2-slug'
+                    }
                 });
 
             var contentDbContextId = Guid.NewGuid().ToString();

@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
                 .OnSuccess(async methodology =>
                 {
-                    var amendment = methodology.CreateAmendment();
+                    var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
                     var savedAmendment = await _context.Methodologies.AddAsync(amendment);
                     await _context.SaveChangesAsync();
                     return savedAmendment;

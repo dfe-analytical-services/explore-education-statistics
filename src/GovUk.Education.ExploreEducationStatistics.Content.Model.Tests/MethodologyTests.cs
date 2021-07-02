@@ -99,5 +99,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);
         }
+
+        [Fact]
+        public void GetTitle_NoAlternativeTitleSet()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Owning Publication Title"
+                }
+            };
+            
+            Assert.Equal(methodology.MethodologyParent.OwningPublicationTitle, methodology.Title);
+        }
+
+        [Fact]
+        public void GetTitle_AlternativeTitleSet()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Owning Publication Title"
+                },
+                AlternativeTitle = "Alternative Title"
+            };
+            
+            Assert.Equal(methodology.AlternativeTitle, methodology.Title);
+        }
+
+        [Fact]
+        public void GetSlug()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "owning-publication-slug"
+                }
+            };
+            
+            Assert.Equal(methodology.MethodologyParent.Slug, methodology.Slug);
+        }
     }
 }

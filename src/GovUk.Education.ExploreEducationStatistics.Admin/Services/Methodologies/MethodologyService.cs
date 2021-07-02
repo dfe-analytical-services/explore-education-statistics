@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var slug = SlugFromTitle(request.Title);
                     return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).Map(_ =>
                     {
-                        methodology.Slug = slug;
+                        methodology.MethodologyParent.Slug = slug;
                         return methodology;
                     });
                 })
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.InternalReleaseNote = request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
-                    methodology.Title = request.Title;
+                    methodology.AlternativeTitle = request.Title;
                     methodology.Updated = DateTime.UtcNow;
 
                     if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))

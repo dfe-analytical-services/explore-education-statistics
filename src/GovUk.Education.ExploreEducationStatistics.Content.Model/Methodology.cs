@@ -28,6 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [Required] 
         public Guid Id { get; set; }
 
+        public string Title => AlternativeTitle ?? MethodologyParent.OwningPublicationTitle;
+
+        public string? AlternativeTitle { get; set; }
+
+        public string Slug => MethodologyParent.Slug;
+
         public MethodologyStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
@@ -84,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public Methodology CreateAmendment(DateTime createdDate, User createdByUser)
+        public Methodology CreateMethodologyAmendment(DateTime createdDate, User createdByUser)
         {
             var copy = MemberwiseClone() as Methodology;
             copy.Id = Guid.NewGuid();
@@ -93,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Updated = null;
             copy.Version = Version++;
             copy.Created = createdDate;
-            copy.CreatedBy = createdByUser;
+            copy.CreatedById = createdByUserId;
             copy.PreviousVersion = this;
             copy.PublishingStrategy = Immediately;
             copy.ScheduledWithRelease = null;
