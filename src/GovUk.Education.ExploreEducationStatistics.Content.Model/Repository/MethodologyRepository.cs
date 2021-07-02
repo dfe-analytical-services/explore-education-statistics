@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
@@ -54,17 +56,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             // First check the publication exists
             var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
 
-            var methodologies = await _methodologyParentRepository.GetByPublication(publication.Id);
-            return methodologies.Select(methodology =>
+            var methodologyParents = await _methodologyParentRepository.GetByPublication(publication.Id);
+            return (await methodologyParents.SelectAsync(async methodologyParent =>
                 {
-                    _contentDbContext.Entry(methodology)
+                    await _contentDbContext.Entry(methodologyParent)
                         .Collection(m => m.Versions)
-                        .Load();
+                        .LoadAsync();
 
-                    return methodology.LatestVersion();
-                })
+                    return methodologyParent.LatestVersion();
+                }))
                 .Where(version => version != null)
                 .ToList();
+        }
+
+        public async Task<Methodology> GetLatestPublishedByMethodologyParent(Guid methodologyParentId)
+        {
+            var methodologyParent = await _contentDbContext.MethodologyParents
+                .FindAsync(methodologyParentId);
+
+            return await GetLatestPublishedByMethodologyParent(methodologyParent);
         }
 
         public async Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId)
@@ -72,28 +82,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             // First check the publication exists
             var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
 
-            var methodologies = await _methodologyParentRepository.GetByPublication(publication.Id);
-            return methodologies.Select(methodology =>
-                {
-                    _contentDbContext.Entry(methodology)
-                        .Collection(m => m.Versions)
-                        .Load();
-
-                    return methodology.LatestPublishedVersion();
-                })
+            var methodologyParents = await _methodologyParentRepository.GetByPublication(publication.Id);
+            return (await methodologyParents.SelectAsync(async methodologyParent =>
+                    await GetLatestPublishedByMethodologyParent(methodologyParent)))
                 .Where(version => version != null)
                 .ToList();
+        }
+
+        private async Task<Methodology> GetLatestPublishedByMethodologyParent(MethodologyParent methodologyParent)
+        {
+            await _contentDbContext.Entry(methodologyParent)
+                .Collection(m => m.Versions)
+                .LoadAsync();
+
+            return await methodologyParent.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
         }
 
         public async Task<bool> IsPubliclyAccessible(Guid methodologyId)
         {
             var methodology = await _contentDbContext.Methodologies
-                .Include(m => m.ScheduledWithRelease)
-                .SingleAsync(m => m.Id == methodologyId);
+                .FindAsync(methodologyId);
 
-            return methodology.Approved &&
-                   (methodology.ScheduledForPublishingImmediately ||
-                    methodology.ScheduledForPublishingWithPublishedRelease);
+            return await IsPubliclyAccessible(methodology);
+        }
+
+        private async Task<bool> IsPubliclyAccessible(Methodology methodology)
+        {
+            if (!methodology.Approved)
+            {
+                return false;
+            }
+
+            if (!await IsLatestVersionOfMethodologyExcludingDrafts(methodology))
+            {
+                return false;
+            }
+
+            if (methodology.ScheduledForPublishingImmediately)
+            {
+                return await PublicationsHaveAtLeastOnePublishedRelease(methodology);
+            }
+
+            // Scheduled for publishing with a Release so check the Release is published
+
+            await _contentDbContext.Entry(methodology)
+                .Reference(m => m.ScheduledWithRelease)
+                .LoadAsync();
+            return methodology.ScheduledForPublishingWithPublishedRelease;
+        }
+
+        private async Task<bool> IsLatestVersionOfMethodologyExcludingDrafts(Methodology methodology)
+        {
+            await _contentDbContext.Entry(methodology)
+                .Reference(m => m.MethodologyParent)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(methodology.MethodologyParent)
+                .Collection(mp => mp.Versions)
+                .LoadAsync();
+
+            return methodology.MethodologyParent.Versions.All(mv =>
+                mv.PreviousVersionId != methodology.Id ||
+                mv.PreviousVersionId == methodology.Id && mv.Status != Approved);
+        }
+
+        private async Task<bool> PublicationsHaveAtLeastOnePublishedRelease(Methodology methodology)
+        {
+            await _contentDbContext.Entry(methodology)
+                .Reference(m => m.MethodologyParent)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(methodology.MethodologyParent)
+                .Collection(mp => mp.Publications)
+                .LoadAsync();
+
+            return methodology.MethodologyParent.Publications.Any(publicationMethodology =>
+            {
+                _contentDbContext.Entry(publicationMethodology)
+                    .Reference(pm => pm.Publication)
+                    .Load();
+
+                return publicationMethodology.Publication.Live;
+            });
         }
     }
 }

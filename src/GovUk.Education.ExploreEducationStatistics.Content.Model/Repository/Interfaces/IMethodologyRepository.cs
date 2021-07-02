@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<List<Methodology>> GetLatestByPublication(Guid publicationId);
 
+        Task<Methodology> GetLatestPublishedByMethodologyParent(Guid methodologyParentId);
+
         Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId);
 
         Task<bool> IsPubliclyAccessible(Guid methodologyId);

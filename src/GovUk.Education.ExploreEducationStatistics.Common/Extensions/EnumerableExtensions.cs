@@ -160,7 +160,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return result;
         }
-        
+
+        public static async Task<TSource> FirstOrDefaultAsync<TSource>(
+            this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+        {
+            foreach (var item in source)
+            {
+                if (await predicate(item))
+                {
+                    return item;
+                }
+            }
+
+            return default;
+        }
+
         /// <summary>
         /// Filter a sequence of elements asynchronously.
         /// </summary>

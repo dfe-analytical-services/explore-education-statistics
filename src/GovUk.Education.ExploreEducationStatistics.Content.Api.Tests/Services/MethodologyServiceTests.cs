@@ -27,14 +27,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             const string slug = "methodology-1";
 
-            // Set up a methodology with a published version
+            // TODO SOW4 Won't need to add 'Versions' to db when Slug is moved to MethodologyParent
+            // since the service will lookup a Methodology parent by slug rather than a Methodology
+            // Also do this for the other variants of this unit test
+
             var methodology1 = new MethodologyParent
             {
                 Slug = slug,
                 Versions = AsList(
                     new Methodology
                     {
-                        Id = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
                         Annexes = new List<ContentSection>(),
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
@@ -43,36 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         Status = Approved,
                         Title = "Methodology 1 title",
                         Version = 0
-                    },
-                    new Methodology
-                    {
-                        Id = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
-                        PublishingStrategy = Immediately,
-                        Slug = slug,
-                        Status = Approved,
-                        Title = "Methodology 1 title updated",
-                        Version = 1
-                    },
-                    // Latest version is a draft that should not be returned
-                    new Methodology
-                    {
-                        Id = Guid.Parse("ad13999c-4caf-4f82-8df0-94db22acbcbc"),
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
-                        PublishingStrategy = Immediately,
-                        Slug = slug,
-                        Status = Draft,
-                        Title = "Methodology 1 title draft",
-                        Version = 2
                     }
                 )
             };
 
-            // Set up a different methodology with a different slug to make sure it's not returned
+            // Set up a MethodologyParent with a different slug to make sure it's not returned
             var methodology2 = new MethodologyParent
             {
                 Slug = "methodology-2",
@@ -99,16 +76,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodology1.Id))
+                .ReturnsAsync(methodology1.Versions[0]);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetLatestMethodologyBySlug(slug);
 
                 result.AssertRight();
 
-                Assert.Equal(Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"), result.Right.Id);
-                Assert.Equal("Methodology 1 title updated", result.Right.Title);
+                Assert.Equal(methodology1.Versions[0].Id, result.Right.Id);
+                Assert.Equal("Methodology 1 title", result.Right.Title);
 
                 var annexes = result.Right.Annexes;
                 Assert.NotNull(annexes);
@@ -118,6 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.NotNull(content);
                 Assert.Empty(content);
             }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
@@ -125,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             const string slug = "methodology-1";
 
-            // Set up a methodology with a draft version that should not be returned
             var methodology1 = new MethodologyParent
             {
                 Slug = slug,
@@ -144,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 )
             };
 
-            // Set up a different approved methodology with a different slug to make sure it's not returned
+            // Set up a MethodologyParent with a different slug to make sure it's not returned
             var methodology2 = new MethodologyParent
             {
                 Slug = "methodology-2",
@@ -171,20 +155,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodology1.Id))
+                .ReturnsAsync((Methodology) null);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetLatestMethodologyBySlug(slug);
 
                 result.AssertNotFound();
             }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
         public async Task GetLatestMethodologyBySlug_SlugNotFound()
         {
-            // Set up a different methodology with a different slug to make sure it's not returned
+            // Set up a MethodologyParent with a different slug to make sure it's not returned
             var methodology = new MethodologyParent
             {
                 Slug = "some-other-slug",
@@ -211,14 +203,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetLatestMethodologyBySlug("methodology-slug");
 
                 result.AssertNotFound();
             }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
