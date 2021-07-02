@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<Methodology> GetLatestPublishedByMethodologyParent(Guid methodologyParentId)
         {
             var methodologyParent = await _contentDbContext.MethodologyParents
-                .FindAsync(methodologyParentId);
+                .SingleAsync(mp => mp.Id == methodologyParentId);
 
             return await GetLatestPublishedByMethodologyParent(methodologyParent);
         }

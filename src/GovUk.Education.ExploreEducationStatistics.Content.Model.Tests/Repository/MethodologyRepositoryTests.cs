@@ -252,6 +252,238 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
+        public async Task GetLatestPublishedByMethodologyParent()
+        {
+            var previousVersion = new Methodology
+            {
+                Id = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
+                PreviousVersionId = null,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var latestPublishedVersion = new Methodology
+            {
+                Id = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
+                PreviousVersionId = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 1
+            };
+
+            var latestDraftVersion = new Methodology
+            {
+                Id = Guid.Parse("9108ed11-ab53-4578-9e9a-f5cfc3443e66"),
+                PreviousVersionId = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Version = 2
+            };
+
+            var methodologyParent = new MethodologyParent
+            {
+                Versions = AsList(previousVersion, latestPublishedVersion, latestDraftVersion)
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
+                await contentDbContext.PublicationMethodologies.AddAsync(
+                    new PublicationMethodology
+                    {
+                        Publication = new Publication
+                        {
+                            Published = DateTime.UtcNow
+                        },
+                        MethodologyParent = methodologyParent,
+                        Owner = true
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.AttachRange(methodologyParent);
+
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
+
+                Assert.Equal(latestPublishedVersion, result);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedByMethodologyParent_MethodologyParentHasNoPublishedVersions()
+        {
+            var methodologyParent = new MethodologyParent
+            {
+                Versions = AsList(
+                    new Methodology
+                    {
+                        PublishingStrategy = Immediately,
+                        Status = Draft
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
+                await contentDbContext.PublicationMethodologies.AddAsync(
+                    new PublicationMethodology
+                    {
+                        Publication = new Publication
+                        {
+                            Published = DateTime.UtcNow
+                        },
+                        MethodologyParent = methodologyParent,
+                        Owner = true
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.AttachRange(methodologyParent);
+
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
+
+                Assert.Null(result);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedByMethodologyParent_MethodologyParentHasNoVersions()
+        {
+            var methodologyParent = new MethodologyParent
+            {
+                Versions = new List<Methodology>()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
+                await contentDbContext.PublicationMethodologies.AddAsync(
+                    new PublicationMethodology
+                    {
+                        Publication = new Publication
+                        {
+                            Published = DateTime.UtcNow
+                        },
+                        MethodologyParent = methodologyParent,
+                        Owner = true
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.AttachRange(methodologyParent);
+
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
+
+                Assert.Null(result);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedByMethodologyParent_PublicationIsNotPublished()
+        {
+            var nonLivePublication = new Publication
+            {
+                Published = null
+            };
+
+            var methodologyParent = new MethodologyParent
+            {
+                Versions = AsList(
+                    new Methodology
+                    {
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
+                await contentDbContext.PublicationMethodologies.AddAsync(
+                    new PublicationMethodology
+                    {
+                        Publication = nonLivePublication,
+                        MethodologyParent = methodologyParent,
+                        Owner = true
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.AttachRange(methodologyParent);
+
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
+
+                Assert.Null(result);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedByMethodologyParent_MethodologyParentNotFoundThrowsException()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                    service.GetLatestPublishedByMethodologyParent(Guid.NewGuid()));
+            }
+
+            MockUtils.VerifyAllMocks(methodologyParentRepository);
+        }
+
+        [Fact]
         public async Task GetLatestPublishedByPublication()
         {
             var publication = new Publication
