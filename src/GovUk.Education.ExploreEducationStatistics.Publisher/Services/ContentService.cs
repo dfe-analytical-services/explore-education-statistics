@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
         {
-            var releases = await _releaseService.GetAsync(releaseIds);
+            var releases = await _releaseService.List(releaseIds);
 
             foreach (var release in releases)
             {
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             await CacheTrees(context, releaseIds);
 
-            var releases = await _releaseService.GetAsync(releaseIds);
+            var releases = await _releaseService.List(releaseIds);
             var publications = releases.Select(release => release.Publication).ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
                 .Select(publication => publication.MethodologyId.Value).Distinct();

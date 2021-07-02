@@ -126,6 +126,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
+        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, int, Task> func)
+        {
+            var index = 0;
+
+            foreach (var item in source)
+            {
+                await func(item, index);
+                index += 1;
+            }
+        }
+
         public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source,
             Func<T, Task<Either<TLeft, TRight>>> func)
         {

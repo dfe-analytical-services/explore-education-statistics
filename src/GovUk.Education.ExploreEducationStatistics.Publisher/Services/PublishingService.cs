@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseFiles(Guid releaseId)
         {
-            var release = await _releaseService.GetAsync(releaseId);
+            var release = await _releaseService.Get(releaseId);
             var files = await _releaseService.GetFiles(releaseId,
                 Ancillary,
                 Chart,

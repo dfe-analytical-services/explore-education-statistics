@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public async Task<Release> GetAsync(Guid id)
+        public async Task<Release> Get(Guid id)
         {
             return await _contentDbContext.Releases
                 .Include(release => release.Publication)
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleOrDefaultAsync(release => release.Id == id);
         }
 
-        public async Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids)
+        public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
         {
             return await _contentDbContext.Releases
                 .Where(release => ids.Contains(release.Id))

@@ -1,9 +1,13 @@
+#nullable enable
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public class TimePeriodLabels
     {
-        public string From { get; }
-        public string To { get; }
+        public string From { get; } = string.Empty;
+        public string To { get; } = string.Empty;
 
         public TimePeriodLabels()
         {
@@ -13,6 +17,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
         {
             From = from;
             To = to;
+        }
+
+        public string ToLabel()
+        {
+            var hasFrom = !From.IsNullOrEmpty();
+            var hasTo = !To.IsNullOrEmpty();
+
+            if (hasFrom && hasTo)
+            {
+                if (To != From)
+                {
+                    return $"{From} to {To}";
+                }
+
+                return To;
+            }
+
+            if (!hasFrom && !hasTo)
+            {
+                return string.Empty;
+            }
+
+            return hasTo ? To : From;
         }
     }
 }
