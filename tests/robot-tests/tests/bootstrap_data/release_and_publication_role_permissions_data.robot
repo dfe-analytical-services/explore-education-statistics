@@ -7,8 +7,8 @@
 #
 
 *** Settings ***
-Resource    bootstrap_common.robot
-Resource    bootstrap_data_constants.robot
+Resource    ../libs/bootstrap_data/bootstrap_common.robot
+Resource    ../libs/bootstrap_data/bootstrap_data_constants.robot
 Resource    ../libs/admin-common.robot
 Library     ../libs/admin_api.py
 

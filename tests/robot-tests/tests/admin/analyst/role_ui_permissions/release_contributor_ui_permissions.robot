@@ -1,8 +1,8 @@
 *** Settings ***
 Resource    ../../../libs/admin-common.robot
 Resource    ../../../libs/common.robot
-Resource    ../../../bootstrap_data/bootstrap_data_constants.robot
-Resource    role_ui_permissions_common.robot
+Resource    ../../../libs/bootstrap_data/bootstrap_data_constants.robot
+Resource    ../../../libs/admin/analyst/role_ui_permissions/role_ui_permissions_common.robot
 
 Force Tags  Admin  Local  Dev
 
