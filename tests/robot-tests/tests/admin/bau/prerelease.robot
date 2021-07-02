@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Resource    ../../libs/tables.robot
+Resource    ../../libs/tables-common.robot
 Library     ../../libs/admin_api.py
 Library     Collections
 
@@ -87,7 +87,7 @@ Create test publication and release via API
 
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
     user waits until h2 is visible  Release summary
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}

@@ -19,7 +19,7 @@ Create test publication and release via API
 
 Verify Release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Tax Year 2020-21 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   Tax Year 2020-21 (not Live)
     user verifies release summary  ${PUBLICATION_NAME}  Tax Year  2020-21  UI test contact name  National Statistics
 
 Upload subject

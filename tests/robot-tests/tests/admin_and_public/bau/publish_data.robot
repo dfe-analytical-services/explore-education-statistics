@@ -21,7 +21,7 @@ Create new publication and release via API
 
 Navigate to release
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
 Add public prerelease access list
     [Tags]  HappyPath

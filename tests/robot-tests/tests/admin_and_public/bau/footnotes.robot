@@ -27,7 +27,7 @@ Create new publication and release via API
 
 Upload subject
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
     user clicks link  Data and files
     user uploads subject   ${SUBJECT_NAME}  dates.csv  dates.meta.csv
 

@@ -181,7 +181,7 @@ describe('MethodologySummary', () => {
   });
 
   describe('renders correctly when no Methodology is supplied', () => {
-    test('the create and link methodology buttons are shown', () => {
+    test('the create and link methodology buttons are shown if the user has permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -201,10 +201,49 @@ describe('MethodologySummary', () => {
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {
+        screen.queryByRole('button', {
           name: 'Link to an externally hosted methodology',
         }),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByText('No methodologies added.'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('the create and link methodology buttons are not shown if the user does not have permission', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              permissions: {
+                ...testPublicationNoMethodology.permissions,
+                canCreateMethodologies: false,
+                canManageExternalMethodology: false,
+              },
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByTestId('methodology-summary-link'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Create methodology' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Link to an externally hosted methodology',
+        }),
+      ).not.toBeInTheDocument();
+
+      expect(screen.queryByText('No methodologies added.')).toBeInTheDocument();
     });
 
     test('clicking the link methodology button shows the form', async () => {

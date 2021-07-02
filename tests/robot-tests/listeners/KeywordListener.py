@@ -13,15 +13,17 @@ class KeywordListener:
         source = attributes["source"]
     
         if attributes["type"].lower() == "keyword" and not attributes["libname"] in ["BuiltIn", "SeleniumLibrary"] and source is not None:
-            args = attributes["args"]
-            values = EXECUTION_CONTEXTS.current.namespace.variables.replace_list(args)
-            args_and_values = list(zip(args, values))
-            args_and_value_string = "\t".join(map(lambda kvp: f'{kvp[0]}={kvp[1]}', args_and_values))
-            
-            logging_colour = KeywordListener.COMMON_KEYWORD_COLOUR if source.endswith('common.robot') else KeywordListener.TEST_SUITE_KEYWORD_COLOUR
-            
+            args_and_value_string = self.get_args_and_values_string(attributes)
+            logging_colour = KeywordListener.COMMON_KEYWORD_COLOUR if "/libs/" in source else KeywordListener.TEST_SUITE_KEYWORD_COLOUR
             print(f'{logging_colour}\t{attributes["kwname"]}\t\t{args_and_value_string}\t\t\t(from file://{attributes["source"]} line {attributes["lineno"]})')
 
     def end_keyword(self, name, attributes):
         if attributes["status"] == "FAIL":
-            warn(f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{attributes["args"]}\t\tfile://{attributes["source"]} line {attributes["lineno"]}')
+            args_and_value_string = self.get_args_and_values_string(attributes)
+            warn(f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{args_and_value_string}\t\tfile://{attributes["source"]} line {attributes["lineno"]}')
+
+    def get_args_and_values_string(self, attributes):
+        args = attributes["args"]
+        values = EXECUTION_CONTEXTS.current.namespace.variables.replace_list(args)
+        args_and_values = list(zip(args, values))
+        return ",\t".join(map(lambda kvp: f'{kvp[0]}={kvp[1]}', args_and_values))

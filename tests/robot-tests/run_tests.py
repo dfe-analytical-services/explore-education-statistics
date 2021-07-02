@@ -160,7 +160,8 @@ robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
              # "--exitonfailure",
              "--exclude", "Failing",
-             "--exclude", "UnderConstruction"]
+             "--exclude", "UnderConstruction",
+             "--exclude", "BootstrapData"]
 
 robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
 
