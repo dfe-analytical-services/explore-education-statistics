@@ -66,8 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool ScheduledForPublishingImmediately => PublishingStrategy == MethodologyPublishingStrategy.Immediately;
 
-        public bool ScheduledForPublishingWithRelease => PublishingStrategy == MethodologyPublishingStrategy.WithRelease;
-
         public bool ScheduledForPublishingWithPublishedRelease
         {
             get
@@ -85,9 +83,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 return ScheduledWithRelease.Live;
             }
         }
-
-        public bool PubliclyAccessible => Approved &&
-                                          (ScheduledForPublishingImmediately ||
-                                           ScheduledForPublishingWithPublishedRelease);
     }
 }
