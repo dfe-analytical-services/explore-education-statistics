@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,12 +47,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public async Task<Release> Get(Guid id)
+        public async Task<Release?> Find(Guid id)
         {
             return await _contentDbContext.Releases
                 .Include(release => release.Publication)
                 .Include(r => r.PreviousVersion)
                 .SingleOrDefaultAsync(release => release.Id == id);
+        }
+
+        public async Task<Release> Get(Guid id)
+        {
+            var release = await Find(id);
+
+            if (release == null)
+            {
+                throw new ArgumentException($"Could not find release: {id}");
+            }
+
+            return release;
         }
 
         public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
@@ -126,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
-                .LastOrDefault();
+                .Last();
         }
 
         public async Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,

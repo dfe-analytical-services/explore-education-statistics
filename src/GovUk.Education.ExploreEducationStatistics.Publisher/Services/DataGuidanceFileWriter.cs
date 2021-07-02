@@ -35,12 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<FileStream> WriteFile(Guid releaseId, string path)
         {
             var release = await _releaseService.Get(releaseId);
-
-            if (release == null)
-            {
-                throw new ArgumentException($"Could not find release: {releaseId}");
-            }
-
             var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id);
 
             if (subjects.IsLeft)
@@ -75,6 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await file.WriteLineAsync();
 
             await WriteDataFiles(subjects, file);
+
+            await file.DisposeAsync();
 
             return File.OpenRead(path);
         }

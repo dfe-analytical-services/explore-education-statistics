@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(releaseId));
+            releaseService.Setup(s => s.Get(releaseId))
+                .ThrowsAsync(new ArgumentException("Could not find release"));
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             );
 
-            Assert.Equal($"Could not find release: {releaseId}", exception.Message);
+            Assert.Equal($"Could not find release", exception.Message);
 
             Assert.False(File.Exists(path));
             MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
@@ -208,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             );
 
             var path = GenerateFilePath();
-            var file = await writer.WriteFile(release.Id, path);
+            await using var file = await writer.WriteFile(release.Id, path);
 
             using var reader = new StreamReader(file);
             var text = await File.ReadAllTextAsync(path);
@@ -320,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             );
 
             var path = GenerateFilePath();
-            var file = await writer.WriteFile(release.Id, path);
+            await using var file = await writer.WriteFile(release.Id, path);
 
             using var reader = new StreamReader(file);
             var text = await File.ReadAllTextAsync(path);

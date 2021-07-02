@@ -26,12 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
             if (hasFrom && hasTo)
             {
-                if (To != From)
-                {
-                    return $"{From} to {To}";
-                }
-
-                return To;
+                return To == From ? To : $"{From} to {To}";
             }
 
             if (!hasFrom && !hasTo)
