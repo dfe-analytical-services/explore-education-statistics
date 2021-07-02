@@ -56,6 +56,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
@@ -378,19 +379,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
         }
 
-        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
-            where TDbContext : DbContext
-        {
-            services.AddTransient<
-                IPersistenceHelper<TDbContext>,
-                PersistenceHelper<TDbContext>>(
-                s =>
-                {
-                    var dbContext = s.GetService<TDbContext>();
-                    return new PersistenceHelper<TDbContext>(dbContext);
-                });
-        }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -514,11 +502,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                     .CreateScope();
-                
+
                 serviceScope.ServiceProvider
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
-            } 
+            }
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

@@ -2,7 +2,6 @@
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -25,6 +24,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
@@ -98,19 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
-        }
-
-        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
-            where TDbContext : DbContext
-        {
-            services.AddTransient<
-                IPersistenceHelper<TDbContext>,
-                PersistenceHelper<TDbContext>>(
-                s =>
-                {
-                    var dbContext = s.GetService<TDbContext>();
-                    return new PersistenceHelper<TDbContext>(dbContext);
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
