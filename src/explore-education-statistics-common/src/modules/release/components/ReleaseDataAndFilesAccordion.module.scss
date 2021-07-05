@@ -1,0 +1,26 @@
+@import '~govuk-frontend/govuk/base';
+
+.container {
+  margin-bottom: govuk-spacing(9);
+  margin-top: -1 * (govuk-spacing(6));
+
+  @include govuk-media-query($until: tablet) {
+    margin-top: 0;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    :global(.govuk-accordion__section-header) {
+      border-top: 0;
+    }
+  }
+
+  :global(.dfe-flex) {
+    @include govuk-media-query($until: tablet) {
+      display: block;
+    }
+  }
+
+  :global(.govuk-button) {
+    width: 100%;
+  }
+}
