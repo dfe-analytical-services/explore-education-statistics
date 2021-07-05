@@ -33,7 +33,7 @@ const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
 
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
 
@@ -133,18 +133,19 @@ const ReleaseContent = () => {
                     />
                   )}
                 />
-                {isEditing && release.summarySection.content?.length === 0 && (
-                  <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                    <Button variant="secondary" onClick={addBlock}>
-                      Add a summary text block
-                    </Button>
-                  </div>
-                )}
+                {editingMode === 'edit' &&
+                  release.summarySection.content?.length === 0 && (
+                    <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+                      <Button variant="secondary" onClick={addBlock}>
+                        Add a summary text block
+                      </Button>
+                    </div>
+                  )}
               </>
             )}
           </div>
 
-          {!isEditing && (
+          {editingMode !== 'edit' && (
             <PageSearchForm
               id="search-form"
               inputLabel="Search in this release page."
@@ -168,7 +169,7 @@ const ReleaseContent = () => {
               </li>
               <li>
                 {release.publication.methodology &&
-                  (isEditing ? (
+                  (editingMode === 'edit' ? (
                     <a>{release.publication.methodology.title}</a>
                   ) : (
                     <Link
@@ -178,7 +179,7 @@ const ReleaseContent = () => {
                     </Link>
                   ))}
                 {release.publication.externalMethodology &&
-                  (isEditing ? (
+                  (editingMode === 'edit' ? (
                     <a>{release.publication.externalMethodology.title}</a>
                   ) : (
                     <Link to={release.publication.externalMethodology.url}>
