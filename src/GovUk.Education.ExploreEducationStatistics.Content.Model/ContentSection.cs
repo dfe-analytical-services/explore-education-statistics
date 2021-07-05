@@ -44,5 +44,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
+        
+        public ContentSection Clone(DateTime createdDate)
+        {
+            var copy = MemberwiseClone() as ContentSection;
+            copy.Id = Guid.Empty;
+
+            copy.Content = copy
+                .Content?
+                .Select(content => content.Clone(createdDate))
+                .ToList();
+
+            return copy;
+        }
     }
 }

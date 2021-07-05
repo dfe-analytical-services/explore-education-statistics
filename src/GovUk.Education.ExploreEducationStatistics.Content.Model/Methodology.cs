@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.Extensions.Logging.Abstractions;
-using static System.DateTime;
+using System.Linq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
@@ -90,20 +89,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public Methodology CreateMethodologyAmendment(DateTime createdDate, User createdByUser)
+        public bool Amendment => PreviousVersionId != Guid.Empty && Published == null;
+        
+        public Methodology CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var copy = MemberwiseClone() as Methodology;
-            copy.Id = Guid.NewGuid();
+            copy.Id = Guid.Empty;
             copy.Status = Draft;
             copy.Published = null;
             copy.Updated = null;
-            copy.Version = Version++;
+            copy.Version = Version + 1;
             copy.Created = createdDate;
+            copy.CreatedBy = null;
             copy.CreatedById = createdByUserId;
-            copy.PreviousVersion = this;
+            copy.PreviousVersion = null;
+            copy.PreviousVersionId = Id;
             copy.PublishingStrategy = Immediately;
             copy.ScheduledWithRelease = null;
             copy.ScheduledWithReleaseId = Guid.Empty;
+            copy.MethodologyParent = null;
+
+            copy.Annexes = Annexes
+                .Select(c => c.Clone(createdDate))
+                .ToList();
+            
+            copy.Content = Content
+                .Select(c => c.Clone(createdDate))
+                .ToList();
+            
             return copy;
         }
     }

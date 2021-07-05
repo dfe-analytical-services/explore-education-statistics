@@ -101,6 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        // TODO EES-2156 - update owned MethodologyParents' OwningPublicationTitles
         public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
             PublicationSaveViewModel updatedPublication)
