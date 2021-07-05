@@ -256,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var previousVersion = new Methodology
             {
-                Id = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
+                Id = Guid.NewGuid(),
                 PreviousVersionId = null,
                 PublishingStrategy = Immediately,
                 Status = Approved,
@@ -265,8 +265,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var latestPublishedVersion = new Methodology
             {
-                Id = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
-                PreviousVersionId = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
+                Id = Guid.NewGuid(),
+                PreviousVersionId = previousVersion.Id,
                 PublishingStrategy = Immediately,
                 Status = Approved,
                 Version = 1
@@ -274,8 +274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var latestDraftVersion = new Methodology
             {
-                Id = Guid.Parse("9108ed11-ab53-4578-9e9a-f5cfc3443e66"),
-                PreviousVersionId = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
+                Id = Guid.NewGuid(),
+                PreviousVersionId = latestPublishedVersion.Id,
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 Version = 2
@@ -298,8 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                         {
                             Published = DateTime.UtcNow
                         },
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -308,14 +307,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.AttachRange(methodologyParent);
-
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
-                Assert.Equal(latestPublishedVersion, result);
+                Assert.Equal(latestPublishedVersion.Id, result.Id);
             }
 
             MockUtils.VerifyAllMocks(methodologyParentRepository);
@@ -347,8 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                         {
                             Published = DateTime.UtcNow
                         },
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -357,8 +353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.AttachRange(methodologyParent);
-
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
@@ -390,8 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                         {
                             Published = DateTime.UtcNow
                         },
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -400,8 +393,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.AttachRange(methodologyParent);
-
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
@@ -427,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     new Methodology
                     {
                         PublishingStrategy = Immediately,
-                        Status = Approved,
+                        Status = Approved
                     }
                 )
             };
@@ -441,8 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     new PublicationMethodology
                     {
                         Publication = nonLivePublication,
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -451,8 +441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.AttachRange(methodologyParent);
-
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
@@ -625,8 +613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     new PublicationMethodology
                     {
                         Publication = nonLivePublication,
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -745,8 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     new PublicationMethodology
                     {
                         Publication = publication,
-                        MethodologyParent = methodologyParent,
-                        Owner = true
+                        MethodologyParent = methodologyParent
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -839,8 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -885,8 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -924,8 +908,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -970,8 +953,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1016,8 +998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1076,8 +1057,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(previousVersion, latestPublishedVersion, latestDraftVersion)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1149,8 +1129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(previousVersion, latestPublishedVersion, latestDraftVersion)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1190,8 +1169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1229,8 +1207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 MethodologyParent = new MethodologyParent
                 {
                     Versions = AsList(methodology)
-                },
-                Owner = true
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

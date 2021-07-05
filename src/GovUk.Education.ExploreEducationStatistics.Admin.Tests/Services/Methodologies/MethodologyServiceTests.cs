@@ -421,8 +421,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            // Methodology is not publicly accessible to begin with when checking if the slug should be updated
-            // Methodology is publicly accessible later after it's publishing strategy and status are updated
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is publicly accessible later after its publishing strategy and status are updated
             methodologyRepository.SetupSequence(mock =>
                     mock.IsPubliclyAccessible(methodology.Id))
                 .ReturnsAsync(false)
@@ -505,8 +505,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            // Methodology is not publicly accessible to begin with when checking if the slug should be updated
-            // Methodology is not publicly accessible later after it's publishing strategy and status are updated
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is not publicly accessible later after its publishing strategy and status are updated
             // due to the Release not being live
             methodologyRepository.SetupSequence(mock =>
                     mock.IsPubliclyAccessible(methodology.Id))

@@ -14,7 +14,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -29,37 +28,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             PublicationId = Guid.NewGuid()
         };
 
-        private static readonly Methodology PublicMethodology = new Methodology
+        private static readonly Methodology MethodologyNoPublication = new Methodology
         {
             Id = Guid.NewGuid(),
-            Status = Approved,
             PublishingStrategy = Immediately,
             MethodologyParent = new MethodologyParent()
         };
 
-        private static readonly Methodology PrivateMethodology = new Methodology
+        private static readonly Methodology MethodologyWithPublication = new Methodology
         {
             Id = Guid.NewGuid(),
-            Status = Draft,
-            PublishingStrategy = Immediately,
-            MethodologyParent = new MethodologyParent()
-        };
-
-        private static readonly Methodology PublicMethodologyWithPublication = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Status = Approved,
-            PublishingStrategy = Immediately,
-            MethodologyParent = new MethodologyParent
-            {
-                Publications = AsList(Publication)
-            }
-        };
-
-        private static readonly Methodology PrivateMethodologyWithPublication = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Status = Draft,
             PublishingStrategy = Immediately,
             MethodologyParent = new MethodologyParent
             {
@@ -76,11 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
 
-                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(PublicMethodology.Id))
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyNoPublication.Id))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, PublicMethodology);
+                    var authContext = CreateAuthContext(user, MethodologyNoPublication);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -99,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
 
-                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(PrivateMethodology.Id))
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyNoPublication.Id))
                         .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, PrivateMethodology);
+                    var authContext = CreateAuthContext(user, MethodologyNoPublication);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -122,11 +100,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(PublicMethodologyWithPublication.Id))
+                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(true);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
+                var authContext = CreateAuthContext(user, MethodologyWithPublication);
 
                 publicationRoleRepository
                     .Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
@@ -147,9 +125,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, PublicMethodologyWithPublication);
+                var authContext = CreateAuthContext(user, MethodologyWithPublication);
 
-                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(PublicMethodologyWithPublication.Id))
+                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(true);
 
                 publicationRoleRepository
@@ -169,11 +147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(PrivateMethodologyWithPublication.Id))
+                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, PrivateMethodologyWithPublication);
+                var authContext = CreateAuthContext(user, MethodologyWithPublication);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyRepository, publicationRoleRepository);
