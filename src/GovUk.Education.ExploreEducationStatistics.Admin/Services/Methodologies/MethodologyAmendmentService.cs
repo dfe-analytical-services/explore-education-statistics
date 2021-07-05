@@ -37,14 +37,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(originalMethodologyId)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
-                .OnSuccess(async methodology =>
-                {
-                    var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
-                    var savedAmendment = await _context.Methodologies.AddAsync(amendment);
-                    await _context.SaveChangesAsync();
-                    return savedAmendment;
-                })
+                .OnSuccess(HydrateMethodologyForAmendment)
+                .OnSuccess(CreateAndSaveAmendment)
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+        }
+        
+        private async Task<Either<ActionResult, Methodology>> CreateAndSaveAmendment(Methodology methodology)
+        {
+            var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
+            var savedAmendment = await _context.Methodologies.AddAsync(amendment);
+            await _context.SaveChangesAsync();
+            return savedAmendment.Entity;
+        }
+
+        private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForAmendment(Methodology methodology)
+        {
+            await _context
+                .Entry(methodology)
+                .Reference(m => m.MethodologyParent)
+                .LoadAsync();
+
+            return methodology;
         }
     }
 }
