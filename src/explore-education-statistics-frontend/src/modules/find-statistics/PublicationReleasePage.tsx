@@ -17,14 +17,13 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
-import { FileInfo } from '@common/services/types/file';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
@@ -330,8 +329,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       <PublicationReleaseHeadlinesSection release={release} />
 
       {release.downloadFiles && (
-        <ReleaseDataAndFiles
-          onSectionOpenEvent={accordionSection => {
+        <ReleaseDataAndFilesAccordion
+          onSectionOpen={accordionSection => {
             logEvent({
               category: `${release.publication.title} release page`,
               action: `Content accordion opened`,
@@ -345,7 +344,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               release={release}
             />
           }
-          renderDownloadLink={(file: FileInfo) => {
+          renderDownloadLink={file => {
             const isAllFiles = !file.id && file.name === 'All files';
             const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
               release.id

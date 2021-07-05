@@ -26,8 +26,7 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
-import { FileInfo } from '@common/services/types/file';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 
 const ReleaseContent = () => {
   const config = useConfig();
@@ -274,9 +273,9 @@ const ReleaseContent = () => {
       <ReleaseHeadlines release={release} />
 
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
-        <ReleaseDataAndFiles
+        <ReleaseDataAndFilesAccordion
           release={release}
-          renderDownloadLink={(file: FileInfo) => {
+          renderDownloadLink={file => {
             return (
               <>
                 <ButtonText
