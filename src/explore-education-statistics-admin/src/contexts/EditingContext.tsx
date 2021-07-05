@@ -7,54 +7,53 @@ import React, {
 } from 'react';
 import noop from 'lodash/noop';
 
-export interface UnSavedEdit {
+export interface UnsavedEdit {
   sectionId: string;
   blockIds: string[];
 }
 
+export type EditingMode = 'preview' | 'table-preview' | 'edit';
+
 export interface EditingContextState {
-  isEditing: boolean;
-  setEditing: (isEditing: boolean) => void;
-  unSavedEdits: UnSavedEdit[];
-  setUnSavedEdits: (unSavedEdits: UnSavedEdit[]) => void;
+  editingMode: EditingMode;
+  setEditingMode: (mode: EditingMode) => void;
+  unsavedEdits: UnsavedEdit[];
+  setUnsavedEdits: (unsavedEdit: UnsavedEdit[]) => void;
 }
 
 export const EditingContext = createContext<EditingContextState>({
-  isEditing: false,
-  setEditing: noop,
-  unSavedEdits: [],
-  setUnSavedEdits: noop,
+  editingMode: 'edit',
+  setEditingMode: noop,
+  unsavedEdits: [],
+  setUnsavedEdits: noop,
 });
 
 export function useEditingContext() {
   return useContext(EditingContext);
 }
 
-interface EditingContextProviderProps {
+export interface EditingContextProviderProps {
   children: ReactNode | ((state: EditingContextState) => ReactNode);
   value?: {
-    isEditing: boolean;
-    unSavedEdits?: UnSavedEdit[];
+    editingMode: string;
+    unsavedEdits?: UnsavedEdit[];
   };
 }
 
 export const EditingContextProvider = ({
   children,
-  value = {
-    isEditing: true,
-  },
 }: EditingContextProviderProps) => {
-  const [isEditing, setEditing] = useState<boolean>(value.isEditing);
-  const [unSavedEdits, setUnSavedEdits] = useState<UnSavedEdit[]>([]);
+  const [editingMode, setEditingMode] = useState<EditingMode>('edit');
+  const [unsavedEdits, setUnsavedEdits] = useState<UnsavedEdit[]>([]);
 
   const state = useMemo<EditingContextState>(() => {
     return {
-      isEditing,
-      setEditing,
-      unSavedEdits,
-      setUnSavedEdits,
+      editingMode,
+      setEditingMode,
+      unsavedEdits,
+      setUnsavedEdits,
     };
-  }, [isEditing, unSavedEdits]);
+  }, [editingMode, unsavedEdits]);
 
   return (
     <EditingContext.Provider value={state}>

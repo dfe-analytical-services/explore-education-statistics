@@ -15,14 +15,14 @@ interface Props {
 const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const {
     attachContentSectionBlock,
     deleteContentSectionBlock,
   } = useReleaseContentActions();
 
-  if (!isEditing) {
+  if (editingMode !== 'edit') {
     return null;
   }
 

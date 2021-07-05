@@ -26,7 +26,7 @@ const ReleaseContentAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { isEditing, unSavedEdits } = useEditingContext();
+  const { editingMode, unsavedEdits } = useEditingContext();
 
   const actions = useReleaseContentActions();
 
@@ -36,7 +36,7 @@ const ReleaseContentAccordionSection = ({
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
   const updatedHeading =
-    unSavedEdits.findIndex(edit => edit.sectionId === sectionId) === -1
+    unsavedEdits.findIndex(edit => edit.sectionId === sectionId) === -1
       ? heading
       : `${heading} (Unsaved changes)`;
 
@@ -187,7 +187,7 @@ const ReleaseContentAccordionSection = ({
         )}
       />
 
-      {isEditing && !isReordering && (
+      {editingMode === 'edit' && !isReordering && (
         <>
           {showDataBlockForm && (
             <DataBlockSelectForm

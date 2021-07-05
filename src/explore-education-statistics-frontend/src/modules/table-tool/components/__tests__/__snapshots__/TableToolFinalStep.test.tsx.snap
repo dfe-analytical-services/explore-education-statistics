@@ -630,16 +630,12 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
             >
-              Test publication
-              ,
-               
-              Latest Release Title
+              Test publication, Latest Release Title
             </a>
           </li>
           <li>
@@ -1383,16 +1379,12 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication/selected-release-slug"
             >
-              Test publication
-              ,
-               
-              Selected Release Title
+              Test publication, Selected Release Title
             </a>
           </li>
           <li>
@@ -2136,16 +2128,12 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication/selected-release-slug"
             >
-              Test publication
-              ,
-               
-              Selected Release Title
+              Test publication, Selected Release Title
             </a>
           </li>
           <li>
@@ -2872,16 +2860,12 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
             >
-              Test publication
-              ,
-               
-              Latest Release Title
+              Test publication, Latest Release Title
             </a>
           </li>
         </ul>
@@ -3606,16 +3590,21 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
             >
-              Test publication
-              ,
-               
-              Latest Release Title
+              Test publication, Latest Release Title
+            </a>
+          </li>
+          <li>
+            Methodology: 
+            <a
+              class="govuk-link"
+              href="/methodology/m1"
+            >
+              methodology title
             </a>
           </li>
           <li>
@@ -4343,16 +4332,12 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
           class="govuk-list"
         >
           <li>
-            Publication:
-             
+            Publication: 
             <a
               class="govuk-link"
               href="/find-statistics/test-publication"
             >
-              Test publication
-              ,
-               
-              Latest Release Title
+              Test publication, Latest Release Title
             </a>
           </li>
           <li>

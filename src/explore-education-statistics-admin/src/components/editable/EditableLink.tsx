@@ -14,9 +14,9 @@ const EditableLink = ({
   children,
   ...props
 }: Props) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
-  return !isEditing ? (
+  return editingMode !== 'edit' ? (
     <Link {...props} to={href}>
       {children}
     </Link>

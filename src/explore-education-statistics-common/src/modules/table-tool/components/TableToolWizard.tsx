@@ -71,6 +71,7 @@ export interface TableToolWizardProps {
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
+  onSubjectStepBack?: () => void;
   loadingFastTrack?: boolean;
 }
 
@@ -82,6 +83,7 @@ const TableToolWizard = ({
   renderHighlightLink,
   finalStep,
   onSubmit,
+  onSubjectStepBack,
   loadingFastTrack = false,
 }: TableToolWizardProps) => {
   const router = useRouter();
@@ -145,6 +147,12 @@ const TableToolWizard = ({
         },
       };
     });
+  };
+
+  const handleSubjectStepBack = () => {
+    if (onSubjectStepBack) {
+      onSubjectStepBack();
+    }
   };
 
   const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
@@ -311,7 +319,7 @@ const TableToolWizard = ({
                 )}
               </WizardStep>
             )}
-            <WizardStep>
+            <WizardStep onBack={handleSubjectStepBack}>
               {stepProps => (
                 <SubjectStep
                   {...stepProps}

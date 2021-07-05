@@ -1,13 +1,37 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext, EditingMode } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import classNames from 'classnames';
 import styles from './EditablePageModeToggle.module.scss';
 
-const EditablePageModeToggle = () => {
-  const { isEditing, setEditing } = useEditingContext();
+interface Props {
+  previewLabel?: string;
+  showTablePreviewOption?: boolean;
+}
+const EditablePageModeToggle = ({
+  previewLabel = 'Preview content',
+  showTablePreviewOption = false,
+}: Props) => {
+  const { editingMode, setEditingMode } = useEditingContext();
   const [isOpen, toggleOpen] = useToggle(true);
+
+  const options = [
+    {
+      label: 'Add / view comments and edit content',
+      value: 'edit',
+    },
+    {
+      label: previewLabel,
+      value: 'preview',
+    },
+  ];
+  if (showTablePreviewOption) {
+    options.push({
+      label: 'Preview table tool',
+      value: 'table-preview',
+    });
+  }
 
   return (
     <div
@@ -27,25 +51,16 @@ const EditablePageModeToggle = () => {
       </button>
       <div aria-labelledby="pageViewToggleButton" className={styles.content}>
         <FormRadioGroup
-          id="pageMode"
-          name="pageMode"
+          id="editingMode"
+          name="editingMode"
           className={styles.fieldset}
-          value={isEditing ? 'edit' : 'preview'}
+          value={editingMode}
           legend="Set page view"
           legendHidden
           small
-          options={[
-            {
-              label: 'Add / view comments and edit content',
-              value: 'edit',
-            },
-            {
-              label: 'Preview content',
-              value: 'preview',
-            },
-          ]}
+          options={options}
           onChange={event => {
-            setEditing(event.target.value === 'edit');
+            setEditingMode(event.target.value as EditingMode);
           }}
         />
       </div>

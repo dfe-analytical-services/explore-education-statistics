@@ -22,7 +22,7 @@ const RelatedPagesSection = ({ release }: Props) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
@@ -94,7 +94,7 @@ const RelatedPagesSection = ({ release }: Props) => {
 
   return (
     <>
-      {(isEditing || links.length > 0) && (
+      {(editingMode === 'edit' || links.length > 0) && (
         <>
           <h2
             className="govuk-heading-s govuk-!-margin-top-6"
@@ -115,7 +115,7 @@ const RelatedPagesSection = ({ release }: Props) => {
           </nav>
         </>
       )}
-      {isEditing && renderLinkForm()}
+      {editingMode === 'edit' && renderLinkForm()}
     </>
   );
 };

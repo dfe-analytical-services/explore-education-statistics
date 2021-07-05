@@ -1,12 +1,12 @@
 import {
-  addUnSavedEdit,
-  removeUnSavedEdit,
-} from '@admin/pages/release/content/components/utils/unSavedEdits';
+  addUnsavedEdit,
+  removeUnsavedEdit,
+} from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 
 describe('Unsaved edits', () => {
   describe('Adding an unsaved edit', () => {
     test('Adding a new unsaved edit', () => {
-      const result = addUnSavedEdit([], 'section-1', 'block-1');
+      const result = addUnsavedEdit([], 'section-1', 'block-1');
       expect(result).toEqual([
         {
           sectionId: 'section-1',
@@ -26,7 +26,7 @@ describe('Unsaved edits', () => {
           blockIds: ['block-4'],
         },
       ];
-      const result = addUnSavedEdit(edits, 'section-1', 'block-3');
+      const result = addUnsavedEdit(edits, 'section-1', 'block-3');
       expect(result).toEqual([
         {
           sectionId: 'section-1',
@@ -50,7 +50,7 @@ describe('Unsaved edits', () => {
           blockIds: ['block-4'],
         },
       ];
-      const result = addUnSavedEdit(edits, 'section-1', 'block-2');
+      const result = addUnsavedEdit(edits, 'section-1', 'block-2');
       expect(result).toEqual([
         {
           sectionId: 'section-1',
@@ -76,7 +76,7 @@ describe('Unsaved edits', () => {
           blockIds: ['block-4'],
         },
       ];
-      const result = removeUnSavedEdit(edits, 'section-2', 'block-4');
+      const result = removeUnsavedEdit(edits, 'section-2', 'block-4');
       expect(result).toEqual([
         {
           sectionId: 'section-1',
@@ -96,7 +96,7 @@ describe('Unsaved edits', () => {
           blockIds: ['block-4'],
         },
       ];
-      const result = removeUnSavedEdit(edits, 'section-1', 'block-1');
+      const result = removeUnsavedEdit(edits, 'section-1', 'block-1');
       expect(result).toEqual([
         {
           sectionId: 'section-1',
@@ -120,7 +120,7 @@ describe('Unsaved edits', () => {
           blockIds: ['block-4'],
         },
       ];
-      const result = removeUnSavedEdit(edits, 'section-3', 'block-5');
+      const result = removeUnsavedEdit(edits, 'section-3', 'block-5');
       expect(result).toEqual([
         {
           sectionId: 'section-1',

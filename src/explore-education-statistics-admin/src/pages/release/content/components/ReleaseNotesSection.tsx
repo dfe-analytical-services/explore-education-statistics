@@ -46,7 +46,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
     release.updates,
   );
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const addReleaseNote = (releaseNote: CreateFormValues) => {
     return new Promise(resolve => {
@@ -196,12 +196,12 @@ const ReleaseNotesSection = ({ release }: Props) => {
         <Details
           summary={`See all updates (${releaseNotes.length})`}
           id="releaseNotes"
-          open={isEditing}
+          open={editingMode === 'edit'}
         >
           <ol className="govuk-list">
             {releaseNotes.map(elem => (
               <li key={elem.id}>
-                {isEditing &&
+                {editingMode === 'edit' &&
                 editFormOpen &&
                 selectedReleaseNote.id === elem.id ? (
                   renderEditForm()
@@ -212,7 +212,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
                     </FormattedDate>
                     <p>{elem.reason}</p>
 
-                    {isEditing && (
+                    {editingMode === 'edit' && (
                       <ButtonGroup>
                         <Button
                           variant="secondary"
@@ -233,7 +233,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
               </li>
             ))}
           </ol>
-          {isEditing && renderAddForm()}
+          {editingMode === 'edit' && renderAddForm()}
         </Details>
 
         <ModalConfirm

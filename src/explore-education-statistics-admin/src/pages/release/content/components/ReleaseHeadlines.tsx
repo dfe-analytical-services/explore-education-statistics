@@ -19,7 +19,7 @@ interface Props {
 }
 
 const ReleaseHeadlines = ({ release }: Props) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
   const actions = useReleaseContentActions();
 
   const getChartFile = useGetChartFile(release.id);
@@ -77,7 +77,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
   const headlinesTab = (
     <TabsSection title="Headlines">
       <section id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing={isEditing} />
+        <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
@@ -99,13 +99,14 @@ const ReleaseHeadlines = ({ release }: Props) => {
           )}
         />
 
-        {isEditing && release.headlinesSection.content?.length === 0 && (
-          <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-            <Button variant="secondary" onClick={addBlock}>
-              Add a headlines text block
-            </Button>
-          </div>
-        )}
+        {editingMode === 'edit' &&
+          release.headlinesSection.content?.length === 0 && (
+            <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+              <Button variant="secondary" onClick={addBlock}>
+                Add a headlines text block
+              </Button>
+            </div>
+          )}
       </section>
     </TabsSection>
   );

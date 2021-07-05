@@ -1,3 +1,4 @@
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
@@ -5,6 +6,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public class StringExtensionTests
     {
+        public class ToLinesListTests
+        {
+            [Fact]
+            public void ReturnsSingleLine()
+            {
+                var lines = "Test line 1"
+                    .ToLinesList();
+
+                Assert.Single(lines);
+                Assert.Equal("Test line 1", lines[0]);
+            }
+
+            [Fact]
+            public void ReturnsMultipleLines()
+            {
+                var lines = "Test line 1\nTest line 2\nTest line 3"
+                    .ToLinesList();
+
+                Assert.Equal(3, lines.Count);
+                Assert.Equal("Test line 1", lines[0]);
+                Assert.Equal("Test line 2", lines[1]);
+                Assert.Equal("Test line 3", lines[2]);
+            }
+
+            [Fact]
+            public void EmptyStringReturnsNoLines()
+            {
+                var lines = ""
+                    .ToLinesList();
+
+                Assert.Empty(lines);
+            }
+        }
+
+        public class StripLinesTests
+        {
+            [Fact]
+            public void RemovesUnixLines()
+            {
+                var stripped = "test line 1 \ntest line 2".StripLines();
+                Assert.Equal("test line 1 test line 2", stripped);
+            }
+
+            [Fact]
+            public void RemovesUnixLines_ToEmptyString()
+            {
+                var stripped = "\n".StripLines();
+                Assert.Equal("", stripped);
+            }
+
+            [Fact]
+            public void RemovesWindowsLine()
+            {
+                var stripped = "test line 1 \r\ntest line 2".StripLines();
+                Assert.Equal("test line 1 test line 2", stripped);
+            }
+
+            [Fact]
+            public void RemovesWindowsLines_ToEmptyString()
+            {
+                var stripped = "\r\n".StripLines();
+                Assert.Equal("", stripped);
+            }
+        }
+
         public class CamelCaseTests
         {
             [Fact]
@@ -46,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 Assert.Equal("foo/", "foo".AppendTrailingSlash());
             }
-            
+
             [Fact]
             public void NullStringCanBeCamelCased()
             {
@@ -107,21 +173,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 const string input = null;
                 Assert.True(input.IsNullOrEmpty());
             }
-            
-            
+
+
             [Fact]
             public void IsNullOrEmptyIsTrueForEmptyString()
             {
                 Assert.True("".IsNullOrEmpty());
             }
-            
+
             [Fact]
             public void IsNullOrEmptyIsFalseForNonEmptyString()
             {
                 Assert.False("foo".IsNullOrEmpty());
             }
         }
-        
+
         public class PascalCaseTests
         {
             [Fact]
@@ -213,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Equal("FOO_BAR", "Foo_Bar".ScreamingSnakeCase());
                 Assert.Equal("FOO_BAR", "FOO_Bar".ScreamingSnakeCase());
             }
-            
+
             [Fact]
             public void PascalCasedStringsAreScreamingSnakeCased()
             {

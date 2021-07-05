@@ -45,6 +45,14 @@ export interface PublicationSummary {
   summary: string;
 }
 
+export interface BasicPublicationContact {
+  id?: string;
+  contactName: string;
+  contactTelNo: string;
+  teamEmail: string;
+  teamName?: string;
+}
+
 export interface PublicationContact {
   teamName: string;
   teamEmail: string;

@@ -5,6 +5,7 @@ interface ButtonLinkProps {
   to?: string;
   as: string;
   href: string;
+  className?: string;
 }
 
 let RealButtonLink: React.ComponentType<ButtonLinkProps>;

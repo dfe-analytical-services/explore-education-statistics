@@ -26,16 +26,20 @@ const MethodologyContentPageInternal = () => {
     canUpdateMethodology && methodology.status === 'Draft';
 
   return (
-    <EditingContextProvider value={{ isEditing: canUpdateContent }}>
-      {({ isEditing }) => (
+    <EditingContextProvider
+      value={{ editingMode: canUpdateContent ? 'edit' : 'preview' }}
+    >
+      {({ editingMode }) => (
         <>
           {canUpdateContent && <EditablePageModeToggle />}
 
           <div className="govuk-width-container">
             <section
-              className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+              className={
+                editingMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
+              }
             >
-              {isEditing && (
+              {editingMode === 'edit' && (
                 <BrowserWarning>
                   <ul>
                     <li>Editing text blocks</li>
@@ -69,7 +73,7 @@ const MethodologyContentPageInternal = () => {
                       </dd>
                     </div>
                   </dl>
-                  {!isEditing && (
+                  {editingMode !== 'edit' && (
                     <>
                       <PrintThisPage />
                       <PageSearchForm inputLabel="Search in this methodology page." />
@@ -82,7 +86,7 @@ const MethodologyContentPageInternal = () => {
                 sectionKey="content"
                 title="Content"
               />
-              {!isEditing && methodology.annexes.length ? (
+              {editingMode !== 'edit' && methodology.annexes.length ? (
                 <h2>Annexes</h2>
               ) : null}
               <MethodologyAccordion
