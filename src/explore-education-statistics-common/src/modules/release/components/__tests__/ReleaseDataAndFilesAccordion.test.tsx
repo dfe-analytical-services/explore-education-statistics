@@ -1,6 +1,7 @@
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import { Release } from '@common/services/publicationService';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { FileInfo } from '@common/services/types/file';
 
@@ -42,9 +43,10 @@ describe('ReleaseDataAndFilesAccordion', () => {
     );
 
     expect(screen.getByText('Explore data and files')).toBeInTheDocument();
-
-    expect(screen.getByText('All files')).toBeInTheDocument();
-    expect(screen.getByText('Test data file')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'All files' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Test data file' }),
+    ).toBeInTheDocument();
 
     expect(screen.getByText('Open data')).toBeInTheDocument();
     expect(
@@ -52,7 +54,11 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByText('Other files')).toBeInTheDocument();
-    expect(screen.getByText('Test ancillary file')).toBeInTheDocument();
+    expect(screen.getByText('List of other files')).toBeInTheDocument();
+    userEvent.click(screen.getByText('List of other files'));
+    expect(
+      screen.getByRole('link', { name: 'Test ancillary file' }),
+    ).toBeInTheDocument();
   });
 
   test('renders the create tables button', () => {

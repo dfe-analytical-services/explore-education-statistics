@@ -22,7 +22,7 @@ const ReleaseDataAndFilesAccordion = ({
   renderPreReleaseAccessLink,
   onSectionOpen,
 }: Props) => {
-  const dataFiles = release.downloadFiles.filter(
+  const otherFiles = release.downloadFiles.filter(
     file => file.name === 'All files' || file.type !== 'Ancillary',
   );
 
@@ -42,7 +42,7 @@ const ReleaseDataAndFilesAccordion = ({
         }}
       >
         <AccordionSection heading="Explore data and files">
-          {dataFiles.length > 0 && (
+          {otherFiles.length > 0 && (
             <>
               <p>
                 All data used to create this release is published as open data
@@ -54,23 +54,23 @@ const ReleaseDataAndFilesAccordion = ({
               </p>
 
               <ul className="govuk-list">
-                {dataFiles.map(file => {
+                {otherFiles.map(file => {
                   return <li key={file.id}>{renderDownloadLink(file)}</li>;
                 })}
               </ul>
             </>
           )}
           {renderCreateTablesButton && (
-            <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+            <div className={styles.createTablesButtonContainer}>
               <div>
                 <h3>Create your own tables</h3>
                 <p>
                   Explore our range of data and build your own tables from it.
                 </p>
               </div>
-              <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
+              <div className="govuk-!-width-one-quarter">
                 {renderCreateTablesButton}
-              </p>
+              </div>
             </div>
           )}
 
