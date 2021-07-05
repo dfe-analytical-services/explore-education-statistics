@@ -129,17 +129,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
@@ -163,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -218,6 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
@@ -232,11 +239,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     }
                 });
 
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
@@ -260,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -315,6 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
@@ -329,11 +342,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     }))
                 .ReturnsAsync(Unit.Instance);
 
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
@@ -364,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -396,11 +414,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
+
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is publicly accessible later after its publishing strategy and status are updated
+            methodologyRepository.SetupSequence(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false)
+                .ReturnsAsync(true);
 
             publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
                 .ReturnsAsync(Unit.Instance);
@@ -410,9 +436,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                methodologyRepository.Verify(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -435,11 +465,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
-        [Fact(Skip = "TODO SOW4 EES-2164 Implements approving with a Release Id")]
-        public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy()
+        [Fact]
+        public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
         {
             var methodology = new Methodology
             {
@@ -453,6 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
+                // TODO SOW4 EES-2164 Add a ScheduledWithRelease here when implementing it
                 Status = Approved,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -467,20 +498,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is not publicly accessible later after its publishing strategy and status are updated
+            // due to the Release not being live
+            methodologyRepository.SetupSequence(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false)
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                methodologyRepository.Verify(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -501,7 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -538,11 +582,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(true);
 
             publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
                 .ReturnsAsync(Unit.Instance);
@@ -552,6 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
@@ -577,7 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -622,17 +672,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology1.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology1.Id))
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var result = await service.UpdateMethodology(methodology1.Id, request);
@@ -641,7 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
 
-            VerifyAllMocks(contentService, imageService, publishingService);
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
 
         private static MethodologyService SetupMethodologyService(

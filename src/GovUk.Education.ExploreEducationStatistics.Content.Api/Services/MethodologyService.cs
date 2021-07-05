@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -40,14 +40,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             // TODO SOW4 EES-2375 lookup the MethodologyParent by slug when slug is moved to the parent
             // For now, this does a lookup on the parent via any Methodology with the slug
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(
-                    query => query
-                        .Include(mv => mv.MethodologyParent)
-                        .ThenInclude(m => m.Versions)
-                        .Where(mv => mv.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(arbitraryVersion =>
+                .CheckEntityExists<Methodology>(query => 
+                    query.Where(mv => mv.Slug == slug))
+                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async arbitraryVersion =>
                 {
-                    var latestPublishedVersion = arbitraryVersion.MethodologyParent.LatestPublishedVersion();
+                    var latestPublishedVersion = await _methodologyRepository.GetLatestPublishedByMethodologyParent(arbitraryVersion.MethodologyParentId);
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();
@@ -62,64 +59,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(async publication =>
-                {
-                    var latestPublishedMethodologies =
-                        await _methodologyRepository.GetLatestPublishedByPublication(publication.Id);
-                    return _mapper.Map<List<MethodologySummaryViewModel>>(latestPublishedMethodologies);
-                });
+                .OnSuccess(BuildMethodologiesForPublication);
         }
 
         public async Task<Either<ActionResult, List<ThemeTree<PublicationMethodologiesTreeNode>>>> GetTree()
         {
             var themesWithMethodologies = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)
-                .ThenInclude(t => t.Publications)
-                .ThenInclude(p => p.Releases)
-                .Include(t => t.Topics)
-                .ThenInclude(t => t.Publications)
-                .ThenInclude(p => p.Methodologies)
-                .ThenInclude(pm => pm.MethodologyParent)
-                .ThenInclude(m => m.Versions)
+                .ThenInclude(topic => topic.Publications)
                 .ToListAsync();
 
-            return themesWithMethodologies.Where(IsThemeIncluded)
-                .Select(BuildThemeTree)
+            return (await themesWithMethodologies.WhereAsync(IsThemeIncluded)
+                .SelectAsync(BuildThemeTree))
                 .OrderBy(theme => theme.Title)
                 .ToList();
         }
 
-        private static ThemeTree<PublicationMethodologiesTreeNode> BuildThemeTree(Theme theme)
+        private async Task<ThemeTree<PublicationMethodologiesTreeNode>> BuildThemeTree(Theme theme)
         {
+            var topics = (await theme.Topics
+                    .WhereAsync(IsTopicIncluded)
+                    .SelectAsync(BuildTopicTree))
+                .OrderBy(topic => topic.Title)
+                .ToList();
+
             return new ThemeTree<PublicationMethodologiesTreeNode>
             {
                 Id = theme.Id,
                 Summary = null,
                 Title = theme.Title,
-                Topics = theme.Topics
-                    .Where(IsTopicIncluded)
-                    .Select(BuildTopicTree)
-                    .OrderBy(topic => topic.Title)
-                    .ToList()
+                Topics = topics
             };
         }
 
-        private static TopicTree<PublicationMethodologiesTreeNode> BuildTopicTree(Topic topic)
+        private async Task<TopicTree<PublicationMethodologiesTreeNode>> BuildTopicTree(Topic topic)
         {
+            var publications = (await topic.Publications
+                .WhereAsync(IsPublicationIncluded)
+                .SelectAsync(BuildPublicationNode))
+                .OrderBy(publication => publication.Title)
+                .ToList();
+
             return new TopicTree<PublicationMethodologiesTreeNode>
             {
                 Id = topic.Id,
                 Summary = null,
                 Title = topic.Title,
-                Publications = topic.Publications
-                    .Where(IsPublicationIncluded)
-                    .Select(BuildPublicationNode)
-                    .OrderBy(publication => publication.Title)
-                    .ToList()
+                Publications = publications
             };
         }
 
-        private static PublicationMethodologiesTreeNode BuildPublicationNode(Publication publication)
+        private async Task<PublicationMethodologiesTreeNode> BuildPublicationNode(Publication publication)
         {
             return new PublicationMethodologiesTreeNode
             {
@@ -127,47 +117,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                Methodologies = publication.Methodologies.Select(BuildMethodologyForLatestVersion).ToList()
+                Methodologies = await BuildMethodologiesForPublication(publication)
             };
         }
 
-        private static bool IsThemeIncluded(Theme theme)
+        private async Task<bool> IsThemeIncluded(Theme theme)
         {
-            return theme.Topics.Any(IsTopicIncluded);
-        }
-
-        private static bool IsTopicIncluded(Topic topic)
-        {
-            return topic.Publications.Any(IsPublicationIncluded);
-        }
-
-        private static bool IsPublicationIncluded(Publication publication)
-        {
-            // TODO SOW4 Potentially remove this check on Releases in future
-            var hasReleases = publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
-
-            if (hasReleases)
+            foreach (var topic in theme.Topics)
             {
-                // TODO SOW4 There should be no LatestPublishedVersion of a Methodology returned if the Publication has no published releases
-                // removing the need for the outer check on hasReleases
-                var hasMethodologies = publication.Methodologies.Any(pm =>
-                    pm.MethodologyParent.LatestPublishedVersion() != null);
-                return hasMethodologies;
+                if (await IsTopicIncluded(topic))
+                {
+                    return true;
+                }
             }
 
             return false;
         }
 
-        private static MethodologySummaryViewModel BuildMethodologyForLatestVersion(
-            PublicationMethodology publicationMethodology)
+        private async Task<bool> IsTopicIncluded(Topic topic)
         {
-            var latestVersion = publicationMethodology.MethodologyParent.LatestPublishedVersion();
-            return new MethodologySummaryViewModel
+            foreach (var publication in topic.Publications)
             {
-                Id = latestVersion.Id,
-                Slug = latestVersion.Slug,
-                Title = latestVersion.Title
-            };
+                if (await IsPublicationIncluded(publication))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<bool> IsPublicationIncluded(Publication publication)
+        {
+            var publishedMethodologies = await _methodologyRepository.GetLatestPublishedByPublication(publication.Id);
+            return publishedMethodologies.Any();
+        }
+
+        private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Publication publication)
+        {
+            var latestPublishedMethodologies =
+                await _methodologyRepository.GetLatestPublishedByPublication(publication.Id);
+            return _mapper.Map<List<MethodologySummaryViewModel>>(latestPublishedMethodologies);
         }
     }
 }

@@ -127,6 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return rightResults;
         }
 
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> list)
+        {
+            if (list == null)
+            {
+                return true;
+            }
+
+            return !list.Any();
+        }
+
         public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
             this IEnumerable<TSource> source, Func<TSource, TResult> selector)
         {
@@ -150,7 +160,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return result;
         }
-        
+
+        public static async Task<TSource> FirstOrDefaultAsync<TSource>(
+            this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+        {
+            foreach (var item in source)
+            {
+                if (await predicate(item))
+                {
+                    return item;
+                }
+            }
+
+            return default;
+        }
+
         /// <summary>
         /// Filter a sequence of elements asynchronously.
         /// </summary>

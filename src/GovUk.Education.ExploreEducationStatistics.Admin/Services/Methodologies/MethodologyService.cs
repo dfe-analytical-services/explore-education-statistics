@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     // In future it probably won't be necessary to do this,
                     // since it won't be possible to change the title of a methodology that's already publicly accessible.
                     // Prevent the slug from being changed on amendments instead.
-                    if (methodology.PubliclyAccessible)
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
                         // Leave slug
                         return methodology;
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.Title = request.Title;
                     methodology.Updated = DateTime.UtcNow;
 
-                    if (methodology.PubliclyAccessible)
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
 
