@@ -99,6 +99,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> func)
+        {
+            foreach (var item in source)
+            {
+                func(item);
+            }
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> func)
+        {
+            var index = 0;
+
+            foreach (var item in source)
+            {
+                func(item, index);
+                index += 1;
+            }
+        }
+
         public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> func)
         {
             foreach (var item in source)
@@ -107,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
-        public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source, 
+        public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source,
             Func<T, Task<Either<TLeft, TRight>>> func)
         {
             List<TRight> rightResults = new List<TRight>();
-            
+
             foreach (var item in source)
             {
                 var result = await func(item);
@@ -120,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 {
                     return new Either<TLeft, List<TRight>>(result.Left);
                 }
-                
+
                 rightResults.Add(result.Right);
             }
 
@@ -201,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
             self.Select((item, index) => (item, index));
-        
+
         /// <summary>
         /// Filter a list down to distinct elements based on a property of the type.
         /// </summary>
@@ -212,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         /// that we can use for equality.  A good property type then could be a Guid Id field, as two identical Guid Ids
         /// can then represent that 2 or more entities in the list are duplicates as they will have the same hash code.
         /// </remarks>
-        /// 
+        ///
         /// <param name="source">Sequence of elements to filter on a distinct property</param>
         /// <param name="propertyGetter">A supplier of a property from each entity to check for equality. The property
         /// chosen must produce the same hash code for any two elements in the source list that are considered
@@ -220,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static IEnumerable<T> DistinctByProperty<T>(
-            this IEnumerable<T> source, 
+            this IEnumerable<T> source,
             Func<T, object> propertyGetter)
             where T : class
         {

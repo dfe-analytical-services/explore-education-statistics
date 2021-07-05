@@ -24,7 +24,7 @@ const MethodologyAccordionSection = ({
   methodologyId,
   ...props
 }: MethodologyAccordionSectionProps) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const {
     addContentSectionBlock,
@@ -162,7 +162,7 @@ const MethodologyAccordionSection = ({
           />
         )}
       />
-      {isEditing && !isReordering && (
+      {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--centre">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block

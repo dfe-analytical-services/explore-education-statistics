@@ -4,6 +4,7 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
 import SummaryList from '@common/components/SummaryList';
+import ButtonLink from '@common/components/ButtonLink';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
@@ -16,7 +17,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import ButtonLink from '@frontend/components/ButtonLink';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -319,76 +320,65 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       <PublicationReleaseHeadlinesSection release={release} />
 
       {release.downloadFiles && (
-        <div className="dfe-download-section">
-          <Accordion
-            id="dataDownloads"
-            showOpenAll={false}
-            onSectionOpen={accordionSection => {
-              logEvent({
-                category: `${release.publication.title} release page`,
-                action: `Content accordion opened`,
-                label: `${accordionSection.title}`,
-              });
-            }}
-          >
-            <AccordionSection heading="Download data and files">
-              <p className="govuk-caption-m">
-                Find and download files used in the production of this release.
-              </p>
-              <ul className="govuk-list govuk-!-width-full">
-                {release.downloadFiles.map(
-                  ({ id: fileId, fileName, extension, name, size }) => {
-                    const isAllFiles = !fileId && name === 'All files';
-
-                    const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
-                      release.id
-                    }/files/${isAllFiles ? 'all' : fileId}`;
-
-                    return (
-                      <li key={isAllFiles ? 'all' : fileId}>
-                        <Link
-                          to={url}
-                          onClick={() => {
-                            logEvent({
-                              category: 'Downloads',
-                              action: `Release page ${
-                                isAllFiles ? 'all files' : 'file'
-                              } downloaded`,
-                              label: `Publication: ${release.title}, File: ${fileName}`,
-                            });
-                          }}
-                        >
-                          {name}
-                        </Link>
-                        {` (${extension}, ${size})`}
-                      </li>
-                    );
-                  },
-                )}
-
-                <li className="govuk-!-margin-top-9">
-                  <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                    <div>
-                      <h2 className="govuk-heading-m">
-                        Create your own tables
-                      </h2>
-                      <p>
-                        Explore our range of data and build your own tables from
-                        it.
-                      </p>
-                    </div>
-                    <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
-                      <CreateTablesButton
-                        className="govuk-!-width-full"
-                        release={release}
-                      />
-                    </p>
-                  </div>
-                </li>
-              </ul>
-            </AccordionSection>
-          </Accordion>
-        </div>
+        <ReleaseDataAndFilesAccordion
+          onSectionOpen={accordionSection => {
+            logEvent({
+              category: `${release.publication.title} release page`,
+              action: `Content accordion opened`,
+              label: `${accordionSection.title}`,
+            });
+          }}
+          release={release}
+          renderCreateTablesButton={
+            <CreateTablesButton
+              className="govuk-!-width-full"
+              release={release}
+            />
+          }
+          renderDownloadLink={file => {
+            const isAllFiles = !file.id && file.name === 'All files';
+            const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
+              release.id
+            }/files/${isAllFiles ? 'all' : file.id}`;
+            return (
+              <>
+                <Link
+                  to={url}
+                  onClick={() => {
+                    logEvent({
+                      category: 'Downloads',
+                      action: `Release page ${
+                        isAllFiles ? 'all files' : 'file'
+                      } downloaded`,
+                      label: `Publication: ${release.title}, File: ${file.fileName}`,
+                    });
+                  }}
+                >
+                  {isAllFiles
+                    ? 'Download all data and files for this release'
+                    : `${file.name}`}
+                </Link>
+                {` (${file.extension}, ${file.size})`}
+              </>
+            );
+          }}
+          renderMetaGuidanceLink={
+            <Link
+              to={
+                release.latestRelease
+                  ? '/find-statistics/[publication]/meta-guidance'
+                  : '/find-statistics/[publication]/[release]/meta-guidance'
+              }
+              as={
+                release.latestRelease
+                  ? `/find-statistics/${release.publication.slug}/meta-guidance`
+                  : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
+              }
+            >
+              data files guide
+            </Link>
+          }
+        />
       )}
 
       {release.content.length > 0 && (
@@ -451,6 +441,7 @@ const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
       className={className}
       to="/data-tables/[publication]"
       as={`/data-tables/${release.publication.slug}`}
+      href={`/data-tables/${release.publication.slug}`}
     >
       Create tables
     </ButtonLink>
@@ -459,6 +450,7 @@ const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
       className={className}
       to="/data-tables/[publication]/[release]"
       as={`/data-tables/${release.publication.slug}/${release.slug}`}
+      href={`/data-tables/${release.publication.slug}/${release.slug}`}
     >
       Create tables
     </ButtonLink>
