@@ -296,6 +296,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.CancelAllFileImports.ToString(),
                         ClaimValue = "",
+                    },
+                    new
+                    {
+                        Id = -38,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.MakeAmendmentsOfAllMethodologies.ToString(),
+                        ClaimValue = "",
                     }
                 );
         }
