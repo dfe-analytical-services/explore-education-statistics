@@ -107,9 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.Title = request.Title;
                     methodology.Updated = DateTime.UtcNow;
 
-                    // TODO EES-2455 Can a single save come later or will IsPubliclyAccessible potentially be wrong?
-                    await _context.SaveChangesAsync();
-
                     if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
@@ -120,10 +117,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // so don't overwrite it. Later this can be changed to:
                         // methodology.Published = DateTime.UtcNow;
 
-                        _context.Methodologies.Update(methodology);
                         methodology.Published ??= DateTime.UtcNow;
-                        await _context.SaveChangesAsync();
                     }
+
+                    await _context.SaveChangesAsync();
 
                     return await GetSummary(id);
                 });
