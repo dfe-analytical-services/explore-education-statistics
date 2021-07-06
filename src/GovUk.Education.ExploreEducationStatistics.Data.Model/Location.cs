@@ -152,6 +152,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
+        [JsonIgnore] public string Provider_Code { get; set; }
+        [JsonIgnore] public string Provider_Name { get; set; }
+
+        [NotMapped]
+        public Provider Provider
+        {
+            get => new Provider(Provider_Code, Provider_Name);
+            set
+            {
+                Provider_Code = value?.Code;
+                Provider_Name = value?.Name;
+            }
+        }
+
         [JsonIgnore] public string Region_Code { get; set; }
         [JsonIgnore] public string Region_Name { get; set; }
 
@@ -173,6 +187,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
             get => new RscRegion(RscRegion_Code);
             set => RscRegion_Code = value?.Code;
+        }
+
+        [JsonIgnore] public string School_Code { get; set; }
+        [JsonIgnore] public string School_Name { get; set; }
+
+        [NotMapped]
+        public School School
+        {
+            get => new School(School_Code, School_Name);
+            set
+            {
+                School_Code = value?.Code;
+                School_Name = value?.Name;
+            }
         }
 
         [JsonIgnore] public string Sponsor_Code { get; set; }
