@@ -2,17 +2,14 @@ import TableHeadersForm from '@common/modules/table-tool/components/TableHeaders
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import { Publication } from '@common/services/publicationService';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import Link from '@admin/components/Link';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React, { useEffect, useRef, useState } from 'react';
-import { BasicMethodology } from 'src/services/methodologyService';
-import { MethodologySummary } from '@common/services/types/methodology';
 
 interface ReleasePreviewTableToolFinalStepProps {
-  publication?: Publication | BasicPublicationDetails;
+  publication?: BasicPublicationDetails;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
 }
@@ -32,10 +29,7 @@ const ReleasePreviewTableToolFinalStep = ({
 
   const getMethodologyLinks = () => {
     if (publication?.methodologies && publication?.methodologies.length) {
-      return publication?.methodologies.map(
-        (methodology: MethodologySummary | BasicMethodology) =>
-          methodology.title,
-      );
+      return publication?.methodologies.map(methodology => methodology.title);
     }
     if (publication?.externalMethodology) {
       return [
