@@ -22,7 +22,7 @@ export interface EditingContextState {
 }
 
 export const EditingContext = createContext<EditingContextState>({
-  editingMode: 'edit',
+  editingMode: 'preview',
   setEditingMode: noop,
   unsavedEdits: [],
   setUnsavedEdits: noop,
