@@ -51,7 +51,7 @@ export interface BasicPublicationDetails {
   title: string;
   slug: string;
   contact?: PublicationContactDetails;
-  methodology?: BasicMethodology;
+  methodologies?: BasicMethodology[];
   externalMethodology?: ExternalMethodology;
   legacyReleases: LegacyRelease[];
   themeId: string;

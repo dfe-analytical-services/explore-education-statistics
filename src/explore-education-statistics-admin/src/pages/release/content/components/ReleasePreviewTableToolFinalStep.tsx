@@ -8,6 +8,8 @@ import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import Link from '@admin/components/Link';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React, { useEffect, useRef, useState } from 'react';
+import { BasicMethodology } from 'src/services/methodologyService';
+import { MethodologySummary } from '@common/services/types/methodology';
 
 interface ReleasePreviewTableToolFinalStepProps {
   publication?: Publication | BasicPublicationDetails;
@@ -29,7 +31,12 @@ const ReleasePreviewTableToolFinalStep = ({
   }, [tableHeaders]);
 
   const getMethodologyLinks = () => {
-    // TODO SOW4 Build methodology links for the Publication
+    if (publication?.methodologies && publication?.methodologies.length) {
+      return publication?.methodologies.map(
+        (methodology: MethodologySummary | BasicMethodology) =>
+          methodology.title,
+      );
+    }
     if (publication?.externalMethodology) {
       return [
         <Link
