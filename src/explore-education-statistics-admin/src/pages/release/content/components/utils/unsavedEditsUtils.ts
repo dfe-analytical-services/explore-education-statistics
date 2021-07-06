@@ -1,7 +1,7 @@
-import { UnSavedEdit } from '@admin/contexts/EditingContext';
+import { UnsavedEdit } from '@admin/contexts/EditingContext';
 
-export const addUnSavedEdit = (
-  edits: UnSavedEdit[],
+export const addUnsavedEdit = (
+  edits: UnsavedEdit[],
   sectionId: string,
   blockId: string,
 ) => {
@@ -28,8 +28,8 @@ export const addUnSavedEdit = (
   );
 };
 
-export const removeUnSavedEdit = (
-  edits: UnSavedEdit[],
+export const removeUnsavedEdit = (
+  edits: UnsavedEdit[],
   sectionId: string,
   blockId: string,
 ) => {
@@ -42,7 +42,7 @@ export const removeUnSavedEdit = (
     .filter(edit => edit.blockIds.length);
 };
 
-export const getNumberOfUnSavedBlocks = (edits: UnSavedEdit[]) => {
+export const getNumberOfUnsavedBlocks = (edits: UnsavedEdit[]) => {
   let count = 0;
   edits.forEach(edit => {
     count += edit.blockIds.length;

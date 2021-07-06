@@ -35,7 +35,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
   onBlocksChange,
   onBlockCommentsChange,
 }: EditableSectionBlockProps<T>) => {
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
 
   const [openedCommentIds, setOpenedCommentIds] = useState<string[]>([]);
 
@@ -61,7 +61,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
     [blocks, onBlockCommentsChange],
   );
 
-  if (!isEditing) {
+  if (editingMode !== 'edit') {
     return blocks.length > 0 ? (
       <>
         {blocks.map(block => (

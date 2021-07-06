@@ -336,7 +336,7 @@ Go back to prerelease content page
 
 Validate public prerelease access list
     [Tags]  HappyPath
-    user clicks link  Pre-release access list
+    user clicks link  View pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000  60
     user waits until h1 is visible  ${PUBLICATION_NAME}  60
@@ -445,7 +445,7 @@ Go back to prerelease content page as Analyst user
 
 Validate public prerelease access list as Analyst user
     [Tags]  HappyPath
-    user clicks link  Pre-release access list
+    user clicks link  View pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000  60
     user waits until h1 is visible  ${PUBLICATION_NAME}  60

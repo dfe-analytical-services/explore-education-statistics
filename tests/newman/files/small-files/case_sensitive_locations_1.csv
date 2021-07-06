@@ -1,0 +1,11 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,region_code,region_name,lad_code,lad_name,local_enterprise_partnership_code,local_enterprise_partnership_name,rsc_region_lead_name,opportunity_area_code,opportunity_area_name,pcon_code,pcon_name,ward_code,ward_name,planning_area_code,planning_area_name,english_devolved_area_code,english_devolved_area_name,admission_numbers
+2018,Calendar year,Local authority,E92000001,england,330,E08000025,casesensitive,,,,,,,,,,,,,,,,,,3962
+2018,Calendar year,Local authority district,E92000001,england,,,,,,E06000001,casesensitive,,,,,,,,,,,,,,6765
+2018,Calendar year,Local enterprise partnership,E92000001,england,,,,,,,,E37000001,casesensitive,,,,,,,,,,,,5876
+2018,Calendar year,RSC region,E92000001,england,,,,,,,,,,casesensitive,,,,,,,,,,,3908
+2018,Calendar year,Opportunity area,E92000001,england,,,,,,,,,,,E02000984,casesensitive,,,,,,,,,8533
+2018,Calendar year,Parliamentary constituency,E92000001,england,,,,,,,,,,,,,E14000683,casesensitive,,,,,,,5549
+2018,Calendar year,Regional,E92000001,england,,,,E12000003,casesensitive,,,,,,,,,,,,,,,,2287
+2018,Calendar year,Ward,E92000001,england,,,,,,,,,,,,,,,E05000364,casesensitive,,,,,1959
+2018,Calendar year,Planning area,E92000001,england,,,,,,,,,,,,,,,,,E02000984,casesensitive,,,8533
+2018,Calendar year,English devolved area,E92000001,england,,,,,,,,,,,,,,,,,,,1,casesensitive,3962

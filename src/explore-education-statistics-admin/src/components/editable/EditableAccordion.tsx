@@ -31,7 +31,7 @@ export interface EditableAccordionProps
 const EditableAccordion = (props: EditableAccordionProps) => {
   const { children, id, sectionName, onAddSection, onReorder } = props;
 
-  const { isEditing } = useEditingContext();
+  const { editingMode } = useEditingContext();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const [sections, setSections] = useState<
@@ -79,7 +79,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
     );
   }, [isReordering, props, sections]);
 
-  if (!isEditing) {
+  if (editingMode !== 'edit') {
     return <Accordion {...props}>{children}</Accordion>;
   }
 
