@@ -13,8 +13,10 @@ CREATE OR ALTER PROCEDURE FilteredObservations
     @multiAcademyTrustList IdListVarcharType READONLY,
     @opportunityAreasList IdListVarcharType READONLY,
     @parliamentaryConstituenciesList IdListVarcharType READONLY,
+    @providersList IdListVarcharType READONLY,
     @regionsList IdListVarcharType READONLY,
     @rscRegionsList IdListVarcharType READONLY,
+    @schoolsList IdListVarcharType READONLY,
     @sponsorList IdListVarcharType READONLY,
     @wardsList IdListVarcharType READONLY,
     @planningAreasList IdListVarcharType READONLY,
@@ -34,8 +36,10 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @multiAcademyTrustList)
                 OR EXISTS(SELECT TOP 1 1 FROM @opportunityAreasList)
                 OR EXISTS(SELECT TOP 1 1 FROM @parliamentaryConstituenciesList)
+                OR EXISTS(SELECT TOP 1 1 FROM @providersList)
                 OR EXISTS(SELECT TOP 1 1 FROM @regionsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @rscRegionsList)
+                OR EXISTS(SELECT TOP 1 1 FROM @schoolsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @sponsorList)
                 OR EXISTS(SELECT TOP 1 1 FROM @wardsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
@@ -109,6 +113,11 @@ DECLARE
                     SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @parliamentaryConstituenciesList)), ''''))
                     SET @sqlString = @sqlString + N'(l.ParliamentaryConstituency_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''PC'')) OR '
                 END
+            IF (EXISTS(SELECT TOP 1 1 FROM @providersList))
+                BEGIN
+                    SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @providersList)), ''''))
+                    SET @sqlString = @sqlString + N'(l.Provider_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''PRO'')) OR '
+                END
             IF (EXISTS(SELECT TOP 1 1 FROM @regionsList))
                 BEGIN
                     SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @regionsList)), ''''))
@@ -118,6 +127,11 @@ DECLARE
                 BEGIN
                     SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @rscRegionsList)), ''''))
                     SET @sqlString = @sqlString + N'(l.RscRegion_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''RSCR'')) OR '
+                END
+            IF (EXISTS(SELECT TOP 1 1 FROM @schoolsList))
+                BEGIN
+                    SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @schoolsList)), ''''))
+                    SET @sqlString = @sqlString + N'(l.School_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''SCH'')) OR '
                 END
             IF (EXISTS(SELECT TOP 1 1 FROM @sponsorList))
                 BEGIN
@@ -160,8 +174,10 @@ DECLARE
                            @multiAcademyTrustList IdListVarcharType READONLY,
                            @opportunityAreasList IdListVarcharType READONLY,
                            @parliamentaryConstituenciesList IdListVarcharType READONLY,
+                           @providersList IdListVarcharType READONLY,
                            @regionsList IdListVarcharType READONLY,
                            @rscRegionsList IdListVarcharType READONLY,
+                           @schoolsList IdListVarcharType READONLY,
                            @sponsorList IdListVarcharType READONLY,
                            @wardsList IdListVarcharType READONLY,
                            @planningAreasList IdListVarcharType READONLY,
@@ -181,8 +197,10 @@ DECLARE
          @multiAcademyTrustList = @multiAcademyTrustList,
          @opportunityAreasList = @opportunityAreasList,
          @parliamentaryConstituenciesList = @parliamentaryConstituenciesList,
+         @providersList = @providersList,
          @regionsList = @regionsList,
          @rscRegionsList = @rscRegionsList,
+         @schoolsList = @schoolsList,
          @sponsorList = @sponsorList,
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,

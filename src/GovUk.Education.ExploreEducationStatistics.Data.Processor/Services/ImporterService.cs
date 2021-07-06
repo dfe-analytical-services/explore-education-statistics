@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -75,8 +76,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     new[] {"pcon_code", "pcon_name"}
                 },
                 {
+                    GeographicLevel.Provider,
+                    new[] {"provider_ukprn", "provider_name"}
+                },
+                {
                     GeographicLevel.Region,
                     new[] {"region_code", "region_name"}
+                },
+                {
+                    GeographicLevel.School,
+                    new[] {"school_urn", "school_name"}
                 },
                 {
                     GeographicLevel.Sponsor,
@@ -341,8 +350,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetMultiAcademyTrust(line, headers),
                 GetOpportunityArea(line, headers),
                 GetParliamentaryConstituency(line, headers),
+                GetProvider(line, headers),
                 GetRegion(line, headers),
                 GetRscRegion(line, headers),
+                GetSchool(line, headers),
                 GetSponsor(line, headers),
                 GetWard(line, headers),
                 GetPlanningArea(line, headers)
@@ -425,6 +436,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 new ParliamentaryConstituency(values[0], values[1]));
         }
 
+        private static Provider GetProvider(IReadOnlyList<string> line,
+            List<string> headers)
+        {
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Provider], values =>
+                new Provider(values[0], values[1]));
+        }
+
         private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
         {
             return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Region], values =>
@@ -434,6 +452,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static RscRegion GetRscRegion(IReadOnlyList<string> line, List<string> headers)
         {
             return CsvUtil.BuildType(line, headers, "rsc_region_lead_name", value => new RscRegion(value));
+        }
+
+        private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
+        {
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.School], values =>
+                new School(values[0], values[1]));
         }
 
         private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers)

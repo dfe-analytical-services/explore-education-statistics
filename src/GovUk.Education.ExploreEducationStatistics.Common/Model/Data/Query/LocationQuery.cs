@@ -18,9 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public IEnumerable<string> MayoralCombinedAuthority { get; set; }
         public IEnumerable<string> OpportunityArea { get; set; }
         public IEnumerable<string> ParliamentaryConstituency { get; set; }
+        public IEnumerable<string> Provider { get; set; }
         public IEnumerable<string> PlanningArea { get; set; }
         public IEnumerable<string> Region { get; set; }
         public IEnumerable<string> RscRegion { get; set; }
+        public IEnumerable<string> School { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
     }
