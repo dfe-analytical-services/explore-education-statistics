@@ -6,11 +6,13 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -23,14 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-        public PublicationService(
-            ContentDbContext context,
+        public PublicationService(ContentDbContext context,
             IMapper mapper,
+            IMethodologyRepository methodologyRepository,
             IUserService userService,
             IPublicationRepository publicationRepository,
             IPublishingService publishingService,
@@ -38,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _context = context;
             _mapper = mapper;
+            _methodologyRepository = methodologyRepository;
             _userService = userService;
             _publicationRepository = publicationRepository;
             _publishingService = publishingService;
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid topicId)
         {
             var userId = _userService.GetUserId();
-            
+
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
@@ -60,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
         {
             var userId = _userService.GetUserId();
-            
+
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
@@ -113,8 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (publication.TopicId != updatedPublication.TopicId)
                     {
-                        return await ValidateSelectedTopic(updatedPublication.TopicId);   
+                        return await ValidateSelectedTopic(updatedPublication.TopicId);
                     }
+
                     return Unit.Instance;
                 })
                 .OnSuccess(async publication =>
@@ -125,11 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return publication;
                     }
 
-                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(_ =>
-                    {
-                        publication.Slug = updatedPublication.Slug;
-                        return publication;
-                    });
+                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(
+                        _ =>
+                        {
+                            publication.Slug = updatedPublication.Slug;
+                            return publication;
+                        });
                 })
                 .OnSuccess(async publication =>
                 {
@@ -184,7 +190,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
+                .OnSuccess(async publication =>
+                {
+                    var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+                    var methodologies = await _methodologyRepository.GetLatestByPublication(publicationId);
+
+                    publicationViewModel.Methodologies = _mapper.Map<List<MethodologyTitleViewModel>>(methodologies);
+
+                    return publicationViewModel;
+                });
         }
 
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
@@ -247,10 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.LegacyReleases)
-                .Include(p => p.Topic)
-                .Include(p => p.Methodologies)
-                .ThenInclude(p => p.MethodologyParent)
-                .ThenInclude(p => p.Versions);
+                .Include(p => p.Topic);
         }
     }
 }
