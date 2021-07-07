@@ -90,7 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public bool Amendment => PreviousVersionId != null && Published == null;
-        
+
+        public bool DraftFirstVersion => PreviousVersionId == null && Status == Draft;
+
         public Methodology CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var copy = MemberwiseClone() as Methodology;
@@ -108,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.ScheduledWithRelease = null;
             copy.ScheduledWithReleaseId = Guid.Empty;
             copy.MethodologyParent = null;
+            copy.InternalReleaseNote = null;
 
             copy.Annexes = Annexes
                 .Select(c => c.Clone(createdDate))

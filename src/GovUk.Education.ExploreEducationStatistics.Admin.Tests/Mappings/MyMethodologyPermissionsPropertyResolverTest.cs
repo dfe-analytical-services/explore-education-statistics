@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             
             Assert.True(permissionsSet.CanUpdateMethodology);
             Assert.False(permissionsSet.CanMakeAmendmentOfMethodology);
-            Assert.True(permissionsSet.CanCancelMethodologyAmendment);
+            Assert.True(permissionsSet.CanDeleteMethodology);
         }
     }
 }

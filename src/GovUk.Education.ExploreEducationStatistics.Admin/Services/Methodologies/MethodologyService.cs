@@ -145,12 +145,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+                .CheckEntityExists<Methodology>(methodologyId, 
+                    query => query.Include(m => m.MethodologyParent))
                 .OnSuccess(_userService.CheckCanDeleteMethodology)
                 .OnSuccessVoid(async methodology =>
                 {
                     _context.Methodologies.Remove(methodology);
                     await _context.SaveChangesAsync();
+
+                    var methodologyParent = await _context
+                        .MethodologyParents
+                        .Include(p => p.Versions)
+                        .SingleAsync(p => p.Id == methodology.MethodologyParentId);
+                    
+                    if (methodologyParent.Versions.Count == 0)
+                    {
+                        _context.MethodologyParents.Remove(methodologyParent);
+                        await _context.SaveChangesAsync();
+                    }
+
                 });
         }
 

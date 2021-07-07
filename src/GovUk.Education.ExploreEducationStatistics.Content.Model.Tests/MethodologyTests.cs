@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             // Check general fields.
             Assert.Equal(Guid.Empty, amendment.Id);
             Assert.Equal(originalMethodology.AlternativeTitle, amendment.AlternativeTitle);
-            Assert.Equal(originalMethodology.InternalReleaseNote, amendment.InternalReleaseNote);
+            Assert.Null(amendment.InternalReleaseNote);
 
             // Check creation and update fields.
             Assert.Equal(creationTime, amendment.Created);
