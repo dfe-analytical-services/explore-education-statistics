@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             DataRowCollection rows,
             Subject subject,
             SubjectMeta subjectMeta,
+            HashSet<GeographicLevel> subjectGeographicLevels,
             int batchNo,
             int rowsPerBatch,
             StatisticsDbContext context);

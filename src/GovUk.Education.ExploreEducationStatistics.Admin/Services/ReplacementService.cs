@@ -406,7 +406,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return GetEnumValues<GeographicLevel>()
-                .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
                 .ToDictionary(geographicLevel => geographicLevel.ToString(),
                     geographicLevel =>
                         ValidateLocationLevelForReplacement(dataBlock.Query.Locations,

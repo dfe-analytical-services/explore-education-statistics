@@ -76,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     dataFileTable.Rows,
                     subject,
                     _importerService.GetMeta(metaFileTable, subject, context),
+                    import.GeographicLevels,
                     message.BatchNo,
                     import.RowsPerBatch,
                     context
