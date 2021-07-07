@@ -28,8 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-        public PublicationService(
-            ContentDbContext context,
+        public PublicationService(ContentDbContext context,
             IMapper mapper,
             IUserService userService,
             IPublicationRepository publicationRepository,
@@ -48,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid topicId)
         {
             var userId = _userService.GetUserId();
-            
+
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
@@ -60,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
         {
             var userId = _userService.GetUserId();
-            
+
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
@@ -113,8 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (publication.TopicId != updatedPublication.TopicId)
                     {
-                        return await ValidateSelectedTopic(updatedPublication.TopicId);   
+                        return await ValidateSelectedTopic(updatedPublication.TopicId);
                     }
+
                     return Unit.Instance;
                 })
                 .OnSuccess(async publication =>
@@ -125,11 +125,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return publication;
                     }
 
-                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(_ =>
-                    {
-                        publication.Slug = updatedPublication.Slug;
-                        return publication;
-                    });
+                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(
+                        _ =>
+                        {
+                            publication.Slug = updatedPublication.Slug;
+                            return publication;
+                        });
                 })
                 .OnSuccess(async publication =>
                 {

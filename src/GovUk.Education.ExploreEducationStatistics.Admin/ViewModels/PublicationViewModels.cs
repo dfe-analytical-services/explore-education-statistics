@@ -20,8 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
-        // TODO SOW4 EES-2220 Update this after Publication is created with Methodology
-        public MethodologyTitleViewModel Methodology { get; set; }
+        public List<MethodologyTitleViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
 
