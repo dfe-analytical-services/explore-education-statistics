@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public bool Amendment => PreviousVersionId != Guid.Empty && Published == null;
+        public bool Amendment => PreviousVersionId != null && Published == null;
         
         public Methodology CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
