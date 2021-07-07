@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -126,6 +125,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FindAll(r => releaseIds.Contains(r.Id));
 
             return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+        }
+
+        private static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
+        {
+            return values.Include(p => p.Contact)
+                .Include(p => p.Releases)
+                .ThenInclude(r => r.Type)
+                .Include(p => p.Releases)
+                .ThenInclude(r => r.ReleaseStatuses)
+                .Include(p => p.LegacyReleases)
+                .Include(p => p.Topic)
+                .Include(p => p.Methodologies)
+                .ThenInclude(p => p.MethodologyParent)
+                .ThenInclude(p => p.Versions);
         }
     }
 }

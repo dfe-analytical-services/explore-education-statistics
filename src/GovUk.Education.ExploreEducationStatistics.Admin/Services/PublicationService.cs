@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
+        private static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
         {
             return values.Include(p => p.Contact)
                 .Include(p => p.Releases)
