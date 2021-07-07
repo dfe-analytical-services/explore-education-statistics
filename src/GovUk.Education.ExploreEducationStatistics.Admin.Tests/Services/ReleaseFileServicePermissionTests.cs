@@ -28,6 +28,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
+        public async Task GetFile()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseFileService(userService: userService.Object);
+                        return service.GetFile(_release.Id, Guid.NewGuid());
+                    }
+                );
+        }
+
+        [Fact]
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -36,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Delete(_release.Id,
-                            Guid.NewGuid());
+                        return service.Delete(_release.Id,Guid.NewGuid());
                     }
                 );
         }

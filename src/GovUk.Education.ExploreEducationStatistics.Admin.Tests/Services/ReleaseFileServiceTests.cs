@@ -1413,7 +1413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
-
         [Fact]
         public async Task GetFile()
         {
@@ -1437,23 +1436,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var blob = new BlobInfo(
-                path: null,
-                size: "93 Kb",
-                contentType: "application/pdf",
-                contentLength: 0L,
-                meta: null,
-                created: null);
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
+
+            blobStorageService
+                .Setup(mock => mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
                 .ReturnsAsync(true);
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(blob);
+            blobStorageService
+                .Setup(mock => mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
+                .ReturnsAsync(
+                    new BlobInfo(
+                        path: null,
+                        size: "93 Kb",
+                        contentType: "application/pdf",
+                        contentLength: 0L,
+                        meta: null,
+                        created: null
+                    )
+                );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
@@ -1467,23 +1470,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("93 Kb", fileInfo.Size);
                 Assert.Equal(Ancillary, fileInfo.Type);
             }
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetFile_NoRelease()
+        {
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext())
+            {
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
+
+                result.AssertNotFound();
+            }
+
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
         public async Task GetFile_NoReleaseFile()
         {
+            var release = new Release();
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                var result = await service.GetFile(release.Id, Guid.NewGuid());
+
+                result.AssertNotFound();
             }
+
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
@@ -1520,9 +1554,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
-                Assert.True(result.IsRight);
+                var fileInfo = result.AssertRight();
 
-                var fileInfo = result.Right;
                 Assert.Equal("Unknown", fileInfo.Name);
                 Assert.Equal(releaseFile.FileId, fileInfo.Id);
                 Assert.Equal("pdf", fileInfo.Extension);
@@ -1740,7 +1773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateName()
+        public async Task Update()
         {
             var releaseFile = new ReleaseFile
             {

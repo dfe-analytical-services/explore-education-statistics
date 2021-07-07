@@ -100,6 +100,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseFile.FileId == fileId);
         }
 
+        public async Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseId, Guid fileId)
+        {
+            return await Find(releaseId, fileId) ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
+        }
+
         public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
