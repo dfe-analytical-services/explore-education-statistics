@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         public Task<ReleaseFile?> Find(Guid releaseId, Guid fileId);
 
+        public Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseId, Guid fileId);
+
         public Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types);
 
         public Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId);
