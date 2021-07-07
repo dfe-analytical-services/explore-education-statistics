@@ -181,19 +181,20 @@ const MethodologySummary = ({
                 )}
               </div>
               <div className="govuk-grid-column-one-third dfe-align--right">
-              {methodology.permissions.canDeleteMethodology && (
-                <Button
-                  onClick={() =>
-                    setDeleteMethodologyDetails({
-                      methodologyId: methodology.id,
-                      amendment: methodology.amendment,
-                    })
-                  }
-                  className="govuk-button--warning"
-                >
-                  {methodology.amendment ? 'Cancel amendment' : 'Remove'}
-                </Button>
-              )}
+                {methodology.permissions.canDeleteMethodology && (
+                  <Button
+                    onClick={() =>
+                      setDeleteMethodologyDetails({
+                        methodologyId: methodology.id,
+                        amendment: methodology.amendment,
+                      })
+                    }
+                    className="govuk-button--warning"
+                  >
+                    {methodology.amendment ? 'Cancel amendment' : 'Remove'}
+                  </Button>
+                )}
+              </div>
             </div>
           </Details>
         ))}

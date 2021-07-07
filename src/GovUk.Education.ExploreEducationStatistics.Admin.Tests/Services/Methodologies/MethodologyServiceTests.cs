@@ -621,7 +621,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.Null(model.Published);
                 Assert.Equal(Approved, model.Status);

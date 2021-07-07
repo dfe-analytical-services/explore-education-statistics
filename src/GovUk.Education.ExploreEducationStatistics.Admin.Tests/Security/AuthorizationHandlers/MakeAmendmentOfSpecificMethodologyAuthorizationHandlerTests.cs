@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -53,9 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyWithPublication);
+                    context.Attach(MethodologyNoPublication);
 
-                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
+                    var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
                     methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyNoPublication.Id))
                         .ReturnsAsync(true);
@@ -79,9 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyWithPublication);
+                    context.Attach(MethodologyNoPublication);
 
-                    var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
+                    var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
                     methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyNoPublication.Id))
                         .ReturnsAsync(false);
@@ -107,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Attach(MethodologyWithPublication);
 
-                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
+                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
                 methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(true);
@@ -137,6 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, MethodologyWithPublication);
 
+                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
+
                 methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(true);
 
@@ -158,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Attach(MethodologyWithPublication);
 
-                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies();
+                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
                 methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(false);

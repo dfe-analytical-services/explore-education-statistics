@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                         .Include(mv => mv.MethodologyParent)
                         .ThenInclude(m => m.Versions)
                         .Where(mv => mv.MethodologyParent.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(arbitraryVersion =>
+                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async arbitraryVersion =>
                 {
                     var latestPublishedVersion =
                         await _methodologyRepository.GetLatestPublishedByMethodologyParent(arbitraryVersion

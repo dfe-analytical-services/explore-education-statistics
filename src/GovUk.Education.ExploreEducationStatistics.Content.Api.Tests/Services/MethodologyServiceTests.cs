@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Version = 0,
                     MethodologyParent = new MethodologyParent 
                     {
-                        Slug = 'methodology-1-slug'
+                        Slug = "methodology-1-slug"
                     }
                 },
                 new Methodology
@@ -373,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Version = 0,
                     MethodologyParent = new MethodologyParent 
                     {
-                        Slug = 'methodology-2-slug'
+                        Slug = "methodology-2-slug"
                     }
                 });
 

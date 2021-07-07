@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.PreviousVersionId = Id;
             copy.PublishingStrategy = Immediately;
             copy.ScheduledWithRelease = null;
-            copy.ScheduledWithReleaseId = Guid.Empty;
+            copy.ScheduledWithReleaseId = null;
             copy.MethodologyParent = null;
             copy.InternalReleaseNote = null;
 
