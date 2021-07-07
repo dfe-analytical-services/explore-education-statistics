@@ -179,18 +179,19 @@ Edit footnote
 Check footnote was updated
     [Tags]  HappyPath
     user clicks link  Content
+    
     user waits until page contains element  id:releaseHeadlines  120
     user scrolls to element  id:releaseHeadlines
     user waits until page contains link  Table  180
     user clicks link  Table
-    user checks page contains  ${FOOTNOTE_TEXT_3}
+    user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
 Check footnote in Preview content mode
     [Tags]  HappyPath
-    user clicks element   id:pageMode-preview
-    user checks page contains  ${FOOTNOTE_TEXT_3}
+    user clicks element   id:editingMode-preview
+    user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
@@ -266,7 +267,7 @@ Check footnote appears on data block
     user waits until page contains element  id:releaseHeadlines-tables-tab
     user clicks element  id:releaseHeadlines-tables-tab
     user waits until parent contains element  id:releaseHeadlines-tables-tab  xpath://h3[text()="Footnotes"]
-    user checks page contains  ${FOOTNOTE_TEXT_3}
+    user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
@@ -321,6 +322,6 @@ Create table (table tool)
     user waits until results table appears     180
 
 Check footnotes in table preview (table tool)
-    user checks page contains  ${FOOTNOTE_TEXT_3}
+    user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}

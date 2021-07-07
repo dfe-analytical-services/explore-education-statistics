@@ -45,8 +45,8 @@ Validate Pupil absence data downloads are available
     user checks link has url  Absence number missing at least one session by reason   %{CONTENT_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_number_missing_at_least_one_session_by_reason.csv
     user waits until details contains link  Pupil absence  Absence rate percent bands
     user checks link has url  Absence rate percent bands  %{CONTENT_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_rate_percent_bands.csv
-    user waits until details contains link  Pupil absence  All files
-    user checks link has url  All files  %{CONTENT_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
+    user waits until details contains link  Pupil absence  Download all data and files for this release 
+    user checks link has url  Download all data and files for this release   %{CONTENT_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
 
 Download Absence in prus CSV
     [Tags]  HappyPath   NotAgainstLocal
@@ -55,7 +55,7 @@ Download Absence in prus CSV
 
 Download All files ZIP
     [Tags]  HappyPath   NotAgainstLocal
-    download file  xpath://ul[@data-testid="Pupil absence in schools in England"]//a[text()="All files"]   pupil-absence-in-schools-in-england_2016-17.zip
+    download file  xpath://ul[@data-testid="Pupil absence in schools in England"]//a[text()="Download all data and files for this release"]   pupil-absence-in-schools-in-england_2016-17.zip
     zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_characteristic.csv
     zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_geographic_level.csv
     zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_term.csv
@@ -87,6 +87,6 @@ Validate Exclusions data downloads are available
     user checks link has url  Number of fixed exclusions   %{CONTENT_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_number_of_fixed_exclusions.csv
     user waits until details contains link  Exclusions  Total days missed due to fixed period exclusions
     user checks link has url  Total days missed due to fixed period exclusions   %{CONTENT_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_total_days_missed_fixed_exclusions.csv
-    user waits until details contains link  Exclusions  All files
-    user checks link has url  All files  %{CONTENT_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/ancillary/permanent-and-fixed-period-exclusions-in-england_2016-17.zip
+    user waits until details contains link  Exclusions  Download all data and files for this release 
+    user checks link has url  Download all data and files for this release   %{CONTENT_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/ancillary/permanent-and-fixed-period-exclusions-in-england_2016-17.zip
     user closes details dropdown  Exclusions
