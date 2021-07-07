@@ -19,6 +19,37 @@ import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
+const myFakeMethodology = {
+  id: 'm1',
+  live: false,
+  title: 'My fake methodology',
+  slug: 'my-fake-methodology',
+  status: 'Draft',
+  publication: {
+    id: 'p1',
+    title: 'owner publication title',
+    releaseId: 'r1',
+  },
+  published: '',
+  otherPublications: [
+    {
+      id: 'op1',
+      title: 'other publication title 1',
+      releaseId: 'r1',
+    },
+    {
+      id: 'op2',
+      title: 'other publication title 2',
+      releaseId: 'r1',
+    },
+    {
+      id: 'op3',
+      title: 'other publication title 3',
+      releaseId: 'r1',
+    },
+  ],
+};
+
 const MethodologySummaryPage = ({
   match,
 }: RouteComponentProps<MethodologyRouteParams>) => {
@@ -27,37 +58,6 @@ const MethodologySummaryPage = ({
   const { value: realMethodology, isLoading } = useAsyncHandledRetry(() =>
     methodologyService.getMethodology(methodologyId),
   );
-
-  const myFakeMethodology = {
-    id: 'm1',
-    live: false,
-    title: 'My fake methodology',
-    slug: 'my-fake-methodology',
-    status: 'Draft',
-    publication: {
-      id: 'p1',
-      title: 'owner publication title',
-      releaseId: 'r1',
-    },
-    published: '',
-    otherPublications: [
-      {
-        id: 'op1',
-        title: 'other publication title 1',
-        releaseId: 'r1',
-      },
-      {
-        id: 'op2',
-        title: 'other publication title 2',
-        releaseId: 'r1',
-      },
-      {
-        id: 'op3',
-        title: 'other publication title 3',
-        releaseId: 'r1',
-      },
-    ],
-  };
 
   // EES-2161 - flip showPublications to see the publications. Remove when BE done and change to alsways use real methodology.
   const showPublications = false;
@@ -87,7 +87,7 @@ const MethodologySummaryPage = ({
                 )}
               </SummaryListItem>
               {currentMethodology.publication && (
-                <SummaryListItem term="Publication">
+                <SummaryListItem term="Owning publication">
                   <Link
                     to={generatePath<ReleaseRouteParams>(
                       releaseSummaryRoute.path,
@@ -103,7 +103,7 @@ const MethodologySummaryPage = ({
               )}
               {currentMethodology.otherPublications &&
                 currentMethodology.otherPublications.length > 0 && (
-                  <SummaryListItem term="Other publications using this methodology">
+                  <SummaryListItem term="Other publications">
                     <ul className="govuk-!-margin-top-0">
                       {currentMethodology.otherPublications?.map(
                         publication => (

@@ -6,11 +6,11 @@ export type UpdateMethodology = {
 
 export type MethodologyStatus = 'Draft' | 'Approved';
 
-type MethodologyPublication = {
+interface MethodologyPublication {
   id: string;
   title: string;
   releaseId: string;
-};
+}
 
 export interface BasicMethodology {
   amendment: boolean;
