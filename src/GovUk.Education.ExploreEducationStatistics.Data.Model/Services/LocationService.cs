@@ -11,12 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class LocationService : AbstractRepository<Location, Guid>, ILocationService
     {
-        public static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.School,
-            GeographicLevel.Provider
-        };
-
         public LocationService(StatisticsDbContext context, ILogger<LocationService> logger) : base(context, logger)
         {
         }
@@ -184,8 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(Guid subjectId)
         {
             var locationIdsWithGeographicLevel = _context.Observation
-                .Where(observation =>
-                    !IgnoredLevels.Contains(observation.GeographicLevel) && observation.SubjectId == subjectId)
+                .Where(observation => observation.SubjectId == subjectId)
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
                 .AsNoTracking()
@@ -199,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IQueryable<Observation> observations)
         {
             var locationIdsWithGeographicLevel = observations
-                .Where(observation => !IgnoredLevels.Contains(observation.GeographicLevel))
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
                 .AsNoTracking()

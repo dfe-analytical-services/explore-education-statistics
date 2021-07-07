@@ -20,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ImporterService;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -244,8 +245,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ExecutionContext executionContext,
                 Guid importId)
         {
+            var colValues = CsvUtil.GetColumnValues(cols);
             var totalRowCount = 0;
-            var filteredRows = 0;
+            var filteredObservationCount = 0;
             var errors = new List<DataImportError>();
             var dataRows = rows.Count;
             var geographicLevels = new HashSet<GeographicLevel>();
@@ -262,16 +264,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 try
                 {
                     var rowValues = CsvUtil.GetRowValues(row);
-                    var colValues = CsvUtil.GetColumnValues(cols);
 
-                    geographicLevels
-                        .Add(_importerService.GetGeographicLevel(rowValues, colValues));
+                    var geographicLevel = _importerService.GetGeographicLevel(rowValues, colValues);
+                    geographicLevels.Add(geographicLevel);
+
                     _importerService.GetTimeIdentifier(rowValues, colValues);
                     _importerService.GetYear(rowValues, colValues);
-                    
-                    if (!IsGeographicLevelIgnored(rowValues, colValues))
+
+                    if (!IgnoredGeographicLevels.Contains(geographicLevel))
                     {
-                        filteredRows++;
+                        filteredObservationCount++;
                     }
                 }
                 catch (Exception e)
@@ -298,18 +300,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 
-            return new ProcessorStatistics(
-                filteredObservationCount: filteredRows,
+            return new ProcessorStatistics
+            (
+                filteredObservationCount:
+                    HasSoloAllowedGeographicLevel(geographicLevels)
+                        ? totalRowCount
+                        : filteredObservationCount,
                 rowsPerBatch: rowsPerBatch,
                 numBatches: GetNumBatches(totalRowCount, rowsPerBatch),
                 geographicLevels: geographicLevels
             );
-        }
-
-        private bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
-        {
-            var geographicLevel = _importerService.GetGeographicLevel(line, headers);
-            return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
         }
 
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
