@@ -34,7 +34,7 @@ user waits until element does not contain map chart
     user waits until parent does not contain element  ${locator}  css:.leaflet-pane
 
 user waits until element contains infographic chart
-    [Arguments]  ${locator}
+    [Arguments]  ${locator}  ${wait}=${timeout}
     user waits until parent contains element  ${locator}  css:img
 
 user waits until element does not contain infographic chart

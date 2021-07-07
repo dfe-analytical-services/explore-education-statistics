@@ -336,28 +336,23 @@ Go back to prerelease content page
 
 Validate public prerelease access list
     [Tags]  HappyPath
-    user clicks link  View pre-release access list
-
-    user waits until page contains title caption  Calendar Year 2000  60
+    user clicks link  Pre-release access list
+    user waits until page contains title caption  Calendar Year 2000  30
     user waits until h1 is visible  ${PUBLICATION_NAME}  60
-
     user waits until h2 is visible  Pre-release access list  60
     user waits until page contains  Updated test public access list  60
 
 Go back to prerelease content page again
     [Tags]  HappyPath
     user clicks link  Back
+    user waits until h1 is visible  ${PUBLICATION_NAME}  60
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
 
-    user waits until page contains title caption  Calendar Year 2000  60
-    user waits until h1 is visible  ${PUBLICATION_NAME}  60
-
 Go to prerelease table tool page
     [Tags]  HappyPath
     user clicks link  Table tool
-
     user waits until h1 is visible  Create your own tables  60
     user waits until table tool wizard step is available  Choose a subject  60
 
@@ -445,7 +440,7 @@ Go back to prerelease content page as Analyst user
 
 Validate public prerelease access list as Analyst user
     [Tags]  HappyPath
-    user clicks link  View pre-release access list
+    user clicks link  Pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000  60
     user waits until h1 is visible  ${PUBLICATION_NAME}  60

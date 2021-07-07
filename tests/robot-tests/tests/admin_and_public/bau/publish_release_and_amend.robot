@@ -143,20 +143,23 @@ Navigate to 'Content' page
     [Tags]  HappyPath
     user clicks link   Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user waits until page contains button  Add a summary text block
+    user waits until page contains button  Add a summary text block  60
 
 Add two accordion sections to release
     [Tags]  HappyPath
+    user waits for page to finish loading
+    user waits until page does not contain loading spinner
     user clicks button   Add new section
     user changes accordion section title  1   Dates data block
-
     user clicks button   Add new section
     user changes accordion section title  2   Test text
 
 Add data block to first accordion section
     [Tags]  HappyPath
     user adds data block to editable accordion section  Dates data block   ${DATABLOCK_NAME}   css:#releaseMainContent
-    ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=  set variable  xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
+    user waits until page contains element  ${datablock}  60
+    user waits until element contains infographic chart  ${datablock}
     user checks chart title contains  ${datablock}  Sample title
     user checks infographic chart contains alt  ${datablock}  Sample alt text
 
@@ -223,17 +226,22 @@ Verify publish and update dates
 
 Verify release associated files
     [Tags]  HappyPath
+    
     user opens accordion section  Explore data and files
     ${downloads}=  user gets accordion section content element  Explore data and files
-    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)
-    user waits until element contains link  ${downloads}  All files
+    user waits until page contains element  ${downloads}  60
+    
+    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)  60
+    user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)  60
+    user checks element should contain  ${downloads}  All data used to create this release is published as open data and is available for download.
+    user checks element should contain  ${downloads}  You can create your own tables from this data using our table tool, or view featured tables that we have built for you.
 
-    user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
-    user waits until element contains link  ${downloads}  Dates test subject
-
-    user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 1
-    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    user checks element should contain  ${downloads}  The open data files contain all data used in this release in a machine readable format.
+    user checks element should contain  ${downloads}  Learn more about the data files used in this release using our data files guide.
+    
+    user clicks element  xpath://*[@data-testid="Expand Details Section List of other files"]
+    user waits until page contains link  Test ancillary file 1  60
+    download file  link:Test ancillary file 1  test_ancillary_file_1.txt 
     downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
 Verify public metadata guidance document
@@ -245,7 +253,7 @@ Verify public metadata guidance document
     user checks nth breadcrumb contains   2    Find statistics and data
     user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains   4    Metadata guidance document
-    user waits until h2 is visible  Metadata guidance document
+    user waits until h2 is visible   Metadata guidance document  30
 
     user waits until page contains title caption  ${RELEASE_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}
@@ -570,20 +578,15 @@ Verify amendment files
     [Tags]  HappyPath
     user opens accordion section  Explore data and files
     ${downloads}=  user gets accordion section content element  Explore data and files
-    user checks element should contain  ${downloads} Download all data and files for this release (zip, 3 Kb)
-    user waits until element contains link  ${downloads}  All files
-
-    user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
-    user waits until element contains link  ${downloads}  Dates test subject
-
-    user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 1
-    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)  30
+    
+    user clicks element  xpath://*[@data-testid="Expand Details Section List of other files"]
+    user waits until page contains link  Test ancillary file 1  60
+    download file  link:Test ancillary file 1  test_ancillary_file_1.txt 
     downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
-    user checks element should contain  ${downloads}  Test ancillary file 2 (txt, 24 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 2
-    download file  link:Test ancillary file 2   test_ancillary_file_2.txt
+    user waits until page contains link  Test ancillary file 2  60
+    download file  link:Test ancillary file 2  test_ancillary_file_2.txt 
     downloaded file should have first line  test_ancillary_file_2.txt   Test file 2
 
 Verify amendment public metadata guidance document

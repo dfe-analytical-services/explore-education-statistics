@@ -336,7 +336,7 @@ user checks element is disabled
     element should be disabled   ${element}
 
 user checks element should contain
-    [Arguments]   ${element}  ${text}
+    [Arguments]   ${element}  ${text}  ${wait}=${timeout}
     element should contain  ${element}    ${text}
 
 user checks element should not contain
@@ -515,9 +515,9 @@ user checks page contains link with text and url
 
 user opens details dropdown
     [Arguments]  ${text}  ${parent}=css:body
-    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]  60
     ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
-    user waits until element is visible  ${summary}
+    user waits until element is visible  ${summary}  60
     ${is_expanded}=  get element attribute  ${summary}  aria-expanded
     run keyword if  '${is_expanded}' != 'true'  user clicks element  ${summary}
     user checks element attribute value should be  ${summary}  aria-expanded  true

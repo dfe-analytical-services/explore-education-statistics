@@ -10,7 +10,7 @@ Suite Teardown    user closes the browser
 Validate Analyst1 can see correct themes and topics
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  Pupils and schools  Pupil absence
-    user waits until page contains accordion section  Pupil absence in schools in England     60
+    user waits until page contains accordion section  Pupil absence in schools in England  60
 
     user checks list contains label   id:publicationsReleases-themeTopic-themeId  Pupils and schools
     user checks list contains x elements   id:publicationsReleases-themeTopic-topicId   2
@@ -70,17 +70,17 @@ Validate Analyst1 can see 'Content' page key stats
 
 Validate Analyst1 can see 'Content' page accordion sections
     [Tags]  HappyPath
-    user checks accordion is in position  About these statistics            1  id:releaseMainContent
-    user checks accordion is in position  Pupil absence rates               2  id:releaseMainContent
-    user checks accordion is in position  Persistent absence                3  id:releaseMainContent
-    user checks accordion is in position  Reasons for absence               4  id:releaseMainContent
-    user checks accordion is in position  Distribution of absence           5  id:releaseMainContent
-    user checks accordion is in position  Absence by pupil characteristics  6  id:releaseMainContent
-    user checks accordion is in position  Absence for 4-year-olds           7  id:releaseMainContent
-    user checks accordion is in position  Pupil referral unit absence       8  id:releaseMainContent
-    user checks accordion is in position  Regional and local authority (LA) breakdown  9  id:releaseMainContent
-    user checks there are x accordion sections  9  id:releaseMainContent
+    user checks accordion is in position  About these statistics            1  id:content
+    user checks accordion is in position  Pupil absence rates               2  id:content
+    user checks accordion is in position  Persistent absence                3  id:content
+    user checks accordion is in position  Reasons for absence               4  id:content
+    user checks accordion is in position  Distribution of absence           5  id:content
+    user checks accordion is in position  Absence by pupil characteristics  6  id:content
+    user checks accordion is in position  Absence for 4-year-olds           7  id:content
+    user checks accordion is in position  Pupil referral unit absence       8  id:content
+    user checks accordion is in position  Regional and local authority (LA) breakdown  9  id:content
+    user checks there are x accordion sections  9  id:content
 
-    user checks accordion is in position  Methodology                       1  id:helpAndSupport
-    user checks accordion is in position  Contact us                        2  id:helpAndSupport
-    user checks there are x accordion sections  2  id:helpAndSupport
+    user checks accordion is in position  Methodology                       1  id:help-and-support
+    user checks accordion is in position  Contact us                        2  id:help-and-support
+    user checks there are x accordion sections  2  id:help-and-support
