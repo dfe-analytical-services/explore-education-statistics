@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -50,7 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var createdMethodology = new Methodology
                 {
-                    Id = Guid.NewGuid()
+                    Id = Guid.NewGuid(),
+                    MethodologyParent = new MethodologyParent
+                    {
+                        Slug = "methodology-slug"
+                    }
                 };
 
                 repository
@@ -110,7 +115,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                AlternativeTitle = "Pupil absence statistics: methodology"
+                AlternativeTitle = "Pupil absence statistics: methodology",
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug"
+                }
             };
 
             var request = new MethodologyUpdateRequest
@@ -161,7 +170,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
@@ -181,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                MethodologyParent =
+                MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Pupil absence statistics: methodology",
                     Slug = "pupil-absence-statistics-methodology"
@@ -267,7 +279,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
@@ -380,7 +395,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.Null(model.Published);
                 Assert.Equal(Draft, model.Status);
@@ -465,7 +483,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.True(model.Published.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Published.Value).Milliseconds, 0, 1500);
@@ -633,7 +654,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context.Methodologies.FindAsync(methodology.Id);
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.Equal(methodology.Published, model.Published);
                 Assert.Equal(Approved, model.Status);

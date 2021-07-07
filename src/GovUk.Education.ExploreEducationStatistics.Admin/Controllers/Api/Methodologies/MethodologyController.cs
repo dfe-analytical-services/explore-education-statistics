@@ -63,5 +63,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .CreateMethodologyAmendment(methodologyId)
                 .HandleFailuresOrOk();
         }
+
+        [HttpDelete("api/methodology/{methodologyId}")]
+        public Task<ActionResult> DeleteMethodology(Guid methodologyId)
+        {
+            return _methodologyService
+                .DeleteMethodology(methodologyId)
+                .HandleFailuresOrNoContent();
+        }
     }
 }

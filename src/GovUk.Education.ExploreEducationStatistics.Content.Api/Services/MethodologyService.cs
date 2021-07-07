@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,12 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
-            // TODO SOW4 EES-2375 lookup the MethodologyParent by slug when slug is moved to the parent
-            // For now, this does a lookup on the parent via any Methodology with the slug
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(query => 
-                    query.Where(mv => mv.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async arbitraryVersion =>
+                .CheckEntityExists<Methodology>(
+                    query => query
+                        .Include(mv => mv.MethodologyParent)
+                        .ThenInclude(m => m.Versions)
+                        .Where(mv => mv.MethodologyParent.Slug == slug))
+                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(arbitraryVersion =>
                 {
                     var latestPublishedVersion = await _methodologyRepository.GetLatestPublishedByMethodologyParent(arbitraryVersion.MethodologyParentId);
                     if (latestPublishedVersion == null)

@@ -10,46 +10,39 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class MakeAmendmentOfSpecificMethodologyRequirement : IAuthorizationRequirement
-    {
-    }
-
-    public class MakeAmendmentOfSpecificMethodologyAuthorizationHandler
-        : AuthorizationHandler<MakeAmendmentOfSpecificMethodologyRequirement, Methodology>
+    public class DeleteSpecificMethodologyRequirement : IAuthorizationRequirement
+    {}
+    
+    public class DeleteSpecificMethodologyAuthorizationHandler
+        : AuthorizationHandler<DeleteSpecificMethodologyRequirement, Methodology>
     {
         private readonly ContentDbContext _context;
-        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
+        public DeleteSpecificMethodologyAuthorizationHandler(
             ContentDbContext context,
-            IMethodologyRepository methodologyRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _context = context;
-            _methodologyRepository = methodologyRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
-            MakeAmendmentOfSpecificMethodologyRequirement requirement,
+            DeleteSpecificMethodologyRequirement requirement,
             Methodology methodology)
         {
-            // Amendments can only be created from Methodologies that are already publicly-accessible.
-            if (!await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+            if (!methodology.Amendment || methodology.PubliclyAccessible)
             {
                 return;
             }
 
-            // Any user with the "MakeAmendmentsOfAllMethodologies" Claim can create an amendment of a
-            // publicly-accessible Methodology.
-            if (SecurityUtils.HasClaim(context.User, MakeAmendmentsOfAllMethodologies))
+            if (SecurityUtils.HasClaim(context.User, DeleteAllMethodologyAmendments))
             {
                 context.Succeed(requirement);
                 return;
             }
-
+            
             await _context
                 .Entry(methodology)
                 .Reference(p => p.MethodologyParent)
