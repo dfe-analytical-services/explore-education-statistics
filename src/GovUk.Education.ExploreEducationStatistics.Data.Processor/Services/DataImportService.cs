@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -75,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return import.Status;
         }
 
-        public async Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches)
+        public async Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches,
+            HashSet<GeographicLevel> geographicLevels)
         {
             await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
             var import = await contentDbContext.DataImports.FindAsync(id);
@@ -84,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             import.RowsPerBatch = rowsPerBatch;
             import.TotalRows = totalRows;
             import.NumBatches = numBatches;
+            import.GeographicLevels = geographicLevels;
 
             await contentDbContext.SaveChangesAsync();
         }

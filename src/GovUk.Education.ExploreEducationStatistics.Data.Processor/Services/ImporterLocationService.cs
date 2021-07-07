@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _guidGenerator = guidGenerator;
         }
 
-        public Location Find(
+        public Location FindOrCreate(
             StatisticsDbContext context,
             Country country,
             EnglishDevolvedArea englishDevolvedArea = null,

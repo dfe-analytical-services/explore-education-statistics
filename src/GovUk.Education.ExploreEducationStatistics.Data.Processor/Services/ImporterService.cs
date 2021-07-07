@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Guid GetLocationId(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
         {
-            return _importerLocationService.Find(
+            return _importerLocationService.FindOrCreate(
                 context,
                 GetCountry(line, headers),
                 GetEnglishDevolvedArea(line, headers),
