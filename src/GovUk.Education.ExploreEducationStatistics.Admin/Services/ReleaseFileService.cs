@@ -183,7 +183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessVoid(async () =>
                 {
-                    await _releaseFileRepository.UpdateName(releaseId, fileId, name);
+                    await _releaseFileRepository.Update(
+                        releaseId: releaseId,
+                        fileId: fileId,
+                        name: name);
                 });
         }
 
@@ -259,10 +262,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var releaseFile = replacingId.HasValue
-                        ? await _releaseFileRepository.UpdateFilename(
-                            releaseId,
-                            replacingId.Value,
-                            formFile.FileName)
+                        ? await _releaseFileRepository.Update(
+                            releaseId: releaseId,
+                            fileId: replacingId.Value,
+                            fileName: formFile.FileName)
                         : await _releaseFileRepository.Create(
                             releaseId: releaseId,
                             filename: formFile.FileName,

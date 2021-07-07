@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             params FileType[] allowedFileTypes)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
-            var releaseFile = await Get(releaseId, id);
+            var releaseFile = await Find(releaseId, id);
 
             if (releaseFile == null)
             {
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filename,
             FileType type,
             Guid createdById,
-            string name = null)
+            string? name = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task Delete(Guid releaseId, Guid fileId)
         {
-            var releaseFile = await Get(releaseId, fileId);
+            var releaseFile = await Find(releaseId, fileId);
             if (releaseFile != null)
             {
                 _contentDbContext.ReleaseFiles.Remove(releaseFile);
@@ -90,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        public async Task<ReleaseFile> Get(Guid releaseId, Guid fileId)
+        public async Task<ReleaseFile?> Find(Guid releaseId, Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(releaseFile => releaseFile.File)
@@ -117,9 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseFile.FileId == fileId);
         }
 
-        public async Task<ReleaseFile> UpdateFilename(Guid releaseId,
+        public async Task<ReleaseFile> Update(Guid releaseId,
             Guid fileId,
-            string filename)
+            string? name = null,
+            string? fileName = null)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
             var releaseFile = await _contentDbContext.ReleaseFiles
@@ -128,30 +130,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     rf.ReleaseId == releaseId
                     && rf.FileId == fileId);
 
-            var file = releaseFile.File;
-            _contentDbContext.Update(file);
-            file.Filename = filename;
+            _contentDbContext.Update(releaseFile);
+
+            if (name != null)
+            {
+                releaseFile.Name = name;
+            }
+
+            if (fileName != null)
+            {
+                releaseFile.File.Filename = fileName;
+            }
 
             await _contentDbContext.SaveChangesAsync();
 
             return releaseFile;
-        }
-
-        public async Task UpdateName(Guid releaseId,
-            Guid fileId,
-            string name)
-        {
-            var releaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseId == releaseId
-                    && rf.FileId == fileId
-                    && (rf.File.Type == FileType.Data || rf.File.Type == Ancillary));
-
-            _contentDbContext.Update(releaseFile);
-            releaseFile.Name = name;
-
-            await _contentDbContext.SaveChangesAsync();
         }
     }
 }
