@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             Assert.Null(amendment.Published);
             Assert.Equal(Immediately, amendment.PublishingStrategy);
             Assert.Null(amendment.ScheduledWithRelease);
-            Assert.Equal(Guid.Empty, amendment.ScheduledWithReleaseId);
+            Assert.Null(amendment.ScheduledWithReleaseId);
 
             // Check versioning fields.
             Assert.Equal(originalMethodology.Version + 1, amendment.Version);
@@ -313,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             var methodology = new Methodology
             {
-                PreviousVersionId = Guid.Empty,
+                PreviousVersionId = null,
                 Published = null
             };
             
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             var methodology = new Methodology
             {
-                PreviousVersionId = Guid.Empty,
+                PreviousVersionId = null,
                 Published = DateTime.Now
             };
             

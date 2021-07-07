@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                         .Include(mv => mv.MethodologyParent)
                         .ThenInclude(m => m.Versions)
                         .Where(mv => mv.MethodologyParent.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(arbitraryVersion =>
+                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async arbitraryVersion =>
                 {
                     var latestPublishedVersion = await _methodologyRepository.GetLatestPublishedByMethodologyParent(arbitraryVersion.MethodologyParentId);
                     if (latestPublishedVersion == null)

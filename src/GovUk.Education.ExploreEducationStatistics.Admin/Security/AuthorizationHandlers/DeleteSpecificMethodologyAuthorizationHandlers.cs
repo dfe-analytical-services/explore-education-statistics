@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
@@ -17,13 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<DeleteSpecificMethodologyRequirement, Methodology>
     {
         private readonly ContentDbContext _context;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
         public DeleteSpecificMethodologyAuthorizationHandler(
             ContentDbContext context,
+            IMethodologyRepository methodologyRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _context = context;
+            _methodologyRepository = methodologyRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
 
@@ -33,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             Methodology methodology)
         {
             // If the Methodology is already public, it cannot be deleted.
-            if (methodology.PubliclyAccessible)
+            if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
             {
                 return;
             }
