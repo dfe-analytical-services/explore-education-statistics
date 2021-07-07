@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -14,12 +15,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         /// <returns></returns>
         public static string AllFilesZipPath(this Release release)
         {
+            return $"{FilesPath(release.Id, Ancillary)}{release.AllFilesZipFileName()}";
+        }
+
+        public static string AllFilesZipFileName(this Release release)
+        {
             if (release.Publication == null)
             {
-                throw new ArgumentException("Release must be hydrated with Publication to create All Files zip path");
+                throw new ArgumentException("Release must be hydrated with Publication to create All Files zip file name");
             }
 
-            return $"{FilesPath(release.Id, Ancillary)}{release.Publication.Slug}_{release.Slug}.zip";
+            return $"{release.Publication.Slug}_{release.Slug}.zip";
         }
 
         /// <summary>

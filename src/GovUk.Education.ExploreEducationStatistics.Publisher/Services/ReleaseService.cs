@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 return new FileInfo
                 {
                     Id = null,
-                    FileName = null,
+                    FileName = release.AllFilesZipFileName(),
                     Name = "Unknown",
                     Size = "0.00 B",
                     Type = Ancillary
@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     rf.ReleaseId == release.Id
                     && rf.FileId == file.Id);
 
-            return releaseFile.ToFileInfo(blob);
+            return releaseFile.ToPublicFileInfo(blob);
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

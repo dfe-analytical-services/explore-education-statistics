@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,17 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
     public class DataFileInfo : FileInfo
     {
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
-        public new readonly FileType Type = FileType.Data;
+        public new const FileType Type = FileType.Data;
 
         public Guid? MetaFileId { get; set; }
-        public string MetaFileName { get; set; }
+
+        public string MetaFileName { get; set; } = string.Empty;
+
         public int Rows { get; set; }
-        public string UserName { get; set; }
-        public DateTime? Created { get; set; }
+
         public Guid? ReplacedBy { get; set; }
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
         public DataImportStatus Status { get; set; }
-        public DataFilePermissions Permissions { get; set; }
+
+        public DataFilePermissions Permissions { get; set; } = new DataFilePermissions();
     }
 }
