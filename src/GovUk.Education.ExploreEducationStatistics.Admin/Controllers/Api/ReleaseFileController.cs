@@ -1,8 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/ancillary")]
-        public async Task<ActionResult<IEnumerable<AncillaryFileInfo>>> GetAncillaryFiles(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
         {
             return await _releaseFileService
                 .GetAncillaryFiles(releaseId)
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/ancillary")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<AncillaryFileInfo>> UploadAncillary(Guid releaseId,
+        public async Task<ActionResult<FileInfo>> UploadAncillary(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFileService

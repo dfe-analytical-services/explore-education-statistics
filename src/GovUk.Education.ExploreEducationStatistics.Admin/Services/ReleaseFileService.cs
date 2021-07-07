@@ -1,9 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
@@ -190,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<AncillaryFileInfo>>> GetAncillaryFiles(Guid releaseId)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -221,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, AncillaryFileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
+        public Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -286,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<AncillaryFileInfo> ToAncillaryFileInfo(ReleaseFile releaseFile, BlobInfo blobInfo)
+        private async Task HydrateReleaseFile(ReleaseFile releaseFile)
         {
             await _contentDbContext.Entry(releaseFile)
                 .Reference(rf => rf.File)
@@ -294,39 +293,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.Entry(releaseFile.File)
                 .Reference(f => f.CreatedBy)
                 .LoadAsync();
+        }
 
-            return new AncillaryFileInfo
-            {
-                Id = releaseFile.FileId,
-                FileName = releaseFile.File.Filename,
-                Name = releaseFile.Name ?? releaseFile.File.Filename,
-                Size = blobInfo.Size,
-                Type = releaseFile.File.Type,
-                UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                Created = releaseFile.File.Created
-            };
+        private async Task<FileInfo> ToAncillaryFileInfo(ReleaseFile releaseFile, BlobInfo blobInfo)
+        {
+            await HydrateReleaseFile(releaseFile);
+            return releaseFile.ToFileInfo(blobInfo);
         }
 
         // TODO: Remove after completion of EES-2343
-        private async Task<AncillaryFileInfo> ToAncillaryFileInfoNotFound(ReleaseFile releaseFile)
+        private async Task<FileInfo> ToAncillaryFileInfoNotFound(ReleaseFile releaseFile)
         {
-            await _contentDbContext.Entry(releaseFile)
-                .Reference(rf => rf.File)
-                .LoadAsync();
-            await _contentDbContext.Entry(releaseFile.File)
-                .Reference(f => f.CreatedBy)
-                .LoadAsync();
-
-            return new AncillaryFileInfo
-            {
-                Id = releaseFile.File.Id,
-                FileName = releaseFile.File.Filename,
-                Name = "Unknown",
-                Size = "0.00 B",
-                Type = releaseFile.File.Type,
-                UserName = releaseFile.File.CreatedBy?.Email ?? "",
-                Created = releaseFile.File.Created
-            };
+            await HydrateReleaseFile(releaseFile);
+            return releaseFile.ToFileInfoNotFound();
         }
     }
 }
