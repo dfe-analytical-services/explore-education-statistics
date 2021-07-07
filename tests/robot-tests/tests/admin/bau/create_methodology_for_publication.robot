@@ -9,7 +9,6 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${PUBLICATION_NAME}  UI tests - create methodology publication %{RUN_IDENTIFIER}
-
 *** Keywords ***
 teardown suite
     user closes the browser
@@ -35,14 +34,13 @@ Update Methodology for Publication
     ${accordion}=  user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     user views methodology for open publication accordion  ${accordion}  ${PUBLICATION_NAME}
     user clicks link  Edit summary
-    user enters text into textfield  Enter methodology title  New methodology title
+    user enters text into textfield  Enter methodology title  ${PUBLICATION_NAME} - New methodology title
     user clicks button  Update methodology
     user waits until h2 is visible  Methodology summary
     user clicks link  Sign off
     user changes methodology status to Approved
     user waits until h2 is visible  Methodology status
     user clicks link  Summary
-    user checks summary list contains   Title   New methodology title
+    user checks summary list contains   Title   ${PUBLICATION_NAME} - New methodology title
     user checks summary list contains   Status  Approved
-    ${date}=  get current datetime   %-d %B %Y
-    user checks summary list contains   Published on  ${date}
+    user checks summary list contains   Published on  Not yet published

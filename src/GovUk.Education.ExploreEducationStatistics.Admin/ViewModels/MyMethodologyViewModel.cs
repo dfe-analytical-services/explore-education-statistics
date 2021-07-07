@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -9,6 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+
+        public DateTime? Published { get; set; }
+
+        public string? InternalReleaseNote { get; set; }
 
         public PermissionsSet Permissions { get; set; }
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -69,43 +68,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 .ThenInclude(topic => topic.Publications)
                 .ToListAsync();
 
-            return (await themesWithMethodologies.WhereAsync(IsThemeIncluded)
-                .SelectAsync(BuildThemeTree))
-                .OrderBy(theme => theme.Title)
-                .ToList();
+            var tree = new List<ThemeTree<PublicationMethodologiesTreeNode>>();
+
+            foreach (var theme in themesWithMethodologies)
+            {
+                if (await IsThemeIncluded(theme))
+                {
+                    tree.Add(await BuildThemeTree(theme));
+                }
+            }
+
+            return tree.OrderBy(theme => theme.Title).ToList();
         }
 
         private async Task<ThemeTree<PublicationMethodologiesTreeNode>> BuildThemeTree(Theme theme)
         {
-            var topics = (await theme.Topics
-                    .WhereAsync(IsTopicIncluded)
-                    .SelectAsync(BuildTopicTree))
-                .OrderBy(topic => topic.Title)
-                .ToList();
+            var topics = new List<TopicTree<PublicationMethodologiesTreeNode>>();
+            foreach (var topic in theme.Topics)
+            {
+                if (await IsTopicIncluded(topic))
+                {
+                    topics.Add(await BuildTopicTree(topic));
+                }
+            }
 
             return new ThemeTree<PublicationMethodologiesTreeNode>
             {
                 Id = theme.Id,
                 Summary = null,
                 Title = theme.Title,
-                Topics = topics
+                Topics = topics.OrderBy(topic => topic.Title).ToList()
             };
         }
 
         private async Task<TopicTree<PublicationMethodologiesTreeNode>> BuildTopicTree(Topic topic)
         {
-            var publications = (await topic.Publications
-                .WhereAsync(IsPublicationIncluded)
-                .SelectAsync(BuildPublicationNode))
-                .OrderBy(publication => publication.Title)
-                .ToList();
+            var publications = new List<PublicationMethodologiesTreeNode>();
+            foreach (var publication in topic.Publications)
+            {
+                if (await IsPublicationIncluded(publication))
+                {
+                    publications.Add(await BuildPublicationNode(publication));
+                }
+            }
 
             return new TopicTree<PublicationMethodologiesTreeNode>
             {
                 Id = topic.Id,
                 Summary = null,
                 Title = topic.Title,
-                Publications = publications
+                Publications = publications.OrderBy(publication => publication.Title).ToList()
             };
         }
 
