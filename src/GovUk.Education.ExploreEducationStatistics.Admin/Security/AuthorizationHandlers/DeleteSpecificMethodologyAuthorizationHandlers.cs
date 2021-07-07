@@ -32,7 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificMethodologyRequirement requirement,
             Methodology methodology)
         {
-            if (!methodology.Amendment || methodology.PubliclyAccessible)
+            // If the Methodology is already public, it cannot be deleted.
+            if (methodology.PubliclyAccessible)
+            {
+                return;
+            }
+         
+            // If the Methodology is the first version added to a Publication and is still in Draft, or if it is a 
+            // subsequent version but is still an amendment, it can potentially be deleted.  Otherwise it cannot.
+            if (!methodology.Amendment && !methodology.DraftFirstVersion)
             {
                 return;
             }
