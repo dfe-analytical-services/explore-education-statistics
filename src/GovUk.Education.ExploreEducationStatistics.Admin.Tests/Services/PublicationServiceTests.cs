@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -17,6 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -25,6 +25,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetPublication()
         {
+            var methodology1Version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft
+            };
+            
+            var methodology2Version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 2 Version 1",
+                Version = 0,
+                Status = Approved
+            };
+            
+            var methodology2Version2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 2 Version 2",
+                Version = 1,
+                Status = Draft,
+                PreviousVersionId = methodology2Version1.Id
+            };
+
             var publication = new Publication
             {
                 Title = "Test publication",
@@ -43,19 +68,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ContactTelNo = "0123456789",
                     TeamName = "Test team",
                     TeamEmail = "team@test.com",
-                }
-            };
-
-            var methodology1 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test methodology 1"
-            };
-
-            var methodology2 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test methodology 2"
+                },
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = new MethodologyParent
+                        {
+                            Slug = "methodology-1-slug",
+                            Versions = AsList(methodology1Version1)
+                        },
+                        Owner = true
+                    },
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = new MethodologyParent
+                        {
+                            Slug = "methodology-2-slug",
+                            Versions = AsList(methodology2Version1, methodology2Version2)
+                        },
+                        Owner = false
+                    }
+                )
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -66,16 +99,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
-            methodologyRepository.Setup(mock =>
-                    mock.GetLatestByPublication(publication.Id))
-                .ReturnsAsync(AsList(methodology1, methodology2));
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationService = BuildPublicationService(context: context,
-                    methodologyRepository: methodologyRepository.Object);
+                var publicationService = BuildPublicationService(context);
 
                 var result = await publicationService.GetPublication(publication.Id);
 
@@ -96,31 +122,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, result.Right.Methodologies.Count);
                 
-                Assert.Equal(methodology1.Id, result.Right.Methodologies[0].Id);
-                Assert.Equal(methodology1.Title, result.Right.Methodologies[0].Title);
+                Assert.Equal(methodology1Version1.Id, result.Right.Methodologies[0].Id);
+                Assert.Equal(methodology1Version1.Title, result.Right.Methodologies[0].Title);
                 
-                Assert.Equal(methodology2.Id, result.Right.Methodologies[1].Id);
-                Assert.Equal(methodology2.Title, result.Right.Methodologies[1].Title);
+                Assert.Equal(methodology2Version2.Id, result.Right.Methodologies[1].Id);
+                Assert.Equal(methodology2Version2.Title, result.Right.Methodologies[1].Title);
             }
-
-            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
         public async void GetPublication_NotFound()
         {
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
             await using var context = InMemoryApplicationDbContext();
 
-            var publicationService = BuildPublicationService(context: context,
-                methodologyRepository: methodologyRepository.Object);
+            var publicationService = BuildPublicationService(context);
 
             var result = await publicationService.GetPublication(Guid.NewGuid());
 
             result.AssertNotFound();
-
-            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
@@ -733,7 +752,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static PublicationService BuildPublicationService(ContentDbContext context,
-            IMethodologyRepository methodologyRepository = null,
             IUserService userService = null,
             IPublicationRepository publicationRepository = null,
             IPublishingService publishingService = null)
@@ -741,7 +759,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new PublicationService(
                 context,
                 AdminMapper(),
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 publicationRepository ?? new Mock<IPublicationRepository>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object, 

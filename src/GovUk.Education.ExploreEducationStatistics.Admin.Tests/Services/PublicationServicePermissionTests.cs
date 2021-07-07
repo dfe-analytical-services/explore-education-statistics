@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -245,18 +244,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static PublicationService BuildPublicationService((Mock<ContentDbContext>,
             Mock<IMapper>,
-            Mock<IMethodologyRepository> methodologyRepository,
             Mock<IUserService> userService,
             Mock<IPublicationRepository> publicationRepository,
             Mock<IPublishingService> publishingService,
             Mock<IPersistenceHelper<ContentDbContext>>) mocks)
         {
-            var (context, mapper, methodologyRepository, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
+            var (context, mapper, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
 
             return new PublicationService(
                 context.Object,
                 mapper.Object,
-                methodologyRepository.Object,
                 userService.Object,
                 publicationRepository.Object,
                 publishingService.Object,
@@ -266,7 +263,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private (
             Mock<ContentDbContext> ContentDbContext,
             Mock<IMapper> Mapper,
-            Mock<IMethodologyRepository> MethodologyRepository,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
             Mock<IPublishingService> PublishingService,
@@ -279,7 +275,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return (
                 new Mock<ContentDbContext>(),
                 new Mock<IMapper>(),
-                new Mock<IMethodologyRepository>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
                 new Mock<IPublishingService>(),
