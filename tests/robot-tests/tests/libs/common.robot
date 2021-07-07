@@ -220,7 +220,7 @@ user checks there are x accordion sections
 
 user checks accordion is in position
     [Arguments]  ${section_text}  ${position}  ${parent}=css:[data-testid="accordion"]
-    user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="accordionSection"][${position}]//button[starts-with(text(), "${section_text}")]
+    user waits until parent contains element  ${parent}  xpath:(.//*[@data-testid="accordionSection"])[${position}]//button[starts-with(text(), "${section_text}")]
 
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}   ${wait}=${timeout}
