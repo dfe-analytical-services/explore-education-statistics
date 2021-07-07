@@ -128,6 +128,7 @@ const ReleasePageContainer = ({
               />
             </div>
 
+            {/* EES-2464
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
@@ -141,7 +142,7 @@ const ReleasePageContainer = ({
                   </li>
                 </ul>
               </RelatedInformation>
-            </div>
+            </div> */}
           </div>
 
           <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>

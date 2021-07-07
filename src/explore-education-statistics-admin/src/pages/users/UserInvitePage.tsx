@@ -80,7 +80,8 @@ const UserInvitePage = ({
             Invite a new user
           </h1>
         </div>
-        <div className="govuk-grid-column-one-third">
+        {/* EES-2464
+         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
@@ -90,7 +91,7 @@ const UserInvitePage = ({
               </li>
             </ul>
           </RelatedInformation>
-        </div>
+        </div> */}
       </div>
       {model && (
         <Formik<FormValues>

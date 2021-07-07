@@ -99,6 +99,7 @@ const ReleaseCreatePage = ({
             caption={model?.publication.title}
           />
         </div>
+        {/* EES-2464
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
@@ -114,7 +115,7 @@ const ReleaseCreatePage = ({
               </li>
             </ul>
           </RelatedInformation>
-        </div>
+        </div> */}
       </div>
 
       <ReleaseSummaryForm<FormValues>
