@@ -1,25 +1,31 @@
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import parseNumber from '@common/utils/number/parseNumber';
+import { max } from 'lodash';
+import maxBy from 'lodash/maxBy';
 
 interface Props {
   dataSetCategories: DataSetCategory[];
-  minorAxisSize: number | undefined;
-  minorAxisDecimals: number | undefined;
+  minorAxisSize?: number;
+  minorAxisDecimals?: number;
   minorAxisUnit: string;
 }
 
 /**
  * Get the highest value used on the axis and determine the axis width based on its length.
- * 12 is a fairly arbitrary width here, more than needed for just the numbers to take into account commas etc.
  */
 const getMinorAxisSize = ({
   dataSetCategories,
   minorAxisSize,
   minorAxisDecimals = 0,
   minorAxisUnit,
-}: Props) => {
+}: Props): number => {
+  const characterWidth = 12; // 12 is a fairly arbitrary width here, more than needed for just the numbers to take into account commas etc.
+
   if (minorAxisSize) {
-    return parseNumber(minorAxisSize);
+    const axisSize = parseNumber(minorAxisSize);
+    if (axisSize) {
+      return axisSize;
+    }
   }
 
   const highestValueLength = dataSetCategories
@@ -32,7 +38,10 @@ const getMinorAxisSize = ({
     }, 0)
     .toString().length;
 
-  return (highestValueLength + minorAxisUnit.length + minorAxisDecimals) * 12;
+  return (
+    (highestValueLength + minorAxisUnit.length + minorAxisDecimals) *
+    characterWidth
+  );
 };
 
 export default getMinorAxisSize;

@@ -1,7 +1,8 @@
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 
 describe('getMinorAxisSize', () => {
-  const testDataSetCategories = [
+  const testDataSetCategories: DataSetCategory[] = [
     {
       dataSets: {
         key: {
@@ -30,11 +31,10 @@ describe('getMinorAxisSize', () => {
       filter: { value: '', label: '', id: '' },
     },
   ];
-  test('it returns the size based on the length of the higest value', () => {
+
+  test('it returns the size based on the length of the highest value', () => {
     const size = getMinorAxisSize({
       dataSetCategories: testDataSetCategories,
-      minorAxisSize: undefined,
-      minorAxisDecimals: undefined,
       minorAxisUnit: '',
     });
     expect(size).toBe(60);
@@ -44,15 +44,14 @@ describe('getMinorAxisSize', () => {
     const size = getMinorAxisSize({
       dataSetCategories: testDataSetCategories,
       minorAxisSize: 55,
-      minorAxisDecimals: undefined,
       minorAxisUnit: '',
     });
     expect(size).toBe(55);
   });
+
   test('it takes into account decimal places', () => {
     const size = getMinorAxisSize({
       dataSetCategories: testDataSetCategories,
-      minorAxisSize: undefined,
       minorAxisDecimals: 3,
       minorAxisUnit: '',
     });
@@ -62,8 +61,6 @@ describe('getMinorAxisSize', () => {
   test('it takes into account units', () => {
     const size = getMinorAxisSize({
       dataSetCategories: testDataSetCategories,
-      minorAxisSize: undefined,
-      minorAxisDecimals: undefined,
       minorAxisUnit: '%',
     });
     expect(size).toBe(72);

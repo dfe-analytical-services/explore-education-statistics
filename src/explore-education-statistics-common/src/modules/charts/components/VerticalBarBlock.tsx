@@ -19,7 +19,7 @@ import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCat
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
-import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
+import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import React, { memo } from 'react';
 import {
@@ -80,10 +80,7 @@ const VerticalBarBlock = ({
     meta,
   );
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
-  const minorAxisUnit = getUnitOrDefault(
-    axes.minor.unit,
-    dataSetCategoryConfigs,
-  );
+  const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
   const yAxisWidth = getMinorAxisSize({
     dataSetCategories,
     minorAxisSize: axes.minor.size,

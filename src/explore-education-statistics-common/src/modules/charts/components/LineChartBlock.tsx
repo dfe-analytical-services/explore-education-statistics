@@ -22,7 +22,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
+import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
   CartesianGrid,
@@ -111,10 +111,7 @@ const LineChartBlock = ({
     meta,
   );
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
-  const minorAxisUnit = getUnitOrDefault(
-    axes.minor.unit,
-    dataSetCategoryConfigs,
-  );
+  const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
   const yAxisWidth = getMinorAxisSize({
     dataSetCategories,
     minorAxisSize: axes.minor.size,

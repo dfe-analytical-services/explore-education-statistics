@@ -17,7 +17,7 @@ import {
 } from '@common/modules/charts/util/domainTicks';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
-import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
+import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
@@ -85,6 +85,7 @@ const HorizontalBarBlock = ({
   );
 
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
+  const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
 
   return (
     <ChartContainer
@@ -122,11 +123,7 @@ const HorizontalBarBlock = ({
             padding={{ left: 0, right: 20 }}
             tickMargin={10}
             tickFormatter={tick =>
-              formatPretty(
-                tick,
-                getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs),
-                minorAxisDecimals,
-              )
+              formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
           />
 
