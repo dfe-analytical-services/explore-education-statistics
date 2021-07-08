@@ -89,6 +89,7 @@ const MethodologyPage = ({
                 <PageTitle title={value.title} caption="Edit methodology" />
               </div>
 
+              {/* EES-2464
               <div className="govuk-grid-column-one-third">
                 <RelatedInformation heading="Help and guidance">
                   <ul className="govuk-list">
@@ -99,7 +100,7 @@ const MethodologyPage = ({
                     </li>
                   </ul>
                 </RelatedInformation>
-              </div>
+              </div> */}
             </div>
 
             <NavBar
