@@ -240,7 +240,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             Assert.True(amendment.Amendment);
 
             // Check general fields.
-            Assert.Equal(Guid.Empty, amendment.Id);
+            Assert.NotEqual(Guid.Empty, amendment.Id);
+            Assert.NotEqual(originalMethodology.Id, amendment.Id);
             Assert.Equal(originalMethodology.AlternativeTitle, amendment.AlternativeTitle);
             Assert.Null(amendment.InternalReleaseNote);
 
@@ -280,8 +281,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         private static void AssertContentSectionAmendedCorrectly(ContentSection amendmentContentSection,
             ContentSection originalContentSection, DateTime creationTime)
         {
-            // Check the Content Section is ready for a new id.
-            Assert.Equal(Guid.Empty, amendmentContentSection.Id);
+            // Check the Content Section has a new id.
+            Assert.NotEqual(Guid.Empty, amendmentContentSection.Id);
+            Assert.NotEqual(originalContentSection.Id, amendmentContentSection.Id);
 
             // Check the other basic Content Section fields are the same
             Assert.Equal(originalContentSection.Caption, amendmentContentSection.Caption);
@@ -292,9 +294,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var amendmentContentBlock = Assert.Single(amendmentContentSection.Content) as HtmlBlock;
             var originalContentBlock = originalContentSection.Content[0] as HtmlBlock;
 
-            // Check the Content Block is ready for a new id.
-            Assert.Equal(Guid.Empty, amendmentContentBlock.Id);
-
+            // Check the Content Block has a new id.
+            Assert.NotEqual(Guid.Empty, amendmentContentBlock.Id);
+            Assert.NotEqual(originalContentBlock.Id, amendmentContentBlock.Id);
+            
             // Check the other Content Block basic fields.
             Assert.Equal(originalContentBlock.Body, amendmentContentBlock.Body);
             Assert.Equal(creationTime, amendmentContentBlock.Created);
