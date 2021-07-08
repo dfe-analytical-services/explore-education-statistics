@@ -794,7 +794,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     // Sanity check that a Methodology, a MethodologyParent and a PublicationMethodology row were
                     // created.
-                    // TODO files!
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodology.Id));
                     Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
                     Assert.NotNull(await context.PublicationMethodologies.SingleAsync(m => m.MethodologyParentId == methodologyParentId));
@@ -816,7 +815,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
                     // db currently doesn't support this so we can't check that there are no longer those
                     // PublicationMethodology rows.
-                    // TODO files!
+                    // TODO EES-2156 - test deleting Methodology Files
                     Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
                     Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
                 }
@@ -857,7 +856,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     // Sanity check that 2 Methodologies and their MethodologyParent is created.
-                    // TODO files!
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[1].Id));
                     Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
@@ -875,7 +873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     // Assert that the Methodology has successfully been deleted and as there was another Methodology
                     // version attached to the MethodologyParent, the Parent itself is not deleted, or the other
                     // Methodology version.
-                    // TODO files!
+                    // TODO EES-2156 - test deleting Methodology Files
                     Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
                     Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
@@ -925,7 +923,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     // Sanity check that 2 MethodologyParents and their Methodologies are created.
-                    // TODO files!
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
                     Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
                     Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
@@ -943,7 +940,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
                     // unaffected. 
-                    // TODO files!
+                    // TODO EES-2156 - test deleting Methodology Files
                     Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
                     Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
                     

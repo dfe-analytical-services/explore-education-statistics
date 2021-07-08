@@ -128,6 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
+        // TODO EES-2156 - delete Methodology Files
         public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
         {
             return _persistenceHelper
