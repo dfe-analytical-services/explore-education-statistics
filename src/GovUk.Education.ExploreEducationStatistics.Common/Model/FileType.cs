@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [EnumLabelValue("image")]
         Image,
         [EnumLabelValue("metadata")]
-        Metadata
+        Metadata,
+        [EnumLabelValue("data-guidance")]
+        DataGuidance
     }
 }

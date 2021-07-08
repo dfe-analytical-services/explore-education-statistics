@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -18,6 +20,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
+using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -44,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         zipFileService: provider.GetRequiredService<IZipFileService>(),
+                        dataGuidanceFileService: provider.GetRequiredService<IDataGuidanceFileService>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
@@ -90,11 +98,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
+                .AddScoped<IFilterService, FilterService>()
+                .AddScoped<IIndicatorService, IndicatorService>()
+                .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
+                .AddScoped<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>()
+                .AddScoped<IDataGuidanceFileWriter, DataGuidanceFileWriter>()
+                .AddScoped<IDataGuidanceFileService, DataGuidanceFileService>(provider =>
+                    new DataGuidanceFileService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        dataGuidanceFileWriter: provider.GetService<IDataGuidanceFileWriter>(),
+                        blobStorageService: GetBlobStorageService(provider, "CoreStorage")
+                    ))
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
                 .AddScoped<IZipFileService, ZipFileService>(provider =>
                     new ZipFileService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
                     ));
+
+            AddPersistenceHelper<StatisticsDbContext>(builder.Services);
         }
 
         private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)

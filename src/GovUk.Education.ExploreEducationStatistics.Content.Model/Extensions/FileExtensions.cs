@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             Ancillary,
             Chart,
             Data,
-            Image
+            Image,
+            DataGuidance
         };
 
         public static string Path(this File file)

@@ -23,14 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseService _releaseService;
         private readonly IZipFileService _zipFileService;
+        private readonly IDataGuidanceFileService _dataGuidanceFileService;
         private readonly ILogger<PublishingService> _logger;
 
-        public PublishingService(string publicStorageConnectionString,
+        public PublishingService(
+            string publicStorageConnectionString,
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
             IReleaseService releaseService,
             IZipFileService zipFileService,
+            IDataGuidanceFileService dataGuidanceFileService,
             ILogger<PublishingService> logger)
         {
             _publicStorageConnectionString = publicStorageConnectionString;
@@ -39,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
             _releaseService = releaseService;
             _zipFileService = zipFileService;
+            _dataGuidanceFileService = dataGuidanceFileService;
             _logger = logger;
         }
 
@@ -64,7 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Delete any existing blobs in public storage
             await _publicBlobStorageService.DeleteBlobs(
                 containerName: PublicMethodologyFiles,
-                directoryPath: directoryPath);
+                directoryPath: directoryPath
+            );
 
             // Copy the blobs from private to public storage
             await _privateBlobStorageService.CopyDirectory(
@@ -89,12 +94,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseFiles(Guid releaseId)
         {
-            var release = await _releaseService.GetAsync(releaseId);
-            var files = await _releaseService.GetFiles(releaseId,
+            var release = await _releaseService.Get(releaseId);
+
+            var files = await _releaseService.GetFiles(
+                releaseId,
                 Ancillary,
                 Chart,
                 FileType.Data,
-                Image);
+                Image
+            );
+
+            var dataGuidanceFile = await _dataGuidanceFileService.CreateDataGuidanceFile(release.Id);
+
+            files.Add(dataGuidanceFile);
 
             var destinationDirectoryPath = $"{release.Id}/";
 

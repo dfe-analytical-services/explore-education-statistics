@@ -95,10 +95,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     ParseDescriptionListElement(element);
                     break;
 
+                case "blockquote":
+                    if (element.Children.Any())
+                    {
+                        ParseChildren(element, ParseElement);
+                    }
+                    else
+                    {
+                        ParseTextElement(element);
+                        _builder.AppendLine();
+                        _builder.AppendLine();
+                    }
+                    break;
+
                 case "cite":
                 case "figcaption":
                     _builder.Append('—');
                     ParseTextElement(element);
+                    _builder.AppendLine();
+                    _builder.AppendLine();
                     break;
 
                 case "br":
@@ -241,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
             headerRows.ForEach(row => table.AddHeaderRow(row));
             bodyRows.ForEach(row => table.AddBodyRow(row));
 
-            _builder.Append(table.Render());
+            _builder.AppendLine(table.Render());
         }
     }
 }
