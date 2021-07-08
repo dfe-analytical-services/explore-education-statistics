@@ -83,9 +83,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; }
 
-        public string PreReleaseAccessList { get; set; }
+        public string PreReleaseAccessList { get; set; } = string.Empty;
 
-        public string MetaGuidance { get; set; }
+        public string MetaGuidance { get; set; } = string.Empty;
 
         public Release? PreviousVersion { get; set; }
 
