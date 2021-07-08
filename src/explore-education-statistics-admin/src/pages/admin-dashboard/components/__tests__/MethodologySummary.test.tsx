@@ -31,7 +31,6 @@ const testContact: PublicationContactDetails = {
 
 const testMethodology: MyMethodology = {
   amendment: false,
-  live: true,
   id: '1234',
   internalReleaseNote: 'this is the release note',
   previousVersionId: 'lfkjdlfj',
@@ -39,6 +38,10 @@ const testMethodology: MyMethodology = {
   slug: 'meth-1',
   status: 'Approved',
   title: 'I am a methodology',
+  publication: {
+    id: 'p1',
+    title: 'Publication title',
+  },
   permissions: {
     canUpdateMethodology: false,
     canCancelMethodologyAmendment: false,
@@ -479,10 +482,13 @@ describe('MethodologySummary', () => {
       const history = createMemoryHistoryWithMockedPush();
       const mockMethodology: BasicMethodology = {
         amendment: true,
-        live: false,
         id: '12345',
         internalReleaseNote: 'this is the release note',
         previousVersionId: 'lfkjdlfj',
+        publication: {
+          id: 'p1',
+          title: 'Publication title',
+        },
         published: '2021-06-08T09:04:17.9805585',
         slug: 'meth-1',
         status: 'Approved',

@@ -5,6 +5,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -67,9 +68,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
+                .CheckEntityExists<Methodology>(id, queryable =>
+                    queryable.Include(methodology => methodology.MethodologyParent)
+                        .ThenInclude(mp => mp.Publications)
+                        .ThenInclude(pm => pm.Publication))
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+                .OnSuccess(methodology =>
+                {
+                    var publicationLinks = methodology.MethodologyParent.Publications;
+                    var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
+                    var otherPublications = publicationLinks.Where(pm => !pm.Owner)
+                        .Select(BuildPublicationViewModel)
+                        .OrderBy(model => model.Title)
+                        .ToList();
+
+                    var viewModel = _mapper.Map<MethodologySummaryViewModel>(methodology);
+                    viewModel.Publication = owningPublication;
+                    viewModel.OtherPublications = otherPublications;
+                    return viewModel;
+                });
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
@@ -166,6 +183,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     return Unit.Instance;
                 });
+        }
+
+        private static TitleAndIdViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
+        {
+            var publication = publicationMethodology.Publication;
+            return new TitleAndIdViewModel(publication.Id, publication.Title);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
