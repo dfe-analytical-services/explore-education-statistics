@@ -1,38 +1,37 @@
 *** Settings ***
-Resource    ../libs/public-common.robot
+Resource            ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test  Preprod
+Suite Setup         user opens the browser
+Suite Teardown      user closes the browser
 
-Suite Setup       user opens the browser
-Suite Teardown    user closes the browser
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 *** Test Cases ***
 Navigate to /methodology page
-    [Tags]  HappyPath
-    environment variable should be set  PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/methodology
-    user waits until h1 is visible   Methodologies
+    [Tags]    HappyPath
+    environment variable should be set    PUBLIC_URL
+    user goes to url    %{PUBLIC_URL}/methodology
+    user waits until h1 is visible    Methodologies
     user waits for page to finish loading
 
 Validate page contents
-    [Tags]  HappyPath
+    [Tags]    HappyPath
     user waits until page contains accordion section    Pupils and schools
     user opens accordion section    Pupils and schools
-    user opens details dropdown     Exclusions
+    user opens details dropdown    Exclusions
     user checks page contains methodology link
-    ...  Exclusions
-    ...  Permanent and fixed-period exclusions in England
-    ...  Pupil exclusion statistics: methodology
-    ...  %{PUBLIC_URL}/methodology/permanent-and-fixed-period-exclusions-in-england
-    user opens details dropdown     Pupil absence
+    ...    Exclusions
+    ...    Permanent and fixed-period exclusions in England
+    ...    Pupil exclusion statistics: methodology
+    ...    %{PUBLIC_URL}/methodology/permanent-and-fixed-period-exclusions-in-england
+    user opens details dropdown    Pupil absence
     user checks page contains methodology link
-    ...  Pupil absence
-    ...  Pupil absence in schools in England
-    ...  Pupil absence statistics: methodology
-    ...  %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
+    ...    Pupil absence
+    ...    Pupil absence in schools in England
+    ...    Pupil absence statistics: methodology
+    ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
 
 Validate Related information section links exist
-    [Tags]  HappyPath
-    user checks page contains element   xpath://a[text()="Find statistics and data"]
-    user checks page contains element   xpath://a[text()="Education statistics: glossary"]
-
+    [Tags]    HappyPath
+    user checks page contains element    xpath://a[text()="Find statistics and data"]
+    user checks page contains element    xpath://a[text()="Education statistics: glossary"]
