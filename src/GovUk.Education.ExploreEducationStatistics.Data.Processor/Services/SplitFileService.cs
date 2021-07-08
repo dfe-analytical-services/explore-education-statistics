@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             DataImport dataImport,
             DataTable dataFileTable)
         {
-            var headerList = CsvUtil.GetColumnValues(dataFileTable.Columns);
+            var colValues = CsvUtil.GetColumnValues(dataFileTable.Columns);
             var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
-                CopyRows(table, batch.ToList(), headerList, dataImport.GeographicLevels);
+                CopyRows(table, batch.ToList(), colValues, dataImport.GeographicLevels);
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
@@ -233,13 +233,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private static void CopyRows(DataTable target,
             IEnumerable<DataRow> rows,
-            List<string> headerList,
+            List<string> colValues,
             HashSet<GeographicLevel> importGeographicLevels)
         {
             rows.ForEach(row =>
             {
                 var rowValues = CsvUtil.GetRowValues(row);
-                var geographicLevel = GetGeographicLevel(rowValues, headerList);
+                var geographicLevel = GetGeographicLevel(rowValues, colValues);
                 if (AllowRowImport(importGeographicLevels, geographicLevel))
                 {
                     target.Rows.Add(row.ItemArray);
