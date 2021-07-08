@@ -106,6 +106,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await IsPubliclyAccessible(methodology);
         }
 
+        // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
+        // where appropriate.  MethodologyParents always keep track of their owning Publication's title for
+        // optimisation purposes, but MethodologyParent.Slug is used for the actual Slug for all of its Methodology
+        // Versions.  It's therefore important to keep it up-to-date with changes to its owning Publication's Slug too, 
+        // but only if none of its Versions are yet publicly accessible.
+        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug)
+        {
+            var slugChanged = originalSlug != updatedSlug;
+            
+            // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
+            // that are owned by this Publication
+            var ownedMethodologyParents = _contentDbContext
+                .PublicationMethodologies
+                .Include(m => m.MethodologyParent)
+                .Where(m => m.PublicationId == publicationId && m.Owner)
+                .Select(m => m.MethodologyParent);
+
+            await ownedMethodologyParents.ForEachAsync(async methodologyParent =>
+            {
+                methodologyParent.OwningPublicationTitle = updatedTitle;
+
+                if (slugChanged && methodologyParent.Slug == originalSlug && !await IsPubliclyAccessible(methodologyParent))
+                {
+                    methodologyParent.Slug = updatedSlug;
+                }
+            });
+                        
+            _contentDbContext.MethodologyParents.UpdateRange(ownedMethodologyParents);
+            await _contentDbContext.SaveChangesAsync();
+        }
+        
+        private async Task<bool> IsPubliclyAccessible(MethodologyParent methodologyParent)
+        {
+            await _contentDbContext
+                .Entry(methodologyParent)
+                .Collection(mp => mp.Versions)
+                .LoadAsync();
+
+            foreach (var version in methodologyParent.Versions)
+            {
+                if (await IsPubliclyAccessible(version))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private async Task<bool> IsPubliclyAccessible(Methodology methodology)
         {
             if (!methodology.Approved)
