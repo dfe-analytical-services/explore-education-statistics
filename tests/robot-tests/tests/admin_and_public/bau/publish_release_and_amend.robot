@@ -226,22 +226,21 @@ Verify publish and update dates
 
 Verify release associated files
     [Tags]  HappyPath
-    
     user opens accordion section  Explore data and files
     ${downloads}=  user gets accordion section content element  Explore data and files
     user waits until page contains element  ${downloads}  60
-    
-    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)  60
+
+    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 4 Kb)  60
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)  60
     user checks element should contain  ${downloads}  All data used to create this release is published as open data and is available for download.
     user checks element should contain  ${downloads}  You can create your own tables from this data using our table tool, or view featured tables that we have built for you.
 
     user checks element should contain  ${downloads}  The open data files contain all data used in this release in a machine readable format.
     user checks element should contain  ${downloads}  Learn more about the data files used in this release using our data files guide.
-    
+
     user clicks element  xpath://*[@data-testid="Expand Details Section List of other files"]
     user waits until page contains link  Test ancillary file 1  60
-    download file  link:Test ancillary file 1  test_ancillary_file_1.txt 
+    download file  link:Test ancillary file 1  test_ancillary_file_1.txt
     downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
 Verify public metadata guidance document
@@ -578,15 +577,15 @@ Verify amendment files
     [Tags]  HappyPath
     user opens accordion section  Explore data and files
     ${downloads}=  user gets accordion section content element  Explore data and files
-    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 3 Kb)  30
-    
+    user checks element should contain  ${downloads}  Download all data and files for this release (zip, 4 Kb)  30
+
     user clicks element  xpath://*[@data-testid="Expand Details Section List of other files"]
     user waits until page contains link  Test ancillary file 1  60
-    download file  link:Test ancillary file 1  test_ancillary_file_1.txt 
+    download file  link:Test ancillary file 1  test_ancillary_file_1.txt
     downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
     user waits until page contains link  Test ancillary file 2  60
-    download file  link:Test ancillary file 2  test_ancillary_file_2.txt 
+    download file  link:Test ancillary file 2  test_ancillary_file_2.txt
     downloaded file should have first line  test_ancillary_file_2.txt   Test file 2
 
 Verify amendment public metadata guidance document
