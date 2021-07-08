@@ -19,7 +19,7 @@ Create test publication and release via API
 
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
     user verifies release summary  ${PUBLICATION_NAME}  Calendar Year  2000  UI test contact name  National Statistics
 
 Upload subject
@@ -51,9 +51,7 @@ Return to admin
 
 Select release from admin dashboard
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
     ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
@@ -69,7 +67,7 @@ Update public prerelease access list
     [Tags]  HappyPath
     user updates public prerelease access list  Updated test public access list
 
-Add meta guidance to ${PUBLICATION_NAME} subject
+Add meta guidance to subject
     [Tags]  HappyPath
     user clicks link  Data and files
     user clicks link  Metadata guidance
@@ -134,7 +132,7 @@ Check "Page not found" appears
 Go to admin release summary
     [Tags]  HappyPath
     user navigates to admin dashboard  Bau1
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
 
 Approve release for immediate publication but don't wait to finish
     [Tags]  HappyPath

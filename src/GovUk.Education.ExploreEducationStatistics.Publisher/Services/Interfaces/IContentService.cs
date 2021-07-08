@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task UpdateContent(PublishContext context, params Guid[] releaseIds);
 
-        Task UpdateMethodology(PublishContext context, Guid methodologyId);
-
         Task UpdatePublication(PublishContext context, Guid publicationId);
 
         Task UpdateTaxonomy(PublishContext context);

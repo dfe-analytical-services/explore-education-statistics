@@ -1,39 +1,17 @@
 import PublicationForm, {
-  PublicationFormValues,
+  FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
-import _methodologyService, {
-  BasicMethodology,
-} from '@admin/services/methodologyService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
-import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
+import React from 'react';
 
-jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/themeService');
 
-const methodologyService = _methodologyService as jest.Mocked<
-  typeof _methodologyService
->;
 const themeService = _themeService as jest.Mocked<typeof _themeService>;
 
 describe('PublicationForm', () => {
-  const testMethodologies: BasicMethodology[] = [
-    {
-      id: 'methodology-1',
-      title: 'Methodology 1',
-      slug: 'methodology-1',
-      status: 'Approved',
-    },
-    {
-      id: 'methodology-2',
-      title: 'Methodology 2',
-      slug: 'methodology-2',
-      status: 'Approved',
-    },
-  ];
-
   const testThemes: Theme[] = [
     {
       id: 'theme-1',
@@ -175,113 +153,7 @@ describe('PublicationForm', () => {
     });
   });
 
-  test('shows validation error when no selected methodology', async () => {
-    methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
-    render(<PublicationForm onSubmit={noop} />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Methodology 2 [Approved]', {
-          selector: 'option',
-        }),
-      ).toBeInTheDocument();
-    });
-
-    userEvent.selectOptions(
-      screen.getByLabelText('Select methodology'),
-      'methodology-2',
-    );
-    userEvent.selectOptions(screen.getByLabelText('Select methodology'), '');
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Choose a methodology', {
-          selector: '#publicationForm-methodologyId-error',
-        }),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('show validation errors when no external methodology link title', async () => {
-    render(<PublicationForm onSubmit={noop} />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByLabelText('Link to an externally hosted methodology'),
-      ).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByLabelText('Link to an externally hosted methodology'),
-    );
-
-    userEvent.click(screen.getByLabelText('Link title'));
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Enter an external methodology link title', {
-          selector: '#publicationForm-externalMethodology-title-error',
-        }),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('show validation error when no external methodology URL', async () => {
-    render(<PublicationForm onSubmit={noop} />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByLabelText('Link to an externally hosted methodology'),
-      ).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByLabelText('Link to an externally hosted methodology'),
-    );
-
-    await userEvent.clear(screen.getByLabelText('URL'));
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Enter an external methodology URL', {
-          selector: '#publicationForm-externalMethodology-url-error',
-        }),
-      ).toBeInTheDocument();
-    });
-  });
-
-  test('show validation error when invalid external methodology URL', async () => {
-    render(<PublicationForm onSubmit={noop} />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByLabelText('Link to an externally hosted methodology'),
-      ).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByLabelText('Link to an externally hosted methodology'),
-    );
-
-    await userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Enter a valid external methodology URL', {
-          selector: '#publicationForm-externalMethodology-url-error',
-        }),
-      ).toBeInTheDocument();
-    });
-  });
-
   test('cannot submit with invalid values', async () => {
-    methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
     const handleSubmit = jest.fn();
 
     render(<PublicationForm onSubmit={handleSubmit} />);
@@ -301,82 +173,18 @@ describe('PublicationForm', () => {
     });
   });
 
-  test(
-    'cannot submit if the previously selected methodology is set back ' +
-      'to Draft and another methodology is not selected instead',
-    async () => {
-      methodologyService.getMethodologies.mockResolvedValue([
-        testMethodologies[0],
-      ]);
-
-      const handleSubmit = jest.fn();
-
-      render(
-        <PublicationForm
-          initialValues={{
-            title: 'Test title',
-            methodologyId: 'methodology-2',
-            teamName: 'Test team',
-            teamEmail: 'team@test.com',
-            contactTelNo: '0123456789',
-            contactName: 'John Smith',
-          }}
-          onSubmit={handleSubmit}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Methodology 1 [Approved]', {
-            selector: 'option',
-          }),
-        ).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: 'Save publication' }),
-        ).toBeInTheDocument();
-      });
-
-      userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
-
-      await waitFor(() => {
-        expect(handleSubmit).not.toHaveBeenCalled();
-      });
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a methodology', {
-            selector: '#publicationForm-methodologyId-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    },
-  );
-
   test('can submit with valid values', async () => {
-    methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
     const handleSubmit = jest.fn();
 
     render(<PublicationForm onSubmit={handleSubmit} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Methodology 2 [Approved]', {
-          selector: 'option',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
     await userEvent.type(
       screen.getByLabelText('Publication title'),
       'Test title',
-    );
-    userEvent.selectOptions(
-      screen.getByLabelText('Select methodology'),
-      'methodology-2',
     );
 
     await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
@@ -397,165 +205,23 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
         title: 'Test title',
-        methodologyId: 'methodology-2',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactName: 'John Smith',
         contactTelNo: '0123456789',
-      } as PublicationFormValues);
+      } as FormValues);
     });
   });
 
   describe('with `initialValues`', () => {
-    test('renders correctly with selected methodology', async () => {
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
-      render(
-        <PublicationForm
-          initialValues={{
-            title: 'Test title',
-            methodologyId: 'methodology-2',
-            teamName: 'Test team',
-            teamEmail: 'team@test.com',
-            contactTelNo: '0123456789',
-            contactName: 'John Smith',
-          }}
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Publication title')).toHaveValue(
-          'Test title',
-        );
-        expect(
-          screen.getByLabelText('Choose an existing methodology'),
-        ).toBeChecked();
-        expect(screen.getByLabelText('Select methodology')).toHaveValue(
-          'methodology-2',
-        );
-        expect(screen.getByLabelText('Team name')).toHaveValue('Test team');
-        expect(screen.getByLabelText('Team email address')).toHaveValue(
-          'team@test.com',
-        );
-        expect(screen.getByLabelText('Contact name')).toHaveValue('John Smith');
-        expect(screen.getByLabelText('Contact telephone number')).toHaveValue(
-          '0123456789',
-        );
-      });
-    });
-
-    test('renders correctly with external methodology', async () => {
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
-      render(
-        <PublicationForm
-          initialValues={{
-            title: 'Test title',
-            externalMethodology: {
-              title: 'Test external methodology',
-              url: 'http://test.com',
-            },
-            teamName: 'Test team',
-            teamEmail: 'team@test.com',
-            contactTelNo: '0123456789',
-            contactName: 'John Smith',
-          }}
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByLabelText('Link to an externally hosted methodology'),
-        ).toBeChecked();
-
-        expect(screen.getByLabelText('Link title')).toHaveValue(
-          'Test external methodology',
-        );
-        expect(screen.getByLabelText('URL')).toHaveValue('http://test.com');
-        expect(screen.getByLabelText('Select methodology')).toHaveValue('');
-      });
-    });
-
-    test('renders correctly with no methodology', async () => {
-      themeService.getThemes.mockResolvedValue(testThemes);
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
-
-      render(
-        <PublicationForm
-          initialValues={{
-            title: 'Test title',
-            teamName: 'Test team',
-            teamEmail: 'team@test.com',
-            contactTelNo: '0123456789',
-            contactName: 'John Smith',
-          }}
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('No methodology')).toBeChecked();
-
-        expect(screen.getByLabelText('Link title')).toHaveValue('');
-        expect(screen.getByLabelText('URL')).toHaveValue('');
-        expect(screen.getByLabelText('Select methodology')).toHaveValue('');
-      });
-    });
-
-    test('renders correctly when existing linked methodology has been set back to Draft', async () => {
-      methodologyService.getMethodologies.mockResolvedValue([
-        testMethodologies[0],
-        {
-          ...testMethodologies[1],
-          status: 'Draft',
-        },
-      ]);
-
-      render(
-        <PublicationForm
-          initialValues={{
-            title: 'Test title',
-            methodologyId: 'methodology-2',
-            teamName: 'Test team',
-            teamEmail: 'team@test.com',
-            contactTelNo: '0123456789',
-            contactName: 'John Smith',
-          }}
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Publication title')).toHaveValue(
-          'Test title',
-        );
-        expect(
-          screen.getByLabelText('Choose an existing methodology'),
-        ).toBeChecked();
-        expect(screen.getByLabelText('Select methodology')).toHaveValue('');
-        expect(screen.getByLabelText('Team name')).toHaveValue('Test team');
-        expect(screen.getByLabelText('Team email address')).toHaveValue(
-          'team@test.com',
-        );
-        expect(screen.getByLabelText('Contact name')).toHaveValue('John Smith');
-        expect(screen.getByLabelText('Contact telephone number')).toHaveValue(
-          '0123456789',
-        );
-      });
-    });
-
     test('renders correctly with selected theme and topic', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
 
       render(
         <PublicationForm
           initialValues={{
             title: 'Test title',
             topicId: 'topic-4',
-            methodologyId: 'methodology-2',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
             contactTelNo: '0123456789',
@@ -596,12 +262,10 @@ describe('PublicationForm', () => {
 
     test('can successfully submit without any changes', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
 
-      const initialValues: PublicationFormValues = {
+      const initialValues: FormValues = {
         title: 'Test title',
         topicId: 'topic-4',
-        methodologyId: 'methodology-2',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactTelNo: '0123456789',
@@ -634,12 +298,10 @@ describe('PublicationForm', () => {
 
     test('can successfully submit with updated topic', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
 
-      const initialValues: PublicationFormValues = {
+      const initialValues: FormValues = {
         title: 'Test title',
         topicId: 'topic-4',
-        methodologyId: 'methodology-2',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactTelNo: '0123456789',
@@ -680,12 +342,10 @@ describe('PublicationForm', () => {
 
     test('shows a confirmation modal on submit if the confirmOnSubmit flag is set', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
 
-      const initialValues: PublicationFormValues = {
+      const initialValues: FormValues = {
         title: 'Test title',
         topicId: 'topic-4',
-        methodologyId: 'methodology-2',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactTelNo: '0123456789',

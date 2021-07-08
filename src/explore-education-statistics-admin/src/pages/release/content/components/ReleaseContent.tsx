@@ -166,26 +166,28 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              <li>
-                {release.publication.methodology &&
-                  (editingMode === 'edit' ? (
-                    <a>{release.publication.methodology.title}</a>
+              {release.publication.methodologies.map(methodology => (
+                <li key={methodology.id}>
+                  {editingMode === 'edit' ? (
+                    <a>{methodology.title}</a>
                   ) : (
-                    <Link
-                      to={`/methodologies/${release.publication.methodology.id}`}
-                    >
-                      {release.publication.methodology.title}
+                    <Link to={`/methodology/${methodology.id}/summary`}>
+                      {methodology.title}
                     </Link>
-                  ))}
-                {release.publication.externalMethodology &&
-                  (editingMode === 'edit' ? (
+                  )}
+                </li>
+              ))}
+              {release.publication.externalMethodology && (
+                <li>
+                  {editingMode === 'edit' ? (
                     <a>{release.publication.externalMethodology.title}</a>
                   ) : (
                     <Link to={release.publication.externalMethodology.url}>
                       {release.publication.externalMethodology.title}
                     </Link>
-                  ))}
-              </li>
+                  )}
+                </li>
+              )}
               {release.hasMetaGuidance && (
                 <li>
                   <Link

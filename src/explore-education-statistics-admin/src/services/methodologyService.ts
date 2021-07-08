@@ -1,44 +1,42 @@
 import client from '@admin/services/utils/service';
-import { IdTitlePair } from 'src/services/types/common';
 
-export interface MethodologyStatusListItem {
-  id: string;
+export type UpdateMethodology = {
   title: string;
-  status: string;
-  publications: {
-    id: string;
-    title: string;
-  }[];
-}
-
-interface SaveMethodologySummary {
-  title: string;
-}
-
-export type CreateMethodology = SaveMethodologySummary;
-export type UpdateMethodology = SaveMethodologySummary;
+};
 
 export type MethodologyStatus = 'Draft' | 'Approved';
 
-export interface BasicMethodology {
+interface MethodologyPublication {
   id: string;
+  title: string;
+  releaseId: string;
+}
+
+export interface BasicMethodology {
+  amendment: boolean;
+  id: string;
+  internalReleaseNote?: string;
+  live: boolean;
+  previousVersionId?: string;
   title: string;
   slug: string;
   status: MethodologyStatus;
   published?: string;
+  publication?: MethodologyPublication;
+  otherPublications?: MethodologyPublication[];
+}
+
+export interface MyMethodology extends BasicMethodology {
+  permissions: {
+    canUpdateMethodology: boolean;
+    canCancelMethodologyAmendment: boolean;
+    canMakeAmendmentOfMethodology: boolean;
+  };
 }
 
 const methodologyService = {
-  getMethodologies(): Promise<BasicMethodology[]> {
-    return client.get<BasicMethodology[]>('/methodologies');
-  },
-
-  getMyMethodologies(): Promise<MethodologyStatusListItem[]> {
-    return client.get<MethodologyStatusListItem[]>('/me/methodologies');
-  },
-
-  createMethodology(data: CreateMethodology): Promise<IdTitlePair> {
-    return client.post(`/methodologies/`, data);
+  createMethodology(publicationId: string): Promise<BasicMethodology> {
+    return client.post(`/publication/${publicationId}/methodology`);
   },
 
   updateMethodology(
@@ -52,6 +50,14 @@ const methodologyService = {
     return client.get<BasicMethodology>(
       `/methodology/${methodologyId}/summary`,
     );
+  },
+
+  createMethodologyAmendment(methodologyId: string): Promise<BasicMethodology> {
+    return client.post(`/methodology/${methodologyId}/amendment`);
+  },
+
+  deleteMethodology(methodologyId: string): Promise<void> {
+    return client.delete(`/methodology/${methodologyId}`);
   },
 };
 

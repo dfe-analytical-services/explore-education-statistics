@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -6,11 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -19,23 +22,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
-        private readonly IMapper _mapper;
-        private readonly IReleaseFileService _releaseFileService;
-        private readonly IContentService _contentService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IMapper _mapper;
+        private readonly IContentService _contentService;
+        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
 
-        public ManageContentPageService(
+        public ManageContentPageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            IReleaseFileService releaseFileService,
             IContentService contentService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IMethodologyRepository methodologyRepository,
+            IReleaseFileService releaseFileService,
             IUserService userService)
         {
-            _mapper = mapper;
-            _releaseFileService = releaseFileService;
-            _contentService = contentService;
             _persistenceHelper = persistenceHelper;
+            _mapper = mapper;
+            _contentService = contentService;
+            _methodologyRepository = methodologyRepository;
+            _releaseFileService = releaseFileService;
             _userService = userService;
         }
 
@@ -45,23 +50,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
-                    .OnSuccess(blocks => _releaseFileService.ListAll(
-                            releaseId,
-                            Ancillary,
-                            FileType.Data)
-                        .OnSuccess(files =>
-                        {
-                            var releaseViewModel =
-                                _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
-                            releaseViewModel.DownloadFiles = files.ToList();
+                .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId))
+                .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
+                    releaseId,
+                    Ancillary,
+                    FileType.Data))
+                .OnSuccess(async releaseBlocksAndFiles =>
+                {
+                    var (release, blocks, files) = releaseBlocksAndFiles;
 
-                            return new ManageContentPageViewModel
-                            {
-                                Release = releaseViewModel,
-                                AvailableDataBlocks = blocks
-                            };
-                        })));
+                    var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+
+                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
+                    releaseViewModel.DownloadFiles = files.ToList();
+                    releaseViewModel.Publication.Methodologies =
+                        _mapper.Map<List<MethodologyTitleViewModel>>(methodologies);
+
+                    return new ManageContentPageViewModel
+                    {
+                        Release = releaseViewModel,
+                        AvailableDataBlocks = blocks
+                    };
+                });
         }
 
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
@@ -73,8 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ThenInclude(publication => publication.Releases)
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Methodology)
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Topic.Theme)
                 .Include(r => r.Type)

@@ -67,7 +67,7 @@ Validate "About these statistics" -- "Last updated"
 
 Validate "Useful information"
     [Tags]  HappyPath
-    user checks page contains link with text and url  Methodology   /methodology/pupil-absence-in-schools-in-england
+    user checks page contains link with text and url  Pupil absence statistics: methodology   /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
     [Documentation]  DFE-958   DFE-562

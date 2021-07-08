@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Resource    ../../libs/tables.robot
+Resource    ../../libs/tables-common.robot
 Library     ../../libs/admin_api.py
 Library     Collections
 
@@ -47,7 +47,7 @@ user chooses location, time period and filters
     user clicks element   id:filtersForm-submit
 
 user validates table rows
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_LONG}
     user waits until element contains  testid:dataTableCaption
     ...  Table showing Admission Numbers for 'UI test subject' in Nailsea Youngwood and Syon between 2005 and 2017
 
@@ -87,7 +87,7 @@ Create test publication and release via API
 
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
     user waits until h2 is visible  Release summary
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}

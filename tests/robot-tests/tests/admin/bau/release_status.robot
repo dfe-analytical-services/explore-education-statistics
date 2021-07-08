@@ -36,7 +36,7 @@ Create new publication and release via API
 
 Go to release sign off page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
     user clicks link  Sign off
     user waits until h2 is visible  Sign off  60
 
@@ -135,7 +135,7 @@ Verify release status is Approved
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  1 December 3000
     user checks summary list contains  Next release expected  March 3002
-    user waits for release process status to be  Scheduled  180
+    user waits for release process status to be  Scheduled  %{WAIT_LONG}
 
 Move release status back to Draft
     [Tags]  HappyPath

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -26,6 +27,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces.IReleaseService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -44,6 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddApplicationInsightsTelemetry();
             services.AddMvc(options => { options.EnableEndpointRouting = false; })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
@@ -95,6 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
+            services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
+            services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IReleaseService, Content.Api.Services.ReleaseService>();
 
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);

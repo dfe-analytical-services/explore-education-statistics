@@ -108,7 +108,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
 
                     {query && response && (
                       <ReleasePreviewTableToolFinalStep
-                        publication={publication}
+                        publication={publication as BasicPublicationDetails}
                         table={response.table}
                         tableHeaders={response.tableHeaders}
                       />

@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
-        public MethodologyTitleViewModel Methodology { get; set; }
+        public List<MethodologyTitleViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
 
@@ -36,8 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required] public string Title { get; set; }
 
         [Required] public Guid TopicId { get; set; }
-
-        public Guid? MethodologyId { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
 

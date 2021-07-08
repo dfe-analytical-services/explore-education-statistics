@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -12,17 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class MethodologyController : ControllerBase
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IMethodologyService _methodologyService;
 
-        public MethodologyController(IFileStorageService fileStorageService)
+        public MethodologyController(IMethodologyService methodologyService)
         {
-            _fileStorageService = fileStorageService;
+            _methodologyService = methodologyService;
         }
 
         [HttpGet("methodologies/{slug}")]
-        public async Task<ActionResult<MethodologyViewModel>> Get(string slug)
+        public async Task<ActionResult<MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
-            return await _fileStorageService.GetDeserialized<MethodologyViewModel>(PublicContentMethodologyPath(slug))
+            return await _methodologyService.GetLatestMethodologyBySlug(slug)
                 .HandleFailuresOrOk();
         }
     }

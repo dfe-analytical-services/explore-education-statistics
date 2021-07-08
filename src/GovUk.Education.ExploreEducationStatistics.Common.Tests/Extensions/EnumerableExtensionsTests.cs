@@ -83,20 +83,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             var results = list.SelectNullSafe(value => value * 2).ToList();
             Assert.Equal(new List<int> {2, 4, 6}, results);            
         }
-        
+
         [Fact]
         public void SelectNullSafe_Null()
         {
             var results = ((List<int>) null).SelectNullSafe(value => value * 2).ToList();
             Assert.Equal(new List<int>(), results);            
         }
-        
+
+        [Fact]
+        public void IsNullOrEmpty_Null()
+        {
+            Assert.True(((List<string>) null).IsNullOrEmpty());
+        }
+
+        [Fact]
+        public void IsNullOrEmpty_Empty()
+        {
+            Assert.True(new List<string>().IsNullOrEmpty());
+        }
+
+        [Fact]
+        public void IsNullOrEmpty_NeitherNullNorEmpty()
+        {
+            var list = new List<string> { "foo", "bar" };
+            Assert.False(list.IsNullOrEmpty());
+        }
+
         private static async Task<int> GetIntTask(int value)
         {
             await Task.Delay(5);
             return value;
         }
-        
+
         private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)
         {
             await Task.Delay(5);

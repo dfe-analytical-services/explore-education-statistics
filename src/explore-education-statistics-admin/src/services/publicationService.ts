@@ -2,7 +2,10 @@ import {
   LegacyRelease,
   UpdateLegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import { BasicMethodology } from '@admin/services/methodologyService';
+import {
+  BasicMethodology,
+  MyMethodology,
+} from '@admin/services/methodologyService';
 import { MyRelease } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
@@ -31,13 +34,15 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  methodology?: IdTitlePair;
+  methodologies: MyMethodology[];
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact?: PublicationContactDetails;
   permissions: {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
+    canCreateMethodologies: boolean;
+    canManageExternalMethodology: boolean;
   };
 }
 
@@ -46,7 +51,7 @@ export interface BasicPublicationDetails {
   title: string;
   slug: string;
   contact?: PublicationContactDetails;
-  methodology?: BasicMethodology;
+  methodologies?: BasicMethodology[];
   externalMethodology?: ExternalMethodology;
   legacyReleases: LegacyRelease[];
   themeId: string;

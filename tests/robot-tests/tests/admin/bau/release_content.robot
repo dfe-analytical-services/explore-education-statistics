@@ -20,7 +20,7 @@ Create test publication and release via API
 
 Navigate to 'Content' page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
     user clicks link   Content
     user waits until h1 is visible  ${PUBLICATION_NAME}
     user waits until h2 is visible  ${PUBLICATION_NAME}

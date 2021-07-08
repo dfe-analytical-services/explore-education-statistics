@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using Microsoft.Azure.Management.DataFactory.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
@@ -25,14 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
 
             CreateMap<LegacyRelease, LegacyReleaseViewModel>();
-
-            CreateMap<Methodology, MethodologySummaryViewModel>();
-
-            CreateMap<Methodology, MethodologyViewModel>()
-                .ForMember(dest => dest.Content,
-                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
-                .ForMember(dest => dest.Annexes,
-                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
 
             CreateMap<Publication, PublicationTitleViewModel>();
 

@@ -288,12 +288,13 @@ export const testPublicationRelease: Release = {
       contactName: 'A person',
       contactTelNo: '012345',
     },
-    methodology: {
-      id: 'm1',
-      slug: 'm1',
-      summary: 'words',
-      title: 'methodology title',
-    },
+    methodologies: [
+      {
+        id: 'm1',
+        title: 'methodology title',
+        slug: 'm1',
+      },
+    ],
   },
   latestRelease: true,
   relatedInformation: [],

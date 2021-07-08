@@ -7,11 +7,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 {
     public class MethodologyUpdateRequest
     {
-        public string InternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; }
 
         [Required] public string Title { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyPublishingStrategy PublishingStrategy { get; set; }
     }
 }

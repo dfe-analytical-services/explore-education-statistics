@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -32,7 +30,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using IdentityServer4.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -198,6 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
             services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
+            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver, MyMethodologyPermissionSetPropertyResolver>();
 
             services.AddMvc(options =>
                 {
@@ -255,6 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();

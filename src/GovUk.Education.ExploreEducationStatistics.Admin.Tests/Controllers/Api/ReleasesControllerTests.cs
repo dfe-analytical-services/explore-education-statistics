@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.CreateReleaseAsync(new ReleaseCreateViewModel(), _publicationId);
-            AssertOkResult(result);
+            result.AssertOkResult();
         }
 
         [Fact]
@@ -67,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
-            var dataFileInfoResult = AssertOkResult(result);
+            var dataFileInfoResult = result.AssertOkResult();
             Assert.Equal("Subject name", dataFileInfoResult.Name);
         }
 
@@ -125,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.GetDataFileInfo(_releaseId);
-            var unboxed = AssertOkResult(result);
+            var unboxed = result.AssertOkResult();
             Assert.Contains(unboxed, f => f.Name == "Release a file 1");
             Assert.Contains(unboxed, f => f.Name == "Release a file 2");
         }
@@ -176,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Method under test
             var result = await controller.UpdateRelease(new ReleaseUpdateViewModel(), _releaseId);
-            var unboxed = AssertOkResult(result);
+            var unboxed = result.AssertOkResult();
             Assert.Equal(_releaseId, unboxed.Id);
         }
 
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Method under test
             var result = await controller.GetTemplateReleaseAsync(_releaseId);
-            AssertOkResult(result);
+            result.AssertOkResult();
         }
 
         [Fact]
@@ -247,12 +248,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             fileMock.Setup(_ => _.FileName).Returns(fileName);
             fileMock.Setup(_ => _.Length).Returns(ms.Length);
             return fileMock.Object;
-        }
-
-        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<T>(result.Value);
-            return result.Value;
         }
 
         private static (

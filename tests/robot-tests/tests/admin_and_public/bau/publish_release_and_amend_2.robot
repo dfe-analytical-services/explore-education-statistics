@@ -13,25 +13,22 @@ ${PUBLICATION_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}  Seven filters
 ${SECOND_SUBJECT}  upload file test
 ${THIRD_SUBJECT}  upload file test with filter subject
-${METHODOLOGY_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
-${METHODOLOGY_TITLE}  ${METHODOLOGY_NAME} - Title
 
 *** Test Cases ***
-Navigate to manage methodoligies page
+Create publication
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}/methodologies
-    user waits until h1 is visible  Manage methodologies
+    user navigates to admin dashboard
+    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
+    user clicks link  Create new publication
+    user waits until h1 is visible  Create new publication
+    user creates publication  ${PUBLICATION_NAME}
 
 Create new methodology
     [Tags]  HappyPath
-    user clicks link  Create new methodology
-    user waits until h1 is visible  Create new methodology
-    user enters text into element  id:createMethodologyForm-title  ${METHODOLOGY_NAME}
-    user clicks button  Create methodology
+    user creates methodology for publication    ${PUBLICATION_NAME}
 
 Add methodology content
     [Tags]  HappyPath
-    user waits until h1 is visible  ${METHODOLOGY_NAME}
     user clicks link  Manage content
     user clicks button  Add new section
     user clicks button  New section
@@ -44,7 +41,7 @@ Add methodology content
     user clicks button  Save
     user clicks link  Go to top
     user clicks button  Edit section title
-    user enters text into element  xpath=//*[@name="heading"]  ${METHODOLOGY_NAME}
+    user enters text into element  xpath=//*[@name="heading"]  ${PUBLICATION_NAME}
     user clicks button  Save section title
 
 Approve methodology
@@ -58,28 +55,10 @@ Approve methodology
 Check methodology is approved
     [Tags]  HappyPath
     user waits until page contains element  xpath://strong[text()="Approved"]
-    user checks page contains element       xpath://strong[text()="Approved"]
-
-Create publication
-    [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user clicks link  Create new publication
-    user waits until h1 is visible  Create new publication
-    user waits until page contains element  id:publicationForm-title
-    user enters text into element  id:publicationForm-title   ${PUBLICATION_NAME}
-    user selects from list by label  id:publicationForm-methodologyId  ${METHODOLOGY_NAME} [Approved]
-    user enters text into element  id:publicationForm-teamName        Attainment statistics team
-    user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
-    user enters text into element  id:publicationForm-contactName     Tingting Shu
-    user enters text into element  id:publicationForm-contactTelNo    0123456789
-    user clicks button   Save publication
-    user waits until h1 is visible  Dashboard
 
 Create new release
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020
     user clicks link  Data and files
@@ -90,7 +69,7 @@ Upload another subject (for deletion later)
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user uploads subject   ${SECOND_SUBJECT}  upload-file-test.csv  upload-file-test.meta.csv
 
-Add meta guidance to ${SUBJECT_NAME} subject
+Add meta guidance to subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document  90
@@ -113,7 +92,7 @@ Navigate to 'Footnotes' page
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
-Add footnote to ${SECOND_SUBJECT}
+Add footnote to second Subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -124,7 +103,7 @@ Add footnote to ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add second footnote to ${SECOND_SUBJECT}
+Add second footnote to second Subject
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
@@ -136,7 +115,7 @@ Add second footnote to ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add footnote to ${SUBJECT_NAME} subject
+Add footnote to subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -147,7 +126,7 @@ Add footnote to ${SUBJECT_NAME} subject
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add second footnote to ${SUBJECT_NAME} subject
+Add second footnote to subject
     [Tags]  HappyPath
     user waits until page contains link   Create footnote
     user clicks link  Create footnote
@@ -186,7 +165,7 @@ Select "Test Topic" publication
     user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
-Select "${SUBJECT_NAME}" subject
+Select subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
@@ -332,9 +311,7 @@ Return to Admin
 
 Change methodology status to Draft
     [Tags]  HappyPath
-    user clicks link  manage methodologies
-    user clicks element  id:approved-methodologies-tab
-    user clicks link  ${METHODOLOGY_NAME}
+    user views methodology for publication   ${PUBLICATION_NAME}
     user clicks link  Sign off
     user clicks button  Edit status
     user clicks element  id:methodologyStatusForm-status-Draft
@@ -343,7 +320,8 @@ Change methodology status to Draft
 Edit methodology content
     [Tags]  HappyPath
     user clicks link  Manage content
-    user clicks button  ${METHODOLOGY_NAME}
+    user clicks button  ${PUBLICATION_NAME}
+
     user scrolls to element  xpath://button[text()="Add text block"]
     user waits until button is enabled  Add text block
     user clicks button  Add text block
@@ -351,7 +329,7 @@ Edit methodology content
     user presses keys  New & Updated content -
     user clicks button  Save
     user clicks button  Edit section title
-    user enters text into element  xpath=//*[@name="heading"]  ${METHODOLOGY_NAME} New and Updated Title -
+    user enters text into element  xpath=//*[@name="heading"]  ${PUBLICATION_NAME} New and Updated Title -
     user clicks button  Save section title
 
 Change methodology status to Approved
@@ -378,7 +356,7 @@ Replace subject data
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains  Footnotes: ERROR  120
+    user waits until page contains  Footnotes: ERROR  %{WAIT_MEDIUM}
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
@@ -503,7 +481,7 @@ Add subject to release
     user clicks link  Data and files
     user uploads subject   ${THIRD_SUBJECT}  upload-file-test-with-filter.csv  upload-file-test-with-filter.meta.csv
 
-Add meta guidance to ${THIRD_SUBJECT} subject
+Add meta guidance to third subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}  meta content
@@ -545,7 +523,7 @@ Go to public Table Tool page for amendment
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables
 
-Select publication ${PUBLICATION_NAME}
+Select publication
     [Tags]  HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -555,7 +533,7 @@ Select publication ${PUBLICATION_NAME}
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select subject ${SUBJECT_NAME}
+Select subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit

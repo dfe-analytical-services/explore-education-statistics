@@ -50,7 +50,7 @@ const MethodologyContentPageInternal = () => {
               <h2
                 aria-hidden
                 className="govuk-heading-lg"
-                data-testid={`page-title ${methodology.title}`}
+                data-testid="page-title"
               >
                 {methodology.title}
               </h2>

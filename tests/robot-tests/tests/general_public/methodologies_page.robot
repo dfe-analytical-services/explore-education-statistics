@@ -17,14 +17,19 @@ Navigate to /methodology page
 Validate page contents
     [Tags]  HappyPath
     user waits until page contains accordion section    Pupils and schools
-
     user opens accordion section    Pupils and schools
-
     user opens details dropdown     Exclusions
-    user checks page contains methodology link  Exclusions   Permanent and fixed-period exclusions in England   /methodology/permanent-and-fixed-period-exclusions-in-england
-
+    user checks page contains methodology link
+    ...  Exclusions
+    ...  Permanent and fixed-period exclusions in England
+    ...  Pupil exclusion statistics: methodology
+    ...  %{PUBLIC_URL}/methodology/permanent-and-fixed-period-exclusions-in-england
     user opens details dropdown     Pupil absence
-    user checks page contains methodology link  Pupil absence  Pupil absence in schools in England   /methodology/pupil-absence-in-schools-in-england
+    user checks page contains methodology link
+    ...  Pupil absence
+    ...  Pupil absence in schools in England
+    ...  Pupil absence statistics: methodology
+    ...  %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
 
 Validate Related information section links exist
     [Tags]  HappyPath

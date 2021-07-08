@@ -2,15 +2,10 @@ using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class BootstrapUsersService
     {

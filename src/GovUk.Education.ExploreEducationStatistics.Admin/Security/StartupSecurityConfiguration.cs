@@ -47,8 +47,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
-                options.AddPolicy(SecurityPolicies.CanUpdatePublication.ToString(), policy =>
+                
+                // does this user have permission to update a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new UpdatePublicationRequirement()));
+                
+                // does this user have permission to create a methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
+
+                // does this user have permission to manage the external methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
 
                 /**
                  * Release management
@@ -62,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
                 // does this user have permission to view a specific Release?
-                options.AddPolicy(ContentSecurityPolicies.CanViewRelease.ToString(), policy =>
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
                 // does this user have permission to update a specific Release?
@@ -154,10 +164,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Methodology management
                  */
-                // does this user have permission to create a methodology?
-                options.AddPolicy(SecurityPolicies.CanCreateMethodologies.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.CreateAnyMethodology.ToString()));
-
                 options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllMethodologies.ToString()));
 
@@ -196,6 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, UpdatePublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();
 
             /**
              * Release management

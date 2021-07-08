@@ -46,8 +46,9 @@ const MethodologyPage = ({
   const currentRouteIndex =
     methodologyRoutes.findIndex(
       route =>
-        generatePath<MethodologyRouteParams>(route.path, { methodologyId }) ===
-        location.pathname,
+        generatePath<MethodologyRouteParams>(route.path, {
+          methodologyId,
+        }) === location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -79,13 +80,7 @@ const MethodologyPage = ({
     : undefined;
 
   return (
-    <Page
-      wide
-      breadcrumbs={[
-        { name: 'Manage methodologies', link: '/methodologies' },
-        { name: 'Edit methodology' },
-      ]}
-    >
+    <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
       <LoadingSpinner loading={isLoading}>
         {value ? (
           <>

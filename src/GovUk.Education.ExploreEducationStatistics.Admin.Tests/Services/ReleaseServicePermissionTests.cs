@@ -20,9 +20,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetRelease()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

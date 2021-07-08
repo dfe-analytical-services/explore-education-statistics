@@ -5,13 +5,13 @@ import { BasicPublicationContact } from '@common/services/publicationService';
 
 interface Props {
   contactDetails?: BasicPublicationContact;
-  methodologyLink?: ReactNode;
+  methodologyLinks?: ReactNode[];
   releaseLink?: ReactNode;
 }
 
 const TableToolInfo = ({
   contactDetails,
-  methodologyLink,
+  methodologyLinks,
   releaseLink,
 }: Props) => {
   return (
@@ -19,7 +19,10 @@ const TableToolInfo = ({
       <AccordionSection heading="Related information">
         <ul className="govuk-list">
           {releaseLink && <li>Publication: {releaseLink}</li>}
-          {methodologyLink && <li>Methodology: {methodologyLink}</li>}
+          {methodologyLinks?.map((methodologyLink, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={index}>{methodologyLink}</li>
+          ))}
         </ul>
       </AccordionSection>
       {contactDetails && (

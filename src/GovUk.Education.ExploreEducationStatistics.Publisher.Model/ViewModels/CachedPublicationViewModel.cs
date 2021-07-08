@@ -27,8 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ContactViewModel Contact { get; set; }
 
-        public MethodologySummaryViewModel Methodology { get; set; }
-
         public ExternalMethodologyViewModel ExternalMethodology { get; set; }
     }
 }

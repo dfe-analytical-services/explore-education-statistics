@@ -13,7 +13,7 @@ user signs in as bau1
 
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   180
+    user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']   %{WAIT_LONG}
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -32,7 +32,7 @@ user signs in as analyst1
 
     # @TODO: Luke - See if this test id is being stripped out of the DOM by React
     # no selector with this data-test id is present 
-    # user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']  180
+    # user waits until page contains element   css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']  %{WAIT_LONG}
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -64,19 +64,47 @@ user selects theme and topic from admin dashboard
     user waits until h2 is visible  ${theme}  60 
     user waits until h3 is visible  ${topic}  60
 
+user navigates to editable release summary from admin dashboard
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release summary from admin dashboard
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}
+    ...  ${TOPIC_NAME}
+    ...  Edit this release
+
+user navigates to readonly release summary from admin dashboard
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release summary from admin dashboard
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}
+    ...  ${TOPIC_NAME}
+    ...  View this release
+
 user navigates to release summary from admin dashboard
-    [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}  60
-    user opens accordion section  ${PUBLICATION_NAME}
+    [Arguments]
+    ...  ${PUBLICATION_NAME}
+    ...  ${DETAILS_HEADING}
+    ...  ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...  ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    ...  ${RELEASE_SUMMARY_LINK_TEXT}=Edit this release
+    user opens publication on the admin dashboard  ${PUBLICATION_NAME}  ${THEME_NAME}  ${TOPIC_NAME}
 
     ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
     user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
     ${details}=  user gets details content element   ${DETAILS_HEADING}  ${accordion}
 
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]  60
-    ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
-    user clicks element   ${edit_button}
+    ${summary_button}=  user waits until element contains link  ${details}  ${RELEASE_SUMMARY_LINK_TEXT}  60
+    user clicks element   ${summary_button}
 
     user waits until h2 is visible  Release summary  60
     user checks summary list contains   Publication title  ${PUBLICATION_NAME}
@@ -86,7 +114,6 @@ user creates publication
     user waits until h1 is visible  Create new publication  60
     user waits until page contains element  id:publicationForm-title  60
     user enters text into element  id:publicationForm-title   ${title}
-    user clicks radio     No methodology
     user enters text into element  id:publicationForm-teamName        Attainment statistics team
     user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
     user enters text into element  id:publicationForm-contactName     Tingting Shu
@@ -106,7 +133,78 @@ user creates release for publication
     user clicks button  Create new release
     user waits until page contains element  xpath://a[text()="Edit release summary"]  60
     user waits until h2 is visible  Release summary  60
+    
+user opens publication on the admin dashboard
+    [Arguments]  
+    ...  ${publication}    
+    ...  ${theme}=%{TEST_THEME_NAME}    
+    ...  ${topic}=%{TEST_TOPIC_NAME}
+    
+    user navigates to admin dashboard
+    user selects theme and topic from admin dashboard  ${theme}  ${topic}
+    user waits until page contains accordion section   ${publication}   %{WAIT_MEDIUM}
+    ${accordion}=  user opens accordion section  ${publication}
+    [Return]  ${accordion}
+        
+user creates methodology for publication
+    [Arguments]
+    ...  ${publication}
+    ...  ${theme}=%{TEST_THEME_NAME}
+    ...  ${topic}=%{TEST_TOPIC_NAME}
 
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}  ${theme}  ${topic}
+    user clicks button   Create methodology  ${accordion}
+    user waits until h2 is visible  Methodology summary
+    user checks summary list contains   Title   ${publication}
+    user checks summary list contains   Status  Draft
+    user checks summary list contains   Published on  Not yet published
+    
+user views methodology for publication
+    [Arguments]  ${publication}     ${methodology_title}=${publication}
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user views methodology for open publication accordion  ${accordion}  ${methodology_title}
+
+user views methodology for open publication accordion
+    [Arguments]  ${accordion}     ${methodology_title}
+    user opens details dropdown  ${methodology_title}  ${accordion}
+    user clicks link   Edit this methodology
+    user waits until h2 is visible  Methodology summary 
+    
+user links publication to external methodology
+    [Arguments]  
+    ...  ${publication}
+    ...  ${title}=${publication}
+    ...  ${link}=https://example.com
+    
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Link to an externally hosted methodology  ${accordion}
+    user waits until legend is visible   Link to an externally hosted methodology
+    user enters text into textfield  Link title   ${title}
+    user enters text into textfield  URL   ${link}
+    user clicks button  Save
+    
+user edits an external methodology
+    [Arguments]  
+    ...  ${publication}
+    ...  ${new_title}=${publication} updated
+    ...  ${new_link}=https://example.com/updated
+    ...  ${original_title}=${publication}
+    ...  ${original_link}=https://example.com
+    
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Edit  ${accordion}
+    user waits until legend is visible   Link to an externally hosted methodology
+    user checks textfield contains  Link title  ${original_title}
+    user checks textfield contains  URL  ${original_link}
+    user enters text into textfield  Link title   ${new_title}
+    user enters text into textfield  URL   ${new_link}
+    user clicks button  Save
+    
+user removes an external methodology from publication
+    [Arguments]  ${publication}
+    ${accordion}=  user opens publication on the admin dashboard   ${publication}
+    user clicks button   Remove  ${accordion}
+                
 user adds basic release content
     [Arguments]  ${publication}
     user clicks button  Add a summary text block
@@ -222,7 +320,7 @@ user clicks footnote radio
 
 user clicks footnote checkbox
     [Arguments]  ${label}    ${parent}=css:body
-    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user waits until parent contains element  ${parent}   xpath:.//*[@id="footnoteForm"]//label[text()="${label}"]/../input
     ${checkbox}=  get child element  ${parent}    xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
     page should contain checkbox  ${checkbox}
     user scrolls to element   ${checkbox}
@@ -231,7 +329,7 @@ user clicks footnote checkbox
 
 user checks footnote checkbox is selected
     [Arguments]  ${label}   ${parent}=css:body
-    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    user waits until parent contains element  ${parent}   xpath:.//*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
     ${checkbox}=  get child element   ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
     wait until element is enabled   ${checkbox}
     checkbox should be selected     ${checkbox}
@@ -320,9 +418,7 @@ user enters text into meta guidance data file content editor
 
 user creates amendment for release
     [Arguments]  ${PUBLICATION_NAME}  ${RELEASE_NAME}  ${RELEASE_STATUS}
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
+    user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
     user opens details dropdown   ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}
     ${details}=  user gets details content element  ${RELEASE_NAME} ${RELEASE_STATUS}  ${accordion}
@@ -341,6 +437,8 @@ user deletes subject file
     user clicks button  Confirm
 
 user approves release for immediate publication
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
     user clicks button  Edit release status
@@ -349,7 +447,7 @@ user approves release for immediate publication
     user enters text into element  id:releaseStatusForm-latestInternalReleaseNote  Approved by UI tests
     user clicks radio   Immediately
     user clicks button   Update status
-    user waits until h2 is visible  Sign off  120
+    user waits until h2 is visible  Sign off  %{WAIT_MEDIUM}
     user checks summary list contains  Current status  Approved
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
@@ -373,19 +471,32 @@ user uploads subject
     user waits until page contains accordion section   ${SUBJECT_NAME}  60
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks headed table body row contains  Status  Complete  ${section}  180
+    user checks headed table body row contains  Status  Complete  ${section}  %{WAIT_LONG}
+
+user puts release into higher level review
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
+    user waits until h2 is visible  Sign off
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status  60
+    user clicks radio   Ready for higher review
+    user enters text into element  id:releaseStatusForm-latestInternalReleaseNote     Ready for higher review
+    user clicks button  Update status
+    user waits until element is visible  id:CurrentReleaseStatus-Awaiting higher review
 
 user approves release for scheduled release
-    [Arguments]  ${DAYS_TILL_RELEASE}  ${RELEASE_MONTH}  ${RELEASE_YEAR}
-    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_TILL_RELEASE}
-    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_TILL_RELEASE}
+    [Arguments]  ${DAYS_UNTIL_RELEASE}  ${NEXT_RELEASE_MONTH}=01  ${NEXT_RELEASE_YEAR}=2200
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d  ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m   ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B  ${DAYS_UNTIL_RELEASE}
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y  ${DAYS_UNTIL_RELEASE}
     set suite variable  ${PUBLISH_DATE_DAY}
     set suite variable  ${PUBLISH_DATE_MONTH}
     set suite variable  ${PUBLISH_DATE_MONTH_WORD}
     set suite variable  ${PUBLISH_DATE_YEAR}
 
+    user clicks link  Sign off
+    user waits until page does not contain loading spinner
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
@@ -399,8 +510,8 @@ user approves release for scheduled release
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
     user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${RELEASE_MONTH}
-    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${RELEASE_YEAR}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-month   ${NEXT_RELEASE_MONTH}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
 
     user clicks button   Update status
     user waits until h1 is visible  Confirm publish date
@@ -428,34 +539,49 @@ user changes methodology status to Approved
     user clicks button  Update status
 
 user gives analyst publication owner access
-    [Arguments]  ${ANALYST_EMAIL}  ${PUBLICATION_NAME}
-    user clicks link  Manage  xpath://td[text()="${ANALYST_EMAIL}"]/..
-    user waits until page does not contain loading spinner
-
-    # stale element exception if you don't wait until it's enabled    
-    user waits until button is enabled  Add publication access
-    user scrolls to element  css:[name="selectedPublicationId"]
-    
-    user waits until element is enabled  css:[name="selectedPublicationId"]
+    [Arguments]  ${PUBLICATION_NAME}  ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    user goes to manage user  ${ANALYST_EMAIL}
     user selects from list by label  css:[name="selectedPublicationId"]  ${PUBLICATION_NAME}
-
     user waits until element is enabled  css:[name="selectedPublicationRole"]
     user selects from list by label  css:[name="selectedPublicationRole"]  Owner
     user clicks button  Add publication access
-
-user removes publication owner access from analyst 
-    [Arguments]  ${PUBLICATION_NAME}
-    user waits until element is enabled  css:[name="selectedPublicationId"]
-    user scrolls to element  css:[name="selectedPublicationId"]
-    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
 
-user gives analyst release access 
-    [Arguments]    ${RELEASE_NAME}  ${ROLE}
-    user waits until element is enabled  css:[name="selectedReleaseId"]
+user gives release access to analyst
+    [Arguments]    ${RELEASE_NAME}  ${ROLE}  ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    user goes to manage user  ${ANALYST_EMAIL}
     user scrolls to element  css:[name="selectedReleaseId"]
     user selects from list by label  css:[name="selectedReleaseId"]  ${RELEASE_NAME}
     user waits until element is enabled  css:[name="selectedReleaseRole"]
     user selects from list by label  css:[name="selectedReleaseRole"]  ${ROLE}
     user clicks button  Add release access
     user waits until page does not contain loading spinner
+
+user removes publication owner access from analyst 
+    [Arguments]  ${PUBLICATION_NAME}  ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    user goes to manage user  ${ANALYST_EMAIL}
+    user scrolls to element  css:[name="selectedPublicationId"]
+    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
+    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
+    Sleep  1
+    user clicks element  testid:remove-publication-role-${PUBLICATION_NAME}
+    user waits until page does not contain loading spinner
+    
+user removes release access from analyst
+    [Arguments]    ${RELEASE_NAME}  ${ROLE}  ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    user goes to manage user  ${ANALYST_EMAIL}
+    user scrolls to element  css:[name="selectedReleaseId"]
+    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
+    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
+    Sleep  1
+    user clicks element  testid:remove-release-role-${ROLE}
+    user waits until page does not contain loading spinner
+
+user goes to manage user
+    [Arguments]  ${EMAIL_ADDRESS}
+    user goes to url  %{ADMIN_URL}/administration/users
+    user clicks link  Manage  xpath://td[text()="${EMAIL_ADDRESS}"]/..
+    user waits until page does not contain loading spinner
+    # stale element exception if you don't wait until it's enabled
+    user waits until element is enabled  css:[name="selectedPublicationId"]
+    user waits until element is enabled  css:[name="selectedReleaseId"]

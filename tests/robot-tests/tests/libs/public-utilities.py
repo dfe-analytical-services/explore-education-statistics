@@ -61,7 +61,20 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
 
 
 # Methodology
-def user_checks_page_contains_methodology_link(topic, methodology, link_url):
+def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url):
+    link = get_methodology_link(topic, publication, methodology)
+
+    if link.get_attribute('href') != link_url:
+        raise_assertion_error(
+            f'Methodology link with title "{methodology}" should be linking to "{link_url}", but is '
+            f'linking to "{link.get_attribute("href")}" instead!')
+
+
+def user_clicks_methodology_link(topic, publication, methodology):
+    get_methodology_link(topic, publication, methodology).click()
+
+
+def get_methodology_link(topic, publication, methodology):
     try:
         sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
     except:
@@ -69,35 +82,16 @@ def user_checks_page_contains_methodology_link(topic, methodology, link_url):
 
     try:
         sl.driver.find_element_by_xpath(
-            f'//summary/span[text()="{topic}"]/../..//h3[text()="{methodology}"]')
+            f'//summary/span[text()="{topic}"]/../..//h3[text()="{publication}"]')
     except:
-        raise_assertion_error(f'Topic "{topic}" doesn\'t contain methodology "{methodology}"!')
+        raise_assertion_error(f'Topic "{topic}" doesn\'t contain publication "{publication}"!')
 
     try:
-        sl.driver.find_element_by_xpath(
-            f'//h3[text()="{methodology}"]/..//a[text()="View methodology" and @href="{link_url}"]')
+        return sl.driver.find_element_by_xpath(
+            f'//h3[text()="{publication}"]/..//a[text()="{methodology}"]')
     except:
         raise_assertion_error(
-            f'View methodology link for "{methodology}" should be linking to "{link_url}"!')
-
-
-def user_clicks_methodology_link(topic, methodology):
-    try:
-        elem = sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
-    except:
-        raise_assertion_error(f'Cannot find theme "{topic}" on page')
-
-    try:
-        elem.find_element_by_xpath(f'./../..//h3[text()="{methodology}"]')
-    except:
-        raise_assertion_error(f'Topic "{topic}" doesn\'t contain methodology "{methodology}"!')
-
-    try:
-        elem.find_element_by_xpath(
-            f'./../..//h3[text()="{methodology}"]/..//a[text()="View methodology"]').click()
-    except:
-        raise_assertion_error(f'Cannot click "View methodology" link for "{methodology}"!')
-
+            f'Could not find methodology link with title "{methodology}""!')
 
 # Table tool
 def user_checks_generated_permalink_is_valid():

@@ -9,6 +9,8 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
@@ -155,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
                 await contentDbContext.Topics.AddAsync(topic);
@@ -165,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
@@ -187,6 +189,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetPublicationsForTopicRelatedToUser_MethodologiesReturned()
+        {
+            var user = new User();
+            var topic = new Topic();
+
+            var methodology1Version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft,
+            };
+            
+            var methodology2Version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 2 Version 1",
+                Version = 0,
+                Status = Approved,
+            };
+            
+            var methodology2Version2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 2 Version 2",
+                Version = 1,
+                Status = Approved,
+                PreviousVersionId = methodology2Version1.Id
+            };
+            
+            // Set up a publication and releases related to the topic that will be granted via a publication role
+            var userPublicationRoles = new List<UserPublicationRole>
+            {
+                new UserPublicationRole
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Related publication",
+                        Methodologies = new List<PublicationMethodology>
+                        {
+                            new PublicationMethodology
+                            {
+                                MethodologyParent = new MethodologyParent
+                                {
+                                    Versions = AsList(methodology1Version1)
+                                }
+                            },
+                            new PublicationMethodology
+                            {
+                                MethodologyParent = new MethodologyParent
+                                {
+                                    Versions = AsList(methodology2Version1, methodology2Version2)
+                                }
+                            }
+                        },
+                        Topic = topic
+                    },
+                    User = user,
+                    Role = Owner
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupPublicationRepository(contentDbContext);
+                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
+
+                var publication = Assert.Single(result);
+                Assert.NotNull(publication);
+                Assert.Equal(2, publication.Methodologies.Count);
+
+                var methodology1 = publication.Methodologies[0];
+                var methodology2 = publication.Methodologies[1];
+                
+                Assert.Equal(methodology1Version1.Id, methodology1.Id);
+                Assert.Equal(methodology2Version2.Id, methodology2.Id);
+            }
+        }
+        
         [Fact]
         public async Task GetPublicationsForTopicRelatedToUser_NoPublicationsForTopic()
         {
@@ -234,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
                 await contentDbContext.Topics.AddAsync(topic);
@@ -243,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
@@ -299,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
                 await contentDbContext.Topics.AddAsync(topic);
@@ -308,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
@@ -354,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
                 await contentDbContext.Topics.AddAsync(topic);
@@ -362,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
@@ -425,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
                 await contentDbContext.Topics.AddAsync(topic);
@@ -436,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
@@ -454,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var topicId = Guid.NewGuid();
             var contextId = Guid.NewGuid().ToString();
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(new Topic
                 {
@@ -517,7 +609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var publicationService = SetupPublicationRepository(context);
                 var publications = await publicationService.GetAllPublicationsForTopicAsync(topicId);
@@ -539,7 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var topicId = Guid.NewGuid();
             var contextId = Guid.NewGuid().ToString();
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(new Topic
                 {
@@ -574,7 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var publicationService = SetupPublicationRepository(context);
 

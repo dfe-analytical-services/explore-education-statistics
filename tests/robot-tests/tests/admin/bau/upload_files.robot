@@ -20,7 +20,7 @@ Create test publication and release via api
 
 Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
 
     user clicks link  Data and files
     user waits until h1 is visible  ${PUBLICATION_NAME}
@@ -48,7 +48,7 @@ Upload a ZIP file subject
     user checks headed table body row contains  Metadata file    absence_in_prus.meta.csv  ${section}
     user checks headed table body row contains  Data file size   141 Kb  ${section}
     user checks headed table body row contains  Number of rows   613  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Status           Complete  ${section}  %{WAIT_LONG}
 
 Check Absence in PRUs subject appears in 'Data blocks' page
     [Tags]  HappyPath

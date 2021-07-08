@@ -30,30 +30,34 @@ const ReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {publication.methodology || publication.externalMethodology ? (
-            <p>
-              Read our{' '}
-              {publication.methodology &&
-                (editingMode === 'edit' ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={`/methodologies/${publication.methodology.id}`}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}
-              {!publication.methodology &&
-                publication.externalMethodology &&
-                (editingMode === 'edit' ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={publication.externalMethodology.url}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}{' '}
-              guidance.
-            </p>
+          {publication.methodologies.length ||
+          publication.externalMethodology ? (
+            <>
+              {publication.methodologies.map(methodology => (
+                <p key={methodology.id} className="govuk-!-margin-bottom-9">
+                  {editingMode === 'edit' ? (
+                    <a>{`${methodology.title}`}</a>
+                  ) : (
+                    <Link to={`/methodology/${methodology.id}/summary`}>
+                      {methodology.title}
+                    </Link>
+                  )}
+                </p>
+              ))}
+              {publication.externalMethodology && (
+                <p className="govuk-!-margin-bottom-9">
+                  {editingMode === 'edit' ? (
+                    <a>{`${publication.externalMethodology.title}`}</a>
+                  ) : (
+                    <Link to={publication.externalMethodology.url}>
+                      {publication.externalMethodology.title}
+                    </Link>
+                  )}
+                </p>
+              )}
+            </>
           ) : (
-            <p>No methodology added.</p>
+            <p>No methodologies added.</p>
           )}
         </AccordionSection>
         {release.type && release.type.title === ReleaseType.NationalStatistics && (

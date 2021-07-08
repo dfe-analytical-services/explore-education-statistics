@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -12,54 +13,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     public class MethodologyControllerTests
     {
         [Fact]
-        public async Task Get()
+        public async Task GetLatestMethodologyBySlug()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var methodologyId = Guid.NewGuid();
 
-            fileStorageService.Setup(
-                    s =>
-                        s.GetDeserialized<MethodologyViewModel>("methodology/methodologies/test-slug.json"
-                    )
-                )
-                .ReturnsAsync(
-                    new MethodologyViewModel
-                    {
-                        Content = new List<ContentSectionViewModel>
-                        {
-                            new ContentSectionViewModel()
-                        },
-                        Annexes = new List<ContentSectionViewModel>
-                        {
-                            new ContentSectionViewModel()
-                        }
-                    }
-                );
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            var controller = new MethodologyController(fileStorageService.Object);
+            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
+                .ReturnsAsync(new MethodologyViewModel
+                {
+                    Id = methodologyId
+                });
 
-            var result = await controller.Get("test-slug");
+            var controller = new MethodologyController(methodologyService.Object);
+
+            var result = await controller.GetLatestMethodologyBySlug("test-slug");
             var methodologyViewModel = result.Value;
 
-            Assert.IsType<MethodologyViewModel>(methodologyViewModel);
+            Assert.Equal(methodologyId, methodologyViewModel.Id);
 
-            Assert.Single(methodologyViewModel.Content);
-            Assert.Single(methodologyViewModel.Annexes);
+            MockUtils.VerifyAllMocks(methodologyService);
         }
 
         [Fact]
-        public async Task Get_NotFound()
+        public async Task GetLatestMethodologyBySlug_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<MethodologyViewModel>(It.IsAny<string>()))
+            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new MethodologyController(fileStorageService.Object);
+            var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.Get("unknown-slug");
+            var result = await controller.GetLatestMethodologyBySlug("unknown-slug");
 
             Assert.IsType<NotFoundResult>(result.Result);
+
+            MockUtils.VerifyAllMocks(methodologyService);
         }
     }
 }

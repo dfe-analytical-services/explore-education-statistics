@@ -27,7 +27,7 @@ Create new publication and release via API
 
 Upload subject
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
+    user navigates to editable release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
     user clicks link  Data and files
     user uploads subject   ${SUBJECT_NAME}  dates.csv  dates.meta.csv
 
@@ -129,7 +129,7 @@ Select category filters (data block)
 Create table (data block)
     [Tags]  HappyPath
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_LONG}
 
 Check footnotes in table preview (data block)
     user checks page contains  ${FOOTNOTE_TEXT_1}
@@ -179,10 +179,9 @@ Edit footnote
 Check footnote was updated
     [Tags]  HappyPath
     user clicks link  Content
-    
-    user waits until page contains element  id:releaseHeadlines  120
+    user waits until page contains element  id:releaseHeadlines  %{WAIT_MEDIUM}
     user scrolls to element  id:releaseHeadlines
-    user waits until page contains link  Table  180
+    user waits until page contains link  Table  %{WAIT_LONG}
     user clicks link  Table
     user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
@@ -247,7 +246,7 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}  120
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  %{WAIT_MEDIUM}
     user opens accordion section  %{TEST_THEME_NAME}
     user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
@@ -319,7 +318,7 @@ Select category filters (table tool)
 Create table (table tool)
     [Tags]  HappyPath
     user clicks element   id:filtersForm-submit
-    user waits until results table appears     180
+    user waits until results table appears     %{WAIT_LONG}
 
 Check footnotes in table preview (table tool)
     user checks page contains element  //*[@data-testid="footnotes"]//li[text()="${FOOTNOTE_TEXT_3}"]

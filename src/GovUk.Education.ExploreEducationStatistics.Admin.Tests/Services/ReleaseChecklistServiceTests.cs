@@ -18,6 +18,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -29,10 +30,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllErrors()
         {
-            var publication = new Publication
+            var publication = new Publication();
+
+            var methodology = new Methodology
             {
-                Methodology = new Methodology()
+                Id = Guid.NewGuid()
             };
+
             var originalRelease = new Release
             {
                 Publication = publication,
@@ -87,10 +91,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
-
+                methodologyRepository
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<Methodology>
+                    {
+                        methodology
+                    });
+                
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
@@ -104,9 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var dataImportService = new Mock<IDataImportService>();
-                var metaGuidanceService = new Mock<IMetaGuidanceService>();
-
                 dataImportService
                     .Setup(s => s.HasIncompleteImports(release.Id))
                     .ReturnsAsync(true);
@@ -119,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     dataImportService: dataImportService.Object,
-                    metaGuidanceService: metaGuidanceService.Object
+                    metaGuidanceService: metaGuidanceService.Object,
+                    methodologyRepository: methodologyRepository.Object
                 );
 
                 var checklist = await service.GetChecklist(release.Id);
@@ -136,22 +148,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologyMustBeApprovedError =
                     Assert.IsType<MethodologyMustBeApprovedError>(checklist.Right.Errors[2]);
                 Assert.Equal(MethodologyMustBeApproved, methodologyMustBeApprovedError.Code);
-                Assert.Equal(publication.MethodologyId, methodologyMustBeApprovedError.MethodologyId);
+                Assert.Equal(methodology.Id, methodologyMustBeApprovedError.MethodologyId);
 
                 Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[3].Code);
                 Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[4].Code);
                 Assert.Equal(EmptyContentSectionExists, checklist.Right.Errors[5].Code);
                 Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Right.Errors[6].Code);
             }
+
+            MockUtils.VerifyAllMocks(dataImportService,
+                metaGuidanceService,
+                methodologyRepository,
+                releaseDataFileRepository);
         }
 
         [Fact]
         public async Task GetChecklist_AllWarningsWithNoDataFiles()
         {
-            var publication = new Publication();
             var release = new Release
             {
-                Publication = publication,
+                Publication = new Publication()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -162,9 +178,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
+                methodologyRepository
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<Methodology>());
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -174,8 +196,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
-                var metaGuidanceService = new Mock<IMetaGuidanceService>();
-
                 metaGuidanceService
                     .Setup(s => s.Validate(release.Id))
                     .ReturnsAsync(ValidationActionResult(PublicMetaGuidanceRequired));
@@ -183,8 +203,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
+
                 var checklist = await service.GetChecklist(release.Id);
 
                 Assert.True(checklist.IsRight);
@@ -197,15 +219,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoDataFiles, checklist.Right.Warnings[2].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[3].Code);
             }
+
+            MockUtils.VerifyAllMocks(metaGuidanceService,
+                methodologyRepository,
+                releaseDataFileRepository);
         }
 
         [Fact]
         public async Task GetChecklist_AllWarningsWithDataFiles()
         {
-            var publication = new Publication();
             var release = new Release
             {
-                Publication = publication,
+                Publication = new Publication()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -215,6 +240,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddRangeAsync(release);
                 await context.SaveChangesAsync();
             }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
@@ -227,7 +258,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                 };
 
-                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
+                methodologyRepository
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<Methodology>());
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -251,13 +284,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var metaGuidanceService = new Mock<IMetaGuidanceService>();
-
                 metaGuidanceService
                     .Setup(s => s.Validate(release.Id))
                     .ReturnsAsync(ValidationActionResult(PublicMetaGuidanceRequired));
-
-                var footnoteRepository = new Mock<IFootnoteRepository>();
 
                 footnoteRepository
                     .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
@@ -272,8 +301,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
-                var dataBlockService = new Mock<IDataBlockService>();
-
                 dataBlockService
                     .Setup(s => s.List(release.Id))
                     .ReturnsAsync(
@@ -287,6 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
@@ -308,17 +336,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoTableHighlights, checklist.Right.Warnings[3].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[4].Code);
             }
+
+            MockUtils.VerifyAllMocks(dataBlockService,
+                footnoteRepository,
+                metaGuidanceService,
+                methodologyRepository,
+                releaseDataFileRepository);
         }
 
         [Fact]
         public async Task GetChecklist_FullyValid()
         {
-            var publication = new Publication
+            var publication = new Publication();
+
+            var methodology = new Methodology
             {
-                Methodology = new Methodology
-                {
-                    Status = MethodologyStatus.Approved
-                }
+                Status = Approved
             };
 
             var originalRelease = new Release
@@ -409,6 +442,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>();
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 var subject = new Subject
@@ -416,7 +455,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 };
 
-                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
+                methodologyRepository
+                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<Methodology>
+                    {
+                        methodology
+                    });
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -437,19 +481,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
-                var metaGuidanceService = new Mock<IMetaGuidanceService>();
-
                 metaGuidanceService
                     .Setup(s => s.Validate(release.Id))
                     .ReturnsAsync(Unit.Instance);
 
-                var footnoteRepository = new Mock<IFootnoteRepository>();
-
                 footnoteRepository
                     .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
                     .ReturnsAsync(new List<Subject>());
-
-                var dataBlockService = new Mock<IDataBlockService>();
 
                 dataBlockService
                     .Setup(s => s.List(release.Id))
@@ -467,6 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     metaGuidanceService: metaGuidanceService.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
+                    methodologyRepository: methodologyRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
@@ -478,6 +517,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(checklist.Right.Warnings);
                 Assert.True(checklist.Right.Valid);
             }
+
+            MockUtils.VerifyAllMocks(dataBlockService,
+                footnoteRepository,
+                metaGuidanceService,
+                methodologyRepository,
+                releaseDataFileRepository);
         }
 
         [Fact]
@@ -510,6 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IReleaseDataFileRepository releaseDataFileRepository = null,
+            IMethodologyRepository methodologyRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
@@ -520,6 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );

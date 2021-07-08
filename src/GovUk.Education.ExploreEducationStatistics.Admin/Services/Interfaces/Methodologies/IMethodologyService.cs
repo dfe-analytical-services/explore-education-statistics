@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,16 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyService
     {
-        Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync();
+        Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId);
 
-        Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync();
+        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
 
-        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id);
-
-        Task<Either<ActionResult, MethodologySummaryViewModel>>
-            CreateMethodologyAsync(MethodologyCreateRequest request);
-
-        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request);
     }
 }

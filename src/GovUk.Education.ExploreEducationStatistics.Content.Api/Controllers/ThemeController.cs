@@ -14,10 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ThemeController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
+        private readonly IMethodologyService _methodologyService;
 
-        public ThemeController(IFileStorageService fileStorageService)
+        public ThemeController(IFileStorageService fileStorageService,
+            IMethodologyService methodologyService)
         {
             _fileStorageService = fileStorageService;
+            _methodologyService = methodologyService;
         }
 
         [HttpGet("themes")]
@@ -39,10 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("methodology-themes")]
-        public async Task<ActionResult<IEnumerable<ThemeTree<MethodologyTreeNode>>>> GetMethodologyThemes()
+        public async Task<ActionResult<List<ThemeTree<PublicationMethodologiesTreeNode>>>> GetMethodologyThemes()
         {
-            return await _fileStorageService
-                .GetDeserialized<IEnumerable<ThemeTree<MethodologyTreeNode>>>(PublicContentMethodologyTreePath())
+            return await _methodologyService.GetTree()
                 .HandleFailuresOrOk();
         }
     }

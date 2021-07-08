@@ -15,16 +15,6 @@ const BauDashboardPage = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Content and data</h2>
 
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {user?.permissions.canAccessMethodologyAdministrationPages && (
-          <div className="govuk-grid-column-one-third">
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/methodology">Manage methodology</Link>
-            </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-1">
-              View a list of all methodologies and their status.
-            </p>
-          </div>
-        )}
         {user?.permissions.canAccessAllImports && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">

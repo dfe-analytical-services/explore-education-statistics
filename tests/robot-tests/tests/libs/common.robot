@@ -6,7 +6,7 @@ Library     OperatingSystem
 Library    file_operations.py
 Library    utilities.py
 
-Resource   ./tables.robot
+Resource   ./tables-common.robot
 Resource   ./table_tool.robot
 
 *** Variables ***
@@ -17,11 +17,13 @@ ${FILES_DIR}    ${EXECDIR}${/}tests${/}files${/}
 ${timeout}          30
 ${implicit_wait}    3
 ${release_complete_wait}   900
+${prompt_to_continue_on_failure}   0
 
 *** Keywords ***
 do this on failure
     capture large screenshot and html
-    set selenium timeout  3
+    run keyword if    ${prompt_to_continue_on_failure} == 1      prompt to continue
+    run keyword if    ${prompt_to_continue_on_failure} == 0      set selenium timeout  3
 
 custom testid locator strategy
   [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
@@ -189,6 +191,12 @@ user waits until page contains link
 user waits until element contains link
     [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
     user waits until parent contains element  ${element}  link:${link_text}  timeout=${wait}
+    ${link}=  get child element  ${element}  xpath:.//a[.="${link_text}"]
+    [Return]  ${link}
+
+user waits until element contains testid
+    [Arguments]  ${element}  ${testid}  ${wait}=${timeout}
+    user waits until parent contains element  ${element}  css:[data-testid="${testid}"]  timeout=${wait}
 
 user waits until page contains accordion section
     [Arguments]   ${section_title}     ${wait}=${timeout}
@@ -212,12 +220,12 @@ user checks there are x accordion sections
 
 user checks accordion is in position
     [Arguments]  ${section_text}  ${position}  ${parent}=css:[data-testid="accordion"]
-    user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="accordionSection"][${position}]
+    user waits until parent contains element  ${parent}  xpath:(.//*[@data-testid="accordionSection"])[${position}]//button[starts-with(text(), "${section_text}")]
 
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}   ${wait}=${timeout}
     ${section}=  user gets accordion section content element  ${section_text}
-    user waits until parent contains element   ${section}   xpath://*[text()="${text}"]     timeout=${wait}
+    user waits until parent contains element   ${section}   xpath:.//*[text()="${text}"]     timeout=${wait}
 
 user gets accordion header button element
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
@@ -225,11 +233,16 @@ user gets accordion header button element
     [Return]  ${button}
 
 user opens accordion section
-    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    [Arguments]  
+    ...  ${heading_text}  
+    ...  ${parent}=css:[data-testid="accordion"]
+    
     ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
     ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
     run keyword if  '${is_expanded}' != 'true'  user clicks element  ${header_button}
     user checks element attribute value should be  ${header_button}  aria-expanded  true
+    ${accordion}=  user gets accordion section content element  ${heading_text}  ${parent}
+    [Return]  ${accordion}
 
 user closes accordion section
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
@@ -273,6 +286,30 @@ user gets testid element
 user checks element does not contain
     [Arguments]   ${element}    ${text}
     element should not contain    ${element}    ${text}
+
+user checks element contains child element
+    [Arguments]
+    ...  ${element}
+    ...  ${child_element}
+    user waits until parent contains element  ${element}  ${child_element}
+
+user checks element does not contain child element
+    [Arguments]
+    ...  ${element}
+    ...  ${child_element}
+    user waits until parent does not contain element  ${element}  ${child_element}
+
+user checks element contains button
+    [Arguments]
+    ...  ${element}
+    ...  ${button_text}
+    user waits until parent contains element  ${element}  xpath:.//button[text()="${button_text}"]
+
+user checks element does not contain button
+    [Arguments]
+    ...  ${element}
+    ...  ${button_text}
+    user waits until parent does not contain element  ${element}  xpath:.//button[text()="${button_text}"]
 
 user waits until element is visible
     [Arguments]    ${selector}    ${wait}=${timeout}
@@ -383,6 +420,10 @@ user waits until h3 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
 
+user waits until legend is visible
+    [Arguments]   ${text}  ${wait}=${timeout}
+    user waits until element is visible  xpath://legend[text()="${text}"]  ${wait}
+
 user waits until page contains title
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until page contains element   xpath://h1[@data-testid="page-title" and text()="${text}"]   ${wait}
@@ -411,9 +452,9 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 
 user checks summary list contains
     [Arguments]  ${term}    ${description}   ${parent}=css:body  ${wait}=${timeout}
-    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]  120
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]  %{WAIT_MEDIUM}
     ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible  ${element}  120
+    user waits until element is visible  ${element}  %{WAIT_MEDIUM}
 
 user selects from list by label
     [Arguments]   ${locator}   ${label}
@@ -447,7 +488,15 @@ user enters text into element
     user waits until element is visible  ${selector}  60
     user clears element text  ${selector}  
     user presses keys   ${text}   ${selector}
+    
+user enters text into textfield
+    [Arguments]   ${label}   ${text}
+    user enters text into element   xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
 
+user checks textfield contains
+    [Arguments]   ${label}   ${text}
+    user checks input field contains    xpath://label[text()="${label}"]/following-sibling::input[@type="text"]  ${text}
+    
 user checks element count is x
     [Arguments]   ${locator}   ${amount}
     page should contain element   ${locator}   limit=${amount}
@@ -458,12 +507,11 @@ user checks url contains
     should contain  ${current_url}   ${text}
 
 user checks page contains link with text and url
-    [Arguments]  ${text}  ${href}
-    user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
-
-user checks link has url
-    [Arguments]  ${link}  ${url}  ${parent}=css:body
-    user waits until parent contains element  ${parent}  xpath://a[@href="${url}" and text()="${link}"]
+    [Arguments]
+    ...  ${text}
+    ...  ${href}
+    ...  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//a[@href="${href}" and .="${text}"]
 
 user opens details dropdown
     [Arguments]  ${text}  ${parent}=css:body
