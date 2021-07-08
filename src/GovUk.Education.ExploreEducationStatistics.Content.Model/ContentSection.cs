@@ -48,13 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public ContentSection Clone(DateTime createdDate)
         {
             var copy = MemberwiseClone() as ContentSection;
-            copy.Id = Guid.Empty;
+            copy.Id = Guid.NewGuid();
 
             copy.Content = copy
                 .Content?
                 .Select(content => content.Clone(createdDate))
                 .ToList();
 
+            copy.Content?.ForEach(c => c.ContentSectionId = copy.Id);
             return copy;
         }
     }

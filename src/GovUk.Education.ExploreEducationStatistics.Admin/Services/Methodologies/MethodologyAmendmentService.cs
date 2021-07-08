@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
         
+        // TODO EES-2156 - copy Methodology Files
         private async Task<Either<ActionResult, Methodology>> CreateAndSaveAmendment(Methodology methodology)
         {
             var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());

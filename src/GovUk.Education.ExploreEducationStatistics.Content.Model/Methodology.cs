@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Methodology CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var copy = MemberwiseClone() as Methodology;
-            copy.Id = Guid.Empty;
+            copy.Id = Guid.NewGuid();
             copy.Status = Draft;
             copy.Published = null;
             copy.Updated = null;
