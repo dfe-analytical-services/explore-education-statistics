@@ -1,0 +1,6 @@
+time_period,time_identifier,geographic_level,country_code,country_name,school_urn,school_laestab,school_name,admission_numbers
+2011,Calendar year,School,E92000001,England,6,66,Six,712196
+2011,Calendar year,School,E92000001,England,7,77,Seven,709548
+2011,Calendar year,School,E92000001,England,8,88,Eight,709143
+2011,Calendar year,School,E92000001,England,9,99,Nine,607928
+2222,Calendar year,School,E92000001,England,10,1010,Ten,600903
