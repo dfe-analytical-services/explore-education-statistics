@@ -3,7 +3,9 @@ import {
   MethodologyRouteParams,
   methodologySummaryEditRoute,
 } from '@admin/routes/methodologyRoutes';
-import methodologyService from '@admin/services/methodologyService';
+import methodologyService, {
+  BasicMethodology,
+} from '@admin/services/methodologyService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
@@ -19,8 +21,9 @@ import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
-const myFakeMethodology = {
+const myFakeMethodology: BasicMethodology = {
   id: 'm1',
+  amendment: false,
   live: false,
   title: 'My fake methodology',
   slug: 'my-fake-methodology',

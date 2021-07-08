@@ -425,6 +425,7 @@ describe('MethodologySummary', () => {
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
             onChangePublication={noop}
+            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -441,6 +442,7 @@ describe('MethodologySummary', () => {
             publication={testPublicationWithMethodology}
             topicId={testTopicId}
             onChangePublication={noop}
+            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -457,6 +459,7 @@ describe('MethodologySummary', () => {
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
             onChangePublication={noop}
+            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -497,6 +500,7 @@ describe('MethodologySummary', () => {
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
             onChangePublication={noop}
+            allowAmendments
           />
         </Router>,
       );
@@ -525,6 +529,8 @@ describe('MethodologySummary', () => {
     });
   });
 
+  // TODO EES-2156 - add tests for deleting the first draft version of a
+  //  Methodology
   describe('Cancelling an amendment', () => {
     test('the cancel amendment button is shown if user has permission', () => {
       render(
