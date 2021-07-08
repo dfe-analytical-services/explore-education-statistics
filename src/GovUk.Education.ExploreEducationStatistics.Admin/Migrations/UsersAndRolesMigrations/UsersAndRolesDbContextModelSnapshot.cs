@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         new
                         {
                             Id = -39,
-                            ClaimType = "DeleteAllMethodologyAmendments",
+                            ClaimType = "DeleteAllMethodologies",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });

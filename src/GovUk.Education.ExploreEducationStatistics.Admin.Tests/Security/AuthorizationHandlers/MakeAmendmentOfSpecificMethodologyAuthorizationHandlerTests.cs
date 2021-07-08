@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -14,8 +15,10 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -25,30 +28,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly PublicationMethodology Publication = new PublicationMethodology
-        {
-            PublicationId = Guid.NewGuid()
-        };
-
-        private static readonly Methodology MethodologyNoPublication = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            PublishingStrategy = Immediately,
-            MethodologyParent = new MethodologyParent()
-        };
-
-        private static readonly Methodology MethodologyWithPublication = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            PublishingStrategy = Immediately,
-            MethodologyParent = new MethodologyParent
-            {
-                Publications = AsList(Publication)
-            }
-        };
-
         public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerClaimTests
         {
+            private static readonly Methodology MethodologyNoPublication = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                MethodologyParent = new MethodologyParent()
+            };
+      
             [Fact]
             public async Task UserWithCorrectClaimCanCreateAmendmentOfPubliclyAccessibleMethodology()
             {
@@ -103,35 +91,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerPublicationRoleTests
         {
-            [Fact]
-            public async Task UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodology()
+            private static readonly Methodology MethodologyWithPublication = new Methodology
             {
-                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(MethodologyWithPublication);
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        PublicationId = Guid.NewGuid()
+                    })
+                }
+            };
 
-                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
+            private static readonly Methodology MethodologyWithPublicationNotOwner = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = false,
+                        PublicationId = Guid.NewGuid()
+                    })
+                }
+            };
+            
+            [Fact]
+            public async Task UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodologyOwnedByPublication()
+            {
+                await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
+                {
+                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                    context.Attach(MethodologyWithPublication);
 
-                methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
-                    .ReturnsAsync(true);
+                    var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, MethodologyWithPublication);
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
+                        .ReturnsAsync(true);
 
-                publicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
-                    .ReturnsAsync(AsList(PublicationRole.Owner));
+                    var user = CreateClaimsPrincipal(UserId);
+                    var authContext = CreateAuthContext(user, MethodologyWithPublication);
 
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                    var publicationId = MethodologyWithPublication.MethodologyParent.Publications[0].PublicationId;
+                    
+                    publicationRoleRepository
+                        .Setup(s => s.GetAllRolesByUser(UserId, publicationId))
+                        .ReturnsAsync(AsList(role));
 
-                // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
-                // that uses this Methodology.
-                Assert.True(authContext.HasSucceeded);
+                    await handler.HandleAsync(authContext);
+                    VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+
+                    // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
+                    // that uses this Methodology.
+                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                });
             }
-
+            
             [Fact]
-            public async Task
-                UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodology()
+            public async Task UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodology()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Attach(MethodologyWithPublication);
@@ -144,8 +164,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublication.Id))
                     .ReturnsAsync(true);
 
+                var publicationId = MethodologyWithPublication.MethodologyParent.Publications[0].PublicationId;
+                    
                 publicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUser(UserId, Publication.PublicationId))
+                    .Setup(s => s.GetAllRolesByUser(UserId, publicationId))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 await handler.HandleAsync(authContext);
@@ -153,6 +175,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Verify that the user cannot create an Amendment, as they don't have a Publication Owner role on a
                 // Publication that uses this Methodology.
+                Assert.False(authContext.HasSucceeded);
+            }
+
+            [Fact]
+            public async Task UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodologyNotOwnedByPublication()
+            {
+                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                context.Attach(MethodologyWithPublicationNotOwner);
+
+                var user = CreateClaimsPrincipal(UserId);
+                var authContext = CreateAuthContext(user, MethodologyWithPublicationNotOwner);
+
+                var (handler, methodologyRepository, publicationRoleRepository) = CreateHandlerAndDependencies(context);
+
+                methodologyRepository
+                    .Setup(mock => mock.IsPubliclyAccessible(MethodologyWithPublicationNotOwner.Id))
+                    .ReturnsAsync(false);
+
+                await handler.HandleAsync(authContext);
+
+                // Verify that the handler does not even check the roles the user has on a Publication if the
+                // Publication does not own this Methodology.
+                VerifyAllMocks(methodologyRepository, publicationRoleRepository);
                 Assert.False(authContext.HasSucceeded);
             }
 

@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     {
                         Id = -39,
                         RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.DeleteAllMethodologyAmendments.ToString(),
+                        ClaimType = SecurityClaimTypes.DeleteAllMethodologies.ToString(),
                         ClaimValue = "",
                     }
                 );
