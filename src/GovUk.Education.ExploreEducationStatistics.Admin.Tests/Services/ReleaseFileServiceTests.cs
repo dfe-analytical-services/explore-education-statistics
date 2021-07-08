@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -1776,36 +1777,112 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update()
         {
-            var releaseFile = new ReleaseFile
+            var release = new Release
             {
-                Release = new Release(),
-                Name = "Test PDF File",
-                File = new File()
+                Id = Guid.NewGuid(),
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test PDF File",
+                File = new File
+                {
+                    RootPath = release.Id,
+                    Filename = "test.pdf",
+                    Type = Ancillary,
+                    Created = new DateTime(),
+                    CreatedBy = new User
+                    {
+                        Email = "test@test.com"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupReleaseFileService(contentDbContext);
 
-                var result = await service.UpdateName(releaseFile.ReleaseId, releaseFile.FileId, "New file title");
+                var result = await service.Update(
+                    releaseFile.ReleaseId,
+                    releaseFile.FileId,
+                    new ReleaseFileUpdateViewModel
+                    {
+                        Name = "New file title",
+                    }
+                );
 
                 Assert.True(result.IsRight);
                 Assert.IsType<Unit>(result.Right);
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
                     rf.ReleaseId == releaseFile.ReleaseId
                     && rf.FileId == releaseFile.FileId);
+
                 Assert.Equal("New file title", updatedReleaseFile.Name);
+            }
+        }
+
+        [Fact]
+        public async Task Update_NoRelease()
+        {
+            await using (var contentDbContext = InMemoryApplicationDbContext())
+            {
+                var service = SetupReleaseFileService(contentDbContext);
+
+                var result = await service.Update(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new ReleaseFileUpdateViewModel
+                    {
+                        Name = "New file title",
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Update_NoReleaseFile()
+        {
+            var release = new Release();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext);
+
+                var result = await service.Update(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new ReleaseFileUpdateViewModel
+                    {
+                        Name = "New file title",
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
             }
         }
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -138,20 +139,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseId, fileId))
-                .OnSuccess(async releaseFile =>
-                {
-                    var blobExists = await _blobStorageService.CheckBlobExists(
-                        PrivateReleaseFiles,
-                        releaseFile.Path());
+                .OnSuccess(GetReleaseFileInfo);
+        }
 
-                    if (!blobExists)
-                    {
-                        return releaseFile.File.ToFileInfoNotFound();
-                    }
+        private async Task<FileInfo> GetReleaseFileInfo(ReleaseFile releaseFile)
+        {
+            var blobExists = await _blobStorageService.CheckBlobExists(
+                PrivateReleaseFiles,
+                releaseFile.Path()
+            );
 
-                    var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
-                    return releaseFile.ToFileInfo(blob);
-                });
+            if (!blobExists)
+            {
+                return releaseFile.File.ToFileInfoNotFound();
+            }
+
+            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
+            return releaseFile.ToFileInfo(blob);
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
@@ -175,18 +179,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name)
+        public Task<Either<ActionResult, Unit>> Update(Guid releaseId, Guid fileId, ReleaseFileUpdateViewModel update)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccessVoid(async () =>
-                {
-                    await _releaseFileRepository.Update(
-                        releaseId: releaseId,
-                        fileId: fileId,
-                        name: name);
-                });
+                .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseId, fileId))
+                .OnSuccessVoid(
+                    async () =>
+                    {
+                        await _releaseFileRepository.Update(
+                            releaseId: releaseId,
+                            fileId: fileId,
+                            name: update.Name
+                        );
+                    }
+                );
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)

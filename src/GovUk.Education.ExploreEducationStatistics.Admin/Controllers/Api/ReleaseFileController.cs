@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -60,13 +61,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
-        [HttpPost("release/{releaseId}/file/{fileId}/rename")]
-        public async Task<ActionResult<Unit>> Rename(Guid releaseId, Guid fileId,
-            [FromQuery(Name = "name"), Required] string name)
+        [HttpPatch("release/{releaseId}/file/{fileId}")]
+        public async Task<ActionResult<Unit>> Update(
+            Guid releaseId,
+            Guid fileId,
+            ReleaseFileUpdateViewModel update)
         {
             return await _releaseFileService
-                .UpdateName(releaseId: releaseId, fileId: fileId, name: name)
-                .HandleFailuresOrOk();
+                .Update(releaseId: releaseId, fileId: fileId, update: update)
+                .HandleFailuresOrNoContent();
         }
 
         [HttpGet("release/{releaseId}/ancillary")]
