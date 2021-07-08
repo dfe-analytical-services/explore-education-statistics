@@ -31,10 +31,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             SubjectMeta subjectMeta,
             StatisticsDbContext context);
 
-        GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers);
+        GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues);
 
-        TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers);
+        TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues);
 
-        int GetYear(IReadOnlyList<string> line, List<string> headers);
+        int GetYear(IReadOnlyList<string> rowValues, List<string> colValues);
     }
 }
