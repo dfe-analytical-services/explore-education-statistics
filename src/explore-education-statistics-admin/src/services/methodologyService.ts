@@ -6,6 +6,12 @@ export type UpdateMethodology = {
 
 export type MethodologyStatus = 'Draft' | 'Approved';
 
+interface MethodologyPublication {
+  id: string;
+  title: string;
+  releaseId: string;
+}
+
 export interface BasicMethodology {
   amendment: boolean;
   id: string;
@@ -16,6 +22,8 @@ export interface BasicMethodology {
   slug: string;
   status: MethodologyStatus;
   published?: string;
+  publication?: MethodologyPublication;
+  otherPublications?: MethodologyPublication[];
 }
 
 export interface MyMethodology extends BasicMethodology {
