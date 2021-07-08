@@ -68,6 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
+            CreateMap<Methodology, TitleAndIdViewModel>();
+
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
