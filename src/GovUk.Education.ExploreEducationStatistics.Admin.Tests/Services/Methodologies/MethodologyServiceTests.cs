@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -800,6 +802,199 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
         }
+
+        [Fact]
+        public async Task DeleteMethodology()
+        {
+            var methodologyParentId = Guid.NewGuid();
+            
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Id = methodologyParentId,
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        MethodologyParentId = methodologyParentId
+                    })
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that a Methodology, a MethodologyParent and a PublicationMethodology row were
+                // created.
+                // TODO files!
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodology.Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+                Assert.NotNull(await context.PublicationMethodologies.SingleAsync(m => m.MethodologyParentId == methodologyParentId));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodology.Id);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology has successfully been deleted and as it was the only Methodology
+                // version on the MethodologyParent, the MethodologyParent is also deleted.
+                //
+                // Also, as the MethodologyParent was deleted, then the PublicationMethodology links that linked
+                // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
+                // db currently doesn't support this so we can't check that there are no longer those
+                // PublicationMethodology rows.
+                // TODO files!
+                Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
+                Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
+            }
+        }
+        
+        [Fact]
+        public async Task DeleteMethodology_MoreThanOneMethodologyVersion()
+        {
+            var methodologyParentId = Guid.NewGuid();
+
+            var methodologyParent = new MethodologyParent
+            {
+                Id = methodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                },
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddAsync(methodologyParent);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that 2 Methodologies and their MethodologyParent is created.
+                // TODO files!
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[1].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology has successfully been deleted and as there was another Methodology
+                // version attached to the MethodologyParent, the Parent itself is not deleted, or the other
+                // Methodology version.
+                // TODO files!
+                Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+            }
+        }
+        
+        [Fact]
+        public async Task DeleteMethodology_UnrelatedMethodologiesAreUnaffected()
+        {
+            var methodologyParentId = Guid.NewGuid();
+            var unrelatedMethodologyParentId = Guid.NewGuid();
+
+            var methodologyParent = new MethodologyParent
+            {
+                Id = methodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var unrelatedMethodologyParent = new MethodologyParent
+            {
+                Id = unrelatedMethodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddRangeAsync(methodologyParent, unrelatedMethodologyParent);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that 2 MethodologyParents and their Methodologies are created.
+                // TODO files!
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodologyParent.Versions[0].Id);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
+                // unaffected. 
+                // TODO files!
+                Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
+                
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
+            }
+        }
+
 
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,

@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         return methodology;
                     }
                     var slug = SlugFromTitle(request.Title);
-                    return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).Map(_ =>
+                    return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).OnSuccess(_ =>
                     {
                         methodology.MethodologyParent.Slug = slug;
                         return methodology;
