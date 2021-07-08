@@ -44,3 +44,16 @@
   outline: $govuk-focus-width solid $govuk-focus-colour;
   outline-offset: 0;
 }
+
+.isSelected {
+  background: $govuk-brand-colour;
+  color: govuk-colour('white');
+
+  &:hover {
+    background: $govuk-brand-colour;
+  }
+}
+
+.isGhosted {
+  opacity: 0.5;
+}

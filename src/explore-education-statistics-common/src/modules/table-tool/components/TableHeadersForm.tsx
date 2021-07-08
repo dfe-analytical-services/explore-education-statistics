@@ -53,7 +53,8 @@ const TableHeadersForm = ({
   return (
     <Details summary="Re-order table headers">
       <p className="govuk-hint">
-        Drag and drop the options below to re-order the table headers. For
+        Drag and drop the options below to re-order the table headers. Hold the
+        Ctrl key and click to select multiple items to drag and drop. For
         keyboard users, select and deselect a draggable item with space and use
         the arrow keys to move a selected item.
       </p>

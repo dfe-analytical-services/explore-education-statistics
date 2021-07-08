@@ -1453,7 +1453,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <p
                 class="govuk-hint"
               >
-                Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+                Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
               </p>
               <div
                 class="govuk-visually-hidden"
@@ -2564,7 +2564,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <p
                 class="govuk-hint"
               >
-                Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+                Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
               </p>
               <div
                 class="govuk-visually-hidden"
@@ -3658,7 +3658,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
               <p
                 class="govuk-hint"
               >
-                Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+                Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
               </p>
               <div
                 class="govuk-visually-hidden"

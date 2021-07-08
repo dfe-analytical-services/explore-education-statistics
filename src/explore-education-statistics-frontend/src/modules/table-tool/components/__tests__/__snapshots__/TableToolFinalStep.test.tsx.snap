@@ -31,7 +31,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
@@ -762,7 +762,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
@@ -1510,7 +1510,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
@@ -2258,7 +2258,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
@@ -2988,7 +2988,7 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
@@ -3720,7 +3720,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
       <p
         class="govuk-hint"
       >
-        Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+        Drag and drop the options below to re-order the table headers. Hold the Ctrl key and click to select multiple items to drag and drop. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
       </p>
       <div
         class="govuk-visually-hidden"
