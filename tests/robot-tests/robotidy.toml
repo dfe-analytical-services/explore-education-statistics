@@ -1,0 +1,11 @@
+[tool.robotidy]
+overwrite = true
+spacecount = 4
+diff = true
+transform = [
+   "DiscardEmptySections:allow_only_comments=True",
+   "SplitTooLongLine"
+]
+configure = [
+    "SplitTooLongLine:split_on_every_arg=False"
+]
