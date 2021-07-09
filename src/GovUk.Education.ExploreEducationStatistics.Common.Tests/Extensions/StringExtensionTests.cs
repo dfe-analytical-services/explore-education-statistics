@@ -1,10 +1,10 @@
-using System.Linq;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
-    public class StringExtensionTests
+    public static class StringExtensionTests
     {
         public class ToLinesListTests
         {
@@ -74,50 +74,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public class CamelCaseTests
         {
             [Fact]
-            public void NullIfWhitespace_IsNullForNullString()
-            {
-                const string input = null;
-                Assert.Null(input.NullIfWhiteSpace());
-            }
-
-            [Fact]
-            public void NullIfWhitespace_RemainsUntouchedForNonWhiteSpaceString()
-            {
-                const string input = "foo";
-                Assert.Equal(input, input.NullIfWhiteSpace());
-            }
-
-            [Fact]
-            public void NullIfWhitespace_IsNullForWhiteSpaceString()
-            {
-                Assert.Null("".NullIfWhiteSpace());
-                Assert.Null(" ".NullIfWhiteSpace());
-            }
-
-            [Fact]
-            public void NullStringCanAppendTrailingSlash()
-            {
-                string input = null;
-                Assert.Null(input.AppendTrailingSlash());
-            }
-
-            [Fact]
-            public void EmptyStringCanAppendTrailingSlash()
-            {
-                Assert.Equal("/", string.Empty.AppendTrailingSlash());
-            }
-
-            [Fact]
-            public void AppendTrailingSlash()
-            {
-                Assert.Equal("foo/", "foo".AppendTrailingSlash());
-            }
-
-            [Fact]
             public void NullStringCanBeCamelCased()
             {
-                string input = null;
-                Assert.Null(input.CamelCase());
+                string? input = null;
+                Assert.Null(input!.CamelCase());
             }
 
             [Fact]
@@ -165,26 +125,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
         }
 
+        public class AppendTrailingSlashTests
+        {
+            [Fact]
+            public void AppendTrailingSlash()
+            {
+                Assert.Equal("foo/", "foo".AppendTrailingSlash());
+            }
+
+            [Fact]
+            public void EmptyStringCanAppendTrailingSlash()
+            {
+                Assert.Equal("/", string.Empty.AppendTrailingSlash());
+            }
+        }
+
+        public class NullIfWhitespaceTests
+        {
+            [Fact]
+            public void NullIfWhitespace_IsNullForNullString()
+            {
+                string? input = null;
+                Assert.Null(input!.NullIfWhiteSpace());
+            }
+
+            [Fact]
+            public void NullIfWhitespace_RemainsUntouchedForNonWhiteSpaceString()
+            {
+                const string input = "foo";
+                Assert.Equal(input, input.NullIfWhiteSpace());
+            }
+
+            [Fact]
+            public void NullIfWhitespace_IsNullForWhiteSpaceString()
+            {
+                Assert.Null("".NullIfWhiteSpace());
+                Assert.Null(" ".NullIfWhiteSpace());
+            }
+
+            [Fact]
+            public void NullStringCanAppendTrailingSlash()
+            {
+                string? input = null;
+                Assert.Null(input.AppendTrailingSlash());
+            }
+        }
+
         public class IsNullOrEmptyTests
         {
             [Fact]
-            public void IsNullOrEmptyIsTrueForNullString()
+            public void TrueForNullString()
             {
-                const string input = null;
+                string? input = null;
                 Assert.True(input.IsNullOrEmpty());
             }
 
 
             [Fact]
-            public void IsNullOrEmptyIsTrueForEmptyString()
+            public void TrueForEmptyString()
             {
                 Assert.True("".IsNullOrEmpty());
             }
 
             [Fact]
-            public void IsNullOrEmptyIsFalseForNonEmptyString()
+            public void FalseForWhitespaceString()
+            {
+                Assert.False("   ".IsNullOrEmpty());
+                Assert.False(" \n  ".IsNullOrEmpty());
+                Assert.False(" \r\n  ".IsNullOrEmpty());
+            }
+
+            [Fact]
+            public void FalseForNonEmptyString()
             {
                 Assert.False("foo".IsNullOrEmpty());
+            }
+        }
+
+        public class IsNullOrWhitespaceTests
+        {
+            [Fact]
+            public void TrueForNullString()
+            {
+                string? input = null;
+                Assert.True(input.IsNullOrWhitespace());
+            }
+
+
+            [Fact]
+            public void TrueForEmptyString()
+            {
+                Assert.True("".IsNullOrWhitespace());
+            }
+
+            [Fact]
+            public void TrueForWhitespaceString()
+            {
+                Assert.True("   ".IsNullOrWhitespace());
+                Assert.True(" \n  ".IsNullOrWhitespace());
+                Assert.True(" \r\n  ".IsNullOrWhitespace());
+            }
+
+            [Fact]
+            public void FalseForNonEmptyString()
+            {
+                Assert.False("foo".IsNullOrWhitespace());
             }
         }
 
@@ -193,8 +238,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void NullStringCanBePascalCased()
             {
-                string input = null;
-                Assert.Null(input.PascalCase());
+                string? input = null;
+                Assert.Null(input!.PascalCase());
             }
 
             [Fact]
@@ -248,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void NullStringsCanBeScreamingSnakeCased()
             {
-                string input = null;
-                Assert.Null(input.ScreamingSnakeCase());
+                string? input = null;
+                Assert.Null(input!.ScreamingSnakeCase());
             }
 
             [Fact]

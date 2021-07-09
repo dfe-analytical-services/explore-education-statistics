@@ -84,6 +84,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
+        public async Task WriteFile_ReleaseHasNoDataGuidance()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService.Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () =>
+                {
+                    await writer.WriteFile(release.Id, path);
+                }
+            );
+
+            Assert.Equal($"Cannot create data guidance file for release {release.Id} with no data guidance", exception.Message);
+
+            Assert.False(File.Exists(path));
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
         public async Task WriteFile_NoSubjects()
         {
             var release = new Release
