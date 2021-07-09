@@ -16,6 +16,7 @@ pyderman = "~=2.0"
 pytz = "~=2020.1"
 beautifulsoup4 = "==4.9.1"
 azure-storage-blob = "~=12.6.0"
+robotframework-tidy = "*"
 
 [requires]
 python_version = "3.8"
