@@ -1,5 +1,5 @@
 [tool.robotidy]
-overwrite = false
+overwrite = true
 spacecount = 4
 diff = true
 transform = [
