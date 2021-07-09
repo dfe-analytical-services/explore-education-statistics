@@ -254,6 +254,7 @@ Verify release associated files
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
+
 Verify public metadata guidance document
     [Tags]    HappyPath
     user clicks link    Metadata guidance document

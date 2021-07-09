@@ -79,6 +79,7 @@ const AdminDashboardPage = () => {
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
+              {/* EES-2464
               <li>
                 <Link to="/documentation/using-dashboard" target="_blank">
                   Using your administration dashboard{' '}
@@ -88,7 +89,7 @@ const AdminDashboardPage = () => {
                 <Link to="/documentation/create-new-release" target="_blank">
                   Creating a new release{' '}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/contact-us" target="_blank">
                   Contact us

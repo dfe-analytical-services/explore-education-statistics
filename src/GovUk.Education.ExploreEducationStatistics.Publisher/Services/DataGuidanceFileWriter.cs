@@ -35,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<FileStream> WriteFile(Guid releaseId, string path)
         {
             var release = await _releaseService.Get(releaseId);
+
+            if (release.MetaGuidance.IsNullOrWhitespace())
+            {
+                throw new InvalidOperationException(
+                    $"Cannot create data guidance file for release {release.Id} with no data guidance"
+                );
+            }
+
             var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id);
 
             if (subjects.IsLeft)

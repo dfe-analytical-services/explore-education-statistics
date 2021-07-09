@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseFileService : IReleaseFileService
     {
+        private static readonly FileType[] DeletableFileTypes = { Ancillary, Chart, Image, DataGuidance };
+
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
@@ -69,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
                 .OnSuccess(async release =>
                     await ids.Select(id =>
-                        _releaseFileRepository.CheckFileExists(releaseId, id, Ancillary, Chart, Image)).OnSuccessAll())
+                        _releaseFileRepository.CheckFileExists(releaseId, id, DeletableFileTypes)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
@@ -89,10 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false)
         {
-            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId,
-                Ancillary,
-                Chart,
-                Image);
+            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, DeletableFileTypes);
 
             return await Delete(releaseId,
                 releaseFiles.Select(releaseFile => releaseFile.File.Id),

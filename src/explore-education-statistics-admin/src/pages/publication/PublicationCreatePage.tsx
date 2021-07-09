@@ -37,6 +37,7 @@ const PublicationCreatePage = ({
         <div className="govuk-grid-column-two-thirds">
           <PageTitle caption={topic.title} title="Create new publication" />
         </div>
+        {/* EES-2464
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
@@ -47,7 +48,7 @@ const PublicationCreatePage = ({
               </li>
             </ul>
           </RelatedInformation>
-        </div>
+        </div> */}
       </div>
 
       <PublicationForm
