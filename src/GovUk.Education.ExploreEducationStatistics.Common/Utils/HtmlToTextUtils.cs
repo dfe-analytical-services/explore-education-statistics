@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using AngleSharp;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Html;

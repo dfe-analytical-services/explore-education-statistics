@@ -28,6 +28,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
+        public async Task HtmlToText_EmptyString()
+        {
+            Assert.Empty(await HtmlToTextUtils.HtmlToText(""));
+        }
+
+        [Fact]
+        public async Task HtmlToText_WhitespaceStrings()
+        {
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  "));
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  \n  "));
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  \r\n  "));
+        }
+
+        [Fact]
         public async Task HtmlToText_SingleElement()
         {
             var text = await HtmlToTextUtils.HtmlToText(
