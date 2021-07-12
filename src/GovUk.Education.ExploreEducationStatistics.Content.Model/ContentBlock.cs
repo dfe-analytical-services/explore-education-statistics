@@ -47,6 +47,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
+        
+        public ContentBlock Clone(DateTime createdDate)
+        {
+            var copy = MemberwiseClone() as ContentBlock;
+            copy.Id = Guid.NewGuid();
+            copy.Created = createdDate;
+            copy.ContentSection = null;
+            copy.ContentSectionId = null;
+
+            // start a new amendment with no comments
+            copy.Comments = new List<Comment>();
+            return copy;
+        }
     }
 
     public class MarkDownBlock : ContentBlock

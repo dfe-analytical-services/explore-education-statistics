@@ -137,12 +137,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Methodology 1 title"
+                    AlternativeTitle = "Methodology 1 title"
                 },
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Methodology 2 title"
+                    AlternativeTitle = "Methodology 2 title"
                 }
             );
 

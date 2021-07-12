@@ -82,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanCancelMethodologyAmendment(
+        public static Task<Either<ActionResult, Methodology>> CheckCanDeleteMethodology(
             this IUserService userService, Methodology methodology)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
+            return userService.CheckPolicy(methodology, SecurityPolicies.CanDeleteSpecificMethodology);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)

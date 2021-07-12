@@ -82,6 +82,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     }
                 );
         }
+        
+        [Fact]
+        public async Task DeleteMethodology()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanDeleteSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology).Object,
+                            userService: userService.Object);
+                        return service.DeleteMethodology(_methodology.Id);
+                    }
+                );
+        }
 
         private MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext = null,

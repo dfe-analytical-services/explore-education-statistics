@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
     {
         public string LatestInternalReleaseNote { get; set; }
 
+        // TODO SOW4 EES-2212 - update to AlternativeTitle
         [Required] public string Title { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
