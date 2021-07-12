@@ -190,22 +190,15 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              {allMethodologies.length > 0 && (
-                <>
-                  {allMethodologies.map(methodology => (
-                    <p
-                      key={methodology.key}
-                      className="govuk-!-margin-bottom-9"
-                    >
-                      {editingMode === 'edit' ? (
-                        <a>{`${methodology.title}`}</a>
-                      ) : (
-                        <Link to={methodology.url}>{methodology.title}</Link>
-                      )}
-                    </p>
-                  ))}
-                </>
-              )}
+              {allMethodologies.map(methodology => (
+                <li key={methodology.key} className="govuk-!-margin-bottom-9">
+                  {editingMode === 'edit' ? (
+                    <a>{methodology.title}</a>
+                  ) : (
+                    <Link to={methodology.url}>{methodology.title}</Link>
+                  )}
+                </li>
+              ))}
               {release.hasMetaGuidance && (
                 <li>
                   <Link

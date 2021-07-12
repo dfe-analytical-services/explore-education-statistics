@@ -200,7 +200,7 @@ user edits an external methodology
     ...    ${original_link}=https://example.com
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks button    Edit    ${accordion}
+    user clicks button    Edit externally hosted methodology    ${accordion}
     user waits until legend is visible    Link to an externally hosted methodology
     user checks textfield contains    Link title    ${original_title}
     user checks textfield contains    URL    ${original_link}
