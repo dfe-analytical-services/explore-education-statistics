@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore] public string Country_Code { get; set; }
-        [JsonIgnore] public string Country_Name { get; set; }
+        public string Country_Code { get; set; }
+        public string Country_Name { get; set; }
 
         [NotMapped]
         public Country Country
@@ -24,8 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string EnglishDevolvedArea_Code { get; set; }
-        [JsonIgnore] public string EnglishDevolvedArea_Name { get; set; }
+        public string EnglishDevolvedArea_Code { get; set; }
+        public string EnglishDevolvedArea_Name { get; set; }
 
         [NotMapped]
         public EnglishDevolvedArea EnglishDevolvedArea
@@ -38,8 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string Institution_Code { get; set; }
-        [JsonIgnore] public string Institution_Name { get; set; }
+        public string Institution_Code { get; set; }
+        public string Institution_Name { get; set; }
 
         [NotMapped]
         public Institution Institution
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string LocalAuthority_Code { get; set; }
-        [JsonIgnore] public string LocalAuthority_OldCode { get; set; }
-        [JsonIgnore] public string LocalAuthority_Name { get; set; }
+        public string LocalAuthority_Code { get; set; }
+        public string LocalAuthority_OldCode { get; set; }
+        public string LocalAuthority_Name { get; set; }
 
         [NotMapped]
         public LocalAuthority LocalAuthority
@@ -68,8 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string LocalAuthorityDistrict_Code { get; set; }
-        [JsonIgnore] public string LocalAuthorityDistrict_Name { get; set; }
+        public string LocalAuthorityDistrict_Code { get; set; }
+        public string LocalAuthorityDistrict_Name { get; set; }
 
         [NotMapped]
         public LocalAuthorityDistrict LocalAuthorityDistrict
@@ -82,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string LocalEnterprisePartnership_Code { get; set; }
-        [JsonIgnore] public string LocalEnterprisePartnership_Name { get; set; }
+        public string LocalEnterprisePartnership_Code { get; set; }
+        public string LocalEnterprisePartnership_Name { get; set; }
 
         [NotMapped]
         public LocalEnterprisePartnership LocalEnterprisePartnership
@@ -96,8 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string MayoralCombinedAuthority_Code { get; set; }
-        [JsonIgnore] public string MayoralCombinedAuthority_Name { get; set; }
+        public string MayoralCombinedAuthority_Code { get; set; }
+        public string MayoralCombinedAuthority_Name { get; set; }
 
         [NotMapped]
         public MayoralCombinedAuthority MayoralCombinedAuthority
@@ -110,8 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string MultiAcademyTrust_Code { get; set; }
-        [JsonIgnore] public string MultiAcademyTrust_Name { get; set; }
+        public string MultiAcademyTrust_Code { get; set; }
+        public string MultiAcademyTrust_Name { get; set; }
 
         [NotMapped]
         public Mat MultiAcademyTrust
@@ -124,8 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string OpportunityArea_Code { get; set; }
-        [JsonIgnore] public string OpportunityArea_Name { get; set; }
+        public string OpportunityArea_Code { get; set; }
+        public string OpportunityArea_Name { get; set; }
 
         [NotMapped]
         public OpportunityArea OpportunityArea
@@ -138,8 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string ParliamentaryConstituency_Code { get; set; }
-        [JsonIgnore] public string ParliamentaryConstituency_Name { get; set; }
+        public string ParliamentaryConstituency_Code { get; set; }
+        public string ParliamentaryConstituency_Name { get; set; }
 
         [NotMapped]
         public ParliamentaryConstituency ParliamentaryConstituency
@@ -152,8 +152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string Provider_Code { get; set; }
-        [JsonIgnore] public string Provider_Name { get; set; }
+        public string Provider_Code { get; set; }
+        public string Provider_Name { get; set; }
 
         [NotMapped]
         public Provider Provider
@@ -166,8 +166,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string Region_Code { get; set; }
-        [JsonIgnore] public string Region_Name { get; set; }
+        public string Region_Code { get; set; }
+        public string Region_Name { get; set; }
 
         [NotMapped]
         public Region Region
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string RscRegion_Code { get; set; }
+        public string RscRegion_Code { get; set; }
 
         [NotMapped]
         public RscRegion RscRegion
@@ -189,8 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             set => RscRegion_Code = value?.Code;
         }
 
-        [JsonIgnore] public string School_Code { get; set; }
-        [JsonIgnore] public string School_Name { get; set; }
+        public string School_Code { get; set; }
+        public string School_Name { get; set; }
 
         [NotMapped]
         public School School
@@ -203,8 +203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string Sponsor_Code { get; set; }
-        [JsonIgnore] public string Sponsor_Name { get; set; }
+        public string Sponsor_Code { get; set; }
+        public string Sponsor_Name { get; set; }
 
         [NotMapped]
         public Sponsor Sponsor
@@ -217,8 +217,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string Ward_Code { get; set; }
-        [JsonIgnore] public string Ward_Name { get; set; }
+        public string Ward_Code { get; set; }
+        public string Ward_Name { get; set; }
 
         [NotMapped]
         public Ward Ward
@@ -231,8 +231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        [JsonIgnore] public string PlanningArea_Code { get; set; }
-        [JsonIgnore] public string PlanningArea_Name { get; set; }
+        public string PlanningArea_Code { get; set; }
+        public string PlanningArea_Name { get; set; }
 
         [NotMapped]
         public PlanningArea PlanningArea
