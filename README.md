@@ -66,22 +66,28 @@ You will need the following groups of dependencies to run the project successful
 2. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
-   - [Docker and Docker Compose](https://docs.docker.com/)
+   - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
 
-3. To emulate Azure storage services (blobs, tables and queues) you will require:
-
+3. To emulate Azure storage services (blobs, tables and queues) you will require one of the following 
+   options.
+   
+   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended approach if 
+     using Linux. See [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) -
-     installer for Windows x64 is [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe)
-   - [Docker and Docker Compose](https://docs.docker.com/)
+     recommended approach if using Windows. The x64 installer can be found [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
     
-   You can also use a Windows VM with the emulator installed. You will need to expose ports 10001, 
-   10002 and 10003 for the host to access in the emulator in the VM.
-
-   Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage Account 
-   on Azure and amend your storage connection strings to point to this.
-
-   - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
-   - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+   - Previous options that are **no longer** recommended: 
+     - Azure Storage Emulator on a Windows VM - if you don't want to use Azurite for Docker, you can 
+       install the Azure Storage Emulator on a [Windows 10 VM](https://developer.microsoft.com/en-us/windows/downloads/virtual-machines/).
+       
+       You will need to expose ports 10001, 10002 and 10003 for the host to access in the emulator 
+       in the VM. You will most likely need to install SQL Server on this VM too, as the emulator 
+       will need this to function.
+       
+     - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage 
+       Account on Azure and amend your storage connection strings to point to this.
+       - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+       - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
  
 4. **Linux only** - Add symlinks to libmagic-1
 
