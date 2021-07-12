@@ -26,20 +26,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class DeleteSpecificMethodologyAuthorizationHandlerTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
+        private static readonly Guid PublicationId = Guid.NewGuid();
             
         public class DeleteSpecificMethodologyAuthorizationHandlerClaimTests
         {
-            private static readonly Methodology MethodologyNoPublications = new Methodology
+            private static readonly Methodology DraftMethodology = new Methodology
             {
                 Id = Guid.NewGuid(),
-                MethodologyParent = new MethodologyParent()
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        PublicationId = PublicationId
+                    })
+                }
             };
 
-            private static readonly Methodology MethodologyApprovedNoPublications = new Methodology
+            private static readonly Methodology ApprovedMethodology = new Methodology
             {
                 Id = Guid.NewGuid(),
                 Status = Approved,
-                MethodologyParent = new MethodologyParent()
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        PublicationId = PublicationId
+                    })
+                }
             };
         
             [Fact]
@@ -47,24 +62,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
+                    var expectClaimToSucceed = claim == DeleteAllMethodologies;
+
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyNoPublications);
+                    context.Attach(DraftMethodology);
 
                     var (handler, methodologyRepository, publicationRoleRepository) =
                         CreateHandlerAndDependencies(context);
 
                     methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(MethodologyNoPublications.Id))
+                        .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
                         .ReturnsAsync(false);
 
+                    // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
+                    // the user's Publication Roles.  
+                    if (!expectClaimToSucceed)
+                    {
+                        publicationRoleRepository
+                            .Setup(s => s.GetAllRolesByUser(UserId, PublicationId))
+                            .ReturnsAsync(new List<PublicationRole>());
+                    }
+
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, MethodologyNoPublications);
+                    var authContext = CreateAuthContext(user, DraftMethodology);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
 
                     // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
-                    Assert.Equal(claim == DeleteAllMethodologies, authContext.HasSucceeded);
+                    Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
                 });
             }
             
@@ -74,17 +100,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyNoPublications);
+                    context.Attach(DraftMethodology);
 
                     var (handler, methodologyRepository, publicationRoleRepository) =
                         CreateHandlerAndDependencies(context);
 
                     methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(MethodologyNoPublications.Id))
+                        .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, MethodologyNoPublications);
+                    var authContext = CreateAuthContext(user, DraftMethodology);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -101,17 +127,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyApprovedNoPublications);
+                    context.Attach(ApprovedMethodology);
 
                     var (handler, methodologyRepository, publicationRoleRepository) =
                         CreateHandlerAndDependencies(context);
 
                     methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(MethodologyApprovedNoPublications.Id))
+                        .Setup(s => s.IsPubliclyAccessible(ApprovedMethodology.Id))
                         .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, MethodologyApprovedNoPublications);
+                    var authContext = CreateAuthContext(user, ApprovedMethodology);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -125,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         
         public class DeleteSpecificMethodologyAuthorizationHandlerPublicationRoleTests
         {
-            private static readonly Methodology MethodologyWithPublications = new Methodology
+            private static readonly Methodology OwnedMethodology = new Methodology
             {
                 Id = Guid.NewGuid(),
                 MethodologyParent = new MethodologyParent
@@ -133,12 +159,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        PublicationId = Guid.NewGuid()
+                        PublicationId = PublicationId
                     })
                 }
             };
             
-            private static readonly Methodology MethodologyWithPublicationsNotOwner = new Methodology
+            private static readonly Methodology AdoptedMethodology = new Methodology
             {
                 Id = Guid.NewGuid(),
                 MethodologyParent = new MethodologyParent
@@ -146,12 +172,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = false,
-                        PublicationId = Guid.NewGuid()
+                        PublicationId = PublicationId
                     })
                 }
             };
             
-            private static readonly Methodology MethodologyApprovedWithPublications = new Methodology
+            private static readonly Methodology ApprovedMethodology = new Methodology
             {
                 Id = Guid.NewGuid(),
                 Status = Approved,
@@ -160,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        PublicationId = Guid.NewGuid()
+                        PublicationId = PublicationId
                     })
                 }
             };
@@ -171,23 +197,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(MethodologyWithPublications);
+                    context.Attach(OwnedMethodology);
 
                     var (handler, methodologyRepository, publicationRoleRepository) =
                         CreateHandlerAndDependencies(context);
 
                     methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(MethodologyWithPublications.Id))
+                        .Setup(s => s.IsPubliclyAccessible(OwnedMethodology.Id))
                         .ReturnsAsync(false);
 
-                    var publicationId = MethodologyWithPublications.MethodologyParent.Publications[0].PublicationId;
-
                     publicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUser(UserId, publicationId))
+                        .Setup(s => s.GetAllRolesByUser(UserId, PublicationId))
                         .ReturnsAsync(AsList(role));
                     
                     var user = CreateClaimsPrincipal(UserId);
-                    var authContext = CreateAuthContext(user, MethodologyWithPublications);
+                    var authContext = CreateAuthContext(user, OwnedMethodology);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -202,23 +226,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserWithNoPublicationRolesCannotDeleteNonPublicDraftMethodologyOfOwningPublications()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(MethodologyWithPublications);
+                context.Attach(OwnedMethodology);
 
                 var (handler, methodologyRepository, publicationRoleRepository) =
                     CreateHandlerAndDependencies(context);
 
                 methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(MethodologyWithPublications.Id))
+                    .Setup(s => s.IsPubliclyAccessible(OwnedMethodology.Id))
                     .ReturnsAsync(false);
 
-                var publicationId = MethodologyWithPublications.MethodologyParent.Publications[0].PublicationId;
-
                 publicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUser(UserId, publicationId))
+                    .Setup(s => s.GetAllRolesByUser(UserId, PublicationId))
                     .ReturnsAsync(new List<PublicationRole>());
                 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, MethodologyWithPublications);
+                var authContext = CreateAuthContext(user, OwnedMethodology);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyRepository, publicationRoleRepository);
@@ -231,17 +253,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserWithPublicationOwnerRoleCannotDeleteNonPublicDraftMethodologyOfNonOwningPublications()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(MethodologyWithPublicationsNotOwner);
+                context.Attach(AdoptedMethodology);
 
                 var (handler, methodologyRepository, publicationRoleRepository) =
                     CreateHandlerAndDependencies(context);
 
                 methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(MethodologyWithPublicationsNotOwner.Id))
+                    .Setup(s => s.IsPubliclyAccessible(AdoptedMethodology.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, MethodologyWithPublicationsNotOwner);
+                var authContext = CreateAuthContext(user, AdoptedMethodology);
 
                 await handler.HandleAsync(authContext);
 
@@ -255,17 +277,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserWithPublicationOwnerRoleCannotDeletePubliclyAccessibleMethodology()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(MethodologyWithPublications);
+                context.Attach(OwnedMethodology);
 
                 var (handler, methodologyRepository, publicationRoleRepository) =
                     CreateHandlerAndDependencies(context);
 
                 methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(MethodologyWithPublications.Id))
+                    .Setup(s => s.IsPubliclyAccessible(OwnedMethodology.Id))
                     .ReturnsAsync(true);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, MethodologyWithPublications);
+                var authContext = CreateAuthContext(user, OwnedMethodology);
 
                 await handler.HandleAsync(authContext);
 
@@ -279,17 +301,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodology()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(MethodologyApprovedWithPublications);
+                context.Attach(ApprovedMethodology);
 
                 var (handler, methodologyRepository, publicationRoleRepository) =
                     CreateHandlerAndDependencies(context);
 
                 methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(MethodologyApprovedWithPublications.Id))
+                    .Setup(s => s.IsPubliclyAccessible(ApprovedMethodology.Id))
                     .ReturnsAsync(true);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, MethodologyApprovedWithPublications);
+                var authContext = CreateAuthContext(user, ApprovedMethodology);
 
                 await handler.HandleAsync(authContext);
 

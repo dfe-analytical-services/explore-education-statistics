@@ -346,6 +346,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("PreviousVersionId");
 
+                    b.HasIndex("ScheduledWithReleaseId");
+
                     b.ToTable("Methodologies");
                 });
 

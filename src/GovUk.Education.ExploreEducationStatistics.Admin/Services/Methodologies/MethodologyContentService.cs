@@ -453,6 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForManageMethodologyContentViewModel(
             Methodology methodology)
         {
+            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
             await _context
                 .Entry(methodology)
                 .Reference(m => m.MethodologyParent)

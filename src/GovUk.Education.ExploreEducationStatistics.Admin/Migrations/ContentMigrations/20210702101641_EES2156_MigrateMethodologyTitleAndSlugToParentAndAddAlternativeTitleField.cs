@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 SET Methodologies.AlternativeTitle = Methodologies.Title
                 FROM Methodologies
                 JOIN MethodologyParents ON MethodologyParents.Id = Methodologies.MethodologyParentId
-                WHERE Methodologies.Title != MethodologyParents.OwningPublicationTitle");
+                WHERE Methodologies.Title != MethodologyParents.OwningPublicationTitle
+                AND Methodologies.Title != CONCAT(MethodologyParents.OwningPublicationTitle, ': methodology')");
 
             // Retain existing Methodologies' slugs, as they should never change.
             migrationBuilder.Sql(@"

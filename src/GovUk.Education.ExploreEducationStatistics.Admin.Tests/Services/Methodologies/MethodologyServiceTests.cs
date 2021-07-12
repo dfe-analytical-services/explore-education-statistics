@@ -30,923 +30,914 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
-        public class MiscellaneousTests
+        [Fact]
+        public async Task CreateMethodology()
         {
-            [Fact]
-            public async Task CreateMethodology()
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publication = new Publication();
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Publications.AddAsync(publication);
-                    await context.SaveChangesAsync();
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var repository = new Mock<IMethodologyRepository>(Strict);
-
-                    var service = SetupMethodologyService(
-                        context,
-                        methodologyRepository: repository.Object);
-
-                    var createdMethodology = new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        MethodologyParent = new MethodologyParent
-                        {
-                            Slug = "methodology-slug"
-                        }
-                    };
-
-                    repository
-                        .Setup(s => s.CreateMethodologyForPublication(publication.Id))
-                        .ReturnsAsync(createdMethodology);
-
-                    var result = await service.CreateMethodology(publication.Id);
-                    VerifyAllMocks(repository);
-
-                    var viewModel = result.AssertRight();
-                    Assert.Equal(createdMethodology.Id, viewModel.Id);
-                }
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
             }
 
-            [Fact]
-            public async Task GetSummary()
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodology = new Methodology
+                var repository = new Mock<IMethodologyRepository>(Strict);
+
+                var service = SetupMethodologyService(
+                    context,
+                    methodologyRepository: repository.Object);
+
+                var createdMethodology = new Methodology
                 {
-                    InternalReleaseNote = "Test approval",
-                    Published = new DateTime(2020, 5, 25),
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    }
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context);
-
-                    var viewModel = (await service.GetSummary(methodology.Id)).Right;
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
-                    Assert.Equal(methodology.Published, viewModel.Published);
-                    Assert.Equal(methodology.Status, viewModel.Status);
-                    Assert.Equal(methodology.MethodologyParent.OwningPublicationTitle, viewModel.Title);
-                }
-            }
-        }
-
-        // TODO EES-2156 - add test for updating AlternativeTitles explicitly
-        public class UpdateMethodologyTests
-        {
-            [Fact]
-            public async Task UpdateMethodology()
-            {
-                var methodology = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    AlternativeTitle = "Pupil absence statistics: methodology",
+                    Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
                         Slug = "methodology-slug"
                     }
                 };
 
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = null,
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                methodologyRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(false);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Null(viewModel.InternalReleaseNote);
-                    Assert.Null(viewModel.Published);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.Null(model.Published);
-                    Assert.Equal(Draft, model.Status);
-                    Assert.Equal(Immediately, model.PublishingStrategy);
-                    Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            public async Task UpdateMethodology_MethodologyHasImages()
-            {
-                var methodology = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        OwningPublicationTitle = "Pupil absence statistics: methodology",
-                        Slug = "pupil-absence-statistics-methodology"
-                    }
-                };
-
-                var imageFile1 = new MethodologyFile
-                {
-                    Methodology = methodology,
-                    File = new File
-                    {
-                        RootPath = Guid.NewGuid(),
-                        Filename = "image1.png",
-                        Type = FileType.Image
-                    }
-                };
-
-                var imageFile2 = new MethodologyFile
-                {
-                    Methodology = methodology,
-                    File = new File
-                    {
-                        RootPath = Guid.NewGuid(),
-                        Filename = "image2.png",
-                        Type = FileType.Image
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = null,
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = $@"
-        <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile1.File.Id}""/>
-        <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile2.File.Id}""/>"
-                        }
-                    });
-
-                methodologyRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(false);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Null(viewModel.InternalReleaseNote);
-                    Assert.Null(viewModel.Published);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.Null(model.Published);
-                    Assert.Equal(Draft, model.Status);
-                    Assert.Equal(Immediately, model.PublishingStrategy);
-                    Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            public async Task UpdateMethodology_MethodologyHasUnusedImages()
-            {
-                var methodology = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology"
-                    }
-                };
-
-                var imageFile1 = new MethodologyFile
-                {
-                    Methodology = methodology,
-                    File = new File
-                    {
-                        RootPath = Guid.NewGuid(),
-                        Filename = "image1.png",
-                        Type = FileType.Image
-                    }
-                };
-
-                var imageFile2 = new MethodologyFile
-                {
-                    Methodology = methodology,
-                    File = new File
-                    {
-                        RootPath = Guid.NewGuid(),
-                        Filename = "image2.png",
-                        Type = FileType.Image
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = null,
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                imageService.Setup(mock =>
-                        mock.Delete(methodology.Id, new List<Guid>
-                        {
-                            imageFile1.File.Id,
-                            imageFile2.File.Id
-                        }))
-                    .ReturnsAsync(Unit.Instance);
-
-                methodologyRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(false);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    imageService.Verify(mock =>
-                        mock.Delete(methodology.Id, new List<Guid>
-                        {
-                            imageFile1.File.Id,
-                            imageFile2.File.Id
-                        }), Times.Once);
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Null(viewModel.InternalReleaseNote);
-                    Assert.Null(viewModel.Published);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.Null(model.Published);
-                    Assert.Equal(Draft, model.Status);
-                    Assert.Equal(Immediately, model.PublishingStrategy);
-                    Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            public async Task UpdateMethodology_ApprovingUsingImmediateStrategy()
-            {
-                var methodology = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology"
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = "Test approval",
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
-                // Methodology is publicly accessible later after its publishing strategy and status are updated
-                methodologyRepository.SetupSequence(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(false)
-                    .ReturnsAsync(true);
-
-                publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
-                    .ReturnsAsync(Unit.Instance);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    methodologyRepository.Verify(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Equal("Test approval", viewModel.InternalReleaseNote);
-                    Assert.True(viewModel.Published.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published.Value).Milliseconds, 0, 1500);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.True(model.Published.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Published.Value).Milliseconds, 0, 1500);
-                    Assert.Equal(Approved, model.Status);
-                    Assert.Equal(Immediately, model.PublishingStrategy);
-                    Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
-            {
-                var methodology = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology"
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = "Test approval",
-                    PublishingStrategy = WithRelease,
-                    // TODO SOW4 EES-2164 Add a ScheduledWithRelease here when implementing it
-                    Status = Approved,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
-                // Methodology is not publicly accessible later after its publishing strategy and status are updated
-                // due to the Release not being live
-                methodologyRepository.SetupSequence(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(false)
-                    .ReturnsAsync(false);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    methodologyRepository.Verify(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    Assert.Equal("Test approval", viewModel.InternalReleaseNote);
-                    Assert.Null(viewModel.Published);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.Null(model.Published);
-                    Assert.Equal(Approved, model.Status);
-                    Assert.Equal(WithRelease, model.PublishingStrategy);
-                    Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            // TODO SOW4 EES-2166 EES-2200:
-            // Once amendments are available updating an approved methodology shouldn't be possible
-            // but un-approving should be provided the Methodology is not publicly accessible
-            public async Task UpdateMethodology_AlreadyPublished()
-            {
-                var methodology = new Methodology
-                {
-                    InternalReleaseNote = "Test approval",
-                    Published = new DateTime(2020, 5, 25),
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology"
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = null,
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    Title = "Pupil absence statistics (updated): methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                methodologyRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(methodology.Id))
-                    .ReturnsAsync(true);
-
-                publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
-                    .ReturnsAsync(Unit.Instance);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
-
-                    Assert.Equal(methodology.Id, viewModel.Id);
-                    // Original release note is not cleared if the update is not altering it
-                    Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
-                    Assert.Equal(methodology.Published, viewModel.Published);
-                    Assert.Equal(request.Status, viewModel.Status);
-                    Assert.Equal(request.Title, viewModel.Title);
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var model = await context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .SingleAsync(m => m.Id == methodology.Id);
-
-                    Assert.Equal(methodology.Published, model.Published);
-                    Assert.Equal(Approved, model.Status);
-                    Assert.Equal(Immediately, model.PublishingStrategy);
-                    // Slug remains unchanged
-                    Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                    Assert.True(model.Updated.HasValue);
-                    Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
-            }
-
-            [Fact]
-            public async Task UpdateMethodology_SlugNotUnique()
-            {
-                var methodology1 = new Methodology
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology"
-                    }
-                };
-
-                var methodology2 = new Methodology
-                {
-                    InternalReleaseNote = "Test approval",
-                    Published = new DateTime(2020, 5, 25),
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Slug = "pupil-exclusion-statistics-methodology",
-                        OwningPublicationTitle = "Pupil exclusion statistics: methodology"
-                    }
-                };
-
-                var request = new MethodologyUpdateRequest
-                {
-                    LatestInternalReleaseNote = null,
-                    PublishingStrategy = Immediately,
-                    Status = Draft,
-                    Title = "Pupil exclusion statistics: methodology"
-                };
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.AddRangeAsync(new List<Methodology>
-                    {
-                        methodology1, methodology2
-                    });
-                    await context.SaveChangesAsync();
-                }
-
-                var contentService = new Mock<IMethodologyContentService>(Strict);
-                var imageService = new Mock<IMethodologyImageService>(Strict);
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-                var publishingService = new Mock<IPublishingService>(Strict);
-
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(methodology1.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                methodologyRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(methodology1.Id))
-                    .ReturnsAsync(false);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(contentDbContext: context,
-                        methodologyContentService: contentService.Object,
-                        methodologyImageService: imageService.Object,
-                        methodologyRepository: methodologyRepository.Object,
-                        publishingService: publishingService.Object);
-
-                    var result = await service.UpdateMethodology(methodology1.Id, request);
-
-                    Assert.True(result.IsLeft);
-                    AssertValidationProblem(result.Left, SlugNotUnique);
-                }
-
-                VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+                repository
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id))
+                    .ReturnsAsync(createdMethodology);
+
+                var result = await service.CreateMethodology(publication.Id);
+                VerifyAllMocks(repository);
+
+                var viewModel = result.AssertRight();
+                Assert.Equal(createdMethodology.Id, viewModel.Id);
             }
         }
 
-        public class DeleteMethodologyTests
+        [Fact]
+        public async Task GetSummary()
         {
-            [Fact]
-            public async Task DeleteMethodology()
+            var methodology = new Methodology
             {
-                var methodologyParentId = Guid.NewGuid();
-                
-                var methodology = new Methodology
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var viewModel = (await service.GetSummary(methodology.Id)).Right;
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.Published, viewModel.Published);
+                Assert.Equal(methodology.Status, viewModel.Status);
+                Assert.Equal(methodology.MethodologyParent.OwningPublicationTitle, viewModel.Title);
+            }
+        }
+
+        // TODO SOW4 EES-2156 - add test for updating AlternativeTitles explicitly
+        [Fact]
+        public async Task UpdateMethodology()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                AlternativeTitle = "Pupil absence statistics: methodology",
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug"
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = null,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Null(model.Published);
+                Assert.Equal(Draft, model.Status);
+                Assert.Equal(Immediately, model.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_MethodologyHasImages()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Slug = "pupil-absence-statistics-methodology"
+                }
+            };
+
+            var imageFile1 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image1.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var imageFile2 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image2.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = null,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = $@"
+    <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile1.File.Id}""/>
+    <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile2.File.Id}""/>"
+                    }
+                });
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Null(model.Published);
+                Assert.Equal(Draft, model.Status);
+                Assert.Equal(Immediately, model.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_MethodologyHasUnusedImages()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
+            };
+
+            var imageFile1 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image1.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var imageFile2 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image2.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = null,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            imageService.Setup(mock =>
+                    mock.Delete(methodology.Id, new List<Guid>
+                    {
+                        imageFile1.File.Id,
+                        imageFile2.File.Id
+                    }))
+                .ReturnsAsync(Unit.Instance);
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                imageService.Verify(mock =>
+                    mock.Delete(methodology.Id, new List<Guid>
+                    {
+                        imageFile1.File.Id,
+                        imageFile2.File.Id
+                    }), Times.Once);
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Null(model.Published);
+                Assert.Equal(Draft, model.Status);
+                Assert.Equal(Immediately, model.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_ApprovingUsingImmediateStrategy()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = "Test approval",
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is publicly accessible later after its publishing strategy and status are updated
+            methodologyRepository.SetupSequence(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false)
+                .ReturnsAsync(true);
+
+            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                methodologyRepository.Verify(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.True(viewModel.Published.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published.Value).Milliseconds, 0, 1500);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.True(model.Published.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Published.Value).Milliseconds, 0, 1500);
+                Assert.Equal(Approved, model.Status);
+                Assert.Equal(Immediately, model.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = "Test approval",
+                PublishingStrategy = WithRelease,
+                // TODO SOW4 EES-2164 Add a ScheduledWithRelease here when implementing it
+                Status = Approved,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
+            // Methodology is not publicly accessible later after its publishing strategy and status are updated
+            // due to the Release not being live
+            methodologyRepository.SetupSequence(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false)
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                methodologyRepository.Verify(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Null(model.Published);
+                Assert.Equal(Approved, model.Status);
+                Assert.Equal(WithRelease, model.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        // TODO SOW4 EES-2166 EES-2200:
+        // Once amendments are available updating an approved methodology shouldn't be possible
+        // but un-approving should be provided the Methodology is not publicly accessible
+        public async Task UpdateMethodology_AlreadyPublished()
+        {
+            var methodology = new Methodology
+            {
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = null,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(true);
+
+            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                // Original release note is not cleared if the update is not altering it
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.Published, viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Equal(methodology.Published, model.Published);
+                Assert.Equal(Approved, model.Status);
+                Assert.Equal(Immediately, model.PublishingStrategy);
+                // Slug remains unchanged
+                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_SlugNotUnique()
+        {
+            var methodology1 = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                }
+            };
+
+            var methodology2 = new Methodology
+            {
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "pupil-exclusion-statistics-methodology",
+                    OwningPublicationTitle = "Pupil exclusion statistics: methodology"
+                }
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = null,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Title = "Pupil exclusion statistics: methodology"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.AddRangeAsync(new List<Methodology>
+                {
+                    methodology1, methodology2
+                });
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var imageService = new Mock<IMethodologyImageService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publishingService = new Mock<IPublishingService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology1.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology1.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyImageService: imageService.Object,
+                    methodologyRepository: methodologyRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var result = await service.UpdateMethodology(methodology1.Id, request);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, SlugNotUnique);
+            }
+
+            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+        }
+
+        [Fact]
+        public async Task DeleteMethodology()
+        {
+            var methodologyParentId = Guid.NewGuid();
+            
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Id = methodologyParentId,
+                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        MethodologyParentId = methodologyParentId
+                    })
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that a Methodology, a MethodologyParent and a PublicationMethodology row were
+                // created.
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodology.Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+                Assert.NotNull(await context.PublicationMethodologies.SingleAsync(m => m.MethodologyParentId == methodologyParentId));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodology.Id);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology has successfully been deleted and as it was the only Methodology
+                // version on the MethodologyParent, the MethodologyParent is also deleted.
+                //
+                // Also, as the MethodologyParent was deleted, then the PublicationMethodology links that linked
+                // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
+                // db currently doesn't support this so we can't check that there are no longer those
+                // PublicationMethodology rows.
+                // TODO SOW4 EES-2156 - test deleting Methodology Files
+                Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
+                Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
+            }
+        }
+        
+        [Fact]
+        public async Task DeleteMethodology_MoreThanOneMethodologyVersion()
+        {
+            var methodologyParentId = Guid.NewGuid();
+
+            var methodologyParent = new MethodologyParent
+            {
+                Id = methodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
                 {
                     Id = Guid.NewGuid(),
                     PublishingStrategy = Immediately,
-                    Status = Draft,
-                    MethodologyParent = new MethodologyParent
-                    {
-                        Id = methodologyParentId,
-                        Slug = "pupil-absence-statistics-methodology",
-                        OwningPublicationTitle = "Pupil absence statistics: methodology",
-                        Publications = AsList(new PublicationMethodology
-                        {
-                            MethodologyParentId = methodologyParentId
-                        })
-                    }
-                };
+                    Status = Draft
+                },
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.AddAsync(methodology);
-                    await context.SaveChangesAsync();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Sanity check that a Methodology, a MethodologyParent and a PublicationMethodology row were
-                    // created.
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodology.Id));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                    Assert.NotNull(await context.PublicationMethodologies.SingleAsync(m => m.MethodologyParentId == methodologyParentId));
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(context);
-                    var result = await service.DeleteMethodology(methodology.Id);
-                    result.AssertRight();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Assert that the Methodology has successfully been deleted and as it was the only Methodology
-                    // version on the MethodologyParent, the MethodologyParent is also deleted.
-                    //
-                    // Also, as the MethodologyParent was deleted, then the PublicationMethodology links that linked
-                    // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
-                    // db currently doesn't support this so we can't check that there are no longer those
-                    // PublicationMethodology rows.
-                    // TODO EES-2156 - test deleting Methodology Files
-                    Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
-                    Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
-                }
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddAsync(methodologyParent);
+                await context.SaveChangesAsync();
             }
             
-            [Fact]
-            public async Task DeleteMethodology_MoreThanOneMethodologyVersion()
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyParentId = Guid.NewGuid();
+                // Sanity check that 2 Methodologies and their MethodologyParent is created.
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[1].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+            }
 
-                var methodologyParent = new MethodologyParent
-                {
-                    Id = methodologyParentId,
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Versions = AsList(new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    },
-                    new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    })
-                };
-                
-                var contentDbContextId = Guid.NewGuid().ToString();
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.MethodologyParents.AddAsync(methodologyParent);
-                    await context.SaveChangesAsync();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Sanity check that 2 Methodologies and their MethodologyParent is created.
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[1].Id));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(context);
-                    var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
-                    result.AssertRight();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Assert that the Methodology has successfully been deleted and as there was another Methodology
-                    // version attached to the MethodologyParent, the Parent itself is not deleted, or the other
-                    // Methodology version.
-                    // TODO EES-2156 - test deleting Methodology Files
-                    Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                }
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
+                result.AssertRight();
             }
             
-            [Fact]
-            public async Task DeleteMethodology_UnrelatedMethodologiesAreUnaffected()
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyParentId = Guid.NewGuid();
-                var unrelatedMethodologyParentId = Guid.NewGuid();
+                // Assert that the Methodology has successfully been deleted and as there was another Methodology
+                // version attached to the MethodologyParent, the Parent itself is not deleted, or the other
+                // Methodology version.
+                // TODO SOW4 EES-2156 - test deleting Methodology Files
+                Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+            }
+        }
+        
+        [Fact]
+        public async Task DeleteMethodology_UnrelatedMethodologiesAreUnaffected()
+        {
+            var methodologyParentId = Guid.NewGuid();
+            var unrelatedMethodologyParentId = Guid.NewGuid();
 
-                var methodologyParent = new MethodologyParent
+            var methodologyParent = new MethodologyParent
+            {
+                Id = methodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
                 {
-                    Id = methodologyParentId,
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Versions = AsList(new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    })
-                };
-                
-                var unrelatedMethodologyParent = new MethodologyParent
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var unrelatedMethodologyParent = new MethodologyParent
+            {
+                Id = unrelatedMethodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
                 {
-                    Id = unrelatedMethodologyParentId,
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Versions = AsList(new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    })
-                };
-                
-                var contentDbContextId = Guid.NewGuid().ToString();
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.MethodologyParents.AddRangeAsync(methodologyParent, unrelatedMethodologyParent);
-                    await context.SaveChangesAsync();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Sanity check that 2 MethodologyParents and their Methodologies are created.
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
-                }
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddRangeAsync(methodologyParent, unrelatedMethodologyParent);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that 2 MethodologyParents and their Methodologies are created.
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
+            }
 
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(context);
-                    var result = await service.DeleteMethodology(methodologyParent.Versions[0].Id);
-                    result.AssertRight();
-                }
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+                var result = await service.DeleteMethodology(methodologyParent.Versions[0].Id);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
+                // unaffected. 
+                // TODO SOW4 EES-2156 - test deleting Methodology Files
+                Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
                 
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
-                    // unaffected. 
-                    // TODO EES-2156 - test deleting Methodology Files
-                    Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
-                    Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
-                    
-                    Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
-                    Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
-                }
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
             }
         }
 
