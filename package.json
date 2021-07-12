@@ -63,7 +63,7 @@
       "prettier --write"
     ],
     "*.robot": [
-      "robotidy --config tests/robot-tests/robotidy.toml"
+      "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml"
     ]
   },
   "dependencies": {}
