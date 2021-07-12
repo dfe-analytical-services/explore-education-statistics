@@ -1,6 +1,6 @@
 *** Settings ***
-Library     public-utilities.py
 Resource    ./common.robot
+Library     public-utilities.py
 
 *** Keywords ***
 user checks headline summary contains

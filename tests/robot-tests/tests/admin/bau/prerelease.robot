@@ -233,7 +233,8 @@ Validate prerelease has started
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}    60
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}    60
+    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
+    ...    60
 
 Validate metadata guidance page
     [Tags]    HappyPath

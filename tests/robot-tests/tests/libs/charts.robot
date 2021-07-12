@@ -7,7 +7,8 @@ user waits for chart preview to update
     # there is no other good way to check that the DOM has actually changed.
     ${count}=    get element attribute    id:chartBuilderPreviewContainer    data-render-count
     ${next_count}=    evaluate    int(${count}) + 1
-    user waits until page contains element    css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]    90
+    user waits until page contains element    css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]
+    ...    90
 
 user waits until element contains line chart
     [Arguments]    ${locator}
@@ -84,14 +85,16 @@ user checks chart y axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
     ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
-    ${element}=    get child element    ${locator}    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ${element}=    get child element    ${locator}
+    ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
 
 user checks chart x axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
     ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
-    ${element}=    get child element    ${locator}    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ${element}=    get child element    ${locator}
+    ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
 
 user checks chart y axis ticks

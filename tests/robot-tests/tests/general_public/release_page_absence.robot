@@ -192,7 +192,8 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    4    1.1
     user checks row cell contains text    ${row}    5    1.3
 
-    ${row}=    user gets row with group and indicator    England    Overall absence rate    css:#releaseHeadlines-tables table
+    ${row}=    user gets row with group and indicator    England    Overall absence rate
+    ...    css:#releaseHeadlines-tables table
     user checks row contains heading    ${row}    Overall absence rate
     user checks row cell contains text    ${row}    1    5.3
     user checks row cell contains text    ${row}    2    4.5

@@ -144,7 +144,8 @@ Navigate to administration as bau1 and swap publication owner role for release a
 Check release approver can access release
     [Tags]    HappyPath
     user changes to analyst1
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}    ${RELEASE_TYPE} (not Live)
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_TYPE} (not Live)
 
 Navigate to 'Footnotes' section
     [Tags]    HappyPath

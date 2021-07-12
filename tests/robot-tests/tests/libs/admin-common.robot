@@ -1,6 +1,6 @@
 *** Settings ***
-Library     admin-utilities.py
 Resource    ./common.robot
+Library     admin-utilities.py
 
 *** Keywords ***
 user signs in as bau1
@@ -357,7 +357,8 @@ user opens nth editable accordion section
     [Arguments]    ${section_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}
     ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    ${section}=    get child element    ${parent}    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
+    ${section}=    get child element    ${parent}
+    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
     ${header_button}=    get child element    ${section}    css:h2 > button[aria-expanded]
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'true'
@@ -368,7 +369,8 @@ user opens nth editable accordion section
 user changes accordion section title
     [Arguments]    ${section_num}    ${title}    ${parent}=id:releaseMainContent
     user opens nth editable accordion section    ${section_num}    ${parent}
-    ${section}=    get child element    ${parent}    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
+    ${section}=    get child element    ${parent}
+    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
     user clicks button    Edit section title    ${section}
     user waits until parent contains element    ${section}    css:input[name="heading"]
     ${input}=    get child element    ${section}    css:input[name="heading"]
