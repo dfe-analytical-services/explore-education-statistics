@@ -3,13 +3,6 @@
 import archiver from 'archiver';
 import fs from 'fs';
 
-/**
- *
- * @param {String} source
- * @param {String} out
- * @returns {Promise}
- */
-
 const ZipDirectory = async (source: string, out: string) => {
   const archive = archiver('zip');
   const stream = fs.createWriteStream(out);

@@ -1,16 +1,4 @@
-/* eslint-disable */
-
-export interface SubjectArrayT {
-  id: string;
-  filename: string;
-  name: string;
-  content: string;
-  timePeriods: { from: string; to: string };
-  geographicLevels: string[];
-  variables: object[];
-}
-
-export interface ReleaseDataProps {
+export interface ReleaseData {
   sub: () => void;
   id: string;
   title: string;
