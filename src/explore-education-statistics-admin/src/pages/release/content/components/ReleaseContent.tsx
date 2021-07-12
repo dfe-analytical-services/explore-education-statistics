@@ -28,6 +28,12 @@ import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 
+interface MethodologyLink {
+  key: string;
+  title: string;
+  url: string;
+}
+
 const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
@@ -103,6 +109,24 @@ const ReleaseContent = () => {
     return null;
   }
 
+  const { publication } = release;
+
+  const allMethodologies: MethodologyLink[] = publication.methodologies.map(
+    methodology => ({
+      key: methodology.id,
+      title: methodology.title,
+      url: `/methodology/${methodology.id}/summary`,
+    }),
+  );
+
+  if (publication.externalMethodology) {
+    allMethodologies.push({
+      key: publication.externalMethodology.url,
+      title: publication.externalMethodology.title,
+      url: publication.externalMethodology.url,
+    });
+  }
+
   return (
     <>
       <div className="govuk-grid-row">
@@ -166,27 +190,21 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              {release.publication.methodologies.map(methodology => (
-                <li key={methodology.id}>
-                  {editingMode === 'edit' ? (
-                    <a>{methodology.title}</a>
-                  ) : (
-                    <Link to={`/methodology/${methodology.id}/summary`}>
-                      {methodology.title}
-                    </Link>
-                  )}
-                </li>
-              ))}
-              {release.publication.externalMethodology && (
-                <li>
-                  {editingMode === 'edit' ? (
-                    <a>{release.publication.externalMethodology.title}</a>
-                  ) : (
-                    <Link to={release.publication.externalMethodology.url}>
-                      {release.publication.externalMethodology.title}
-                    </Link>
-                  )}
-                </li>
+              {allMethodologies.length > 0 && (
+                <>
+                  {allMethodologies.map(methodology => (
+                    <p
+                      key={methodology.key}
+                      className="govuk-!-margin-bottom-9"
+                    >
+                      {editingMode === 'edit' ? (
+                        <a>{`${methodology.title}`}</a>
+                      ) : (
+                        <Link to={methodology.url}>{methodology.title}</Link>
+                      )}
+                    </p>
+                  ))}
+                </>
               )}
               {release.hasMetaGuidance && (
                 <li>

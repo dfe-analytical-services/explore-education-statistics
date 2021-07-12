@@ -102,39 +102,42 @@ const MethodologySummary = ({
 
   return (
     <>
-      {publication.permissions.canCreateMethodologies && (
+      {hasMethodologyPermissions && (
         <ButtonGroup className="govuk-!-margin-bottom-2">
-          <Button
-            onClick={async () => {
-              const {
-                id: methodologyId,
-              } = await methodologyService.createMethodology(publicationId);
-              history.push(
-                generatePath<MethodologyRouteParams>(
-                  methodologySummaryRoute.path,
-                  {
-                    methodologyId,
-                  },
-                ),
-              );
-            }}
-            data-testid={`Create methodology for ${title}`}
-            disabled={showAddEditExternalMethodologyForm}
-          >
-            Create methodology
-          </Button>
-
-          {publication.permissions.canManageExternalMethodology && (
+          {publication.permissions.canCreateMethodologies && (
             <Button
-              type="button"
-              data-testid={`Link methodology for ${title}`}
-              variant="secondary"
-              onClick={() => setShowAddEditExternalMethodologyForm(true)}
+              onClick={async () => {
+                const {
+                  id: methodologyId,
+                } = await methodologyService.createMethodology(publicationId);
+                history.push(
+                  generatePath<MethodologyRouteParams>(
+                    methodologySummaryRoute.path,
+                    {
+                      methodologyId,
+                    },
+                  ),
+                );
+              }}
+              data-testid={`Create methodology for ${title}`}
               disabled={showAddEditExternalMethodologyForm}
             >
-              Link to an externally hosted methodology
+              Create methodology
             </Button>
           )}
+
+          {publication.permissions.canManageExternalMethodology &&
+            !externalMethodology && (
+              <Button
+                type="button"
+                data-testid={`Link methodology for ${title}`}
+                variant="secondary"
+                onClick={() => setShowAddEditExternalMethodologyForm(true)}
+                disabled={showAddEditExternalMethodologyForm}
+              >
+                Link to an externally hosted methodology
+              </Button>
+            )}
         </ButtonGroup>
       )}
 
@@ -149,7 +152,7 @@ const MethodologySummary = ({
                 type="button"
                 onClick={() => setShowAddEditExternalMethodologyForm(true)}
               >
-                Edit
+                Edit externally hosted methodology
               </Button>
               <Button
                 type="button"

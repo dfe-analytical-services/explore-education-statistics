@@ -8,6 +8,12 @@ import NationalStatisticsSection from '@common/modules/find-statistics/component
 import { ReleaseType } from '@common/services/publicationService';
 import React from 'react';
 
+interface MethodologyLink {
+  key: string;
+  title: string;
+  url: string;
+}
+
 const ReleaseHelpAndSupportSection = ({
   release,
 }: {
@@ -15,6 +21,23 @@ const ReleaseHelpAndSupportSection = ({
 }) => {
   const { editingMode } = useEditingContext();
   const { publication } = release;
+
+  const allMethodologies: MethodologyLink[] = publication.methodologies.map(
+    methodology => ({
+      key: methodology.id,
+      title: methodology.title,
+      url: `/methodology/${methodology.id}/summary`,
+    }),
+  );
+
+  if (publication.externalMethodology) {
+    allMethodologies.push({
+      key: publication.externalMethodology.url,
+      title: publication.externalMethodology.title,
+      url: publication.externalMethodology.url,
+    });
+  }
+
   return (
     <>
       <h2
@@ -30,31 +53,17 @@ const ReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {publication.methodologies.length ||
-          publication.externalMethodology ? (
+          {allMethodologies.length ? (
             <>
-              {publication.methodologies.map(methodology => (
-                <p key={methodology.id} className="govuk-!-margin-bottom-9">
+              {allMethodologies.map(methodology => (
+                <p key={methodology.key} className="govuk-!-margin-bottom-9">
                   {editingMode === 'edit' ? (
                     <a>{`${methodology.title}`}</a>
                   ) : (
-                    <Link to={`/methodology/${methodology.id}/summary`}>
-                      {methodology.title}
-                    </Link>
+                    <Link to={methodology.url}>{methodology.title}</Link>
                   )}
                 </p>
               ))}
-              {publication.externalMethodology && (
-                <p className="govuk-!-margin-bottom-9">
-                  {editingMode === 'edit' ? (
-                    <a>{`${publication.externalMethodology.title}`}</a>
-                  ) : (
-                    <Link to={publication.externalMethodology.url}>
-                      {publication.externalMethodology.title}
-                    </Link>
-                  )}
-                </p>
-              )}
             </>
           ) : (
             <p>No methodologies added.</p>

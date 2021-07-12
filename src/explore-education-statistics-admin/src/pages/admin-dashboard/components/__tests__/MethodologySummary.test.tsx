@@ -176,7 +176,7 @@ describe('MethodologySummary', () => {
         screen.queryByRole('button', {
           name: 'Link to an externally hosted methodology',
         }),
-      ).not.toBeInTheDocument();
+      ).toBeInTheDocument();
     });
   });
 
@@ -211,7 +211,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('the create and link methodology buttons are not shown if the user does not have permission', () => {
+    test('the create and link methodology buttons are not shown if the user does not have permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -373,7 +373,9 @@ describe('MethodologySummary', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Edit' }),
+          screen.getByRole('button', {
+            name: 'Edit externally hosted methodology',
+          }),
         ).toBeInTheDocument();
 
         expect(
@@ -407,7 +409,9 @@ describe('MethodologySummary', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.queryByRole('button', { name: 'Edit' }),
+          screen.queryByRole('button', {
+            name: 'Edit externally hosted methodology',
+          }),
         ).not.toBeInTheDocument();
 
         expect(

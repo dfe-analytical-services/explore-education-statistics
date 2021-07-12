@@ -6,7 +6,7 @@ import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import Link from '@admin/components/Link';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
   publication?: BasicPublicationDetails;
@@ -28,20 +28,20 @@ const ReleasePreviewTableToolFinalStep = ({
   }, [tableHeaders]);
 
   const getMethodologyLinks = () => {
-    if (publication?.methodologies && publication?.methodologies.length) {
-      return publication?.methodologies.map(methodology => methodology.title);
-    }
+    const links: ReactNode[] =
+      publication?.methodologies?.map(methodology => methodology.title) ?? [];
+
     if (publication?.externalMethodology) {
-      return [
+      links.push(
         <Link
           key={publication.externalMethodology.url}
           to={publication.externalMethodology.url}
         >
           {publication.externalMethodology.title}
         </Link>,
-      ];
+      );
     }
-    return [];
+    return links;
   };
 
   return (
