@@ -1,4 +1,13 @@
+*** Settings ***
+Resource    ../../common.robot
+
 *** Keywords ***
+user navigates to publication on admin dashboard
+    [Arguments]  ${publication}  ${theme}  ${topic}
+    ${publication_accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}
+    ...    ${topic}
+    set suite variable    ${publication_accordion}
+
 user cannot see the create methodologies controls for publication
     [Arguments]  ${PUBLICATION_ACCORDION}
     user checks element does not contain button  ${PUBLICATION_ACCORDION}  Create methodology
@@ -8,6 +17,18 @@ user cannot see the create amendment controls for release
     [Arguments]  ${RELEASE_DETAILS_SECTION}
     user waits until element contains link   ${RELEASE_DETAILS_SECTION}  View this release  30
     user checks element does not contain button  ${RELEASE_DETAILS_SECTION}  Amend this release
+
+user cannot see edit controls for release content
+    [Arguments]  ${publication}
+    user clicks link   Content
+    user waits until h2 is visible    ${publication}
+    user waits until page does not contain button  Set page view
+    user waits until page does not contain button  Add note
+    user waits until page does not contain button  Add related page link
+    user waits until page does not contain button  Add secondary stats
+    user waits until page does not contain button  Add key statistic
+    user waits until page does not contain button  Add a headlines text block
+    user waits until page does not contain button  Add new section
 
 user cannot see the edit release status controls for release
     [Arguments]
