@@ -68,13 +68,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             var publications = methodology.MethodologyParent.Publications;
             
-            // If the user has a Publication Owner role on a Publication that uses this Methodology, they can create 
-            // an Amendment of this Methodology.
             if (publications.IsNullOrEmpty())
             {
                 return;
             }
 
+            // If the user has a Publication Owner role on a Publication that owns this Methodology, they can delete 
+            // this Methodology.
             foreach (var publication in publications.Where(p => p.Owner))
             {
                 var publicationRoles =

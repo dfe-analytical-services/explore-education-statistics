@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        // TODO DW - add test for updating AlternativeTitles explicitly
+        // TODO SOW4 EES-2156 - add test for updating AlternativeTitles explicitly
         [Fact]
         public async Task UpdateMethodology()
         {
@@ -858,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
                 // db currently doesn't support this so we can't check that there are no longer those
                 // PublicationMethodology rows.
-                // TODO EES-2156 - test deleting Methodology Files
+                // TODO SOW4 EES-2156 - test deleting Methodology Files
                 Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
             }
@@ -983,7 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
                 // unaffected. 
-                // TODO EES-2156 - test deleting Methodology Files
+                // TODO SOW4 EES-2156 - test deleting Methodology Files
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
                 

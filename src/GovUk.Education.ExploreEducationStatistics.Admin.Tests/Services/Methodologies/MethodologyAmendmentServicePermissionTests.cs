@@ -1,5 +1,6 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
@@ -36,13 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private MethodologyAmendmentService SetupMethodologyAmendmentService(
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IMethodologyService methodologyService = null)
         {
             return new MethodologyAmendmentService(
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 userService ?? new Mock<IUserService>().Object,
-                MapperUtils.AdminMapper(),
-                null
+                methodologyService ?? new Mock<IMethodologyService>().Object,
+                InMemoryApplicationDbContext()
             );
         }
 

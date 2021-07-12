@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        // TODO EES-2156 - delete Methodology Files
+        // TODO SOW4 EES-2156 - delete Methodology Files
         public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
         {
             return _persistenceHelper
@@ -237,6 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForManageMethodologySummaryViewModel(
             Methodology methodology)
         {
+            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
             await _context
                 .Entry(methodology)
                 .Reference(m => m.MethodologyParent)

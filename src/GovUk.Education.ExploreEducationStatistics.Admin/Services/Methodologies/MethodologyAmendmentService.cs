@@ -17,18 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IMapper _mapper;
+        private readonly IMethodologyService _methodologyService;
         private readonly ContentDbContext _context;
 
         public MethodologyAmendmentService(
             IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService,
-            IMapper mapper, 
+            IMethodologyService methodologyService,
             ContentDbContext context)
         {
             _persistenceHelper = persistenceHelper;
             _userService = userService;
-            _mapper = mapper;
+            _methodologyService = methodologyService;
             _context = context;
         }
 
@@ -39,10 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
                 .OnSuccess(HydrateMethodologyForAmendment)
                 .OnSuccess(CreateAndSaveAmendment)
-                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+                .OnSuccess(amendment => _methodologyService.GetSummary(amendment.Id));
         }
         
-        // TODO EES-2156 - copy Methodology Files
+        // TODO SOW4 EES-2156 - copy Methodology Files
         private async Task<Either<ActionResult, Methodology>> CreateAndSaveAmendment(Methodology methodology)
         {
             var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());

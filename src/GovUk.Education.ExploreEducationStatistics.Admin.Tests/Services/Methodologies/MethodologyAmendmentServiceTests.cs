@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
     public class MethodologyAmendmentServiceTests
     {
         [Fact]
-        // TODO EES-2156 - test copying Methodology Files
+        // TODO SOW4 EES-2156 - test copying Methodology Files
         public async Task CreateMethodologyAmendment()
         {
             var originalMethodology = new Methodology
@@ -57,18 +58,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Call the method under test
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildService(context);
+                var methodologyService = new Mock<IMethodologyService>();
+                var service = BuildService(context, methodologyService: methodologyService.Object);
+                
+                var amendmentIdCapture = new List<Guid>();
+                var summaryViewModel = new MethodologySummaryViewModel();
+                
+                methodologyService
+                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
+                    .ReturnsAsync(summaryViewModel);
+                
                 var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
-                
                 var resultingViewModel = result.AssertRight();
-                amendmentId = resultingViewModel.Id;
-                
-                // Check over the returned values in the View Model for the amendment.
-                Assert.NotEqual(originalMethodology.Id, resultingViewModel.Id);
-                Assert.Equal(originalMethodology.Title, resultingViewModel.Title);
-                Assert.Equal(Draft, resultingViewModel.Status);
-                Assert.Null(resultingViewModel.Published);
-                Assert.Null(resultingViewModel.InternalReleaseNote);
+                Assert.Same(summaryViewModel, resultingViewModel);
+                amendmentId = Assert.Single(amendmentIdCapture);
             }
 
             // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
@@ -89,13 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private static MethodologyAmendmentService BuildService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IMapper adminMapper = null,
+            IMethodologyService methodologyService = null,
             IUserService userService = null)
         {
             return new MethodologyAmendmentService(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                adminMapper ?? AdminMapper(),
+                methodologyService ?? new Mock<IMethodologyService>().Object,
                 contentDbContext
             );
         }
