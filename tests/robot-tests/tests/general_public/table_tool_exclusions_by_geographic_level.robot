@@ -18,7 +18,8 @@ Select Exclusions publication
     user clicks radio    Permanent and fixed-period exclusions in England
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    Choose a subject
-    user checks previous table tool step contains    1    Publication    Permanent and fixed-period exclusions in England
+    user checks previous table tool step contains    1    Publication
+    ...    Permanent and fixed-period exclusions in England
 
 Validate "Exclusions by geographic level" subject details
     [Tags]    HappyPath

@@ -23,7 +23,8 @@ Select "Pupil absence" publication
 Validate "Absence in prus" subject details
     [Tags]    HappyPath
     user opens details dropdown    More details    css:[data-testid="Radio item for Absence in prus"]
-    ${details}=    user gets details content element    More details    css:[data-testid="Radio item for Absence in prus"]
+    ${details}=    user gets details content element    More details
+    ...    css:[data-testid="Radio item for Absence in prus"]
     user checks summary list contains    Geographic levels    Local Authority; National; Regional    ${details}
     user checks summary list contains    Time period    2013/14 to 2016/17    ${details}
 

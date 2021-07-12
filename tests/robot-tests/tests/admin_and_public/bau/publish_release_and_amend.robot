@@ -22,7 +22,8 @@ Create new publication for "UI tests topic" topic
 
 Go to "Release summary" page
     [Tags]    HappyPath
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME} (not Live)
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME} (not Live)
 
 Verify release summary
     [Tags]    HappyPath
@@ -156,7 +157,8 @@ Add two accordion sections to release
 
 Add data block to first accordion section
     [Tags]    HappyPath
-    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}    css:#releaseMainContent
+    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
+    ...    css:#releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until page contains element    ${datablock}    60
     user waits until element contains infographic chart    ${datablock}
@@ -199,7 +201,8 @@ Verify newly published release is on Find Statistics page
     user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}    %{WAIT_MEDIUM}
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    ...    %{WAIT_MEDIUM}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
@@ -222,7 +225,8 @@ Verify publish and update dates
     set suite variable    ${PUBLISH_DATE_DAY}
     set suite variable    ${PUBLISH_DATE_MONTH_WORD}
     set suite variable    ${PUBLISH_DATE_YEAR}
-    user checks summary list contains    Published    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published
+    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains    Next update    December 3001
 
 Verify release associated files
@@ -231,7 +235,8 @@ Verify release associated files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user waits until page contains element    ${downloads}    60
 
-    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)    60
+    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
+    ...    60
     user checks element should contain    ${downloads}    Dates test subject (csv, 17 Kb)    60
     user checks element should contain    ${downloads}
     ...    All data used to create this release is published as open data and is available for download.
@@ -516,7 +521,8 @@ Navigate to 'Content' page for amendment
 Update second accordion section text for amendment
     [Tags]    HappyPath
     user opens accordion section    Test text    css:#releaseMainContent
-    user adds content to accordion section text block    Test text    1    Updated test text!    css:#releaseMainContent
+    user adds content to accordion section text block    Test text    1    Updated test text!
+    ...    css:#releaseMainContent
 
 Add release note to amendment
     [Tags]    HappyPath
@@ -576,14 +582,16 @@ Verify amendment is displayed as the latest release
 
 Verify amendment is published
     [Tags]    HappyPath
-    user checks summary list contains    Published    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published
+    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains    Next update    December 3001    # TODO: Check Next update date can be updated
 
 Verify amendment files
     [Tags]    HappyPath
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)    30
+    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
+    ...    30
 
     user clicks element    xpath://*[@data-testid="Expand Details Section List of other files"]
     user waits until page contains link    Test ancillary file 1    60

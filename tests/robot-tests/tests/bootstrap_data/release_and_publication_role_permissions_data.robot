@@ -36,7 +36,8 @@ Create new publications and published releases - for Release Viewer
     user gives release access to all releases of publication to analyst    ${PUBLICATION_FOR_RELEASE_VIEWER}    Viewer
 
 Create new publications and published releases - for Release Contributor
-    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_FOR_RELEASE_CONTRIBUTOR}    ${TOPIC_ID}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_FOR_RELEASE_CONTRIBUTOR}
+    ...    ${TOPIC_ID}
     user creates releases in all states for publication    ${PUBLICATION_ID}    ${PUBLICATION_FOR_RELEASE_CONTRIBUTOR}
     user gives release access to all releases of publication to analyst    ${PUBLICATION_FOR_RELEASE_CONTRIBUTOR}
     ...    Contributor
@@ -44,14 +45,16 @@ Create new publications and published releases - for Release Contributor
 Create new publications and published releases - for Release Approver
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_FOR_RELEASE_APPROVER}    ${TOPIC_ID}
     user creates releases in all states for publication    ${PUBLICATION_ID}    ${PUBLICATION_FOR_RELEASE_APPROVER}
-    user gives release access to all releases of publication to analyst    ${PUBLICATION_FOR_RELEASE_APPROVER}    Approver
+    user gives release access to all releases of publication to analyst    ${PUBLICATION_FOR_RELEASE_APPROVER}
+    ...    Approver
 
 *** Keywords ***
 user creates releases in all states for publication
     [Arguments]
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
-    user creates a fully populated draft release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user creates a fully populated draft release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
     user creates a fully populated higher review release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}
     ...    ${TOPIC_NAME}
     user creates a fully populated approved release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}

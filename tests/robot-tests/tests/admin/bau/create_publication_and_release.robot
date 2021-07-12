@@ -87,8 +87,10 @@ Add a methodology
 
 Verify publication has been updated
     [Tags]    HappyPath
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}    ${CREATED_TOPIC_NAME}
-    user checks testid element contains    Team name for ${PUBLICATION_NAME}    Special educational needs statistics team
+    user opens publication on the admin dashboard    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
+    ...    ${CREATED_TOPIC_NAME}
+    user checks testid element contains    Team name for ${PUBLICATION_NAME}
+    ...    Special educational needs statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME}    sen.statistics@education.gov.uk
     user checks testid element contains    Contact name for ${PUBLICATION_NAME}    Sean Gibson
     user checks testid element contains    Contact phone number for ${PUBLICATION_NAME}    0987654321
@@ -111,7 +113,8 @@ Verify created release summary
     [Tags]    HappyPath
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    Sean Gibson    National Statistics
+    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    Sean Gibson
+    ...    National Statistics
 
 Edit release summary
     [Tags]    HappyPath
@@ -127,7 +130,8 @@ Edit release summary
 Verify updated release summary
     [Tags]    HappyPath
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    Sean Gibson    Official Statistics
+    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    Sean Gibson
+    ...    Official Statistics
 
 *** Keywords ***
 teardown suite

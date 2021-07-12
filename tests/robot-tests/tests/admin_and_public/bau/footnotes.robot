@@ -158,7 +158,8 @@ Add data block to release
     user scrolls to element    xpath://button[text()="Add secondary stats"]
     user clicks button    Add secondary stats
     user waits until page contains element    secondaryStats-dataBlockSelectForm-selectedDataBlock
-    user selects from list by label    secondaryStats-dataBlockSelectForm-selectedDataBlock    ${FOOTNOTE_DATABLOCK_NAME}
+    user selects from list by label    secondaryStats-dataBlockSelectForm-selectedDataBlock
+    ...    ${FOOTNOTE_DATABLOCK_NAME}
     user waits until page contains element    css:table
     user clicks button    Embed
     user clicks element    id:releaseHeadlines-dataBlock-tables-tab
