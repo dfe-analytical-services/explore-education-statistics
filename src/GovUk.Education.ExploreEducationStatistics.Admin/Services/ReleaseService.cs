@@ -568,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ =>
                 {
                     // Ensure file is linked to the Release by getting the ReleaseFile first
-                    var releaseFile = await _releaseFileRepository.Get(releaseId, fileId);
+                    var releaseFile = await _releaseFileRepository.Find(releaseId, fileId);
                     if (releaseFile == null || releaseFile.File.Type != FileType.Data)
                     {
                         return DataImportViewModel.NotFound();

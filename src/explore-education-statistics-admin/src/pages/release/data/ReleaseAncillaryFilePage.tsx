@@ -53,10 +53,13 @@ const ReleaseAncillaryFilePage = ({
               validationSchema={Yup.object<EditFormValues>({
                 title: Yup.string().required('Enter a ancillary title'),
               })}
-              onSubmit={values => {
-                releaseAncillaryFileService
-                  .renameFile(releaseId, fileId, values.title)
-                  .then();
+              onSubmit={async values => {
+                await releaseAncillaryFileService.updateFile(
+                  releaseId,
+                  fileId,
+                  { title: values.title },
+                );
+
                 history.push(
                   generatePath<ReleaseRouteParams>(
                     releaseDataAncillaryRoute.path,

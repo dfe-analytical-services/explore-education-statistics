@@ -338,7 +338,7 @@ describe('ReleaseFileUploadsSection', () => {
         expect(
           releaseAncillaryFileService.uploadAncillaryFile,
         ).toHaveBeenCalledWith('release-1', {
-          name: 'Test title',
+          title: 'Test title',
           file,
         } as UploadAncillaryFileRequest);
       });
@@ -373,7 +373,7 @@ describe('ReleaseFileUploadsSection', () => {
         expect(
           releaseAncillaryFileService.uploadAncillaryFile,
         ).toHaveBeenCalledWith('release-1', {
-          name: 'Test name',
+          title: 'Test name',
           file,
         } as UploadAncillaryFileRequest);
 

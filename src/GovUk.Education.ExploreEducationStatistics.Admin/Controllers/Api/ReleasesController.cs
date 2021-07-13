@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .ListAll(releaseId)
                 .HandleFailuresOrOk();
         }
-        
+
 
         [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "name")] string subjectName,
+            [FromQuery(Name = "title")] string subjectName,
             IFormFile file,
             IFormFile metaFile)
         {
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "name")] string subjectName,
+            [FromQuery(Name = "title")] string subjectName,
             IFormFile zipFile)
         {
             var user = await _userManager.GetUserAsync(User);

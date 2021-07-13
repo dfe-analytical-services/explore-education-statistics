@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 throw new ArgumentException("file.Type should equal FileType.Data");
             }
 
-            return (await _releaseFileRepository.Get(releaseId, file.Id)).Name ?? "Unknown";
+            return (await _releaseFileRepository.Find(releaseId, file.Id))?.Name ?? "Unknown";
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,

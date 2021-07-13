@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,24 +19,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string filename,
             FileType type,
             Guid createdById,
-            string name = null);
+            string? name = null,
+            string? summary = null);
 
         public Task Delete(Guid releaseId, Guid fileId);
 
-        public Task<ReleaseFile> Get(Guid releaseId, Guid fileId);
+        public Task<ReleaseFile?> Find(Guid releaseId, Guid fileId);
+
+        public Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseId, Guid fileId);
 
         public Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types);
 
         public Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId);
 
-        public Task<ReleaseFile> UpdateFilename(
+        public Task<ReleaseFile> Update(
             Guid releaseId,
             Guid fileId,
-            string filename);
-
-        public Task UpdateName(
-            Guid releaseId,
-            Guid fileId,
-            string name);
+            string? name = null,
+            string? fileName = null,
+            string? summary = null);
     }
 }

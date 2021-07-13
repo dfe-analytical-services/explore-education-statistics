@@ -1,7 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,15 +26,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params FileType[] types);
 
         Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId);
+
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 
-        Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name);
+        Task<Either<ActionResult, Unit>> Update(Guid releaseId, Guid fileId, ReleaseFileUpdateViewModel update);
 
-        Task<Either<ActionResult, IEnumerable<AncillaryFileInfo>>> GetAncillaryFiles(Guid releaseId);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId);
 
-        Task<Either<ActionResult, AncillaryFileInfo>> UploadAncillary(Guid releaseId,
-            IFormFile formFile,
-            string name);
+        Task<Either<ActionResult, FileInfo>> UploadAncillary(
+            Guid releaseId,
+            ReleaseAncillaryFileUploadViewModel upload);
 
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
             IFormFile formFile,

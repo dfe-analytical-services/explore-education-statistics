@@ -687,7 +687,7 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
           'release-1',
           {
-            name: 'Test title',
+            title: 'Test title',
             dataFile,
             metadataFile,
           } as UploadDataFilesRequest,
@@ -780,7 +780,7 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadZipDataFile).toHaveBeenCalledWith(
           'release-1',
           {
-            name: 'Test title',
+            title: 'Test title',
             zipFile,
           } as UploadZipDataFileRequest,
         );
@@ -880,7 +880,7 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadZipDataFile).toHaveBeenCalledWith(
           'release-1',
           {
-            name: 'Test title',
+            title: 'Test title',
             zipFile,
           } as UploadZipDataFileRequest,
         ),
