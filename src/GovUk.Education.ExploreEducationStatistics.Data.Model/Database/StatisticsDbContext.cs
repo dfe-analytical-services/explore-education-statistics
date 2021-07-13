@@ -46,8 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Release> Release { get; set; }
         public DbSet<Subject> Subject { get; set; }
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
-        public DbSet<Theme> Theme { get; set; }
-        public DbSet<Topic> Topic { get; set; }
 
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; }

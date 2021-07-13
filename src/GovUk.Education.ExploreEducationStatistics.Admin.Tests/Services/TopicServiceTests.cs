@@ -323,11 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Publication = new Publication
                 {
-                    Topic = new Data.Model.Topic
-                    {
-                        Id = topicId,
-                        Title = "UI test topic"
-                    }
+                    TopicId = topicId
                 }
             };
 
@@ -354,7 +350,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(0, contentContext.Topics.Count());
                 Assert.Equal(0, statisticsContext.Release.Count());
-                Assert.Equal(0, statisticsContext.Topic.Count());
             }
         }
 
