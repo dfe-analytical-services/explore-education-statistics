@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using Xunit;
@@ -124,22 +125,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         public async Task GetMethodologyThemes()
         {
             var themes = AsList(
-                new ThemeTree<PublicationMethodologiesTreeNode>
+                new AllMethodologiesThemeViewModel
                 {
                     Id = Guid.NewGuid(),
-                    Summary = "Publication summary",
                     Title = "Publication title",
                     Topics = AsList(
-                        new TopicTree<PublicationMethodologiesTreeNode>
+                        new AllMethodologiesTopicViewModel
                         {
                             Id = Guid.NewGuid(),
-                            Summary = "Topic summary",
                             Title = "Topic title",
                             Publications = AsList(
-                                new PublicationMethodologiesTreeNode
+                                new AllMethodologiesPublicationViewModel
                                 {
                                     Id = Guid.NewGuid(),
-                                    Summary = "Publication summary",
                                     Title = "Publication title",
                                     Methodologies = AsList(
                                         new MethodologySummaryViewModel

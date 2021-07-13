@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetByPublication_PublicationNotFoundThrowsException()
+        public async Task GetByPublication_PublicationNotFoundIsEmpty()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -76,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyParentRepository(contentDbContext);
 
-                await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetByPublication(Guid.NewGuid()));
+                var result = await service.GetByPublication(Guid.NewGuid());
+                Assert.Empty(result);
             }
         }
 
