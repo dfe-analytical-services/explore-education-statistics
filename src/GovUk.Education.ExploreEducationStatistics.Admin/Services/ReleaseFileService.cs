@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (!blobExists)
             {
-                return releaseFile.File.ToFileInfoNotFound();
+                return releaseFile.ToFileInfoNotFound();
             }
 
             var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
@@ -191,7 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _releaseFileRepository.Update(
                             releaseId: releaseId,
                             fileId: fileId,
-                            name: update.Name
+                            name: update.Name,
+                            summary: update.Summary
                         );
                     }
                 );
@@ -228,27 +229,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
+        public Task<Either<ActionResult, FileInfo>> UploadAncillary(
+            Guid releaseId,
+            ReleaseAncillaryFileUploadViewModel upload)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Ancillary))
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(upload.File, Ancillary))
                 .OnSuccess(async () =>
                 {
                     var releaseFile = await _releaseFileRepository.Create(
                         releaseId: releaseId,
-                        filename: formFile.FileName,
+                        filename: upload.File.FileName,
                         type: Ancillary,
                         createdById: _userService.GetUserId(),
-                        name: name);
+                        name: upload.Name,
+                        summary: upload.Summary);
 
                     await _contentDbContext.SaveChangesAsync();
 
                     await _blobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: releaseFile.Path(),
-                        file: formFile);
+                        file: upload.File);
 
                     var blob = await _blobStorageService.GetBlob(
                         PrivateReleaseFiles,

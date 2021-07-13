@@ -1558,7 +1558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
                 var fileInfo = result.AssertRight();
 
-                Assert.Equal("Unknown", fileInfo.Name);
+                Assert.Equal("Test PDF File", fileInfo.Name);
                 Assert.Equal(releaseFile.FileId, fileInfo.Id);
                 Assert.Equal("pdf", fileInfo.Extension);
                 Assert.Equal(releaseFile.File.Filename, fileInfo.FileName);
@@ -1809,7 +1809,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupReleaseFileService(contentDbContext);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
+
+                var result = await service.Update(
+                    releaseFile.ReleaseId,
+                    releaseFile.FileId,
+                    new ReleaseFileUpdateViewModel
+                    {
+                        Name = "New file title",
+                        Summary = "New file summary"
+                    }
+                );
+
+                Assert.True(result.IsRight);
+                Assert.IsType<Unit>(result.Right);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
+                    rf.ReleaseId == releaseFile.ReleaseId
+                    && rf.FileId == releaseFile.FileId);
+
+                Assert.Equal("New file title", updatedReleaseFile.Name);
+                Assert.Equal("New file summary", updatedReleaseFile.Summary);
+            }
+        }
+
+        [Fact]
+        public async Task Update_OnlyName()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Old file name",
+                Summary = "Old file summary",
+                File = new File
+                {
+                    RootPath = release.Id,
+                    Filename = "test.pdf"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.Update(
                     releaseFile.ReleaseId,
@@ -1831,6 +1888,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     && rf.FileId == releaseFile.FileId);
 
                 Assert.Equal("New file title", updatedReleaseFile.Name);
+                Assert.Equal("Old file summary", updatedReleaseFile.Summary);
+            }
+        }
+
+        [Fact]
+        public async Task Update_OnlySummary()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Old file title",
+                Summary = "Old file summary",
+                File = new File
+                {
+                    RootPath = release.Id,
+                    Filename = "test.pdf",
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
+
+                var result = await service.Update(
+                    releaseFile.ReleaseId,
+                    releaseFile.FileId,
+                    new ReleaseFileUpdateViewModel
+                    {
+                        Summary = "New file summary",
+                    }
+                );
+
+                Assert.True(result.IsRight);
+                Assert.IsType<Unit>(result.Right);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
+                    rf.ReleaseId == releaseFile.ReleaseId
+                    && rf.FileId == releaseFile.FileId);
+
+                Assert.Equal("Old file title", updatedReleaseFile.Name);
+                Assert.Equal("New file summary", updatedReleaseFile.Summary);
             }
         }
 
@@ -1935,9 +2049,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
-                var result = await service.UploadAncillary(release.Id, formFile, "Test Ancillary File");
+                var result = await service.UploadAncillary(
+                    release.Id,
+                    new ReleaseAncillaryFileUploadViewModel
+                    {
+                        Name = "Test name",
+                        Summary = "Test summary",
+                        File = formFile
+                    }
+                );
 
-                Assert.True(result.IsRight);
+                var fileInfo = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Ancillary), Times.Once);
@@ -1956,14 +2078,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 path.Contains(FilesPath(release.Id, Ancillary)))),
                     Times.Once);
 
-                Assert.True(result.Right.Id.HasValue);
-                Assert.Equal("pdf", result.Right.Extension);
-                Assert.Equal("ancillary.pdf", result.Right.FileName);
-                Assert.Equal("Test Ancillary File", result.Right.Name);
-                Assert.Equal("10 Kb", result.Right.Size);
-                Assert.Equal(Ancillary, result.Right.Type);
-                Assert.Equal("test@test.com", result.Right.UserName);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
+                Assert.True(fileInfo.Id.HasValue);
+                Assert.Equal("pdf", fileInfo.Extension);
+                Assert.Equal("ancillary.pdf", fileInfo.FileName);
+                Assert.Equal("Test name", fileInfo.Name);
+                Assert.Equal("Test summary", fileInfo.Summary);
+                Assert.Equal("10 Kb", fileInfo.Size);
+                Assert.Equal(Ancillary, fileInfo.Type);
+                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1977,7 +2100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 
@@ -2082,12 +2205,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseFileService SetupReleaseFileService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
-            IFileRepository fileRepository = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IBlobStorageService? blobStorageService = null,
+            IFileRepository? fileRepository = null,
+            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            IUserService? userService = null)
         {
             contentDbContext.Users.Add(_user);
             contentDbContext.SaveChanges();

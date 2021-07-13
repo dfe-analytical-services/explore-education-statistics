@@ -74,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             {
                 Release = new Release(),
                 Name = "Test ancillary file",
+                Summary = "Test summary",
                 File = new File
                 {
                     Id = Guid.NewGuid(),
@@ -101,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal("pdf", info.Extension);
             Assert.Equal("ancillary.pdf", info.FileName);
             Assert.Equal("Test ancillary file", info.Name);
+            Assert.Equal("Test summary", info.Summary);
             Assert.Equal("400 B", info.Size);
             Assert.Equal(Ancillary, info.Type);
             Assert.Equal(releaseFile.File.Created, info.Created);

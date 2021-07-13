@@ -56,15 +56,11 @@ const releaseAncillaryFileService = {
   ): Promise<AncillaryFile> {
     const data = new FormData();
     data.append('file', request.file);
+    data.append('name', request.name);
 
     const file = await client.post<AncillaryFileInfo>(
       `/release/${releaseId}/ancillary`,
       data,
-      {
-        params: {
-          name: request.name,
-        },
-      },
     );
 
     return mapFile(file);
