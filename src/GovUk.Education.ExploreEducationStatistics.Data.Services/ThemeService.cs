@@ -1,29 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ThemeService : IThemeService
     {
-        private readonly StatisticsDbContext _context;
+        private readonly ContentDbContext _contentDbContext;
         private readonly IMapper _mapper;
 
-        public ThemeService(StatisticsDbContext context,
+        public ThemeService(ContentDbContext contentDbContext,
             IMapper mapper)
         {
-            _context = context;
+            _contentDbContext = contentDbContext;
             _mapper = mapper;
         }
 
         public IEnumerable<ThemeViewModel> ListThemes()
         {
-            return _context.Theme
+            return _contentDbContext.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)

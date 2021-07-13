@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -15,11 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public void ListThemes()
         {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            using (var context = InMemoryContentDbContext())
             {
                 var themeA = new Theme
                 {
@@ -298,11 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public void ListThemes_ThemeHasNoTopics()
         {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            using (var context = InMemoryContentDbContext())
             {
                 var theme = new Theme
                 {
@@ -324,11 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public void ListThemes_TopicHasNoPublications()
         {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            using (var context = InMemoryContentDbContext())
             {
                 var theme = new Theme
                 {
@@ -359,11 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public void ListThemes_PublicationHasNoReleases()
         {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            using (var context = InMemoryContentDbContext())
             {
                 var theme = new Theme
                 {
@@ -403,11 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public void ListThemes_PublicationHasReleasesNotPublished()
         {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            using (var context = InMemoryContentDbContext())
             {
                 var theme = new Theme
                 {
