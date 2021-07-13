@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -22,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IContentService _contentService;
@@ -29,13 +31,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
 
-        public ManageContentPageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public ManageContentPageService(ContentDbContext contentDbContext,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IContentService contentService,
             IMethodologyRepository methodologyRepository,
             IReleaseFileService releaseFileService,
             IUserService userService)
         {
+            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _contentService = contentService;
@@ -48,7 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
+                .CheckEntityExists<Release>(query => query
+                        .Include(r => r.Type)
+                        .Where(r => r.Id == releaseId)
+                )
+                .OnSuccess(HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
@@ -74,24 +82,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
+        private async Task<Release> HydrateReleaseForReleaseViewModel(Release release)
         {
-            return values
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Releases)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.LegacyReleases)
-                .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Topic.Theme)
-                .Include(r => r.Type)
-                .Include(r => r.Content)
-                .ThenInclude(join => join.ContentSection)
-                .ThenInclude(section => section.Content)
-                .ThenInclude(content => content.Comments)
-                .ThenInclude(comment => comment.CreatedBy)
-                .Include(r => r.Updates);
+            release.Updates = await _contentDbContext.Update
+                .Where(u => u.ReleaseId == release.Id)
+                .ToListAsync();
+
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .Include(p => p.Topic.Theme)
+                .Include(p => p.Contact)
+                .SingleAsync(p => p.Releases.Contains(release));
+            release.Publication = publication;
+
+            await _contentDbContext.Entry(release.Publication)
+                .Collection(p => p.LegacyReleases)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(release.Publication)
+                .Collection(p => p.Releases)
+                .LoadAsync();
+
+            var content = await _contentDbContext.ReleaseContentSections
+                .Where(rcs => rcs.ReleaseId == release.Id)
+                .Include(rcs => rcs.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .ToListAsync();
+            release.Content = content;
+
+            await release.Content.ForEachAsync(async rcs =>
+            {
+                await rcs.ContentSection.Content.ForEachAsync(async cb =>
+                {
+                    cb.Comments = await _contentDbContext.Comment
+                        .Where(c => c.ContentBlockId == cb.Id)
+                        .Include(c => c.CreatedBy)
+                        .ToListAsync();
+                });
+            });
+            return release;
         }
     }
 }
