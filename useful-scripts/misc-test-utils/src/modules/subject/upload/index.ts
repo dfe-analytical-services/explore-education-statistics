@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-console */
 import axios from 'axios';
 import 'dotenv-safe/config';
 import { v4 } from 'uuid';
@@ -7,11 +7,11 @@ import StreamZip from 'node-stream-zip';
 import globby from 'globby';
 import rimraf from 'rimraf';
 import FormData from 'form-data';
+import chalk from 'chalk';
 import ZipDirectory from '../../../utils/zipDirectory';
 import Sleep from '../../../utils/Sleep';
 import { SubjectArray } from '../../../interfaces/SubjectArray';
 import errorHandler from '../../../utils/errorHandler';
-import chalk from 'chalk';
 
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -23,6 +23,7 @@ const extractZip = async () => {
   const cleanZipFile = zippedFile[0];
   const archive = fs.existsSync(zippedFile[0]);
   if (archive) {
+    // eslint-disable-next-line new-cap
     const zip = new StreamZip.async({ file: cleanZipFile });
     const count = await zip.extract(null, `${cwd}/test-files`);
     console.log(chalk.green(`Extracted ${count} entries to test-files`));
@@ -59,13 +60,13 @@ const addSubject = async (releaseId: string) => {
 
   // potential issue here with how windows paths are formatted in git bash
   if (glob !== undefined) {
-    const oldPath =
-      process.cwd() +
-      '/zip-files/' +
-      fs.readdirSync(process.cwd() + '/zip-files')[0];
+    const oldPath = `${process.cwd()}/zip-files/${
+      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
+    }`;
 
-    const newPath =
-      process.cwd() + '/' + fs.readdirSync(process.cwd() + '/zip-files')[0];
+    const newPath = `${process.cwd()}/${
+      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
+    }`;
     fs.renameSync(oldPath, newPath);
   }
 
@@ -90,6 +91,7 @@ const addSubject = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
 const getSubjectProgress = async (releaseId: string, subjectId: string) => {
@@ -106,6 +108,7 @@ const getSubjectProgress = async (releaseId: string, subjectId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
 const getSubjectIdArr = async (releaseId: string) => {
@@ -119,7 +122,7 @@ const getSubjectIdArr = async (releaseId: string) => {
       },
     });
     const subjects: SubjectArray[] = res.data?.subjects;
-    let subjArr: { id: string; content: string }[] = [];
+    const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
       subjArr.push({ id: `${sub.id}`, content: `Hello ${v4()}` });
     });
@@ -127,7 +130,7 @@ const getSubjectIdArr = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
-  return;
+  return null;
 };
 
 const addMetaGuidance = async (
@@ -196,7 +199,6 @@ const UploadSingleSubject = async (releaseId: string) => {
   }
 
   type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
-  let subjectId: string;
   let importStatus: importStages = '';
 
   await extractZip();
@@ -205,19 +207,27 @@ const UploadSingleSubject = async (releaseId: string) => {
     `${cwd}/test-files`,
     `${cwd}/zip-files/clean-test-zip-${v4()}.zip`,
   );
-  subjectId = await addSubject(releaseId);
+  const subjectId = await addSubject(releaseId);
   console.time('import subject upload');
   while (importStatus !== 'COMPLETE') {
     console.log(chalk.blue('importStatus', importStatus));
+    // eslint-disable-next-line no-await-in-loop
     await Sleep(300);
+    // eslint-disable-next-line no-await-in-loop
     importStatus = await getSubjectProgress(releaseId, subjectId);
   }
   console.timeEnd(chalk.green('import subject upload'));
 
   try {
-    let subjArr;
-    subjArr = await getSubjectIdArr(releaseId);
-    await addMetaGuidance(subjArr!, releaseId);
+    const subjArr = await getSubjectIdArr(releaseId);
+    if (!subjArr) {
+      throw new Error(
+        chalk.red(
+          'No subject array returned from `getSubjectIdArr` function!, existing test with failures',
+        ),
+      );
+    }
+    await addMetaGuidance(subjArr, releaseId);
     console.timeEnd(chalk.green('publication elapsed time'));
   } catch (e) {
     errorHandler(e);

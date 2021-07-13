@@ -1,8 +1,8 @@
-/* eslint-disable */
+/* eslint-disable no-console */
 import axios from 'axios';
 import 'dotenv-safe/config';
-import errorHandler from '../../../utils/errorHandler';
 import { v4 } from 'uuid';
+import errorHandler from '../../../utils/errorHandler';
 
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -37,6 +37,7 @@ const createPublication = async () => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
 const createRelease = async (publicationId: string) => {
@@ -66,10 +67,10 @@ const createRelease = async (publicationId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 const createSingleRelease = async () => {
-  let publicationId: string;
-  publicationId = await createPublication();
+  const publicationId: string = await createPublication();
   await createRelease(publicationId);
 };
 export default createSingleRelease;

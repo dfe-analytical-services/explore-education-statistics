@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-console */
 import axios from 'axios';
 import 'dotenv-safe/config';
 import { v4 } from 'uuid';
@@ -7,17 +7,50 @@ import StreamZip from 'node-stream-zip';
 import globby from 'globby';
 import rimraf from 'rimraf';
 import FormData from 'form-data';
+import chalk from 'chalk';
 import ZipDirectory from '../../../utils/zipDirectory';
 import Sleep from '../../../utils/Sleep';
 import { SubjectArray } from '../../../interfaces/SubjectArray';
 import { ReleaseData } from '../../../interfaces/ReleaseData';
 import errorHandler from '../../../utils/errorHandler';
-import chalk from 'chalk';
 
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, TOPIC_ID, JWT_TOKEN } = process.env;
 const cwd = process.cwd();
+
+type finalReleaseData = {
+  id: string;
+  title: string;
+  slug: string;
+  publicationId: string;
+  publicationTitle: string;
+  publicationSlug: string;
+  releaseName: string;
+  yearTitle: string;
+  typeId: string;
+  live: string;
+  timePeriodCoverage: {
+    value: string;
+    label: string;
+  };
+  latestRelease: string;
+  type: {
+    id: string;
+    title: string;
+  };
+  contact: {
+    id: string;
+    teamName: string;
+    teamEmail: string;
+    contactName: string;
+    contactTelNo: string;
+  };
+  status: string;
+  amendment: string;
+  latestInternalReleaseNote: string;
+  publishMethod: string;
+};
 
 const createPublication = async () => {
   console.time('CreatePublication');
@@ -47,9 +80,10 @@ const createPublication = async () => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
-const createRelease = async (publicationId: string) => {
+const createRelease = async (publicationId: string): Promise<string | null> => {
   console.time('createRelease');
   try {
     const res = await axios({
@@ -78,6 +112,7 @@ const createRelease = async (publicationId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
 const extractZip = async () => {
@@ -85,6 +120,7 @@ const extractZip = async () => {
   const cleanZipFile = zippedFile[0];
   const archive = fs.existsSync(zippedFile[0]);
   if (archive) {
+    // eslint-disable-next-line new-cap
     const zip = new StreamZip.async({ file: cleanZipFile });
     const count = await zip.extract(null, `${cwd}/test-files`);
     console.log(chalk.green(`Extracted ${count} entries to test-files`));
@@ -116,18 +152,18 @@ const renameFiles = async () => {
   );
 };
 
-const addSubject = async (releaseId: string) => {
+const addSubject = async (releaseId: string): Promise<string | null> => {
   const glob = await globby(`${cwd}/zip-files/*.zip`);
 
   // potential issue here with how windows paths are formatted in git bash
   if (glob !== undefined) {
-    const oldPath =
-      process.cwd() +
-      '/zip-files/' +
-      fs.readdirSync(process.cwd() + '/zip-files')[0];
+    const oldPath = `${process.cwd()}/zip-files/${
+      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
+    }`;
 
-    const newPath =
-      process.cwd() + '/' + fs.readdirSync(process.cwd() + '/zip-files')[0];
+    const newPath = `${process.cwd()}/${
+      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
+    }`;
     fs.renameSync(oldPath, newPath);
   }
 
@@ -152,9 +188,14 @@ const addSubject = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
-const getSubjectProgress = async (releaseId: string, subjectId: string) => {
+const getSubjectProgress = async (
+  releaseId: string,
+  subjectId: string,
+  // eslint-disable-next-line consistent-return
+) => {
   try {
     const res = await axios({
       method: 'GET',
@@ -164,13 +205,23 @@ const getSubjectProgress = async (releaseId: string, subjectId: string) => {
         'Content-Type': 'application/json',
       },
     });
+    if (!res.data.status) {
+      console.info(
+        chalk.cyan(
+          'No import status available. Waiting 3 seconds before polling the API',
+        ),
+      );
+      await Sleep(3000);
+    }
     return res.data.status;
   } catch (e) {
     errorHandler(e);
   }
 };
 
-const getSubjectIdArr = async (releaseId: string) => {
+const getSubjectIdArr = async (
+  releaseId: string,
+): Promise<{ id: string; content: string }[] | null> => {
   try {
     const res = await axios({
       method: 'GET',
@@ -181,7 +232,7 @@ const getSubjectIdArr = async (releaseId: string) => {
       },
     });
     const subjects: SubjectArray[] = res.data?.subjects;
-    let subjArr: { id: string; content: string }[] = [];
+    const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
       subjArr.push({ id: `${sub.id}`, content: `Hello ${v4()}` });
     });
@@ -189,7 +240,7 @@ const getSubjectIdArr = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
-  return;
+  return null;
 };
 
 const addMetaGuidance = async (
@@ -226,7 +277,8 @@ const getFinalReleaseDetails = async (releaseId: string) => {
     });
     const releaseData: ReleaseData = res.data;
     await Sleep(1000);
-    const obj = {
+
+    const obj: finalReleaseData = {
       id: releaseData.id,
       title: releaseData.title,
       slug: releaseData.slug,
@@ -262,10 +314,10 @@ const getFinalReleaseDetails = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
-  return;
+  return null;
 };
 
-const publishRelease = async (obj: any, releaseId: string) => {
+const publishRelease = async (obj: finalReleaseData, releaseId: string) => {
   try {
     await axios({
       method: 'PUT',
@@ -297,6 +349,7 @@ const getPublicationProgress = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
+  return null;
 };
 
 const createReleaseAndPublish = async () => {
@@ -338,41 +391,65 @@ const createReleaseAndPublish = async () => {
   }
 
   type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
-  let publicationId: string;
-  let releaseId: string;
-  let subjectId: string;
   let importStatus: importStages = '';
 
-  publicationId = await createPublication();
-  releaseId = await createRelease(publicationId);
+  const publicationId = await createPublication();
+  const releaseId = await createRelease(publicationId);
   await extractZip();
   await renameFiles();
   await ZipDirectory(
     `${cwd}/test-files`,
     `${cwd}/zip-files/clean-test-zip-${v4()}.zip`,
   );
-  subjectId = await addSubject(releaseId);
+  if (!releaseId) {
+    throw new Error(
+      chalk.red(
+        'No release ID returned from `createRelease` function! Exiting test with errors',
+      ),
+    );
+  }
+  const subjectId = await addSubject(releaseId);
   console.time('import subject upload');
+  if (!importStatus) {
+    console.info(
+      'No importStatus just yet, waiting 3 seconds before polling again',
+    );
+    await Sleep(3000);
+  }
+
   while (importStatus !== 'COMPLETE') {
     console.log(chalk.blue('importStatus', importStatus));
+    // eslint-disable-next-line no-await-in-loop
     await Sleep(300);
-    importStatus = await getSubjectProgress(releaseId, subjectId);
+
+    // eslint-disable-next-line no-await-in-loop
+    importStatus = await getSubjectProgress(releaseId, subjectId as string);
   }
   console.timeEnd('import subject upload');
 
   try {
-    let subjArr;
-    let obj;
     type publicationStages = 'notStarted' | 'Started' | 'Complete' | '';
     let publicationStatus: publicationStages = '';
-    subjArr = await getSubjectIdArr(releaseId);
-    await addMetaGuidance(subjArr!, releaseId);
-    obj = await getFinalReleaseDetails(releaseId);
-    await publishRelease(obj, releaseId);
+    const subjectArray = await getSubjectIdArr(releaseId);
+    if (!subjectArray) {
+      throw new Error(
+        chalk.red(
+          'No subjectArray object returned from `getSubjectArr` function! Exiting test with failures',
+        ),
+      );
+    }
+    await addMetaGuidance(subjectArray, releaseId);
+    const finalReleaseObject = await getFinalReleaseDetails(releaseId);
+    await publishRelease(finalReleaseObject, releaseId);
     console.time('publication elapsed time');
     while (publicationStatus !== 'Complete') {
       console.log('publicationStatus', publicationStatus);
-      publicationStatus = await getPublicationProgress(releaseId);
+      // eslint-disable-next-line no-await-in-loop
+      if (publicationStatus !== undefined) {
+        // eslint-disable-next-line no-await-in-loop
+        publicationStatus = await getPublicationProgress(releaseId);
+      }
+      // eslint-disable-next-line no-await-in-loop
       await Sleep(1500);
     }
     console.timeEnd('publication elapsed time');
