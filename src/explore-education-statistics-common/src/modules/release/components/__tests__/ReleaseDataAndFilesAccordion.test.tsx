@@ -1,51 +1,81 @@
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import { Release } from '@common/services/publicationService';
+import { within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { FileInfo } from '@common/services/types/file';
 
 describe('ReleaseDataAndFilesAccordion', () => {
   const testRelease = {
     id: 'r1',
     downloadFiles: [
       {
-        id: 'f1',
+        id: 'file-1',
+        name: 'Test data file 2',
+        type: 'Data',
+      },
+      {
+        id: 'file-2',
+        name: 'A Test data file 1',
+        type: 'Data',
+      },
+      {
+        id: 'file-3',
         name: 'All files',
         type: 'Ancillary',
       },
       {
-        id: 'f2',
-        name: 'Test data file',
-        type: 'Data',
-      },
-      {
-        id: 'f3',
-        name: 'Test ancillary file',
+        id: 'file-4',
+        name: 'Test ancillary file 2',
+        summary: 'Test ancillary file 2 summary',
         type: 'Ancillary',
       },
-    ] as FileInfo[],
+      {
+        id: 'file-5',
+        name: 'Test ancillary file 1',
+        summary: 'A Test ancillary file 1 summary',
+        type: 'Ancillary',
+      },
+    ],
     hasMetaGuidance: true,
     hasPreReleaseAccessList: true,
     publication: {
-      slug: 'p-slug',
+      slug: 'publication-1',
     },
-    slug: 'r-slug',
-  };
+    slug: 'release-1',
+  } as Release;
 
-  test('renders the data and files accordion', () => {
+  test('renders the accordion with files', () => {
     render(
       <ReleaseDataAndFilesAccordion
-        release={testRelease as Release}
+        release={testRelease}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
       />,
     );
 
     expect(screen.getByText('Explore data and files')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'All files' })).toBeInTheDocument();
+
+    // Files should be ordered alphabetically, with the
+    // 'All files' zip always being at the top
+    const downloadFiles = within(
+      screen.getByTestId('download-files'),
+    ).getAllByRole('listitem');
+
     expect(
-      screen.getByRole('link', { name: 'Test data file' }),
+      within(downloadFiles[0]).getByRole('link', {
+        name: 'All files',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[1]).getByRole('link', {
+        name: 'A Test data file 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[2]).getByRole('link', {
+        name: 'Test data file 2',
+      }),
     ).toBeInTheDocument();
 
     expect(screen.getByText('Open data')).toBeInTheDocument();
@@ -55,10 +85,49 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     expect(screen.getByText('Other files')).toBeInTheDocument();
     expect(screen.getByText('List of other files')).toBeInTheDocument();
+
     userEvent.click(screen.getByText('List of other files'));
+
+    // Files should be ordered alphabetically
+    const otherFiles = within(
+      screen.getByTestId('other-download-files'),
+    ).getAllByRole('listitem');
+
     expect(
-      screen.getByRole('link', { name: 'Test ancillary file' }),
+      within(otherFiles[0]).getByRole('link', {
+        name: 'Test ancillary file 1',
+      }),
     ).toBeInTheDocument();
+    expect(
+      within(otherFiles[0]).getByText('A Test ancillary file 1 summary'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(otherFiles[1]).getByRole('link', {
+        name: 'Test ancillary file 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(otherFiles[1]).getByText('Test ancillary file 2 summary'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the accordion without files', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          downloadFiles: [],
+        }}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
+      />,
+    );
+
+    expect(screen.queryByTestId('download-files')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('other-download-files'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders the create tables button', () => {
