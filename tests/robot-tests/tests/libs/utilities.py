@@ -14,9 +14,11 @@ sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = ElementFinder(sl)
 waiting = WaitingKeywords(sl)
 
+
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
+
 
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
@@ -26,7 +28,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
             sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
             parent_el = sl.find_element(parent_locator)
             # the below substitution is necessary if the parent is an xpath expression in order
-            # to correctly find the parent's descendants  
+            # to correctly find the parent's descendants
             child_locator = child_locator.replace("xpath:.//", "xpath://")
         else:
             parent_el = parent_locator
@@ -230,6 +232,7 @@ def capture_html():
     html_file.write(html)
     html_file.close()
     warning(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
+
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')

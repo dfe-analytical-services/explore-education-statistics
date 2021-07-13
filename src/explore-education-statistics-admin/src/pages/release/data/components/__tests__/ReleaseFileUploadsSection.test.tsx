@@ -1,7 +1,6 @@
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
 import _releaseAncillaryFileService, {
   AncillaryFile,
-  UploadAncillaryFileRequest,
 } from '@admin/services/releaseAncillaryFileService';
 import {
   fireEvent,
@@ -25,6 +24,7 @@ describe('ReleaseFileUploadsSection', () => {
     {
       id: 'file-1',
       title: 'Test file 1',
+      summary: 'Test summary 1',
       filename: 'file-1.docx',
       fileSize: {
         size: 50,
@@ -36,6 +36,7 @@ describe('ReleaseFileUploadsSection', () => {
     {
       id: 'file-2',
       title: 'Test file 2',
+      summary: 'Test summary 2',
       filename: 'file-2.docx',
       fileSize: {
         size: 100,
@@ -78,9 +79,12 @@ describe('ReleaseFileUploadsSection', () => {
         section1.getByRole('button', { name: 'Test file 1' }),
       ).toBeInTheDocument();
 
-      expect(section1.getByTestId('Name')).toHaveTextContent('Test file 1');
+      expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
       expect(section1.getByTestId('File')).toHaveTextContent('file-1.docx');
       expect(section1.getByTestId('File size')).toHaveTextContent('50 Kb');
+      expect(section1.getByTestId('Summary')).toHaveTextContent(
+        'Test summary 1',
+      );
       expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
         'test@test.com',
       );
@@ -94,9 +98,12 @@ describe('ReleaseFileUploadsSection', () => {
         section2.getByRole('button', { name: 'Test file 2' }),
       ).toBeInTheDocument();
 
-      expect(section2.getByTestId('Name')).toHaveTextContent('Test file 2');
+      expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
       expect(section2.getByTestId('File')).toHaveTextContent('file-2.docx');
       expect(section2.getByTestId('File size')).toHaveTextContent('100 Kb');
+      expect(section2.getByTestId('Summary')).toHaveTextContent(
+        'Test summary 2',
+      );
       expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
         'test@test.com',
       );
@@ -211,37 +218,52 @@ describe('ReleaseFileUploadsSection', () => {
       );
     });
 
-    test('show validation message when no subject title', async () => {
+    test('show validation message when no `title`', async () => {
       renderPage();
 
-      userEvent.click(screen.getByLabelText('Name'));
+      userEvent.click(screen.getByLabelText('Title'));
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a name', {
-            selector: '#fileUploadForm-name-error',
+          screen.getByText('Enter a title', {
+            selector: '#fileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
     });
 
-    test('shows validation message when non-unique name', async () => {
+    test('shows validation message when `title` is non-unique', async () => {
       renderPage();
 
-      await userEvent.type(screen.getByLabelText('Name'), 'Test file 1');
+      await userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a unique name', {
-            selector: '#fileUploadForm-name-error',
+          screen.getByText('Enter a unique title', {
+            selector: '#fileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
     });
 
-    test('shows validation message when no file selected', async () => {
+    test('shows validation message when no `summary`', async () => {
+      renderPage();
+
+      userEvent.click(screen.getByLabelText('Summary'));
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a summary', {
+            selector: '#fileUploadForm-summary-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when no `file` selected', async () => {
       renderPage();
 
       userEvent.click(screen.getByLabelText('Upload file'));
@@ -261,7 +283,7 @@ describe('ReleaseFileUploadsSection', () => {
       });
     });
 
-    test('shows validation message when file is empty', async () => {
+    test('shows validation message when `file` is empty', async () => {
       renderPage();
 
       const file = new File([''], 'test.txt', {
@@ -295,8 +317,14 @@ describe('ReleaseFileUploadsSection', () => {
         ).not.toHaveBeenCalled();
 
         expect(
-          screen.getByText('Enter a name', {
-            selector: '#fileUploadForm-name-error',
+          screen.getByText('Enter a title', {
+            selector: '#fileUploadForm-title-error',
+          }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText('Enter a summary', {
+            selector: '#fileUploadForm-summary-error',
           }),
         ).toBeInTheDocument();
 
@@ -311,7 +339,8 @@ describe('ReleaseFileUploadsSection', () => {
     test('can submit with valid values', async () => {
       releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
         id: 'test-file',
-        title: 'Test name',
+        title: 'Test title',
+        summary: 'Test summary',
         filename: 'test-file.docx',
         fileSize: {
           size: 150,
@@ -325,7 +354,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.txt');
 
-      await userEvent.type(screen.getByLabelText('Name'), 'Test title');
+      await userEvent.type(screen.getByLabelText('Title'), 'Test title');
+      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
@@ -337,17 +367,21 @@ describe('ReleaseFileUploadsSection', () => {
       await waitFor(() => {
         expect(
           releaseAncillaryFileService.uploadAncillaryFile,
-        ).toHaveBeenCalledWith('release-1', {
+        ).toHaveBeenCalledWith<
+          Parameters<typeof releaseAncillaryFileService.uploadAncillaryFile>
+        >('release-1', {
           title: 'Test title',
+          summary: 'Test summary',
           file,
-        } as UploadAncillaryFileRequest);
+        });
       });
     });
 
     test('renders with uploaded file appended to list of files', async () => {
       releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
         id: 'test-file',
-        title: 'Test name',
+        title: 'Test file 3',
+        summary: 'Test summary 3',
         filename: 'test-file.docx',
         fileSize: {
           size: 150,
@@ -361,7 +395,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.docx');
 
-      await userEvent.type(screen.getByLabelText('Name'), 'Test name');
+      await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
+      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
         screen.getByRole('button', {
@@ -372,46 +407,50 @@ describe('ReleaseFileUploadsSection', () => {
       await waitFor(() => {
         expect(
           releaseAncillaryFileService.uploadAncillaryFile,
-        ).toHaveBeenCalledWith('release-1', {
-          title: 'Test name',
+        ).toHaveBeenCalledWith<
+          Parameters<typeof releaseAncillaryFileService.uploadAncillaryFile>
+        >('release-1', {
+          title: 'Test file 3',
+          summary: 'Test summary 3',
           file,
-        } as UploadAncillaryFileRequest);
-
-        const sections = screen.getAllByTestId('accordionSection');
-
-        expect(sections).toHaveLength(3);
-
-        const section1 = within(sections[0]);
-
-        expect(
-          section1.getByRole('button', { name: 'Test file 1' }),
-        ).toBeInTheDocument();
-
-        const section2 = within(sections[1]);
-
-        expect(
-          section2.getByRole('button', { name: 'Test file 2' }),
-        ).toBeInTheDocument();
-
-        const section3 = within(sections[2]);
-
-        expect(
-          section3.getByRole('button', { name: 'Test name' }),
-        ).toBeInTheDocument();
-
-        expect(section3.getByTestId('Name')).toHaveTextContent('Test name');
-
-        expect(section3.getByTestId('File')).toHaveTextContent(
-          'test-file.docx',
-        );
-        expect(section3.getByTestId('File size')).toHaveTextContent('150 Kb');
-        expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-          'test@test.com',
-        );
-        expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-          '25 May 2021 00:00',
-        );
+        });
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      expect(sections).toHaveLength(3);
+
+      const section1 = within(sections[0]);
+
+      expect(
+        section1.getByRole('button', { name: 'Test file 1' }),
+      ).toBeInTheDocument();
+
+      const section2 = within(sections[1]);
+
+      expect(
+        section2.getByRole('button', { name: 'Test file 2' }),
+      ).toBeInTheDocument();
+
+      const section3 = within(sections[2]);
+
+      expect(
+        section3.getByRole('button', { name: 'Test file 3' }),
+      ).toBeInTheDocument();
+
+      expect(section3.getByTestId('Title')).toHaveTextContent('Test file 3');
+
+      expect(section3.getByTestId('File')).toHaveTextContent('test-file.docx');
+      expect(section3.getByTestId('File size')).toHaveTextContent('150 Kb');
+      expect(section3.getByTestId('Summary')).toHaveTextContent(
+        'Test summary 3',
+      );
+      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+        'test@test.com',
+      );
+      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+        '25 May 2021 00:00',
+      );
     });
   });
 });

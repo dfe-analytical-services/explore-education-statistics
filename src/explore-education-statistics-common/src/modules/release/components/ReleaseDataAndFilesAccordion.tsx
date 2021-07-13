@@ -3,6 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
+import orderBy from 'lodash/orderBy';
 import React, { ReactNode } from 'react';
 import styles from './ReleaseDataAndFilesAccordion.module.scss';
 
@@ -22,12 +23,22 @@ const ReleaseDataAndFilesAccordion = ({
   renderPreReleaseAccessLink,
   onSectionOpen,
 }: Props) => {
-  const otherFiles = release.downloadFiles.filter(
-    file => file.name === 'All files' || file.type !== 'Ancillary',
+  const allFilesZip = release.downloadFiles.find(
+    file => file.name === 'All files' && file.type === 'Ancillary',
   );
 
-  const ancillaryFiles = release.downloadFiles.filter(
-    file => file.type === 'Ancillary' && file.name !== 'All files',
+  const downloadFiles = orderBy(
+    release.downloadFiles.filter(
+      file => file.type !== 'Ancillary' && file.name !== 'All files',
+    ),
+    ['name'],
+  );
+
+  const otherFiles = orderBy(
+    release.downloadFiles.filter(
+      file => file.type === 'Ancillary' && file.name !== 'All files',
+    ),
+    ['name'],
   );
 
   return (
@@ -42,7 +53,7 @@ const ReleaseDataAndFilesAccordion = ({
         }}
       >
         <AccordionSection heading="Explore data and files">
-          {otherFiles.length > 0 && (
+          {downloadFiles.length > 0 && (
             <>
               <p>
                 All data used to create this release is published as open data
@@ -53,10 +64,20 @@ const ReleaseDataAndFilesAccordion = ({
                 tool, or view featured tables that we have built for you.
               </p>
 
-              <ul className="govuk-list">
-                {otherFiles.map(file => {
-                  return <li key={file.id}>{renderDownloadLink(file)}</li>;
-                })}
+              <ul className="govuk-list" data-testid="download-files">
+                {allFilesZip && (
+                  <li>
+                    {renderDownloadLink(allFilesZip)}
+                    {` (${allFilesZip.extension}, ${allFilesZip.size})`}
+                  </li>
+                )}
+
+                {downloadFiles.map(file => (
+                  <li key={file.id}>
+                    {renderDownloadLink(file)}
+                    {` (${file.extension}, ${file.size})`}
+                  </li>
+                ))}
               </ul>
             </>
           )}
@@ -87,15 +108,30 @@ const ReleaseDataAndFilesAccordion = ({
               </p>
             </>
           )}
-          {ancillaryFiles.length > 0 && (
+          {otherFiles.length > 0 && (
             <>
               <h3>Other files</h3>
               <p>All other files available for download are listed below:</p>
+
               <Details summary="List of other files">
-                <ul className="govuk-list">
-                  {ancillaryFiles.map(file => {
-                    return <li key={file.id}>{renderDownloadLink(file)}</li>;
-                  })}
+                <ul className="govuk-list" data-testid="other-download-files">
+                  {otherFiles.map(file => (
+                    <li key={file.id}>
+                      {renderDownloadLink(file)}
+                      {` (${file.extension}, ${file.size})`}
+
+                      {file.summary && (
+                        <Details
+                          summary="More details"
+                          className="govuk-!-margin-top-2"
+                        >
+                          <div className="dfe-white-space--pre-wrap">
+                            {file.summary}
+                          </div>
+                        </Details>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </Details>
             </>

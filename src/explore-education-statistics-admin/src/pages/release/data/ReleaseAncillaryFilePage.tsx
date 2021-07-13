@@ -3,19 +3,26 @@ import {
   ReleaseRouteParams,
   releaseDataAncillaryRoute,
 } from '@admin/routes/releaseRoutes';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import React from 'react';
 import Link from '@admin/components/Link';
 import { generatePath, RouteComponentProps } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import { Form, FormFieldTextInput } from '@common/components/form';
+import {
+  Form,
+  FormFieldTextArea,
+  FormFieldTextInput,
+} from '@common/components/form';
 import Button from '@common/components/Button';
 import releaseAncillaryFileService from '@admin/services/releaseAncillaryFileService';
 
-interface EditFormValues {
+interface FormValues {
   title: string;
+  summary: string;
 }
 
 const ReleaseAncillaryFilePage = ({
@@ -32,6 +39,20 @@ const ReleaseAncillaryFilePage = ({
     [releaseId, fileId],
   );
 
+  const handleSubmit = useFormSubmit<FormValues>(async ({ title, summary }) => {
+    await releaseAncillaryFileService.updateFile(releaseId, fileId, {
+      title,
+      summary,
+    });
+
+    history.push(
+      generatePath<ReleaseRouteParams>(releaseDataAncillaryRoute.path, {
+        publicationId,
+        releaseId,
+      }),
+    );
+  });
+
   return (
     <>
       <Link
@@ -44,42 +65,45 @@ const ReleaseAncillaryFilePage = ({
       >
         Back
       </Link>
-      <LoadingSpinner loading={ancillaryFileLoading}>
-        {ancillaryFile && (
-          <section>
-            <h2>Edit ancillary file details</h2>
-            <Formik<EditFormValues>
-              initialValues={{ title: ancillaryFile.title }}
-              validationSchema={Yup.object<EditFormValues>({
-                title: Yup.string().required('Enter a ancillary title'),
-              })}
-              onSubmit={async values => {
-                await releaseAncillaryFileService.updateFile(
-                  releaseId,
-                  fileId,
-                  { title: values.title },
-                );
 
-                history.push(
-                  generatePath<ReleaseRouteParams>(
-                    releaseDataAncillaryRoute.path,
-                    {
-                      publicationId,
-                      releaseId,
-                    },
-                  ),
-                );
+      <LoadingSpinner loading={ancillaryFileLoading}>
+        <section>
+          <h2>Edit ancillary file details</h2>
+
+          {ancillaryFile ? (
+            <Formik<FormValues>
+              initialValues={{
+                title: ancillaryFile.title,
+                summary: ancillaryFile.summary,
               }}
+              validationSchema={Yup.object<FormValues>({
+                title: Yup.string().required('Enter a title'),
+                summary: Yup.string().required('Enter a summary'),
+              })}
+              onSubmit={handleSubmit}
             >
-              {form => (
-                <Form {...form} id="edit-data-file-form">
-                  <FormFieldTextInput id="title" label="Title" name="title" />
-                  <Button type="submit">Save changes</Button>
-                </Form>
-              )}
+              <Form id="ancillaryFileForm">
+                <FormFieldTextInput<FormValues>
+                  className="govuk-!-width-one-half"
+                  label="Title"
+                  name="title"
+                />
+
+                <FormFieldTextArea<FormValues>
+                  className="govuk-!-width-one-half"
+                  label="Summary"
+                  name="summary"
+                />
+
+                <Button type="submit">Save changes</Button>
+              </Form>
             </Formik>
-          </section>
-        )}
+          ) : (
+            <WarningMessage>
+              Could not load ancillary file details
+            </WarningMessage>
+          )}
+        </section>
       </LoadingSpinner>
     </>
   );

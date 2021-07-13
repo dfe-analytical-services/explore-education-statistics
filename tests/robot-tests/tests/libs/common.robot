@@ -1,6 +1,6 @@
 *** Settings ***
-Library     OperatingSystem
 Library     SeleniumLibrary    timeout=${timeout}    implicit_wait=${implicit_wait}    run_on_failure=do this on failure
+Library     OperatingSystem
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
@@ -28,13 +28,21 @@ do this on failure
     END
 
 custom testid locator strategy
-    [Arguments]    ${browser}    ${test_id}    ${tag}    ${constraints}
-    ${element}=    Execute Javascript
-    ...    let xPathResult = document.evaluate('//*[@data-testid="${test_id}"]', document); if(xPathResult) return xPathResult.iterateNext(); return [];
-    [Return]    ${element}
+    [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
+    ${element}=  user gets testid element  ${test_id}
+    [Return]  ${element}
+
+custom label locator strategy
+    [Arguments]  ${browser}  ${label}  ${tag}  ${constraints}
+    user waits until element is visible  xpath://label[text()="${label}"]
+    ${label_el}=  get web element  xpath://label[text()="${label}"]
+    ${input_id}=  get element attribute  ${label_el}  for
+    ${element}=   get web element  id:${input_id}
+    [Return]  ${element}
 
 set custom locator strategies
-    add location strategy    testid    custom testid locator strategy
+    add location strategy   testid    custom testid locator strategy
+    add location strategy   label     custom label locator strategy
 
 user opens the browser
     set custom locator strategies
@@ -521,15 +529,6 @@ user enters text into element
     user waits until element is visible    ${selector}    60
     user clears element text    ${selector}
     user presses keys    ${text}    ${selector}
-
-user enters text into textfield
-    [Arguments]    ${label}    ${text}
-    user enters text into element    xpath://label[text()="${label}"]/following-sibling::input[@type="text"]    ${text}
-
-user checks textfield contains
-    [Arguments]    ${label}    ${text}
-    user checks input field contains    xpath://label[text()="${label}"]/following-sibling::input[@type="text"]
-    ...    ${text}
 
 user checks element count is x
     [Arguments]    ${locator}    ${amount}
