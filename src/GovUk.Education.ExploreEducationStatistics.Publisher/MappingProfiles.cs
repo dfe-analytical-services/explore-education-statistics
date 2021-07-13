@@ -35,8 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Publication, Data.Model.Publication>()
-                .ForMember(dest => dest.Releases, m => m.Ignore())
-                .ForMember(dest => dest.Topic, m => m.Ignore());
+                .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
@@ -51,14 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Theme, ThemeViewModel>();
 
-            CreateMap<Theme, Data.Model.Theme>()
-                .ForMember(dest => dest.Topics, m => m.Ignore());
-
             CreateMap<Topic, TopicViewModel>();
-
-            CreateMap<Topic, Data.Model.Topic>()
-                .ForMember(dest => dest.Publications, m => m.Ignore())
-                .ForMember(dest => dest.Theme, m => m.Ignore());
 
             CreateMap<Update, ReleaseNoteViewModel>();
         }

@@ -62,36 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = await _contentDbContext.Releases
                 .Include(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
                 .FirstOrDefaultAsync(r => r.Id == releaseId);
-
-            var existingTheme =
-                await _statisticsDbContext.Theme.FindAsync(
-                    release.Publication.Topic.Theme.Id);
-            if (existingTheme == null)
-            {
-                var statsTheme = _mapper.Map(release.Publication.Topic.Theme, new Data.Model.Theme());
-                await _statisticsDbContext.Theme.AddAsync(statsTheme);
-            }
-            else
-            {
-                _mapper.Map(release.Publication.Topic.Theme, existingTheme);
-                _statisticsDbContext.Theme.Update(existingTheme);
-            }
-
-            var existingTopic = await _statisticsDbContext.Topic.FindAsync(
-                release.Publication.Topic.Id);
-            if (existingTopic == null)
-            {
-                var statsTopic = _mapper.Map(release.Publication.Topic, new Data.Model.Topic());
-                await _statisticsDbContext.Topic.AddAsync(statsTopic);
-            }
-            else
-            {
-                _mapper.Map(release.Publication.Topic, existingTopic);
-                _statisticsDbContext.Topic.Update(existingTopic);
-            }
 
             var existingPub =
                 await _statisticsDbContext.Publication.FindAsync(
