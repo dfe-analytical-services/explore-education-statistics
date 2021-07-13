@@ -65,6 +65,10 @@ export type UploadZipDataFileRequest =
       zipFile: File;
     };
 
+export interface DataFileUpdateRequest {
+  name: string;
+}
+
 export type ImportStatusCode =
   | 'COMPLETE'
   | 'QUEUED'
@@ -86,6 +90,7 @@ export interface DataFileImportStatus {
   errors?: string[];
   numberOfRows: number;
 }
+
 function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
@@ -180,16 +185,12 @@ const releaseDataFileService = {
       })
       .then(response => downloadFile(response, fileName));
   },
-  renameFile(releaseId: string, fileId: string, name: string): Promise<void> {
-    return client.post(
-      `/release/${releaseId}/file/${fileId}/rename`,
-      {},
-      {
-        params: {
-          name,
-        },
-      },
-    );
+  updateFile(
+    releaseId: string,
+    fileId: string,
+    data: DataFileUpdateRequest,
+  ): Promise<void> {
+    return client.patch(`/release/${releaseId}/file/${fileId}`, data);
   },
   cancelImport(releaseId: string, fileId: string): Promise<void> {
     return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);
