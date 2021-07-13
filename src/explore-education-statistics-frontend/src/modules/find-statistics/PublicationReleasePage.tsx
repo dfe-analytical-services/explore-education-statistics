@@ -340,26 +340,24 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
               release.id
             }/files/${isAllFiles ? 'all' : file.id}`;
+
             return (
-              <>
-                <Link
-                  to={url}
-                  onClick={() => {
-                    logEvent({
-                      category: 'Downloads',
-                      action: `Release page ${
-                        isAllFiles ? 'all files' : 'file'
-                      } downloaded`,
-                      label: `Publication: ${release.title}, File: ${file.fileName}`,
-                    });
-                  }}
-                >
-                  {isAllFiles
-                    ? 'Download all data and files for this release'
-                    : `${file.name}`}
-                </Link>
-                {` (${file.extension}, ${file.size})`}
-              </>
+              <Link
+                to={url}
+                onClick={() => {
+                  logEvent({
+                    category: 'Downloads',
+                    action: `Release page ${
+                      isAllFiles ? 'all files' : 'file'
+                    } downloaded`,
+                    label: `Publication: ${release.title}, File: ${file.fileName}`,
+                  });
+                }}
+              >
+                {isAllFiles
+                  ? 'Download all data and files for this release'
+                  : `${file.name}`}
+              </Link>
             );
           }}
           renderMetaGuidanceLink={

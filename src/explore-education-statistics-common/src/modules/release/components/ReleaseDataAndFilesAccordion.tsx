@@ -65,10 +65,18 @@ const ReleaseDataAndFilesAccordion = ({
               </p>
 
               <ul className="govuk-list" data-testid="download-files">
-                {allFilesZip && <li>{renderDownloadLink(allFilesZip)}</li>}
+                {allFilesZip && (
+                  <li>
+                    {renderDownloadLink(allFilesZip)}
+                    {` (${allFilesZip.extension}, ${allFilesZip.size})`}
+                  </li>
+                )}
 
                 {downloadFiles.map(file => (
-                  <li key={file.id}>{renderDownloadLink(file)}</li>
+                  <li key={file.id}>
+                    {renderDownloadLink(file)}
+                    {` (${file.extension}, ${file.size})`}
+                  </li>
                 ))}
               </ul>
             </>
@@ -110,6 +118,7 @@ const ReleaseDataAndFilesAccordion = ({
                   {otherFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}
+                      {` (${file.extension}, ${file.size})`}
 
                       {file.summary && (
                         <Details
