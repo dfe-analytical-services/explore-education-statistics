@@ -27,7 +27,7 @@ const MethodologyContentPageInternal = () => {
 
   return (
     <EditingContextProvider
-      value={{ editingMode: canUpdateContent ? 'edit' : 'preview' }}
+      initialEditingMode={canUpdateContent ? 'edit' : 'preview'}
     >
       {({ editingMode }) => (
         <>
