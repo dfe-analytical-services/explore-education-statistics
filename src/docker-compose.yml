@@ -7,6 +7,8 @@ services:
       - "10000:10000"
       - "10001:10001"
       - "10002:10002"
+    volumes:
+      - data-storage-data:/data
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"
@@ -39,3 +41,6 @@ services:
       dockerfile: Dockerfile-Keycloak
     ports:
       - 5030:8080
+
+volumes:
+  data-storage-data:
