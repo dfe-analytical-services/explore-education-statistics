@@ -21,9 +21,9 @@ Link Publication to External Methodology
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks page contains link with text and url    ${PUBLICATION_NAME} (external methodology)
     ...    https://example.com    ${accordion}
-    user checks element contains button    ${accordion}    Edit
+    user checks element contains button    ${accordion}    Edit externally hosted methodology
     user checks element contains button    ${accordion}    Remove
-    user checks element does not contain button    ${accordion}    Create methodology
+    user checks element contains button    ${accordion}    Create methodology
 
 Edit the External Methodology of the Publication
     user edits an external methodology    ${PUBLICATION_NAME}
@@ -36,7 +36,7 @@ Remove the External Methodology from Publication
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
     user checks element contains button    ${accordion}    Link to an externally hosted methodology
-    user checks element does not contain button    ${accordion}    Edit
+    user checks element does not contain button    ${accordion}    Edit externally hosted methodology
     user checks element does not contain button    ${accordion}    Remove
 
 *** Keywords ***

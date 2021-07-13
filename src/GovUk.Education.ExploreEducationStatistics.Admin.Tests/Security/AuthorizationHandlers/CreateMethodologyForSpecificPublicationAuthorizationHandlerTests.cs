@@ -69,12 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
             
             [Fact]
-            public async Task UserWithCorrectClaimCannotCreateMethodologyForAnyPublication_LinkedToExternalMethodology()
-            {
-                await AssertUserWithCorrectClaimCannotCreateMethodology(PublicationWithExternalMethodology);
-            }
-
-            [Fact]
             public async Task UserWithCorrectClaimCannotCreateMethodologyForAnyPublication_OwnsAnotherMethodology()
             {
                 await AssertUserWithCorrectClaimCannotCreateMethodology(PublicationWithOwnedMethodology);
@@ -166,12 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Verify that the user can't create a Methodology for this Publication because they don't have 
                 // Publication Owner role on it
                 Assert.False(authContext.HasSucceeded);
-            }
-            
-            [Fact]
-            public async Task UserCannotCreateMethodologyForPublication_LinkedToExternalMethodology()
-            {
-                await AssertPublicationOwnerCannotCreateMethodology(PublicationWithExternalMethodology);
             }
             
             [Fact]

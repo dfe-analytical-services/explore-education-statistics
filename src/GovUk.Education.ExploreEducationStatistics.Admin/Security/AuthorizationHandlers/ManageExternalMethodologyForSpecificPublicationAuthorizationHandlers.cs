@@ -16,32 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler 
         : AuthorizationHandler<ManageExternalMethodologyForSpecificPublicationRequirement, Publication>
     {
-        private readonly ContentDbContext _context;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
         public ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository, 
-            ContentDbContext context)
+            IUserPublicationRoleRepository userPublicationRoleRepository)
         {
             _userPublicationRoleRepository = userPublicationRoleRepository;
-            _context = context;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
             ManageExternalMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            await _context
-                .Entry(publication)
-                .Collection(p => p.Methodologies)
-                .LoadAsync();
-            
-            // If a Publication is linked to a Methodology, this should be unlinked first.
-            if (publication.Methodologies.Count > 0)
-            {
-                return;
-            }
-            
             if (SecurityUtils.HasClaim(context.User, CreateAnyMethodology))
             {
                 context.Succeed(requirement);

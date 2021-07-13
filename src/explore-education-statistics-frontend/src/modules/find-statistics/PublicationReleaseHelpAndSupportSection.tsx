@@ -1,18 +1,18 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import {
   PublicationContact,
   ReleaseType,
 } from '@common/services/publicationService';
-import Link from '@frontend/components/Link';
-import React, { ReactNode } from 'react';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
   ExternalMethodology,
   MethodologySummary,
 } from '@common/services/types/methodology';
+import Link from '@frontend/components/Link';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import React, { ReactNode } from 'react';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -64,10 +64,7 @@ const PublicationReleaseHelpAndSupportSection = ({
             ))}
             {externalMethodology && (
               <p className="govuk-!-margin-bottom-9">
-                <Link
-                  to="/methodology/[methodology]"
-                  as={externalMethodology.url}
-                >
+                <Link to={externalMethodology.url}>
                   {externalMethodology.title}
                 </Link>
               </p>
