@@ -57,7 +57,7 @@ const ReleaseAncillaryFilePage = ({
                 await releaseAncillaryFileService.updateFile(
                   releaseId,
                   fileId,
-                  { name: values.title },
+                  { title: values.title },
                 );
 
                 history.push(

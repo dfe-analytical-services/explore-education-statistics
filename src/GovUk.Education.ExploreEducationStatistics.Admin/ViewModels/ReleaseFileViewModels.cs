@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class ReleaseAncillaryFileUploadViewModel
     {
         [Required]
-        public string Name { get; set; } = null!;
+        public string Title { get; set; } = null!;
 
         [Required]
         public string Summary { get; set; } = null!;
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
     public class ReleaseFileUpdateViewModel
     {
-        public string? Name { get; set; }
+        public string? Title { get; set; }
 
         public string? Summary { get; set; }
     }

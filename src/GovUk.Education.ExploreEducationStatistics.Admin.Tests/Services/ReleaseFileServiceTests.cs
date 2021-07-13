@@ -1816,7 +1816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFile.FileId,
                     new ReleaseFileUpdateViewModel
                     {
-                        Name = "New file title",
+                        Title = "New file title",
                         Summary = "New file summary"
                     }
                 );
@@ -1873,7 +1873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFile.FileId,
                     new ReleaseFileUpdateViewModel
                     {
-                        Name = "New file title",
+                        Title = "New file title",
                     }
                 );
 
@@ -1960,7 +1960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Guid.NewGuid(),
                     new ReleaseFileUpdateViewModel
                     {
-                        Name = "New file title",
+                        Title = "New file title",
                     }
                 );
 
@@ -1991,7 +1991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Guid.NewGuid(),
                     new ReleaseFileUpdateViewModel
                     {
-                        Name = "New file title",
+                        Title = "New file title",
                     }
                 );
 
@@ -2053,7 +2053,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release.Id,
                     new ReleaseAncillaryFileUploadViewModel
                     {
-                        Name = "Test name",
+                        Title = "Test name",
                         Summary = "Test summary",
                         File = formFile
                     }

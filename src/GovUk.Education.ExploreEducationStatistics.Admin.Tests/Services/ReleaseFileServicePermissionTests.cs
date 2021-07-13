@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Guid.NewGuid(),
                             new ReleaseFileUpdateViewModel
                             {
-                                Name = "Test name"
+                                Title = "Test title"
                             }
                         );
                     }
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             upload: new ReleaseAncillaryFileUploadViewModel
                             {
                                 File = Mock.Of<IFormFile>(),
-                                Name = "Name",
+                                Title = "Title",
                                 Summary = "Summary",
                             }
                         );
