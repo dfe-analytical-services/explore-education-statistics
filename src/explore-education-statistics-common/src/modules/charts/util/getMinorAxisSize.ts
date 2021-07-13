@@ -1,7 +1,5 @@
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import parseNumber from '@common/utils/number/parseNumber';
-import { max } from 'lodash';
-import maxBy from 'lodash/maxBy';
 
 interface Props {
   dataSetCategories: DataSetCategory[];
