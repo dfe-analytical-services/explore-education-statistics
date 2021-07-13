@@ -87,6 +87,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(import => import.Status)
                 .HasConversion(new EnumToStringConverter<DataImportStatus>());
 
+            modelBuilder.Entity<DataImport>()
+                .Property(import => import.GeographicLevels)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<HashSet<GeographicLevel>>(v));
+
             modelBuilder.Entity<DataImportError>()
                 .Property(importError => importError.Created)
                 .HasConversion(

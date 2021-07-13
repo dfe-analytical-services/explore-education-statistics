@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
@@ -17,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
-        Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches);
+        Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches,
+            HashSet<GeographicLevel> geographicLevels);
     }
 }

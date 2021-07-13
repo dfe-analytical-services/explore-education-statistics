@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
@@ -51,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public int RowsPerBatch { get; set; }
 
         public int TotalRows { get; set; }
+
+        public HashSet<GeographicLevel> GeographicLevels { get; set; }
 
         public List<DataImportError> Errors { get; set; } = new List<DataImportError>();
 

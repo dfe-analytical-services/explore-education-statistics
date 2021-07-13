@@ -11,12 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class LocationService : AbstractRepository<Location, Guid>, ILocationService
     {
-        public static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.School,
-            GeographicLevel.Provider
-        };
-
         public LocationService(StatisticsDbContext context, ILogger<LocationService> logger) : base(context, logger)
         {
         }
@@ -88,6 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         .Where(q => codes.Contains(q.ParliamentaryConstituency_Code))
                         .GroupBy(q => new {q.ParliamentaryConstituency_Code, q.ParliamentaryConstituency_Name})
                         .Select(q => new ParliamentaryConstituency(q.Key.ParliamentaryConstituency_Code, q.Key.ParliamentaryConstituency_Name)),
+                GeographicLevel.Provider =>
+                    _context.Location
+                        .Where(q => codes.Contains(q.Provider_Code))
+                        .GroupBy(q => new {q.Provider_Code, q.Provider_Name})
+                        .Select(q => new Provider(q.Key.Provider_Code, q.Key.Provider_Name)),
                 GeographicLevel.Region =>
                     _context.Location
                         .Where(q => codes.Contains(q.Region_Code))
@@ -98,6 +97,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         .Where(q => codes.Contains(q.RscRegion_Code))
                         .GroupBy(q => new {q.RscRegion_Code})
                         .Select(q => new RscRegion(q.Key.RscRegion_Code)),
+                GeographicLevel.School =>
+                    _context.Location
+                        .Where(q => codes.Contains(q.School_Code))
+                        .GroupBy(q => new {q.School_Code, q.School_Name})
+                        .Select(q => new School(q.Key.School_Code, q.Key.School_Name)),
                 GeographicLevel.Sponsor =>
                     _context.Location
                         .Where(q => codes.Contains(q.Sponsor_Code))
@@ -152,10 +156,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     return location.OpportunityArea;
                 case GeographicLevel.ParliamentaryConstituency:
                     return location.ParliamentaryConstituency;
+                case GeographicLevel.Provider:
+                    return location.Provider;
                 case GeographicLevel.Region:
                     return location.Region;
                 case GeographicLevel.RscRegion:
                     return location.RscRegion;
+                case GeographicLevel.School:
+                    return location.School;
                 case GeographicLevel.Sponsor:
                     return location.Sponsor;
                 case GeographicLevel.Ward:
@@ -170,8 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(Guid subjectId)
         {
             var locationIdsWithGeographicLevel = _context.Observation
-                .Where(observation =>
-                    !IgnoredLevels.Contains(observation.GeographicLevel) && observation.SubjectId == subjectId)
+                .Where(observation => observation.SubjectId == subjectId)
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
                 .AsNoTracking()
@@ -185,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IQueryable<Observation> observations)
         {
             var locationIdsWithGeographicLevel = observations
-                .Where(observation => !IgnoredLevels.Contains(observation.GeographicLevel))
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
                 .AsNoTracking()

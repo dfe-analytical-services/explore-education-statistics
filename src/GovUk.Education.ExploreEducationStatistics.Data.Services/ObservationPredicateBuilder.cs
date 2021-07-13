@@ -102,6 +102,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(ParliamentaryConstituencyPredicate(query));
             }
 
+            if (query.Provider != null)
+            {
+                predicate = predicate.Or(ProviderPredicate(query));
+            }
+
             if (query.Region != null)
             {
                 predicate = predicate.Or(RegionPredicate(query));
@@ -110,6 +115,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             if (query.RscRegion != null)
             {
                 predicate = predicate.Or(RscRegionPredicate(query));
+            }
+
+            if (query.School != null)
+            {
+                predicate = predicate.Or(SchoolPredicate(query));
             }
 
             if (query.Sponsor != null)
@@ -221,6 +231,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     query.ParliamentaryConstituency.Contains(observation.Location.ParliamentaryConstituency_Code));
         }
 
+        private static Expression<Func<Observation, bool>> ProviderPredicate(
+            LocationQuery query)
+        {
+            return ObservationalUnitPredicate(query, GeographicLevel.Provider,
+                observation =>
+                    query.Provider.Contains(observation.Location.Provider_Code));
+        }
+
         private static Expression<Func<Observation, bool>> RegionPredicate(LocationQuery query)
         {
             return ObservationalUnitPredicate(query, GeographicLevel.Region,
@@ -231,6 +249,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return ObservationalUnitPredicate(query, GeographicLevel.RscRegion,
                 observation => query.RscRegion.Contains(observation.Location.RscRegion_Code));
+        }
+
+        private static Expression<Func<Observation, bool>> SchoolPredicate(LocationQuery query)
+        {
+            return ObservationalUnitPredicate(query, GeographicLevel.School,
+                observation => query.School.Contains(observation.Location.School_Code));
         }
 
         private static Expression<Func<Observation, bool>> SponsorPredicate(LocationQuery query)

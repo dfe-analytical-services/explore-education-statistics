@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Extensions.Logging;
@@ -135,7 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await service.Update(import.Id,
                 rowsPerBatch: 1000,
                 totalRows: 10000,
-                numBatches: 10);
+                numBatches: 10,
+                geographicLevels: new HashSet<GeographicLevel>
+                {
+                    GeographicLevel.Country,
+                    GeographicLevel.Region
+                });
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -143,6 +149,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(1000, updated.RowsPerBatch);
                 Assert.Equal(10000, updated.TotalRows);
                 Assert.Equal(10, updated.NumBatches);
+
+                Assert.Equal(2, updated.GeographicLevels.Count);
+                Assert.Contains(GeographicLevel.Country, updated.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region, updated.GeographicLevels);
             }
         }
 
