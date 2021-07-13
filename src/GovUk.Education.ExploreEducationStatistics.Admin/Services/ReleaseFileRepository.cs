@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filename,
             FileType type,
             Guid createdById,
-            string? name = null)
+            string? name = null,
+            string? summary = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -66,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 ReleaseId = releaseId,
                 Name = name,
+                Summary = summary,
                 File = new File
                 {
                     Created = DateTime.UtcNow,
@@ -126,7 +128,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<ReleaseFile> Update(Guid releaseId,
             Guid fileId,
             string? name = null,
-            string? fileName = null)
+            string? fileName = null,
+            string? summary = null)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
             var releaseFile = await _contentDbContext.ReleaseFiles
@@ -137,15 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _contentDbContext.Update(releaseFile);
 
-            if (name != null)
-            {
-                releaseFile.Name = name;
-            }
-
-            if (fileName != null)
-            {
-                releaseFile.File.Filename = fileName;
-            }
+            releaseFile.Name = name ?? releaseFile.Name;
+            releaseFile.File.Filename = fileName ?? releaseFile.File.Filename;
+            releaseFile.Summary = summary ?? releaseFile.Summary;
 
             await _contentDbContext.SaveChangesAsync();
 

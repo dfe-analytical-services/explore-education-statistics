@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Id = releaseFile.FileId,
                 FileName = releaseFile.File.Filename,
                 Name = releaseFile.Name ?? releaseFile.File.Filename,
+                Summary = releaseFile.Summary,
                 Size = blobInfo.Size,
                 Type = releaseFile.File.Type,
             };
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Id = releaseFile.FileId,
                 FileName = releaseFile.File.Filename,
                 Name = releaseFile.Name ?? releaseFile.File.Filename,
+                Summary = releaseFile.Summary,
                 Size = FileInfo.UnknownSize,
                 Type = releaseFile.File.Type,
                 UserName = releaseFile.File.CreatedBy?.Email,

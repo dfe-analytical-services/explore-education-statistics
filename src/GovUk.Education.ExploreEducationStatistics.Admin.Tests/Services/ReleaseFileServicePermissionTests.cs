@@ -167,9 +167,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.UploadAncillary(releaseId: _release.Id,
-                            formFile: new Mock<IFormFile>().Object,
-                            name: "");
+                        return service.UploadAncillary(
+                            releaseId: _release.Id,
+                            upload: new ReleaseAncillaryFileUploadViewModel
+                            {
+                                File = Mock.Of<IFormFile>(),
+                                Name = "Name",
+                                Summary = "Summary",
+                            }
+                        );
                     }
                 );
         }

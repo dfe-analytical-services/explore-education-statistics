@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -83,11 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/ancillary")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> UploadAncillary(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string name, IFormFile file)
+        public async Task<ActionResult<FileInfo>> UploadAncillary(
+            Guid releaseId,
+            [FromForm] ReleaseAncillaryFileUploadViewModel upload)
         {
             return await _releaseFileService
-                .UploadAncillary(releaseId, file, name)
+                .UploadAncillary(releaseId, upload)
                 .HandleFailuresOrOk();
         }
 

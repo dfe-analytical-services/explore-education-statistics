@@ -33,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId);
 
-        Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
-            IFormFile formFile,
-            string name);
+        Task<Either<ActionResult, FileInfo>> UploadAncillary(
+            Guid releaseId,
+            ReleaseAncillaryFileUploadViewModel upload);
 
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
             IFormFile formFile,

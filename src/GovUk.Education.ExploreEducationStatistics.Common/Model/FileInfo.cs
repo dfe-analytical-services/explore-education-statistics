@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public string Name { get; set; } = string.Empty;
 
+        public string? Summary { get; set; }
+
         public string Size { get; set; } = string.Empty;
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
@@ -30,6 +32,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public DateTime? Created { get; set; }
 
         public string? UserName { get; set; }
-
     }
 }
