@@ -106,6 +106,8 @@ const MethodologySummary = ({
         <ButtonGroup className="govuk-!-margin-bottom-2">
           {publication.permissions.canCreateMethodologies && (
             <Button
+              data-testid={`Create methodology for ${title}`}
+              disabled={showAddEditExternalMethodologyForm}
               onClick={async () => {
                 const {
                   id: methodologyId,
@@ -119,8 +121,6 @@ const MethodologySummary = ({
                   ),
                 );
               }}
-              data-testid={`Create methodology for ${title}`}
-              disabled={showAddEditExternalMethodologyForm}
             >
               Create methodology
             </Button>
@@ -132,8 +132,8 @@ const MethodologySummary = ({
                 type="button"
                 data-testid={`Link methodology for ${title}`}
                 variant="secondary"
-                onClick={() => setShowAddEditExternalMethodologyForm(true)}
                 disabled={showAddEditExternalMethodologyForm}
+                onClick={() => setShowAddEditExternalMethodologyForm(true)}
               >
                 Link to an externally hosted methodology
               </Button>
@@ -245,8 +245,8 @@ const MethodologySummary = ({
                         .canMakeAmendmentOfMethodology && (
                         <Button
                           type="button"
-                          onClick={() => setAmendMethodologyId(methodology.id)}
                           variant="secondary"
+                          onClick={() => setAmendMethodologyId(methodology.id)}
                         >
                           Amend methodology
                         </Button>
@@ -259,10 +259,10 @@ const MethodologySummary = ({
                 {methodology.permissions.canCancelMethodologyAmendment &&
                   methodology.amendment && (
                     <Button
+                      className="govuk-button--warning"
                       onClick={() =>
                         setCancelAmendmentMethodologyId(methodology.id)
                       }
-                      className="govuk-button--warning"
                     >
                       Cancel amendment
                     </Button>
