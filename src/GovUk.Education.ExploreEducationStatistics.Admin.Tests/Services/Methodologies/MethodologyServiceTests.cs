@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -70,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent(),
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
@@ -78,11 +80,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
+            var owningPublication = new Publication
+            {
+                Title = "Owning publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = true
+                    }
+                )
+            };
+
+            var adoptingPublication1 = new Publication
+            {
+                Title = "Test publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = false
+                    }
+                )
+            };
+
+            var adoptingPublication2 = new Publication
+            {
+                Title = "Test publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = false
+                    }
+                )
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Methodologies.AddAsync(methodology);
+                await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
                 await context.SaveChangesAsync();
             }
 
@@ -90,21 +129,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
-                var viewModel = (await service.GetSummary(methodology.Id)).Right;
+                var viewModel = (await service.GetSummary(methodology.Id)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
+                
+                Assert.Equal(owningPublication.Id, viewModel.Publication.Id);
+                Assert.Equal(owningPublication.Title, viewModel.Publication.Title);
+
+                Assert.Equal(2, viewModel.OtherPublications.Count);
+                Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
+                Assert.Equal(adoptingPublication1.Title, viewModel.OtherPublications[0].Title);
+                Assert.Equal(adoptingPublication2.Id, viewModel.OtherPublications[1].Id);
+                Assert.Equal(adoptingPublication2.Title, viewModel.OtherPublications[1].Title);
             }
         }
 
         [Fact]
         public async Task UpdateMethodology()
         {
+            var publication = new Publication
+            {
+                Title = "Test publication"
+            };
+
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = publication,
+                            Owner = true
+                        }
+                    )
+                },
                 PublishingStrategy = Immediately,
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
@@ -155,6 +218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.Published);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
+                Assert.Equal(publication.Id, viewModel.Publication.Id);
+                Assert.Equal(publication.Title, viewModel.Publication.Title);
+                Assert.Empty(viewModel.OtherPublications);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -177,6 +243,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = new Publication
+                            {
+                                Title = "Test publication"
+                            },
+                            Owner = true
+                        }
+                    )
+                },
                 PublishingStrategy = Immediately,
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
@@ -280,6 +359,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = new Publication
+                            {
+                                Title = "Test publication"
+                            },
+                            Owner = true
+                        }
+                    )
+                },
                 PublishingStrategy = Immediately,
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
@@ -390,6 +482,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = new Publication
+                            {
+                                Title = "Test publication"
+                            },
+                            Owner = true
+                        }
+                    )
+                },
                 PublishingStrategy = Immediately,
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
@@ -473,6 +578,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = new Publication
+                            {
+                                Title = "Test publication"
+                            },
+                            Owner = true
+                        }
+                    )
+                },
                 PublishingStrategy = Immediately,
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
@@ -556,6 +674,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
+                MethodologyParent = new MethodologyParent
+                {
+                    Publications = AsList(
+                        new PublicationMethodology
+                        {
+                            Publication = new Publication
+                            {
+                                Title = "Test publication"
+                            },
+                            Owner = true
+                        }
+                    )
+                },
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
