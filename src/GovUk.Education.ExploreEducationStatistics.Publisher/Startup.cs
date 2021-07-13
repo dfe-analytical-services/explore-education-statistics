@@ -61,7 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>()
                     ))
-                .AddScoped<ITaxonomyService, TaxonomyService>()
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetService<ContentDbContext>(),
