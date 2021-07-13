@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
                     }
                 });
 
-            CreateMap<Publication, TopicPublicationViewModel>();
+            CreateMap<Content.Model.Publication, TopicPublicationViewModel>();
 
-            CreateMap<Theme, ThemeViewModel>()
+            CreateMap<Content.Model.Theme, ThemeViewModel>()
                 .ForMember(dest => dest.Topics, opts => opts.Ignore());
 
-            CreateMap<Topic, TopicViewModel>()
+            CreateMap<Content.Model.Topic, TopicViewModel>()
                 .ForMember(dest => dest.Publications, opts => opts.Ignore());
         }
 
