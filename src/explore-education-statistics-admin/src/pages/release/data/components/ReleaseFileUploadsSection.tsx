@@ -174,9 +174,9 @@ const ReleaseFileUploadsSection = ({
                   )}
 
                   <FormFieldTextInput<FormValues>
+                    className="govuk-!-width-one-half"
                     name="name"
                     label="Name"
-                    width={20}
                   />
 
                   <FormFieldFileInput<FormValues>
