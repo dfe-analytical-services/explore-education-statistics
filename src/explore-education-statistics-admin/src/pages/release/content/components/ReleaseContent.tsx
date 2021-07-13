@@ -191,7 +191,7 @@ const ReleaseContent = () => {
                 </a>
               </li>
               {allMethodologies.map(methodology => (
-                <li key={methodology.key} className="govuk-!-margin-bottom-9">
+                <li key={methodology.key}>
                   {editingMode === 'edit' ? (
                     <a>{methodology.title}</a>
                   ) : (
