@@ -59,15 +59,17 @@ Add ancillary file
     user clicks link    Ancillary file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    id:fileUploadForm-name    Test ancillary file 1
-    user chooses file    id:fileUploadForm-file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    label:Title    Test ancillary file 1
+    user enters text into element    label:Summary    Test ancillary file 1 summary
+    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
     user clicks button    Upload file
 
     user waits until page contains accordion section    Test ancillary file 1
     user opens accordion section    Test ancillary file 1    id:file-uploads
 
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
-    user checks summary list contains    Name    Test ancillary file 1    ${section_1}
+    user checks summary list contains    Title    Test ancillary file 1    ${section_1}
+    user checks summary list contains    Summary    Test ancillary file 1 summary    ${section_1}
     user checks summary list contains    File    test-file-1.txt    ${section_1}
     user checks summary list contains    File size    12 B    ${section_1}
 
@@ -248,8 +250,15 @@ Verify release associated files
     user checks element should contain    ${downloads}
     ...    Learn more about the data files used in this release using our data files guide.
 
-    user clicks element    xpath://*[@data-testid="Expand Details Section List of other files"]
-    user waits until page contains link    Test ancillary file 1    60
+    user opens details dropdown  List of other files
+    ${other_files}=   user gets details content element  List of other files
+    ${other_files_1}=  get child element  ${other_files}  css:li:nth-child(1)
+
+    user waits until element contains link  ${other_files_1}  Test ancillary file 1
+    user opens details dropdown  More details  ${other_files_1}
+    ${other_files_1_details}  user gets details content element   More details  ${other_files_1}
+    user checks element should contain  ${other_files_1_details}  Test ancillary file 1 summary
+
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
@@ -437,15 +446,17 @@ Add ancillary file to amendment
     user clicks link    Ancillary file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    id:fileUploadForm-name    Test ancillary file 2
-    user chooses file    id:fileUploadForm-file    ${FILES_DIR}test-file-2.txt
+    user enters text into element    label:Title    Test ancillary file 2
+    user enters text into element    label:Summary    Test ancillary file 2 summary
+    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
     user clicks button    Upload file
 
     user waits until page contains accordion section    Test ancillary file 2
     user opens accordion section    Test ancillary file 2    id:file-uploads
 
     ${section_2}=    user gets accordion section content element    Test ancillary file 2    id:file-uploads
-    user checks summary list contains    Name    Test ancillary file 2    ${section_2}
+    user checks summary list contains    Title    Test ancillary file 2    ${section_2}
+    user checks summary list contains    Summary    Test ancillary file 2 summary    ${section_2}
     user checks summary list contains    File    test-file-2.txt    ${section_2}
     user checks summary list contains    File size    24 B    ${section_2}
 
@@ -593,12 +604,24 @@ Verify amendment files
     user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
     ...    30
 
-    user clicks element    xpath://*[@data-testid="Expand Details Section List of other files"]
-    user waits until page contains link    Test ancillary file 1    60
+    user opens details dropdown  List of other files
+    ${other_files}=   user gets details content element  List of other files
+    ${other_files_1}=  get child element  ${other_files}  css:li:nth-child(1)
+    ${other_files_2}=  get child element  ${other_files}  css:li:nth-child(2)
+
+    user waits until element contains link  ${other_files_1}  Test ancillary file 1
+    user opens details dropdown  More details  ${other_files_1}
+    ${other_files_1_details}  user gets details content element   More details  ${other_files_1}
+    user checks element should contain  ${other_files_1_details}  Test ancillary file 1 summary
+
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
-    user waits until page contains link    Test ancillary file 2    60
+    user waits until element contains link  ${other_files_2}  Test ancillary file 2
+    user opens details dropdown  More details  ${other_files_2}
+    ${other_files_2_details}  user gets details content element   More details  ${other_files_2}
+    user checks element should contain  ${other_files_2_details}  Test ancillary file 2 summary
+
     download file    link:Test ancillary file 2    test_ancillary_file_2.txt
     downloaded file should have first line    test_ancillary_file_2.txt    Test file 2
 
