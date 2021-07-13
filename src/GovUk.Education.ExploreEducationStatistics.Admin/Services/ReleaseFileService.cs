@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _releaseFileRepository.Update(
                             releaseId: releaseId,
                             fileId: fileId,
-                            name: update.Name,
+                            name: update.Title,
                             summary: update.Summary
                         );
                     }
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         filename: upload.File.FileName,
                         type: Ancillary,
                         createdById: _userService.GetUserId(),
-                        name: upload.Name,
+                        name: upload.Title,
                         summary: upload.Summary);
 
                     await _contentDbContext.SaveChangesAsync();

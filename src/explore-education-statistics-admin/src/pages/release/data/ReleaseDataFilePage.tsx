@@ -55,7 +55,7 @@ const ReleaseDataFilePage = ({
               })}
               onSubmit={async values => {
                 await releaseDataFileService.updateFile(releaseId, fileId, {
-                  name: values.title,
+                  title: values.title,
                 });
 
                 history.push(

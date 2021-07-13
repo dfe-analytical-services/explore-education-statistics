@@ -45,7 +45,7 @@ export interface DataFile {
 
 export type UploadDataFilesRequest =
   | {
-      name: string;
+      title: string;
       dataFile: File;
       metadataFile: File;
     }
@@ -57,7 +57,7 @@ export type UploadDataFilesRequest =
 
 export type UploadZipDataFileRequest =
   | {
-      name: string;
+      title: string;
       zipFile: File;
     }
   | {
@@ -66,7 +66,7 @@ export type UploadZipDataFileRequest =
     };
 
 export interface DataFileUpdateRequest {
-  name: string;
+  title: string;
 }
 
 export type ImportStatusCode =
