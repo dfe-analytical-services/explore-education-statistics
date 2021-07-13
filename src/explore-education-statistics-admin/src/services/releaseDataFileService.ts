@@ -91,12 +91,12 @@ export interface DataFileImportStatus {
   numberOfRows: number;
 }
 
-function mapFile(file: DataFileInfo): DataFile {
+function mapFile({ name, ...file }: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
     ...file,
-    title: file.name,
+    title: name,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
