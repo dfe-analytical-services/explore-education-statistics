@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
@@ -28,7 +27,6 @@ import {
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
