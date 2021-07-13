@@ -12,6 +12,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
+import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
@@ -21,7 +22,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
+import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
   CartesianGrid,
@@ -104,17 +105,20 @@ const LineChartBlock = ({
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
-
-  const yAxisWidth = parseNumber(axes.minor.size);
-  const xAxisHeight = parseNumber(axes.major.size);
-
   const dataSetCategoryConfigs = getDataSetCategoryConfigs(
     dataSetCategories,
     legend.items,
     meta,
   );
-
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
+  const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
+  const yAxisWidth = getMinorAxisSize({
+    dataSetCategories,
+    minorAxisSize: axes.minor.size,
+    minorAxisDecimals,
+    minorAxisUnit,
+  });
+  const xAxisHeight = parseNumber(axes.major.size);
 
   return (
     <ChartContainer
@@ -163,11 +167,7 @@ const LineChartBlock = ({
             hide={!axes.minor.visible}
             width={yAxisWidth}
             tickFormatter={tick =>
-              formatPretty(
-                tick,
-                getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs),
-                minorAxisDecimals,
-              )
+              formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
           />
 
@@ -276,7 +276,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       defaults: {
         min: 0,
         showGrid: true,
-        size: 50,
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',

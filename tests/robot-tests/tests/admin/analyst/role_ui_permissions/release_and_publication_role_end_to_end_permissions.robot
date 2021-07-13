@@ -28,13 +28,13 @@ Sign in as Analyst1 User1 (publication owner)
     [Tags]    HappyPath
     user changes to analyst1
 
-Assert publication owner can create methodology for publication
+Check publication owner can create methodology for publication
     user creates methodology for publication    ${PUBLICATION_NAME}
     user checks summary list contains    Title    ${PUBLICATION_NAME}
     user checks summary list contains    Status    Draft
     user checks summary list contains    Published on    Not yet published
 
-Assert publication owner can approve methodology for publication
+Check publication owner can approve methodology for publication
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user clicks button    Edit status
@@ -45,7 +45,7 @@ Assert publication owner can approve methodology for publication
     user clicks button    Update status
     user waits until h2 is visible    Methodology status
 
-Assert publication owner can upload subject file
+Check publication owner can upload subject file
     [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
@@ -53,7 +53,7 @@ Assert publication owner can upload subject file
     user waits until page does not contain loading spinner
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-Assert publication owner can add meta guidance to ${SUBJECT_NAME}
+Check publication owner can add meta guidance to ${SUBJECT_NAME}
     [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until page does not contain loading spinner
@@ -69,7 +69,7 @@ Navigate to 'Footnotes' page
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
-Assert publication owner can add a footnote to ${SUBJECT_NAME}
+Check publication owner can add a footnote to ${SUBJECT_NAME}
     [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
@@ -92,7 +92,7 @@ Go to "Sign off" page
     user waits until page does not contain loading spinner
     user clicks button    Edit release status
 
-Assert publication owner can edit release status to "Ready for higher review"
+Check publication owner can edit release status to "Ready for higher review"
     [Tags]    HappyPath
     user clicks radio    Ready for higher review
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
@@ -100,7 +100,7 @@ Assert publication owner can edit release status to "Ready for higher review"
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
 
-Assert publication owner can edit release status to "In draft"
+Check publication owner can edit release status to "In draft"
     [Tags]    HappyPath
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    30
@@ -113,19 +113,19 @@ User goes back to admin dashboard
     [Tags]    HappyPath
     user goes to url    %{ADMIN_URL}
 
-Assert that a publication owner can make a new release
+Check that a publication owner can make a new release
     [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
-Assert publication owner can upload subject file on new release
+Check publication owner can upload subject file on new release
     [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-Assert publication owner can add meta guidance to ${SUBJECT_NAME} on new release
+Check publication owner can add meta guidance to ${SUBJECT_NAME} on new release
     [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until page does not contain loading spinner
@@ -164,7 +164,7 @@ Add a Footnote as a release approver
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
-Assert release approver can create a release note
+Check release approver can create a release note
     [Tags]    HappyPath
     user clicks link    Content
     user clicks button    Add note
@@ -174,6 +174,6 @@ Assert release approver can create a release note
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Assert release approver can publish a release
+Check release approver can publish a release
     user clicks link    Sign off
     user approves release for immediate publication

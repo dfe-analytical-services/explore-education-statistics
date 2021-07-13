@@ -28,6 +28,7 @@ Create Methodology for Publication
     user checks summary list contains   Title   ${PUBLICATION_NAME}
     user checks summary list contains   Status  Draft
     user checks summary list contains   Published on  Not yet published
+    user checks summary list contains   Owning publication  ${PUBLICATION_NAME}
 
 Update Methodology for Publication
     [Tags]  HappyPath
@@ -44,3 +45,4 @@ Update Methodology for Publication
     user checks summary list contains   Title   ${PUBLICATION_NAME} - New methodology title
     user checks summary list contains   Status  Approved
     user checks summary list contains   Published on  Not yet published
+    user checks summary list contains   Owning publication  ${PUBLICATION_NAME}

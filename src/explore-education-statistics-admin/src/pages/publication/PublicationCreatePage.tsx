@@ -7,7 +7,6 @@ import publicationService from '@admin/services/publicationService';
 import topicService from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import RelatedInformation from '@common/components/RelatedInformation';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
