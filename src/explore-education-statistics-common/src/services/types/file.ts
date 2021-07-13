@@ -5,4 +5,6 @@ export interface FileInfo {
   name: string;
   size: string;
   type: 'Data' | 'DataZip' | 'Metadata' | 'Ancillary' | 'Chart' | 'Image';
+  userName?: string;
+  created?: string;
 }

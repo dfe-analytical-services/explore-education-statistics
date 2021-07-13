@@ -53,10 +53,11 @@ const ReleaseDataFilePage = ({
               validationSchema={Yup.object<EditSubjectFormValues>({
                 title: Yup.string().required('Enter a subject title'),
               })}
-              onSubmit={values => {
-                releaseDataFileService
-                  .renameFile(releaseId, fileId, values.title)
-                  .then();
+              onSubmit={async values => {
+                await releaseDataFileService.updateFile(releaseId, fileId, {
+                  name: values.title,
+                });
+
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
                     publicationId,
