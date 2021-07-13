@@ -54,17 +54,17 @@ const ReleaseHelpAndSupportSection = ({
           headingTag="h3"
         >
           {allMethodologies.length ? (
-            <>
+            <ul className="govuk-list govuk-list--spaced">
               {allMethodologies.map(methodology => (
-                <p key={methodology.key} className="govuk-!-margin-bottom-9">
+                <li key={methodology.key}>
                   {editingMode === 'edit' ? (
                     <a>{`${methodology.title}`}</a>
                   ) : (
                     <Link to={methodology.url}>{methodology.title}</Link>
                   )}
-                </p>
+                </li>
               ))}
-            </>
+            </ul>
           ) : (
             <p>No methodologies added.</p>
           )}
