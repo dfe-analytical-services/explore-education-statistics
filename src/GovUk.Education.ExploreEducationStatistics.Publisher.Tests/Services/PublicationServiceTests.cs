@@ -370,20 +370,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
-
-                await statisticsDbContext.AddAsync(
-                    new Data.Model.Topic
-                    {
-                        Id = publication.Topic.Id,
-                        Title = "Test topic",
-                        Slug = "test-topic",
-                    }
-                );
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -441,15 +430,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     {
                         Id = publication.Id,
                         Title = "Old test publication",
-                        Slug = "old-test-publication"
-                    }
-                );
-                await statisticsDbContext.AddAsync(
-                    new Data.Model.Topic
-                    {
-                        Id = publication.Topic.Id,
-                        Title = "Test topic",
-                        Slug = "test-topic"
+                        Slug = "old-test-publication",
+                        TopicId = publication.TopicId
                     }
                 );
                 await statisticsDbContext.SaveChangesAsync();

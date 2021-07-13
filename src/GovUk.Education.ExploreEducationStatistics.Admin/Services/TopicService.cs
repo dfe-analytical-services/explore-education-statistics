@@ -176,10 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _statisticsContext.Release.Where(r => r.Publication.TopicId == topic.Id)
                         );
 
-                        _statisticsContext.Topic.RemoveRange(
-                            _statisticsContext.Topic.Where(t => t.Id == topic.Id)
-                        );
-
                         await _statisticsContext.SaveChangesAsync();
 
                         _contentContext.Topics.RemoveRange(
