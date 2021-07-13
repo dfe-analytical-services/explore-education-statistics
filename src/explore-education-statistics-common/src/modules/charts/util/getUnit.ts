@@ -1,13 +1,6 @@
 import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
-const getUnitOrDefault = (
-  configUnit: string | undefined,
-  dataSetCategoryConfigs: DataSetCategoryConfig[],
-) => {
-  if (configUnit) {
-    return configUnit;
-  }
-
+const getUnit = (dataSetCategoryConfigs: DataSetCategoryConfig[]): string => {
   const units = dataSetCategoryConfigs.map(config => {
     return config.dataSet.indicator.unit;
   });
@@ -17,4 +10,4 @@ const getUnitOrDefault = (
     ? ''
     : units[0];
 };
-export default getUnitOrDefault;
+export default getUnit;

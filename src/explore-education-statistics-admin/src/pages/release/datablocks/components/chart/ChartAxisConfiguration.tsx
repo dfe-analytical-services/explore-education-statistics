@@ -211,9 +211,7 @@ const ChartAxisConfiguration = ({
     const axisDefinition = definition.axes[type];
 
     let schema: ObjectSchema<FormValues> = Yup.object({
-      size: Yup.number()
-        .required('Enter size of axis')
-        .positive('Size of axis must be positive'),
+      size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
