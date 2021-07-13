@@ -289,24 +289,19 @@ const ReleaseContent = () => {
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
         <ReleaseDataAndFilesAccordion
           release={release}
-          renderDownloadLink={file => {
-            return (
-              <>
-                <ButtonText
-                  onClick={() =>
-                    releaseDataFileService.downloadFile(
-                      release.id,
-                      file.id,
-                      file.fileName,
-                    )
-                  }
-                >
-                  {file.name}
-                </ButtonText>
-                {` (${file.extension}, ${file.size})`}
-              </>
-            );
-          }}
+          renderDownloadLink={file => (
+            <ButtonText
+              onClick={() =>
+                releaseDataFileService.downloadFile(
+                  release.id,
+                  file.id,
+                  file.fileName,
+                )
+              }
+            >
+              {file.name}
+            </ButtonText>
+          )}
           renderMetaGuidanceLink={
             <Link
               to={{

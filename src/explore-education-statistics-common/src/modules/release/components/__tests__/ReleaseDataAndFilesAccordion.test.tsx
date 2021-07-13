@@ -12,29 +12,39 @@ describe('ReleaseDataAndFilesAccordion', () => {
       {
         id: 'file-1',
         name: 'Test data file 2',
+        size: '10 KB',
         type: 'Data',
+        extension: 'csv',
       },
       {
         id: 'file-2',
         name: 'A Test data file 1',
+        size: '15 KB',
         type: 'Data',
+        extension: 'csv',
       },
       {
         id: 'file-3',
         name: 'All files',
         type: 'Ancillary',
+        size: '100 KB',
+        extension: 'zip',
       },
       {
         id: 'file-4',
         name: 'Test ancillary file 2',
         summary: 'Test ancillary file 2 summary',
         type: 'Ancillary',
+        size: '20 KB',
+        extension: 'pdf',
       },
       {
         id: 'file-5',
         name: 'Test ancillary file 1',
         summary: 'A Test ancillary file 1 summary',
         type: 'Ancillary',
+        size: '25 KB',
+        extension: 'txt',
       },
     ],
     hasMetaGuidance: true,
@@ -62,20 +72,34 @@ describe('ReleaseDataAndFilesAccordion', () => {
       screen.getByTestId('download-files'),
     ).getAllByRole('listitem');
 
+    // File 1
     expect(
       within(downloadFiles[0]).getByRole('link', {
         name: 'All files',
       }),
     ).toBeInTheDocument();
     expect(
+      within(downloadFiles[0]).getByText('(zip, 100 KB)'),
+    ).toBeInTheDocument();
+
+    // File 2
+    expect(
       within(downloadFiles[1]).getByRole('link', {
         name: 'A Test data file 1',
       }),
     ).toBeInTheDocument();
     expect(
+      within(downloadFiles[1]).getByText('(csv, 15 KB)'),
+    ).toBeInTheDocument();
+
+    // File 3
+    expect(
       within(downloadFiles[2]).getByRole('link', {
         name: 'Test data file 2',
       }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[2]).getByText('(csv, 10 KB)'),
     ).toBeInTheDocument();
 
     expect(screen.getByText('Open data')).toBeInTheDocument();
@@ -93,20 +117,24 @@ describe('ReleaseDataAndFilesAccordion', () => {
       screen.getByTestId('other-download-files'),
     ).getAllByRole('listitem');
 
+    // File 1
     expect(
       within(otherFiles[0]).getByRole('link', {
         name: 'Test ancillary file 1',
       }),
     ).toBeInTheDocument();
+    expect(within(otherFiles[0]).getByText('(txt, 25 KB)')).toBeInTheDocument();
     expect(
       within(otherFiles[0]).getByText('A Test ancillary file 1 summary'),
     ).toBeInTheDocument();
 
+    // File 2
     expect(
       within(otherFiles[1]).getByRole('link', {
         name: 'Test ancillary file 2',
       }),
     ).toBeInTheDocument();
+    expect(within(otherFiles[1]).getByText('(pdf, 20 KB)')).toBeInTheDocument();
     expect(
       within(otherFiles[1]).getByText('Test ancillary file 2 summary'),
     ).toBeInTheDocument();
