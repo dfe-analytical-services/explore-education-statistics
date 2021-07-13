@@ -330,21 +330,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var publication = new Publication
             {
-                Title = "Publication title",
-                Slug = "publication-slug",
-                Summary = "Publication summary"
+                Title = "Publication title"
             };
 
             var theme = new Theme
             {
                 Title = "Theme title",
-                Slug = "theme-slug",
-                Summary = "Theme summary",
                 Topics = AsList(
                     new Topic
                     {
                         Title = "Topic title",
-                        Slug = "topic-slug",
                         Publications = AsList(publication)
                     }
                 )
@@ -402,22 +397,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Single(themes);
 
                 Assert.Equal(theme.Id, themes[0].Id);
-                Assert.Null(themes[0].Summary);
                 Assert.Equal("Theme title", themes[0].Title);
 
                 var topics = themes[0].Topics;
                 Assert.Single(topics);
 
                 Assert.Equal(theme.Topics[0].Id, topics[0].Id);
-                Assert.Null(topics[0].Summary);
                 Assert.Equal("Topic title", topics[0].Title);
 
                 var publications = topics[0].Publications;
                 Assert.Single(publications);
 
                 Assert.Equal(publication.Id, publications[0].Id);
-                Assert.Equal("publication-slug", publications[0].Slug);
-                Assert.Equal("Publication summary", publications[0].Summary);
                 Assert.Equal("Publication title", publications[0].Title);
 
                 var methodologies = publications[0].Methodologies;

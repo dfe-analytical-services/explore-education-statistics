@@ -19,11 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<List<MethodologyParent>> GetByPublication(Guid publicationId)
         {
-            // First check the publication exists
-            var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
-
-            return await _contentDbContext.MethodologyParents
-                .Where(m => m.Publications.Any(pm => pm.PublicationId == publication.Id))
+            return await _contentDbContext.PublicationMethodologies
+                .Where(pm => pm.PublicationId == publicationId)
+                .Select(pm => pm.MethodologyParent)
                 .ToListAsync();
         }
     }

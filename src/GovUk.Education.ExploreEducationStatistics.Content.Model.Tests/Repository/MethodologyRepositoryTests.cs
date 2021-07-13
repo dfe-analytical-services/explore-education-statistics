@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestPublishedByPublication_PublicationNotFoundThrowsException()
+        public async Task GetLatestPublishedByPublication_PublicationNotFoundIsEmpty()
         {
             var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
 
@@ -766,8 +766,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
-                await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    service.GetLatestPublishedByPublication(Guid.NewGuid()));
+                var result = await service.GetLatestPublishedByPublication(Guid.NewGuid());
+                Assert.Empty(result);
             }
 
             MockUtils.VerifyAllMocks(methodologyParentRepository);

@@ -79,10 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId)
         {
-            // First check the publication exists
-            var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
-
-            var methodologyParents = await _methodologyParentRepository.GetByPublication(publication.Id);
+            var methodologyParents = await _methodologyParentRepository.GetByPublication(publicationId);
             return (await methodologyParents.SelectAsync(async methodologyParent =>
                     await GetLatestPublishedByMethodologyParent(methodologyParent)))
                 .Where(version => version != null)
