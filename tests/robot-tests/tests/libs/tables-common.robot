@@ -9,7 +9,7 @@ user waits until table is visible
 user checks table column heading contains
     [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table    ${wait}=30
     user waits until parent contains element    ${parent}
-    ...    xpath:.//thead/tr[${row}]/th[${column}][text()="${expected}"]
+    ...    xpath://thead/tr[${row}]/th[${column}][text()="${expected}"]
     ...    timeout=${wait}
 
 user checks row contains heading
