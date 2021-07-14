@@ -67,9 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         await _methodologyFileRepository.Delete(methodologyId, file.Id);
 
-                        // If this Methodology is the only Methodology that is referencing this Methodology File, it
+                        // If this Methodology is the only Methodology that is referencing this Blob and File, it
                         // can be deleted from Blob Storage and the File table.  Otherwise preserve them for the other
-                        // Methodology versions that are still using them.
+                        // Methodology versions that are still using them. 
                         if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyId == methodologyId)
                         {
                             await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());

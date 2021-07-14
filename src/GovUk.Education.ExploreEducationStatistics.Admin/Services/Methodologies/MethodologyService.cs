@@ -155,14 +155,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return Unit.Instance;
         }
         
-        private async Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Methodology methodology)
+        private async Task DeleteMethodologyVersion(Methodology methodology)
         {
             _context.Methodologies.Remove(methodology);
             await _context.SaveChangesAsync();
-            return Unit.Instance;
         }
         
-        private async Task<Either<ActionResult, Unit>> DeleteMethodologyParentIfOrphaned(Methodology methodology)
+        private async Task DeleteMethodologyParentIfOrphaned(Methodology methodology)
         {
             var methodologyParent = await _context
                 .MethodologyParents
@@ -174,8 +173,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 _context.MethodologyParents.Remove(methodologyParent);
                 await _context.SaveChangesAsync();
             }
-
-            return Unit.Instance;
         }
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,

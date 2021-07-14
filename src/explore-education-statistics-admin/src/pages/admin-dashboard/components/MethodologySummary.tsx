@@ -33,7 +33,7 @@ const MethodologySummary = ({
   publication,
   topicId,
   onChangePublication,
-  allowAmendments = true,
+  allowAmendments = false,
 }: Props) => {
   const history = useHistory();
   const [
