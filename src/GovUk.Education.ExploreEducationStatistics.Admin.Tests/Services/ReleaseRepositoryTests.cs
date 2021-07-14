@@ -56,10 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var statsPub = await statisticsDbContext.Publication.FindAsync(release.Publication.Id);
-                Assert.NotNull(statsPub);
-                Assert.Equal(release.Publication.Title, statsPub.Title);
-
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
                 Assert.Equal(release.Published, statsRelease.Published);
@@ -103,17 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(new Data.Model.Publication
-                {
-                    Id = release.Publication.Id,
-                    Title = "Incorrect publication title",
-                    TopicId = release.Publication.TopicId
-                });
                 await statisticsDbContext.AddAsync(new Data.Model.Release
                 {
                     Id = release.Id,
                     Year = 1234,
-                    TimeIdentifier = TimeIdentifier.CalendarYearQ1
+                    TimeIdentifier = TimeIdentifier.CalendarYearQ1,
+                    PublicationId = release.Publication.Id
                 });
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -130,14 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var statsPub = await statisticsDbContext.Publication.FindAsync(release.Publication.Id);
-                Assert.NotNull(statsPub);
-                Assert.Equal(release.Publication.Title, statsPub.Title);
-
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
                 Assert.Equal(release.Year, statsRelease.Year);
                 Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
+                Assert.Equal(release.PublicationId, statsRelease.PublicationId);
             }
         }
         

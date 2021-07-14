@@ -114,10 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     dest => dest.ChartsCount,
                     m => m.MapFrom(d => d.Charts.Count));
 
-            CreateMap<Publication, Data.Model.Publication>()
-                .ForMember(dest => dest.Releases, m => m.Ignore());
             CreateMap<Release, Data.Model.Release>()
-                .ForMember(dest => dest.Publication, m => m.Ignore())
                 .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));
 
             CreateMap<Theme, ThemeViewModel>()

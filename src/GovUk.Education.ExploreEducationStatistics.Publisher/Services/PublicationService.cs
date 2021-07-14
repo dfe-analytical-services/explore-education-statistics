@@ -17,18 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public PublicationService(
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
             IMapper mapper,
             IReleaseService releaseService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
             _mapper = mapper;
             _releaseService = releaseService;
         }
@@ -94,23 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             _contentDbContext.Update(publication);
             await _contentDbContext.SaveChangesAsync();
-
-            // Synchronize the stats publication as well
-            var statsPublication = await _statisticsDbContext.Publication
-                .FindAsync(publication.Id);
-
-            if (statsPublication == null)
-            {
-                var newStatsPublication = _mapper.Map(publication, new Data.Model.Publication());
-                await _statisticsDbContext.Publication.AddAsync(newStatsPublication);
-            }
-            else
-            {
-                _mapper.Map(publication, statsPublication);
-                _statisticsDbContext.Update(statsPublication);
-            }
-
-            await _statisticsDbContext.SaveChangesAsync();
         }
 
         private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)

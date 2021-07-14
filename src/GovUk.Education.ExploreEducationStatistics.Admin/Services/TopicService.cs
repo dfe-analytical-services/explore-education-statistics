@@ -172,8 +172,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _releaseSubjectService.DeleteAllReleaseSubjects(release.Id);
                         }
 
+                        var publicationIds = topic.Publications
+                            .Select(p => p.Id)
+                            .ToList();
                         _statisticsContext.Release.RemoveRange(
-                            _statisticsContext.Release.Where(r => r.Publication.TopicId == topic.Id)
+                            _statisticsContext.Release.Where(r => publicationIds.Contains(r.PublicationId))
                         );
 
                         await _statisticsContext.SaveChangesAsync();

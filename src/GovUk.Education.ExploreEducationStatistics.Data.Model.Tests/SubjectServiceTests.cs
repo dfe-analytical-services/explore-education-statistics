@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 Release = new Release
                 {
-                    Publication = new Publication(),
+                    PublicationId = Guid.NewGuid(),
                     Published = DateTime.UtcNow
                 },
                 Subject = new Subject()
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 Release = new Release
                 {
-                    Publication = new Publication(),
+                    PublicationId = Guid.NewGuid(),
                     Published = DateTime.UtcNow
                 },
                 Subject = new Subject()
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 Release = new Release
                 {
-                    Publication = new Publication(),
+                    PublicationId = Guid.NewGuid(),
                     Published = null
                 },
                 Subject = new Subject()
@@ -169,10 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 Release = new Release
                 {
-                    Publication = new Publication
-                    {
-                        Title = "Test publication"
-                    },
+                    PublicationId = Guid.NewGuid(),
                 },
                 Subject = new Subject()
             };
@@ -216,10 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             {
                 Release = new Release
                 {
-                    Publication = new Publication
-                    {
-                        Title = "Test publication"
-                    },
+                    PublicationId = Guid.NewGuid(),
                 },
                 Subject = new Subject()
             };

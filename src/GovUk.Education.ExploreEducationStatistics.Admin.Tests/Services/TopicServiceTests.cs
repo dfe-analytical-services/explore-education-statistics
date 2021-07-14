@@ -313,18 +313,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var topicId = Guid.NewGuid();
 
-            var topic = new Topic
+            var publication = new Content.Model.Publication
             {
-                Id = topicId,
-                Title = "UI test topic"
+                Id = Guid.NewGuid(),
+                Topic = new Topic
+                {
+                    Id = topicId,
+                    Title = "UI test topic"
+                }
             };
 
             var release = new Release
             {
-                Publication = new Publication
-                {
-                    TopicId = topicId
-                }
+                PublicationId = publication.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -332,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
-                contentContext.Add(topic);
+                contentContext.Add(publication);
                 statisticsContext.Add(release);
 
                 await contentContext.SaveChangesAsync();
@@ -344,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupTopicService(contentContext, statisticsContext: statisticsContext);
 
-                var result = await service.DeleteTopic(topic.Id);
+                var result = await service.DeleteTopic(topicId);
 
                 Assert.True(result.IsRight);
 
