@@ -8,6 +8,7 @@ from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary import ElementFinder
 from SeleniumLibrary.errors import ElementNotFound
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
+from selenium.webdriver.remote.webelement import WebElement
 import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
@@ -17,25 +18,20 @@ waiting = WaitingKeywords(sl)
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
-
+    
+    
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
     try:
-        if isinstance(parent_locator, str):
-            sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
-            parent_el = sl.find_element(parent_locator)
-            # the below substitution is necessary if the parent is an xpath expression in order
-            # to correctly find the parent's descendants  
-            child_locator = child_locator.replace("xpath:.//", "xpath://")
-        else:
-            parent_el = parent_locator
-            # the below substitution is necessary if the parent is a Selenium WebElement in order
-            # to correctly find the parent's descendants
-            child_locator = child_locator.replace("xpath://", "xpath:.//")
+        child_locator = __normalise_child_locator(parent_locator, child_locator)
 
         def parent_contains_matching_element() -> bool:
-            return element_finder.find(child_locator, required=False, parent=parent_el) is not None
+            parent_el = __get_parent_webelement_from_locator(parent_locator, timeout, error)
+            return element_finder.find(
+                child_locator, 
+                required=False, 
+                parent=parent_el) is not None
 
         if is_noney(limit):
             return waiting._wait_until(
@@ -47,6 +43,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
         limit = int(limit)
 
         def parent_contains_matching_elements() -> bool:
+            parent_el = __get_parent_webelement_from_locator(parent_locator, timeout, error)
             return len(sl.find_elements(child_locator, parent=parent_el)) == limit
 
         waiting._wait_until(
@@ -63,25 +60,11 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
 def user_waits_until_parent_does_not_contain_element(parent_locator: object, child_locator: str,
                                                      timeout: int = None, error: str = None,
                                                      limit: int = None):
-
-    if isinstance(parent_locator, str):
-        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
-        parent_el = sl.find_element(parent_locator)
-        if (child_locator.startswith("xpath:.//")):
-            child_locator = child_locator.replace("xpath:.//", "xpath://")
-    else:
-        parent_el = parent_locator
-        if (child_locator.startswith("xpath://")):
-            child_locator = child_locator.replace("xpath://", "xpath:.//")
-
     try:
-        if isinstance(parent_locator, str):
-            sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
-            parent_el = sl.find_element(parent_locator)
-        else:
-            parent_el = parent_locator
+        child_locator = __normalise_child_locator(parent_locator, child_locator)
 
         def parent_does_not_contain_matching_element() -> bool:
+            parent_el = __get_parent_webelement_from_locator(parent_locator, timeout, error)
             return element_finder.find(child_locator, required=False, parent=parent_el) is None
 
         if is_noney(limit):
@@ -95,6 +78,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
         limit = int(limit)
 
         def parent_does_not_contain_matching_elements() -> bool:
+            parent_el = __get_parent_webelement_from_locator(parent_locator, timeout, error)
             return len(sl.find_elements(child_locator, parent=parent_el)) != limit
 
         waiting._wait_until(
@@ -109,33 +93,27 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
 
 
 def get_child_element(parent_locator: object, child_locator: str):
-
     try:
-        if isinstance(parent_locator, str):
-            sl.wait_until_page_contains_element(parent_locator)
-            parent_el = sl.find_element(parent_locator)
-        else:
-            parent_el = parent_locator
-
-        return sl.find_element(child_locator, parent=parent_el)
-    except ElementNotFound as err:
-        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
-        raise_assertion_error(
-            f"Could not find child '{child_locator}' within parent '{parent_locator}'")
+        children = get_child_elements(parent_locator, child_locator)
+        
+        if (len(children) > 1):
+            warning(f"Found {len(children)} child elements matching child locator {child_locator} under parent "
+                    f"locator {parent_locator} in utilities.py#get_child_element() - was expecting only one. Consider "
+                    f"making the parent selector more specific. Returning the first element found.")
+            return children[0]
+        
+        return children[0]
     except Exception as err:
-        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
+                f"locator {child_locator} - {err}")
         raise_assertion_error(err)
 
 
 def get_child_elements(parent_locator: object, child_locator: str):
     try:
-        if isinstance(parent_locator, str):
-            sl.wait_until_page_contains_element(parent_locator)
-            parent_el = sl.find_element(parent_locator)
-        else:
-            parent_el = parent_locator
-
-        return sl.find_elements(child_locator, parent=parent_el)
+        child_locator = __normalise_child_locator(parent_locator, child_locator)
+        parent_el = __get_parent_webelement_from_locator(parent_locator)
+        return element_finder.find(child_locator, required=True, first_only=False, parent=parent_el)
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
@@ -306,3 +284,25 @@ def remove_substring_from_right_of_string(string, substring):
 def user_clicks_element_if_exists(selector):
     if element_finder.find(selector, required=False) is not None:
         sl.click_element(selector)
+
+
+def __normalise_child_locator(parent_locator: object, child_locator: str) -> str:
+    if isinstance(parent_locator, str):
+        return child_locator
+    elif isinstance(parent_locator, WebElement):
+        # the below substitution is necessary if the parent is a Selenium WebElement in order to correctly find the 
+        # parent's descendants.  Without the preceding dot, the double forward slash breaks out of the parent container
+        # and returns the xpath query to the root of the DOM, leading to false positives or incorrectly found DOM 
+        # elements.
+        return child_locator.replace("xpath://", "xpath:.//")
+    else:
+        raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
+
+def __get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = '') -> WebElement:
+    if isinstance(parent_locator, str):
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+        return sl.find_element(parent_locator)
+    elif isinstance(parent_locator, WebElement):
+        return parent_locator
+    else:
+        raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
