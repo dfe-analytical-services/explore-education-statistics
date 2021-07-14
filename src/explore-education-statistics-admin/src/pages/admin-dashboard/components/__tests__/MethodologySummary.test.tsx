@@ -433,7 +433,6 @@ describe('MethodologySummary', () => {
             topicId={testTopicId}
             allowAmendments
             onChangePublication={noop}
-            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -451,7 +450,6 @@ describe('MethodologySummary', () => {
             topicId={testTopicId}
             allowAmendments
             onChangePublication={noop}
-            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -469,7 +467,6 @@ describe('MethodologySummary', () => {
             topicId={testTopicId}
             allowAmendments
             onChangePublication={noop}
-            allowAmendments
           />
         </MemoryRouter>,
       );
@@ -514,7 +511,6 @@ describe('MethodologySummary', () => {
             topicId={testTopicId}
             allowAmendments
             onChangePublication={noop}
-            allowAmendments
           />
         </Router>,
       );
