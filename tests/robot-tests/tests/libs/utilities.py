@@ -9,6 +9,7 @@ from SeleniumLibrary import ElementFinder
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.remote.webelement import WebElement
 import os
+import re
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = ElementFinder(sl)
@@ -287,8 +288,9 @@ def __normalise_child_locator(parent_locator: object, child_locator: str) -> str
         # the below substitution is necessary if the parent is a Selenium WebElement in order to correctly find the 
         # parent's descendants.  Without the preceding dot, the double forward slash breaks out of the parent container
         # and returns the xpath query to the root of the DOM, leading to false positives or incorrectly found DOM 
-        # elements.
-        return child_locator.replace("xpath://", "xpath:.//")
+        # elements.  The below substitution covers both selectors beginning with "xpath://" and "//", as the double
+        # forward slashes without the "xpath:" prefix are inferred as being xpath expressions.
+        return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
 
