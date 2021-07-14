@@ -3,6 +3,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("methodology-themes")]
-        public async Task<ActionResult<List<ThemeTree<PublicationMethodologiesTreeNode>>>> GetMethodologyThemes()
+        public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
             return await _methodologyService.GetTree()
                 .HandleFailuresOrOk();
