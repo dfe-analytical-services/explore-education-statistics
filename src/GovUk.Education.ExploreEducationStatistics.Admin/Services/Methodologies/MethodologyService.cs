@@ -142,30 +142,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        // TODO SOW4 EES-2156 - delete Methodology Files
         public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId, 
                     query => query.Include(m => m.MethodologyParent))
                 .OnSuccess(_userService.CheckCanDeleteMethodology)
-                .OnSuccessVoid(async methodology =>
-                {
-                    _context.Methodologies.Remove(methodology);
-                    await _context.SaveChangesAsync();
+                .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
+                .OnSuccessDo(DeleteMethodologyVersion)
+                .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
+        }
 
-                    var methodologyParent = await _context
-                        .MethodologyParents
-                        .Include(p => p.Versions)
-                        .SingleAsync(p => p.Id == methodology.MethodologyParentId);
+        private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(Methodology methodology)
+        {
+            var methodologyFileIds = await _context
+                    .MethodologyFiles
+                    .Where(f => f.MethodologyId == methodology.Id)
+                    .Select(f => f.FileId)
+                    .ToListAsync();
+
+            if (methodologyFileIds.Count > 0)
+            {
+                return await _methodologyImageService.UnlinkAndDeleteIfOrphaned(methodology.Id, methodologyFileIds);
+            }
+
+            return Unit.Instance;
+        }
+        
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Methodology methodology)
+        {
+            _context.Methodologies.Remove(methodology);
+            await _context.SaveChangesAsync();
+            return Unit.Instance;
+        }
+        
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologyParentIfOrphaned(Methodology methodology)
+        {
+            var methodologyParent = await _context
+                .MethodologyParents
+                .Include(p => p.Versions)
+                .SingleAsync(p => p.Id == methodology.MethodologyParentId);
                     
-                    if (methodologyParent.Versions.Count == 0)
-                    {
-                        _context.MethodologyParents.Remove(methodologyParent);
-                        await _context.SaveChangesAsync();
-                    }
+            if (methodologyParent.Versions.Count == 0)
+            {
+                _context.MethodologyParents.Remove(methodologyParent);
+                await _context.SaveChangesAsync();
+            }
 
-                });
+            return Unit.Instance;
         }
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,
@@ -203,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (unusedImages.Any())
                     {
-                        return await _methodologyImageService.Delete(methodologyId, unusedImages);
+                        return await _methodologyImageService.UnlinkAndDeleteIfOrphaned(methodologyId, unusedImages);
                     }
 
                     return Unit.Instance;

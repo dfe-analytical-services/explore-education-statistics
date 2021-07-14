@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -24,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
     public class MethodologyAmendmentServiceTests
     {
         [Fact]
-        // TODO SOW4 EES-2156 - test copying Methodology Files
         public async Task CreateMethodologyAmendment()
         {
             var originalMethodology = new Methodology
@@ -86,6 +86,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var contentBlock = Assert.Single(contentSection.Content) as HtmlBlock;
                 Assert.NotNull(contentBlock);
                 Assert.Equal("Content!", contentBlock.Body);
+            }
+        }
+        
+        [Fact]
+        public async Task CreateMethodologyAmendmentWithMethodologyFiles()
+        {
+            var originalMethodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Status = Approved,
+                Published = DateTime.Today,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "methodology-slug",
+                    OwningPublicationTitle = "Owning Publication Title"
+                },
+                Content = AsList(new ContentSection
+                {
+                    Content = AsList<ContentBlock>(new HtmlBlock
+                    {
+                        Body = "Content!"
+                    })
+                })
+            };
+
+            var originalMethodologyFile1 = new MethodologyFile
+            {
+                Id = Guid.NewGuid(),
+                MethodologyId = originalMethodology.Id,
+                File = new File
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var originalMethodologyFile2 = new MethodologyFile
+            {
+                Id = Guid.NewGuid(),
+                MethodologyId = originalMethodology.Id,
+                File = new File
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+            await using(var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Methodologies.AddAsync(originalMethodology);
+                await context.MethodologyFiles.AddRangeAsync(originalMethodologyFile1, originalMethodologyFile2);
+                await context.SaveChangesAsync();
+            }
+
+            Guid amendmentId;
+
+            // Call the method under test
+            await using(var context = InMemoryApplicationDbContext(contextId))
+            {
+                var methodologyService = new Mock<IMethodologyService>();
+                var service = BuildService(context, methodologyService: methodologyService.Object);
+                
+                var amendmentIdCapture = new List<Guid>();
+                var summaryViewModel = new MethodologySummaryViewModel();
+                
+                methodologyService
+                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
+                    .ReturnsAsync(summaryViewModel);
+                
+                var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
+                var resultingViewModel = result.AssertRight();
+                Assert.Same(summaryViewModel, resultingViewModel);
+                amendmentId = Assert.Single(amendmentIdCapture);
+            }
+
+            // Check that the Methodology Files were successfully linked to the Amendment.
+            await using(var context = InMemoryApplicationDbContext(contextId))
+            {
+                var amendmentMethodologyFiles = await context
+                    .MethodologyFiles
+                    .Where(m => m.MethodologyId == amendmentId)
+                    .ToListAsync();
+                
+                Assert.Equal(2, amendmentMethodologyFiles.Count());
+                
+                var methodologyFile1ForAmendment =
+                    Assert.Single(amendmentMethodologyFiles
+                        .Where(f => f.FileId == originalMethodologyFile1.FileId));
+
+                var methodologyFile2ForAmendment =
+                    Assert.Single(amendmentMethodologyFiles
+                        .Where(f => f.FileId == originalMethodologyFile2.FileId));
+
+                Assert.NotEqual(originalMethodologyFile1.Id, methodologyFile1ForAmendment.Id);
+                Assert.NotEqual(originalMethodologyFile2.Id, methodologyFile2ForAmendment.Id);
             }
         }
 
