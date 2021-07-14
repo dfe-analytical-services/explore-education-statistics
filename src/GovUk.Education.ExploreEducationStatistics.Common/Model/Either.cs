@@ -131,6 +131,15 @@ public class Either<Tl, Tr> {
             return Unit.Instance;
         }
 
+        /**
+         * Convenience method so that the success chain can be converted to a Unit without having to explicitly supply
+         * it.
+         */
+        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+        {
+            return OnSuccessVoid(task, () => { });
+        }
+
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(this Task<Either<TFailure, TSuccess1>> task, Func<Task<TSuccess2>> func)
         {
             var firstResult = await task;

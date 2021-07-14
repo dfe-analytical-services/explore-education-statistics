@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyId, IEnumerable<Guid> fileIds)
+        public async Task<Either<ActionResult, Unit>> UnlinkAndDeleteIfOrphaned(Guid methodologyId, IEnumerable<Guid> fileIds)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
@@ -63,10 +63,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     await files.ForEachAsync(async file =>
                     {
-                        // TODO EES-1263 Methodology amendments - Check if file is linked to other methodolgies before deleting blob
-                        await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                        var methodologyLinks = await _methodologyFileRepository.GetMethodologyLinksToFile(file.Id);
+
                         await _methodologyFileRepository.Delete(methodologyId, file.Id);
-                        await _fileRepository.Delete(file.Id);
+
+                        // If this Methodology is the only Methodology that is referencing this Methodology File, it
+                        // can be deleted from Blob Storage and the File table.  Otherwise preserve them for the other
+                        // Methodology versions that are still using them.
+                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyId == methodologyId)
+                        {
+                            await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                            await _fileRepository.Delete(file.Id);
+                        }
                     });
                 });
         }

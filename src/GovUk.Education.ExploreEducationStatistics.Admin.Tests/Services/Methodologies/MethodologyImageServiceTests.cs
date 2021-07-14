@@ -22,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         [Fact]
-        public async Task Delete()
+        public async Task UnlinkAndDeleteIfOrphaned()
         {
             var methodology = new Methodology();
 
@@ -98,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, new List<Guid>
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
                 {
                     imageFile1.File.Id,
                     imageFile2.File.Id
@@ -129,7 +130,101 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task Delete_InvalidFileType()
+        public async Task UnlinkAndDeleteIfOrphaned_FilesLinkedToOtherMethodologyVersions()
+        {
+            var methodology = new Methodology();
+            var anotherMethodology = new Methodology();
+
+            var imageFile1 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image1.png",
+                    Type = Image
+                }
+            };
+
+            var imageFile2 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image2.png",
+                    Type = Image
+                }
+            };
+            
+            var imageFile2UsedByAnotherMethodology = new MethodologyFile
+            {
+                Methodology = anotherMethodology,
+                File = imageFile2.File
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2,
+                    imageFile2UsedByAnotherMethodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.DeleteBlob(PrivateMethodologyFiles, imageFile1.Path()))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
+                {
+                    imageFile1.File.Id,
+                    imageFile2.File.Id
+                });
+
+                Assert.True(result.IsRight);
+
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateMethodologyFiles, imageFile1.Path()), Times.Once);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // All of the MethodologyFiles links for the methodology having the images removed from it are removed.
+                Assert.Null(await contentDbContext.MethodologyFiles.FindAsync(imageFile1.Id));
+                Assert.Null(await contentDbContext.Files.FindAsync(imageFile1.File.Id));
+                Assert.Null(await contentDbContext.MethodologyFiles.FindAsync(imageFile2.Id));
+                
+                // However, the file that is still lined to anotherMethodology remains in the File table, as does
+                // its link to anotherMethodology.
+                Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile2UsedByAnotherMethodology.Id));
+                
+                var fileIdForFileLinkedToDeletingMethodology = 
+                    await contentDbContext.Files.FindAsync(imageFile2.File.Id);
+                
+                var fileIdForFileLinkedToAnotherMethodology = 
+                    await contentDbContext.Files.FindAsync(imageFile2UsedByAnotherMethodology.File.Id);
+                
+                Assert.NotNull(fileIdForFileLinkedToAnotherMethodology);
+                
+                // Sanity check that the File entry that remains is the same File as was referenced by the
+                // MethodologyFile link that was deleted.
+                Assert.Equal(fileIdForFileLinkedToDeletingMethodology, fileIdForFileLinkedToAnotherMethodology);
+            }
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task UnlinkAndDeleteIfOrphaned_InvalidFileType()
         {
             var methodology = new Methodology();
 
@@ -171,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, new List<Guid>
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
                 {
                     ancillaryFile.File.Id,
                     imageFile.File.Id,
@@ -195,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task Delete_MethodologyNotFound()
+        public async Task UnlinkAndDeleteIfOrphaned_MethodologyNotFound()
         {
             var methodology = new Methodology();
 
@@ -226,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(Guid.NewGuid(), new List<Guid>
+                var result = await service.UnlinkAndDeleteIfOrphaned(Guid.NewGuid(), new List<Guid>
                 {
                     imageFile.File.Id
                 });
@@ -245,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task Delete_FileNotFound()
+        public async Task UnlinkAndDeleteIfOrphaned_FileNotFound()
         {
             var methodology = new Methodology();
 
@@ -276,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, new List<Guid>
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
                 {
                     imageFile.File.Id,
                     // Include an unknown id

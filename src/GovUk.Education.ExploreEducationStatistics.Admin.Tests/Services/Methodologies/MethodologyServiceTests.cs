@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -360,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             imageService.Setup(mock =>
-                    mock.Delete(methodology.Id, new List<Guid>
+                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -382,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 imageService.Verify(mock =>
-                    mock.Delete(methodology.Id, new List<Guid>
+                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -793,7 +794,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(context);
+                // Verify that no methods to delete Methodology images are called if no files are linked to this
+                // Methodology.
+                var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+
+                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodology(methodology.Id);
                 result.AssertRight();
             }
@@ -807,7 +812,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // it with Publications should also be deleted.  This is done with a cascade delete, but in-memory
                 // db currently doesn't support this so we can't check that there are no longer those
                 // PublicationMethodology rows.
-                // TODO SOW4 EES-2156 - test deleting Methodology Files
                 Assert.False(context.Methodologies.Any(m => m.Id == methodology.Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
             }
@@ -865,13 +869,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Assert that the Methodology has successfully been deleted and as there was another Methodology
                 // version attached to the MethodologyParent, the Parent itself is not deleted, or the other
                 // Methodology version.
-                // TODO SOW4 EES-2156 - test deleting Methodology Files
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
                 Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
                 Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
             }
         }
-        
+
+        [Fact]
+        public async Task DeleteMethodology_MethodologyFilesAreLinkedToThisMethodology()
+        {
+            var methodologyParentId = Guid.NewGuid();
+
+            var methodologyParent = new MethodologyParent
+            {
+                Id = methodologyParentId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = AsList(new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                },
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+            
+            var file1 = new File();
+            var file2 = new File();
+
+            var methodologyVersion1File1Link = new MethodologyFile
+            {
+                File = file1,
+                Methodology = methodologyParent.Versions[0]
+            };
+            
+            var methodologyVersion2File1Link = new MethodologyFile
+            {
+                File = file1,
+                Methodology = methodologyParent.Versions[1]
+            };
+            
+            var methodologyVersion2File2Link = new MethodologyFile
+            {
+                File = file2,
+                Methodology = methodologyParent.Versions[1]
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddAsync(methodologyParent);
+                await context.Files.AddRangeAsync(file1, file2);
+                await context.MethodologyFiles.AddRangeAsync(
+                    methodologyVersion1File1Link, methodologyVersion2File1Link, methodologyVersion2File2Link);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyImageService = new Mock<IMethodologyImageService>();
+                var methodologyVersion2FileIds =
+                    AsArray(methodologyVersion2File1Link.File.Id, methodologyVersion2File2Link.File.Id);
+
+                methodologyImageService
+                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[1].Id,
+                        methodologyVersion2FileIds))
+                    .ReturnsAsync(Unit.Instance);
+                
+                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
+                var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
+                
+                // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
+                // the Methodology Version being deleted.
+                VerifyAllMocks(methodologyImageService);
+                result.AssertRight();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the Methodology has successfully been deleted.
+                Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[1].Id));
+                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
+            }
+        }
+
         [Fact]
         public async Task DeleteMethodology_UnrelatedMethodologiesAreUnaffected()
         {
@@ -904,27 +992,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 })
             };
             
+            var relatedFile = new File();
+            var unrelatedFile = new File();
+
+            var relatedFileMethodologyLink = new MethodologyFile
+            {
+                File = relatedFile,
+                Methodology = methodologyParent.Versions[0]
+            };
+            
+            var unrelatedFileMethodologyLink = new MethodologyFile
+            {
+                File = unrelatedFile,
+                Methodology = unrelatedMethodologyParent.Versions[0]
+            };
+            
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.MethodologyParents.AddRangeAsync(methodologyParent, unrelatedMethodologyParent);
+                await context.Files.AddRangeAsync(relatedFile, unrelatedFile);
+                await context.MethodologyFiles.AddRangeAsync(relatedFileMethodologyLink, unrelatedFileMethodologyLink);
                 await context.SaveChangesAsync();
             }
             
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Sanity check that 2 MethodologyParents and their Methodologies are created.
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyParent.Versions[0].Id));
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
-                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
-            }
+                var methodologyImageService = new Mock<IMethodologyImageService>();
+                var relatedMethodologyFileLinks = AsArray(relatedFileMethodologyLink.File.Id);
 
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(context);
+                methodologyImageService
+                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[0].Id, relatedMethodologyFileLinks))
+                    .ReturnsAsync(Unit.Instance);
+                
+                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodology(methodologyParent.Versions[0].Id);
+                
+                // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
+                // the Methodology being deleted.
+                VerifyAllMocks(methodologyImageService);
                 result.AssertRight();
             }
             
@@ -932,7 +1039,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
                 // unaffected. 
-                // TODO SOW4 EES-2156 - test deleting Methodology Files
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
                 
