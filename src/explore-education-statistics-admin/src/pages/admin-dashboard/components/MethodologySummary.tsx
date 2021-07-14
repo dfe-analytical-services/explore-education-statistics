@@ -26,14 +26,12 @@ export interface Props {
   publication: MyPublication;
   topicId: string;
   onChangePublication: () => void;
-  allowAmendments?: boolean; // TODO EES-2156 - remove when Amendments are ready to use
 }
 
 const MethodologySummary = ({
   publication,
   topicId,
   onChangePublication,
-  allowAmendments = false,
 }: Props) => {
   const history = useHistory();
   const [
@@ -244,19 +242,16 @@ const MethodologySummary = ({
                           ? 'Edit this methodology'
                           : 'View this methodology'}
                       </ButtonLink>
-                      {allowAmendments &&
-                        methodology.permissions
-                          .canMakeAmendmentOfMethodology && (
-                          <Button
-                            type="button"
-                            onClick={() =>
-                              setAmendMethodologyId(methodology.id)
-                            }
-                            variant="secondary"
-                          >
-                            Amend methodology
-                          </Button>
-                        )}
+                      {methodology.permissions
+                        .canMakeAmendmentOfMethodology && (
+                        <Button
+                          type="button"
+                          onClick={() => setAmendMethodologyId(methodology.id)}
+                          variant="secondary"
+                        >
+                          Amend methodology
+                        </Button>
+                      )}
                     </ButtonGroup>
                   </>
                 )}
