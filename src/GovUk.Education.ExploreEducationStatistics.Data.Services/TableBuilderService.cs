@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            var publication = await _subjectService.GetPublicationForSubject(queryContext.SubjectId);
-            var release = _releaseRepository.GetLatestPublishedRelease(publication.Id);
+            var publicationId = await _subjectService.GetPublicationIdForSubject(queryContext.SubjectId);
+            var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
             {

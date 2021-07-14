@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             .ReturnsAsync(false);
 
                         subjectService
-                            .Setup(s => s.GetPublicationForSubject(_subject.Id))
-                            .ReturnsAsync(publication);
+                            .Setup(s => s.GetPublicationIdForSubject(_subject.Id))
+                            .ReturnsAsync(publication.Id);
 
                         var releaseService = new Mock<IReleaseRepository>();
 

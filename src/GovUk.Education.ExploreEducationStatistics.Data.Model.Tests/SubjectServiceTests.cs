@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         }
 
         [Fact]
-        public async Task GetPublicationForSubject()
+        public async Task GetPublicationIdForSubject()
         {
             var releaseSubject = new ReleaseSubject
             {
@@ -188,15 +188,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
-                var result = await service.GetPublicationForSubject(releaseSubject.SubjectId);
+                var result = await service.GetPublicationIdForSubject(releaseSubject.SubjectId);
 
-                Assert.Equal(releaseSubject.Release.PublicationId, result.Id);
-                Assert.Equal("Test publication", result.Title);
+                Assert.Equal(releaseSubject.Release.PublicationId, result);
             }
         }
 
         [Fact]
-        public async Task GetPublicationForSubject_NotFoundThrows()
+        public async Task GetPublicationIdForSubject_NotFoundThrows()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -205,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var service = BuildSubjectService(context);
 
                 await Assert.ThrowsAsync<InvalidOperationException>(
-                    () => service.GetPublicationForSubject(Guid.NewGuid())
+                    () => service.GetPublicationIdForSubject(Guid.NewGuid())
                 );
             }
         }
@@ -236,10 +235,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
-                var result = await service.FindPublicationForSubject(releaseSubject.SubjectId);
+                var result = await service.FindPublicationIdForSubject(releaseSubject.SubjectId);
 
-                Assert.Equal(releaseSubject.Release.PublicationId, result.Id);
-                Assert.Equal("Test publication", result.Title);
+                Assert.Equal(releaseSubject.Release.PublicationId, result);
             }
         }
 
@@ -251,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
-                var result = await service.FindPublicationForSubject(Guid.NewGuid());
+                var result = await service.FindPublicationIdForSubject(Guid.NewGuid());
 
                 Assert.Null(result);
             }
