@@ -292,6 +292,7 @@ def __normalise_child_locator(parent_locator: object, child_locator: str) -> str
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
 
+
 def __get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = '') -> WebElement:
     if isinstance(parent_locator, str):
         sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
