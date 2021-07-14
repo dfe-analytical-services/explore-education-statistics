@@ -6,7 +6,6 @@ from logging import warning
 from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary import ElementFinder
-from SeleniumLibrary.errors import ElementNotFound
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.remote.webelement import WebElement
 import os
@@ -28,10 +27,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
 
         def parent_contains_matching_element() -> bool:
             parent_el = __get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return element_finder.find(
-                child_locator, 
-                required=False, 
-                parent=parent_el) is not None
+            return element_finder.find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(limit):
             return waiting._wait_until(
@@ -96,11 +92,10 @@ def get_child_element(parent_locator: object, child_locator: str):
     try:
         children = get_child_elements(parent_locator, child_locator)
         
-        if (len(children) > 1):
+        if len(children) > 1:
             warning(f"Found {len(children)} child elements matching child locator {child_locator} under parent "
                     f"locator {parent_locator} in utilities.py#get_child_element() - was expecting only one. Consider "
                     f"making the parent selector more specific. Returning the first element found.")
-            return children[0]
         
         return children[0]
     except Exception as err:
@@ -165,8 +160,7 @@ def get_current_datetime(strf: str, offset_days: int = 0) -> str:
 def user_should_be_at_top_of_page():
     (x, y) = sl.get_window_position()
     if y != 0:
-        raise_assertion_error(
-            f"Windows position Y is {y} not 0! User should be at the top of the page!")
+        raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
 def prompt_to_continue():
