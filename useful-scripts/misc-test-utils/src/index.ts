@@ -1,13 +1,13 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import createReleaseAndPublish from './modules/publication/publish';
-import createSingleRelease from './modules/release/create';
-import uploadSubect from './modules/subject/upload';
+import createPublicationAndRelease from './modules/release/create';
+import uploadSingleSubject from './modules/subject/upload';
 
 const choices = [
   'create new release',
   'publish a new release',
-  'upload subjects',
+  'upload subject',
 ] as const;
 
 const start = async () => {
@@ -21,7 +21,7 @@ const start = async () => {
 
   switch (answers.test) {
     case 'create new release':
-      await createSingleRelease();
+      await createPublicationAndRelease();
       break;
 
     case 'publish a new release':
@@ -37,7 +37,7 @@ const start = async () => {
         prefix: '>',
       });
 
-      await uploadSubect(release.id);
+      await uploadSingleSubject(release.id);
       break;
 
     default:

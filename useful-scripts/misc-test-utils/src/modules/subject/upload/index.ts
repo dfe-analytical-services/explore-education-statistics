@@ -8,6 +8,8 @@ import globby from 'globby';
 import rimraf from 'rimraf';
 import FormData from 'form-data';
 import chalk from 'chalk';
+import path from 'path';
+import { projectRoot } from '../../../config';
 import ZipDirectory from '../../../utils/zipDirectory';
 import Sleep from '../../../utils/Sleep';
 import { SubjectArray } from '../../../interfaces/SubjectArray';
@@ -16,7 +18,9 @@ import errorHandler from '../../../utils/errorHandler';
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, JWT_TOKEN } = process.env;
-const cwd = process.cwd();
+const cwd = projectRoot;
+
+console.log('cwd', cwd);
 
 const extractZip = async () => {
   const zippedFile = await globby(`${cwd}/*.zip`);
@@ -56,23 +60,17 @@ const renameFiles = async () => {
 };
 
 const addSubject = async (releaseId: string) => {
-  const glob = await globby(`${cwd}/zip-files/*.zip`);
+  const testingGlob = await globby(`${cwd}/zip-files/clean-test-zip-*.zip`);
+  console.log('testingGlob', testingGlob);
 
-  // potential issue here with how windows paths are formatted in git bash
-  if (glob !== undefined) {
-    const oldPath = `${process.cwd()}/zip-files/${
-      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
-    }`;
+  const oldPath = testingGlob[0];
 
-    const newPath = `${process.cwd()}/${
-      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
-    }`;
-    fs.renameSync(oldPath, newPath);
-  }
+  const newPath = path.resolve(oldPath, '..', path.basename(oldPath));
+  fs.renameSync(oldPath, newPath);
 
-  const rootGlob = await globby(`${cwd}/clean-test-zip-*.zip`);
+  // const rootGlob = await globby(`${cwd}/clean-test-zip-*.zip`);
   const form = new FormData();
-  form.append('zipFile', fs.createReadStream(rootGlob[0]));
+  form.append('zipFile', fs.createReadStream(newPath));
 
   try {
     const res = await axios({
@@ -89,7 +87,8 @@ const addSubject = async (releaseId: string) => {
     const subjectId = res.data.id;
     return subjectId;
   } catch (e) {
-    errorHandler(e);
+    // errorHandler(e);
+    console.error(e);
   }
   return null;
 };
@@ -155,7 +154,7 @@ const addMetaGuidance = async (
   }
 };
 
-const UploadSingleSubject = async (releaseId: string) => {
+const uploadSingleSubject = async (releaseId: string) => {
   if (releaseId === '') {
     throw new Error(chalk.red('Release ID is required!'));
   }
@@ -181,9 +180,7 @@ const UploadSingleSubject = async (releaseId: string) => {
       console.log(chalk.green('cleaned zip-files folder'));
     });
   }
-  if (!fs.existsSync(`${cwd}/test-results`)) {
-    fs.mkdirSync(`${cwd}/test-results`);
-  }
+
   if (!fs.existsSync(`${cwd}/test-files`)) {
     fs.mkdirSync(`${cwd}/test-files`);
   }
@@ -208,11 +205,11 @@ const UploadSingleSubject = async (releaseId: string) => {
     `${cwd}/zip-files/clean-test-zip-${v4()}.zip`,
   );
   const subjectId = await addSubject(releaseId);
-  console.time('import subject upload');
   while (importStatus !== 'COMPLETE') {
+    console.time('import subject upload');
     console.log(chalk.blue('importStatus', importStatus));
     // eslint-disable-next-line no-await-in-loop
-    await Sleep(300);
+    await Sleep(1000);
     // eslint-disable-next-line no-await-in-loop
     importStatus = await getSubjectProgress(releaseId, subjectId);
   }
@@ -233,4 +230,4 @@ const UploadSingleSubject = async (releaseId: string) => {
     errorHandler(e);
   }
 };
-export default UploadSingleSubject;
+export default uploadSingleSubject;

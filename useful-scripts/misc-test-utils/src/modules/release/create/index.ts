@@ -69,8 +69,8 @@ const createRelease = async (publicationId: string) => {
   }
   return null;
 };
-const createSingleRelease = async () => {
+const createPublicationAndRelease = async () => {
   const publicationId: string = await createPublication();
   await createRelease(publicationId);
 };
-export default createSingleRelease;
+export default createPublicationAndRelease;

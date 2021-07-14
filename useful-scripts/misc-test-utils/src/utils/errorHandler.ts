@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable no-constant-condition */
 /* eslint-disable no-console */
-
 import { AxiosError } from 'axios';
 import chalk from 'chalk';
 
 const errorHandler = async (e: AxiosError) => {
-  switch (e!.response!.status) {
+  switch (e?.response?.status) {
     case 401:
       console.log(
-        chalk.red`JWT token has expired, get a new one from Admin EES ${e}`,
+        chalk.red`JWT token has expired, get a new one from Admin EES`,
       );
       break;
 
@@ -17,18 +14,21 @@ const errorHandler = async (e: AxiosError) => {
       console.log(
         chalk.red`Bad request made to server, check your code is correct ${e}`,
       );
+      console.error(e.response.data);
       break;
 
     case 500:
       console.log(
         chalk.red`something is not working. Check everything is ok with the environment you're testing against ${e}`,
       );
+      console.error(e.response.data);
       break;
 
     case 503:
       console.log(
         chalk.red`something is not working. Check everything is ok with the environment you're testing against ${e}`,
       );
+      console.error(e.response.data);
       break;
 
     default:

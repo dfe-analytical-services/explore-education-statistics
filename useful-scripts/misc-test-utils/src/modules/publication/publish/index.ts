@@ -373,9 +373,7 @@ const createReleaseAndPublish = async () => {
       console.log(chalk.green('cleaned zip-files folder'));
     });
   }
-  if (!fs.existsSync(`${cwd}/test-results`)) {
-    fs.mkdirSync(`${cwd}/test-results`);
-  }
+
   if (!fs.existsSync(`${cwd}/test-files`)) {
     fs.mkdirSync(`${cwd}/test-files`);
   }
@@ -440,6 +438,13 @@ const createReleaseAndPublish = async () => {
     }
     await addMetaGuidance(subjectArray, releaseId);
     const finalReleaseObject = await getFinalReleaseDetails(releaseId);
+    if (!finalReleaseObject) {
+      throw new Error(
+        chalk.red(
+          "didn't get final release details object needed to publish release from `getFinalReleaseDetails` function! Exiting test with errors",
+        ),
+      );
+    }
     await publishRelease(finalReleaseObject, releaseId);
     console.time('publication elapsed time');
     while (publicationStatus !== 'Complete') {
