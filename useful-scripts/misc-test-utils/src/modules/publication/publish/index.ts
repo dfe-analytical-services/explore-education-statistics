@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import axios from 'axios';
 import 'dotenv-safe/config';
@@ -8,16 +9,18 @@ import globby from 'globby';
 import rimraf from 'rimraf';
 import FormData from 'form-data';
 import chalk from 'chalk';
+import path from 'path';
 import ZipDirectory from '../../../utils/zipDirectory';
 import Sleep from '../../../utils/Sleep';
 import { SubjectArray } from '../../../interfaces/SubjectArray';
 import { ReleaseData } from '../../../interfaces/ReleaseData';
 import errorHandler from '../../../utils/errorHandler';
+import { projectRoot } from '../../../config';
 
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, TOPIC_ID, JWT_TOKEN } = process.env;
-const cwd = process.cwd();
+const cwd = projectRoot;
 
 type finalReleaseData = {
   id: string;
@@ -153,23 +156,16 @@ const renameFiles = async () => {
 };
 
 const addSubject = async (releaseId: string): Promise<string | null> => {
-  const glob = await globby(`${cwd}/zip-files/*.zip`);
+  const testingGlob = await globby(`${cwd}/zip-files/clean-test-zip-*.zip`);
+  console.log('testingGlob', testingGlob);
 
-  // potential issue here with how windows paths are formatted in git bash
-  if (glob !== undefined) {
-    const oldPath = `${process.cwd()}/zip-files/${
-      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
-    }`;
+  const oldPath = testingGlob[0];
 
-    const newPath = `${process.cwd()}/${
-      fs.readdirSync(`${process.cwd()}/zip-files`)[0]
-    }`;
-    fs.renameSync(oldPath, newPath);
-  }
+  const newPath = path.resolve(oldPath, '..', path.basename(oldPath));
+  fs.renameSync(oldPath, newPath);
 
-  const rootGlob = await globby(`${cwd}/clean-test-zip-*.zip`);
   const form = new FormData();
-  form.append('zipFile', fs.createReadStream(rootGlob[0]));
+  form.append('zipFile', fs.createReadStream(newPath));
 
   try {
     const res = await axios({
@@ -234,7 +230,7 @@ const getSubjectIdArr = async (
     const subjects: SubjectArray[] = res.data?.subjects;
     const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
-      subjArr.push({ id: `${sub.id}`, content: `Hello ${v4()}` });
+      subjArr.push({ id: sub.id, content: `Hello ${v4()}` });
     });
     return subjArr;
   } catch (e) {
@@ -246,7 +242,7 @@ const getSubjectIdArr = async (
 const addMetaGuidance = async (
   subjArr: { id: string; content: string }[],
   releaseId: string,
-) => {
+): Promise<boolean> => {
   try {
     await axios({
       method: 'PATCH',
@@ -260,11 +256,14 @@ const addMetaGuidance = async (
         subjects: subjArr,
       },
     });
+    return true;
   } catch (e) {
     errorHandler(e);
   }
+  return false;
 };
 
+// eslint-disable-next-line consistent-return
 const getFinalReleaseDetails = async (releaseId: string) => {
   try {
     const res = await axios({
@@ -278,7 +277,7 @@ const getFinalReleaseDetails = async (releaseId: string) => {
     const releaseData: ReleaseData = res.data;
     await Sleep(1000);
 
-    const obj: finalReleaseData = {
+    const obj = {
       id: releaseData.id,
       title: releaseData.title,
       slug: releaseData.slug,
@@ -314,9 +313,9 @@ const getFinalReleaseDetails = async (releaseId: string) => {
   } catch (e) {
     errorHandler(e);
   }
-  return null;
 };
 
+// doesn't publish the release here for some reason
 const publishRelease = async (obj: finalReleaseData, releaseId: string) => {
   try {
     await axios({
@@ -333,6 +332,7 @@ const publishRelease = async (obj: finalReleaseData, releaseId: string) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const getPublicationProgress = async (releaseId: string) => {
   try {
     const res = await axios({
@@ -347,9 +347,8 @@ const getPublicationProgress = async (releaseId: string) => {
     });
     return res.data?.overallStage;
   } catch (e) {
-    errorHandler(e);
+    console.error(e);
   }
-  return null;
 };
 
 const createReleaseAndPublish = async () => {
@@ -409,16 +408,16 @@ const createReleaseAndPublish = async () => {
   const subjectId = await addSubject(releaseId);
   console.time('import subject upload');
   if (!importStatus) {
-    console.info(
-      'No importStatus just yet, waiting 3 seconds before polling again',
+    console.log(
+      'No importStatus just yet, waiting 4 seconds before polling again',
     );
-    await Sleep(3000);
+    await Sleep(4000);
   }
 
   while (importStatus !== 'COMPLETE') {
     console.log(chalk.blue('importStatus', importStatus));
     // eslint-disable-next-line no-await-in-loop
-    await Sleep(300);
+    await Sleep(1000);
 
     // eslint-disable-next-line no-await-in-loop
     importStatus = await getSubjectProgress(releaseId, subjectId as string);
@@ -447,17 +446,24 @@ const createReleaseAndPublish = async () => {
     }
     await publishRelease(finalReleaseObject, releaseId);
     console.time('publication elapsed time');
-    while (publicationStatus !== 'Complete') {
-      console.log('publicationStatus', publicationStatus);
-      // eslint-disable-next-line no-await-in-loop
-      if (publicationStatus !== undefined) {
-        // eslint-disable-next-line no-await-in-loop
-        publicationStatus = await getPublicationProgress(releaseId);
-      }
-      // eslint-disable-next-line no-await-in-loop
-      await Sleep(1500);
+    console.log(
+      chalk.green(
+        `Started publication of release: $${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`,
+      ),
+    );
+
+    publicationStatus = await getPublicationProgress(releaseId);
+    if (!publicationStatus) {
+      console.log(
+        'No publicationStatus just yet, waiting 4 seconds before polling again',
+      );
+      await Sleep(4000);
     }
-    console.timeEnd('publication elapsed time');
+    while (publicationStatus !== 'Complete') {
+      console.log('PublicationStatus:', publicationStatus);
+      await Sleep(3000);
+      await getPublicationProgress(releaseId);
+    }
   } catch (e) {
     errorHandler(e);
   }

@@ -20,8 +20,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, JWT_TOKEN } = process.env;
 const cwd = projectRoot;
 
-console.log('cwd', cwd);
-
 const extractZip = async () => {
   const zippedFile = await globby(`${cwd}/*.zip`);
   const cleanZipFile = zippedFile[0];
@@ -59,16 +57,16 @@ const renameFiles = async () => {
   );
 };
 
-const addSubject = async (releaseId: string) => {
-  const testingGlob = await globby(`${cwd}/zip-files/clean-test-zip-*.zip`);
-  console.log('testingGlob', testingGlob);
+const addSubject = async (releaseId: string): Promise<string | null> => {
+  const finalZipFileGlob = await globby(
+    `${cwd}/zip-files/clean-test-zip-*.zip`,
+  );
 
-  const oldPath = testingGlob[0];
+  const oldPath = finalZipFileGlob[0];
 
   const newPath = path.resolve(oldPath, '..', path.basename(oldPath));
   fs.renameSync(oldPath, newPath);
 
-  // const rootGlob = await globby(`${cwd}/clean-test-zip-*.zip`);
   const form = new FormData();
   form.append('zipFile', fs.createReadStream(newPath));
 
@@ -87,13 +85,16 @@ const addSubject = async (releaseId: string) => {
     const subjectId = res.data.id;
     return subjectId;
   } catch (e) {
-    // errorHandler(e);
-    console.error(e);
+    errorHandler(e);
   }
   return null;
 };
 
-const getSubjectProgress = async (releaseId: string, subjectId: string) => {
+const getSubjectProgress = async (
+  releaseId: string,
+  subjectId: string,
+  // eslint-disable-next-line consistent-return
+) => {
   try {
     const res = await axios({
       method: 'GET',
@@ -103,14 +104,23 @@ const getSubjectProgress = async (releaseId: string, subjectId: string) => {
         'Content-Type': 'application/json',
       },
     });
+    if (!res.data.status) {
+      console.info(
+        chalk.cyan(
+          'No import status available. Waiting 3 seconds before polling the API',
+        ),
+      );
+      await Sleep(3000);
+    }
     return res.data.status;
   } catch (e) {
     errorHandler(e);
   }
-  return null;
 };
 
-const getSubjectIdArr = async (releaseId: string) => {
+const getSubjectIdArr = async (
+  releaseId: string,
+): Promise<{ id: string; content: string }[] | null> => {
   try {
     const res = await axios({
       method: 'GET',
@@ -123,7 +133,7 @@ const getSubjectIdArr = async (releaseId: string) => {
     const subjects: SubjectArray[] = res.data?.subjects;
     const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
-      subjArr.push({ id: `${sub.id}`, content: `Hello ${v4()}` });
+      subjArr.push({ id: sub.id, content: `Hello ${v4()}` });
     });
     return subjArr;
   } catch (e) {
@@ -135,7 +145,7 @@ const getSubjectIdArr = async (releaseId: string) => {
 const addMetaGuidance = async (
   subjArr: { id: string; content: string }[],
   releaseId: string,
-) => {
+): Promise<boolean> => {
   try {
     await axios({
       method: 'PATCH',
@@ -149,9 +159,11 @@ const addMetaGuidance = async (
         subjects: subjArr,
       },
     });
+    return true;
   } catch (e) {
     errorHandler(e);
   }
+  return false;
 };
 
 const uploadSingleSubject = async (releaseId: string) => {
@@ -211,7 +223,7 @@ const uploadSingleSubject = async (releaseId: string) => {
     // eslint-disable-next-line no-await-in-loop
     await Sleep(1000);
     // eslint-disable-next-line no-await-in-loop
-    importStatus = await getSubjectProgress(releaseId, subjectId);
+    importStatus = await getSubjectProgress(releaseId, subjectId as string);
   }
   console.timeEnd(chalk.green('import subject upload'));
 
