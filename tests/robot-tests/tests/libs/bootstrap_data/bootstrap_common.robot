@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/common.robot
-Resource    ../libs/admin-common.robot
-Library     ../libs/admin_api.py
+Resource    ../common.robot
+Resource    ../admin-common.robot
+Library     ../admin_api.py
 
 *** Variables ***
 ${SUBJECT_NAME}  UI test subject

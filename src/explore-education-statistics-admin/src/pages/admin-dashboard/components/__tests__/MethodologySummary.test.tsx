@@ -31,7 +31,6 @@ const testContact: PublicationContactDetails = {
 
 const testMethodology: MyMethodology = {
   amendment: false,
-  live: true,
   id: '1234',
   internalReleaseNote: 'this is the release note',
   previousVersionId: 'lfkjdlfj',
@@ -39,6 +38,10 @@ const testMethodology: MyMethodology = {
   slug: 'meth-1',
   status: 'Approved',
   title: 'I am a methodology',
+  publication: {
+    id: 'p1',
+    title: 'Publication title',
+  },
   permissions: {
     canUpdateMethodology: false,
     canCancelMethodologyAmendment: false,
@@ -176,7 +179,7 @@ describe('MethodologySummary', () => {
         screen.queryByRole('button', {
           name: 'Link to an externally hosted methodology',
         }),
-      ).not.toBeInTheDocument();
+      ).toBeInTheDocument();
     });
   });
 
@@ -211,7 +214,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('the create and link methodology buttons are not shown if the user does not have permission', () => {
+    test('the create and link methodology buttons are not shown if the user does not have permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -373,7 +376,9 @@ describe('MethodologySummary', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Edit' }),
+          screen.getByRole('button', {
+            name: 'Edit externally hosted methodology',
+          }),
         ).toBeInTheDocument();
 
         expect(
@@ -407,7 +412,9 @@ describe('MethodologySummary', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.queryByRole('button', { name: 'Edit' }),
+          screen.queryByRole('button', {
+            name: 'Edit externally hosted methodology',
+          }),
         ).not.toBeInTheDocument();
 
         expect(
@@ -479,10 +486,13 @@ describe('MethodologySummary', () => {
       const history = createMemoryHistoryWithMockedPush();
       const mockMethodology: BasicMethodology = {
         amendment: true,
-        live: false,
         id: '12345',
         internalReleaseNote: 'this is the release note',
         previousVersionId: 'lfkjdlfj',
+        publication: {
+          id: 'p1',
+          title: 'Publication title',
+        },
         published: '2021-06-08T09:04:17.9805585',
         slug: 'meth-1',
         status: 'Approved',

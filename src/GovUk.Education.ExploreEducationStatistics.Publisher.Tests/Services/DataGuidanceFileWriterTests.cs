@@ -42,6 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             </ul>
             ";
 
+        private const string TestBasicMetaGuidance = @"
+            <p>
+                This document describes the data included in the ‘Children looked after in England'
+            </p>
+        ";
+
         private readonly List<string> _filePaths = new List<string>();
 
         public void Dispose()
@@ -58,7 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(releaseId))
+            releaseService
+                .Setup(s => s.Get(releaseId))
                 .ThrowsAsync(new ArgumentException("Could not find release"));
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
@@ -71,13 +78,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var path = GenerateFilePath();
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(
-                async () =>
-                {
-                    await writer.WriteFile(releaseId, path);
-                }
+                async () => { await writer.WriteFile(releaseId, path); }
             );
 
             Assert.Equal($"Could not find release", exception.Message);
+
+            Assert.False(File.Exists(path));
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_ReleaseHasNoDataGuidance()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => { await writer.WriteFile(release.Id, path); }
+            );
+
+            Assert.Equal(
+                $"Cannot create data guidance file for release {release.Id} with no data guidance",
+                exception.Message
+            );
 
             Assert.False(File.Exists(path));
             MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
@@ -100,12 +146,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(release.Id))
+            releaseService
+                .Setup(s => s.Get(release.Id))
                 .ReturnsAsync(release);
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
 
-            metaGuidanceSubjectService.Setup(s => s.GetSubjects(release.Id, null))
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
                 .ReturnsAsync(new NotFoundResult());
 
             var writer = BuildDataGuidanceFileWriter(
@@ -116,10 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var path = GenerateFilePath();
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(
-                async () =>
-                {
-                    await writer.WriteFile(release.Id, path);
-                }
+                async () => { await writer.WriteFile(release.Id, path); }
             );
 
             Assert.Equal($"Could not find subjects for release: {release.Id}", exception.Message);
@@ -195,12 +240,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(release.Id))
+            releaseService
+                .Setup(s => s.Get(release.Id))
                 .ReturnsAsync(release);
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
 
-            metaGuidanceSubjectService.Setup(s => s.GetSubjects(release.Id, null))
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
                 .ReturnsAsync(subjects);
 
             var writer = BuildDataGuidanceFileWriter(
@@ -265,12 +312,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(release.Id))
+            releaseService
+                .Setup(s => s.Get(release.Id))
                 .ReturnsAsync(release);
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
 
-            metaGuidanceSubjectService.Setup(s => s.GetSubjects(release.Id, null))
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
                 .ReturnsAsync(subjects);
 
             var writer = BuildDataGuidanceFileWriter(
@@ -307,12 +356,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.Get(release.Id))
+            releaseService
+                .Setup(s => s.Get(release.Id))
                 .ReturnsAsync(release);
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
 
-            metaGuidanceSubjectService.Setup(s => s.GetSubjects(release.Id, null))
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
                 .ReturnsAsync(new List<MetaGuidanceSubjectViewModel>());
 
             var writer = BuildDataGuidanceFileWriter(
@@ -322,6 +373,300 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var path = GenerateFilePath();
             await using var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithSingleProperties()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "<p>Test file content</p>",
+                    GeographicLevels = new List<string>
+                    {
+                        "Local Authority",
+                    },
+                    TimePeriods = new TimePeriodLabels("2018", "2018"),
+                    Variables = new List<LabelValue>
+                    {
+                        new LabelValue("Accommodation type", "accommodation_type"),
+                    }
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithEmptyProperties()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels(),
+                    Variables = new List<LabelValue>()
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithEmptyTimePeriodStart()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels("", "2019"),
+                    Variables = new List<LabelValue>()
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithEmptyTimePeriodEnd()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    Variables = new List<LabelValue>()
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithEmptyVariable()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    Variables = new List<LabelValue>
+                    {
+                        new LabelValue("", "")
+                    }
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
 
             using var reader = new StreamReader(file);
             var text = await File.ReadAllTextAsync(path);

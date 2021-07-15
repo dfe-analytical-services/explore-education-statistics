@@ -14,6 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 
         public Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
 
-        public Task<Either<ActionResult, List<ThemeTree<PublicationMethodologiesTreeNode>>>> GetTree();
+        public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree();
     }
 }

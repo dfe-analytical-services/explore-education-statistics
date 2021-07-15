@@ -32,12 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CreateMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            // If a Publication is linked to an External Methodology, this should be unlinked first.
-            if (publication.ExternalMethodology != null)
-            {
-                return;
-            }
-            
             await _context
                 .Entry(publication)
                 .Collection(p => p.Methodologies)

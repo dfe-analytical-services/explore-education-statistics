@@ -35,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<FileStream> WriteFile(Guid releaseId, string path)
         {
             var release = await _releaseService.Get(releaseId);
+
+            if (release.MetaGuidance.IsNullOrWhitespace())
+            {
+                throw new InvalidOperationException(
+                    $"Cannot create data guidance file for release {release.Id} with no data guidance"
+                );
+            }
+
             var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id);
 
             if (subjects.IsLeft)
@@ -94,57 +102,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await file.WriteLineAsync();
 
                     await file.WriteLineAsync("Filename: " + subject.Filename);
-                    await file.WriteLineAsync("Geographic levels: " + string.Join("; ", subject.GeographicLevels));
 
-                    await file.WriteLineAsync($"Time period: {subject.TimePeriods.ToLabel()}");
+                    if (subject.GeographicLevels.Any())
+                    {
+                        await file.WriteLineAsync("Geographic levels: " + string.Join("; ", subject.GeographicLevels));
+                    }
 
-                    var content = await HtmlToTextUtils.HtmlToText(subject.Content);
-                    await file.WriteLineAsync($"Content summary: {content}");
-                    await file.WriteLineAsync();
+                    var timePeriodsLabel = subject.TimePeriods.ToLabel();
+
+                    if (!timePeriodsLabel.IsNullOrWhitespace())
+                    {
+                        await file.WriteLineAsync($"Time period: {timePeriodsLabel}");
+                    }
+
+                    if (!subject.Content.IsNullOrWhitespace())
+                    {
+                        var content = await HtmlToTextUtils.HtmlToText(subject.Content);
+                        await file.WriteLineAsync($"Content summary: {content}");
+                    }
 
                     // TODO EES-1768 - Add footnotes
 
-                    await file.WriteLineAsync("Variable names and descriptions for this file are provided below:");
-                    await file.WriteLineAsync();
+                    var variables = subject.Variables
+                        .Where(variable =>
+                            !variable.Label.IsNullOrWhitespace()
+                            || !variable.Value.IsNullOrWhitespace())
+                        .ToList();
 
-                    var padding = subject.Variables.Aggregate(
-                        (Value: 0, Label: 0),
-                        (acc, variable) =>
-                        {
-                            if (variable.Value.Length > acc.Value)
+                    if (variables.Any())
+                    {
+                        await file.WriteLineAsync();
+                        await file.WriteLineAsync("Variable names and descriptions for this file are provided below:");
+                        await file.WriteLineAsync();
+
+                        var padding = variables.Aggregate(
+                            (Value: 0, Label: 0),
+                            (acc, variable) =>
                             {
-                                acc.Value = variable.Value.Length;
-                            }
+                                if (variable.Value.Length > acc.Value)
+                                {
+                                    acc.Value = variable.Value.Length;
+                                }
 
-                            if (variable.Label.Length > acc.Label)
+                                if (variable.Label.Length > acc.Label)
+                                {
+                                    acc.Label = variable.Label.Length;
+                                }
+
+                                return acc;
+                            }
+                        );
+
+                        // Adds a table header for variable names/descriptions
+                        await file.WriteLineAsync(
+                            "Variable name".PadRight(padding.Value) + VariableSeparator + "Variable description"
+                        );
+                        await file.WriteLineAsync(
+                            string.Empty.PadRight(
+                                padding.Value,
+                                '-'
+                            ) + VariableSeparator + string.Empty.PadRight(padding.Label, '-')
+                        );
+
+                        // Add table body for variable names/descriptions
+                        await variables.ForEachAsync(
+                            async variable =>
                             {
-                                acc.Label = variable.Label.Length;
+                                await file.WriteLineAsync(
+                                    variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
+                                );
                             }
-
-                            return acc;
-                        }
-                    );
-
-                    // Adds a table header for variable names/descriptions
-                    await file.WriteLineAsync(
-                        "Variable name".PadRight(padding.Value) + VariableSeparator + "Variable description"
-                    );
-                    await file.WriteLineAsync(
-                        string.Empty.PadRight(
-                            padding.Value,
-                            '-'
-                        ) + VariableSeparator + string.Empty.PadRight(padding.Label, '-')
-                    );
-
-                    // Add table body for variable names/descriptions
-                    await subject.Variables.ForEachAsync(
-                        async variable =>
-                        {
-                            await file.WriteLineAsync(
-                                variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
-                            );
-                        }
-                    );
+                        );
+                    }
 
                     // Add some extra lines between data files
                     if (index < subjects.Count - 1)

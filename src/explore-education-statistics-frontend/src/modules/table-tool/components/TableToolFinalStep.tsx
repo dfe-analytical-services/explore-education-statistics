@@ -16,7 +16,7 @@ import {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
   query: TableDataQuery;
@@ -48,8 +48,8 @@ const TableToolFinalStep = ({
   const publication = fullPublication?.publication;
 
   const getMethodologyLinks = () => {
-    if (publication?.methodologies.length) {
-      return publication?.methodologies.map(methodology => (
+    const links: ReactNode[] =
+      publication?.methodologies?.map(methodology => (
         <Link
           key={methodology.id}
           to="/methodology/[methodology]"
@@ -57,19 +57,19 @@ const TableToolFinalStep = ({
         >
           {methodology.title}
         </Link>
-      ));
-    }
+      )) ?? [];
+
     if (publication?.externalMethodology) {
-      return [
+      links.push(
         <Link
           key={publication.externalMethodology.url}
           to={publication.externalMethodology.url}
         >
           {publication.externalMethodology.title}
         </Link>,
-      ];
+      );
     }
-    return [];
+    return links;
   };
 
   return (

@@ -533,7 +533,7 @@ Select publication
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
-Select subject
+Select subject again
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit

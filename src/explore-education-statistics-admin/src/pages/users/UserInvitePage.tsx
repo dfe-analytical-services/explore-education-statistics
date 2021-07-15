@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService, { Role, UserInvite } from '@admin/services/userService';
 import Button from '@common/components/Button';
@@ -7,7 +6,6 @@ import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import RelatedInformation from '@common/components/RelatedInformation';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
@@ -80,7 +78,8 @@ const UserInvitePage = ({
             Invite a new user
           </h1>
         </div>
-        <div className="govuk-grid-column-one-third">
+        {/* EES-2464
+         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
@@ -90,7 +89,7 @@ const UserInvitePage = ({
               </li>
             </ul>
           </RelatedInformation>
-        </div>
+        </div> */}
       </div>
       {model && (
         <Formik<FormValues>

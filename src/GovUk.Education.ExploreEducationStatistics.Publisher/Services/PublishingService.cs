@@ -1,7 +1,9 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -104,9 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Image
             );
 
-            var dataGuidanceFile = await _dataGuidanceFileService.CreateDataGuidanceFile(release.Id);
+            if (!release.MetaGuidance.IsNullOrWhitespace())
+            {
+                var dataGuidanceFile = await _dataGuidanceFileService.CreateDataGuidanceFile(release.Id);
 
-            files.Add(dataGuidanceFile);
+                files.Add(dataGuidanceFile);
+            }
 
             var destinationDirectoryPath = $"{release.Id}/";
 

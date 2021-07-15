@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
@@ -69,9 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
-            CreateMap<Methodology, MethodologyTitleViewModel>();
-
-            CreateMap<Publication, IdTitlePair>();
+            CreateMap<Methodology, TitleAndIdViewModel>();
 
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,

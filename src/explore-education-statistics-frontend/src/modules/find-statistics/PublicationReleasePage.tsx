@@ -195,13 +195,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 ))}
                 {release.publication.externalMethodology && (
                   <li>
-                    <a
-                      href={release.publication.externalMethodology.url}
+                    <Link
+                      to={release.publication.externalMethodology.url}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {release.publication.externalMethodology.title}
-                    </a>
+                    </Link>
                   </li>
                 )}
                 {release.hasMetaGuidance && (

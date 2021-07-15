@@ -331,6 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IUserService userService = null)
         {
             return new ManageContentPageService(
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.AdminMapper(),
                 contentService ?? new Mock<IContentService>().Object,
