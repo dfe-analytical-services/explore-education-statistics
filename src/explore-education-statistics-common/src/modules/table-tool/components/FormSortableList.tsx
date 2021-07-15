@@ -1,16 +1,18 @@
 import { FormFieldset } from '@common/components/form';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { Filter } from '@common/modules/table-tool/types/filters';
-import reorderMulti from '@common/utils/reorderMulti';
+import reorderMultiple from '@common/utils/reorderMultiple';
 import classNames from 'classnames';
-import React, { MouseEventHandler, useState, useEffect } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
-  Droppable,
   DraggableStateSnapshot,
+  Droppable,
 } from 'react-beautiful-dnd';
 import styles from './FormSortableList.module.scss';
+
+const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 
 type SortableOptionChangeEventHandler = (value: Filter[]) => void;
 
@@ -29,166 +31,172 @@ const FormSortableList = ({
   value,
   ...props
 }: FormSortableListProps) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [draggingTaskId, setDraggingTaskId] = useState<string>('');
+  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const [draggingIndex, setDraggingIndex] = useState<number>();
 
-  const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+  useEffect(() => {
+    const resetState = () => {
+      setDraggingIndex(undefined);
+      setSelectedIndices([]);
+    };
 
-  const keyCodes = {
-    enter: 13,
-    escape: 27,
-    arrowDown: 40,
-    arrowUp: 38,
-    tab: 9,
-  };
-
-  const toggleSelection = (selectedId: string) => {
-    const wasSelected: boolean = selectedIds.includes(selectedId);
-
-    const newTaskIds: string[] = (() => {
-      if (!wasSelected || selectedIds.length > 1) {
-        return [selectedId];
+    const handleWindowKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
       }
 
-      return [];
-    })();
+      if (event.key === 'Escape') {
+        resetState();
+      }
+    };
 
-    setSelectedIds(newTaskIds);
+    const handleWindowClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      resetState();
+    };
+
+    const handleWindowTouchEnd = (event: TouchEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      resetState();
+    };
+
+    // Add event handlers to reset the state if
+    // the user clicks outside of the component.
+    window.addEventListener('click', handleWindowClick);
+    window.addEventListener('keydown', handleWindowKeyDown);
+    window.addEventListener('touchend', handleWindowTouchEnd);
+
+    return () => {
+      window.removeEventListener('click', handleWindowClick);
+      window.removeEventListener('keydown', handleWindowKeyDown);
+      window.removeEventListener('touchend', handleWindowTouchEnd);
+    };
+  }, []);
+
+  const toggleSelection = (index: number) => {
+    setSelectedIndices(prevIndices =>
+      prevIndices.includes(index) ? [] : [index],
+    );
   };
 
-  const toggleSelectionInGroup = (selectedId: string) => {
-    const index = selectedIds.indexOf(selectedId);
+  const toggleSelectionInGroup = (index: number) => {
+    setSelectedIndices(prevIndices => {
+      const indexPosition = prevIndices.indexOf(index);
 
-    if (index === -1) {
-      setSelectedIds([...selectedIds, selectedId]);
+      if (indexPosition === -1) {
+        return [...prevIndices, index];
+      }
+
+      const nextIndices = [...prevIndices];
+      nextIndices.splice(indexPosition, 1);
+
+      return nextIndices;
+    });
+  };
+
+  const performAction = (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    if (isGroupKeyUsed(event)) {
+      toggleSelectionInGroup(index);
       return;
     }
 
-    const shallow = [...selectedIds];
-    shallow.splice(index, 1);
-    setSelectedIds(shallow);
+    toggleSelection(index);
   };
 
-  const unselectAll = () => {
-    setSelectedIds([]);
-  };
-
-  const onKeyDown = (
-    event: React.KeyboardEvent,
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>,
     snapshot: DraggableStateSnapshot,
-    itemId: string,
+    index: number,
   ) => {
     if (
       event.defaultPrevented ||
       snapshot.isDragging ||
-      event.keyCode !== keyCodes.enter
+      event.key !== 'Enter'
     ) {
       return;
     }
+
     event.preventDefault();
-    performAction(event, itemId);
+    performAction(event, index);
   };
 
-  const onClick = (event: React.MouseEvent, itemId: string) => {
+  const handleClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    index: number,
+  ) => {
     if (event.defaultPrevented || event.button !== primaryButton) {
       return;
     }
+
     event.preventDefault();
-    performAction(event, itemId);
+    performAction(event, index);
   };
 
-  const onTouchEnd = (event: React.TouchEvent) => {
+  const handleTouchEnd = (
+    event: React.TouchEvent<HTMLDivElement>,
+    index: number,
+  ) => {
     if (event.defaultPrevented) {
       return;
     }
+
     event.preventDefault();
-    toggleSelectionInGroup(id);
+    toggleSelectionInGroup(index);
   };
-
-  // Determines if the platform specific toggle selection in group key was used
-  const wasToggleInSelectionGroupKeyUsed = (
-    event: React.MouseEvent | React.KeyboardEvent,
-  ) => {
-    const isUsingWindows = navigator.platform.indexOf('Win') >= 0;
-    return isUsingWindows ? event.ctrlKey : event.metaKey;
-  };
-
-  const performAction = (
-    event: React.MouseEvent | React.KeyboardEvent,
-    itemId: string,
-  ) => {
-    if (wasToggleInSelectionGroupKeyUsed(event)) {
-      toggleSelectionInGroup(itemId);
-      return;
-    }
-    toggleSelection(itemId);
-  };
-
-  const onWindowKeyDown = (event: KeyboardEvent) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      unselectAll();
-    }
-  };
-
-  const onWindowClick = (event: MouseEvent) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-    unselectAll();
-  };
-
-  const onWindowTouchEnd = (event: TouchEvent) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-    unselectAll();
-  };
-
-  useEffect(() => {
-    window.addEventListener('click', onWindowClick);
-    window.addEventListener('keydown', onWindowKeyDown);
-    window.addEventListener('touchend', onWindowTouchEnd);
-
-    return function cleanup() {
-      window.removeEventListener('click', onWindowClick);
-      window.removeEventListener('keydown', onWindowKeyDown);
-      window.removeEventListener('touchend', onWindowTouchEnd);
-    };
-  });
 
   return (
     <FormFieldset {...props} id={id}>
       <DragDropContext
         onDragStart={start => {
-          const selected = selectedIds.includes(start.draggableId);
-          if (!selected) {
-            unselectAll();
+          if (!selectedIndices.includes(start.source.index)) {
+            setSelectedIndices([]);
           }
-          setDraggingTaskId(start.draggableId);
+
+          setDraggingIndex(start.source.index);
         }}
         onDragEnd={result => {
-          if (!result.destination) {
+          if (result.destination?.index == null) {
             return;
           }
 
-          const newValue = reorderMulti({
+          const destinationIndex = result.destination.index;
+
+          const selected = selectedIndices.length
+            ? selectedIndices
+            : [result.source.index];
+
+          const nextValue = reorderMultiple({
             list: value,
-            sourceIndex: result.source.index,
-            destinationIndex: result.destination.index,
-            selectedIds: selectedIds.length
-              ? selectedIds
-              : [result.draggableId],
+            destinationIndex,
+            selectedIndices: selected,
           });
 
-          setDraggingTaskId('');
+          setDraggingIndex(undefined);
 
-          if (onChange) {
-            onChange(newValue);
-          }
+          const oldOptions = selected.map(index => value[index]);
+
+          setSelectedIndices(
+            nextValue.reduce<number[]>((acc, option, index) => {
+              if (oldOptions.includes(option)) {
+                acc.push(index);
+              }
+
+              return acc;
+            }, []),
+          );
+
+          onChange?.(nextValue);
         }}
       >
         <Droppable droppableId={id}>
@@ -216,25 +224,28 @@ const FormSortableList = ({
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.dragHandleProps}
                       className={classNames(styles.optionRow, {
-                        [styles.optionCurrentDragging]:
-                          draggableSnapshot.isDragging,
-                        [styles.isSelected]: selectedIds.includes(option.value),
-                        [styles.isGhosted]:
-                          selectedIds.includes(option.value) &&
-                          draggingTaskId &&
-                          draggingTaskId !== option.value,
+                        [styles.optionDragging]: draggableSnapshot.isDragging,
+                        [styles.optionSelected]: selectedIndices.includes(
+                          index,
+                        ),
+                        [styles.optionGhosted]:
+                          selectedIndices.includes(index) &&
+                          typeof draggingIndex === 'number' &&
+                          draggingIndex !== index,
                       })}
                       ref={draggableProvided.innerRef}
-                      style={draggableProvided.draggableProps.style}
-                      onClick={event => {
-                        onClick(event, option.value);
-                      }}
-                      onKeyDown={(event: React.KeyboardEvent) =>
-                        onKeyDown(event, draggableSnapshot, option.value)
-                      }
-                      onTouchEnd={onTouchEnd}
                       role="button"
+                      style={draggableProvided.draggableProps.style}
                       tabIndex={0}
+                      onClick={event => {
+                        handleClick(event, index);
+                      }}
+                      onKeyDown={event =>
+                        handleKeyDown(event, draggableSnapshot, index)
+                      }
+                      onTouchEnd={event => {
+                        handleTouchEnd(event, index);
+                      }}
                     >
                       <div className={styles.optionText}>
                         <strong>{option.label}</strong>
@@ -254,3 +265,15 @@ const FormSortableList = ({
 };
 
 export default FormSortableList;
+
+/**
+ * Determines if the platform-specific grouping key was used
+ * e.g. Ctrl for Linux/Windows and the Meta key for Mac.
+ */
+function isGroupKeyUsed(
+  event: React.MouseEvent | React.KeyboardEvent,
+): boolean {
+  return Boolean(
+    navigator.platform.includes('Mac') ? event.metaKey : event.ctrlKey,
+  );
+}

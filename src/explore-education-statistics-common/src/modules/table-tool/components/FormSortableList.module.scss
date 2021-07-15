@@ -23,8 +23,9 @@
     cursor: move;
     cursor: grab;
   }
+
   &:focus {
-    border: $govuk-focus-width solid #000;
+    border: $govuk-focus-width solid govuk-colour('black');
     outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 }
@@ -39,21 +40,22 @@
   flex-direction: column;
 }
 
-.optionCurrentDragging {
-  background: #fff;
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-  outline-offset: 0;
+.optionDragging {
+  background: govuk-colour('blue');
+  border: $govuk-focus-width solid govuk-colour('black');
+  color: govuk-colour('white');
+  outline: $govuk-focus-colour solid $govuk-focus-width;
 }
 
-.isSelected {
-  background: $govuk-brand-colour;
+.optionSelected {
+  background: govuk-colour('blue');
   color: govuk-colour('white');
 
   &:hover {
-    background: $govuk-brand-colour;
+    background: darken(govuk-colour('blue'), 5);
   }
 }
 
-.isGhosted {
+.optionGhosted {
   opacity: 0.5;
 }
