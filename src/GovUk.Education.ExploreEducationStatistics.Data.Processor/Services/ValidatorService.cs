@@ -20,7 +20,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ImporterService;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services

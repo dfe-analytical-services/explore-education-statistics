@@ -14,10 +14,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -101,45 +101,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             };
 
-        public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.Institution,
-            GeographicLevel.Provider,
-            GeographicLevel.School,
-            GeographicLevel.PlanningArea
-        };
-
-        private static readonly List<GeographicLevel> AllowedSoloGeographicLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.Provider,
-            GeographicLevel.School,
-        };
-
-        public static bool HasSoloAllowedGeographicLevel(HashSet<GeographicLevel> subjectGeographicLevels)
-        {
-            if (subjectGeographicLevels.Count == 1)
-            {
-                foreach (var allowedSoloLevel in AllowedSoloGeographicLevels)
-                {
-                    if (subjectGeographicLevels.Contains(allowedSoloLevel))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public static bool AllowRowImport(HashSet<GeographicLevel> subjectGeographicLevels, GeographicLevel rowGeographicLevel)
-        {
-            if (HasSoloAllowedGeographicLevel(subjectGeographicLevels))
-            {
-                return true;
-            }
-
-            return !IgnoredGeographicLevels.Contains(rowGeographicLevel);
-        }
-
         public ImporterService(
             IGuidGenerator guidGenerator,
             ImporterFilterService importerFilterService,
@@ -179,6 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var colValues = CsvUtil.GetColumnValues(cols);
             var rowCount = 1;
             var totalRows = rows.Count;
+            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(dataImport.GeographicLevels);
 
             foreach (DataRow row in rows)
             {
@@ -200,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var rowValues = CsvUtil.GetRowValues(row);
                 var rowGeographicLevel = GetGeographicLevel(rowValues, colValues);
-                if (AllowRowImport(dataImport.GeographicLevels, rowGeographicLevel))
+                if (hasSoloAllowedGeographicLevel || AllowRowImport(rowGeographicLevel))
                 {
                     CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
                 }
@@ -284,6 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var observations = new List<Observation>();
             var i = 0;
+            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(subjectGeographicLevels);
 
             foreach (DataRow row in rows)
             {
@@ -295,7 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     subjectMeta,
                     ((batchNo - 1) * rowsPerBatch) + i++ + 2);
 
-                if (AllowRowImport(subjectGeographicLevels, o.GeographicLevel))
+                if (hasSoloAllowedGeographicLevel || AllowRowImport(o.GeographicLevel))
                 {
                     observations.Add(o);
                 }
