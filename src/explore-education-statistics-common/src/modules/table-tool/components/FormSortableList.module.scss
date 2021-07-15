@@ -15,6 +15,7 @@
   background: #fff;
   border-bottom: 1px solid govuk-colour('mid-grey');
   padding: govuk-spacing(2);
+  position: relative;
   user-select: none;
 
   &:hover {
@@ -58,4 +59,17 @@
 
 .optionGhosted {
   opacity: 0.5;
+}
+
+.selectedCount {
+  align-items: center;
+  background: govuk-colour('yellow');
+  border: $govuk-focus-width solid govuk-colour('black');
+  color: govuk-colour('black');
+  display: flex;
+  justify-content: center;
+  padding: govuk-spacing(1) govuk-spacing(2);
+  position: absolute;
+  right: -#{govuk-spacing(5)};
+  top: -#{govuk-spacing(5)};
 }

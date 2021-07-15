@@ -249,8 +249,21 @@ const FormSortableList = ({
                     >
                       <div className={styles.optionText}>
                         <strong>{option.label}</strong>
-                        <span>⇅</span>
+                        <span aria-hidden>⇅</span>
                       </div>
+
+                      {selectedIndices.length > 1 &&
+                        draggingIndex === index &&
+                        draggableSnapshot.isDragging && (
+                          <div className={styles.selectedCount}>
+                            {selectedIndices.length}{' '}
+                            <span className="govuk-visually-hidden">
+                              {`${selectedIndices.length} ${
+                                selectedIndices.length === 1 ? 'item' : 'items'
+                              } selected`}
+                            </span>
+                          </div>
+                        )}
                     </div>
                   )}
                 </Draggable>
