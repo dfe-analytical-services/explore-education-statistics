@@ -1,12 +1,12 @@
 import { FastTrackTable } from '@common/services/fastTrackService';
 import {
+  SelectedPublication,
   SubjectMeta,
   SubjectsAndHighlights,
   Theme,
 } from '@common/services/tableBuilderService';
 import { render, screen } from '@testing-library/react';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
 import React from 'react';
@@ -45,11 +45,11 @@ describe('TableToolPage', () => {
                 label: 'Default',
                 options: [
                   {
-                    label: '1 .  PGCE',
+                    label: 'PGCE',
                     value: '72303947-27a4-4ea2-a708-dfeb7bb31efb',
                   },
                   {
-                    label: '2 .  MBA',
+                    label: 'MBA',
                     value: '0164a10e-c041-49f8-b44d-daa6f0c1fbfd',
                   },
                 ],
@@ -144,7 +144,7 @@ describe('TableToolPage', () => {
     subjects: [
       {
         id: '1f1b1780-a607-454e-b331-08d9097c40f5',
-        name: 'dates',
+        name: 'Test subject',
         content: '<p>ryt</p>',
         timePeriods: { from: '2020 Week 13', to: '2021 Week 24' },
         geographicLevels: ['National'],
@@ -164,15 +164,15 @@ describe('TableToolPage', () => {
             label: 'Default',
             options: [
               {
-                label: '1 .  PGCE',
+                label: 'PGCE',
                 value: '72303947-27a4-4ea2-a708-dfeb7bb31efb',
               },
               {
-                label: '10 .  Psychology',
+                label: 'Psychology',
                 value: '0164a10e-c041-49f8-b44d-daa6f0c1fbfd',
               },
               {
-                label: '11 .  Veterinary sciences',
+                label: 'Veterinary sciences',
                 value: '89cf21bd-2d1c-479b-9bde-550fc1ade623',
               },
             ],
@@ -296,7 +296,7 @@ describe('TableToolPage', () => {
     },
   ];
 
-  const testSelectedPublicationWithLatestRelease = {
+  const testSelectedPublicationWithLatestRelease: SelectedPublication = {
     id: testPublicationId,
     title: 'Test Publication',
     slug: 'test-publication',
@@ -311,7 +311,7 @@ describe('TableToolPage', () => {
     },
   };
 
-  const testSelectedPublicationWithNonLatestRelease = {
+  const testSelectedPublicationWithNonLatestRelease: SelectedPublication = {
     id: testPublicationId,
     title: 'Test Publication',
     slug: 'test-publication',
@@ -326,15 +326,26 @@ describe('TableToolPage', () => {
     },
   };
 
-  beforeEach(preloadAll);
+  beforeAll(preloadAll);
 
-  test('renders the Table Tool page correctly when Theme metadata is provided, giving the user a choice of Publications', async () => {
+  test('renders the page correctly with themes and publications', async () => {
     render(<TableToolPage themeMeta={testThemeMeta} />);
 
-    expect(screen.getByRole('main')).toMatchSnapshot();
+    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByLabelText('Test publication')).not.toBeVisible();
+
+    userEvent.click(screen.getByRole('button', { name: 'Pupils and schools' }));
+    userEvent.click(screen.getByRole('button', { name: 'Admission appeals' }));
+
+    // Check there is only one radio for the publication
+    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(1);
+    expect(screen.getByLabelText('Test publication')).toBeVisible();
   });
 
-  test('renders the Table Tool page correctly when Publication is chosen, giving the user a choice of Subjects', async () => {
+  test('renders the page correctly with pre-selected publication', async () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
@@ -343,10 +354,26 @@ describe('TableToolPage', () => {
       />,
     );
 
-    expect(screen.getByRole('main')).toMatchSnapshot();
+    // Check we are on step 2, not 1
+    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    expect(screen.getByTestId('Publication')).toHaveTextContent(
+      'Test publication',
+    );
+
+    // Check there is only one radio for the subject
+    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(1);
+    expect(screen.getByLabelText('Test subject')).toBeInTheDocument();
   });
 
-  test('renders the Table Tool page correctly when a Fast Track is provided, rendering a previously configured table', async () => {
+  test('renders the page correctly with pre-built table when a fast track is provided', async () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
@@ -357,10 +384,10 @@ describe('TableToolPage', () => {
       />,
     );
 
-    expect(screen.getByRole('main')).toMatchSnapshot();
+    expect(screen.getByRole('table')).toMatchSnapshot();
   });
 
-  test('renders the Table Tool page correctly when a Fast Track is provided and this is the latest data', async () => {
+  test('renders the page correctly when a fast track is provided and this is the latest data', async () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
@@ -371,18 +398,16 @@ describe('TableToolPage', () => {
       />,
     );
 
-    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+    expect(screen.getByText('This is the latest data')).toBeInTheDocument();
     expect(
       screen.queryByText('This data is not from the latest release'),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('View latest data link'),
     ).not.toBeInTheDocument();
-
-    expect(screen.getByRole('main')).toMatchSnapshot();
   });
 
-  test('renders the Table Tool page correctly when a Fast Track is provided and this is not the latest data', async () => {
+  test('renders the page correctly when a fast track is provided and this is not the latest data', async () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
@@ -397,19 +422,18 @@ describe('TableToolPage', () => {
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText('This data is not from the latest release'),
+      screen.getByText('This data is not from the latest release'),
     ).toBeInTheDocument();
 
-    const latestDataLink = screen.queryByTestId(
+    const latestDataLink = screen.getByTestId(
       'View latest data link',
     ) as HTMLAnchorElement;
+
     expect(latestDataLink).toBeInTheDocument();
     expect(latestDataLink.href).toEqual(
       'http://localhost/find-statistics/test-publication',
     );
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');
-
-    expect(screen.getByRole('main')).toMatchSnapshot();
   });
 });

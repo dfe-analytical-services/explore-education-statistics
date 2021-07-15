@@ -37,6 +37,7 @@ describe('TableToolFinalStep', () => {
     // test the reordering controls for the table headers are present
     const groups = screen.queryAllByRole('group');
     expect(groups).toHaveLength(2);
+
     const reorderTableHeadersGroup = groups[0];
     expect(
       within(reorderTableHeadersGroup).queryByRole('button', {
@@ -50,6 +51,7 @@ describe('TableToolFinalStep', () => {
         "Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26",
       ),
     ).toBeInTheDocument();
+
     const table = screen.queryByTestId('dataTableCaption-table');
     expect(table).toBeInTheDocument();
     expect(table).toMatchSnapshot();
@@ -107,10 +109,6 @@ describe('TableToolFinalStep', () => {
         }),
       ).toBeInTheDocument();
     });
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
 
   test('shows and hides table header re-ordering controls successfully', async () => {
@@ -142,10 +140,6 @@ describe('TableToolFinalStep', () => {
         screen.queryByRole('button', { name: 'Re-order table' }),
       ).toBeInTheDocument(),
     );
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
 
   test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
@@ -175,10 +169,6 @@ describe('TableToolFinalStep', () => {
         'http://localhost/find-statistics/test-publication/selected-release-slug',
       );
     });
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
 
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
@@ -209,10 +199,6 @@ describe('TableToolFinalStep', () => {
         'http://localhost/find-statistics/test-publication',
       );
     });
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
 
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
@@ -235,11 +221,8 @@ describe('TableToolFinalStep', () => {
     expect(
       screen.queryByTestId('View latest data link'),
     ).not.toBeInTheDocument();
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
+
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
       testPublicationRelease,
@@ -285,10 +268,6 @@ describe('TableToolFinalStep', () => {
         'http://localhost/find-statistics/test-publication/selected-release-slug',
       );
     });
-
-    expect(
-      screen.getByTestId('Table tool final step container'),
-    ).toMatchSnapshot();
   });
 
   test('renders the methodology link correctly', async () => {
