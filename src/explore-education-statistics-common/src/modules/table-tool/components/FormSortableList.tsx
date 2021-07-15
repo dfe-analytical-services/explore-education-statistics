@@ -3,7 +3,13 @@ import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import reorderMultiple from '@common/utils/reorderMultiple';
 import classNames from 'classnames';
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import React, {
+  FocusEventHandler,
+  MouseEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -17,7 +23,9 @@ const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/Mou
 type SortableOptionChangeEventHandler = (value: Filter[]) => void;
 
 export type FormSortableListProps = {
+  onBlur?: FocusEventHandler<HTMLDivElement>;
   onChange?: SortableOptionChangeEventHandler;
+  onFocus?: FocusEventHandler<HTMLDivElement>;
   onMouseEnter?: MouseEventHandler<HTMLDivElement>;
   onMouseLeave?: MouseEventHandler<HTMLDivElement>;
   value: Filter[];
@@ -25,12 +33,16 @@ export type FormSortableListProps = {
 
 const FormSortableList = ({
   id,
+  onBlur,
   onChange,
+  onFocus,
   onMouseEnter,
   onMouseLeave,
   value,
   ...props
 }: FormSortableListProps) => {
+  const isFocusWithinRef = useRef(false);
+
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number>();
 
@@ -155,6 +167,47 @@ const FormSortableList = ({
     toggleSelectionInGroup(index);
   };
 
+  const handleContainerBlur: FocusEventHandler<HTMLDivElement> = event => {
+    event.persist();
+
+    // We need to use a timeout so that `document.activeElement`
+    // is set if the focus is within the container (without the
+    // timeout, it gets set to the document `body` for some reason).
+    //
+    // Unfortunately, this also means that the `currentTarget`
+    // gets set to null (not sure why), so to workaround this
+    // we set the element variable here to retain a reference
+    // to use later.
+    const element = event.currentTarget;
+
+    setTimeout(() => {
+      if (
+        isFocusWithinRef.current &&
+        !element.contains(document.activeElement)
+      ) {
+        isFocusWithinRef.current = false;
+
+        // As `currentTarget` will be null at this point due
+        // to being wrapped in a timeout, we need to assign it
+        // back to the event so that consumers are not affected.
+        // eslint-disable-next-line no-param-reassign
+        event.currentTarget = element;
+
+        onBlur?.(event);
+      }
+    });
+  };
+
+  const handleContainerFocus: FocusEventHandler<HTMLDivElement> = event => {
+    if (
+      !isFocusWithinRef.current &&
+      event.currentTarget.contains(document.activeElement)
+    ) {
+      isFocusWithinRef.current = true;
+      onFocus?.(event);
+    }
+  };
+
   return (
     <FormFieldset {...props} id={id}>
       <DragDropContext
@@ -208,6 +261,8 @@ const FormSortableList = ({
                 [styles.listDraggingOver]: droppableSnapshot.isDraggingOver,
               })}
               ref={droppableProvided.innerRef}
+              onBlur={handleContainerBlur}
+              onFocus={handleContainerFocus}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
             >

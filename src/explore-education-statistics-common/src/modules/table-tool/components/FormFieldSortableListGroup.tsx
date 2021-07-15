@@ -69,11 +69,15 @@ function FormFieldSortableListGroup<FormValues>({
                         [styles.isDragging]: draggableSnapshot.isDragging,
                       })}
                       ref={draggableProvided.innerRef}
+                      role="button"
+                      tabIndex={0}
                     >
                       <FormFieldSortableList
                         name={`${name}[${index}]`}
                         legend={`${groupLegend} ${index + 1}`}
                         legendSize="s"
+                        onBlur={toggleDragDisabled.off}
+                        onFocus={toggleDragDisabled.on}
                         onMouseEnter={toggleDragDisabled.on}
                         onMouseLeave={toggleDragDisabled.off}
                       />
