@@ -25,12 +25,14 @@ import { generatePath, useHistory } from 'react-router';
 export interface Props {
   publication: MyPublication;
   topicId: string;
+  allowAmendments?: boolean;
   onChangePublication: () => void;
 }
 
 const MethodologySummary = ({
   publication,
   topicId,
+  allowAmendments = false,
   onChangePublication,
 }: Props) => {
   const history = useHistory();
@@ -241,16 +243,19 @@ const MethodologySummary = ({
                           ? 'Edit this methodology'
                           : 'View this methodology'}
                       </ButtonLink>
-                      {methodology.permissions
-                        .canMakeAmendmentOfMethodology && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => setAmendMethodologyId(methodology.id)}
-                        >
-                          Amend methodology
-                        </Button>
-                      )}
+                      {allowAmendments &&
+                        methodology.permissions
+                          .canMakeAmendmentOfMethodology && (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() =>
+                              setAmendMethodologyId(methodology.id)
+                            }
+                          >
+                            Amend methodology
+                          </Button>
+                        )}
                     </ButtonGroup>
                   </>
                 )}
