@@ -9,9 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IPublicationService
     {
         Task<Publication> Get(Guid id);
+
         List<Publication> GetPublicationsWithPublishedReleases();
+
         Task<CachedPublicationViewModel> GetViewModel(Guid id, IEnumerable<Guid> includedReleaseIds);
+
         List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
+
+        Task<bool> IsPublicationPublished(Guid publicationId);
+
         Task SetPublishedDate(Guid id, DateTime published);
     }
 }

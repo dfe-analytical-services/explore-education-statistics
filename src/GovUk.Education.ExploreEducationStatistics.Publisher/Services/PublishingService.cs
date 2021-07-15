@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDirectoryCallbacks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -23,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
+        private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
         private readonly IZipFileService _zipFileService;
         private readonly IDataGuidanceFileService _dataGuidanceFileService;
@@ -33,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
+            IPublicationService publicationService,
             IReleaseService releaseService,
             IZipFileService zipFileService,
             IDataGuidanceFileService dataGuidanceFileService,
@@ -42,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
+            _publicationService = publicationService;
             _releaseService = releaseService;
             _zipFileService = zipFileService;
             _dataGuidanceFileService = dataGuidanceFileService;
@@ -63,35 +67,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishMethodologyFiles(Guid methodologyId)
         {
             var methodology = await _methodologyService.Get(methodologyId);
-            var files = await _methodologyService.GetFiles(methodologyId, Image);
+            await PublishMethodologyFiles(methodology);
+        }
 
-            var directoryPath = $"{methodology.Id}/";
+        public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId)
+        {
+            var methodologies = await _methodologyService.GetLatestByRelease(releaseId);
 
-            // Delete any existing blobs in public storage
-            await _publicBlobStorageService.DeleteBlobs(
-                containerName: PublicMethodologyFiles,
-                directoryPath: directoryPath
-            );
-
-            // Copy the blobs from private to public storage
-            await _privateBlobStorageService.CopyDirectory(
-                sourceContainerName: PrivateMethodologyFiles,
-                sourceDirectoryPath: directoryPath,
-                destinationContainerName: PublicMethodologyFiles,
-                destinationDirectoryPath: directoryPath,
-                new IBlobStorageService.CopyDirectoryOptions
+            if (methodologies.Any())
+            {
+                // Publish the files of the latest methodologies of this release that
+                // aren't already accessible but depended on this release being published,
+                // since those methodologies will be published for the first time with this release
+                var release = await _releaseService.Get(releaseId);
+                var firstRelease = !await _publicationService.IsPublicationPublished(release.PublicationId);
+                foreach (var methodology in methodologies)
                 {
-                    DestinationConnectionString = _publicStorageConnectionString,
-                    SetAttributesCallbackAsync = destination =>
-                        SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
-                    ShouldTransferCallbackAsync = (source, _) =>
-                        // Filter by blobs with matching file paths
-                        TransferBlobIfFileExistsCallback(
-                            source: source,
-                            files: files,
-                            sourceContainerName: PrivateMethodologyFiles,
-                            logger: _logger)
-                });
+                    if (methodology.Approved)
+                    {
+                        // Include methodologies scheduled immediately that will now be accessible
+                        // because this Publication's first release is being published
+                        var firstReleaseAndMethodologyScheduledImmediately =
+                            firstRelease &&
+                            methodology.ScheduledForPublishingImmediately;
+
+                        // Include methodologies scheduled to be published with this release
+                        var methodologyScheduledWithThisRelease =
+                            methodology.PublishingStrategy == WithRelease
+                            && methodology.ScheduledWithReleaseId == releaseId;
+
+                        if (firstReleaseAndMethodologyScheduledImmediately ||
+                            methodologyScheduledWithThisRelease)
+                        {
+                            await PublishMethodologyFiles(methodology);
+                        }
+                    }
+                }
+            }
         }
 
         public async Task PublishReleaseFiles(Guid releaseId)
@@ -167,6 +179,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 releaseId: release.Id,
                 publishScheduled: release.PublishScheduled.Value
             );
+        }
+
+        private async Task PublishMethodologyFiles(Methodology methodology)
+        {
+            var files = await _methodologyService.GetFiles(methodology.Id, Image);
+
+            var directoryPath = $"{methodology.Id}/";
+
+            // Delete any existing blobs in public storage
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: PublicMethodologyFiles,
+                directoryPath: directoryPath
+            );
+
+            // Copy the blobs from private to public storage
+            await _privateBlobStorageService.CopyDirectory(
+                sourceContainerName: PrivateMethodologyFiles,
+                sourceDirectoryPath: directoryPath,
+                destinationContainerName: PublicMethodologyFiles,
+                destinationDirectoryPath: directoryPath,
+                new IBlobStorageService.CopyDirectoryOptions
+                {
+                    DestinationConnectionString = _publicStorageConnectionString,
+                    SetAttributesCallbackAsync = destination =>
+                        SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
+                    ShouldTransferCallbackAsync = (source, _) =>
+                        // Filter by blobs with matching file paths
+                        TransferBlobIfFileExistsCallback(
+                            source: source,
+                            files: files,
+                            sourceContainerName: PrivateMethodologyFiles,
+                            logger: _logger)
+                });
         }
     }
 }
