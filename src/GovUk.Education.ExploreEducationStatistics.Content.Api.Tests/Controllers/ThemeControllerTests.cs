@@ -1,12 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -15,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetThemes()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
             fileStorageService
                 .Setup(
@@ -42,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = new ThemeController(fileStorageService.Object);
+            var controller = BuildThemeController(fileStorageService.Object,
+                methodologyService.Object);
 
             var result = await controller.GetThemes();
 
-            Assert.IsAssignableFrom<IEnumerable<ThemeTree<PublicationTreeNode>>>(result.Value);
             Assert.Single(result.Value);
 
             var theme = result.Value.First();
@@ -55,12 +60,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var topic = theme.Topics.First();
             Assert.Single(topic.Publications);
+
+            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
         }
 
         [Fact]
         public async Task GetDownloadThemes()
         {
             var fileStorageService = new Mock<IFileStorageService>();
+            var methodologyService = new Mock<IMethodologyService>();
 
             fileStorageService
                 .Setup(
@@ -93,10 +101,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = new ThemeController(fileStorageService.Object);
+            var controller = BuildThemeController(fileStorageService.Object,
+                methodologyService.Object);
+
             var result = await controller.GetDownloadThemes();
 
-            Assert.IsAssignableFrom<IEnumerable<ThemeTree<PublicationDownloadTreeNode>>>(result.Value);
             Assert.Single(result.Value);
 
             var theme = result.Value.First();
@@ -108,52 +117,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var publication = topic.Publications.First();
             Assert.Single(publication.DownloadFiles);
+
+            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
         }
 
         [Fact]
         public async Task GetMethodologyThemes()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<IEnumerable<ThemeTree<MethodologyTreeNode>>>(
-                        "methodology/tree.json"
-                    )
-                )
-                .ReturnsAsync(
-                    new List<ThemeTree<MethodologyTreeNode>>
-                    {
-                        new ThemeTree<MethodologyTreeNode>
+            var themes = AsList(
+                new AllMethodologiesThemeViewModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication title",
+                    Topics = AsList(
+                        new AllMethodologiesTopicViewModel
                         {
-                            Topics = new List<TopicTree<MethodologyTreeNode>>
-                            {
-                                new TopicTree<MethodologyTreeNode>
+                            Id = Guid.NewGuid(),
+                            Title = "Topic title",
+                            Publications = AsList(
+                                new AllMethodologiesPublicationViewModel
                                 {
-                                    Publications = new List<MethodologyTreeNode>
-                                    {
-                                        new MethodologyTreeNode()
-                                    }
+                                    Id = Guid.NewGuid(),
+                                    Title = "Publication title",
+                                    Methodologies = AsList(
+                                        new MethodologySummaryViewModel
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Slug = "methodology-slug",
+                                            Title = "Methodology title"
+                                        }
+                                    )
                                 }
-                            }
+                            )
                         }
-                    }
-                );
+                    )
+                }
+            );
 
-            var controller = new ThemeController(fileStorageService.Object);
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+
+            methodologyService.Setup(mock => mock.GetTree())
+                .ReturnsAsync(themes);
+
+            var controller = BuildThemeController(fileStorageService.Object,
+                methodologyService.Object);
 
             var result = await controller.GetMethodologyThemes();
 
-            Assert.IsAssignableFrom<IEnumerable<ThemeTree<MethodologyTreeNode>>>(result.Value);
-            Assert.Single(result.Value);
+            Assert.Equal(themes, result.Value);
 
-            var theme = result.Value.First();
+            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
+        }
 
-            Assert.IsType<ThemeTree<MethodologyTreeNode>>(theme);
-            Assert.Single(theme.Topics);
-
-            var topic = theme.Topics.First();
-            Assert.Single(topic.Publications);
+        private static ThemeController BuildThemeController(
+            IFileStorageService fileStorageService = null,
+            IMethodologyService methodologyService = null
+        )
+        {
+            return new ThemeController(
+                fileStorageService ?? new Mock<IFileStorageService>().Object,
+                methodologyService ?? new Mock<IMethodologyService>().Object
+            );
         }
     }
 }

@@ -8,6 +8,12 @@ import NationalStatisticsSection from '@common/modules/find-statistics/component
 import { ReleaseType } from '@common/services/publicationService';
 import React from 'react';
 
+interface MethodologyLink {
+  key: string;
+  title: string;
+  url: string;
+}
+
 const ReleaseHelpAndSupportSection = ({
   release,
 }: {
@@ -15,6 +21,23 @@ const ReleaseHelpAndSupportSection = ({
 }) => {
   const { editingMode } = useEditingContext();
   const { publication } = release;
+
+  const allMethodologies: MethodologyLink[] = publication.methodologies.map(
+    methodology => ({
+      key: methodology.id,
+      title: methodology.title,
+      url: `/methodology/${methodology.id}/summary`,
+    }),
+  );
+
+  if (publication.externalMethodology) {
+    allMethodologies.push({
+      key: publication.externalMethodology.url,
+      title: publication.externalMethodology.title,
+      url: publication.externalMethodology.url,
+    });
+  }
+
   return (
     <>
       <h2
@@ -30,30 +53,20 @@ const ReleaseHelpAndSupportSection = ({
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          {publication.methodology || publication.externalMethodology ? (
-            <p>
-              Read our{' '}
-              {publication.methodology &&
-                (editingMode === 'edit' ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={`/methodologies/${publication.methodology.id}`}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}
-              {!publication.methodology &&
-                publication.externalMethodology &&
-                (editingMode === 'edit' ? (
-                  <a>{`${publication.title}: methodology`}</a>
-                ) : (
-                  <Link to={publication.externalMethodology.url}>
-                    {`${publication.title}: methodology`}
-                  </Link>
-                ))}{' '}
-              guidance.
-            </p>
+          {allMethodologies.length ? (
+            <ul className="govuk-list govuk-list--spaced">
+              {allMethodologies.map(methodology => (
+                <li key={methodology.key}>
+                  {editingMode === 'edit' ? (
+                    <a>{`${methodology.title}`}</a>
+                  ) : (
+                    <Link to={methodology.url}>{methodology.title}</Link>
+                  )}
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p>No methodology added.</p>
+            <p>No methodologies added.</p>
           )}
         </AccordionSection>
         {release.type && release.type.title === ReleaseType.NationalStatistics && (

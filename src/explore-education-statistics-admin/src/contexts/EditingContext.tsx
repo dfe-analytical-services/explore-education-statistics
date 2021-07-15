@@ -34,16 +34,16 @@ export function useEditingContext() {
 
 export interface EditingContextProviderProps {
   children: ReactNode | ((state: EditingContextState) => ReactNode);
-  value?: {
-    editingMode: string;
-    unsavedEdits?: UnsavedEdit[];
-  };
+  initialEditingMode: EditingMode;
 }
 
 export const EditingContextProvider = ({
   children,
+  initialEditingMode = 'preview',
 }: EditingContextProviderProps) => {
-  const [editingMode, setEditingMode] = useState<EditingMode>('edit');
+  const [editingMode, setEditingMode] = useState<EditingMode>(
+    initialEditingMode,
+  );
   const [unsavedEdits, setUnsavedEdits] = useState<UnsavedEdit[]>([]);
 
   const state = useMemo<EditingContextState>(() => {

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<Publication> Get(Guid id);
         List<Publication> GetPublicationsWithPublishedReleases();
-        Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds);
+        Task<CachedPublicationViewModel> GetViewModel(Guid id, IEnumerable<Guid> includedReleaseIds);
         List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
         Task SetPublishedDate(Guid id, DateTime published);
     }

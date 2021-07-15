@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@admin/*": ["../explore-education-statistics-admin/src/*"],
+      "@admin-test/*": ["../explore-education-statistics-admin/test/*"],
       "@common/*": ["../explore-education-statistics-common/src/*"],
       "@common-test/*": ["../explore-education-statistics-common/test/*"]
     },

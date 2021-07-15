@@ -1,5 +1,4 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import Link from '@admin/components/Link';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -17,13 +16,19 @@ import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
+import MethodologySummary from './MethodologySummary';
 
 export interface Props {
   publication: MyPublication;
+  topicId: string;
   onChangePublication: () => void;
 }
 
-const PublicationSummary = ({ publication, onChangePublication }: Props) => {
+const PublicationSummary = ({
+  publication,
+  topicId,
+  onChangePublication,
+}: Props) => {
   const history = useHistory();
 
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
@@ -31,19 +36,10 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
     string
   >();
 
-  const {
-    contact,
-    externalMethodology,
-    methodology,
-    permissions,
-    releases,
-    id,
-    title,
-  } = publication;
+  const { contact, permissions, releases, id, title } = publication;
 
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
-
   return (
     <>
       <table>
@@ -93,23 +89,13 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
             </td>
           </tr>
           <tr>
-            <th>Methodology</th>
+            <th>Methodologies</th>
             <td data-testid={`Methodology for ${publication.title}`}>
-              {methodology ? (
-                <Link to={`/methodologies/${methodology.id}`}>
-                  {methodology.title}
-                </Link>
-              ) : (
-                <>
-                  {externalMethodology?.url ? (
-                    <Link to={externalMethodology.url} unvisited>
-                      {externalMethodology.title} (external methodology)
-                    </Link>
-                  ) : (
-                    'No methodology assigned'
-                  )}
-                </>
-              )}
+              <MethodologySummary
+                publication={publication}
+                topicId={topicId}
+                onChangePublication={onChangePublication}
+              />
             </td>
           </tr>
           {permissions.canUpdatePublication && (

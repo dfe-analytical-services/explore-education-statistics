@@ -30,9 +30,7 @@ const ReleaseContentPageLoaded = () => {
 
   return (
     <EditingContextProvider
-      value={{
-        editingMode: canUpdateRelease ? 'edit' : 'preview',
-      }}
+      initialEditingMode={canUpdateRelease ? 'edit' : 'preview'}
     >
       {({ editingMode, unsavedEdits }) => {
         const numOfEdits = getNumberOfUnsavedBlocks(unsavedEdits);

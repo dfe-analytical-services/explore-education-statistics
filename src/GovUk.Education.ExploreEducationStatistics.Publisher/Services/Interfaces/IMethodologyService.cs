@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
@@ -12,14 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<Methodology> Get(Guid id);
 
-        Task<Methodology> GetByRelease(Guid releaseId);
+        Task<List<Methodology>> GetLatestByRelease(Guid releaseId);
 
         Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types);
 
-        Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context);
-
-        List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
-
-        Task SetPublishedDate(Guid id, DateTime published);
+        Task SetPublishedDatesByPublication(Guid publicationId, DateTime published);
     }
 }

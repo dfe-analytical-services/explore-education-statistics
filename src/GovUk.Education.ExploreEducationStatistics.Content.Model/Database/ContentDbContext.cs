@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
+        public DbSet<MethodologyParent> MethodologyParents { get; set; }
+        public DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
@@ -92,20 +94,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Content)
+                .Property(m => m.Content)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Annexes)
+                .Property(m => m.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
-                .Property(b => b.Status)
+                .Property(m => m.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
+
+            modelBuilder.Entity<Methodology>()
+                .Property(m => m.PublishingStrategy)
+                .HasConversion(new EnumToStringConverter<MethodologyPublishingStrategy>());
+
+            modelBuilder.Entity<Methodology>()
+                .Property(m => m.Created)
+                .HasConversion(
+                    v => v, 
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<Methodology>()
+                .HasOne(m => m.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<MethodologyFile>()
                 .HasOne(mf => mf.Methodology)
@@ -124,7 +141,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     p => new Uri(p));
 
             modelBuilder.Entity<Publication>()
-                .OwnsOne(p => p.ExternalMethodology).ToTable("ExternalMethodology");
+                .OwnsOne(p => p.ExternalMethodology)
+                .ToTable("ExternalMethodology");
+
+            modelBuilder.Entity<PublicationMethodology>()
+                .HasKey(pm => new {pm.PublicationId, pm.MethodologyParentId});
+
+            modelBuilder.Entity<PublicationMethodology>()
+                .HasOne(pm => pm.Publication)
+                .WithMany(p => p.Methodologies)
+                .HasForeignKey(pm => pm.PublicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PublicationMethodology>()
+                .HasOne(pm => pm.MethodologyParent)
+                .WithMany(m => m.Publications)
+                .HasForeignKey(pm => pm.MethodologyParentId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)

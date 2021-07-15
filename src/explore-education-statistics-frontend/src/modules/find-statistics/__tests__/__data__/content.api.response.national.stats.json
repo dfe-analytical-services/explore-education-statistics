@@ -51,12 +51,13 @@
           "contactName": "Sean Gibson",
           "contactTelNo": "0370 000 2288"
       },
-      "methodology": {
+      "methodologies": [
+        {
           "id": "caa8e56f-41d2-4129-a5c3-53b051134bd7",
           "slug": "pupil-absence-in-schools-in-england",
-          "summary": "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
           "title": "Pupil absence statistics: methodology"
-      }
+        }
+      ]
   },
   "id": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
   "title": "Academic Year 2016/17",

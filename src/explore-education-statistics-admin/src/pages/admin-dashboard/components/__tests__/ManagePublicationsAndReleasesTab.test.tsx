@@ -85,9 +85,12 @@ describe('ManagePublicationsAndReleasesTab', () => {
       title: 'Publication 1',
       contact: testContact,
       releases: [],
+      methodologies: [],
       permissions: {
         canCreateReleases: true,
         canUpdatePublication: true,
+        canCreateMethodologies: true,
+        canManageExternalMethodology: true,
       },
     },
     {
@@ -95,9 +98,12 @@ describe('ManagePublicationsAndReleasesTab', () => {
       title: 'Publication 2',
       contact: testContact,
       releases: [],
+      methodologies: [],
       permissions: {
         canCreateReleases: true,
         canUpdatePublication: true,
+        canCreateMethodologies: true,
+        canManageExternalMethodology: true,
       },
     },
   ];

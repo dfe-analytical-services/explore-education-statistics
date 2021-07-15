@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,9 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleaseService
     {
-        Task<Release> GetAsync(Guid id);
+        Task<Release?> Find(Guid id);
 
-        Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids);
+        Task<Release> Get(Guid id);
+
+        Task<IEnumerable<Release>> List(IEnumerable<Guid> ids);
 
         Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds);
 
@@ -28,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context);
 
-        Task SetPublishedDatesAsync(Guid id, DateTime published);
+        Task SetPublishedDates(Guid id, DateTime published);
 
         Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds);
     }

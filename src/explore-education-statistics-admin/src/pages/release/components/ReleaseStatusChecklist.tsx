@@ -71,7 +71,9 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             message: 'Methodology must be approved',
             link: generatePath<MethodologyRouteParams>(
               methodologyStatusRoute.path,
-              { methodologyId: error.methodologyId },
+              {
+                methodologyId: error.methodologyId,
+              },
             ),
           };
         case 'PublicMetaGuidanceRequired':

@@ -107,6 +107,18 @@ parser.add_argument("--implicit-wait",
                     default="5",
                     dest="implicit_wait",
                     help="default robot implicit wait in seconds (default is 5)")
+parser.add_argument("--print-keywords",
+                    dest="print_keywords",
+                    action='store_true',
+                    help="choose to print out keywords as they are started")
+parser.add_argument("--prompt-to-continue",
+                    dest="prompt_to_continue",
+                    action='store_true',
+                    help="get prompted to continue with test execution upon a failure")
+parser.add_argument("--fail-fast",
+                    dest="fail_fast",
+                    action='store_true',
+                    help="stop test execution on failure")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -148,9 +160,13 @@ robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
              # "--exitonfailure",
              "--exclude", "Failing",
-             "--exclude", "UnderConstruction"]
+             "--exclude", "UnderConstruction",
+             "--exclude", "BootstrapData"]
 
 robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
+
+if args.fail_fast:
+    robotArgs += ["--exitonfailure"]
 
 if args.rerun_failed_tests:
     robotArgs += ["--rerunfailed", "test-results/output.xml"]
@@ -160,6 +176,9 @@ if args.rerun_failed_suites:
 
 if args.tags:
     robotArgs += ["--include", args.tags]
+
+if args.print_keywords:
+    robotArgs += ["--listener", 'listeners/KeywordListener.py']
 
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
@@ -327,6 +346,9 @@ else:
 if os.getenv('RELEASE_COMPLETE_WAIT'):
     robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
 
+if args.prompt_to_continue:
+    robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
+
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
@@ -390,4 +412,6 @@ finally:
         ]
         robot_rebot_cli(merge_options, exit=False)
 
-    print("Tests finished!")
+    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
+    print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
+    print("\nTests finished!")

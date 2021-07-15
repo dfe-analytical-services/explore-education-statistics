@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Type = FileType.Data,
                 },
             };
-            
+
             var releaseFile2 = new ReleaseFile
             {
                 ReleaseId = release.Id,
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Type = FileType.Data,
                 },
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -435,8 +435,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
                 Assert.Equal("file1.csv", result.Right[0].Filename);
                 Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Null(result.Right[0].TimePeriods.From);
-                Assert.Null(result.Right[0].TimePeriods.To);
+                Assert.Empty(result.Right[0].TimePeriods.From);
+                Assert.Empty(result.Right[0].TimePeriods.To);
                 Assert.Empty(result.Right[0].GeographicLevels);
                 Assert.Empty(result.Right[0].Variables);
 
@@ -444,8 +444,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 3 Meta Guidance", result.Right[1].Content);
                 Assert.Equal("file3.csv", result.Right[1].Filename);
                 Assert.Equal("Subject 3", result.Right[1].Name);
-                Assert.Null(result.Right[1].TimePeriods.From);
-                Assert.Null(result.Right[1].TimePeriods.To);
+                Assert.Empty(result.Right[1].TimePeriods.From);
+                Assert.Empty(result.Right[1].TimePeriods.To);
                 Assert.Empty(result.Right[1].GeographicLevels);
                 Assert.Empty(result.Right[1].Variables);
             }
@@ -618,8 +618,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right[0].Name);
-                Assert.Null(version1Result.Right[0].TimePeriods.From);
-                Assert.Null(version1Result.Right[0].TimePeriods.To);
+                Assert.Empty(version1Result.Right[0].TimePeriods.From);
+                Assert.Empty(version1Result.Right[0].TimePeriods.To);
                 Assert.Empty(version1Result.Right[0].GeographicLevels);
                 Assert.Empty(version1Result.Right[0].Variables);
 
@@ -634,16 +634,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 2 Subject 1 Meta Guidance", version2Result.Right[0].Content);
                 Assert.Equal("file1.csv", version2Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version2Result.Right[0].Name);
-                Assert.Null(version2Result.Right[0].TimePeriods.From);
-                Assert.Null(version2Result.Right[0].TimePeriods.To);
+                Assert.Empty(version2Result.Right[0].TimePeriods.From);
+                Assert.Empty(version2Result.Right[0].TimePeriods.To);
                 Assert.Empty(version2Result.Right[0].GeographicLevels);
 
                 Assert.Equal(subject2.Id, version2Result.Right[1].Id);
                 Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right[1].Content);
                 Assert.Equal("file2.csv", version2Result.Right[1].Filename);
                 Assert.Equal("Subject 2", version2Result.Right[1].Name);
-                Assert.Null(version2Result.Right[1].TimePeriods.From);
-                Assert.Null(version2Result.Right[1].TimePeriods.To);
+                Assert.Empty(version2Result.Right[1].TimePeriods.From);
+                Assert.Empty(version2Result.Right[1].TimePeriods.To);
                 Assert.Empty(version2Result.Right[1].GeographicLevels);
                 Assert.Empty(version2Result.Right[1].Variables);
             }
@@ -861,8 +861,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.GetTimePeriods(subject.Id);
 
-                Assert.Null(result.From);
-                Assert.Null(result.To);
+                Assert.Empty(result.From);
+                Assert.Empty(result.To);
             }
         }
 
@@ -977,7 +977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 indicatorService ?? new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
-                contentDbContext != null 
+                contentDbContext != null
                     ? new ReleaseDataFileRepository(contentDbContext)
                     : new Mock<IReleaseDataFileRepository>().Object
             );

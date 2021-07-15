@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
-                await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
+                await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
                 if (!PublisherUtils.IsDevelopment())
                 {

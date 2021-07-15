@@ -22,11 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{AppendPathSeparator(prefix)}fast-track";
         }
 
-        private static string PublicContentMethodologiesPath(string prefix = null)
-        {
-            return $"{AppendPathSeparator(prefix)}methodology";
-        }
-
         private static string PublicContentPublicationsPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}publications";
@@ -47,19 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
         }
 
-        public static string PublicContentMethodologyTreePath(string prefix = null)
-        {
-            return $"{PublicContentMethodologiesPath(prefix)}/tree.json";
-        }
-
         public static string PublicContentPublicationsTreePath(string prefix = null)
         {
             return $"{PublicContentPublicationsPath(prefix)}/tree.json";
-        }
-
-        public static string PublicContentMethodologyPath(string slug, string prefix = null)
-        {
-            return $"{PublicContentMethodologiesPath(prefix)}/methodologies/{slug}.json";
         }
 
         public static string PublicContentPublicationParentPath(string slug, string prefix = null)

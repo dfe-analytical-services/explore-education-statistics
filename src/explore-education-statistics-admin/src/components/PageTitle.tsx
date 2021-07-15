@@ -23,7 +23,7 @@ const PageTitle = ({ caption, className, title }: Props) => {
 
       <h1
         className={classNames('govuk-heading-xl', className)}
-        data-testid={`page-title ${title}`}
+        data-testid="page-title"
       >
         {title}
       </h1>

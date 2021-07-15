@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -110,7 +111,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string excludePattern = null)
         {
-            var prefix = directoryPath.AppendTrailingSlash();
+            if (!directoryPath.IsNullOrEmpty())
+            {
+                // Forcefully add a trailing slash to prevent deleting blobs whose names begin with that string
+                directoryPath = directoryPath.AppendTrailingSlash();
+            }
 
             var blobContainer = await GetBlobContainer(containerName);
 
@@ -120,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             do
             {
-                var blobPages = blobContainer.GetBlobsAsync(prefix: prefix)
+                var blobPages = blobContainer.GetBlobsAsync(prefix: directoryPath)
                     .AsPages(continuationToken);
 
                 var deleteTasks = new List<Task>();

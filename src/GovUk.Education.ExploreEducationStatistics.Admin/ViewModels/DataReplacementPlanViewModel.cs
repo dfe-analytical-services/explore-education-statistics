@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using IdentityServer4.Extensions;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels

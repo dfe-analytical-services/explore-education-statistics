@@ -19,7 +19,8 @@ import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCat
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
-import getUnitOrDefault from '@common/modules/charts/util/getUnitOrDefault';
+import getUnit from '@common/modules/charts/util/getUnit';
+import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import React, { memo } from 'react';
 import {
   Bar,
@@ -73,17 +74,20 @@ const VerticalBarBlock = ({
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
-
-  const yAxisWidth = parseNumber(axes.minor.size);
-  const xAxisHeight = parseNumber(axes.major.size);
-
   const dataSetCategoryConfigs = getDataSetCategoryConfigs(
     dataSetCategories,
     legend.items,
     meta,
   );
-
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
+  const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
+  const yAxisWidth = getMinorAxisSize({
+    dataSetCategories,
+    minorAxisSize: axes.minor.size,
+    minorAxisDecimals,
+    minorAxisUnit,
+  });
+  const xAxisHeight = parseNumber(axes.major.size);
 
   return (
     <ChartContainer
@@ -116,13 +120,9 @@ const VerticalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            width={parseNumber(axes.minor.size)}
+            width={yAxisWidth}
             tickFormatter={tick =>
-              formatPretty(
-                tick,
-                getUnitOrDefault(axes.minor.unit, dataSetCategoryConfigs),
-                minorAxisDecimals,
-              )
+              formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
           />
 
@@ -241,7 +241,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       defaults: {
         min: 0,
         showGrid: true,
-        size: 50,
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',

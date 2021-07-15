@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             List<LegacyReleaseViewModel> legacyReleases,
             TopicViewModel topic,
             ContactViewModel contact,
-            ExternalMethodologyViewModel externalMethodology,
-            MethodologySummaryViewModel methodology)
+            ExternalMethodologyViewModel externalMethodology)
         {
             Id = id;
             Title = title;
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             Topic = topic;
             Contact = contact;
             ExternalMethodology = externalMethodology;
-            Methodology = methodology;
         }
 
         public Guid Id { get; }
@@ -60,6 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 
         public ExternalMethodologyViewModel ExternalMethodology { get; }
 
-        public MethodologySummaryViewModel Methodology { get; }
+        public List<MethodologySummaryViewModel> Methodologies { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -99,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public Contact Contact { get; set; }
 
-            public MethodologyTitleViewModel Methodology { get; set; }
+            public List<TitleAndIdViewModel> Methodologies { get; set; }
 
             public ExternalMethodology ExternalMethodology { get; set; }
         }

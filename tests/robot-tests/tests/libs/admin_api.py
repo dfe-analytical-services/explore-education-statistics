@@ -57,7 +57,7 @@ def user_creates_theme_via_api(title: str, summary: str = '') -> str:
     })
 
     assert resp.status_code == 200, \
-        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+        f'Could not create theme! Responded with {resp.status_code} and {resp.text}'
 
     return resp.json()['id']
 
@@ -80,7 +80,7 @@ def user_creates_topic_via_api(title: str, theme_id: str) -> str:
     })
 
     assert resp.status_code == 200, \
-        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+        f'Could not create topic! Responded with {resp.status_code} and {resp.text}'
 
     return resp.json()['id']
 
@@ -91,15 +91,18 @@ def user_triggers_release_on_demand(release_id: str):
         f'Release on demand request failed! Responded with {resp.status_code} and {resp.text}'
 
 
-def user_creates_test_publication_via_api(publication_name: str):
-    assert os.getenv('TEST_TOPIC_ID') is not None
-    topic_id = os.getenv('TEST_TOPIC_ID')
+def user_creates_test_publication_via_api(publication_name: str, topic_id: str = None):
+    if topic_id is not None:
+        chosen_topic_id = topic_id
+    else:
+        assert os.getenv('TEST_TOPIC_ID') is not None
+        chosen_topic_id = os.getenv('TEST_TOPIC_ID')
 
     response = admin_client.post(
         '/api/publications',
         {
             "title": publication_name,
-            "topicId": topic_id,
+            "topicId": chosen_topic_id,
             "contact": {
                 "contactName": "UI test contact name",
                 "contactTelNo": "1234 1234",

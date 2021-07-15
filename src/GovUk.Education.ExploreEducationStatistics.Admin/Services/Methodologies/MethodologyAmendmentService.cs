@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
@@ -29,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAmendment(
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyId)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(originalMethodologyId)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
                 .OnSuccessDo(() => throw new NotImplementedException())
-                .OnSuccess(_mapper.Map<MethodologyViewModel>);
+                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
     }
 }

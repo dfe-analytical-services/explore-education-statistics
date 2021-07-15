@@ -1,10 +1,13 @@
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
-import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
+import {
+  MethodologyRouteParams,
+  methodologySummaryRoute,
+} from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps } from 'react-router';
 
 const MethodologySummaryEditPage = ({
   history,
@@ -26,6 +29,7 @@ const MethodologySummaryEditPage = ({
             id="updateMethodologyForm"
             initialValues={{
               title: methodology.title,
+              titleType: 'publication', // EES-2159 - use real value
             }}
             submitText="Update methodology"
             onSubmit={async values => {
@@ -34,7 +38,14 @@ const MethodologySummaryEditPage = ({
                 title: values.title,
               });
 
-              history.push(`/methodologies/${methodologyId}/summary`);
+              history.push(
+                generatePath<MethodologyRouteParams>(
+                  methodologySummaryRoute.path,
+                  {
+                    methodologyId,
+                  },
+                ),
+              );
             }}
             onCancel={history.goBack}
           />

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -38,6 +37,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddAuthorization(options =>
             {
                 // does this use have permission to view a specific Release?
-                options.AddPolicy(ContentSecurityPolicies.CanViewRelease.ToString(), policy =>
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
                 // does this user have permission to view the subject data of a specific Release?
@@ -198,17 +198,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000","http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
-        }
-
-        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
-            where TDbContext : DbContext
-        {
-            services.AddTransient<IPersistenceHelper<TDbContext>, PersistenceHelper<TDbContext>>(
-                s =>
-                {
-                    var dbContext = s.GetService<TDbContext>();
-                    return new PersistenceHelper<TDbContext>(dbContext);
-                });
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)

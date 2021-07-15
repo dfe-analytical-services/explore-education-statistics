@@ -1,5 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
+import {
+  MethodologyRouteParams,
+  methodologySummaryEditRoute,
+} from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -9,7 +12,7 @@ import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps } from 'react-router';
 
 const MethodologySummaryPage = ({
   match,
@@ -41,10 +44,37 @@ const MethodologySummaryPage = ({
                   'Not yet published'
                 )}
               </SummaryListItem>
+              <SummaryListItem term="Owning publication">
+                {currentMethodology.publication.title}
+              </SummaryListItem>
+              {currentMethodology.otherPublications &&
+                currentMethodology.otherPublications.length > 0 && (
+                  <SummaryListItem term="Other publications">
+                    <ul className="govuk-!-margin-top-0">
+                      {currentMethodology.otherPublications?.map(
+                        publication => (
+                          <li
+                            key={publication.id}
+                            data-testid="other-publication-item"
+                          >
+                            {publication.title}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </SummaryListItem>
+                )}
             </SummaryList>
 
             {currentMethodology.status !== 'Approved' && (
-              <ButtonLink to={`/methodologies/${methodologyId}/summary/edit`}>
+              <ButtonLink
+                to={generatePath<MethodologyRouteParams>(
+                  methodologySummaryEditRoute.path,
+                  {
+                    methodologyId,
+                  },
+                )}
+              >
                 Edit summary
               </ButtonLink>
             )}

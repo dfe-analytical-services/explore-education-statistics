@@ -7,7 +7,6 @@ import publicationService from '@admin/services/publicationService';
 import topicService from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import RelatedInformation from '@common/components/RelatedInformation';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -37,6 +36,7 @@ const PublicationCreatePage = ({
         <div className="govuk-grid-column-two-thirds">
           <PageTitle caption={topic.title} title="Create new publication" />
         </div>
+        {/* EES-2464
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
@@ -47,7 +47,7 @@ const PublicationCreatePage = ({
               </li>
             </ul>
           </RelatedInformation>
-        </div>
+        </div> */}
       </div>
 
       <PublicationForm

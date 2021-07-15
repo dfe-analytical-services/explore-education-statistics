@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceService _metaGuidanceService;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
@@ -39,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IMetaGuidanceService metaGuidanceService,
             IReleaseDataFileRepository fileRepository,
+            IMethodologyRepository methodologyRepository,
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService)
         {
@@ -48,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _metaGuidanceService = metaGuidanceService;
             _fileRepository = fileRepository;
+            _methodologyRepository = methodologyRepository;
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
         }
@@ -67,7 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public static IQueryable<Release> HydrateReleaseForChecklist(IQueryable<Release> query)
         {
             return query.Include(r => r.Publication)
-                .ThenInclude(p => p.Methodology)
                 .Include(r => r.Updates);
         }
 
@@ -87,10 +89,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            if (release.Publication.Methodology != null
-                && release.Publication.Methodology.Status != MethodologyStatus.Approved)
+            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+            var methodologiesNotApproved = methodologies
+                .Where(m => m.Status != MethodologyStatus.Approved)
+                .ToList();
+
+            if (methodologiesNotApproved.Any())
             {
-                errors.Add(new MethodologyMustBeApprovedError(release.Publication.Methodology.Id));
+                errors.AddRange(methodologiesNotApproved.Select(m =>
+                    new MethodologyMustBeApprovedError(m.Id)));
             }
 
             var isMetaGuidanceValid = await _metaGuidanceService.Validate(release.Id);
@@ -155,7 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
-            if (!release.Publication.MethodologyId.HasValue)
+            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+            if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));
             }

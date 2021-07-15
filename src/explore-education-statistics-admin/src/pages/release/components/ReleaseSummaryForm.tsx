@@ -125,6 +125,7 @@ const ReleaseSummaryForm = <
         return (
           <Form id={formId}>
             <FormFieldset
+              hint="For 6 digit years, enter only the first four digits in this box e.g. for 2017/18, only enter 2017."
               id="timePeriodCoverage"
               legend="Select time period coverage"
               legendSize="m"

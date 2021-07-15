@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task GetContentBlocks()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanViewRelease)
+                .SetupResourceCheckToFail(_release, CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {

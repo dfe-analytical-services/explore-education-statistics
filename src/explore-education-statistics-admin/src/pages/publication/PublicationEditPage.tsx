@@ -63,8 +63,6 @@ const PublicationEditPage = ({
               teamEmail: contact?.teamEmail ?? '',
               contactName: contact?.contactName ?? '',
               contactTelNo: contact?.contactTelNo ?? '',
-              externalMethodology: publication.externalMethodology,
-              methodologyId: publication.methodology?.id,
             }}
             onSubmit={async ({
               teamName,

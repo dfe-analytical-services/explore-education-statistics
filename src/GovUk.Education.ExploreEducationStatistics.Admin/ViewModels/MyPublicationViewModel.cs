@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<MyReleaseViewModel> Releases { get; set; }
         
-        public MethodologyTitleViewModel Methodology { get; set; }
+        public List<MyMethodologyViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
         
@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanCreateReleases { get; set; }
+            public bool CanCreateMethodologies { get; set; }
+            public bool CanManageExternalMethodology { get; set; }
         }
     }
 }

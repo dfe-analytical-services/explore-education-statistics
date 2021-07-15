@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return value.StripLineBreaks();
         }
 
-        public static string AppendTrailingSlash(this string input)
+        public static string? AppendTrailingSlash(this string? input)
         {
             if (input == null)
             {
@@ -61,12 +62,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public static bool IsNullOrEmpty(this string value)
+        public static bool IsNullOrEmpty(this string? value)
         {
             return string.IsNullOrEmpty(value);
         }
 
-        public static string NullIfWhiteSpace(this string value)
+        public static bool IsNullOrWhitespace(this string? value)
+        {
+            return string.IsNullOrWhiteSpace(value);
+        }
+
+        public static string? NullIfWhiteSpace(this string value)
         {
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }

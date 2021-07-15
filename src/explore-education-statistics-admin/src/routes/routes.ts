@@ -3,8 +3,6 @@ import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage'
 import ContactUsPage from '@admin/pages/ContactUsPage';
 import LegacyReleasesPageContainer from '@admin/pages/legacy-releases/LegacyReleasesPageContainer';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
-import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
-import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
@@ -107,22 +105,8 @@ export const publicationEditRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const methodologiesIndexRoute: ProtectedRouteProps = {
-  path: '/methodologies',
-  component: MethodologiesPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-  exact: true,
-};
-
-export const methodologyCreateRoute: ProtectedRouteProps = {
-  path: '/methodologies/create',
-  component: MethodologyCreatePage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-  exact: true,
-};
-
 export const methodologyRoute: ProtectedRouteProps = {
-  path: '/methodologies/:methodologyId',
+  path: '/methodology/:methodologyId',
   component: MethodologyPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };
@@ -179,8 +163,6 @@ const routes = {
   topicEditRoute,
   publicationCreateRoute,
   publicationEditRoute,
-  methodologiesIndexRoute,
-  methodologyCreateRoute,
   methodologyRoute,
   preReleaseRoute,
   preReleaseContentRoute,

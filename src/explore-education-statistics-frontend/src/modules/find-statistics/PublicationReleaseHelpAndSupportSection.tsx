@@ -1,21 +1,25 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import {
   PublicationContact,
   ReleaseType,
 } from '@common/services/publicationService';
+import {
+  ExternalMethodology,
+  MethodologySummary,
+} from '@common/services/types/methodology';
 import Link from '@frontend/components/Link';
-import React, { ReactNode } from 'react';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import React, { ReactNode } from 'react';
 
 interface Props {
   includeAnalytics?: boolean;
   accordionId: string;
   publicationTitle: string;
-  methodologyUrl?: string;
-  methodologySummary?: string;
+  methodologies: MethodologySummary[];
+  externalMethodology?: ExternalMethodology;
   releaseType?: string;
   publicationContact: PublicationContact;
 }
@@ -24,8 +28,8 @@ const PublicationReleaseHelpAndSupportSection = ({
   accordionId,
   includeAnalytics = false,
   publicationTitle,
-  methodologyUrl = '',
-  methodologySummary,
+  methodologies,
+  externalMethodology,
   releaseType,
   publicationContact,
 }: Props) => {
@@ -42,21 +46,29 @@ const PublicationReleaseHelpAndSupportSection = ({
         includeAnalytics={includeAnalytics}
         publicationTitle={publicationTitle}
       >
-        {methodologyUrl !== '' && (
+        {(methodologies.length || externalMethodology) && (
           <AccordionSection
             heading="Methodology"
-            caption={
-              methodologySummary ||
-              'Find out how and why we collect, process and publish these statistics'
-            }
+            caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
-            <p className="govuk-!-margin-bottom-9">
-              <Link to="/methodology/[methodology]" as={methodologyUrl}>
-                View methodology
-              </Link>{' '}
-              for {publicationTitle}.
-            </p>
+            {methodologies.map(methodology => (
+              <p key={methodology.id} className="govuk-!-margin-bottom-9">
+                <Link
+                  to="/methodology/[methodology]"
+                  as={`/methodology/${methodology.slug}`}
+                >
+                  {methodology.title}
+                </Link>
+              </p>
+            ))}
+            {externalMethodology && (
+              <p className="govuk-!-margin-bottom-9">
+                <Link to={externalMethodology.url}>
+                  {externalMethodology.title}
+                </Link>
+              </p>
+            )}
           </AccordionSection>
         )}
         {releaseType === ReleaseType.NationalStatistics && (

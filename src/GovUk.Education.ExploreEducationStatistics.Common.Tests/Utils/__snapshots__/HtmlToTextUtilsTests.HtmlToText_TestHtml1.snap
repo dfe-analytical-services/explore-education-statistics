@@ -24,3 +24,5 @@ The following symbols have been used within the publication and are defined belo
 c  |  Small number suppressed to preserve confidentiality
 z  |  Not applicable
 :  |  Not available
+
+The files are in comma separated values format (.csv) with UTF-8 encoding.

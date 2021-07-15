@@ -26,8 +26,13 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import AccordionSection from '@common/components/AccordionSection';
-import Accordion from '@common/components/Accordion';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
+
+interface MethodologyLink {
+  key: string;
+  title: string;
+  url: string;
+}
 
 const ReleaseContent = () => {
   const config = useConfig();
@@ -104,6 +109,24 @@ const ReleaseContent = () => {
     return null;
   }
 
+  const { publication } = release;
+
+  const allMethodologies: MethodologyLink[] = publication.methodologies.map(
+    methodology => ({
+      key: methodology.id,
+      title: methodology.title,
+      url: `/methodology/${methodology.id}/summary`,
+    }),
+  );
+
+  if (publication.externalMethodology) {
+    allMethodologies.push({
+      key: publication.externalMethodology.url,
+      title: publication.externalMethodology.title,
+      url: publication.externalMethodology.url,
+    });
+  }
+
   return (
     <>
       <div className="govuk-grid-row">
@@ -167,26 +190,15 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              <li>
-                {release.publication.methodology &&
-                  (editingMode === 'edit' ? (
-                    <a>{release.publication.methodology.title}</a>
+              {allMethodologies.map(methodology => (
+                <li key={methodology.key}>
+                  {editingMode === 'edit' ? (
+                    <a>{methodology.title}</a>
                   ) : (
-                    <Link
-                      to={`/methodologies/${release.publication.methodology.id}`}
-                    >
-                      {release.publication.methodology.title}
-                    </Link>
-                  ))}
-                {release.publication.externalMethodology &&
-                  (editingMode === 'edit' ? (
-                    <a>{release.publication.externalMethodology.title}</a>
-                  ) : (
-                    <Link to={release.publication.externalMethodology.url}>
-                      {release.publication.externalMethodology.title}
-                    </Link>
-                  ))}
-              </li>
+                    <Link to={methodology.url}>{methodology.title}</Link>
+                  )}
+                </li>
+              ))}
               {release.hasMetaGuidance && (
                 <li>
                   <Link
@@ -275,79 +287,63 @@ const ReleaseContent = () => {
       <ReleaseHeadlines release={release} />
 
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
-        <div className="dfe-download-section">
-          <Accordion id="dataDownloads" showOpenAll={false}>
-            <AccordionSection heading="Download data and files">
-              <p className="govuk-caption-m">
-                Find and download files used in the production of this release.
-              </p>
-              <ul className="govuk-list govuk-!-width-full">
-                {release.downloadFiles.map(
-                  ({ id: fileId, fileName, extension, name, size }) => {
-                    const isAllFiles = !fileId && name === 'All files';
-
-                    return (
-                      <li key={isAllFiles ? 'all' : fileId}>
-                        <ButtonText
-                          onClick={() =>
-                            releaseDataFileService.downloadFile(
-                              release.id,
-                              fileId,
-                              fileName,
-                            )
-                          }
-                        >
-                          {name}
-                        </ButtonText>
-                        {` (${extension}, ${size})`}
-                      </li>
-                    );
+        <ReleaseDataAndFilesAccordion
+          release={release}
+          renderDownloadLink={file => {
+            return (
+              <>
+                <ButtonText
+                  onClick={() =>
+                    releaseDataFileService.downloadFile(
+                      release.id,
+                      file.id,
+                      file.fileName,
+                    )
+                  }
+                >
+                  {file.name}
+                </ButtonText>
+                {` (${file.extension}, ${file.size})`}
+              </>
+            );
+          }}
+          renderMetaGuidanceLink={
+            <Link
+              to={{
+                pathname: generatePath<ReleaseRouteParams>(
+                  releaseMetaGuidanceRoute.path,
+                  {
+                    publicationId: release.publication.id,
+                    releaseId: release.id,
                   },
-                )}
-                {release.hasMetaGuidance && (
-                  <li>
-                    <Link
-                      to={{
-                        pathname: generatePath<ReleaseRouteParams>(
-                          releaseMetaGuidanceRoute.path,
-                          {
-                            publicationId: release.publication.id,
-                            releaseId: release.id,
-                          },
-                        ),
-                        state: {
-                          backLink: location.pathname,
-                        },
-                      }}
-                    >
-                      Metadata guidance
-                    </Link>
-                  </li>
-                )}
-                {release.hasPreReleaseAccessList && (
-                  <li>
-                    <Link
-                      to={{
-                        pathname: generatePath<ReleaseRouteParams>(
-                          preReleaseAccessListRoute.path,
-                          {
-                            publicationId: release.publication.id,
-                            releaseId: release.id,
-                          },
-                        ),
-                        state: {
-                          backLink: location.pathname,
-                        },
-                      }}
-                    >
-                      Pre-release access list
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </AccordionSection>
-          </Accordion>
-        </div>
+                ),
+                state: {
+                  backLink: location.pathname,
+                },
+              }}
+            >
+              data files guide
+            </Link>
+          }
+          renderPreReleaseAccessLink={
+            <Link
+              to={{
+                pathname: generatePath<ReleaseRouteParams>(
+                  preReleaseAccessListRoute.path,
+                  {
+                    publicationId: release.publication.id,
+                    releaseId: release.id,
+                  },
+                ),
+                state: {
+                  backLink: location.pathname,
+                },
+              }}
+            >
+              View pre-release access list
+            </Link>
+          }
+        />
       )}
 
       <ReleaseContentAccordion release={release} sectionName="Contents" />

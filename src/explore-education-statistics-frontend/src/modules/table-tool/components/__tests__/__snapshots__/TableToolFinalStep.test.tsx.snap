@@ -639,7 +639,6 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
             </a>
           </li>
           <li>
-            Methodology: 
             <a
               class="govuk-link"
               href="/methodology/m1"
@@ -1388,7 +1387,6 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
             </a>
           </li>
           <li>
-            Methodology: 
             <a
               class="govuk-link"
               href="/methodology/m1"
@@ -2137,7 +2135,6 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
             </a>
           </li>
           <li>
-            Methodology: 
             <a
               class="govuk-link"
               href="/methodology/m1"
@@ -3599,7 +3596,6 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
             </a>
           </li>
           <li>
-            Methodology: 
             <a
               class="govuk-link"
               href="/methodology/m1"
@@ -4332,7 +4328,6 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
             </a>
           </li>
           <li>
-            Methodology: 
             <a
               class="govuk-link"
               href="/methodology/m1"

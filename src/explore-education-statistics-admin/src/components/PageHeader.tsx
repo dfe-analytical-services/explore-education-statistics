@@ -113,16 +113,16 @@ interface LoggedInLinksProps {
 
 const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
   <>
-    {user.permissions.canAccessAnalystPages && (
+    {/* EES-2464
+      {user.permissions.canAccessAnalystPages && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/documentation">
           Administrators' guide
         </a>
       </li>
-    )}
+    )} */}
 
-    {(user.permissions.canAccessUserAdministrationPages ||
-      user.permissions.canAccessMethodologyAdministrationPages) && (
+    {user.permissions.canAccessUserAdministrationPages && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/administration">
           Platform administration

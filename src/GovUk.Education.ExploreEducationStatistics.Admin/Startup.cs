@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -32,7 +30,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using IdentityServer4.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -56,6 +53,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
@@ -198,6 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
             services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
+            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver, MyMethodologyPermissionSetPropertyResolver>();
 
             services.AddMvc(options =>
                 {
@@ -255,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
@@ -376,19 +376,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     }
                 });
             });
-        }
-
-        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
-            where TDbContext : DbContext
-        {
-            services.AddTransient<
-                IPersistenceHelper<TDbContext>,
-                PersistenceHelper<TDbContext>>(
-                s =>
-                {
-                    var dbContext = s.GetService<TDbContext>();
-                    return new PersistenceHelper<TDbContext>(dbContext);
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -514,11 +501,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                     .CreateScope();
-                
+
                 serviceScope.ServiceProvider
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
-            } 
+            }
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

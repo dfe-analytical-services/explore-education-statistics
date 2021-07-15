@@ -13,6 +13,7 @@ The project is primarily composed of two areas:
   - Depends on:
     - Content API
     - Data API
+    - Notifier
 
 - **Content API**
   - Depends on:
@@ -21,6 +22,9 @@ The project is primarily composed of two areas:
 - **Data API**
   - Depends on:
     - SQLServer `statistics` database (known as `public-statistics` in non-local environments)
+
+- **Notifier**
+    - Azure function for adding users to GOV.UK Notify
 
 ### Admin (for admins and analysts)
 
@@ -62,30 +66,28 @@ You will need the following groups of dependencies to run the project successful
 2. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
-   - [Docker and Docker Compose](https://docs.docker.com/)
+   - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
 
-3. To emulate azure storage you will require:
-   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
-
-  The installer for Windows x64 is 
-  [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
-  
-  You can then run Azure Storage Emulator using the default instance of SQL Server as its data source, with the command:
-  
-  ```
-  AzureStorageEmulator.exe init /server .
-  ```
-  
-   You will currently need to use Windows (or a Windows VM with ports 10001, 10002 and 10003 exposed) to run the service 
-   due to a dependency on Azure Storage Emulator for development, specifically the table storage component which is not 
-   supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the 
-   service.
-
-   Alternatively if opting to not use Storage Explorer at all, you could create your own Storage Account on Azure and 
-   amend your storage connection strings to point to this.
-
-  - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
-  - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+3. To emulate Azure storage services (blobs, tables and queues) you will require one of the following 
+   options.
+   
+   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended approach if 
+     using Linux. See [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
+   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) -
+     recommended approach if using Windows. The x64 installer can be found [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+    
+   - Previous options that are **no longer** recommended: 
+     - Azure Storage Emulator on a Windows VM - if you don't want to use Azurite for Docker, you can 
+       install the Azure Storage Emulator on a [Windows 10 VM](https://developer.microsoft.com/en-us/windows/downloads/virtual-machines/).
+       
+       You will need to expose ports 10001, 10002 and 10003 for the host to access in the emulator 
+       in the VM. You will most likely need to install SQL Server on this VM too, as the emulator 
+       will need this to function.
+       
+     - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage 
+       Account on Azure and amend your storage connection strings to point to this.
+       - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+       - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
  
 4. **Linux only** - Add symlinks to libmagic-1
 
@@ -97,141 +99,152 @@ You will need the following groups of dependencies to run the project successful
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
-### Setting up the database and Identity Provider
+### Setting up the database and storage emulator
 
-The service can be started against a set of non-existent database. If no pre-existing `content` or `statistics` 
-databases yet exist on the target SQL Server instance, starting up the service will create them and provide the basic
-starting data to get up and running.
+1. Start the database and storage emulator:
 
-Similarly, the service can be started alongside a local Identity Provider called [Keycloak]() 
+   - If using Docker:
 
-### Running the backend
+     ```bash
+     cd src
+     docker-compose up -d db data-storage
+     ```
 
-1. Add the following to your `hosts` file:
+   - If using Windows, ensure SQL Server is running then you can start the Storage Emulator, with the 
+     default instance of SQL Server as its data source:
+
+     ```
+     AzureStorageEmulator.exe init /server .
+     ```
+
+2. Add the following to your `hosts` file:
 
    ```
    127.0.0.1    db
    127.0.0.1    data-storage
+   ```
+   
+   If using a VM, the IP addresses in this file should be set to your VM's network IP address.
+   
+#### Use a pre-built development database
 
-2. Ensure you have Azure Storage Emulator running.
+We regularly create new development databases that are uploaded to [Confluence](https://dfedigital.atlassian.net/wiki/spaces/EES/pages/2004189186/Testing) and Google Drive. Ask a team member if you need to 
+request access.
 
-3. Start the locally-provided Identity Provider or configure your own.
+These are already bootstrapped with seed data to run tests and start the project. This is the 
+**recommended** way of running the project. 
 
-Out of the box, the project supplies a Docker container Identity Provider called [Keycloak](https://www.keycloak.org/) 
-but any OpenID Connect compatible Identity Provider can be used e.g. Active Directory. It must have Implicit Flow enabled 
-and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
+This data will need to be loaded into SQL Server:
 
-- To run the out-of-the-box Keycloak Identity Provider:
+- Using Docker - copy the `ees-mssql` directory into the project's `data` directory. You **must** 
+  give all OS users full access to this directory i.e. in Linux, set the directory to `777` permissions.
+  
+  This is necessary to give the Docker container the right permissions to modify the directory contents.
+  
+- Using Windows - attach the database using SQL Management Studio.
 
-  ```
-  cd useful-scripts
-  ./run.js idp
-  ```
+#### Use a bare database
 
-To then get the other service components to use Keycloak, set the following environment variable:
-```
-IdpProviderConfiguration=Keycloak
-```
-And additionally if wanting to set up a set of Keycloak users automatically in the service in order to start using 
-the service against an empty set of databases, set the following environment variable:
+The service can be started against a set of non-existent database. If no pre-existing `content` or 
+`statistics` databases yet exist on the target SQL Server instance, starting up the service will 
+create them and provide the basic starting data to get up and running.
+
+### Running a different identity provider (optional)
+
+> For running the project day-to-day as a team member, you can ignore this step.
+
+Currently, the project defaults to using Active Directory as its identity provider. Typically, this
+will be used by things such as the admin service to allow users to log in.
+
+If you wish use a different identity provider (e.g. working outside the team), you can use:
+
+- Our out-of-the-box identity provider called [Keycloak](https://www.keycloak.org/) (as a Docker 
+  container).
+- Any OpenID Connect compatible identity provider e.g. Active Directory. It must have Implicit Flow 
+  enabled and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
+
+#### Using Keycloak identity provider
+
+1. To run the out-of-the-box Keycloak identity provider:
+
+   ```bash
+   cd src/
+   docker-compose up -d idp
+   ```
+   
+   or
+   
+   ```bash
+   cd useful-scripts/
+   ./run.js idp
+   ```
+  
+2. To then get the other service components to use Keycloak, set the following environment variable:
+
+   ```
+   IdpProviderConfiguration=Keycloak
+   ```
+
+Additionally, if wanting to set up a set of Keycloak users automatically in the service in order
+to start using the service against an empty set of databases, set the following environment variable:
+
 ```
 BootstrapUsersConfiguration=KeycloakBootstrapUsers
 ```
-The effect of setting these 2 environment variables together will allow authentication of users with Keycloak, and those
-users specified within the 
-`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` will be available for use
- as "BAU Users", who have the ability to create new Publications and Releases, and invite other users to the system to
- work on those Publications and Releases.
 
-Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory and provide its 
-credentials in a file called 
-`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` and a set of users'
-email addresses who you want to access the system straight away in a file called 
+The effect of setting these 2 environment variables together will allow authentication of users with 
+Keycloak, and those users specified within the `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` 
+will be available for use as "BAU Users", who have the ability to create new Publications and Releases, 
+and invite other users to the system to work on those Publications and Releases.
+
+#### Using your own identity provider
+
+Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory 
+and provide its credentials in a file called `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` 
+and a set of users' email addresses who you want to access the system straight away in a file called 
 `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}BootstrapUsers.json`.  
+
 Then set the environment variables above like:
+
 ```
 IdpProviderConfiguration={NameOfYourIdentityProvider}
 BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
 ```
 
 If choosing to provide your own OpenID Connect configuration file, you can use the existing Keycloak configuration file
-as a reference, at 
-[appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json).
+as a reference, at [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json).
 
-#### Running the applications
+### Running the backend
 
 The recommended way of running backend applications/functions is through the [Rider IDE](https://www.jetbrains.com/rider/).
 If this is not available to you then you will need to use one, or a combination, of the following:
 
-##### Using `run` script
+#### Using `run` script
 
-The `run` script is a simple wrapper around the various CLI commands you need to run the applications. You will need to
-ensure you have all the project dependencies as specified in [Requirements](#requirements).
-
-Examples:
-
-- To run the public frontend:
-
-  ```
-  cd useful-scripts
-  ./run.js data content publisher
-  ```
-
-- To run the admin:
-
-  ```
-  cd useful-scripts
-  ./run.js admin processor notifier
-  ```
-  
-  More specifically, to run the admin using Keycloak as the Identity Provider and to auto-create a set of users from 
-  Keycloak within the admin:
-
-  Set the following environment variables:
-  ```
-  IdpProviderConfiguration=Keycloak
-  BootstrapUsersConfiguration=KeycloakBootstrapUsers
-  ```
-  
-  and then continue on to run:
-
-  ```
-  cd useful-scripts
-  ./run.js admin processor notifier
-  ```
-
-##### Using Docker
-
-Parts (but not all) of the service can be run using Docker. 
+The `run` script is a simple wrapper around the various CLI commands you need to run the applications. 
+You will need to ensure you have all the project dependencies as specified in [Requirements](#requirements).
 
 Examples:
 
-- To run public frontend services:
+- To run the public frontend services:
 
   ```bash
-  cd src/
-  docker-compose up -d data-api content-api
+  cd useful-scripts
+  ./run.js data content
   ```
 
-- To run public frontend databases:
+- To run the admin. Note you must set up the frontend first - see [Running the frontend](#running-the-frontend).
 
-  ```
-  cd src/
-  docker-compose up -d db
-  ```
-
-- To run the Keycloak IdP:
-
-  ```
-  cd src/
-  docker-compose up -d idp
+  ```bash
+  cd useful-scripts
+  ./run.js admin
   ```
 
-  or
+- To run other services:
   
-  ```
-  cd useful-scripts/
-  ./run.js idp
+  ```bash
+  cd useful-scripts
+  ./run.js publisher processor
   ```
 
 ### Running the frontend
@@ -245,22 +258,36 @@ Examples:
 
 2. Startup any required backend services (see [Running the backend](#running-the-backend))
 
-3. Run the frontend applications by running from the project root
+3. Run the frontend applications using any of the following:
+   
+   - Running using the `run` script:
+    
+     ```bash
+     cd useful-scripts
+          
+     # Admin frontend
+     ./run.js admin
+     
+     # Public frontend
+     ./run.js frontend
+     ```
 
-   ```bash
-   # Admin frontend
-   npm run start:admin
+   - Running from the project root:
 
-   # Public frontend
-   npm run start:frontend
-   ```
-
-   Alternatively, go into one of the sub-project directories and start them directly:
-
-   ```bash
-   cd src/explore-education-statistics-frontend
-   npm start
-   ```
+     ```bash
+     # Admin frontend
+     npm run start:admin
+    
+     # Public frontend
+     npm run start:frontend
+     ```
+ 
+    - Going into each of the sub-project directories and starting it directly e.g.
+    
+     ```bash
+     cd src/explore-education-statistics-frontend
+     npm start
+     ```
 
 4. Access frontend applications at:
 

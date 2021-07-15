@@ -26,13 +26,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .GetDeserialized<PublicationTitleViewModel>(PublicContentPublicationPath(slug))
                 .HandleFailuresOrOk();
         }
-
-        [HttpGet("publications/{slug}/methodology")]
-        public async Task<ActionResult<PublicationMethodologyViewModel>> GetPublicationMethodology(string slug)
-        {
-            return await _fileStorageService
-                .GetDeserialized<PublicationMethodologyViewModel>(PublicContentPublicationPath(slug))
-                .HandleFailuresOrOk();
-        }
     }
 }

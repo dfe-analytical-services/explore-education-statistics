@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
@@ -13,7 +12,6 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -46,8 +44,9 @@ const MethodologyPage = ({
   const currentRouteIndex =
     methodologyRoutes.findIndex(
       route =>
-        generatePath<MethodologyRouteParams>(route.path, { methodologyId }) ===
-        location.pathname,
+        generatePath<MethodologyRouteParams>(route.path, {
+          methodologyId,
+        }) === location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -79,13 +78,7 @@ const MethodologyPage = ({
     : undefined;
 
   return (
-    <Page
-      wide
-      breadcrumbs={[
-        { name: 'Manage methodologies', link: '/methodologies' },
-        { name: 'Edit methodology' },
-      ]}
-    >
+    <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
       <LoadingSpinner loading={isLoading}>
         {value ? (
           <>
@@ -94,6 +87,7 @@ const MethodologyPage = ({
                 <PageTitle title={value.title} caption="Edit methodology" />
               </div>
 
+              {/* EES-2464
               <div className="govuk-grid-column-one-third">
                 <RelatedInformation heading="Help and guidance">
                   <ul className="govuk-list">
@@ -104,7 +98,7 @@ const MethodologyPage = ({
                     </li>
                   </ul>
                 </RelatedInformation>
-              </div>
+              </div> */}
             </div>
 
             <NavBar

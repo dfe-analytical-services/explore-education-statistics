@@ -1,6 +1,5 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
-import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import BauImportsPage from '@admin/pages/bau/BauImportsPage';
 import InvitedUsersPage from '@admin/pages/users/InvitedUsersPage';
@@ -11,17 +10,7 @@ import UserInvitePage from '@admin/pages/users/UserInvitePage';
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
   component: BauDashboardPage,
-  protectionAction: user =>
-    user.permissions.canAccessUserAdministrationPages ||
-    user.permissions.canAccessMethodologyAdministrationPages,
-  exact: true,
-};
-
-export const administrationMethodologyRoute: ProtectedRouteProps = {
-  path: '/administration/methodology',
-  component: BauMethodologyPage,
-  protectionAction: user =>
-    user.permissions.canAccessMethodologyAdministrationPages,
+  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
   exact: true,
 };
 
@@ -68,7 +57,6 @@ export const administrationUserManageRoute: ProtectedRouteProps = {
 
 const administrationRoutes = {
   administrationIndexRoute,
-  administrationMethodologyRoute,
   administrationImportsRoute,
   administrationUsersRoute,
   administrationUserInviteRoute,

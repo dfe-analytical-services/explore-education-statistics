@@ -60,12 +60,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await UpdateStage(releaseId, releaseStatusId, Started);
                 try
                 {
-                    var methodology = await _methodologyService.GetByRelease(releaseId);
-                    // Publish the files of the Methodology if it's not already live
-                    // Since the Methodology will be published for the first time with this Release
-                    if (methodology != null && !methodology.Live)
+                    var methodologies = await _methodologyService.GetLatestByRelease(releaseId);
+                    // Publish the files of the latest methodologies of this release that
+                    // aren't already accessible but depended on this release being published,
+                    // since those methodologies will be published for the first time with this release
+                    foreach (var methodology in methodologies)
                     {
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
+                        // TODO SOW EES-2385 Also need to do this if ScheduledForPublishingImmediately
+                        // but not accessible yet because this is the first Release
+                        if (methodology.ScheduledForPublishingWithPublishedRelease
+                            && methodology.ScheduledWithReleaseId == releaseId)
+                        {
+                            await _publishingService.PublishMethodologyFiles(methodology.Id);
+                        }
                     }
                     await _publishingService.PublishReleaseFiles(releaseId);
                     published.Add((releaseId, releaseStatusId));

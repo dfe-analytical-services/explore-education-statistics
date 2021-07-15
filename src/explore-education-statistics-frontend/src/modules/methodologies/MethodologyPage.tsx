@@ -24,7 +24,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
   return (
     <Page
       title={data.title}
-      description={data.summary}
+      description="Find out how and why we collect, process and publish these statistics"
       breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
     >
       <div className="govuk-grid-row">

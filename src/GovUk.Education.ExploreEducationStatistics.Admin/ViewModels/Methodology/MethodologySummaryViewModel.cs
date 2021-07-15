@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,6 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public Guid Id { get; set; }
 
         public string InternalReleaseNote { get; set; }
+
+        public TitleAndIdViewModel Publication { get; set; }
+
+        public List<TitleAndIdViewModel> OtherPublications { get; set; }
 
         public DateTime? Published { get; set; }
 

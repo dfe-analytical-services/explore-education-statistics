@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -17,241 +17,201 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetLatestRelease()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            var fileStorageService = new Mock<IFileStorageService>();
-            var controller = new ReleaseController(fileStorageService.Object);
+            releaseService.Setup(mock => mock.Get(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/latest-release.json"))
+                .ReturnsAsync(BuildReleaseViewModel());
 
-            SetupLatestReleaseExpectations(fileStorageService, publicationId, releaseId);
+            var controller = BuildReleaseController(releaseService.Object);
 
             var result = await controller.GetLatestRelease("publication-a");
             var releaseViewModel = result.Value;
 
             Assert.IsType<ReleaseViewModel>(releaseViewModel);
-            Assert.True(releaseViewModel.LatestRelease);
 
-            Assert.Single(releaseViewModel.Content);
-
-            var contentSection = releaseViewModel.Content.First();
-            Assert.Single(contentSection.Content);
-            Assert.IsType<HtmlBlockViewModel>(contentSection.Content.First());
-
-            var publication = releaseViewModel.Publication;
-            Assert.Equal(publicationId, publication.Id);
+            MockUtils.VerifyAllMocks(releaseService);
         }
 
         [Fact]
         public async Task GetLatestRelease_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
+            releaseService.Setup(mock => mock.Get(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/latest-release.json"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new ReleaseController(fileStorageService.Object);
+            var controller = BuildReleaseController(releaseService.Object);
             var result = await controller.GetLatestRelease("publication-a");
 
             Assert.IsType<NotFoundResult>(result.Result);
+
+            MockUtils.VerifyAllMocks(releaseService);
         }
 
         [Fact]
         public async Task GetRelease()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            var fileStorageService = new Mock<IFileStorageService>();
-            var controller = new ReleaseController(fileStorageService.Object);
+            releaseService.Setup(mock => mock.Get(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/releases/2000.json"))
+                .ReturnsAsync(BuildReleaseViewModel());
 
-            SetupNonLatestReleaseExpectations(fileStorageService, publicationId, releaseId);
+            var controller = BuildReleaseController(releaseService.Object);
 
-            var result = await controller.GetRelease("publication-a", "2016");
+            var result = await controller.GetRelease("publication-a", "2000");
             var releaseViewModel = result.Value;
 
             Assert.IsType<ReleaseViewModel>(releaseViewModel);
-            Assert.True(releaseViewModel.LatestRelease);
 
-            Assert.Single(releaseViewModel.Content);
-
-            var contentSection = releaseViewModel.Content.First();
-            Assert.Single(contentSection.Content);
-            Assert.IsType<HtmlBlockViewModel>(contentSection.Content.First());
-
-            var publication = releaseViewModel.Publication;
-            Assert.Equal(publicationId, publication.Id);
+            MockUtils.VerifyAllMocks(releaseService);
         }
+
 
         [Fact]
         public async Task GetRelease_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
+            releaseService.Setup(mock => mock.Get(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/releases/2000.json"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new ReleaseController(fileStorageService.Object);
+            var controller = BuildReleaseController(releaseService.Object);
             var result = await controller.GetRelease("publication-a", "2000");
 
             Assert.IsType<NotFoundResult>(result.Result);
+
+            MockUtils.VerifyAllMocks(releaseService);
         }
-        
+
         [Fact]
         public async Task GetLatestReleaseSummary()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            var fileStorageService = new Mock<IFileStorageService>();
-            var controller = new ReleaseController(fileStorageService.Object);
+            releaseService.Setup(mock => mock.GetSummary(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/latest-release.json"))
+                .ReturnsAsync(BuildReleaseSummaryViewModel());
 
-            SetupLatestReleaseExpectations(fileStorageService, publicationId, releaseId);
+            var controller = BuildReleaseController(releaseService.Object);
 
             var result = await controller.GetLatestReleaseSummary("publication-a");
             var releaseViewModel = result.Value;
 
             Assert.IsType<ReleaseSummaryViewModel>(releaseViewModel);
-            Assert.True(releaseViewModel.LatestRelease);
 
-            var publication = releaseViewModel.Publication;
-            Assert.Equal(publicationId, publication.Id);
+            MockUtils.VerifyAllMocks(releaseService);
         }
 
         [Fact]
         public async Task GetLatestReleaseSummary_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
+            releaseService.Setup(mock => mock.GetSummary(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/latest-release.json"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new ReleaseController(fileStorageService.Object);
+            var controller = BuildReleaseController(releaseService.Object);
+
             var result = await controller.GetLatestReleaseSummary("publication-a");
 
             Assert.IsType<NotFoundResult>(result.Result);
+
+            MockUtils.VerifyAllMocks(releaseService);
         }
-        
+
         [Fact]
         public async Task GetReleaseSummary()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            var fileStorageService = new Mock<IFileStorageService>();
-            var controller = new ReleaseController(fileStorageService.Object);
+            releaseService.Setup(mock => mock.GetSummary(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/releases/2000.json"))
+                .ReturnsAsync(BuildReleaseSummaryViewModel());
 
-            SetupNonLatestReleaseExpectations(fileStorageService, publicationId, releaseId);
+            var controller = BuildReleaseController(releaseService.Object);
 
-            var result = await controller.GetReleaseSummary("publication-a", "2016");
+            var result = await controller.GetReleaseSummary("publication-a", "2000");
             var releaseViewModel = result.Value;
 
             Assert.IsType<ReleaseSummaryViewModel>(releaseViewModel);
-            Assert.True(releaseViewModel.LatestRelease);
 
-            var publication = releaseViewModel.Publication;
-            Assert.Equal(publicationId, publication.Id);
+            MockUtils.VerifyAllMocks(releaseService);
         }
 
         [Fact]
         public async Task GetReleaseSummary_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
+            releaseService.Setup(mock => mock.GetSummary(
+                    "publications/publication-a/publication.json",
+                    "publications/publication-a/releases/2000.json"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new ReleaseController(fileStorageService.Object);
-            var result = await controller.GetReleaseSummary("publication-a", "2016");
+            var controller = BuildReleaseController(releaseService.Object);
+
+            var result = await controller.GetReleaseSummary("publication-a", "2000");
 
             Assert.IsType<NotFoundResult>(result.Result);
-        }
-        
-        private static void SetupLatestReleaseExpectations(Mock<IFileStorageService> fileStorageService, Guid publicationId, Guid releaseId)
-        {
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<CachedPublicationViewModel>(
-                        "publications/publication-a/publication.json"
-                    )
-                )
-                .ReturnsAsync(new CachedPublicationViewModel
-                {
-                    Id = publicationId,
-                    LatestReleaseId = releaseId,
-                    Releases = new List<ReleaseTitleViewModel>
-                    {
-                        new ReleaseTitleViewModel
-                        {
-                            Id = releaseId
-                        }
-                    }
-                });
 
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<CachedReleaseViewModel>(
-                        "publications/publication-a/latest-release.json"
-                    )
-                )
-                .ReturnsAsync(new CachedReleaseViewModel
+            MockUtils.VerifyAllMocks(releaseService);
+        }
+
+        private static ReleaseViewModel BuildReleaseViewModel()
+        {
+            var releaseId = Guid.NewGuid();
+
+            return new ReleaseViewModel(
+                new CachedReleaseViewModel
                 {
-                    Id = releaseId,
-                    Content = new List<ContentSectionViewModel>
+                    Id = releaseId
+                },
+                new CachedPublicationViewModel
+                {
+                    Releases = AsList(new ReleaseTitleViewModel
                     {
-                        new ContentSectionViewModel
-                        {
-                            Content = new List<IContentBlockViewModel>
-                            {
-                                new HtmlBlockViewModel()
-                            }
-                        }
-                    }
+                        Id = releaseId
+                    })
                 });
         }
-        
-        private static void SetupNonLatestReleaseExpectations(Mock<IFileStorageService> fileStorageService, Guid publicationId, Guid releaseId)
-        {
-            fileStorageService.Setup(
-                    s => s.GetDeserialized<CachedPublicationViewModel>(
-                        "publications/publication-a/publication.json"
-                    )
-                )
-                .ReturnsAsync(new CachedPublicationViewModel
-                {
-                    Id = publicationId,
-                    LatestReleaseId = releaseId,
-                    Releases = new List<ReleaseTitleViewModel>
-                    {
-                        new ReleaseTitleViewModel
-                        {
-                            Id = releaseId
-                        }
-                    }
-                });
 
-            fileStorageService.Setup(
-                    s => s.GetDeserialized<CachedReleaseViewModel>(
-                        "publications/publication-a/releases/2016.json"
-                    )
-                )
-                .ReturnsAsync(new CachedReleaseViewModel
+        private static ReleaseSummaryViewModel BuildReleaseSummaryViewModel()
+        {
+            var releaseId = Guid.NewGuid();
+
+            return new ReleaseSummaryViewModel(
+                new CachedReleaseViewModel
                 {
-                    Id = releaseId,
-                    Content = new List<ContentSectionViewModel>
+                    Id = releaseId
+                },
+                new CachedPublicationViewModel
+                {
+                    Releases = AsList(new ReleaseTitleViewModel
                     {
-                        new ContentSectionViewModel
-                        {
-                            Content = new List<IContentBlockViewModel>
-                            {
-                                new HtmlBlockViewModel()
-                            }
-                        }
-                    }
+                        Id = releaseId
+                    })
                 });
+        }
+
+        private static ReleaseController BuildReleaseController(
+            IReleaseService releaseService = null
+        )
+        {
+            return new ReleaseController(
+                releaseService ?? new Mock<IReleaseService>().Object
+            );
         }
     }
 }

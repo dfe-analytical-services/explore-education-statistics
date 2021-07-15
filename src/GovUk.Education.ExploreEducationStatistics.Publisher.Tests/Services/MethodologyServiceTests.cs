@@ -1,131 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        [Fact]
-        public async Task GetTree()
-        {
-            var topicA = new Topic
-            {
-                Title = "Topic A",
-                Theme = new Theme
-                {
-                    Title = "Theme A",
-                    Slug = "theme-a",
-                    Summary = "The first theme"
-                },
-                Slug = "topic-a"
-            };
-
-            var methodologyA = new Methodology
-            {
-                Slug = "methodology-a",
-                Title = "Methodology A",
-                Summary = "first methodology",
-                Published = new DateTime(2019, 1, 01),
-                Updated = new DateTime(2019, 1, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
-            };
-
-            var methodologyB = new Methodology
-            {
-                Slug = "methodology-b",
-                Title = "Methodology B",
-                Summary = "second methodology",
-                Published = new DateTime(2019, 3, 01),
-                Updated = new DateTime(2019, 3, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
-            };
-
-            var publicationA = new Publication
-            {
-                Title = "Publication A",
-                Topic = topicA,
-                Slug = "publication-a",
-                Summary = "first publication",
-                Methodology = methodologyA
-            };
-
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                Topic = topicA,
-                Slug = "publication-b",
-                Summary = "second publication",
-                Methodology = methodologyB
-            };
-
-            var publicationARelease1 = new Release
-            {
-                Publication = publicationA,
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
-                Published = new DateTime(2019, 1, 01),
-                ApprovalStatus = Approved
-            };
-
-            var publicationBRelease1 = new Release
-            {
-                Publication = publicationB,
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
-                Published = null,
-                ApprovalStatus = Draft
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Topics.AddAsync(topicA);
-                await contentDbContext.Methodologies.AddRangeAsync(methodologyA, methodologyB);
-                await contentDbContext.Publications.AddRangeAsync(publicationA, publicationB);
-                await contentDbContext.Releases.AddRangeAsync(publicationARelease1, publicationBRelease1);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
-
-                var result = service.GetTree(Enumerable.Empty<Guid>());
-
-                Assert.Single(result);
-                var theme = result.First();
-                Assert.Equal("Theme A", theme.Title);
-
-                Assert.Single(theme.Topics);
-                var topic = theme.Topics.First();
-                Assert.Equal("Topic A", topic.Title);
-
-                Assert.Single(topic.Publications);
-                var publication = topic.Publications.First();
-                Assert.Equal("Publication A", publication.Title);
-
-                var methodology = publication.Methodology;
-                Assert.Equal("methodology-a", methodology.Slug);
-                Assert.Equal("first methodology", methodology.Summary);
-                Assert.Equal("Methodology A", methodology.Title);
-            }
-        }
-
         [Fact]
         public async Task GetFiles()
         {
@@ -183,64 +75,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetViewModel()
+        public async Task GetLatestByRelease()
         {
-            var methodology = new Methodology
+            var release = new Release
             {
-                Id = Guid.NewGuid(),
-                Slug = "methodology-slug",
-                Title = "Methodology",
-                Summary = "Methodology summary",
-                Published = new DateTime(2019, 1, 01),
-                Updated = new DateTime(2019, 1, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
+                Publication = new Publication
+                {
+                    Title = "Publication",
+                    Slug = "publication-slug"
+                },
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ1
             };
-            
+
+            var methodologies = AsList(
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PreviousVersionId = null,
+                    PublishingStrategy = Immediately,
+                    Status = Approved,
+                    Version = 0
+                },
+                new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    PreviousVersionId = null,
+                    PublishingStrategy = Immediately,
+                    Status = Approved,
+                    Version = 0
+                });
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestByPublication(release.PublicationId))
+                .ReturnsAsync(methodologies);
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext);
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
 
-                var result = await service.GetViewModelAsync(methodology.Id, PublishContext());
+                var result = await service.GetLatestByRelease(release.Id);
 
-                Assert.Equal(methodology.Id, result.Id);
-                Assert.Equal("Methodology", result.Title);
-                Assert.Equal(new DateTime(2019, 1, 01), result.Published);
-                Assert.Equal(new DateTime(2019, 1, 15), result.Updated);
-                Assert.Equal("Methodology summary", result.Summary);
-
-                var annexes = result.Annexes;
-                Assert.NotNull(annexes);
-                Assert.Empty(annexes);
-
-                var content = result.Content;
-                Assert.NotNull(content);
-                Assert.Empty(content);
+                Assert.Equal(methodologies, result);
             }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
-        public async Task GetViewModel_NotYetPublished()
+        public async Task SetPublishedDatesByPublication_PublishedMethodologyHasPublishedDateSet()
         {
+            var publicationId = Guid.NewGuid();
+            var published = DateTime.UtcNow;
+
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
-                Title = "Methodology",
-                Summary = "Methodology summary",
                 Published = null,
-                Updated = new DateTime(2019, 6, 15),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>()
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -249,109 +154,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publicationId))
+                .ReturnsAsync(AsList(methodology));
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext);
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
 
-                var context = PublishContext();
-                var result = await service.GetViewModelAsync(methodology.Id, context);
-
-                Assert.Equal(methodology.Id, result.Id);
-                Assert.Equal("Methodology", result.Title);
-                Assert.Equal(context.Published, result.Published);
-                Assert.Equal(new DateTime(2019, 6, 15), result.Updated);
-                Assert.Equal("Methodology summary", result.Summary);
-
-                var annexes = result.Annexes;
-                Assert.NotNull(annexes);
-                Assert.Empty(annexes);
-
-                var content = result.Content;
-                Assert.NotNull(content);
-                Assert.Empty(content);
+                await service.SetPublishedDatesByPublication(publicationId, published);
             }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actual = await contentDbContext.Methodologies.FindAsync(methodology.Id);
+                Assert.NotNull(actual);
+                Assert.Equal(published, actual.Published);
+            }
+
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
-        public async Task GetByRelease()
+        public async Task SetPublishedDatesByPublication_MethodologyWithAPublishedDateRemainsUntouched()
         {
-            var methodology = new Methodology();
+            var publicationId = Guid.NewGuid();
 
-            var release = new Release
+            var methodology = new Methodology
             {
-                Publication = new Publication
-                {
-                    Title = "Publication",
-                    Slug = "publication-slug",
-                    Methodology = methodology
-                },
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
-                ApprovalStatus = Approved
+                Published = DateTime.UtcNow.AddDays(-1),
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-        
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Methodologies.AddAsync(methodology);
-                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publicationId))
+                .ReturnsAsync(AsList(methodology));
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext);
+                var service = SetupMethodologyService(contentDbContext,
+                    methodologyRepository.Object);
 
-                var result = await service.GetByRelease(release.Id);
-                Assert.Equal(methodology.Id, result.Id);
+                await service.SetPublishedDatesByPublication(publicationId, DateTime.UtcNow);
             }
-        }
 
-        [Fact]
-        public async Task GetByRelease_PublicationHasNoMethodology()
-        {
-            var release = new Release
-            {
-                Publication = new Publication
-                {
-                    Title = "Publication",
-                    Slug = "publication-slug",
-                    Methodology = null
-                },
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1,
-                ApprovalStatus = Approved
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-        
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
+                var actual = await contentDbContext.Methodologies.FindAsync(methodology.Id);
+                Assert.NotNull(actual);
+                Assert.Equal(methodology.Published, actual.Published);
             }
-            
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext);
 
-                var result = await service.GetByRelease(release.Id);
-                Assert.Null(result);
-            }
+            MockUtils.VerifyAllMocks(methodologyRepository);
         }
 
-        private static PublishContext PublishContext()
-        {
-            var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-            return new PublishContext(published, true);
-        }
-
-        private MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
+        private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext,
+            IMethodologyRepository methodologyRepository = null)
         {
             return new MethodologyService(
                 contentDbContext,
-                MapperForProfile<MappingProfiles>());
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object);
         }
     }
 }

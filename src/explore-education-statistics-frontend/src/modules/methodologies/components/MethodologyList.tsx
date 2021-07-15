@@ -8,7 +8,7 @@ interface Props {
 
 function MethodologyList({ publications }: Props) {
   const filteredPublications = publications.filter(
-    publication => !!publication.methodology,
+    publication => !!publication.methodologies,
   );
 
   if (!filteredPublications.length) {
@@ -23,12 +23,18 @@ function MethodologyList({ publications }: Props) {
             {publication.title}
           </h3>
 
-          <Link
-            to="/methodology/[methodology]"
-            as={`/methodology/${publication.methodology?.slug}`}
-          >
-            View methodology
-          </Link>
+          <ul>
+            {publication.methodologies.map(methodology => (
+              <li key={methodology.id}>
+                <Link
+                  to="/methodology/[methodology]"
+                  as={`/methodology/${methodology.slug}`}
+                >
+                  {methodology.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </li>
       ))}
     </ul>

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
@@ -34,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IBlobStorageService publicBlobStorageService,
+            IMethodologyService methodologyService,
             IReleaseSubjectService releaseSubjectService,
             ILogger<ReleaseService> logger,
             IMapper mapper)
@@ -41,12 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _publicBlobStorageService = publicBlobStorageService;
+            _methodologyService = methodologyService;
             _releaseSubjectService = releaseSubjectService;
             _logger = logger;
             _mapper = mapper;
         }
 
-        public async Task<Release> GetAsync(Guid id)
+        public async Task<Release?> Find(Guid id)
         {
             return await _contentDbContext.Releases
                 .Include(release => release.Publication)
@@ -54,7 +58,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleOrDefaultAsync(release => release.Id == id);
         }
 
-        public async Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids)
+        public async Task<Release> Get(Guid id)
+        {
+            var release = await Find(id);
+
+            if (release == null)
+            {
+                throw new ArgumentException($"Could not find release: {id}");
+            }
+
+            return release;
+        }
+
+        public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
         {
             return await _contentDbContext.Releases
                 .Where(release => ids.Contains(release.Id))
@@ -126,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
-                .LastOrDefault();
+                .Last();
         }
 
         public async Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,
@@ -136,11 +152,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await GetReleaseViewModel(latestRelease.Id, context);
         }
 
-        public async Task SetPublishedDatesAsync(Guid id, DateTime published)
+        public async Task SetPublishedDates(Guid id, DateTime published)
         {
             var contentRelease = await _contentDbContext.Releases
                 .Include(release => release.Publication)
-                .ThenInclude(publication => publication.Methodology)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             var statisticsRelease = await _statisticsDbContext.Release
@@ -172,12 +187,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Update the Publication published date since we always generate the Publication when generating Release Content
             contentRelease.Publication.Published = published;
 
-            // Update the Methodology published date if it's the first time it's published
-            var methodology = contentRelease.Publication.Methodology;
-            if (methodology != null)
-            {
-                methodology.Published ??= published;
-            }
+            // Set the published date on any methodologies used by this publication that are now publicly accessible
+            // as a result of this release being published
+            await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
 

@@ -16,7 +16,7 @@ import {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
   query: TableDataQuery;
@@ -47,25 +47,29 @@ const TableToolFinalStep = ({
   );
   const publication = fullPublication?.publication;
 
-  const getMethodologyLink = () => {
-    if (publication?.methodology) {
-      return (
+  const getMethodologyLinks = () => {
+    const links: ReactNode[] =
+      publication?.methodologies?.map(methodology => (
         <Link
+          key={methodology.id}
           to="/methodology/[methodology]"
-          as={`/methodology/${publication.methodology.slug}`}
+          as={`/methodology/${methodology.slug}`}
         >
-          {publication.methodology.title}
+          {methodology.title}
         </Link>
-      );
-    }
+      )) ?? [];
+
     if (publication?.externalMethodology) {
-      return (
-        <Link to={publication.externalMethodology.url}>
+      links.push(
+        <Link
+          key={publication.externalMethodology.url}
+          to={publication.externalMethodology.url}
+        >
           {publication.externalMethodology.title}
-        </Link>
+        </Link>,
       );
     }
-    return null;
+    return links;
   };
 
   return (
@@ -155,7 +159,7 @@ const TableToolFinalStep = ({
 
       <TableToolInfo
         contactDetails={publication?.contact}
-        methodologyLink={getMethodologyLink()}
+        methodologyLinks={getMethodologyLinks()}
         releaseLink={
           <>
             {selectedPublication.selectedRelease.latestData ? (

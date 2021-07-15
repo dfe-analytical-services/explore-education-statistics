@@ -1,17 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -27,18 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
         private readonly IMethodologyContentService _methodologyContentService;
-        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
+        private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
 
-        public MethodologyService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public MethodologyService(
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
             IMapper mapper,
             IMethodologyContentService methodologyContentService,
-            IMethodologyRepository methodologyRepository,
             IMethodologyFileRepository methodologyFileRepository,
+            IMethodologyRepository methodologyRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService)
@@ -47,74 +49,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _context = context;
             _mapper = mapper;
             _methodologyContentService = methodologyContentService;
-            _methodologyRepository = methodologyRepository;
             _methodologyFileRepository = methodologyFileRepository;
+            _methodologyRepository = methodologyRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
-            MethodologyCreateRequest request)
+        public Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
         {
-            var slug = SlugFromTitle(request.Title);
-            return await _userService.CheckCanCreateMethodology()
-                .OnSuccess(() => ValidateMethodologySlugUnique(slug))
-                .OnSuccess(async () =>
-                {
-                    var model = new Methodology
-                    {
-                        Title = request.Title,
-                        Slug = slug
-                    };
-
-                    var saved = await _context.Methodologies.AddAsync(model);
-                    await _context.SaveChangesAsync();
-                    return await GetSummaryAsync(saved.Entity.Id);
-                });
-        }
-
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
-                .OnSuccess(_userService.CheckCanViewMethodology)
+            return _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
+                .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(publicationId))
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync()
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
-            return await _userService.CheckCanViewAllMethodologies()
-                .OnSuccess(async () =>
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(id, queryable =>
+                    queryable.Include(methodology => methodology.MethodologyParent)
+                        .ThenInclude(mp => mp.Publications)
+                        .ThenInclude(pm => pm.Publication))
+                .OnSuccess(_userService.CheckCanViewMethodology)
+                .OnSuccess(methodology =>
                 {
-                    var result = await _context.Methodologies.ToListAsync();
-                    return _mapper.Map<List<MethodologySummaryViewModel>>(result);
+                    var publicationLinks = methodology.MethodologyParent.Publications;
+                    var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
+                    var otherPublications = publicationLinks.Where(pm => !pm.Owner)
+                        .Select(BuildPublicationViewModel)
+                        .OrderBy(model => model.Title)
+                        .ToList();
+
+                    var viewModel = _mapper.Map<MethodologySummaryViewModel>(methodology);
+                    viewModel.Publication = owningPublication;
+                    viewModel.OtherPublications = otherPublications;
+                    return viewModel;
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync()
-        {
-            return await _userService
-                .CheckCanViewAllMethodologies()
-                .OnSuccess(async () =>
-                {
-                    var result = await _context
-                        .Methodologies
-                        .Include(m => m.Publications)
-                        .OrderBy(m => m.Title)
-                        .ToListAsync();
-
-                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(result);
-                })
-                .OrElse(async () =>
-                {
-                    var userId = _userService.GetUserId();
-                    var viewableMethodologies = await _methodologyRepository.GetMethodologiesForUser(userId);
-                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(viewableMethodologies);
-                });
-        }
-
-        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
@@ -123,7 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
                 .OnSuccess(async methodology =>
                 {
-                    if (methodology.Live)
+                    // TODO SOW4 EES-2166 EES-2200:
+                    // In future it probably won't be necessary to do this,
+                    // since it won't be possible to change the title of a methodology that's already publicly accessible.
+                    // Prevent the slug from being changed on amendments instead.
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
                         // Leave slug
                         return methodology;
@@ -137,20 +116,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 })
                 .OnSuccess(async methodology =>
                 {
-                    methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
+                    _context.Methodologies.Update(methodology);
+
+                    methodology.InternalReleaseNote = request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
+                    methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Updated = DateTime.UtcNow;
 
-                    _context.Methodologies.Update(methodology);
-                    await _context.SaveChangesAsync();
-
-                    if (methodology.Status == MethodologyStatus.Approved && methodology.Live)
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
-                        await _publishingService.MethodologyChanged(methodology.Id);
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
+
+                        // TODO SOW4 EES-2166 EES-2200
+                        // Until it's possible to create an amendment we still allow un-approving and re-approving.
+                        // This means the methodology may already have a published date that it was first published on,
+                        // so don't overwrite it. Later this can be changed to:
+                        // methodology.Published = DateTime.UtcNow;
+
+                        methodology.Published ??= DateTime.UtcNow;
                     }
 
-                    return await GetSummaryAsync(id);
+                    await _context.SaveChangesAsync();
+
+                    return await GetSummary(id);
                 });
         }
 
@@ -196,14 +185,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUnique(string slug)
+        private static TitleAndIdViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
         {
-            if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug))
-            {
-                return ValidationActionResult(SlugNotUnique);
-            }
-
-            return Unit.Instance;
+            var publication = publicationMethodology.Publication;
+            return new TitleAndIdViewModel(publication.Id, publication.Title);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)

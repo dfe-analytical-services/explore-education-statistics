@@ -324,7 +324,7 @@ describe('TableToolFinalStep', () => {
       ...testPublicationRelease,
       publication: {
         ...testPublicationRelease.publication,
-        methodology: undefined,
+        methodologies: [],
         externalMethodology: {
           url: 'http://somewhere.com',
           title: 'An external methodology',

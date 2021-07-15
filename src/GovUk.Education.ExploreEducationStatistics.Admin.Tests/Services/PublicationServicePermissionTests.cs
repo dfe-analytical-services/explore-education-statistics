@@ -57,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Left;
             Assert.IsAssignableFrom<ForbidResult>(result);
 
+            userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.VerifyNoOtherCalls();
 
@@ -91,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Right;
             Assert.Equal(list, result);
 
+            userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.VerifyNoOtherCalls();
@@ -192,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _publication,
                 mocks.UserService,
                 BuildPublicationService(mocks),
-                SecurityPolicies.CanUpdatePublication);
+                SecurityPolicies.CanUpdateSpecificPublication);
         }
 
         [Fact]

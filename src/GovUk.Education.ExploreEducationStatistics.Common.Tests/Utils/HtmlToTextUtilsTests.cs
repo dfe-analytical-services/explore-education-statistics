@@ -28,6 +28,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
+        public async Task HtmlToText_EmptyString()
+        {
+            Assert.Empty(await HtmlToTextUtils.HtmlToText(""));
+        }
+
+        [Fact]
+        public async Task HtmlToText_WhitespaceStrings()
+        {
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  "));
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  \n  "));
+            Assert.Empty(await HtmlToTextUtils.HtmlToText("  \r\n  "));
+        }
+
+        [Fact]
         public async Task HtmlToText_SingleElement()
         {
             var text = await HtmlToTextUtils.HtmlToText(
@@ -148,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_UnorderedListElements()
+        public async Task HtmlToText_UnorderedList()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -161,7 +175,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_OrderedListElements()
+        public async Task HtmlToText_UnorderedList_HasLineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <ul>
+                    <li>List item 1</li>
+                    <li>List item 2</li>
+                </ul>
+                <p>Paragraph after</p>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_OrderedList()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -174,7 +202,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_UnorderedListElementsWithNestedText()
+        public async Task HtmlToText_OrderedList_HasLineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <ol>
+                    <li>List item 1</li>
+                    <li>List item 2</li>
+                </ol>
+                <p>Paragraph after</p>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_UnorderedList_WithNestedText()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -192,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_UnorderedListElementsWithNestedList()
+        public async Task HtmlToText_UnorderedList_WithNestedList()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -211,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_UnorderedListElementsWithDeeplyNestedList()
+        public async Task HtmlToText_UnorderedList_WithDeeplyNestedList()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -254,7 +296,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_DescriptionListWithMultilineItem()
+        public async Task HtmlToText_DescriptionList_HasLineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <dl>
+                    <dt>Term 1</dt>
+                    <dd>Description 1</dd>
+                    <dt>Term 2</dt>
+                    <dd>Description 2</dd>
+                    <dt>Term 3</dt>
+                    <dd>Description 3</dd>
+                </dl>
+                <p>Paragraph after</p>");
+
+            Snapshot.Match(text);
+        }
+
+
+        [Fact]
+        public async Task HtmlToText_DescriptionList_WithMultilineItem()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -272,8 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     </dd>
                     <dt>Term 3</dt>
                     <dd>Description 3</dd>
-                </dl>
-                <p>Paragraph after</p>");
+                </dl>");
 
             Snapshot.Match(text);
         }
@@ -288,7 +348,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_BlockquoteWithParagraphs()
+        public async Task HtmlToText_Blockquote_HasLineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <blockquote>Test quote</blockquote>
+                <p>Paragraph after</p>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Blockquote_WithParagraphs()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -301,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_BlockquoteWithCaption()
+        public async Task HtmlToText_Blockquote_WithCaption()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -319,7 +390,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_TableElementPadsToLargestCell()
+        public async Task HtmlToText_Blockquote_WithCaptionHasLineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <figure>
+                    <blockquote>
+                        <p>Test paragraph quote 1</p>
+                        <p>Test paragraph quote 2</p>
+                    </blockquote>
+                    <figcaption>
+                        <cite>Test citation</cite>
+                    </figcaption>
+                </figure>
+                <p>Paragraph after</p>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_TableElement_PadsToLargestCell()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"

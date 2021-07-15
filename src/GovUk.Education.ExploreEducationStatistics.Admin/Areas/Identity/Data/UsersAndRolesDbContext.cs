@@ -215,13 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     },
                     new IdentityRoleClaim<string>
                     {
-                        Id = -25,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.CreateAnyMethodology.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
                         Id = -26,
                         RoleId = analystRoleId,
                         ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),

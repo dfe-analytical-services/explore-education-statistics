@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/config")]
         public ActionResult<Dictionary<string, string>> GetConfig()
         {
-            return Ok(BuildConfigurationValues());
+            return new ActionResult<Dictionary<string, string>>(BuildConfigurationValues());
         }
 
         private Dictionary<string, string> BuildConfigurationValues()

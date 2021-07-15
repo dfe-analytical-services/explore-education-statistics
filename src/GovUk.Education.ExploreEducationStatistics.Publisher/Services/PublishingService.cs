@@ -1,7 +1,9 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,14 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseService _releaseService;
         private readonly IZipFileService _zipFileService;
+        private readonly IDataGuidanceFileService _dataGuidanceFileService;
         private readonly ILogger<PublishingService> _logger;
 
-        public PublishingService(string publicStorageConnectionString,
+        public PublishingService(
+            string publicStorageConnectionString,
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
             IReleaseService releaseService,
             IZipFileService zipFileService,
+            IDataGuidanceFileService dataGuidanceFileService,
             ILogger<PublishingService> logger)
         {
             _publicStorageConnectionString = publicStorageConnectionString;
@@ -39,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
             _releaseService = releaseService;
             _zipFileService = zipFileService;
+            _dataGuidanceFileService = dataGuidanceFileService;
             _logger = logger;
         }
 
@@ -51,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 destinationDirectoryPath: string.Empty
             );
 
-            await _releaseService.SetPublishedDatesAsync(releaseId, DateTime.UtcNow);
+            await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
         }
 
         public async Task PublishMethodologyFiles(Guid methodologyId)
@@ -64,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Delete any existing blobs in public storage
             await _publicBlobStorageService.DeleteBlobs(
                 containerName: PublicMethodologyFiles,
-                directoryPath: directoryPath);
+                directoryPath: directoryPath
+            );
 
             // Copy the blobs from private to public storage
             await _privateBlobStorageService.CopyDirectory(
@@ -89,12 +96,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseFiles(Guid releaseId)
         {
-            var release = await _releaseService.GetAsync(releaseId);
-            var files = await _releaseService.GetFiles(releaseId,
+            var release = await _releaseService.Get(releaseId);
+
+            var files = await _releaseService.GetFiles(
+                releaseId,
                 Ancillary,
                 Chart,
                 FileType.Data,
-                Image);
+                Image
+            );
+
+            if (!release.MetaGuidance.IsNullOrWhitespace())
+            {
+                var dataGuidanceFile = await _dataGuidanceFileService.CreateDataGuidanceFile(release.Id);
+
+                files.Add(dataGuidanceFile);
+            }
 
             var destinationDirectoryPath = $"{release.Id}/";
 

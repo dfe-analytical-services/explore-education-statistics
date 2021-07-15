@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetChecklist()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IReleaseDataFileRepository releaseDataFileRepository = null,
+            IMethodologyRepository methodologyRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
@@ -56,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );

@@ -16,7 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 { typeof(IMyPublicationPermissionSetPropertyResolver), 
                     new Mock<IMyPublicationPermissionSetPropertyResolver>().Object },
                 { typeof(IMyReleasePermissionSetPropertyResolver), 
-                    new Mock<IMyReleasePermissionSetPropertyResolver>().Object }
+                    new Mock<IMyReleasePermissionSetPropertyResolver>().Object },
+                { typeof(IMyMethodologyPermissionSetPropertyResolver), 
+                    new Mock<IMyMethodologyPermissionSetPropertyResolver>().Object }
             };
 
             object ServiceLocator(Type serviceType) => serviceLookupByType[serviceType];

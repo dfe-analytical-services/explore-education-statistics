@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public abstract class Versioned
+    public abstract class Versioned<T> where T : Versioned<T>
     {
         public DateTime Created { get; set; }
 
@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid CreatedById { get; set; }
 
-        public Versioned? PreviousVersion { get; set; }
+        public T? PreviousVersion { get; set; }
 
         public Guid? PreviousVersionId { get; set; }
 

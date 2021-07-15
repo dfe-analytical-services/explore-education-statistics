@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var controller = new ConfigurationController(GetConfiguration());
             var result = controller.GetConfig();
-            var unboxed = AssertOkResult(result);
+            var unboxed = result.AssertOkResult();
             Assert.Equal(string.Empty, unboxed["AppInsightsKey"]);
             Assert.Equal("http://localhost:3000", unboxed["PublicAppUrl"]);
         }
@@ -43,15 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .AddJsonFile("appsettings.Development.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();
-        }
-
-        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<ActionResult<T>>(result);
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            var okObjectResult = result.Result as OkObjectResult;
-            Assert.IsAssignableFrom<T>(okObjectResult?.Value);
-            return okObjectResult?.Value as T;
         }
     }
 }
