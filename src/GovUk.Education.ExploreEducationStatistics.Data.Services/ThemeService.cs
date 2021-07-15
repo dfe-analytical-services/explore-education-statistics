@@ -6,8 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -23,13 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ThemeViewModel> ListThemes()
+        public IEnumerable<ThemeViewModel> ListThemesWithLiveSubjects()
         {
             return _contentDbContext.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
-                .Where(IsThemePublished)
+                .ToList()
+                .Where(IsThemePublishedWithLiveSubjects)
                 .Select(BuildThemeViewModel)
                 .OrderBy(theme => theme.Title);
         }
@@ -38,9 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var viewModel = _mapper.Map<ThemeViewModel>(theme);
             viewModel.Topics = theme.Topics
-                .Where(IsTopicPublished)
+                .Where(IsTopicPublishedWithLiveSubjects)
                 .Select(BuildTopicViewModel)
-                .OrderBy(publication => publication.Title);
+                .OrderBy(topic => topic.Title);
             return viewModel;
         }
 
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var viewModel = _mapper.Map<TopicViewModel>(topic);
             viewModel.Publications = topic.Publications
-                .Where(IsPublicationPublished)
+                .Where(IsPublicationPublishedWithLiveSubjects)
                 .Select(BuildPublicationViewModel)
                 .OrderBy(publication => publication.Title);
             return viewModel;
@@ -59,24 +60,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _mapper.Map<TopicPublicationViewModel>(publication);
         }
 
-        private static bool IsThemePublished(Theme theme)
+        private bool IsThemePublishedWithLiveSubjects(Theme theme)
         {
-            return theme.Topics?.Any(IsTopicPublished) ?? false;
+            return theme.Topics?.Any(IsTopicPublishedWithLiveSubjects) ?? false;
         }
 
-        private static bool IsTopicPublished(Topic topic)
+        private bool IsTopicPublishedWithLiveSubjects(Topic topic)
         {
-            return topic.Publications?.Any(IsPublicationPublished) ?? false;
+            return topic.Publications?.Any(IsPublicationPublishedWithLiveSubjects) ?? false;
         }
 
-        private static bool IsPublicationPublished(Publication publication)
+        private bool IsPublicationPublishedWithLiveSubjects(Publication publication)
         {
-            return publication.Releases?.Any(IsReleasePublished) ?? false;
-        }
-
-        private static bool IsReleasePublished(Release release)
-        {
-            return release.Live;
+            var latestLiveRelease = publication.LatestPublishedRelease();
+            return latestLiveRelease != null && _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Any(rf =>
+                    rf.ReleaseId == latestLiveRelease.Id
+                    && rf.File.Type == FileType.Data);
         }
     }
 }

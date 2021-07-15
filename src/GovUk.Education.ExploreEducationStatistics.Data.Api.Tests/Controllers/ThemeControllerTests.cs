@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var themeMetaService = new Mock<IThemeService>();
 
-            themeMetaService.Setup(s => s.ListThemes())
+            themeMetaService.Setup(s => s.ListThemesWithLiveSubjects())
                 .Returns(new List<ThemeViewModel>
                 {
                     new ThemeViewModel()
@@ -25,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public void ListThemes_Ok()
+        public void ListThemesWithLiveSubjects_Ok()
         {
-            var result = _controller.ListThemes();
+            var result = _controller.ListThemesWithLiveSubjects();
 
             Assert.IsAssignableFrom<IEnumerable<ThemeViewModel>>(result.Value);
         }
