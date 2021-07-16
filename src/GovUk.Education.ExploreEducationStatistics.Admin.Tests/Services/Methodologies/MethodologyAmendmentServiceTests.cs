@@ -19,6 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Call the method under test
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyService = new Mock<IMethodologyService>();
+                var methodologyService = new Mock<IMethodologyService>(Strict);
                 var service = BuildService(context, methodologyService: methodologyService.Object);
                 
                 var amendmentIdCapture = new List<Guid>();
@@ -69,6 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .ReturnsAsync(summaryViewModel);
                 
                 var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
+                VerifyAllMocks(methodologyService);
+                
                 var resultingViewModel = result.AssertRight();
                 Assert.Same(summaryViewModel, resultingViewModel);
                 amendmentId = Assert.Single(amendmentIdCapture);
@@ -144,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Call the method under test
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyService = new Mock<IMethodologyService>();
+                var methodologyService = new Mock<IMethodologyService>(Strict);
                 var service = BuildService(context, methodologyService: methodologyService.Object);
                 
                 var amendmentIdCapture = new List<Guid>();
@@ -155,6 +158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .ReturnsAsync(summaryViewModel);
                 
                 var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
+                VerifyAllMocks(methodologyService);
+                
                 var resultingViewModel = result.AssertRight();
                 Assert.Same(summaryViewModel, resultingViewModel);
                 amendmentId = Assert.Single(amendmentIdCapture);
