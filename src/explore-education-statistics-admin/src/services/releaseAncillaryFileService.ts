@@ -3,6 +3,7 @@ import { FileInfo } from '@common/services/types/file';
 import downloadFile from './utils/file/downloadFile';
 
 interface AncillaryFileInfo extends FileInfo {
+  summary: string;
   userName: string;
   created: string;
 }
@@ -10,6 +11,7 @@ interface AncillaryFileInfo extends FileInfo {
 export interface AncillaryFile {
   id: string;
   title: string;
+  summary: string;
   filename: string;
   fileSize: {
     size: number;
@@ -22,19 +24,21 @@ export interface AncillaryFile {
 
 export interface UploadAncillaryFileRequest {
   title: string;
+  summary: string;
   file: File;
 }
 
 export interface AncillaryFileUpdateRequest {
   title: string;
+  summary: string;
 }
 
-function mapFile(file: AncillaryFileInfo): AncillaryFile {
+function mapFile({ name, ...file }: AncillaryFileInfo): AncillaryFile {
   const [size, unit] = file.size.split(' ');
 
   return {
     ...file,
-    title: file.name,
+    title: name,
     filename: file.fileName,
     fileSize: {
       size: parseInt(size, 10),
@@ -61,6 +65,7 @@ const releaseAncillaryFileService = {
     const data = new FormData();
     data.append('file', request.file);
     data.append('title', request.title);
+    data.append('summary', request.summary);
 
     const file = await client.post<AncillaryFileInfo>(
       `/release/${releaseId}/ancillary`,
