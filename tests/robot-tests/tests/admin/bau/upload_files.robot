@@ -52,8 +52,8 @@ Upload a ZIP file subject
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
 
 Change subject title
-    [Tags]  HappyPath
-    user waits until page contains accordion section     Absence in PRUs
+    [Tags]    HappyPath
+    user waits until page contains accordion section    Absence in PRUs
     user clicks link    Edit title
 
     user waits until h2 is visible    Edit data file details
@@ -63,7 +63,7 @@ Change subject title
     user clicks button    Save changes
 
 Validate subject title has been updated
-    [Tags]  HappyPath
+    [Tags]    HappyPath
     user waits until h2 is visible    Uploaded data files
     user waits until page contains accordion section    Updated Absence in PRUs
     user opens accordion section    Absence in PRUs
@@ -131,61 +131,61 @@ Upload multiple ancillary files
 
 Validate ancillary files on release page
     [Tags]    HappyPath
-    user clicks link  Content
-    user waits until h2 is visible  ${PUBLICATION_NAME}
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
 
-    user waits until h3 is visible  Other files
+    user waits until h3 is visible    Other files
 
-    user opens details dropdown  List of other files
-    ${other_files}=   user gets details content element  List of other files
-    ${other_files_1}=  get child element  ${other_files}  css:li:nth-child(1)
+    user opens details dropdown    List of other files
+    ${other_files}=    user gets details content element    List of other files
+    ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
-    user checks element contains button  ${other_files_1}  Test 1
+    user checks element contains button    ${other_files_1}    Test 1
 
-    user opens details dropdown  More details  ${other_files_1}
-    ${other_files_1_details}  user gets details content element   More details  ${other_files_1}
-    user checks element should contain  ${other_files_1_details}  Test 1 summary
+    user opens details dropdown    More details    ${other_files_1}
+    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
+    user checks element should contain    ${other_files_1_details}    Test 1 summary
 
 Navigate back to 'Ancillary file uploads' tab
     [Tags]    HappyPath
-    user clicks link  Data and files
+    user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
     user clicks link    Ancillary file uploads
     user waits until h2 is visible    Add file to release
 
 Change ancillary file details
-    [Tags]  HappyPath
+    [Tags]    HappyPath
     user waits until page contains accordion section    Test 2
-    user opens accordion section    Test 2   id:file-uploads
+    user opens accordion section    Test 2    id:file-uploads
 
-    ${section}=    user gets accordion section content element    Test 2  id:file-uploads
-    user clicks link  Edit file  ${section}
+    ${section}=    user gets accordion section content element    Test 2    id:file-uploads
+    user clicks link    Edit file    ${section}
 
-    user waits until h2 is visible  Edit ancillary file details
-    user enters text into element  label:Title  Test 2 updated
-    user enters text into element  label:Summary  Test 2 summary updated
+    user waits until h2 is visible    Edit ancillary file details
+    user enters text into element    label:Title    Test 2 updated
+    user enters text into element    label:Summary    Test 2 summary updated
 
-    user clicks button  Save changes
+    user clicks button    Save changes
 
 Validate ancillary file details were changed
-    [Tags]  HappyPath
+    [Tags]    HappyPath
     user waits until h2 is visible    Add file to release
     user waits until h2 is visible    Uploaded files
 
     user waits until page contains accordion section    Test 2 updated
-    user opens accordion section    Test 2 updated   id:file-uploads
+    user opens accordion section    Test 2 updated    id:file-uploads
 
-    ${section}=    user gets accordion section content element    Test 2 updated  id:file-uploads
+    ${section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
     user checks summary list contains    Title    Test 2 updated    ${section}
     user checks summary list contains    Summary    Test 2 summary updated    ${section}
 
 Delete ancillary file
     [Tags]    HappyPath
-    ${file_2_section}=    user gets accordion section content element    Test 2 updated   id:file-uploads
+    ${file_2_section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
     user clicks button    Delete file    ${file_2_section}
     user waits until h1 is visible    Confirm deletion of file
     user clicks button    Confirm

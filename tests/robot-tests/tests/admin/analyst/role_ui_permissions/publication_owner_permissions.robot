@@ -17,7 +17,7 @@ Import permissions test variables
 
 Navigate to Publication where analyst has Publication Owner role
     [Tags]    HappyPath
-    user navigates to publication on admin dashboard  ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check can create a Methodology for the owned Publication
     [Tags]    HappyPath
@@ -26,12 +26,12 @@ Check can create a Methodology for the owned Publication
 Check cannot edit content for published release
     [Tags]    HappyPath
     user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}
-        ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
-    user cannot see edit controls for release content  ${PUBLICATION_NAME}
+    ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
+    user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
 Navigate back to admin dashboard for publication
     [Tags]    HappyPath
-    user navigates to publication on admin dashboard  ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check can create an amendment of a published release
     [Tags]    HappyPath
