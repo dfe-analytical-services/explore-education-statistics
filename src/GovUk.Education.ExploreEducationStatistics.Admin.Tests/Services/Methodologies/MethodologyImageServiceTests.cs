@@ -99,13 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
-                {
-                    imageFile1.File.Id,
-                    imageFile2.File.Id
-                });
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, 
+                    AsList(imageFile1.File.Id, imageFile2.File.Id));
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateMethodologyFiles, imageFile1.Path()), Times.Once);
@@ -184,13 +181,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
-                {
-                    imageFile1.File.Id,
-                    imageFile2.File.Id
-                });
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, 
+                    AsList(imageFile1.File.Id, imageFile2.File.Id));
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateMethodologyFiles, imageFile1.Path()), Times.Once);
@@ -203,21 +197,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(await contentDbContext.Files.FindAsync(imageFile1.File.Id));
                 Assert.Null(await contentDbContext.MethodologyFiles.FindAsync(imageFile2.Id));
                 
-                // However, the file that is still lined to anotherMethodology remains in the File table, as does
+                // However, the file that is still linked to anotherMethodology remains in the File table, as does
                 // its link to anotherMethodology.
                 Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile2UsedByAnotherMethodology.Id));
                 
-                var fileIdForFileLinkedToDeletingMethodology = 
+                var filesForFileLinkedToDeletingMethodology = 
                     await contentDbContext.Files.FindAsync(imageFile2.File.Id);
                 
-                var fileIdForFileLinkedToAnotherMethodology = 
+                var filesForFileLinkedToAnotherMethodology = 
                     await contentDbContext.Files.FindAsync(imageFile2UsedByAnotherMethodology.File.Id);
                 
-                Assert.NotNull(fileIdForFileLinkedToAnotherMethodology);
+                Assert.NotNull(filesForFileLinkedToAnotherMethodology);
                 
                 // Sanity check that the File entry that remains is the same File as was referenced by the
                 // MethodologyFile link that was deleted.
-                Assert.Equal(fileIdForFileLinkedToDeletingMethodology, fileIdForFileLinkedToAnotherMethodology);
+                Assert.Equal(filesForFileLinkedToDeletingMethodology, filesForFileLinkedToAnotherMethodology);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
@@ -266,14 +260,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
-                {
-                    ancillaryFile.File.Id,
-                    imageFile.File.Id,
-                });
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, 
+                    AsList(ancillaryFile.File.Id, imageFile.File.Id));
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, FileTypeInvalid);
+                var actionResult = result.AssertLeft();
+                ValidationTestUtil.AssertValidationProblem(actionResult, FileTypeInvalid);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -321,10 +312,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.UnlinkAndDeleteIfOrphaned(Guid.NewGuid(), new List<Guid>
-                {
-                    imageFile.File.Id
-                });
+                var result = await service.UnlinkAndDeleteIfOrphaned(Guid.NewGuid(), 
+                    AsList(imageFile.File.Id));
 
                 result.AssertNotFound();
             }
@@ -371,12 +360,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
-                {
-                    imageFile.File.Id,
-                    // Include an unknown id
-                    Guid.NewGuid()
-                });
+                var result = await service.UnlinkAndDeleteIfOrphaned(methodology.Id, 
+                    AsList(imageFile.File.Id, Guid.NewGuid()));
 
                 result.AssertNotFound();
             }
@@ -442,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var result = await service.Stream(methodology.Id, methodologyFile.File.Id);
 
-                Assert.True(result.IsRight);
+                var image = result.AssertRight();
 
                 blobStorageService.Verify(
                     mock => mock.GetBlob(PrivateMethodologyFiles, methodologyFile.Path()),
@@ -452,9 +437,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock => mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
                         It.IsAny<MemoryStream>()), Times.Once());
 
-                Assert.Equal("image/png", result.Right.ContentType);
-                Assert.Equal("image.png", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("image/png", image.ContentType);
+                Assert.Equal("image.png", image.FileDownloadName);
+                Assert.IsType<MemoryStream>(image.FileStream);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
@@ -576,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var result = await service.Upload(methodology.Id, formFile);
 
-                Assert.True(result.IsRight);
+                var upload = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Image), Times.Once);
@@ -595,8 +580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                                 path.Contains(FilesPath(methodology.Id, Image)))),
                     Times.Once);
 
-                Assert.True(result.Right.ContainsKey("default"));
-                Assert.Contains($"/api/methodologies/{methodology.Id}/images/", result.Right["default"]);
+                Assert.True(upload.ContainsKey("default"));
+                Assert.Contains($"/api/methodologies/{methodology.Id}/images/", upload["default"]);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
