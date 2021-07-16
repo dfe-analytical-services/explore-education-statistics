@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -68,9 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
+                .CheckEntityExists<Methodology>(id, HydrateMethodologyForMethodologySummaryViewModel)
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccess(methodology =>
                 {
                     var publicationLinks = methodology.MethodologyParent.Publications;
@@ -90,10 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id, 
+                    HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
-                .OnSuccess(HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
                 .OnSuccess(async methodology =>
                 {
@@ -255,16 +255,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return Unit.Instance;
         }
         
-        private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForManageMethodologySummaryViewModel(
-            Methodology methodology)
+        private static IIncludableQueryable<Methodology, Publication> HydrateMethodologyForMethodologySummaryViewModel(IQueryable<Methodology> queryable)
         {
-            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
-            await _context
-                .Entry(methodology)
-                .Reference(m => m.MethodologyParent)
-                .LoadAsync();
+            return queryable
+                .Include(methodology => methodology.MethodologyParent)
+                .ThenInclude(mp => mp.Publications)
+                .ThenInclude(pm => pm.Publication);
+        }
 
-            return methodology;
+        private static IQueryable<Methodology> HydrateMethodologyForManageMethodologySummaryViewModel(
+            IQueryable<Methodology> queryable)
+        {
+            return queryable.Include(methodology => methodology.MethodologyParent);
         }
     }
 }

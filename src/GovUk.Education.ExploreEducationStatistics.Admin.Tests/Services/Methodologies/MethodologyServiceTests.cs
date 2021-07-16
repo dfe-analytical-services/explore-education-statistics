@@ -162,9 +162,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
-                Title = "Test publication"
+                Title = "Test publication",
             };
-
+            
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
@@ -172,7 +172,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AlternativeTitle = "Pupil absence statistics: methodology",
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "methodology-slug"
+                    Slug = "methodology-slug",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = publication
+                    })
                 }
             };
 
@@ -213,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -251,7 +256,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Slug = "pupil-absence-statistics-methodology"
+                    Slug = "pupil-absence-statistics-methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Title = "Publication title"
+                        }
+                    })
                 }
             };
 
@@ -358,7 +371,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Title = "Publication title"
+                        }
+                    })
                 }
             };
 
@@ -474,7 +495,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Title = "Publication title"
+                        }
+                    })
                 }
             };
 
@@ -563,7 +592,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Title = "Publication title"
+                        }
+                    })
                 }
             };
 
@@ -654,7 +691,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology"
+                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Title = "Publication title"
+                        }
+                    })
                 }
             };
 
