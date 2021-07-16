@@ -76,6 +76,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
+        public async Task<bool> IsPublicationPublished(Guid publicationId)
+        {
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == publicationId);
+
+            return publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
+        }
+
         public async Task SetPublishedDate(Guid id, DateTime published)
         {
             var publication = await Get(id);

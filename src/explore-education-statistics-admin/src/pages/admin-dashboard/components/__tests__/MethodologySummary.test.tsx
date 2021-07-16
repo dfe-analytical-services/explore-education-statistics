@@ -431,6 +431,7 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
+            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -447,6 +448,7 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodology}
             topicId={testTopicId}
+            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -463,6 +465,7 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
+            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -506,6 +509,7 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
+            allowAmendments
             onChangePublication={noop}
           />
         </Router>,

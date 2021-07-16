@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
+                        publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         zipFileService: provider.GetRequiredService<IZipFileService>(),
                         dataGuidanceFileService: provider.GetRequiredService<IDataGuidanceFileService>(),

@@ -352,6 +352,103 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
+        public async Task IsPublicationPublished_TrueWhenPublicationHasPublishedReleases()
+        {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                Published = DateTime.UtcNow,
+                Version = 1
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = previousRelease.Id,
+                Published = DateTime.UtcNow,
+                Version = 1
+            };
+
+            var latestDraftRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = latestPublishedRelease.Id,
+                Published = null,
+                Version = 2
+            };
+
+            var publication = new Publication
+            {
+                Releases = AsList(previousRelease, latestPublishedRelease, latestDraftRelease)
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(contentDbContext);
+
+                Assert.True(await service.IsPublicationPublished(publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsPublicationPublished_FalseWhenPublicationHasNoReleases()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(contentDbContext);
+
+                Assert.False(await service.IsPublicationPublished(publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsPublicationPublished_FalseWhenPublicationHasNoPublishedReleases()
+        {
+            var publication = new Publication
+            {
+                Releases = AsList(
+                    new Release
+                {
+                    Published = null
+                })
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(contentDbContext);
+
+                Assert.False(await service.IsPublicationPublished(publication.Id));
+            }
+        }
+
+        [Fact]
         public async Task SetPublishedDate_AddsStatsPublication()
         {
             var publication = new Publication
