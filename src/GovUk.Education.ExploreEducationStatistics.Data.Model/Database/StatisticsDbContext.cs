@@ -121,6 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(location => location.ParliamentaryConstituency_Code);
 
             modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Provider_Code);
+
+            modelBuilder.Entity<Location>()
                 .HasIndex(location => location.PlanningArea_Code);
 
             modelBuilder.Entity<Location>()
@@ -128,6 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<Location>()
                 .HasIndex(location => location.RscRegion_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.School_Code);
 
             modelBuilder.Entity<Location>()
                 .HasIndex(location => location.Sponsor_Code);
