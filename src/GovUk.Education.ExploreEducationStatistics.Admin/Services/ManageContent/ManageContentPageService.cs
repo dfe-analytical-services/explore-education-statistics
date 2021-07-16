@@ -117,6 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     cb.Comments = await _contentDbContext.Comment
                         .Where(c => c.ContentBlockId == cb.Id)
                         .Include(c => c.CreatedBy)
+                        .Include(c => c.ResolvedBy)
                         .ToListAsync();
                 });
             });

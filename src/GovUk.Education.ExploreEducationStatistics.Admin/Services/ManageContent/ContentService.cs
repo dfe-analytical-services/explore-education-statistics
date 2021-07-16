@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -364,7 +363,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private Task<Either<ActionResult, CommentViewModel>> GetCommentAsync(Guid commentId)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId, queryable =>
-                    queryable.Include(comment => comment.CreatedBy))
+                    queryable
+                        .Include(comment => comment.CreatedBy)
+                        .Include(comment => comment.ResolvedBy))
                 .OnSuccess(comment => _mapper.Map<CommentViewModel>(comment));
         }
 
@@ -423,6 +424,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             );
         }
 
+        public Task<Either<ActionResult, CommentViewModel>> ResolveComment(Guid commentId, bool resolve)
+        {
+            return _persistenceHelper.CheckEntityExists<Comment>(commentId)
+                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccess(async comment =>
+                {
+                    _context.Comment.Update(comment);
+                    comment.Resolved = resolve ? DateTime.UtcNow : (DateTime?)null;
+                    comment.ResolvedById = resolve ? _userService.GetUserId() : (Guid?)null;
+                    await _context.SaveChangesAsync();
+                    return await GetCommentAsync(comment.Id);
+                });
+        }
+
         public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId,
             CommentSaveRequest saveRequest)
         {
@@ -434,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         comment.Content = saveRequest.Content;
                         comment.Updated = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
-                        return await GetCommentAsync(commentId);
+                        return await GetCommentAsync(comment.Id);
                     }
                 );
         }
@@ -598,12 +613,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> releases)
         {
             return releases
-                    .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.CreatedBy)
-                ;
+                .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
+                .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.ResolvedBy);
         }
 
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(

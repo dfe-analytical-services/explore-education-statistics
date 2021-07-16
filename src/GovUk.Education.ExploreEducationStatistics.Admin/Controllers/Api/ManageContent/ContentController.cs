@@ -156,8 +156,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPut("comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, CommentSaveRequest saveRequest)
+        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, 
+            CommentSaveRequest saveRequest,
+            [FromQuery(Name = "resolved")] bool? resolved = null)
         {
+            if (resolved.HasValue)
+            {
+                return await _contentService
+                    .ResolveComment(commentId, resolved.Value)
+                    .HandleFailuresOrOk();
+            }
+
             return await _contentService
                 .UpdateCommentAsync(commentId, saveRequest)
                 .HandleFailuresOrOk();

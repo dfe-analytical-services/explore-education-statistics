@@ -59,6 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest);
 
+        Task<Either<ActionResult, CommentViewModel>> ResolveComment(Guid commentId, bool resolve);
+
         Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId, 
             CommentSaveRequest saveRequest);
 
