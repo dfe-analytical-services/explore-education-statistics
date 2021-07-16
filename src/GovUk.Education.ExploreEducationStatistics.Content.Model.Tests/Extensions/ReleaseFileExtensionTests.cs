@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -9,19 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 {
     public class ReleaseFileExtensionTests
     {
-        private readonly ReleaseFile _releaseFile = new ReleaseFile
-        {
-            Release = new Release(),
-            Name = "Test ancillary file",
-            File = new File
-            {
-                Id = Guid.NewGuid(),
-                RootPath = Guid.NewGuid(),
-                Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
-        };
-
         [Fact]
         public void BatchesPath()
         {
@@ -38,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             Assert.Equal(releaseFile.File.BatchesPath(), releaseFile.BatchesPath());
         }
-        
+
         [Fact]
         public void Path()
         {
@@ -55,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             Assert.Equal(releaseFile.File.Path(), releaseFile.Path());
         }
-        
+
         [Fact]
         public void PublicPath()
         {
@@ -82,7 +70,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void ToFileInfo()
         {
-            var result = _releaseFile.ToFileInfo(new BlobInfo
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test ancillary file",
+                Summary = "Test summary",
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary,
+                    Created = new DateTime(),
+                    CreatedBy = new User
+                    {
+                        Email = "test@test.com"
+                    }
+                }
+            };
+
+            var info = releaseFile.ToFileInfo(new BlobInfo
             (
                 path: "Ignored",
                 size: "400 B",
@@ -91,12 +98,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 meta: new Dictionary<string, string>()
             ));
 
-            Assert.Equal(_releaseFile.FileId, result.Id);
-            Assert.Equal("pdf", result.Extension);
-            Assert.Equal("ancillary.pdf", result.FileName);
-            Assert.Equal("Test ancillary file", result.Name);
-            Assert.Equal("400 B", result.Size);
-            Assert.Equal(Ancillary, result.Type);
+            Assert.Equal(releaseFile.FileId, info.Id);
+            Assert.Equal("pdf", info.Extension);
+            Assert.Equal("ancillary.pdf", info.FileName);
+            Assert.Equal("Test ancillary file", info.Name);
+            Assert.Equal("Test summary", info.Summary);
+            Assert.Equal("400 B", info.Size);
+            Assert.Equal(Ancillary, info.Type);
+            Assert.Equal(releaseFile.File.Created, info.Created);
+            Assert.Equal("test@test.com", info.UserName);
+        }
+
+        [Fact]
+        public void ToFileInfo_NoCreatedBy()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test ancillary file",
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary,
+                }
+            };
+
+            var info = releaseFile.ToFileInfo(new BlobInfo
+            (
+                path: "Ignored",
+                size: "400 B",
+                contentType: "Ignored",
+                contentLength: -1L,
+                meta: new Dictionary<string, string>()
+            ));
+
+            Assert.Null(info.Created);
+            Assert.Null(info.UserName);
         }
     }
 }

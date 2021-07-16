@@ -100,7 +100,7 @@ const ReleaseFileUploadsSection = ({
       const newFile = await releaseAncillaryFileService.uploadAncillaryFile(
         releaseId,
         {
-          name: values.name.trim(),
+          title: values.name.trim(),
           file: values.file as File,
         },
       );

@@ -1,5 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
@@ -20,15 +20,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return releaseFile.File.PublicPath(releaseFile.Release);
         }
 
-        public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
+        public static FileInfo ToPublicFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             return new FileInfo
             {
                 Id = releaseFile.FileId,
                 FileName = releaseFile.File.Filename,
                 Name = releaseFile.Name ?? releaseFile.File.Filename,
+                Summary = releaseFile.Summary,
                 Size = blobInfo.Size,
-                Type = releaseFile.File.Type
+                Type = releaseFile.File.Type,
+            };
+        }
+
+        public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
+        {
+            var info = releaseFile.ToPublicFileInfo(blobInfo);
+
+            info.Created = releaseFile.File.Created;
+            info.UserName = releaseFile.File.CreatedBy?.Email;
+
+            return info;
+        }
+
+        // TODO: Remove after completion of EES-2343
+        public static FileInfo ToFileInfoNotFound(this ReleaseFile releaseFile)
+        {
+            return new FileInfo
+            {
+                Id = releaseFile.FileId,
+                FileName = releaseFile.File.Filename,
+                Name = releaseFile.Name ?? releaseFile.File.Filename,
+                Summary = releaseFile.Summary,
+                Size = FileInfo.UnknownSize,
+                Type = releaseFile.File.Type,
+                UserName = releaseFile.File.CreatedBy?.Email,
+                Created = releaseFile.File.Created
             };
         }
     }

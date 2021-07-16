@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -60,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 Id = file.Id,
                 FileName = file.Filename,
-                Name = "Unknown",
-                Size = "0.00 B",
+                Name = FileInfo.UnknownName,
+                Size = FileInfo.UnknownSize,
                 Type = file.Type
             };
         }

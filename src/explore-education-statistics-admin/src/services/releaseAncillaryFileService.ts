@@ -21,8 +21,12 @@ export interface AncillaryFile {
 }
 
 export interface UploadAncillaryFileRequest {
-  name: string;
+  title: string;
   file: File;
+}
+
+export interface AncillaryFileUpdateRequest {
+  title: string;
 }
 
 function mapFile(file: AncillaryFileInfo): AncillaryFile {
@@ -56,15 +60,11 @@ const releaseAncillaryFileService = {
   ): Promise<AncillaryFile> {
     const data = new FormData();
     data.append('file', request.file);
+    data.append('title', request.title);
 
     const file = await client.post<AncillaryFileInfo>(
       `/release/${releaseId}/ancillary`,
       data,
-      {
-        params: {
-          name: request.name,
-        },
-      },
     );
 
     return mapFile(file);
@@ -79,16 +79,12 @@ const releaseAncillaryFileService = {
       })
       .then(response => downloadFile(response, fileName));
   },
-  renameFile(releaseId: string, fileId: string, name: string): Promise<void> {
-    return client.post(
-      `/release/${releaseId}/file/${fileId}/rename`,
-      {},
-      {
-        params: {
-          name,
-        },
-      },
-    );
+  updateFile(
+    releaseId: string,
+    fileId: string,
+    data: AncillaryFileUpdateRequest,
+  ): Promise<void> {
+    return client.patch(`/release/${releaseId}/file/${fileId}`, data);
   },
 };
 

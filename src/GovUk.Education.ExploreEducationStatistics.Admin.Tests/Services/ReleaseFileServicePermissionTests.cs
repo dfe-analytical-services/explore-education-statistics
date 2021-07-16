@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -28,6 +29,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
+        public async Task GetFile()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseFileService(userService: userService.Object);
+                        return service.GetFile(_release.Id, Guid.NewGuid());
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task Update()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseFileService(userService: userService.Object);
+                        return service.Update(
+                            _release.Id,
+                            Guid.NewGuid(),
+                            new ReleaseFileUpdateViewModel
+                            {
+                                Title = "Test title"
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -36,8 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Delete(_release.Id,
-                            Guid.NewGuid());
+                        return service.Delete(_release.Id,Guid.NewGuid());
                     }
                 );
         }
@@ -132,9 +167,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.UploadAncillary(releaseId: _release.Id,
-                            formFile: new Mock<IFormFile>().Object,
-                            name: "");
+                        return service.UploadAncillary(
+                            releaseId: _release.Id,
+                            upload: new ReleaseAncillaryFileUploadViewModel
+                            {
+                                File = Mock.Of<IFormFile>(),
+                                Title = "Title",
+                                Summary = "Summary",
+                            }
+                        );
                     }
                 );
         }
