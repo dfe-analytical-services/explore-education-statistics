@@ -21,4 +21,3 @@ This tool consists of 3 areas.
 * Start the tool: `npm run start`
 * clean test data, node_modules etc.: `npm run clean`
 * generate new `.env` types: `npm run gen-env`
-* If you're running this tool on windows use [git-bash](https://gitforwindows.org/)

@@ -22,39 +22,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, TOPIC_ID, JWT_TOKEN } = process.env;
 const cwd = projectRoot;
 
-type finalReleaseData = {
-  id: string;
-  title: string;
-  slug: string;
-  publicationId: string;
-  publicationTitle: string;
-  publicationSlug: string;
-  releaseName: string;
-  yearTitle: string;
-  typeId: string;
-  live: string;
-  timePeriodCoverage: {
-    value: string;
-    label: string;
-  };
-  latestRelease: string;
-  type: {
-    id: string;
-    title: string;
-  };
-  contact: {
-    id: string;
-    teamName: string;
-    teamEmail: string;
-    contactName: string;
-    contactTelNo: string;
-  };
-  status: string;
-  amendment: string;
-  latestInternalReleaseNote: string;
-  publishMethod: string;
-};
-
 const createPublication = async () => {
   console.time('CreatePublication');
   try {
@@ -156,10 +123,11 @@ const renameFiles = async () => {
 };
 
 const addSubject = async (releaseId: string): Promise<string | null> => {
-  const testingGlob = await globby(`${cwd}/zip-files/clean-test-zip-*.zip`);
-  console.log('testingGlob', testingGlob);
+  const finalZipFileGlob = await globby(
+    `${cwd}/zip-files/clean-test-zip-*.zip`,
+  );
 
-  const oldPath = testingGlob[0];
+  const oldPath = finalZipFileGlob[0];
 
   const newPath = path.resolve(oldPath, '..', path.basename(oldPath));
   fs.renameSync(oldPath, newPath);
@@ -275,6 +243,7 @@ const getFinalReleaseDetails = async (releaseId: string) => {
       },
     });
     const releaseData: ReleaseData = res.data;
+
     await Sleep(1000);
 
     const obj = {
@@ -292,6 +261,7 @@ const getFinalReleaseDetails = async (releaseId: string) => {
         value: releaseData.timePeriodCoverage.value,
         label: releaseData.timePeriodCoverage.label,
       },
+      preReleaseAccessList: '',
       latestRelease: 'false',
       type: {
         id: releaseData.type.id,
@@ -304,7 +274,7 @@ const getFinalReleaseDetails = async (releaseId: string) => {
         contactName: releaseData.contact.contactName,
         contactTelNo: releaseData.contact.contactTelNo,
       },
-      status: 'Approved',
+      approvalstatus: 'Approved',
       amendment: 'false',
       latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
@@ -315,12 +285,11 @@ const getFinalReleaseDetails = async (releaseId: string) => {
   }
 };
 
-// doesn't publish the release here for some reason
-const publishRelease = async (obj: finalReleaseData, releaseId: string) => {
+const publishRelease = async (obj: ReleaseData, releaseId: string) => {
   try {
     await axios({
-      method: 'PUT',
-      url: `${ADMIN_URL}/api/releases/${releaseId}`,
+      method: 'POST',
+      url: `${ADMIN_URL}/api/releases/${releaseId}/status`,
       headers: {
         Authorization: `Bearer ${JWT_TOKEN}`,
         'Content-Type': 'application/json',
@@ -339,13 +308,32 @@ const getPublicationProgress = async (releaseId: string) => {
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
       method: 'GET',
-      url: `${ADMIN_URL}/api/releases/${releaseId}/status`,
+      url: `${ADMIN_URL}/api/releases/${releaseId}/stage-status`,
       headers: {
         Authorization: `Bearer ${JWT_TOKEN}`,
         'content-Type': 'application/json',
       },
     });
-    return res.data?.overallStage;
+    // eslint-disable-next-line no-constant-condition
+    while (res.data.overallStage !== 'Complete') {
+      console.log(
+        chalk.blue('overall stage'),
+        chalk.green(res.data.overallStage),
+      );
+      console.log(chalk.blue('data stage'), chalk.green(res.data.dataStage));
+      console.log(
+        chalk.blue('content stage'),
+        chalk.green(res.data.contentStage),
+      );
+      console.log(chalk.blue('files stage'), chalk.green(res.data.filesStage));
+      console.log(
+        chalk.blue('publishing stage'),
+        chalk.green(res.data.publishingStage),
+      );
+      await Sleep(3000);
+      await getPublicationProgress(releaseId);
+    }
+    return res.data;
   } catch (e) {
     console.error(e);
   }
@@ -415,7 +403,7 @@ const createReleaseAndPublish = async () => {
   }
 
   while (importStatus !== 'COMPLETE') {
-    console.log(chalk.blue('importStatus', importStatus));
+    console.log(chalk.blue('importStatus', chalk.green(importStatus)));
     // eslint-disable-next-line no-await-in-loop
     await Sleep(1000);
 
@@ -424,48 +412,22 @@ const createReleaseAndPublish = async () => {
   }
   console.timeEnd('import subject upload');
 
-  try {
-    type publicationStages = 'notStarted' | 'Started' | 'Complete' | '';
-    let publicationStatus: publicationStages = '';
-    const subjectArray = await getSubjectIdArr(releaseId);
-    if (!subjectArray) {
-      throw new Error(
-        chalk.red(
-          'No subjectArray object returned from `getSubjectArr` function! Exiting test with failures',
-        ),
-      );
-    }
-    await addMetaGuidance(subjectArray, releaseId);
-    const finalReleaseObject = await getFinalReleaseDetails(releaseId);
-    if (!finalReleaseObject) {
-      throw new Error(
-        chalk.red(
-          "didn't get final release details object needed to publish release from `getFinalReleaseDetails` function! Exiting test with errors",
-        ),
-      );
-    }
-    await publishRelease(finalReleaseObject, releaseId);
-    console.time('publication elapsed time');
-    console.log(
-      chalk.green(
-        `Started publication of release: $${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`,
-      ),
-    );
+  const subjectArray = await getSubjectIdArr(releaseId);
 
-    publicationStatus = await getPublicationProgress(releaseId);
-    if (!publicationStatus) {
-      console.log(
-        'No publicationStatus just yet, waiting 4 seconds before polling again',
-      );
-      await Sleep(4000);
-    }
-    while (publicationStatus !== 'Complete') {
-      console.log('PublicationStatus:', publicationStatus);
-      await Sleep(3000);
-      await getPublicationProgress(releaseId);
-    }
-  } catch (e) {
-    errorHandler(e);
-  }
+  await addMetaGuidance(
+    subjectArray as { id: string; content: string }[],
+    releaseId,
+  );
+  const finalReleaseObject = await getFinalReleaseDetails(releaseId);
+
+  await publishRelease(finalReleaseObject as never, releaseId);
+  console.time('publication elapsed time');
+  console.log(
+    chalk.green(
+      `Started publication of release: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`,
+    ),
+  );
+
+  await getPublicationProgress(releaseId);
 };
 export default createReleaseAndPublish;

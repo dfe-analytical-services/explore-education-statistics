@@ -1,5 +1,4 @@
 export interface ReleaseData {
-  sub: () => void;
   id: string;
   title: string;
   slug: string;
