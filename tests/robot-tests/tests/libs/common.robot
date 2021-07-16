@@ -30,7 +30,7 @@ do this on failure
 custom testid locator strategy
     [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
     ${elements}=    get webelements    css:[data-testid="${test_id}"]
-    [Return]  ${elements}
+    [Return]    ${elements}
 
 custom label locator strategy
     [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
@@ -46,8 +46,8 @@ custom label locator strategy
     [Return]    ${elements}
 
 set custom locator strategies
-    add location strategy   testid    custom testid locator strategy
-    add location strategy   label     custom label locator strategy
+    add location strategy    testid    custom testid locator strategy
+    add location strategy    label    custom label locator strategy
 
 user opens the browser
     set custom locator strategies
