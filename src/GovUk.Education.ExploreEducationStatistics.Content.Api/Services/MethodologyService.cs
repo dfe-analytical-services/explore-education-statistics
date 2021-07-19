@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -22,16 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
         private readonly IMethodologyRepository _methodologyRepository;
 
         public MethodologyService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
+            ICacheService cacheService,
             IMethodologyRepository methodologyRepository)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
+            _cacheService = cacheService;
             _methodologyRepository = methodologyRepository;
         }
 
@@ -64,37 +68,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
-            var themes = await _contentDbContext.Themes
-                .Include(theme => theme.Topics)
-                .ThenInclude(topic => topic.Publications)
-                .AsNoTracking()
-                .Select(theme => new AllMethodologiesThemeViewModel
-                {
-                    Id = theme.Id,
-                    Title = theme.Title,
-                    Topics = theme.Topics.Select(topic => new AllMethodologiesTopicViewModel
+            return await _cacheService.GetCachedEntity(new AllMethodologiesCacheKey(), async () =>
+            {
+                var themes = await _contentDbContext.Themes
+                    .Include(theme => theme.Topics)
+                    .ThenInclude(topic => topic.Publications)
+                    .AsNoTracking()
+                    .Select(theme => new AllMethodologiesThemeViewModel
                     {
-                        Id = topic.Id,
-                        Title = topic.Title,
-                        Publications = topic.Publications.Select(publication => new AllMethodologiesPublicationViewModel
+                        Id = theme.Id,
+                        Title = theme.Title,
+                        Topics = theme.Topics.Select(topic => new AllMethodologiesTopicViewModel
                         {
-                            Id = publication.Id,
-                            Title = publication.Title
+                            Id = topic.Id,
+                            Title = topic.Title,
+                            Publications = topic.Publications.Select(publication =>
+                                new AllMethodologiesPublicationViewModel
+                                {
+                                    Id = publication.Id,
+                                    Title = publication.Title
+                                }).ToList()
                         }).ToList()
-                    }).ToList()
-                })
-                .ToListAsync();
+                    })
+                    .ToListAsync();
 
-            await themes.SelectMany(model => model.Topics)
-                .SelectMany(model => model.Publications)
-                .ForEachAsync(async publication =>
-                    publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
+                await themes.SelectMany(model => model.Topics)
+                    .SelectMany(model => model.Publications)
+                    .ForEachAsync(async publication =>
+                        publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
 
-            themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());
+                themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());
 
-            return themes.Where(theme => theme.Topics.Any())
-                .OrderBy(theme => theme.Title)
-                .ToList();
+                return themes.Where(theme => theme.Topics.Any())
+                    .OrderBy(theme => theme.Title)
+                    .ToList();
+            });
         }
 
         private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
