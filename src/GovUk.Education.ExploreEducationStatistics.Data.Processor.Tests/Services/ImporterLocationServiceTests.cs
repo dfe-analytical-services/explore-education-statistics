@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result1 = service.Find(statisticsDbContext, location.Country,
+                var result1 = service.FindOrCreate(statisticsDbContext, location.Country,
                     localAuthority: location.LocalAuthority);
                 Assert.NotNull(result1);
                 Assert.Equal("Bedford", result1.LocalAuthority_Name);
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result1 = service.Find(statisticsDbContext, country,
+                var result1 = service.FindOrCreate(statisticsDbContext, country,
                     englishDevolvedArea: lowerCase);
                 Assert.NotNull(result1);
                 Assert.Equal("casesensitive", result1.EnglishDevolvedArea_Name);
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result2 = service.Find(statisticsDbContext, country,
+                var result2 = service.FindOrCreate(statisticsDbContext, country,
                     englishDevolvedArea: upperCase);
                 Assert.NotNull(result2);
 

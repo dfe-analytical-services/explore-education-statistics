@@ -24,7 +24,6 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -406,7 +405,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return GetEnumValues<GeographicLevel>()
-                .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
                 .ToDictionary(geographicLevel => geographicLevel.ToString(),
                     geographicLevel =>
                         ValidateLocationLevelForReplacement(dataBlock.Query.Locations,

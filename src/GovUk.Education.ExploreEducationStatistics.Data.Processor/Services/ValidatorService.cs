@@ -8,6 +8,7 @@ using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -243,15 +245,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ExecutionContext executionContext,
                 Guid importId)
         {
-            var idx = 0;
-            var filteredRows = 0;
+            var colValues = CsvUtil.GetColumnValues(cols);
             var totalRowCount = 0;
+            var filteredObservationCount = 0;
             var errors = new List<DataImportError>();
             var dataRows = rows.Count;
+            var geographicLevels = new HashSet<GeographicLevel>();
 
             foreach (DataRow row in rows)
             {
-                idx++;
+                totalRowCount++;
                 if (errors.Count == 100)
                 {
                     errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
@@ -261,24 +264,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 try
                 {
                     var rowValues = CsvUtil.GetRowValues(row);
-                    var colValues = CsvUtil.GetColumnValues(cols);
 
-                    _importerService.GetGeographicLevel(rowValues, colValues);
+                    var geographicLevel = _importerService.GetGeographicLevel(rowValues, colValues);
+                    geographicLevels.Add(geographicLevel);
+
                     _importerService.GetTimeIdentifier(rowValues, colValues);
                     _importerService.GetYear(rowValues, colValues);
-                    
-                    if (!IsGeographicLevelIgnored(rowValues, colValues))
+
+                    if (!IgnoredGeographicLevels.Contains(geographicLevel))
                     {
-                        filteredRows++;
+                        filteredObservationCount++;
                     }
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new DataImportError($"error at row {idx}: {e.Message}"));
+                    errors.Add(new DataImportError($"error at row {totalRowCount}: {e.Message}"));
                 }
                 
-                totalRowCount++;
-
                 if (totalRowCount % Stage1RowCheck == 0)
                 {
                     await _dataImportService.UpdateStatus(importId,
@@ -299,17 +301,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 
             return new ProcessorStatistics
-            {
-                FilteredObservationCount = filteredRows,
-                RowsPerBatch = rowsPerBatch,
-                NumBatches = GetNumBatches(totalRowCount, rowsPerBatch)
-            };
-        }
-
-        private bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
-        {
-            var geographicLevel = _importerService.GetGeographicLevel(line, headers);
-            return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
+            (
+                filteredObservationCount:
+                    HasSoloAllowedGeographicLevel(geographicLevels)
+                        ? totalRowCount
+                        : filteredObservationCount,
+                rowsPerBatch: rowsPerBatch,
+                numBatches: GetNumBatches(totalRowCount, rowsPerBatch),
+                geographicLevels: geographicLevels
+            );
         }
 
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)

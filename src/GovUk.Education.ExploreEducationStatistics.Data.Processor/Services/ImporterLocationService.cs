@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _guidGenerator = guidGenerator;
         }
 
-        public Location Find(
+        public Location FindOrCreate(
             StatisticsDbContext context,
             Country country,
             EnglishDevolvedArea englishDevolvedArea = null,
@@ -30,8 +30,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
+            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
+            School school = null,
             Sponsor sponsor = null,
             Ward ward = null,
             PlanningArea planningArea = null)
@@ -47,8 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                provider,
                 region,
                 rscRegion,
+                school,
                 sponsor,
                 ward,
                 planningArea);
@@ -70,8 +74,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                provider,
                 region,
                 rscRegion,
+                school,
                 sponsor,
                 ward,
                 planningArea);
@@ -91,8 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Mat multiAcademyTrust,
             OpportunityArea opportunityArea,
             ParliamentaryConstituency parliamentaryConstituency,
+            Provider provider,
             Region region,
             RscRegion rscRegion,
+            School school,
             Sponsor sponsor,
             Ward ward,
             PlanningArea planningArea)
@@ -108,9 +116,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 mayoralCombinedAuthority,
                 multiAcademyTrust,
                 parliamentaryConstituency,
+                provider,
                 opportunityArea,
                 region,
                 rscRegion,
+                school,
                 sponsor,
                 ward,
                 planningArea
@@ -136,8 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
+            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
+            School school = null,
             Sponsor sponsor = null,
             Ward ward = null,
             PlanningArea planningArea = null)
@@ -154,8 +166,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                provider,
                 region,
                 rscRegion,
+                school,
                 sponsor,
                 ward,
                 planningArea);
@@ -175,8 +189,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     MultiAcademyTrust = multiAcademyTrust ?? Mat.Empty(),
                     OpportunityArea = opportunityArea ?? OpportunityArea.Empty(),
                     ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
+                    Provider = provider ?? Provider.Empty(),
                     Region = region ?? Region.Empty(),
                     RscRegion = rscRegion ?? RscRegion.Empty(),
+                    School = school ?? School.Empty(),
                     Sponsor = sponsor ?? Sponsor.Empty(),
                     Ward = ward ?? Ward.Empty(),
                     PlanningArea = planningArea ?? PlanningArea.Empty()
@@ -200,8 +216,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
+            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
+            School school = null,
             Sponsor sponsor = null,
             Ward ward = null,
             PlanningArea planningArea = null)
@@ -250,12 +268,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                  && location.ParliamentaryConstituency_Name == (parliamentaryConstituency != null ? parliamentaryConstituency.Name : null));
 
             predicateBuilder = predicateBuilder
+                .And(location => location.Provider_Code == (provider != null ? provider.Code : null)
+                                 && location.Provider_Name == (provider != null ? provider.Name : null));
+
+            predicateBuilder = predicateBuilder
                 .And(location => location.Region_Code == (region != null ? region.Code : null)
                                  && location.Region_Name == (region != null ? region.Name : null));
 
             // Note that Name is not included in the predicate here as it is the same as the code
             predicateBuilder = predicateBuilder
                 .And(location => location.RscRegion_Code == (rscRegion != null ? rscRegion.Code : null));
+
+            predicateBuilder = predicateBuilder
+                .And(location =>
+                    location.School_Code == (school != null ? school.Code : null)
+                    && location.School_Name == (school != null ? school.Name : null));
 
             predicateBuilder = predicateBuilder
                 .And(location => location.Sponsor_Code == (sponsor != null ? sponsor.Code : null)
@@ -285,8 +312,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 && location.MultiAcademyTrust_Name == multiAcademyTrust?.Name
                 && location.OpportunityArea_Name == opportunityArea?.Name
                 && location.ParliamentaryConstituency_Name == parliamentaryConstituency?.Name
+                && location.Provider_Name == provider?.Name
                 && location.Region_Name == region?.Name
                 && location.RscRegion_Code == rscRegion?.Code // RscRegion codes function as the name
+                && location.School_Name == school?.Name
                 && location.Sponsor_Name == sponsor?.Name
                 && location.Ward_Name == ward?.Name
                 && location.PlanningArea_Name == planningArea?.Name

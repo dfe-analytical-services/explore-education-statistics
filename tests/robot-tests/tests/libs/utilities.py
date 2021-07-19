@@ -15,11 +15,11 @@ sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = ElementFinder(sl)
 waiting = WaitingKeywords(sl)
 
+
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
-    
-    
+
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
@@ -92,12 +92,12 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
 def get_child_element(parent_locator: object, child_locator: str):
     try:
         children = get_child_elements(parent_locator, child_locator)
-        
+
         if len(children) > 1:
             warning(f"Found {len(children)} child elements matching child locator {child_locator} under parent "
                     f"locator {parent_locator} in utilities.py#get_child_element() - was expecting only one. Consider "
                     f"making the parent selector more specific. Returning the first element found.")
-        
+
         return children[0]
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
@@ -204,6 +204,7 @@ def capture_html():
     html_file.close()
     warning(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
+
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
     rows = get_child_elements(table_locator, 'css:tbody tr')
@@ -285,9 +286,9 @@ def __normalise_child_locator(parent_locator: object, child_locator: str) -> str
     if isinstance(parent_locator, str):
         return child_locator
     elif isinstance(parent_locator, WebElement):
-        # the below substitution is necessary if the parent is a Selenium WebElement in order to correctly find the 
+        # the below substitution is necessary if the parent is a Selenium WebElement in order to correctly find the
         # parent's descendants.  Without the preceding dot, the double forward slash breaks out of the parent container
-        # and returns the xpath query to the root of the DOM, leading to false positives or incorrectly found DOM 
+        # and returns the xpath query to the root of the DOM, leading to false positives or incorrectly found DOM
         # elements.  The below substitution covers both selectors beginning with "xpath://" and "//", as the double
         # forward slashes without the "xpath:" prefix are inferred as being xpath expressions.
         return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)

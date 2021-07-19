@@ -143,6 +143,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("GeographicLevels")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
 
@@ -573,6 +576,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -21,6 +21,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -30,14 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly ILogger<ISplitFileService> _logger;
         private readonly IDataImportService _dataImportService;
-
-        private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
-        {
-            GeographicLevel.Institution,
-            GeographicLevel.Provider,
-            GeographicLevel.School,
-            GeographicLevel.PlanningArea
-        };
 
         public SplitFileService(
             IBatchService batchService,
@@ -116,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             DataImport dataImport,
             DataTable dataFileTable)
         {
-            var headerList = CsvUtil.GetColumnValues(dataFileTable.Columns);
+            var colValues = CsvUtil.GetColumnValues(dataFileTable.Columns);
             var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
@@ -158,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
-                CopyRows(table, batch.ToList(), headerList);
+                CopyRows(table, batch.ToList(), colValues, dataImport.GeographicLevels);
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
@@ -191,12 +184,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 batchFilesExist = true;
                 batchCount++;
             }
-        }
-
-        private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
-        {
-            var geographicLevel = GetGeographicLevel(line, headers);
-            return IgnoredGeographicLevels.Contains(geographicLevel);
         }
 
         private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -244,12 +231,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static void CopyRows(DataTable target, IEnumerable<DataRow> rows, List<string> headerList)
+        private static void CopyRows(DataTable target,
+            IEnumerable<DataRow> rows,
+            List<string> colValues,
+            HashSet<GeographicLevel> importGeographicLevels)
         {
-            foreach (var row in from line in rows let s = CsvUtil.GetRowValues(line) where !IsGeographicLevelIgnored(s, headerList) select line)
+            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(importGeographicLevels);
+            rows.ForEach(row =>
             {
-                target.Rows.Add(row.ItemArray);
-            }
+                var rowValues = CsvUtil.GetRowValues(row);
+                var geographicLevel = GetGeographicLevel(rowValues, colValues);
+                if (hasSoloAllowedGeographicLevel || AllowRowImport(geographicLevel))
+                {
+                    target.Rows.Add(row.ItemArray);
+                }
+            });
         }
 
         private static int GetBatchNumberFromBatchFileName(string batchFileName)

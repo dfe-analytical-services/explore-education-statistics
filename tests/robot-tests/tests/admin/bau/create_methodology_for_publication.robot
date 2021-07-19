@@ -35,7 +35,7 @@ Update Methodology for Publication
     ${accordion}=  user opens publication on the admin dashboard   ${PUBLICATION_NAME}
     user views methodology for open publication accordion  ${accordion}  ${PUBLICATION_NAME}
     user clicks link  Edit summary
-    user enters text into textfield  Enter methodology title  ${PUBLICATION_NAME} - New methodology title
+    user enters text into element  label:Enter methodology title  ${PUBLICATION_NAME} - New methodology title
     user clicks button  Update methodology
     user waits until h2 is visible  Methodology summary
     user clicks link  Sign off

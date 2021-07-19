@@ -6,7 +6,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form } from '@common/components/form';
+import { Form, FormFieldTextArea } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import InsetText from '@common/components/InsetText';
@@ -31,13 +31,14 @@ import {
 import FormattedDate from '@common/components/FormattedDate';
 
 interface FormValues {
-  name: string;
+  title: string;
+  summary: string;
   file: File | null;
 }
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'name',
+    target: 'title',
     messages: {
       FILE_UPLOAD_NAME_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
         'File upload name cannot contain special characters',
@@ -100,8 +101,9 @@ const ReleaseFileUploadsSection = ({
       const newFile = await releaseAncillaryFileService.uploadAncillaryFile(
         releaseId,
         {
-          name: values.name.trim(),
+          title: values.title.trim(),
           file: values.file as File,
+          summary: values.summary.trim(),
         },
       );
 
@@ -119,7 +121,8 @@ const ReleaseFileUploadsSection = ({
       <Formik<FormValues>
         enableReinitialize
         initialValues={{
-          name: '',
+          title: '',
+          summary: '',
           file: null,
         }}
         onReset={() => {
@@ -132,12 +135,12 @@ const ReleaseFileUploadsSection = ({
         }}
         onSubmit={handleSubmit}
         validationSchema={Yup.object<FormValues>({
-          name: Yup.string()
+          title: Yup.string()
             .trim()
-            .required('Enter a name')
+            .required('Enter a title')
             .test({
               name: 'unique',
-              message: 'Enter a unique name',
+              message: 'Enter a unique title',
               test(value: string) {
                 if (!value) {
                   return true;
@@ -149,6 +152,7 @@ const ReleaseFileUploadsSection = ({
                 );
               },
             }),
+          summary: Yup.string().required('Enter a summary'),
           file: Yup.file()
             .required('Choose a file')
             .minSize(0, 'Choose a file that is not empty'),
@@ -174,9 +178,15 @@ const ReleaseFileUploadsSection = ({
                   )}
 
                   <FormFieldTextInput<FormValues>
-                    name="name"
-                    label="Name"
-                    width={20}
+                    className="govuk-!-width-one-half"
+                    name="title"
+                    label="Title"
+                  />
+
+                  <FormFieldTextArea<FormValues>
+                    className="govuk-!-width-one-half"
+                    name="summary"
+                    label="Summary"
                   />
 
                   <FormFieldFileInput<FormValues>
@@ -228,7 +238,8 @@ const ReleaseFileUploadsSection = ({
                   )}
 
                   <SummaryList>
-                    <SummaryListItem term="Name">{file.title}</SummaryListItem>
+                    <SummaryListItem term="Title">{file.title}</SummaryListItem>
+
                     <SummaryListItem term="File">
                       <ButtonText
                         onClick={() =>
@@ -242,17 +253,27 @@ const ReleaseFileUploadsSection = ({
                         {file.filename}
                       </ButtonText>
                     </SummaryListItem>
+
                     <SummaryListItem term="File size">
                       {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
                     </SummaryListItem>
+
                     <SummaryListItem term="Uploaded by">
                       <a href={`mailto:${file.userName}`}>{file.userName}</a>
                     </SummaryListItem>
+
                     <SummaryListItem term="Date uploaded">
                       <FormattedDate format="d MMMM yyyy HH:mm">
                         {file.created}
                       </FormattedDate>
                     </SummaryListItem>
+
+                    <SummaryListItem term="Summary">
+                      <div className="dfe-white-space--pre-wrap">
+                        {file.summary}
+                      </div>
+                    </SummaryListItem>
+
                     {canUpdateRelease && (
                       <SummaryListItem
                         term="Actions"
@@ -269,7 +290,7 @@ const ReleaseFileUploadsSection = ({
                                 },
                               )}
                             >
-                              Edit title
+                              Edit file
                             </Link>
                             <ButtonText onClick={() => setDeleteFile(file)}>
                               Delete file

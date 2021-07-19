@@ -305,6 +305,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("PlanningArea_Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Provider_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Provider_Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Region_Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -313,6 +319,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("RscRegion_Code")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("School_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("School_Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Sponsor_Code")
                         .HasColumnType("nvarchar(450)");
@@ -352,9 +364,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("PlanningArea_Code");
 
+                    b.HasIndex("Provider_Code");
+
                     b.HasIndex("Region_Code");
 
                     b.HasIndex("RscRegion_Code");
+
+                    b.HasIndex("School_Code");
 
                     b.HasIndex("Sponsor_Code");
 

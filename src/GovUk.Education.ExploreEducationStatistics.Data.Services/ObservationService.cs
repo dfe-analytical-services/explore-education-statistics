@@ -57,10 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("opportunityAreaList", locationsQuery?.OpportunityArea);
             var parliamentaryConstituencyListParam =
                 CreateIdListType("parliamentaryConstituencyList", locationsQuery?.ParliamentaryConstituency);
+            var providersListParam =
+                CreateIdListType("providersList", locationsQuery?.Provider);
             var planningAreaListParam =
                 CreateIdListType("planningAreaList", locationsQuery?.PlanningArea);
             var regionsListParam = CreateIdListType("regionsList", locationsQuery?.Region);
             var rscRegionListParam = CreateIdListType("rscRegionsList", locationsQuery?.RscRegion);
+            var schoolsListParam = CreateIdListType("schoolsList", locationsQuery?.School);
             var sponsorListParam = CreateIdListType("sponsorList", locationsQuery?.Sponsor);
             var wardListParam =
                 CreateIdListType("wardList", locationsQuery?.Ward);
@@ -85,8 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@multiAcademyTrustList," +
                             "@opportunityAreaList," +
                             "@parliamentaryConstituencyList," +
+                            "@providersList," +
                             "@regionsList," +
                             "@rscRegionsList," +
+                            "@schoolsList," +
                             "@sponsorList," +
                             "@wardList," +
                             "@planningAreaList," +
@@ -105,8 +110,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     multiAcademyTrustListParam,
                     opportunityAreaListParam,
                     parliamentaryConstituencyListParam,
+                    providersListParam,
                     regionsListParam,
                     rscRegionListParam,
+                    schoolsListParam,
                     sponsorListParam,
                     wardListParam,
                     planningAreaListParam,

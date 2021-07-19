@@ -3,7 +3,9 @@ import {
   ReleaseRouteParams,
   releaseDataRoute,
 } from '@admin/routes/releaseRoutes';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import React from 'react';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Link from '@admin/components/Link';
@@ -14,7 +16,7 @@ import { Formik } from 'formik';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import Button from '@common/components/Button';
 
-interface EditSubjectFormValues {
+interface FormValues {
   title: string;
 }
 
@@ -32,6 +34,19 @@ const ReleaseDataFilePage = ({
     [releaseId, fileId],
   );
 
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    await releaseDataFileService.updateFile(releaseId, fileId, {
+      title: values.title,
+    });
+
+    history.push(
+      generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+        publicationId,
+        releaseId,
+      }),
+    );
+  });
+
   return (
     <>
       <Link
@@ -44,36 +59,33 @@ const ReleaseDataFilePage = ({
       >
         Back
       </Link>
+
       <LoadingSpinner loading={dataFileLoading}>
-        {dataFile && (
-          <section>
-            <h2>Edit data file details</h2>
-            <Formik<EditSubjectFormValues>
+        <section>
+          <h2>Edit data file details</h2>
+
+          {dataFile ? (
+            <Formik<FormValues>
               initialValues={{ title: dataFile.title }}
-              validationSchema={Yup.object<EditSubjectFormValues>({
-                title: Yup.string().required('Enter a subject title'),
+              validationSchema={Yup.object<FormValues>({
+                title: Yup.string().required('Enter a title'),
               })}
-              onSubmit={values => {
-                releaseDataFileService
-                  .renameFile(releaseId, fileId, values.title)
-                  .then();
-                history.push(
-                  generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
-                    publicationId,
-                    releaseId,
-                  }),
-                );
-              }}
+              onSubmit={handleSubmit}
             >
-              {form => (
-                <Form {...form} id="edit-data-file-form">
-                  <FormFieldTextInput id="title" label="Title" name="title" />
-                  <Button type="submit">Save changes</Button>
-                </Form>
-              )}
+              <Form id="dataFileForm">
+                <FormFieldTextInput<FormValues>
+                  className="govuk-!-width-two-thirds"
+                  label="Title"
+                  name="title"
+                />
+
+                <Button type="submit">Save changes</Button>
+              </Form>
             </Formik>
-          </section>
-        )}
+          ) : (
+            <WarningMessage>Could not load data file details</WarningMessage>
+          )}
+        </section>
       </LoadingSpinner>
     </>
   );
