@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
             migrationBuilder.Sql("DROP PROCEDURE UpsertLocation");
             migrationBuilder.Sql("DROP TYPE LocationType");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_LocationType.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_TableType_LocationType.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertLocation.sql");
         }
 
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
             migrationBuilder.Sql("DROP PROCEDURE UpsertLocation");
             migrationBuilder.Sql("DROP TYPE LocationType");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousLocationTypeMigrationId}_Routine_LocationType.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousLocationTypeMigrationId}_TableType_LocationType.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousUpsertLocationMigrationId}_Routine_UpsertLocation.sql");
         }
     }
