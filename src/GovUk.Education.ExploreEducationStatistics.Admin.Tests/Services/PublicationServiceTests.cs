@@ -103,30 +103,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.GetPublication(publication.Id);
+                var result = (await publicationService.GetPublication(publication.Id)).AssertRight();
 
-                Assert.True(result.IsRight);
+                Assert.Equal(publication.Id, result.Id);
+                Assert.Equal(publication.Title, result.Title);
+                Assert.Equal(publication.Slug, result.Slug);
 
-                Assert.Equal(publication.Id, result.Right.Id);
-                Assert.Equal(publication.Title, result.Right.Title);
-                Assert.Equal(publication.Slug, result.Right.Slug);
+                Assert.Equal(publication.Topic.Id, result.TopicId);
+                Assert.Equal(publication.Topic.ThemeId, result.ThemeId);
 
-                Assert.Equal(publication.Topic.Id, result.Right.TopicId);
-                Assert.Equal(publication.Topic.ThemeId, result.Right.ThemeId);
+                Assert.Equal(publication.Contact.Id, result.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, result.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, result.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamEmail, result.Contact.TeamEmail);
+                Assert.Equal(publication.Contact.TeamName, result.Contact.TeamName);
 
-                Assert.Equal(publication.Contact.Id, result.Right.Contact.Id);
-                Assert.Equal(publication.Contact.ContactName, result.Right.Contact.ContactName);
-                Assert.Equal(publication.Contact.ContactTelNo, result.Right.Contact.ContactTelNo);
-                Assert.Equal(publication.Contact.TeamEmail, result.Right.Contact.TeamEmail);
-                Assert.Equal(publication.Contact.TeamName, result.Right.Contact.TeamName);
-
-                Assert.Equal(2, result.Right.Methodologies.Count);
+                Assert.Equal(2, result.Methodologies.Count);
                 
-                Assert.Equal(methodology1Version1.Id, result.Right.Methodologies[0].Id);
-                Assert.Equal(methodology1Version1.Title, result.Right.Methodologies[0].Title);
+                Assert.Equal(methodology1Version1.Id, result.Methodologies[0].Id);
+                Assert.Equal(methodology1Version1.Title, result.Methodologies[0].Title);
                 
-                Assert.Equal(methodology2Version2.Id, result.Right.Methodologies[1].Id);
-                Assert.Equal(methodology2Version2.Title, result.Right.Methodologies[1].Title);
+                Assert.Equal(methodology2Version2.Id, result.Methodologies[1].Id);
+                Assert.Equal(methodology2Version2.Title, result.Methodologies[1].Title);
             }
         }
 

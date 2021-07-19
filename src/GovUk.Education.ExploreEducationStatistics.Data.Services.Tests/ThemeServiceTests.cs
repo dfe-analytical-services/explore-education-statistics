@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
     public class ThemeServiceTests
     {
         [Fact]
-        public async void ListThemesWithLiveSubjects()
+        public async Task ListThemesWithLiveSubjects()
         {
             var releaseFile1 = new ReleaseFile
             {

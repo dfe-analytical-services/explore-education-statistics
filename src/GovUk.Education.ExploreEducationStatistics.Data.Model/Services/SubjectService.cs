@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(rs => rs.Release)
                 .Where(rs => rs.SubjectId == subjectId)
                 .FirstOrDefaultAsync();
-            return firstReleaseSubject?.Release?.PublicationId;
+            return firstReleaseSubject?.Release.PublicationId;
         }
     }
 }
