@@ -1873,26 +1873,6 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "Provider_Name",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "Provider_Name",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "Provider_Code",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "Provider_Code",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
                                             "name": "Region_Code",
                                             "type": "String"
                                         },
@@ -1918,26 +1898,6 @@
                                         },
                                         "sink": {
                                             "name": "RscRegion_Code",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "School_Name",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "School_Name",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "School_Code",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "School_Code",
                                             "type": "String"
                                         }
                                     },
@@ -1998,6 +1958,46 @@
                                         },
                                         "sink": {
                                             "name": "PlanningArea_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Provider_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Provider_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Provider_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Provider_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "School_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "School_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "School_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "School_Name",
                                             "type": "String"
                                         }
                                     }
