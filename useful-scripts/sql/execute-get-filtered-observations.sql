@@ -25,9 +25,13 @@ begin
 
     declare @parliamentaryConstituenciesList IdListVarcharType
 
+    declare @providersList IdListVarcharType
+
     declare @regionsList IdListVarcharType
 
     declare @rscRegionsList IdListVarcharType
+
+    declare @schoolsList IdListVarcharType
 
     declare @sponsorList IdListVarcharType
 
@@ -52,8 +56,10 @@ begin
                   @multiAcademyTrustList,
                   @opportunityAreasList,
                   @parliamentaryConstituenciesList,
+                  @providersList,
                   @regionsList,
                   @rscRegionsList,
+                  @schoolsList,
                   @sponsorList,
                   @wardsList,
                   @planningAreasList,
