@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public async void GetPublication()
+        public async Task GetPublication()
         {
             var methodology1Version1 = new Methodology
             {
@@ -129,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetPublication_NotFound()
+        public async Task GetPublication_NotFound()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication()
+        public async Task CreatePublication()
         {
             var topic = new Topic
             {
@@ -204,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication_FailsWithNonExistingTopic()
+        public async Task CreatePublication_FailsWithNonExistingTopic()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -223,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication_FailsWithNonUniqueSlug()
+        public async Task CreatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
             {
@@ -266,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication()
+        public async Task UpdatePublication()
         {
             var topic = new Topic
             {
@@ -348,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_AlreadyPublished()
+        public async Task UpdatePublication_AlreadyPublished()
         {
             var topic = new Topic
             {
@@ -433,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_SavesNewContact()
+        public async Task UpdatePublication_SavesNewContact()
         {
             var publication = new Publication
             {
@@ -483,7 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
+        public async Task UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
         {
             var sharedContact = new Contact
             {
@@ -548,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_FailsWithNonExistingTopic()
+        public async Task UpdatePublication_FailsWithNonExistingTopic()
         {
             var publication = new Publication
             {
@@ -587,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_FailsWithNonUniqueSlug()
+        public async Task UpdatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
             {
@@ -635,7 +636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void PartialUpdateLegacyReleases_OnlyMatchingEntities()
+        public async Task PartialUpdateLegacyReleases_OnlyMatchingEntities()
         {
             var publication = new Publication
             {
@@ -699,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
+        public async Task PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
             var publication = new Publication
             {

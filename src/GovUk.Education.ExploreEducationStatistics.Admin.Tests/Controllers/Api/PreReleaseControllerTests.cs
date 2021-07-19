@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class PreReleaseControllerTests
     {
         [Fact]
-        public async void GetPreReleaseSummaryAsync_Returns_Ok()
+        public async Task GetPreReleaseSummaryAsync_Returns_Ok()
         {
             var (preReleaseContactsService, preReleaseSummaryService) = Mocks();
 

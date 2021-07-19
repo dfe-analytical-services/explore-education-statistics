@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class FootnoteServiceTests
     {
         [Fact]
-        public async void GetFootnote()
+        public async Task GetFootnote()
         {
             var release = new Release();
 
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetFootnote_ReleaseNotFound()
+        public async Task GetFootnote_ReleaseNotFound()
         {
             var footnote = new Footnote
             {
@@ -194,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetFootnote_FootnoteNotFound()
+        public async Task GetFootnote_FootnoteNotFound()
         {
             var release = new Release();
 
@@ -228,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetFootnote_ReleaseAndFootnoteNotRelated()
+        public async Task GetFootnote_ReleaseAndFootnoteNotRelated()
         {
             var release = new Release();
             var footnote = new Footnote
@@ -274,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CopyFootnotes()
+        public async Task CopyFootnotes()
         {
             var release = new Release();
             var amendment = new Release();

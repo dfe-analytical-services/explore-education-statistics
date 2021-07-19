@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -15,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _id = Guid.NewGuid();
 
         [Fact]
-        public async void CreateMethodology_Returns_Ok()
+        public async Task CreateMethodology_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>();
 
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
         
         [Fact]
-        public async void GetMethodologySummary_Returns_Ok()
+        public async Task GetMethodologySummary_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>();
 
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void GetMethodologySummary_Returns_NotFound()
+        public async Task GetMethodologySummary_Returns_NotFound()
         {
             var methodologyService = new Mock<IMethodologyService>();
 
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void UpdateMethodology_Returns_Ok()
+        public async Task UpdateMethodology_Returns_Ok()
         {
             var request = new MethodologyUpdateRequest();
 

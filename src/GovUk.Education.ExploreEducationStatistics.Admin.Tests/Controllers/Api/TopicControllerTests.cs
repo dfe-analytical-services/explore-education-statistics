@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class TopicControllerTests
     {
         [Fact]
-        public async void CreateTopic_Returns_Ok()
+        public async Task CreateTopic_Returns_Ok()
         {
             var request = new TopicSaveViewModel
             {

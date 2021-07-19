@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class DataImportServiceTests
     {
         [Fact]
-        public async void CancelImport()
+        public async Task CancelImport()
         {
             var release = new Release();
 
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CancelFileImportButNotAllowed()
+        public async Task CancelFileImportButNotAllowed()
         {
             var release = new Release();
 

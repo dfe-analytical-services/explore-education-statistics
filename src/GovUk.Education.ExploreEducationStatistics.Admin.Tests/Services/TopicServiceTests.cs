@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class TopicServiceTests
     {
         [Fact]
-        public async void CreateTopic()
+        public async Task CreateTopic()
         {
             var theme = new Theme
             {
@@ -67,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateTopic_FailsNonExistingTheme()
+        public async Task CreateTopic_FailsNonExistingTheme()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();
 
@@ -87,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateTopic_FailsNonUniqueSlug()
+        public async Task CreateTopic_FailsNonUniqueSlug()
         {
             var theme = new Theme
             {
@@ -130,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic()
+        public async Task UpdateTopic()
         {
             var theme = new Theme
             {
@@ -185,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic_FailsNonExistingTheme()
+        public async Task UpdateTopic_FailsNonExistingTheme()
         {
             var topic = new Topic
             {
@@ -225,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic_FailsNonUniqueSlug()
+        public async Task UpdateTopic_FailsNonUniqueSlug()
         {
             var theme = new Theme
             {
@@ -275,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetTopic()
+        public async Task GetTopic()
         {
             var topic = new Topic
             {
@@ -310,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void DeleteTopic()
+        public async Task DeleteTopic()
         {
             var topicId = Guid.NewGuid();
 
