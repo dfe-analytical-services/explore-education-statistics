@@ -2,10 +2,13 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -53,8 +56,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(cacheKey, (Func<SampleClass>) (() =>
-                throw new ArgumentException("Unexpected call to provider when cached entity exists")));
+            var result = await service.GetCachedEntity(PublicContent,
+                cacheKey,
+                (Func<SampleClass>) (() =>
+                    throw new ArgumentException("Unexpected call to provider when cached entity exists")));
 
             Assert.Equal(entity, result);
 
@@ -86,9 +91,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(cacheKey, () => entity);
+            var result = await service.GetCachedEntity(PublicContent,
+                cacheKey,
+                () => entity);
 
             Assert.Equal(entity, result);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetCachedEntity_ProviderReturnsRightUploadsBlob()
+        {
+            var entity = new SampleClass();
+
+            var cacheKey = new SampleCacheKey(entity.Id);
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.GetDeserializedJson<SampleClass>(
+                        PublicContent,
+                        cacheKey.Key))
+                .ThrowsAsync(new FileNotFoundException());
+
+            blobStorageService.Setup(mock =>
+                    mock.UploadAsJson(
+                        PublicContent,
+                        cacheKey.Key,
+                        entity,
+                        null))
+                .Returns(Task.CompletedTask);
+
+            var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
+
+            var result = (await service.GetCachedEntity(PublicContent,
+                cacheKey,
+                () => Task.FromResult(new Either<ActionResult, SampleClass>(entity)))).AssertRight();
+
+            Assert.Equal(entity, result);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetCachedEntity_ProviderReturnsLeft()
+        {
+            var entity = new SampleClass();
+
+            var cacheKey = new SampleCacheKey(entity.Id);
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.GetDeserializedJson<SampleClass>(
+                        PublicContent,
+                        cacheKey.Key))
+                .ThrowsAsync(new FileNotFoundException());
+
+            var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
+
+            var result = await service.GetCachedEntity(PublicContent,
+                cacheKey,
+                () => Task.FromResult(new Either<ActionResult, SampleClass>(new NotFoundResult())));
+
+            result.AssertNotFound();
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
@@ -118,7 +185,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(cacheKey, () => entity);
+            var result = await service.GetCachedEntity(
+                PublicContent,
+                cacheKey,
+                () => entity);
 
             Assert.Equal(entity, result);
 
@@ -155,7 +225,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(cacheKey, () => entity);
+            var result = await service.GetCachedEntity(
+                PublicContent,
+                cacheKey,
+                () => entity);
 
             Assert.Equal(entity, result);
 

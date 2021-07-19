@@ -2,11 +2,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -22,11 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<TEntity> GetCachedEntity<TEntity>(ICacheKey<TEntity> cacheKey,
+        public async Task<TEntity> GetCachedEntity<TEntity>(
+            IBlobContainer blobContainer,
+            ICacheKey<TEntity> cacheKey,
             Func<TEntity> entityProvider) where TEntity : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache(cacheKey);
+            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
 
             if (cachedEntity != null)
             {
@@ -37,15 +40,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var entity = entityProvider();
 
             // Write result to cache as a json blob before returning
-            await WriteToCache(cacheKey, entity);
+            await WriteToCache(blobContainer, cacheKey, entity);
             return entity;
         }
 
-        public async Task<TEntity> GetCachedEntity<TEntity>(ICacheKey<TEntity> cacheKey,
-            Func<Task<TEntity>> entityProvider) where TEntity : class
+        public async Task<TEntity> GetCachedEntity<TEntity>(
+            IBlobContainer blobContainer,
+            ICacheKey<TEntity> cacheKey,
+            Func<Task<TEntity>> entityProvider)
+            where TEntity : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache(cacheKey);
+            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
             if (cachedEntity != null)
             {
                 return cachedEntity;
@@ -55,24 +61,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var entity = await entityProvider();
 
             // Write result to cache as a json blob before returning
-            await WriteToCache(cacheKey, entity);
+            await WriteToCache(blobContainer, cacheKey, entity);
             return entity;
         }
 
-        private async Task<TEntity?> ReadFromCache<TEntity>(ICacheKey<TEntity> cacheKey) where TEntity : class
+        public async Task<Either<ActionResult, TEntity>> GetCachedEntity<TEntity>(
+            IBlobContainer blobContainer,
+            ICacheKey<TEntity> cacheKey,
+            Func<Task<Either<ActionResult, TEntity>>> entityProvider)
+            where TEntity : class
+        {
+            // Attempt to read blob from the cache container
+            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
+            if (cachedEntity != null)
+            {
+                return cachedEntity;
+            }
+
+            // Cache miss - invoke provider instead
+            return await entityProvider().OnSuccessDo(async entity =>
+            {
+                // Write result to cache as a json blob before returning
+                await WriteToCache(blobContainer, cacheKey, entity);
+            });
+        }
+
+        private async Task<TEntity?> ReadFromCache<TEntity>(
+            IBlobContainer blobContainer,
+            ICacheKey<TEntity> cacheKey)
+            where TEntity : class
         {
             var key = cacheKey.Key;
 
             // Attempt to read blob from the storage container
             try
             {
-                return await _blobStorageService.GetDeserializedJson<TEntity>(PublicContent, key);
+                return await _blobStorageService.GetDeserializedJson<TEntity>(blobContainer, key);
             }
             catch (JsonException)
             {
                 // If there's an error deserializing the blob, we should
                 // assume it's not salvageable and delete it so that it's re-built.
-                await _blobStorageService.DeleteBlob(PublicContent, key);
+                await _blobStorageService.DeleteBlob(blobContainer, key);
             }
             catch (FileNotFoundException)
             {
@@ -80,16 +110,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Caught error fetching cache entry from: {PublicContent}/{key}");
+                _logger.LogError(e, $"Caught error fetching cache entry from: {blobContainer}/{key}");
             }
 
             return null;
         }
 
-        private async Task WriteToCache<TEntity>(ICacheKey<TEntity> cacheKey, TEntity entity)
+        private async Task WriteToCache<TEntity>(
+            IBlobContainer blobContainer,
+            ICacheKey<TEntity> cacheKey,
+            TEntity entity)
         {
             // Write result to cache as a json blob before returning
-            await _blobStorageService.UploadAsJson(PublicContent, cacheKey.Key, entity);
+            await _blobStorageService.UploadAsJson(blobContainer, cacheKey.Key, entity);
         }
     }
 }

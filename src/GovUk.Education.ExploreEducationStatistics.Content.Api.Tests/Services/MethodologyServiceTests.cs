@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -264,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task GetTree_CachedTree()
+        public async Task GetTree_CachedResultExists()
         {
             var expectedResult = new List<AllMethodologiesThemeViewModel>
             {
@@ -300,6 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
 
             cacheService.Setup(mock => mock.GetCachedEntity(
+                    PublicContent,
                     It.IsAny<AllMethodologiesCacheKey>(),
                     It.IsAny<Func<Task<List<AllMethodologiesThemeViewModel>>>>()))
                 .ReturnsAsync(expectedResult);
@@ -377,8 +379,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = NeverCachedCacheService<List<AllMethodologiesThemeViewModel>>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            cacheService.SetupEntityProviderResult(
+                PublicContent,
+                new AllMethodologiesCacheKey());
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
@@ -442,8 +448,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = NeverCachedCacheService<List<AllMethodologiesThemeViewModel>>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            cacheService.SetupEntityProviderResult(
+                PublicContent,
+                new AllMethodologiesCacheKey());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -485,8 +495,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = NeverCachedCacheService<List<AllMethodologiesThemeViewModel>>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            cacheService.SetupEntityProviderResult(
+                PublicContent,
+                new AllMethodologiesCacheKey());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -545,8 +559,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = NeverCachedCacheService<List<AllMethodologiesThemeViewModel>>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            cacheService.SetupEntityProviderResult(
+            PublicContent,
+                new AllMethodologiesCacheKey());
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);

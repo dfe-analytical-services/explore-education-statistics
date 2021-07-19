@@ -1,9 +1,7 @@
+#nullable enable
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -96,23 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 
                 return new NotFoundResult();
             };
-        }
-
-        /// <summary>
-        /// Mock cache service that regardless of cache key, always returns the result of invoking the entity provider
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static Mock<ICacheService> NeverCachedCacheService<T>() where T : class
-        {
-            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
-
-            cacheService.Setup(mock => mock.GetCachedEntity(
-                    It.IsAny<ICacheKey<T>>(), 
-                    It.IsAny<Func<Task<T>>>()))
-                .Returns(async (ICacheKey<T> _, Func<Task<T>> entityProvider) => await entityProvider());
-
-            return cacheService;
         }
 
         public static Mock<IUserService> AlwaysTrueUserService(Guid? userId = null)

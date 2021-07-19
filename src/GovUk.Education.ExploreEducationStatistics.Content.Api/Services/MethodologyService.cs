@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -68,7 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
-            return await _cacheService.GetCachedEntity(new AllMethodologiesCacheKey(), async () =>
+            return await _cacheService.GetCachedEntity(
+                PublicContent,
+                new AllMethodologiesCacheKey(),
+                async () =>
             {
                 var themes = await _contentDbContext.Themes
                     .Include(theme => theme.Topics)
