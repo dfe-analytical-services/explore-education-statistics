@@ -530,8 +530,8 @@
       "defaultValue": "deploy"
     },
     "maxDbSizeBytes": {
-      "type": "int", 
-      "defaultValue": 268435456000 
+      "type": "int",
+      "defaultValue": 268435456000
     },
     "enableAlerts": {
       "type": "bool",
@@ -2964,6 +2964,11 @@
             },
             {
               "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicStatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }

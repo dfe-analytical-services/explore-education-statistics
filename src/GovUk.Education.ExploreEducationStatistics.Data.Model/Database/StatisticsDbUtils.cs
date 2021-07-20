@@ -16,5 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             return InMemoryStatisticsDbContext(Guid.NewGuid().ToString());
         }
+
+        public static PublicStatisticsDbContext InMemoryPublicStatisticsDbContext(string dbName)
+        {
+            var builder = new DbContextOptionsBuilder<PublicStatisticsDbContext>();
+            builder.UseInMemoryDatabase(databaseName: dbName);
+            return new PublicStatisticsDbContext(builder.Options, null);
+        }
+
+        public static PublicStatisticsDbContext InMemoryPublicStatisticsDbContext()
+        {
+            return InMemoryPublicStatisticsDbContext(Guid.NewGuid().ToString());
+        }
     }
 }
