@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
-                .Setup(s => s.GetCachedEntity(
+                .Setup(s => s.GetItem(
                     PublicContent,
                     It.Is<TableBuilderResultCacheKey>(key => key.Key == cacheKey),
                     It.IsAny<Func<Task<Either<ActionResult, TableBuilderResultViewModel>>>>()))

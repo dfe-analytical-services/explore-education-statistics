@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
-            return await _cacheService.GetCachedEntity(
+            return await _cacheService.GetItem(
                 PublicContent,
                 new AllMethodologiesCacheKey(),
                 async () =>

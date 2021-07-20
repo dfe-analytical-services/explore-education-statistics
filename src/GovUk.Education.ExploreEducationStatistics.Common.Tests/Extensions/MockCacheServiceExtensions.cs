@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             ICacheKey<TEntity>? expectedCacheKey = null)
             where TEntity : class
         {
-            cacheService.Setup(mock => mock.GetCachedEntity(
+            cacheService.Setup(mock => mock.GetItem(
                     expectedBlobContainer,
                     It.Is<ICacheKey<TEntity>>(ck =>
                         expectedCacheKey == null ||
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             where TEntity : class
             where TProvider : Task<Either<ActionResult, TEntity>>
         {
-            cacheService.Setup(mock => mock.GetCachedEntity(
+            cacheService.Setup(mock => mock.GetItem(
                     expectedBlobContainer,
                     It.Is<ICacheKey<TEntity>>(ck =>
                         expectedCacheKey == null ||

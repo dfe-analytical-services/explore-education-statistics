@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     {
                         if (block.ContentBlock is DataBlock dataBlock)
                         {
-                            return await _cacheService.GetCachedEntity(
+                            return await _cacheService.GetItem(
                                 PublicContent,
                                 new TableBuilderResultCacheKey(block),
                                 async () =>

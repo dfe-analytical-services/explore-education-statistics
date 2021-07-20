@@ -23,7 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<TEntity> GetCachedEntity<TEntity>(
+        public async Task DeleteItem<TEntity>(IBlobContainer blobContainer, ICacheKey<TEntity> cacheKey)
+        {
+            await _blobStorageService.DeleteBlob(blobContainer, cacheKey.Key);
+        }
+
+        public async Task<TEntity> GetItem<TEntity>(
             IBlobContainer blobContainer,
             ICacheKey<TEntity> cacheKey,
             Func<TEntity> entityProvider) where TEntity : class
@@ -44,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return entity;
         }
 
-        public async Task<TEntity> GetCachedEntity<TEntity>(
+        public async Task<TEntity> GetItem<TEntity>(
             IBlobContainer blobContainer,
             ICacheKey<TEntity> cacheKey,
             Func<Task<TEntity>> entityProvider)
@@ -65,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return entity;
         }
 
-        public async Task<Either<ActionResult, TEntity>> GetCachedEntity<TEntity>(
+        public async Task<Either<ActionResult, TEntity>> GetItem<TEntity>(
             IBlobContainer blobContainer,
             ICacheKey<TEntity> cacheKey,
             Func<Task<Either<ActionResult, TEntity>>> entityProvider)

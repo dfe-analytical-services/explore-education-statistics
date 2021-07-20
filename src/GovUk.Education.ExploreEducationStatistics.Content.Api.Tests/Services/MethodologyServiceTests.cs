@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
 
-            cacheService.Setup(mock => mock.GetCachedEntity(
+            cacheService.Setup(mock => mock.GetItem(
                     PublicContent,
                     It.IsAny<AllMethodologiesCacheKey>(),
                     It.IsAny<Func<Task<List<AllMethodologiesThemeViewModel>>>>()))

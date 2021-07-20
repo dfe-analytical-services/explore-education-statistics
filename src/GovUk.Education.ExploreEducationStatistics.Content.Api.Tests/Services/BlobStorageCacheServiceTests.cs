@@ -7,13 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
@@ -40,7 +40,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task GetCachedEntity_CachedEntityExists()
+        public async Task DeleteItem()
+        {
+            var cacheKey = new SampleCacheKey(Guid.NewGuid());
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.DeleteBlob(PublicContent,
+                        cacheKey.Key))
+                .Returns(Task.CompletedTask);
+
+            var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
+
+            await service.DeleteItem(PublicContent, cacheKey);
+
+            VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetItem_CachedEntityExists()
         {
             var entity = new SampleClass();
 
@@ -56,18 +75,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(PublicContent,
+            var result = await service.GetItem(PublicContent,
                 cacheKey,
                 (Func<SampleClass>) (() =>
                     throw new ArgumentException("Unexpected call to provider when cached entity exists")));
 
             Assert.Equal(entity, result);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetCachedEntity_CachedEntityNotFoundUploadsBlob()
+        public async Task GetItem_CachedEntityNotFoundUploadsBlob()
         {
             var entity = new SampleClass();
 
@@ -91,17 +110,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(PublicContent,
+            var result = await service.GetItem(PublicContent,
                 cacheKey,
                 () => entity);
 
             Assert.Equal(entity, result);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetCachedEntity_ProviderReturnsRightUploadsBlob()
+        public async Task GetItem_ProviderReturnsRightUploadsBlob()
         {
             var entity = new SampleClass();
 
@@ -125,17 +144,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = (await service.GetCachedEntity(PublicContent,
+            var result = (await service.GetItem(PublicContent,
                 cacheKey,
                 () => Task.FromResult(new Either<ActionResult, SampleClass>(entity)))).AssertRight();
 
             Assert.Equal(entity, result);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetCachedEntity_ProviderReturnsLeft()
+        public async Task GetItem_ProviderReturnsLeft()
         {
             var entity = new SampleClass();
 
@@ -151,17 +170,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(PublicContent,
+            var result = await service.GetItem(PublicContent,
                 cacheKey,
                 () => Task.FromResult(new Either<ActionResult, SampleClass>(new NotFoundResult())));
 
             result.AssertNotFound();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetCachedEntity_ExceptionFetchingCachedEntityUploadsBlob()
+        public async Task GetItem_ExceptionFetchingCachedEntityUploadsBlob()
         {
             var entity = new SampleClass();
 
@@ -185,18 +204,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(
+            var result = await service.GetItem(
                 PublicContent,
                 cacheKey,
                 () => entity);
 
             Assert.Equal(entity, result);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetCachedEntity_ErrorDeserializingCachedEntityDeletesAndUploadsBlob()
+        public async Task GetItem_ErrorDeserializingCachedEntityDeletesAndUploadsBlob()
         {
             var entity = new SampleClass();
 
@@ -225,14 +244,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetCachedEntity(
+            var result = await service.GetItem(
                 PublicContent,
                 cacheKey,
                 () => entity);
 
             Assert.Equal(entity, result);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            VerifyAllMocks(blobStorageService);
         }
 
         private static BlobStorageCacheService SetupBlobStorageCacheService(
