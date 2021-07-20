@@ -25,6 +25,10 @@ const PageMeta = ({
       <meta name="title" content={title} />
       <meta name="description" content={description} />
       <meta name="theme-color" content="#0b0c0c" />
+      <meta
+        name="google-site-verification"
+        content="jWf4Mg_pzTOgXDWccGcv9stMsdyptYwHeVpODHdesoY"
+      />
 
       {/* <!-- Open Graph / Facebook --> */}
       <meta property="og:type" content="website" />
