@@ -465,47 +465,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
-
-                await statisticsDbContext.AddAsync(
-                    new Data.Model.Topic
-                    {
-                        Id = publication.Topic.Id,
-                        Title = "Test topic",
-                        Slug = "test-topic",
-                    }
-                );
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildPublicationService(contentDbContext, statisticsDbContext);
-
+                var service = BuildPublicationService(contentDbContext);
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
-                var statsPublication = await statisticsDbContext.Publication.FindAsync(publication.Id);
 
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal(publishDate, contentPublication.Published);
-
-                Assert.Equal(publication.Id, statsPublication.Id);
-                Assert.Equal("Test publication", statsPublication.Title);
-                Assert.Equal("test-publication", statsPublication.Slug);
-                Assert.Equal(publication.TopicId, statsPublication.TopicId);
             }
         }
 
@@ -526,67 +505,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
-
-                await statisticsDbContext.AddAsync(
-                    new Data.Model.Publication
-                    {
-                        Id = publication.Id,
-                        Title = "Old test publication",
-                        Slug = "old-test-publication"
-                    }
-                );
-                await statisticsDbContext.AddAsync(
-                    new Data.Model.Topic
-                    {
-                        Id = publication.Topic.Id,
-                        Title = "Test topic",
-                        Slug = "test-topic"
-                    }
-                );
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildPublicationService(contentDbContext, statisticsDbContext);
+                var service = BuildPublicationService(contentDbContext);
 
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
             await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
-                var statsPublication = await statisticsDbContext.Publication.FindAsync(publication.Id);
 
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal(publishDate, contentPublication.Published);
-
-                Assert.Equal(publication.Id, statsPublication.Id);
-                Assert.Equal("Test publication", statsPublication.Title);
-                Assert.Equal("test-publication", statsPublication.Slug);
-                Assert.Equal(publication.TopicId, statsPublication.TopicId);
             }
         }
 
         private PublicationService BuildPublicationService(
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext = null,
             IMapper mapper = null,
             IReleaseService releaseService = null
         ) {
             return new PublicationService(
                 contentDbContext: contentDbContext,
-                statisticsDbContext: statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 mapper: mapper ?? MapperForProfile<MappingProfiles>(),
                 releaseService: releaseService ?? new Mock<IReleaseService>().Object
             );

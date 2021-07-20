@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    partial class StatisticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210714123342_EES2401RemoveThemeTopicPublicationTables")]
+    partial class EES2401RemoveThemeTopicPublicationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,12 +307,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("PlanningArea_Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Provider_Code")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Provider_Name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Region_Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -319,12 +315,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("RscRegion_Code")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("School_Code")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("School_Name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Sponsor_Code")
                         .HasColumnType("nvarchar(450)");
@@ -364,13 +354,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("PlanningArea_Code");
 
-                    b.HasIndex("Provider_Code");
-
                     b.HasIndex("Region_Code");
 
                     b.HasIndex("RscRegion_Code");
-
-                    b.HasIndex("School_Code");
 
                     b.HasIndex("Sponsor_Code");
 

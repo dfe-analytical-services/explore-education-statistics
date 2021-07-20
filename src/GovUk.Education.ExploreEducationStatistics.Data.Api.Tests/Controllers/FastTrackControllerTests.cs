@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async void Get_FastTrack()
+        public async Task Get_FastTrack()
         {
             var result = await _controller.Get(_validId.ToString());
             Assert.IsType<FastTrackViewModel>(result.Value);
@@ -42,14 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async void Get_NotFound()
+        public async Task Get_NotFound()
         {
             var result = await _controller.Get(_notFoundId.ToString());
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
-        public async void Get_InvalidId()
+        public async Task Get_InvalidId()
         {
             var result = await _controller.Get("InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);

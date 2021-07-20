@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async void GetThemes_CanViewAllTopics()
+        public async Task GetThemes_CanViewAllTopics()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetThemes_CanViewLinkedTopics()
+        public async Task GetThemes_CanViewLinkedTopics()
         {
             var userId = Guid.NewGuid();
 

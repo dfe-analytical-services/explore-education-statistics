@@ -27,15 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
+            var publicationId = Guid.NewGuid();
 
             var release = new Release
             {
-                PublicationId = publication.Id,
-                Publication = publication,
+                PublicationId = publicationId,
             };
 
             var releaseSubject = new ReleaseSubject
@@ -136,8 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectService = new Mock<ISubjectService>();
 
                 subjectService
-                    .Setup(s => s.GetPublicationForSubject(query.SubjectId))
-                    .ReturnsAsync(publication);
+                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .ReturnsAsync(publicationId);
 
                 subjectService
                     .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
@@ -146,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var releaseService = new Mock<IReleaseRepository>();
 
                 releaseService
-                    .Setup(s => s.GetLatestPublishedRelease(publication.Id))
+                    .Setup(s => s.GetLatestPublishedRelease(publicationId))
                     .Returns(release);
 
                 var service = BuildTableBuilderService(
@@ -183,10 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_ReleaseNotFound()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
+            var publicationId = Guid.NewGuid();
 
             var query = new ObservationQueryContext
             {
@@ -200,13 +193,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectService = new Mock<ISubjectService>();
 
                 subjectService
-                    .Setup(s => s.GetPublicationForSubject(query.SubjectId))
-                    .ReturnsAsync(publication);
+                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .ReturnsAsync(publicationId);
 
                 var releaseService = new Mock<IReleaseRepository>();
 
                 releaseService
-                    .Setup(s => s.GetLatestPublishedRelease(publication.Id));
+                    .Setup(s => s.GetLatestPublishedRelease(publicationId));
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext,
@@ -225,15 +218,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_SubjectNotFound()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
+            var publicationId = Guid.NewGuid();
 
             var release = new Release
             {
-                PublicationId = publication.Id,
-                Publication = publication,
+                PublicationId = publicationId,
             };
 
             var query = new ObservationQueryContext
@@ -248,13 +237,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectService = new Mock<ISubjectService>();
 
                 subjectService
-                    .Setup(s => s.GetPublicationForSubject(query.SubjectId))
-                    .ReturnsAsync(publication);
+                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .ReturnsAsync(publicationId);
 
                 var releaseService = new Mock<IReleaseRepository>();
 
                 releaseService
-                    .Setup(s => s.GetLatestPublishedRelease(publication.Id))
+                    .Setup(s => s.GetLatestPublishedRelease(publicationId))
                     .Returns(release);
 
                 var service = BuildTableBuilderService(

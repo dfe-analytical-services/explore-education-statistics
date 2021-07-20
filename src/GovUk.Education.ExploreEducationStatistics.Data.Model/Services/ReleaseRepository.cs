@@ -18,18 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public Release? GetLatestPublishedRelease(Guid publicationId)
         {
             return DbSet()
-                .Include(release => release.Publication)
                 .Where(release => release.PublicationId.Equals(publicationId))
                 .ToList()
-                .Where(release => release.Live && IsLatestVersionOfRelease(release.Publication, release.Id))
+                .Where(release => release.Live && IsLatestVersionOfRelease(release.PublicationId, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimeIdentifier)
                 .LastOrDefault();
         }
 
-        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+        private bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId)
         {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Live && r.Id != releaseId);
+            var releases = _context.Release
+                .Where(r => r.PublicationId == publicationId)
+                .ToList();
+            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Live && r.Id != releaseId);
         }
     }
 }

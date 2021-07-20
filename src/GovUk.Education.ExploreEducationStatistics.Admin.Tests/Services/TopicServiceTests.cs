@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -7,8 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Moq;
@@ -16,6 +17,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
 using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 
@@ -24,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class TopicServiceTests
     {
         [Fact]
-        public async void CreateTopic()
+        public async Task CreateTopic()
         {
             var theme = new Theme
             {
@@ -66,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateTopic_FailsNonExistingTheme()
+        public async Task CreateTopic_FailsNonExistingTheme()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();
 
@@ -86,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateTopic_FailsNonUniqueSlug()
+        public async Task CreateTopic_FailsNonUniqueSlug()
         {
             var theme = new Theme
             {
@@ -129,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic()
+        public async Task UpdateTopic()
         {
             var theme = new Theme
             {
@@ -184,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic_FailsNonExistingTheme()
+        public async Task UpdateTopic_FailsNonExistingTheme()
         {
             var topic = new Topic
             {
@@ -224,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTopic_FailsNonUniqueSlug()
+        public async Task UpdateTopic_FailsNonUniqueSlug()
         {
             var theme = new Theme
             {
@@ -274,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetTopic()
+        public async Task GetTopic()
         {
             var topic = new Topic
             {
@@ -309,26 +311,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void DeleteTopic()
+        public async Task DeleteTopic()
         {
             var topicId = Guid.NewGuid();
 
-            var topic = new Topic
+            var publication = new Publication
             {
-                Id = topicId,
-                Title = "UI test topic"
+                Id = Guid.NewGuid(),
+                Topic = new Topic
+                {
+                    Id = topicId,
+                    Title = "UI test topic"
+                }
             };
 
             var release = new Release
             {
-                Publication = new Publication
-                {
-                    Topic = new Data.Model.Topic
-                    {
-                        Id = topicId,
-                        Title = "UI test topic"
-                    }
-                }
+                PublicationId = publication.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -336,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
-                contentContext.Add(topic);
+                contentContext.Add(publication);
                 statisticsContext.Add(release);
 
                 await contentContext.SaveChangesAsync();
@@ -348,13 +347,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupTopicService(contentContext, statisticsContext: statisticsContext);
 
-                var result = await service.DeleteTopic(topic.Id);
+                var result = await service.DeleteTopic(topicId);
 
                 Assert.True(result.IsRight);
 
                 Assert.Equal(0, contentContext.Topics.Count());
                 Assert.Equal(0, statisticsContext.Release.Count());
-                Assert.Equal(0, statisticsContext.Topic.Count());
             }
         }
 

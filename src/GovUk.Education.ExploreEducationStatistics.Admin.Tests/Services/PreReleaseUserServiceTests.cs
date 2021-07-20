@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PreReleaseUserServiceTests
     {
         [Fact]
-        public async void GetPreReleaseUsers_OrderedCorrectly()
+        public async Task GetPreReleaseUsers_OrderedCorrectly()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -97,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetPreReleaseUsers_FiltersInvalidReleaseUsers()
+        public async Task GetPreReleaseUsers_FiltersInvalidReleaseUsers()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -145,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetPreReleaseUsers_FiltersInvalidReleaseInvites()
+        public async Task GetPreReleaseUsers_FiltersInvalidReleaseInvites()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -198,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_Fails_InvalidEmail()
+        public async Task AddPreReleaseUser_Fails_InvalidEmail()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -222,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_Fails_NoRelease()
+        public async Task AddPreReleaseUser_Fails_NoRelease()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -238,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_Fails_ExistingReleaseRole()
+        public async Task AddPreReleaseUser_Fails_ExistingReleaseRole()
         {
             var release = new Release
             {
@@ -276,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_Fails_ExistingReleaseInvite()
+        public async Task AddPreReleaseUser_Fails_ExistingReleaseInvite()
         {
             var release = new Release
             {
@@ -311,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_InvitesExistingUser()
+        public async Task AddPreReleaseUser_InvitesExistingUser()
         {
             var release = new Release
             {
@@ -408,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void AddPreReleaseUser_InvitesNewUser()
+        public async Task AddPreReleaseUser_InvitesNewUser()
         {
             var release = new Release
             {
@@ -513,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_Fails_InvalidEmail()
+        public async Task RemovePreReleaseUser_Fails_InvalidEmail()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -537,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_ReleaseRoleRemoved()
+        public async Task RemovePreReleaseUser_ReleaseRoleRemoved()
         {
             var release = new Release();
 
@@ -603,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_OtherReleaseRolesNotRemoved()
+        public async Task RemovePreReleaseUser_OtherReleaseRolesNotRemoved()
         {
             var release = new Release();
             var otherRelease = new Release();
@@ -696,7 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_AllInvitesRemoved()
+        public async Task RemovePreReleaseUser_AllInvitesRemoved()
         {
             var release = new Release();
 
@@ -765,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_OtherReleaseInvitesNotRemoved()
+        public async Task RemovePreReleaseUser_OtherReleaseInvitesNotRemoved()
         {
             var release = new Release();
             var otherRelease = new Release();
@@ -856,7 +857,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void RemovePreReleaseUser_AcceptedSystemInviteNotRemoved()
+        public async Task RemovePreReleaseUser_AcceptedSystemInviteNotRemoved()
         {
             var release = new Release();
 

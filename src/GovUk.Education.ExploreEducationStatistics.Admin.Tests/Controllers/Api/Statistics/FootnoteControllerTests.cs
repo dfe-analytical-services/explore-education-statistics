@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void Post_CreateFootnote_Returns_Ok()
+        public async Task Post_CreateFootnote_Returns_Ok()
         {
             var result = await _controller.CreateFootnote(ReleaseId, new FootnoteCreateViewModel()
             {
@@ -178,14 +178,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void Get_Footnotes_Returns_Ok()
+        public async Task Get_Footnotes_Returns_Ok()
         {
             var result = await _controller.GetFootnotes(ReleaseId);
             Assert.IsAssignableFrom<IEnumerable<FootnoteViewModel>>(result.Value);
         }
 
         [Fact]
-        public async void Put_UpdateFootnote_Returns_Ok()
+        public async Task Put_UpdateFootnote_Returns_Ok()
         {
             var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new FootnoteUpdateViewModel
             {
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void Delete_DeleteFootnote_Returns_Ok()
+        public async Task Delete_DeleteFootnote_Returns_Ok()
         {
             var result = await _controller.DeleteFootnote(ReleaseId, FootnoteId);
             Assert.IsType<NoContentResult>(result);

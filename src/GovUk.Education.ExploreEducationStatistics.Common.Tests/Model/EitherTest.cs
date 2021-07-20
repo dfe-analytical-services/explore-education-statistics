@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
     public class EitherTaskTest
     {
         [Fact]
-        public async void OnSuccess()
+        public async Task OnSuccess()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(str => str.ToUpper());
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithRight()
+        public async Task OnSuccess_WithRight()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(str => new Either<int, string>("another success"));
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithLeft()
+        public async Task OnSuccess_WithLeft()
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>("a success"))
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithTask()
+        public async Task OnSuccess_WithTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(str => Task.FromResult("another success"));
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessVoid()
+        public async Task OnSuccessVoid()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccessVoid(
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithRightTask()
+        public async Task OnSuccess_WithRightTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(str => Task.FromResult(new Either<int, string>("another success")));
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithLeftTask()
+        public async Task OnSuccess_WithLeftTask()
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>("a success"))
@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessDo_WithVoid()
+        public async Task OnSuccessDo_WithVoid()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccessDo(async () =>
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessDo_WithRightTask()
+        public async Task OnSuccessDo_WithRightTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccessDo(() => Task.FromResult(new Either<int, string>("another success")));
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessDo_WithLeftTask()
+        public async Task OnSuccessDo_WithLeftTask()
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>("a success"))
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnFailureDo_WithTask()
+        public async Task OnFailureDo_WithTask()
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>(exception))
@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnFailureSucceedWith()
+        public async Task OnFailureSucceedWith()
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>(exception))
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnFailureFailWith()
+        public async Task OnFailureFailWith()
         {
             var exception = new Exception("Something went wrong");
             var nextException = new Exception("Another failure!");
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessCombineWith_AllSuccess()
+        public async Task OnSuccessCombineWith_AllSuccess()
         {
             var either = await Task.FromResult(new Either<int, string>("Success number one!"))
                 .OnSuccessCombineWith(firstSuccess =>
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessCombineWith_AllSuccessMixedTypes()
+        public async Task OnSuccessCombineWith_AllSuccessMixedTypes()
         {
             var either = await Task.FromResult(new Either<int, string>("Success number one!"))
                 .OnSuccessCombineWith(firstSuccess =>
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessCombineWith_FirstFails()
+        public async Task OnSuccessCombineWith_FirstFails()
         {
             var either = await Task.FromResult(new Either<int, string>(500))
                 .OnSuccessCombineWith(firstSuccess =>
@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccessCombineWith_SecondFails()
+        public async Task OnSuccessCombineWith_SecondFails()
         {
             var either = await Task.FromResult(new Either<int, string>("Success number one!"))
                 .OnSuccessCombineWith(_ => Task.FromResult(new Either<int, string>(500)));

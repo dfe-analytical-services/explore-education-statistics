@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Obsolete("Use SecurityPolicyCheckBuilder class or PolicyCheckBuilder method")]
-        public static async void AssertSecurityPoliciesChecked<TProtectedResource, TReturn, TService>(
+        public static async Task AssertSecurityPoliciesChecked<TProtectedResource, TReturn, TService>(
             Func<TService, Task<Either<ActionResult, TReturn>>> protectedAction,
             TProtectedResource resource,
             Mock<IUserService> userService,

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class PublicationControllerTests
     {
         [Fact]
-        public async void CreatePublication_Ok()
+        public async Task CreatePublication_Ok()
         {
             var publicationService = new Mock<IPublicationService>();
 
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
         
         [Fact] 
-        public async void CreatePublication_ValidationFailure()
+        public async Task CreatePublication_ValidationFailure()
         {
             var publicationService = new Mock<IPublicationService>();
 

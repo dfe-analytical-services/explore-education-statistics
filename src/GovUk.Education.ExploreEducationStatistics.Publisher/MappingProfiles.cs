@@ -34,10 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
-            CreateMap<Publication, Data.Model.Publication>()
-                .ForMember(dest => dest.Releases, m => m.Ignore())
-                .ForMember(dest => dest.Topic, m => m.Ignore());
-
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
@@ -51,14 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Theme, ThemeViewModel>();
 
-            CreateMap<Theme, Data.Model.Theme>()
-                .ForMember(dest => dest.Topics, m => m.Ignore());
-
             CreateMap<Topic, TopicViewModel>();
-
-            CreateMap<Topic, Data.Model.Topic>()
-                .ForMember(dest => dest.Publications, m => m.Ignore())
-                .ForMember(dest => dest.Theme, m => m.Ignore());
 
             CreateMap<Update, ReleaseNoteViewModel>();
         }

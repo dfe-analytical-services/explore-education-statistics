@@ -21,24 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                var publicationA = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = "publication-a",
-                    Title = "Publication A"
-                };
-
-                var publicationB = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = "publication-b",
-                    Title = "Publication B"
-                };
+                var publicationAId = Guid.NewGuid();
+                var publicationBId = Guid.NewGuid();
 
                 var publicationARelease1 = new Release
                 {
                     Id = Guid.NewGuid(),
-                    PublicationId = publicationA.Id,
+                    PublicationId = publicationAId,
                     Published = DateTime.UtcNow,
                     Slug = "publication-a-release-1",
                     TimeIdentifier = AcademicYearQ1,
@@ -48,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var publicationARelease2 = new Release
                 {
                     Id = Guid.NewGuid(),
-                    PublicationId = publicationA.Id,
+                    PublicationId = publicationAId,
                     Published = DateTime.UtcNow,
                     Slug = "publication-a-release-2",
                     TimeIdentifier = AcademicYearQ4,
@@ -58,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var publicationARelease3 = new Release
                 {
                     Id = Guid.NewGuid(),
-                    PublicationId = publicationA.Id,
+                    PublicationId = publicationAId,
                     Published = null,
                     Slug = "publication-a-release-3",
                     TimeIdentifier = AcademicYearQ2,
@@ -68,17 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var publicationBRelease1 = new Release
                 {
                     Id = Guid.NewGuid(),
-                    PublicationId = publicationB.Id,
+                    PublicationId = publicationBId,
                     Published = DateTime.UtcNow,
                     Slug = "publication-b-release-1",
                     TimeIdentifier = AcademicYearQ1,
                     Year = 2018
                 };
-
-                context.AddRange(new List<Publication>
-                {
-                    publicationA, publicationB
-                });
 
                 context.AddRange(new List<Release>
                 {
@@ -89,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var repository = new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object);
 
-                var result = repository.GetLatestPublishedRelease(publicationA.Id);
+                var result = repository.GetLatestPublishedRelease(publicationAId);
                 Assert.Equal(publicationARelease1, result);
             }
         }

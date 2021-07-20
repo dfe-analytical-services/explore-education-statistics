@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IThemeService
     {
-        IEnumerable<ThemeViewModel> ListThemes();
+        IEnumerable<ThemeViewModel> ListThemesWithLiveSubjects();
     }
 }

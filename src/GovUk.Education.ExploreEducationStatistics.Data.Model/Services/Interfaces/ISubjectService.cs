@@ -9,12 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId);
 
-        Task<Publication> GetPublicationForSubject(Guid subjectId);
-
-        Task<Publication?> FindPublicationForSubject(Guid subjectId);
-
         Task<Subject?> Get(Guid subjectId);
 
-        Task<List<Subject>> GetSubjectsForRelease(Guid releaseId);
+        Task<Guid> GetPublicationIdForSubject(Guid subjectId);
+
+        Task<Guid?> FindPublicationIdForSubject(Guid subjectId);
     }
 }
