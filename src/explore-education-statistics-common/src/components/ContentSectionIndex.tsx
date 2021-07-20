@@ -9,6 +9,7 @@ import React, {
   useState,
 } from 'react';
 import generateContentList from '@common/components/util/generateContentList';
+import styles from '@common/components/ContentSectionIndex.module.scss';
 
 const TOP_MARGIN = 20;
 const BOTTOM_MARGIN = 40;
@@ -182,13 +183,18 @@ const ContentSectionIndex = ({
           <ul className="govuk-body-s">
             {headingsList.map(listItem => (
               <li key={listItem.id}>
-                <a href={`#${listItem.id}`}>{listItem.textContent}</a>
+                <a href={`#${listItem.id}`} className={styles.link}>
+                  {listItem.textContent.trim()}
+                </a>
                 {listItem.children.length > 0 && (
                   <ul>
                     {listItem.children.map(childListItem => (
                       <li key={childListItem.id}>
-                        <a href={`#${childListItem.id}`}>
-                          {childListItem.textContent}
+                        <a
+                          href={`#${childListItem.id}`}
+                          className={styles.link}
+                        >
+                          {childListItem.textContent.trim()}
                         </a>
                       </li>
                     ))}
