@@ -1,8 +1,11 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import createReleaseAndPublish from './modules/publication/publish';
-import createPublicationAndRelease from './modules/release/create';
-import uploadSingleSubject from './modules/subject/upload';
+import 'dotenv-safe/config';
+import createReleaseAndPublish from './modules/publication/publishPublication';
+import createPublicationAndRelease from './modules/release/createRelease';
+import uploadSingleSubject from './modules/subject/uploadSubject';
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const choices = [
   'create new release',

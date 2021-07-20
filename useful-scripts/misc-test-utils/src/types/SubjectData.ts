@@ -1,4 +1,4 @@
-export interface SubjectArray {
+export interface SubjectData {
   id: string;
   filename: string;
   name: string;

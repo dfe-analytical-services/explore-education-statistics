@@ -1,22 +1,19 @@
 /* eslint-disable no-console */
 import axios from 'axios';
-import 'dotenv-safe/config';
-import { v4 } from 'uuid';
-import fs from 'fs';
-import StreamZip from 'node-stream-zip';
-import globby from 'globby';
-import rimraf from 'rimraf';
-import FormData from 'form-data';
 import chalk from 'chalk';
+import FormData from 'form-data';
+import fs from 'fs';
+import globby from 'globby';
+import StreamZip from 'node-stream-zip';
 import path from 'path';
-import { projectRoot } from '../../../config';
-import ZipDirectory from '../../../utils/zipDirectory';
-import Sleep from '../../../utils/Sleep';
-import { SubjectArray } from '../../../interfaces/SubjectArray';
-import errorHandler from '../../../utils/errorHandler';
+import rimraf from 'rimraf';
+import { v4 } from 'uuid';
+import { projectRoot } from '../../config';
+import { SubjectData } from '../../types/SubjectData';
+import errorHandler from '../../utils/errorHandler';
+import sleep from '../../utils/sleep';
+import ZipDirectory from '../../utils/zipDirectory';
 
-// disable insecure warnings
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, JWT_TOKEN } = process.env;
 const cwd = projectRoot;
 
@@ -82,19 +79,15 @@ const addSubject = async (releaseId: string): Promise<string | null> => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    const subjectId = res.data.id;
-    return subjectId;
+
+    return res.data.id;
   } catch (e) {
     errorHandler(e);
   }
   return null;
 };
 
-const getSubjectProgress = async (
-  releaseId: string,
-  subjectId: string,
-  // eslint-disable-next-line consistent-return
-) => {
+const getSubjectProgress = async (releaseId: string, subjectId: string) => {
   try {
     const res = await axios({
       method: 'GET',
@@ -110,11 +103,11 @@ const getSubjectProgress = async (
           'No import status available. Waiting 3 seconds before polling the API',
         ),
       );
-      await Sleep(3000);
+      await sleep(3000);
     }
     return res.data.status;
   } catch (e) {
-    errorHandler(e);
+    return errorHandler(e);
   }
 };
 
@@ -130,7 +123,7 @@ const getSubjectIdArr = async (
         'Content-Type': 'application/json',
       },
     });
-    const subjects: SubjectArray[] = res.data?.subjects;
+    const subjects: SubjectData[] = res.data?.subjects;
     const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
       subjArr.push({ id: sub.id, content: `Hello ${v4()}` });
@@ -216,19 +209,23 @@ const uploadSingleSubject = async (releaseId: string) => {
     `${cwd}/test-files`,
     `${cwd}/zip-files/clean-test-zip-${v4()}.zip`,
   );
+
   const subjectId = await addSubject(releaseId);
+
   while (importStatus !== 'COMPLETE') {
     console.time('import subject upload');
     console.log(chalk.blue('importStatus', importStatus));
     // eslint-disable-next-line no-await-in-loop
-    await Sleep(1000);
+    await sleep(1000);
     // eslint-disable-next-line no-await-in-loop
     importStatus = await getSubjectProgress(releaseId, subjectId as string);
   }
+
   console.timeEnd(chalk.green('import subject upload'));
 
   try {
     const subjArr = await getSubjectIdArr(releaseId);
+
     if (!subjArr) {
       throw new Error(
         chalk.red(
@@ -236,10 +233,12 @@ const uploadSingleSubject = async (releaseId: string) => {
         ),
       );
     }
+
     await addMetaGuidance(subjArr, releaseId);
     console.timeEnd(chalk.green('publication elapsed time'));
   } catch (e) {
     errorHandler(e);
   }
 };
+
 export default uploadSingleSubject;

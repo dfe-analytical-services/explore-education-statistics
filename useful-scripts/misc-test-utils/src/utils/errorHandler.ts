@@ -2,8 +2,13 @@
 import { AxiosError } from 'axios';
 import chalk from 'chalk';
 
-const errorHandler = async (e: AxiosError) => {
-  switch (e?.response?.status) {
+const errorHandler = (e: AxiosError): void => {
+  if (!e.isAxiosError) {
+    console.error(e);
+    process.exit(1);
+  }
+
+  switch (e.response?.status) {
     case 401:
       console.log(
         chalk.red`JWT token has expired, get a new one from Admin EES`,
@@ -33,7 +38,10 @@ const errorHandler = async (e: AxiosError) => {
 
     default:
       console.error(e);
+      break;
   }
+
   process.exit(1);
 };
+
 export default errorHandler;

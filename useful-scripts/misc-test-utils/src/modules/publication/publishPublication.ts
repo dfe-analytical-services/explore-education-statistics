@@ -1,29 +1,27 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import axios from 'axios';
-import 'dotenv-safe/config';
-import { v4 } from 'uuid';
-import fs from 'fs';
-import StreamZip from 'node-stream-zip';
-import globby from 'globby';
-import rimraf from 'rimraf';
-import FormData from 'form-data';
 import chalk from 'chalk';
+import FormData from 'form-data';
+import fs from 'fs';
+import globby from 'globby';
+import StreamZip from 'node-stream-zip';
 import path from 'path';
-import ZipDirectory from '../../../utils/zipDirectory';
-import Sleep from '../../../utils/Sleep';
-import { SubjectArray } from '../../../interfaces/SubjectArray';
-import { ReleaseData } from '../../../interfaces/ReleaseData';
-import errorHandler from '../../../utils/errorHandler';
-import { projectRoot } from '../../../config';
+import rimraf from 'rimraf';
+import { v4 } from 'uuid';
+import { projectRoot } from '../../config';
+import { ReleaseData } from '../../types/ReleaseData';
+import { SubjectData } from '../../types/SubjectData';
+import errorHandler from '../../utils/errorHandler';
+import sleep from '../../utils/sleep';
+import ZipDirectory from '../../utils/zipDirectory';
 
 // disable insecure warnings
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { ADMIN_URL, TOPIC_ID, JWT_TOKEN } = process.env;
 const cwd = projectRoot;
 
 const createPublication = async () => {
-  console.time('CreatePublication');
+  console.time('createPublication');
+
   try {
     const res = await axios({
       method: 'POST',
@@ -43,10 +41,11 @@ const createPublication = async () => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    console.timeEnd('CreatePublication');
+
+    console.timeEnd('createPublication');
     console.log(chalk.green(`Created publication. Status code ${res.status}`));
-    const publicationId = res.data.id;
-    return publicationId;
+
+    return res.data.id;
   } catch (e) {
     errorHandler(e);
   }
@@ -71,8 +70,11 @@ const createRelease = async (publicationId: string): Promise<string | null> => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
+
     console.timeEnd('createRelease');
+
     const releaseId = res.data.id;
+
     console.log(
       chalk.green(
         `Release URL: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/data`,
@@ -147,11 +149,12 @@ const addSubject = async (releaseId: string): Promise<string | null> => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    const subjectId = res.data.id;
-    return subjectId;
+
+    return res.data.id;
   } catch (e) {
     errorHandler(e);
   }
+
   return null;
 };
 
@@ -175,7 +178,7 @@ const getSubjectProgress = async (
           'No import status available. Waiting 3 seconds before polling the API',
         ),
       );
-      await Sleep(3000);
+      await sleep(3000);
     }
     return res.data.status;
   } catch (e) {
@@ -195,7 +198,7 @@ const getSubjectIdArr = async (
         'Content-Type': 'application/json',
       },
     });
-    const subjects: SubjectArray[] = res.data?.subjects;
+    const subjects: SubjectData[] = res.data?.subjects;
     const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(sub => {
       subjArr.push({ id: sub.id, content: `Hello ${v4()}` });
@@ -231,7 +234,6 @@ const addMetaGuidance = async (
   return false;
 };
 
-// eslint-disable-next-line consistent-return
 const getFinalReleaseDetails = async (releaseId: string) => {
   try {
     const res = await axios({
@@ -244,9 +246,9 @@ const getFinalReleaseDetails = async (releaseId: string) => {
     });
     const releaseData: ReleaseData = res.data;
 
-    await Sleep(1000);
+    await sleep(1000);
 
-    const obj = {
+    return {
       id: releaseData.id,
       title: releaseData.title,
       slug: releaseData.slug,
@@ -279,9 +281,9 @@ const getFinalReleaseDetails = async (releaseId: string) => {
       latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
-    return obj;
   } catch (e) {
     errorHandler(e);
+    return undefined;
   }
 };
 
@@ -301,7 +303,6 @@ const publishRelease = async (obj: ReleaseData, releaseId: string) => {
   }
 };
 
-// eslint-disable-next-line consistent-return
 const getPublicationProgress = async (releaseId: string) => {
   try {
     const res = await axios({
@@ -330,12 +331,14 @@ const getPublicationProgress = async (releaseId: string) => {
         chalk.blue('publishing stage'),
         chalk.green(res.data.publishingStage),
       );
-      await Sleep(3000);
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(3000);
+      // eslint-disable-next-line no-await-in-loop
       await getPublicationProgress(releaseId);
     }
     return res.data;
   } catch (e) {
-    console.error(e);
+    return errorHandler(e);
   }
 };
 
@@ -399,13 +402,13 @@ const createReleaseAndPublish = async () => {
     console.log(
       'No importStatus just yet, waiting 4 seconds before polling again',
     );
-    await Sleep(4000);
+    await sleep(4000);
   }
 
   while (importStatus !== 'COMPLETE') {
     console.log(chalk.blue('importStatus', chalk.green(importStatus)));
     // eslint-disable-next-line no-await-in-loop
-    await Sleep(1000);
+    await sleep(1000);
 
     // eslint-disable-next-line no-await-in-loop
     importStatus = await getSubjectProgress(releaseId, subjectId as string);
