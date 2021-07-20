@@ -28,7 +28,7 @@ do this on failure
     END
 
 custom testid locator strategy
-    [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
+    [Arguments]    ${browser}    ${test_id}    ${tag}    ${constraints}
     ${elements}=    get webelements    css:[data-testid="${test_id}"]
     [Return]    ${elements}
 
