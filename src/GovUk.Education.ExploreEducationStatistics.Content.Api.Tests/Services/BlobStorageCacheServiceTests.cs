@@ -2,8 +2,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             }
         }
 
-        private class SampleCacheKey : ICacheKey<SampleClass>
+        private class SampleCacheKey : ICacheKey
         {
             public string Key { get; }
 

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
@@ -79,10 +78,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             if (ReferenceEquals(null, other)) return 1;
             return string.Compare(Title, other.Title, StringComparison.Ordinal);
         }
-    }
-
-    public class AllMethodologiesCacheKey : ICacheKey<List<AllMethodologiesThemeViewModel>>
-    {
-        public string Key => "627b1bfc-3436-474c-9d10-7b0b98b6dee5";
     }
 }

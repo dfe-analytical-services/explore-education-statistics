@@ -7,7 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
@@ -28,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyRepository _methodologyRepository;
@@ -39,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
             IMapper mapper,
+            ICacheService cacheService,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyRepository methodologyRepository,
@@ -49,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _persistenceHelper = persistenceHelper;
             _context = context;
             _mapper = mapper;
+            _cacheService = cacheService;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyRepository = methodologyRepository;
@@ -134,6 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // methodology.Published = DateTime.UtcNow;
 
                         methodology.Published ??= DateTime.UtcNow;
+
+                        // Invalidate the 'All Methodologies' cache item
+                        await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
                     }
 
                     await _context.SaveChangesAsync();

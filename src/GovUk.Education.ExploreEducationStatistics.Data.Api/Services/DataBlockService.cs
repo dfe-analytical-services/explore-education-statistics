@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -56,15 +57,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         if (block.ContentBlock is DataBlock dataBlock)
                         {
                             return await _cacheService.GetItem(
-                                PublicContent,
-                                new TableBuilderResultCacheKey(block),
-                                async () =>
-                            {
-                                var query = dataBlock.Query.Clone();
-                                query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
+                                blobContainer: PublicContent,
+                                cacheKey: new DataBlockTableResultCacheKey(block),
+                                entityProvider: async () =>
+                                {
+                                    var query = dataBlock.Query.Clone();
+                                    query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
 
-                                return await _tableBuilderService.Query(block.ReleaseId, query);
-                            });
+                                    return await _tableBuilderService.Query(block.ReleaseId, query);
+                                });
                         }
 
                         return new NotFoundResult();

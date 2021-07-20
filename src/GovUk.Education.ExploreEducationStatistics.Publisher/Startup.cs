@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        cacheService: provider.GetService<ICacheService>(),
                         fastTrackService: provider.GetService<IFastTrackService>(),
                         downloadService: provider.GetRequiredService<IDownloadService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),

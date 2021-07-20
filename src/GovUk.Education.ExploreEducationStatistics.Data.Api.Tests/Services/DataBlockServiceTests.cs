@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -74,10 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
-                .SetupEntityProviderResult<TableBuilderResultViewModel,
+                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
                     Task<Either<ActionResult, TableBuilderResultViewModel>>>(
                     PublicContent,
-                    new TableBuilderResultCacheKey(releaseContentBlock));
+                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -155,10 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
-                .SetupEntityProviderResult<TableBuilderResultViewModel,
+                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
                     Task<Either<ActionResult, TableBuilderResultViewModel>>>(
                     PublicContent,
-                    new TableBuilderResultCacheKey(releaseContentBlock));
+                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -239,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             cacheService
                 .Setup(s => s.GetItem(
                     PublicContent,
-                    It.Is<TableBuilderResultCacheKey>(key => key.Key == cacheKey),
+                    It.Is<DataBlockTableResultCacheKey>(key => key.Key == cacheKey),
                     It.IsAny<Func<Task<Either<ActionResult, TableBuilderResultViewModel>>>>()))
                 .ReturnsAsync(tableResult);
 

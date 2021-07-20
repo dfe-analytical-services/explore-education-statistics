@@ -2,8 +2,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,18 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task DeleteItem<TEntity>(IBlobContainer blobContainer, ICacheKey<TEntity> cacheKey)
+        public async Task DeleteItem(IBlobContainer blobContainer, ICacheKey cacheKey)
         {
             await _blobStorageService.DeleteBlob(blobContainer, cacheKey.Key);
         }
 
         public async Task<TEntity> GetItem<TEntity>(
             IBlobContainer blobContainer,
-            ICacheKey<TEntity> cacheKey,
+            ICacheKey cacheKey,
             Func<TEntity> entityProvider) where TEntity : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
+            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
 
             if (cachedEntity != null)
             {
@@ -51,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<TEntity> GetItem<TEntity>(
             IBlobContainer blobContainer,
-            ICacheKey<TEntity> cacheKey,
+            ICacheKey cacheKey,
             Func<Task<TEntity>> entityProvider)
             where TEntity : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
+            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
             if (cachedEntity != null)
             {
                 return cachedEntity;
@@ -72,12 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<Either<ActionResult, TEntity>> GetItem<TEntity>(
             IBlobContainer blobContainer,
-            ICacheKey<TEntity> cacheKey,
+            ICacheKey cacheKey,
             Func<Task<Either<ActionResult, TEntity>>> entityProvider)
             where TEntity : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache(blobContainer, cacheKey);
+            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
             if (cachedEntity != null)
             {
                 return cachedEntity;
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private async Task<TEntity?> ReadFromCache<TEntity>(
             IBlobContainer blobContainer,
-            ICacheKey<TEntity> cacheKey)
+            ICacheKey cacheKey)
             where TEntity : class
         {
             var key = cacheKey.Key;
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private async Task WriteToCache<TEntity>(
             IBlobContainer blobContainer,
-            ICacheKey<TEntity> cacheKey,
+            ICacheKey cacheKey,
             TEntity entity)
         {
             // Write result to cache as a json blob before returning

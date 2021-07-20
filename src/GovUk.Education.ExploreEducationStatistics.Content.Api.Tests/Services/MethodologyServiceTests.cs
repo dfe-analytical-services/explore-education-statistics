@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -382,9 +383,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            cacheService.SetupEntityProviderResult(
+            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
                 PublicContent,
-                new AllMethodologiesCacheKey());
+                AllMethodologiesCacheKey.Instance);
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
@@ -451,9 +452,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            cacheService.SetupEntityProviderResult(
+            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
                 PublicContent,
-                new AllMethodologiesCacheKey());
+                AllMethodologiesCacheKey.Instance);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -498,9 +499,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            cacheService.SetupEntityProviderResult(
+            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
                 PublicContent,
-                new AllMethodologiesCacheKey());
+                AllMethodologiesCacheKey.Instance);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -562,9 +563,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            cacheService.SetupEntityProviderResult(
-            PublicContent,
-                new AllMethodologiesCacheKey());
+            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
+                PublicContent,
+                AllMethodologiesCacheKey.Instance);
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
