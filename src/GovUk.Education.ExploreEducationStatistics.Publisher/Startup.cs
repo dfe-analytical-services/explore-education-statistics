@@ -104,7 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                             logger: provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
-                .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
+                .AddScoped<IReleaseSubjectService, ReleaseSubjectService>(provider =>
+                    new ReleaseSubjectService(
+                        statisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
+                        footnoteRepository: provider.GetService<IFootnoteRepository>()))
                 .AddScoped<IFilterService, FilterService>()
                 .AddScoped<IIndicatorService, IndicatorService>()
                 .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
