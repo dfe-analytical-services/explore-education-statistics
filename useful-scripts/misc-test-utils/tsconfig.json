@@ -5,11 +5,10 @@
     "lib": [
       "dom",
       "es6",
-      "es2017",
+      "es2019",
       "esnext.asynciterable"
     ],
-    "strict": true,
-    "sourceMap": false,
+    "outDir": "./dist",
     "moduleResolution": "node",
     "removeComments": true,
     "noImplicitAny": true,
@@ -31,7 +30,8 @@
     "node_modules"
   ],
   "include": [
-    "./**/*.tsx",
-    "./**/*.ts",
-  ]
-} 
+    "./src/**/*.tsx",
+    "./src/**/*.ts",
+    "."
+ ]
+}
