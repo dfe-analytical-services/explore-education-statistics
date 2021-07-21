@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ThemeServiceTests
     {
         [Fact]
-        public async void CreateTheme()
+        public async Task CreateTheme()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateTheme_FailsNonUniqueSlug()
+        public async Task CreateTheme_FailsNonUniqueSlug()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTheme()
+        public async Task UpdateTheme()
         {
             var theme = new Theme
             {
@@ -126,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateTheme_FailsNonUniqueSlug()
+        public async Task UpdateTheme_FailsNonUniqueSlug()
         {
             var theme = new Theme
             {
@@ -171,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetTheme()
+        public async Task GetTheme()
         {
             var theme = new Theme
             {
@@ -203,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetThemes()
+        public async Task GetThemes()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -266,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void DeleteTheme()
+        public async Task DeleteTheme()
         {
             var theme = new Theme
             {

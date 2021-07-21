@@ -1,10 +1,21 @@
 [tool.robotidy]
 overwrite = true
 spacecount = 4
-diff = true
+diff = false
 transform = [
-   "DiscardEmptySections:allow_only_comments=True",
-   "SplitTooLongLine"
+    "AlignSettingsSection",
+    "AlignVariablesSection",
+    "DiscardEmptySections:allow_only_comments=True",
+    "MergeAndOrderSections",
+    "NormalizeAssignments",
+    "NormalizeNewLines",
+    "NormalizeSectionHeaderName",
+    "NormalizeSeparators",
+    "NormalizeSettingName",
+    "OrderSettings",
+    "RemoveEmptySettings",
+    "ReplaceRunKeywordIf",
+    "SplitTooLongLine"
 ]
 configure = [
     "SplitTooLongLine:split_on_every_arg=False"

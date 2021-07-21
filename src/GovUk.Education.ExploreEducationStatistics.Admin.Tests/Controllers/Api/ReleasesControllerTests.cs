@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _publicationId = Guid.NewGuid();
 
         [Fact]
-        public async void Create_Release_Returns_Ok()
+        public async Task Create_Release_Returns_Ok()
         {
             var mocks = Mocks();
 
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void UpdateRelease_Returns_Ok()
+        public async Task UpdateRelease_Returns_Ok()
         {
             var mocks = Mocks();
 
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void Get_Releases_For_Publication_Returns_Ok()
+        public async Task Get_Releases_For_Publication_Returns_Ok()
         {
             var mocks = Mocks();
             var templateReleaseResult =
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void CancelFileImport()
+        public async Task CancelFileImport()
         {
             var mocks = Mocks();
 
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void CancelFileImportButNotAllowed()
+        public async Task CancelFileImportButNotAllowed()
         {
             var mocks = Mocks();
             

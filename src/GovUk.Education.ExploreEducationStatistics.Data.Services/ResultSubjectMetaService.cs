@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IIndicatorService _indicatorService;
@@ -38,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IMapper _mapper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
-        public ResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+        public ResultSubjectMetaService(ContentDbContext contentDbContext,
+            IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
             IFootnoteRepository footnoteRepository,
             IGeoJsonService geoJsonService,
@@ -52,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IMapper mapper,
             IReleaseDataFileRepository releaseDataFileRepository) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
+            _contentDbContext = contentDbContext;
             _boundaryLevelService = boundaryLevelService;
             _footnoteRepository = footnoteRepository;
             _indicatorService = indicatorService;
@@ -106,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
-                    var publication = await _subjectService.GetPublicationForSubject(subject.Id);
+                    var publicationId = await _subjectService.GetPublicationIdForSubject(subject.Id);
+                    var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
                     var subjectName = releaseFile.Name;
@@ -119,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Indicators = indicators,
                         Locations = locations,
                         BoundaryLevels = boundaryLevels,
-                        PublicationName = publication.Title,
+                        PublicationName = publicationTitle,
                         SubjectName = subjectName,
                         TimePeriodRange = timePeriodRange
                     };

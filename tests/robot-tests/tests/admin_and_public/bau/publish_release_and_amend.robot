@@ -250,14 +250,14 @@ Verify release associated files
     user checks element should contain    ${downloads}
     ...    Learn more about the data files used in this release using our data files guide.
 
-    user opens details dropdown  List of other files
-    ${other_files}=   user gets details content element  List of other files
-    ${other_files_1}=  get child element  ${other_files}  css:li:nth-child(1)
+    user opens details dropdown    List of other files
+    ${other_files}=    user gets details content element    List of other files
+    ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
-    user waits until element contains link  ${other_files_1}  Test ancillary file 1
-    user opens details dropdown  More details  ${other_files_1}
-    ${other_files_1_details}  user gets details content element   More details  ${other_files_1}
-    user checks element should contain  ${other_files_1_details}  Test ancillary file 1 summary
+    user waits until element contains link    ${other_files_1}    Test ancillary file 1
+    user opens details dropdown    More details    ${other_files_1}
+    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
+    user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
 
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
@@ -604,23 +604,23 @@ Verify amendment files
     user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
     ...    30
 
-    user opens details dropdown  List of other files
-    ${other_files}=   user gets details content element  List of other files
-    ${other_files_1}=  get child element  ${other_files}  css:li:nth-child(1)
-    ${other_files_2}=  get child element  ${other_files}  css:li:nth-child(2)
+    user opens details dropdown    List of other files
+    ${other_files}=    user gets details content element    List of other files
+    ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
+    ${other_files_2}=    get child element    ${other_files}    css:li:nth-child(2)
 
-    user waits until element contains link  ${other_files_1}  Test ancillary file 1
-    user opens details dropdown  More details  ${other_files_1}
-    ${other_files_1_details}  user gets details content element   More details  ${other_files_1}
-    user checks element should contain  ${other_files_1_details}  Test ancillary file 1 summary
+    user waits until element contains link    ${other_files_1}    Test ancillary file 1
+    user opens details dropdown    More details    ${other_files_1}
+    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
+    user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
 
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
-    user waits until element contains link  ${other_files_2}  Test ancillary file 2
-    user opens details dropdown  More details  ${other_files_2}
-    ${other_files_2_details}  user gets details content element   More details  ${other_files_2}
-    user checks element should contain  ${other_files_2_details}  Test ancillary file 2 summary
+    user waits until element contains link    ${other_files_2}    Test ancillary file 2
+    user opens details dropdown    More details    ${other_files_2}
+    ${other_files_2_details}=    user gets details content element    More details    ${other_files_2}
+    user checks element should contain    ${other_files_2_details}    Test ancillary file 2 summary
 
     download file    link:Test ancillary file 2    test_ancillary_file_2.txt
     downloaded file should have first line    test_ancillary_file_2.txt    Test file 2

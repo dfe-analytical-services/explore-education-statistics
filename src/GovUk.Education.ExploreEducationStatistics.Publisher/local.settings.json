@@ -13,7 +13,8 @@
   },
   "ConnectionStrings": {
     "ContentDb": "Server=db;Database=content;User=SA;Password=Your_Password123;",
-    "StatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;"
+    "StatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;",
+    "PublicStatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;"
   },
   "Host": {
     "CORS": "*"

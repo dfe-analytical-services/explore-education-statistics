@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class LegacyReleaseServiceTests
     {
         [Fact]
-        public async void GetLegacyRelease()
+        public async Task GetLegacyRelease()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateLegacyRelease()
+        public async Task CreateLegacyRelease()
         {
             var publicationId = Guid.NewGuid();
             
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreateLegacyRelease_WithExisting()
+        public async Task CreateLegacyRelease_WithExisting()
         {
             var publicationId = Guid.NewGuid();
 
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateLegacyRelease()
+        public async Task UpdateLegacyRelease()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
@@ -209,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdateLegacyRelease_ReordersWithExisting()
+        public async Task UpdateLegacyRelease_ReordersWithExisting()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
@@ -282,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         /// updating a legacy release with an `Order` larger than 
         /// the number of legacy releases.
         [Fact]
-        public async void UpdateLegacyRelease_ReordersWithoutGaps()
+        public async Task UpdateLegacyRelease_ReordersWithoutGaps()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
@@ -352,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void DeleteLegacyRelease()
+        public async Task DeleteLegacyRelease()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
@@ -396,7 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void DeleteLegacyRelease_ReordersWithExisting()
+        public async Task DeleteLegacyRelease_ReordersWithExisting()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();

@@ -24,8 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
-            var publication = await GetPublicationForSubject(subjectId);
-            var latestRelease = _releaseRepository.GetLatestPublishedRelease(publication.Id);
+            var publicationId = await GetPublicationIdForSubject(subjectId);
+            var latestRelease = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (latestRelease == null)
             {
@@ -44,34 +44,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FindAsync(subjectId);
         }
 
-        public Task<Publication> GetPublicationForSubject(Guid subjectId)
+        public async Task<Guid> GetPublicationIdForSubject(Guid subjectId)
         {
-            return QueryPublicationForSubject(subjectId).FirstAsync();
+            var firstReleaseSubject = await _context.ReleaseSubject
+                .Include(rs => rs.Release)
+                .Where(rs => rs.SubjectId == subjectId)
+                .FirstAsync();
+            return firstReleaseSubject.Release.PublicationId;
         }
 
-        public async Task<Publication?> FindPublicationForSubject(Guid subjectId)
+        public async Task<Guid?> FindPublicationIdForSubject(Guid subjectId)
         {
-            return await QueryPublicationForSubject(subjectId).FirstOrDefaultAsync();
-        }
-
-        private IQueryable<Publication> QueryPublicationForSubject(Guid subjectId)
-        {
-            return _context
-                .ReleaseSubject
-                .Include(r => r.Release)
-                .ThenInclude(r => r.Publication)
-                .Where(r => r.SubjectId == subjectId)
-                .Select(r => r.Release.Publication);
-        }
-
-        public Task<List<Subject>> GetSubjectsForRelease(Guid releaseId)
-        {
-            return _context
-                .ReleaseSubject
-                .Include(s => s.Subject)
-                .Where(s => s.ReleaseId == releaseId)
-                .Select(s => s.Subject)
-                .ToListAsync();
+            var firstReleaseSubject = await _context.ReleaseSubject
+                .Include(rs => rs.Release)
+                .Where(rs => rs.SubjectId == subjectId)
+                .FirstOrDefaultAsync();
+            return firstReleaseSubject?.Release.PublicationId;
         }
     }
 }

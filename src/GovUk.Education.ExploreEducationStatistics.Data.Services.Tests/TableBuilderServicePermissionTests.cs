@@ -40,14 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .AssertForbidden(
                     async userService =>
                     {
-                        var publication = new Model.Publication
-                        {
-                            Id = Guid.NewGuid(),
-                        };
+                        var publicationId = Guid.NewGuid();
 
-                        var release = new Model.Release
+                        var release = new Release
                         {
                             Id = Guid.NewGuid(),
+                            PublicationId = publicationId,
                         };
 
                         var subjectService = new Mock<ISubjectService>();
@@ -57,13 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             .ReturnsAsync(false);
 
                         subjectService
-                            .Setup(s => s.GetPublicationForSubject(_subject.Id))
-                            .ReturnsAsync(publication);
+                            .Setup(s => s.GetPublicationIdForSubject(_subject.Id))
+                            .ReturnsAsync(publicationId);
 
                         var releaseService = new Mock<IReleaseRepository>();
 
                         releaseService
-                            .Setup(s => s.GetLatestPublishedRelease(publication.Id))
+                            .Setup(s => s.GetLatestPublishedRelease(publicationId))
                             .Returns(release);
 
                         var service = BuildTableBuilderService(

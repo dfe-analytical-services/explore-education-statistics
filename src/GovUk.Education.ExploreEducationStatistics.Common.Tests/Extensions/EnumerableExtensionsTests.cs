@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
         
         [Fact]
-        public async void ForEachAsync()
+        public async Task ForEachAsync()
         {
             List<int> results = new List<int>();
             
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
         
         [Fact]
-        public async void ForEachAsync_SuccessfulEitherList()
+        public async Task ForEachAsync_SuccessfulEitherList()
         {
             Either<Unit, List<int>> results = 
                 await new List<int> {1, 2}
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
         
         [Fact]
-        public async void ForEachAsync_FailingEither()
+        public async Task ForEachAsync_FailingEither()
         {
             Either<Unit, List<int>> results = 
                 await new List<int> {1, -1, 2}

@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Guid Id { get; set; }
         public DateTime? Published { get; set; }
         public string Slug { get; set; }
-        public Publication Publication { get; set; }
         public Guid PublicationId { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }

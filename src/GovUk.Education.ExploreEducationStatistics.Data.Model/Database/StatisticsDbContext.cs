@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -12,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     {
         public StatisticsDbContext()
         {
-
         }
 
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
@@ -21,36 +21,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
         {
+            Configure(timeout);
+        }
+
+        /// <summary>
+        /// This constructor is required to allow sub-classes to pass in
+        /// DbContextOptions without a type parameter.
+        /// We would otherwise need to set a type parameter at the class
+        /// level and this doesn't really work with the DI container (unless
+        /// we created an abstract base class with a type parameter).
+        /// </summary>
+        protected StatisticsDbContext(DbContextOptions options, int? timeout) : base(options)
+        {
+            Configure(timeout);
+        }
+
+        private void Configure(int? timeout)
+        {
             if (timeout.HasValue)
             {
                 Database.SetCommandTimeout(timeout);
             }
         }
 
-        public DbSet<BoundaryLevel> BoundaryLevel { get; set; }
-        public DbSet<Filter> Filter { get; set; }
-        public DbSet<FilterFootnote> FilterFootnote { get; set; }
-        public DbSet<FilterGroup> FilterGroup { get; set; }
-        public DbSet<FilterGroupFootnote> FilterGroupFootnote { get; set; }
-        public DbSet<FilterItem> FilterItem { get; set; }
-        public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; }
-        public DbSet<Footnote> Footnote { get; set; }
-        public DbSet<GeoJson> GeoJson { get; set; }
-        public DbSet<Indicator> Indicator { get; set; }
-        public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; }
-        public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
-        public DbSet<Location> Location { get; set; }
-        public DbSet<Observation> Observation { get; set; }
-        public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
-        public DbSet<Publication> Publication { get; set; }
-        public DbSet<Release> Release { get; set; }
-        public DbSet<Subject> Subject { get; set; }
-        public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
-        public DbSet<Theme> Theme { get; set; }
-        public DbSet<Topic> Topic { get; set; }
+        public DbSet<BoundaryLevel> BoundaryLevel { get; set; } = null!;
+        public DbSet<Filter> Filter { get; set; } = null!;
+        public DbSet<FilterFootnote> FilterFootnote { get; set; } = null!;
+        public DbSet<FilterGroup> FilterGroup { get; set; } = null!;
+        public DbSet<FilterGroupFootnote> FilterGroupFootnote { get; set; } = null!;
+        public DbSet<FilterItem> FilterItem { get; set; } = null!;
+        public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; } = null!;
+        public DbSet<Footnote> Footnote { get; set; } = null!;
+        public DbSet<GeoJson> GeoJson { get; set; } = null!;
+        public DbSet<Indicator> Indicator { get; set; } = null!;
+        public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; } = null!;
+        public DbSet<IndicatorGroup> IndicatorGroup { get; set; } = null!;
+        public DbSet<Location> Location { get; set; } = null!;
+        public DbSet<Observation> Observation { get; set; } = null!;
+        public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; } = null!;
+        public DbSet<Release> Release { get; set; } = null!;
+        public DbSet<Subject> Subject { get; set; } = null!;
+        public DbSet<SubjectFootnote> SubjectFootnote { get; set; } = null!;
 
-        public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
-        public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; }
+        public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
+        public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureBoundaryLevel(modelBuilder);
