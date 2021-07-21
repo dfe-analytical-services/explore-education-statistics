@@ -14,6 +14,7 @@ p {
 
 a {
   @extend %govuk-link;
+  word-break: break-word;
 }
 
 strong {
