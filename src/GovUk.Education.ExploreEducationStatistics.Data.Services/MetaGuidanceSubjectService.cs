@@ -25,18 +25,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly StatisticsDbContext _context;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
+        private readonly IFootnoteRepository _footnoteRepository;
 
         public MetaGuidanceSubjectService(IFilterRepository filterRepository,
             IIndicatorRepository indicatorRepository,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
-            IReleaseDataFileRepository releaseDataFileRepository)
+            IReleaseDataFileRepository releaseDataFileRepository,
+            IFootnoteRepository footnoteRepository)
         {
             _filterRepository = filterRepository;
             _indicatorRepository = indicatorRepository;
             _context = context;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _releaseDataFileRepository = releaseDataFileRepository;
+            _footnoteRepository = footnoteRepository;
         }
 
         public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
@@ -135,6 +138,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
+        private List<FootnoteViewModel> GetFootnotes(Guid releaseId, Guid subjectId)
+        {
+            return _footnoteRepository.GetFootnotes(releaseId, subjectId)
+                .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))
+                .ToList();
+        }
+
         private async Task<MetaGuidanceSubjectViewModel> BuildSubjectViewModel(ReleaseSubject releaseSubject)
         {
             var subject = releaseSubject.Subject;
@@ -147,6 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = await GetTimePeriods(subject.Id);
             var variables = GetVariables(subject.Id);
+            var footnotes = GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 
             return new MetaGuidanceSubjectViewModel
             {
@@ -156,7 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Name = releaseFile.Name ?? "",
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
-                Variables = variables
+                Variables = variables,
+                Footnotes = footnotes
             };
         }
     }
