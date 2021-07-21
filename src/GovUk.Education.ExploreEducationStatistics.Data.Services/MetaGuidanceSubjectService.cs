@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -39,8 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _releaseDataFileRepository = releaseDataFileRepository;
         }
 
-        public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId,
-            List<Guid> subjectIds = null)
+        public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
+            Guid releaseId,
+            List<Guid>? subjectIds = null)
         {
             return await _statisticsPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
@@ -142,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 await _releaseDataFileRepository.GetBySubject(
                     releaseSubject.ReleaseId,
                     releaseSubject.SubjectId);
-            
+
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = await GetTimePeriods(subject.Id);
             var variables = GetVariables(subject.Id);
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Id = subject.Id,
                 Content = releaseSubject.MetaGuidance ?? "",
                 Filename = releaseFile.File.Filename,
-                Name = releaseFile.Name,
+                Name = releaseFile.Name ?? "",
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
                 Variables = variables
