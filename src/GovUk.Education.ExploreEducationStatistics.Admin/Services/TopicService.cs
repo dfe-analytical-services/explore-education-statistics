@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -172,12 +173,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _releaseSubjectService.DeleteAllReleaseSubjects(release.Id);
                         }
 
+                        var publicationIds = topic.Publications
+                            .Select(p => p.Id)
+                            .ToList();
                         _statisticsContext.Release.RemoveRange(
-                            _statisticsContext.Release.Where(r => r.Publication.TopicId == topic.Id)
-                        );
-
-                        _statisticsContext.Topic.RemoveRange(
-                            _statisticsContext.Topic.Where(t => t.Id == topic.Id)
+                            _statisticsContext.Release.Where(r => publicationIds.Contains(r.PublicationId))
                         );
 
                         await _statisticsContext.SaveChangesAsync();

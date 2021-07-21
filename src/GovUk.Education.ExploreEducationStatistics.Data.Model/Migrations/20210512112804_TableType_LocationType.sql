@@ -1,3 +1,7 @@
+/* WARN: This SQL file wasn't used in the 20210512112804 migration. It was created in case we need
+         to reverse the 20210719084148 migration. The original LocationType was created  as
+         part of 20210512112804_TableTypes.sql 
+ */
 create type LocationType as table
 (
     Id                              uniqueidentifier not null,
@@ -22,13 +26,9 @@ create type LocationType as table
     OpportunityArea_Name            varchar(max),
     ParliamentaryConstituency_Code  varchar(max),
     ParliamentaryConstituency_Name  varchar(max),
-    Provider_Code                   varchar(max),
-    Provider_Name                   varchar(max),
     Region_Code                     varchar(max),
     Region_Name                     varchar(max),
     RscRegion_Code                  varchar(max),
-    School_Code                     varchar(max),
-    School_Name                     varchar(max),
     Sponsor_Code                    varchar(max),
     Sponsor_Name                    varchar(max),
     Ward_Code                       varchar(max),

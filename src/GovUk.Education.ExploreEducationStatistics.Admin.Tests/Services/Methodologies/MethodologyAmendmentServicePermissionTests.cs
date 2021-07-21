@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         [Fact]
-        public async void CreateMethodologyAmendment()
+        public async Task CreateMethodologyAmendment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_methodology, CanMakeAmendmentOfSpecificMethodology)

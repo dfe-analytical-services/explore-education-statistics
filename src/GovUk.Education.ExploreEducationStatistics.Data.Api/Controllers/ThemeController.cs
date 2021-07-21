@@ -18,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ThemeViewModel>> ListThemes()
+        public ActionResult<IEnumerable<ThemeViewModel>> ListThemesWithLiveSubjects()
         {
-            return _themeService.ListThemes().ToList();
+            return _themeService.ListThemesWithLiveSubjects().ToList();
         }
     }
 }

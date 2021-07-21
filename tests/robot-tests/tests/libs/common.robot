@@ -28,21 +28,26 @@ do this on failure
     END
 
 custom testid locator strategy
-    [Arguments]  ${browser}  ${test_id}   ${tag}  ${constraints}
-    ${element}=  user gets testid element  ${test_id}
-    [Return]  ${element}
+    [Arguments]    ${browser}    ${test_id}    ${tag}    ${constraints}
+    ${elements}=    get webelements    css:[data-testid="${test_id}"]
+    [Return]    ${elements}
 
 custom label locator strategy
-    [Arguments]  ${browser}  ${label}  ${tag}  ${constraints}
-    user waits until element is visible  xpath://label[text()="${label}"]
-    ${label_el}=  get web element  xpath://label[text()="${label}"]
-    ${input_id}=  get element attribute  ${label_el}  for
-    ${element}=   get web element  id:${input_id}
-    [Return]  ${element}
+    [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
+    ${label_els}=    get webelements    xpath://label[text()="${label}"]
+    ${label_count}=    get length    ${label_els}
+    # Return an empty list if no matching elements
+    ${elements}=    create list
+
+    IF    ${label_count} > 0
+        ${input_id}=    get element attribute    ${label_els}[0]    for
+        ${elements}=    get webelements    id:${input_id}
+    END
+    [Return]    ${elements}
 
 set custom locator strategies
-    add location strategy   testid    custom testid locator strategy
-    add location strategy   label     custom label locator strategy
+    add location strategy    testid    custom testid locator strategy
+    add location strategy    label    custom label locator strategy
 
 user opens the browser
     set custom locator strategies

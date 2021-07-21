@@ -13,12 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishTaxonomyFunction
     {
         private readonly IContentService _contentService;
-        private readonly ITaxonomyService _taxonomyService;
 
-        public PublishTaxonomyFunction(IContentService contentService, ITaxonomyService taxonomyService)
+        public PublishTaxonomyFunction(IContentService contentService)
         {
             _contentService = contentService;
-            _taxonomyService = taxonomyService;
         }
 
         [FunctionName("PublishTaxonomy")]
@@ -36,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await _contentService.UpdateTaxonomy(context);
-            await _taxonomyService.SyncTaxonomy();
 
             logger.LogInformation("{0} completed",
                 executionContext.FunctionName);

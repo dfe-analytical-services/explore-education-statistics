@@ -22,11 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetPublication()
         {
-            var publication = new Publication();
+            var publicationId = Guid.NewGuid();
 
             var release1 = new Release
             {
-                Publication = publication,
+                PublicationId = publicationId,
                 Published = DateTime.Parse("2018-06-01T09:00:00Z"),
                 TimeIdentifier = AcademicYearQ1,
                 Year = 2018
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var release2 = new Release
             {
-                Publication = publication,
+                PublicationId = publicationId,
                 Published = DateTime.Parse("2018-03-01T09:00:00Z"),
                 TimeIdentifier = AcademicYearQ4,
                 Year = 2017
@@ -44,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddAsync(publication);
                 await context.AddRangeAsync(release1, release2);
                 await context.SaveChangesAsync();
             }
@@ -105,10 +104,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var service = BuildPublicationService(context, releaseService: releaseService.Object);
 
-                var result = (await service.GetLatestPublicationSubjectsAndHighlights(publication.Id)).Right;
+                var result = await service.GetLatestPublicationSubjectsAndHighlights(publicationId);
+                var viewModel = result.Right;
 
-                var highlights = result.Highlights.ToList();
-                var subjects = result.Subjects.ToList();
+                var highlights = viewModel.Highlights.ToList();
+                var subjects = viewModel.Subjects.ToList();
 
                 Assert.Equal(2, highlights.Count);
                 Assert.Equal(highlight1, highlights[0]);

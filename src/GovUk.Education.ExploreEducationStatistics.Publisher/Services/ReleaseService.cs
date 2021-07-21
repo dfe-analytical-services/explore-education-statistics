@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectService _releaseSubjectService;
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
+            PublicStatisticsDbContext publicStatisticsDbContext,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
             IReleaseSubjectService releaseSubjectService,
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
+            _publicStatisticsDbContext = publicStatisticsDbContext;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
             _releaseSubjectService = releaseSubjectService;
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(release => release.Publication)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
-            var statisticsRelease = await _statisticsDbContext.Release
+            var statisticsRelease = await _publicStatisticsDbContext.Release
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             if (contentRelease == null)
@@ -196,9 +196,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // The Release in the statistics database can be absent if no Subjects were created
             if (statisticsRelease != null)
             {
-                _statisticsDbContext.Release.Update(statisticsRelease);
+                _publicStatisticsDbContext.Release.Update(statisticsRelease);
                 statisticsRelease.Published ??= published;
-                await _statisticsDbContext.SaveChangesAsync();
+                await _publicStatisticsDbContext.SaveChangesAsync();
             }
         }
 
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Remove Statistical Releases for each of the Content Releases
             await RemoveStatisticalReleases(previousVersions);
 
-            await _statisticsDbContext.SaveChangesAsync();
+            await _publicStatisticsDbContext.SaveChangesAsync();
         }
 
         private async Task<FileInfo> GetAllFilesZip(Release release)
@@ -313,11 +313,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)
         {
-            var releases = await _statisticsDbContext.Release
+            var releases = await _publicStatisticsDbContext.Release
                 .Where(r => releaseIds.Contains(r.Id))
                 .ToListAsync();
 
-            _statisticsDbContext.Release.RemoveRange(releases);
+            _publicStatisticsDbContext.Release.RemoveRange(releases);
         }
     }
 }

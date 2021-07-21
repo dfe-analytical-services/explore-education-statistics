@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async void Get_Permalink()
+        public async Task Get_Permalink()
         {
             var result = await _controller.GetAsync(_validId.ToString());
 
@@ -54,21 +55,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async void Get_Permalink_NotFound()
+        public async Task Get_Permalink_NotFound()
         {
             var result = await _controller.GetAsync(_notFoundId.ToString());
             Assert.IsType<NotFoundResult>(result.Result);
         }
         
         [Fact]
-        public async void Get_Permalink_InvalidId()
+        public async Task Get_Permalink_InvalidId()
         {
             var result = await _controller.GetAsync("InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
-        public async void Create_Permalink_Returns_Id()
+        public async Task Create_Permalink_Returns_Id()
         {
             var result = await _controller.CreateAsync(_releaseId, _request);
 

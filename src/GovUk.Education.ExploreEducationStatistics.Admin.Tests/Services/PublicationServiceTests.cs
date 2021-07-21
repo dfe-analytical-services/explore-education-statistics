@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public async void GetPublication()
+        public async Task GetPublication()
         {
             var methodology1Version1 = new Methodology
             {
@@ -106,35 +106,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.GetPublication(publication.Id);
+                var result = (await publicationService.GetPublication(publication.Id)).AssertRight();
 
-                Assert.True(result.IsRight);
+                Assert.Equal(publication.Id, result.Id);
+                Assert.Equal(publication.Title, result.Title);
+                Assert.Equal(publication.Slug, result.Slug);
 
-                Assert.Equal(publication.Id, result.Right.Id);
-                Assert.Equal(publication.Title, result.Right.Title);
-                Assert.Equal(publication.Slug, result.Right.Slug);
+                Assert.Equal(publication.Topic.Id, result.TopicId);
+                Assert.Equal(publication.Topic.ThemeId, result.ThemeId);
 
-                Assert.Equal(publication.Topic.Id, result.Right.TopicId);
-                Assert.Equal(publication.Topic.ThemeId, result.Right.ThemeId);
+                Assert.Equal(publication.Contact.Id, result.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, result.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, result.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamEmail, result.Contact.TeamEmail);
+                Assert.Equal(publication.Contact.TeamName, result.Contact.TeamName);
 
-                Assert.Equal(publication.Contact.Id, result.Right.Contact.Id);
-                Assert.Equal(publication.Contact.ContactName, result.Right.Contact.ContactName);
-                Assert.Equal(publication.Contact.ContactTelNo, result.Right.Contact.ContactTelNo);
-                Assert.Equal(publication.Contact.TeamEmail, result.Right.Contact.TeamEmail);
-                Assert.Equal(publication.Contact.TeamName, result.Right.Contact.TeamName);
-
-                Assert.Equal(2, result.Right.Methodologies.Count);
+                Assert.Equal(2, result.Methodologies.Count);
                 
-                Assert.Equal(methodology1Version1.Id, result.Right.Methodologies[0].Id);
-                Assert.Equal(methodology1Version1.Title, result.Right.Methodologies[0].Title);
+                Assert.Equal(methodology1Version1.Id, result.Methodologies[0].Id);
+                Assert.Equal(methodology1Version1.Title, result.Methodologies[0].Title);
                 
-                Assert.Equal(methodology2Version2.Id, result.Right.Methodologies[1].Id);
-                Assert.Equal(methodology2Version2.Title, result.Right.Methodologies[1].Title);
+                Assert.Equal(methodology2Version2.Id, result.Methodologies[1].Id);
+                Assert.Equal(methodology2Version2.Title, result.Methodologies[1].Title);
             }
         }
 
         [Fact]
-        public async void GetPublication_NotFound()
+        public async Task GetPublication_NotFound()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -146,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication()
+        public async Task CreatePublication()
         {
             var topic = new Topic
             {
@@ -209,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication_FailsWithNonExistingTopic()
+        public async Task CreatePublication_FailsWithNonExistingTopic()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -228,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication_FailsWithNonUniqueSlug()
+        public async Task CreatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
             {
@@ -271,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication()
+        public async Task UpdatePublication()
         {
             var topic = new Topic
             {
@@ -362,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_AlreadyPublished()
+        public async Task UpdatePublication_AlreadyPublished()
         {
             var topic = new Topic
             {
@@ -522,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_SavesNewContact()
+        public async Task UpdatePublication_SavesNewContact()
         {
             var publication = new Publication
             {
@@ -572,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
+        public async Task UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
         {
             var sharedContact = new Contact
             {
@@ -637,7 +635,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_FailsWithNonExistingTopic()
+        public async Task UpdatePublication_FailsWithNonExistingTopic()
         {
             var publication = new Publication
             {
@@ -676,7 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_FailsWithNonUniqueSlug()
+        public async Task UpdatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
             {
@@ -724,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void PartialUpdateLegacyReleases_OnlyMatchingEntities()
+        public async Task PartialUpdateLegacyReleases_OnlyMatchingEntities()
         {
             var publication = new Publication
             {
@@ -788,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
+        public async Task PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
             var publication = new Publication
             {

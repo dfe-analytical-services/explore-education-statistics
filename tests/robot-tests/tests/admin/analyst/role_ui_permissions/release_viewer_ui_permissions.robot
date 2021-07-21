@@ -28,12 +28,12 @@ Check cannot create a Methodology for a Publication if they don't have Publicati
 Check cannot edit content for published release
     [Tags]    HappyPath
     user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}
-        ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
-    user cannot see edit controls for release content  ${PUBLICATION_NAME}
+    ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
+    user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
 Navigate back to admin dashboard for publication
     [Tags]    HappyPath
-    user navigates to publication on admin dashboard  ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create an amendment of a published release
     [Tags]    HappyPath

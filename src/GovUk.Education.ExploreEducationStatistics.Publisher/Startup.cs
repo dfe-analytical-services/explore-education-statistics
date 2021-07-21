@@ -41,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
+                .AddDbContext<PublicStatisticsDbContext>(options =>
+                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
@@ -62,11 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>()
                     ))
-                .AddScoped<ITaxonomyService, TaxonomyService>()
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetService<ContentDbContext>(),
-                        statisticsDbContext: provider.GetService<StatisticsDbContext>(),
+                        publicStatisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetService<IMethodologyService>(),
                         releaseSubjectService: provider.GetService<IReleaseSubjectService>(),
@@ -94,8 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new QueueService(
                         storageQueueService: new StorageQueueService(
                             storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")),
-                        releaseStatusService: provider.GetService<IReleaseStatusService>(),
-                        logger: provider.GetRequiredService<ILogger<QueueService>>()))
+                            releaseStatusService: provider.GetService<IReleaseStatusService>(),
+                            logger: provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
@@ -117,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ));
 
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
+            AddPersistenceHelper<PublicStatisticsDbContext>(builder.Services);
         }
 
         private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
