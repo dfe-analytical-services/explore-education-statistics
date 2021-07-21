@@ -15,7 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
         }
 
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout = int.MaxValue) : base(options)
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
+        {
+        }
+
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
         {
             Configure(timeout);
         }
@@ -27,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         /// level and this doesn't really work with the DI container (unless
         /// we created an abstract base class with a type parameter).
         /// </summary>
-        protected StatisticsDbContext(DbContextOptions options, int? timeout = int.MaxValue) : base(options)
+        protected StatisticsDbContext(DbContextOptions options, int? timeout) : base(options)
         {
             Configure(timeout);
         }
