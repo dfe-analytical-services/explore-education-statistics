@@ -2,6 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
+import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
 import {
   PublicationContact,
   ReleaseType,
@@ -74,6 +75,11 @@ const PublicationReleaseHelpAndSupportSection = ({
         {releaseType === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === ReleaseType.OfficialStatistics && (
+          <AccordionSection heading="Official Statistics" headingTag="h3">
+            <OfficialStatisticsSection />
           </AccordionSection>
         )}
         <AccordionSection
