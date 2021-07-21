@@ -205,13 +205,13 @@ const LineChartBlock = ({
             <ReferenceLine
               key={`${referenceLine.position}_${referenceLine.label}`}
               x={referenceLine.position}
-              label={props =>
-                CustomReferenceLineLabel({
-                  chartData,
-                  referenceLine,
-                  referenceLineProps: props,
-                })
-              }
+              label={props => (
+                <CustomReferenceLineLabel
+                  chartData={chartData}
+                  referenceLine={referenceLine}
+                  referenceLineProps={props}
+                />
+              )}
             />
           ))}
 
