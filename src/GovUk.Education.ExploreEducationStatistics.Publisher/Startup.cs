@@ -45,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
+                .AddScoped<ICacheService, BlobStorageCacheService>(provider =>
+                    new BlobStorageCacheService(
+                        blobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        logger: provider.GetRequiredService<ILogger<BlobStorageCacheService>>()))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
@@ -59,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        cacheService: provider.GetService<ICacheService>(),
                         fastTrackService: provider.GetService<IFastTrackService>(),
                         downloadService: provider.GetRequiredService<IDownloadService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),

@@ -1,21 +1,18 @@
-using System;
-using System.IO;
+#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -23,23 +20,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class DataBlockService : IDataBlockService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly ICacheService _cacheService;
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IUserService _userService;
-        private readonly ILogger<DataBlockService> _logger;
 
         public DataBlockService(
             ContentDbContext contentDbContext,
-            IBlobStorageService blobStorageService,
+            ICacheService cacheService,
             ITableBuilderService tableBuilderService,
-            IUserService userService,
-            ILogger<DataBlockService> logger)
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
-            _blobStorageService = blobStorageService;
+            _cacheService = cacheService;
             _tableBuilderService = tableBuilderService;
             _userService = userService;
-            _logger = logger;
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
@@ -62,44 +56,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     {
                         if (block.ContentBlock is DataBlock dataBlock)
                         {
-                            var path = FileStoragePathUtils.PublicContentDataBlockPath(
-                                block.Release.Publication.Slug,
-                                block.Release.Slug,
-                                block.ContentBlockId
-                            );
+                            return await _cacheService.GetItem(
+                                blobContainer: PublicContent,
+                                cacheKey: new DataBlockTableResultCacheKey(block),
+                                entityProvider: async () =>
+                                {
+                                    var query = dataBlock.Query.Clone();
+                                    query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
 
-                            try
-                            {
-                                return await _blobStorageService.GetDeserializedJson<TableBuilderResultViewModel>(
-                                    PublicContent,
-                                    path
-                                );
-                            }
-                            catch (JsonException)
-                            {
-                                // If there's an error deserializing the blob, we should
-                                // assume it's not salvageable and just re-build it.
-                                await _blobStorageService.DeleteBlob(PublicContent, path);
-                            }
-                            catch (FileNotFoundException)
-                            {
-                                // Do nothing as the blob just doesn't exist
-                            }
-                            catch (Exception exception)
-                            {
-                                _logger.LogWarning(
-                                    exception,
-                                    $"Unable to fetch data block response from blob storage with path: {path}"
-                                );
-                            }
-
-                            var query = dataBlock.Query.Clone();
-                            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-                            return await _tableBuilderService.Query(block.ReleaseId, query)
-                                .OnSuccessDo(
-                                    result => _blobStorageService.UploadAsJson(PublicContent, path, result)
-                                );
+                                    return await _tableBuilderService.Query(block.ReleaseId, query);
+                                });
                         }
 
                         return new NotFoundResult();

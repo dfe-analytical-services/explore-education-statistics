@@ -92,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
+            services.AddTransient<ICacheService, BlobStorageCacheService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IIndicatorService, IndicatorService>();

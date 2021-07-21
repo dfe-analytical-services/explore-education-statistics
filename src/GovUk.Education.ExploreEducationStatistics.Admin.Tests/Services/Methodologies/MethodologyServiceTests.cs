@@ -6,7 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -20,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -197,6 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -213,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -245,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -307,6 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -331,6 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -360,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -422,6 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -446,6 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -482,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -523,10 +532,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
+
+            cacheService.Setup(mock =>
+                mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
+                .Returns(Task.CompletedTask);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -545,6 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -579,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -621,6 +636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -641,6 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -673,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -719,10 +736,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
+
+            cacheService.Setup(mock =>
+                    mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
+                .Returns(Task.CompletedTask);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -738,6 +760,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -769,7 +792,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -818,6 +841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -834,6 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
+                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
@@ -845,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
 
-            VerifyAllMocks(contentService, imageService, methodologyRepository, publishingService);
+            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1145,6 +1170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            ICacheService cacheService = null,
             IMethodologyContentService methodologyContentService = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IMethodologyRepository methodologyRepository = null,
@@ -1156,6 +1182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),
+                cacheService ?? new Mock<ICacheService>().Object,
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
