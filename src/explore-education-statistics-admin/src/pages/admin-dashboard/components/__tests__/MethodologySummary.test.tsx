@@ -539,8 +539,7 @@ describe('MethodologySummary', () => {
     });
   });
 
-  // TODO EES-2156 - add tests for deleting the first draft version of a
-  //  Methodology
+  // TODO SOW4 EES-2156 - add tests for deleting the first draft version of a Methodology
   describe('Cancelling an amendment', () => {
     test('the cancel amendment button is shown if user has permission', () => {
       render(
