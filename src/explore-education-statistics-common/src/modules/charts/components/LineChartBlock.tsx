@@ -39,6 +39,7 @@ import {
   YAxis,
 } from 'recharts';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
+import CustomReferenceLineLabel from '@common/modules/charts/components/CustomReferenceLineLabel';
 
 const lineStyles: Dictionary<string> = {
   solid: '',
@@ -204,7 +205,13 @@ const LineChartBlock = ({
             <ReferenceLine
               key={`${referenceLine.position}_${referenceLine.label}`}
               x={referenceLine.position}
-              label={referenceLine.label}
+              label={props => (
+                <CustomReferenceLineLabel
+                  chartData={chartData}
+                  referenceLine={referenceLine}
+                  referenceLineProps={props}
+                />
+              )}
             />
           ))}
 
