@@ -17,11 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public ReleaseSubjectService(
             StatisticsDbContext statisticsDbContext,
             IFootnoteRepository footnoteRepository,
-            SubjectDeleter subjectDeleter)
+            SubjectDeleter? subjectDeleter = null)
         {
             _statisticsDbContext = statisticsDbContext;
             _footnoteRepository = footnoteRepository;
-            _subjectDeleter = subjectDeleter;
+            _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
         }
 
         public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
