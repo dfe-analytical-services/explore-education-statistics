@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -137,6 +138,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 TimeIdentifier = TimeIdentifier.SpringTerm
             };
 
+            var subject1Footnote1 = new SubjectFootnote
+            {
+                Subject = subject1,
+                Footnote = new Footnote
+                {
+                    Content = "Subject 1 Footnote 1"
+                }
+            };
+            var subject1Footnote2 = new FilterFootnote
+            {
+                Filter = subject1Filter,
+                Footnote = new Footnote
+                {
+                    Content = "Subject 1 Footnote 2"
+                }
+            };
+            var subject1Footnote3 = new FilterGroupFootnote
+            {
+                FilterGroup = new FilterGroup
+                {
+                    Filter = subject1Filter
+                },
+                Footnote = new Footnote
+                {
+                    Content = "Subject 1 Footnote 3"
+                }
+            };
+
+            var subject2Footnote1 = new FilterItemFootnote
+            {
+                FilterItem = new FilterItem
+                {
+                    FilterGroup = new FilterGroup
+                    {
+                        Filter = subject2Filter
+                    }
+                },
+                Footnote = new Footnote
+                {
+                    Content = "Subject 2 Footnote 1"
+                }
+            };
+            var subject2Footnote2 = new IndicatorFootnote
+            {
+                Indicator = subject2IndicatorGroup.Indicators[0],
+                Footnote = new Footnote
+                {
+                    Content = "Subject 2 Footnote 2"
+                }
+            };
+
+            var releaseFootnote1 = new ReleaseFootnote
+            {
+                Footnote = subject1Footnote1.Footnote,
+                Release = release
+            };
+            var releaseFootnote2 = new ReleaseFootnote
+            {
+                Footnote = subject1Footnote2.Footnote,
+                Release = release
+            };
+            var releaseFootnote3 = new ReleaseFootnote
+            {
+                Footnote = subject1Footnote3.Footnote,
+                Release = release
+            };
+            var releaseFootnote4 = new ReleaseFootnote
+            {
+                Footnote = subject2Footnote1.Footnote,
+                Release = release
+            };
+            var releaseFootnote5 = new ReleaseFootnote
+            {
+                Footnote = subject2Footnote2.Footnote,
+                Release = release
+            };
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -146,8 +224,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.AddRangeAsync(subject1Filter, subject2Filter);
                 await statisticsDbContext.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
-                await statisticsDbContext.AddRangeAsync(subject1Observation1, subject1Observation2,
-                    subject1Observation3, subject2Observation1, subject2Observation2, subject2Observation3);
+                await statisticsDbContext.AddRangeAsync(
+                    subject1Observation1,
+                    subject1Observation2,
+                    subject1Observation3,
+                    subject2Observation1,
+                    subject2Observation2,
+                    subject2Observation3
+                );
+                await statisticsDbContext.AddRangeAsync(subject1Footnote1, subject1Footnote2, subject1Footnote3);
+                await statisticsDbContext.AddRangeAsync(subject2Footnote1, subject2Footnote2);
+                await statisticsDbContext.AddRangeAsync(
+                    releaseFootnote1,
+                    releaseFootnote2,
+                    releaseFootnote3,
+                    releaseFootnote4,
+                    releaseFootnote5
+                );
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -189,44 +282,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.GetSubjects(release.Id);
+                var result = (await service.GetSubjects(release.Id)).AssertRight();
 
                 // Assert there are two Subjects with the correct content
-                Assert.True(result.IsRight);
 
-                Assert.Equal(2, result.Right.Count);
+                Assert.Equal(2, result.Count);
 
-                Assert.Equal(subject1.Id, result.Right[0].Id);
-                Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
-                Assert.Equal("file1.csv", result.Right[0].Filename);
-                Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Equal("2020/21 Q3", result.Right[0].TimePeriods.From);
-                Assert.Equal("2021/22 Q1", result.Right[0].TimePeriods.To);
+                Assert.Equal(subject1.Id, result[0].Id);
+                Assert.Equal("Subject 1 Meta Guidance", result[0].Content);
+                Assert.Equal("file1.csv", result[0].Filename);
+                Assert.Equal("Subject 1", result[0].Name);
+
+                Assert.Equal("2020/21 Q3", result[0].TimePeriods.From);
+                Assert.Equal("2021/22 Q1", result[0].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
-                    "National", "Local Authority", "Local Authority District"
-                }, result.Right[0].GeographicLevels);
-                Assert.Equal(2, result.Right[0].Variables.Count);
-                Assert.Equal("Subject 1 Filter - Hint", result.Right[0].Variables[0].Label);
-                Assert.Equal("subject1_filter", result.Right[0].Variables[0].Value);
-                Assert.Equal("Subject 1 Indicator", result.Right[0].Variables[1].Label);
-                Assert.Equal("subject1_indicator", result.Right[0].Variables[1].Value);
+                    "National",
+                    "Local Authority",
+                    "Local Authority District"
+                }, result[0].GeographicLevels);
 
-                Assert.Equal(subject2.Id, result.Right[1].Id);
-                Assert.Equal("Subject 2 Meta Guidance", result.Right[1].Content);
-                Assert.Equal("file2.csv", result.Right[1].Filename);
-                Assert.Equal("Subject 2", result.Right[1].Name);
-                Assert.Equal("2020/21 Summer Term", result.Right[1].TimePeriods.From);
-                Assert.Equal("2021/22 Spring Term", result.Right[1].TimePeriods.To);
+                Assert.Equal(2, result[0].Variables.Count);
+                Assert.Equal("Subject 1 Filter - Hint", result[0].Variables[0].Label);
+                Assert.Equal("subject1_filter", result[0].Variables[0].Value);
+                Assert.Equal("Subject 1 Indicator", result[0].Variables[1].Label);
+                Assert.Equal("subject1_indicator", result[0].Variables[1].Value);
+
+                Assert.Equal(3, result[0].Footnotes.Count);
+                Assert.Equal("Subject 1 Footnote 1", result[0].Footnotes[0].Label);
+                Assert.Equal(subject1Footnote1.FootnoteId, result[0].Footnotes[0].Id);
+                Assert.Equal("Subject 1 Footnote 2", result[0].Footnotes[1].Label);
+                Assert.Equal(subject1Footnote2.FootnoteId, result[0].Footnotes[1].Id);
+                Assert.Equal("Subject 1 Footnote 3", result[0].Footnotes[2].Label);
+                Assert.Equal(subject1Footnote3.FootnoteId, result[0].Footnotes[2].Id);
+
+                Assert.Equal(subject2.Id, result[1].Id);
+                Assert.Equal("Subject 2 Meta Guidance", result[1].Content);
+                Assert.Equal("file2.csv", result[1].Filename);
+                Assert.Equal("Subject 2", result[1].Name);
+
+                Assert.Equal("2020/21 Summer Term", result[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring Term", result[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
-                    "National", "Regional"
-                }, result.Right[1].GeographicLevels);
-                Assert.Equal(2, result.Right[1].Variables.Count);
-                Assert.Equal("Subject 2 Filter", result.Right[1].Variables[0].Label);
-                Assert.Equal("subject2_filter", result.Right[1].Variables[0].Value);
-                Assert.Equal("Subject 2 Indicator", result.Right[1].Variables[1].Label);
-                Assert.Equal("subject2_indicator", result.Right[1].Variables[1].Value);
+                    "National",
+                    "Regional"
+                }, result[1].GeographicLevels);
+
+                Assert.Equal(2, result[1].Variables.Count);
+                Assert.Equal("Subject 2 Filter", result[1].Variables[0].Label);
+                Assert.Equal("subject2_filter", result[1].Variables[0].Value);
+                Assert.Equal("Subject 2 Indicator", result[1].Variables[1].Label);
+                Assert.Equal("subject2_indicator", result[1].Variables[1].Value);
+
+                Assert.Equal(2, result[1].Footnotes.Count);
+                Assert.Equal("Subject 2 Footnote 1", result[1].Footnotes[0].Label);
+                Assert.Equal(subject2Footnote1.FootnoteId, result[1].Footnotes[0].Id);
+                Assert.Equal("Subject 2 Footnote 2", result[1].Footnotes[1].Label);
+                Assert.Equal(subject2Footnote2.FootnoteId, result[1].Footnotes[1].Id);
             }
         }
 
@@ -971,16 +1084,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IFilterService? filterService = null,
             IIndicatorService? indicatorService = null,
             IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
-            ContentDbContext? contentDbContext = null)
+            ContentDbContext? contentDbContext = null,
+            IFootnoteRepository? footnoteRepository = null)
         {
             return new MetaGuidanceSubjectService(
-                filterService ?? new FilterService(statisticsDbContext, new Mock<ILogger<FilterService>>().Object),
-                indicatorService ?? new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
+                filterService ?? new FilterService(statisticsDbContext, Mock.Of<ILogger<FilterService>>()),
+                indicatorService ?? new IndicatorService(statisticsDbContext, Mock.Of<ILogger<IndicatorService>>()),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 contentDbContext != null
                     ? new ReleaseDataFileRepository(contentDbContext)
-                    : new Mock<IReleaseDataFileRepository>().Object
+                    : Mock.Of<IReleaseDataFileRepository>(),
+                footnoteRepository ?? new FootnoteRepository(statisticsDbContext, Mock.Of<ILogger<FootnoteRepository>>())
             );
         }
     }

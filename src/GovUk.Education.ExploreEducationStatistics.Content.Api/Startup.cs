@@ -97,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
