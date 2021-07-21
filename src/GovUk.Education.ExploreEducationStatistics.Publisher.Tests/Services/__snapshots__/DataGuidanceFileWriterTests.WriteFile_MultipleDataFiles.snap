@@ -32,6 +32,11 @@ age_end                |  Age at end
 number_of_leavers      |  Number of leavers
 percentage_of_leavers  |  Percentage of leavers by accommodation type
 
+Footnotes:
+
+1. Subject 1 Footnote 1
+2. Subject 1 Footnote 2
+
 
 Test data 2
 
@@ -48,3 +53,10 @@ age                   |  Academic age
 category              |  Activity
 gender                |  Gender
 labour_market_status  |  Labour market status
+
+Footnotes:
+
+1. Subject 2 Footnote 1
+2. Subject 2 Footnote 2
+3. Subject 2 Footnote 3
+4. Subject 2 Footnote 4
