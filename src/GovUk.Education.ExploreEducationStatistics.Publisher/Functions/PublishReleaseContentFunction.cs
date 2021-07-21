@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             IReleaseService releaseService,
             IReleaseStatusService releaseStatusService)
         {
-            _cacheService = _cacheService;
+            _cacheService = cacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseService = releaseService;

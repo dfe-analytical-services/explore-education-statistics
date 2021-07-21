@@ -196,19 +196,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
-                var result = await service.GetSummariesByPublication(publication.Id);
+                var result = (await service.GetSummariesByPublication(publication.Id)).AssertRight();
 
-                result.AssertRight();
+                Assert.Equal(2, result.Count);
 
-                Assert.Equal(2, result.Right.Count);
+                Assert.Equal(methodologies[0].Id, result[0].Id);
+                Assert.Equal(methodologyParent.Slug, result[0].Slug);
+                Assert.Equal(methodologyParent.OwningPublicationTitle, result[0].Title);
 
-                Assert.Equal(methodologies[0].Id, result.Right[0].Id);
-                Assert.Equal(methodologyParent.Slug, result.Right[0].Slug);
-                Assert.Equal(methodologyParent.OwningPublicationTitle, result.Right[0].Title);
-
-                Assert.Equal(methodologies[1].Id, result.Right[1].Id);
-                Assert.Equal(methodologyParent.Slug, result.Right[1].Slug);
-                Assert.Equal(methodologies[1].AlternativeTitle, result.Right[1].Title);
+                Assert.Equal(methodologies[1].Id, result[1].Id);
+                Assert.Equal(methodologyParent.Slug, result[1].Slug);
+                Assert.Equal(methodologies[1].AlternativeTitle, result[1].Title);
             }
 
             VerifyAllMocks(methodologyRepository);
@@ -237,11 +235,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
-                var result = await service.GetSummariesByPublication(publication.Id);
+                var result = (await service.GetSummariesByPublication(publication.Id)).AssertRight();
 
-                result.AssertRight();
-
-                Assert.Empty(result.Right);
+                Assert.Empty(result);
             }
 
             VerifyAllMocks(methodologyRepository);
@@ -582,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 Assert.Empty(result.Right);
             }
-        
+
             VerifyAllMocks(cacheService, methodologyRepository);
         }
 

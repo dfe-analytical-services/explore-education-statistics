@@ -45,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
+                .AddScoped<ICacheService, BlobStorageCacheService>(provider =>
+                    new BlobStorageCacheService(
+                        blobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        logger: provider.GetRequiredService<ILogger<BlobStorageCacheService>>()))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
