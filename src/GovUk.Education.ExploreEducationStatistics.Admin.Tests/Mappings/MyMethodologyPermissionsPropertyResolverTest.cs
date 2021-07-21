@@ -21,13 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             
             userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanUpdateSpecificMethodology)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology)).ReturnsAsync(false);
-            
+            userService.Setup(s => s.MatchesPolicy(methodology, SecurityPolicies.CanDeleteSpecificMethodology)).ReturnsAsync(true);
+
             var permissionsSet = resolver.Resolve(methodology, null, null, null);
             VerifyAllMocks(userService);
             
             Assert.True(permissionsSet.CanUpdateMethodology);
-            Assert.False(permissionsSet.CanCancelMethodologyAmendment);
             Assert.False(permissionsSet.CanMakeAmendmentOfMethodology);
+            Assert.True(permissionsSet.CanDeleteMethodology);
         }
     }
 }

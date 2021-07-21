@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyImageService
     {
-        Task<Either<ActionResult, Unit>> Delete(
+        Task<Either<ActionResult, Unit>> UnlinkAndDeleteIfOrphaned(
             Guid methodologyId,
             IEnumerable<Guid> fileIds);
 

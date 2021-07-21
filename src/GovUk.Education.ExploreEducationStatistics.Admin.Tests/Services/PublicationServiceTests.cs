@@ -6,10 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -17,7 +17,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -29,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology1Version1 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 1 Version 1",
+                AlternativeTitle = "Methodology 1 Version 1",
                 Version = 0,
                 Status = Draft
             };
@@ -37,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology2Version1 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 2 Version 1",
+                AlternativeTitle = "Methodology 2 Version 1",
                 Version = 0,
                 Status = Approved
             };
@@ -45,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology2Version2 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 2 Version 2",
+                AlternativeTitle = "Methodology 2 Version 2",
                 Version = 1,
                 Status = Draft,
                 PreviousVersionId = methodology2Version1.Id
@@ -254,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "Test publication",
                         TopicId = topic.Id
@@ -277,6 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Old title",
+                Slug = "old-slug",
                 Topic = new Topic
                 {
                     Title = "Old topic"
@@ -302,12 +305,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationService = BuildPublicationService(context);
+                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                
+                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
 
+                methodologyRepository
+                    .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "new-title"))
+                    .Returns(Task.CompletedTask);
+                
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "New title",
                         Contact = new ContactSaveViewModel
@@ -320,6 +329,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = topic.Id
                     }
                 );
+                
+                VerifyAllMocks(methodologyRepository);
 
                 Assert.Equal("New title", result.Right.Title);
 
@@ -386,12 +397,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationService = BuildPublicationService(context);
+                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                
+                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
 
+                // Expect the title to change but not the slug, as the Publication is already published. 
+                methodologyRepository
+                    .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "old-title"))
+                    .Returns(Task.CompletedTask);
+                
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "New title",
                         Contact = new ContactSaveViewModel
@@ -404,6 +422,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = topic.Id
                     }
                 );
+                
+                VerifyAllMocks(methodologyRepository);
 
                 Assert.Equal("New title", result.Right.Title);
 
@@ -430,6 +450,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
+            }
+        }
+
+                [Fact]
+        public async void UpdatePublication_NoTitleChange()
+        {
+            var topic = new Topic
+            {
+                Title = "New topic"
+            };
+
+            var publication = new Publication
+            {
+                Title = "Old title",
+                Slug = "old-slug",
+                Topic = new Topic
+                {
+                    Title = "Old topic"
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Old name",
+                    ContactTelNo = "0987654321",
+                    TeamName = "Old team",
+                    TeamEmail = "old.smith@test.com",
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                context.Add(publication);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // Expect no calls to be made on this Mock as the Publication's Title hasn't changed.  
+                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                
+                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
+
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Old title",
+                        Contact = new ContactSaveViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = topic.Id
+                    }
+                );
+                
+                VerifyAllMocks(methodologyRepository);
+
+                Assert.Equal("Old title", result.Right.Title);
+                Assert.Equal("John Smith", result.Right.Contact.ContactName);
             }
         }
 
@@ -460,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "New title",
                         Contact = new ContactSaveViewModel
@@ -524,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "New title",
                         Contact = new ContactSaveViewModel
@@ -575,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "Test publication",
                         TopicId = Guid.NewGuid(),
@@ -623,7 +709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new PublicationSaveViewModel()
+                    new PublicationSaveViewModel
                     {
                         Title = "Duplicated title",
                         TopicId = topic.Id,
@@ -753,15 +839,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static PublicationService BuildPublicationService(ContentDbContext context,
             IUserService userService = null,
             IPublicationRepository publicationRepository = null,
-            IPublishingService publishingService = null)
+            IPublishingService publishingService = null,
+            IMethodologyRepository methodologyRepository = null)
         {
             return new PublicationService(
                 context,
-                AdminMapper(),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
-                publicationRepository ?? new Mock<IPublicationRepository>().Object,
+                AdminMapper(), 
+                new PersistenceHelper<ContentDbContext>(context),
+                userService ?? AlwaysTrueUserService().Object, 
+                publicationRepository ?? new Mock<IPublicationRepository>().Object, 
                 publishingService ?? new Mock<IPublishingService>().Object, 
-                new PersistenceHelper<ContentDbContext>(context));
+                methodologyRepository ?? new Mock<IMethodologyRepository>().Object);
         }
     }
 }

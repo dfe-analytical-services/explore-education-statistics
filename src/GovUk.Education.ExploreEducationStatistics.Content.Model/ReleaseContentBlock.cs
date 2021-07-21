@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 ?? ContentBlock.Clone(context, null);
 
             copy.ContentBlock = clonedContentBlock;
-            copy.ContentBlockId = clonedContentBlock.Id;
+            copy.ContentBlockId = (Guid) clonedContentBlock.Id;
 
             return copy;
         }

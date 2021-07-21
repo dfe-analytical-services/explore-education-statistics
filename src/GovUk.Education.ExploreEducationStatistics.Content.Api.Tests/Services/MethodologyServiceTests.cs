@@ -25,79 +25,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         [Fact]
         public async Task GetLatestMethodologyBySlug()
         {
-            const string slug = "methodology-1";
-
-            // TODO SOW4 Won't need to add 'Versions' to db when Slug is moved to MethodologyParent
-            // since the service will lookup a Methodology parent by slug rather than a Methodology
-            // Also do this for the other variants of this unit test
-
-            var methodology1 = new MethodologyParent
+            var methodologyParent = new MethodologyParent
             {
-                Slug = slug,
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
                 Versions = AsList(
                     new Methodology
                     {
+                        Id = Guid.NewGuid(),
                         Annexes = new List<ContentSection>(),
                         Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Slug = slug,
                         Status = Approved,
-                        Title = "Methodology 1 title",
+                        AlternativeTitle = "Alternative title",
                         Version = 0
-                    }
-                )
-            };
-
-            // Set up a MethodologyParent with a different slug to make sure it's not returned
-            var methodology2 = new MethodologyParent
-            {
-                Slug = "methodology-2",
-                Versions = AsList(
-                    new Methodology
-                    {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Slug = "methodology-2",
-                        Status = Approved,
-                        Title = "Methodology 2 title",
-                        Version = 0
-                    }
-                )
+                    })
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyParents.AddRangeAsync(methodology1, methodology2);
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodology1.Id))
-                .ReturnsAsync(methodology1.Versions[0]);
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodologyParent.Id))
+                .ReturnsAsync(methodologyParent.Versions[0]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
-                var result = await service.GetLatestMethodologyBySlug(slug);
+                var result = (await service.GetLatestMethodologyBySlug(methodologyParent.Slug)).AssertRight();
 
-                result.AssertRight();
+                Assert.Equal(methodologyParent.Versions[0].Id, result.Id);
+                Assert.Equal("Alternative title", result.Title);
 
-                Assert.Equal(methodology1.Versions[0].Id, result.Right.Id);
-                Assert.Equal("Methodology 1 title", result.Right.Title);
-
-                var annexes = result.Right.Annexes;
+                var annexes = result.Annexes;
                 Assert.NotNull(annexes);
                 Assert.Empty(annexes);
 
-                var content = result.Right.Content;
+                var content = result.Content;
                 Assert.NotNull(content);
                 Assert.Empty(content);
             }
@@ -108,56 +81,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         [Fact]
         public async Task GetLatestMethodologyBySlug_MethodologyHasNoPublishedVersion()
         {
-            const string slug = "methodology-1";
-
-            var methodology1 = new MethodologyParent
+            var methodologyParent = new MethodologyParent
             {
-                Slug = slug,
-                Versions = AsList(
-                    new Methodology
-                    {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Slug = slug,
-                        Status = Draft,
-                        Title = "Methodology 1 title",
-                        Version = 0
-                    }
-                )
-            };
-
-            // Set up a MethodologyParent with a different slug to make sure it's not returned
-            var methodology2 = new MethodologyParent
-            {
-                Slug = "methodology-2",
-                Versions = AsList(
-                    new Methodology
-                    {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Slug = "methodology-2",
-                        Status = Approved,
-                        Title = "Methodology 2 title",
-                        Version = 0
-                    }
-                )
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyParents.AddRangeAsync(methodology1, methodology2);
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
-            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodology1.Id))
+            methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodologyParent.Id))
                 .ReturnsAsync((Methodology) null);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -165,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyRepository: methodologyRepository.Object);
 
-                var result = await service.GetLatestMethodologyBySlug(slug);
+                var result = await service.GetLatestMethodologyBySlug(methodologyParent.Slug);
 
                 result.AssertNotFound();
             }
@@ -177,33 +117,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         public async Task GetLatestMethodologyBySlug_SlugNotFound()
         {
             // Set up a MethodologyParent with a different slug to make sure it's not returned
-            var methodology = new MethodologyParent
+            var methodologyParent = new MethodologyParent
             {
                 Slug = "some-other-slug",
-                Versions = AsList(
-                    new Methodology
-                    {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Slug = "some-other-slug",
-                        Status = Approved,
-                        Title = "Methodology title",
-                        Version = 0
-                    }
-                )
+                OwningPublicationTitle = "Methodology title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyParents.AddAsync(methodology);
+                await contentDbContext.MethodologyParents.AddAsync(methodologyParent);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+
+            // Expect no call to get the latest published version since no methodology parent will be found
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -223,18 +153,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var publication = new Publication();
 
+            var methodologyParent = new MethodologyParent
+            {
+                Slug = "methodology-1",
+                OwningPublicationTitle = "Methodology 1 title"
+            };
+
             var methodologies = AsList(
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Slug = "methodology-1",
-                    Title = "Methodology 1 title"
+                    MethodologyParent = methodologyParent
                 },
                 new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    Slug = "methodology-2",
-                    Title = "Methodology 2 title"
+                    MethodologyParent = methodologyParent,
+                    AlternativeTitle = "Methodology 2 title",
                 }
             );
 
@@ -263,12 +198,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Equal(2, result.Right.Count);
 
                 Assert.Equal(methodologies[0].Id, result.Right[0].Id);
-                Assert.Equal(methodologies[0].Slug, result.Right[0].Slug);
-                Assert.Equal(methodologies[0].Title, result.Right[0].Title);
+                Assert.Equal(methodologyParent.Slug, result.Right[0].Slug);
+                Assert.Equal(methodologyParent.OwningPublicationTitle, result.Right[0].Title);
 
                 Assert.Equal(methodologies[1].Id, result.Right[1].Id);
-                Assert.Equal(methodologies[1].Slug, result.Right[1].Slug);
-                Assert.Equal(methodologies[1].Title, result.Right[1].Title);
+                Assert.Equal(methodologyParent.Slug, result.Right[1].Slug);
+                Assert.Equal(methodologies[1].AlternativeTitle, result.Right[1].Title);
             }
 
             MockUtils.VerifyAllMocks(methodologyRepository);
@@ -353,10 +288,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
-                    Slug = "methodology-1-slug",
                     Status = Approved,
-                    Title = "Methodology 1 v0 title",
-                    Version = 0
+                    AlternativeTitle = "Methodology 1 v0 title",
+                    Version = 0,
+                    MethodologyParent = new MethodologyParent
+                    {
+                        Slug = "methodology-1-slug"
+                    }
                 },
                 new Methodology
                 {
@@ -365,10 +303,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
-                    Slug = "methodology-2-slug",
                     Status = Approved,
-                    Title = "Methodology 2 v0 title",
-                    Version = 0
+                    AlternativeTitle = "Methodology 2 v0 title",
+                    Version = 0,
+                    MethodologyParent = new MethodologyParent
+                    {
+                        Slug = "methodology-2-slug"
+                    }
                 });
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -417,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Equal(Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"), methodologies[0].Id);
                 Assert.Equal("methodology-1-slug", methodologies[0].Slug);
                 Assert.Equal("Methodology 1 v0 title", methodologies[0].Title);
-                
+
                 Assert.Equal(Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"), methodologies[1].Id);
                 Assert.Equal("methodology-2-slug", methodologies[1].Slug);
                 Assert.Equal("Methodology 2 v0 title", methodologies[1].Title);
@@ -514,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Slug = "publication-slug",
                 Summary = "Publication summary"
             };
-            
+
             var theme = new Theme
             {
                 Title = "Theme title",
@@ -550,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
-            
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,

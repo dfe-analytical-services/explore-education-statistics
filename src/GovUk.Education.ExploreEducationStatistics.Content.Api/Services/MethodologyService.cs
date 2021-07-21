@@ -37,16 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
-            // TODO SOW4 EES-2375 lookup the MethodologyParent by slug when slug is moved to the parent
-            // For now, this does a lookup on the parent via any Methodology with the slug
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(query =>
-                    query.Where(mv => mv.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async arbitraryVersion =>
+                .CheckEntityExists<MethodologyParent>(
+                    query => query
+                        .Where(mp => mp.Slug == slug))
+                .OnSuccess<ActionResult, MethodologyParent, MethodologyViewModel>(async methodologyParent =>
                 {
                     var latestPublishedVersion =
-                        await _methodologyRepository.GetLatestPublishedByMethodologyParent(arbitraryVersion
-                            .MethodologyParentId);
+                        await _methodologyRepository.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();

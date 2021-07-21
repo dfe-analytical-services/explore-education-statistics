@@ -11,6 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+        
+        public bool Amendment { get; set; }
+        
+        public Guid PreviousVersionId { get; set; }
 
         public DateTime? Published { get; set; }
 
@@ -23,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public class PermissionsSet
         {
             public bool CanUpdateMethodology { get; set; }
-            public bool CanCancelMethodologyAmendment { get; set; }
+            public bool CanDeleteMethodology { get; set; }
             public bool CanMakeAmendmentOfMethodology { get; set; }
         }
     }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -11,9 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<PublicationMethodology> Publications { get; set; }
 
-        // TODO SOW4 EES-2375 Move slug to parent
-        // Need to sort migration for this field
-        [NotMapped]
+        [Required]
+        public string OwningPublicationTitle { get; set; }
+
+        [Required]
         public string Slug { get; set; }
 
         public List<Methodology> Versions { get; set; }

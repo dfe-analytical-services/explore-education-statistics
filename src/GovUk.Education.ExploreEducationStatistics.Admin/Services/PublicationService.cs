@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -27,20 +28,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IMethodologyRepository _methodologyRepository;
 
         public PublicationService(ContentDbContext context,
             IMapper mapper,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
             IPublishingService publishingService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IMethodologyRepository methodologyRepository)
         {
             _context = context;
             _mapper = mapper;
+            _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
             _publishingService = publishingService;
-            _persistenceHelper = persistenceHelper;
+            _methodologyRepository = methodologyRepository;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -119,21 +123,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(async publication =>
                 {
-                    if (publication.Live)
-                    {
-                        // Leave slug
-                        return publication;
-                    }
-
-                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(
-                        _ =>
+                    var originalTitle = publication.Title;
+                    var originalSlug = publication.Slug;
+                    
+                    if (!publication.Live) {
+                        
+                        var slugValidation = await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug);
+                        
+                        if (slugValidation.IsLeft)
                         {
-                            publication.Slug = updatedPublication.Slug;
-                            return publication;
-                        });
-                })
-                .OnSuccess(async publication =>
-                {
+                            return new Either<ActionResult, PublicationViewModel>(slugValidation.Left);
+                        }    
+                            
+                        publication.Slug = updatedPublication.Slug;
+                    }
+                    
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
@@ -155,7 +159,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.Contact.TeamEmail = updatedPublication.Contact.TeamEmail;
 
                     _context.Publications.Update(publication);
+
                     await _context.SaveChangesAsync();
+                    
+                    if (originalTitle != publication.Title)
+                    {
+                        await _methodologyRepository.PublicationTitleChanged(publicationId, originalSlug, publication.Title, publication.Slug);
+                    }
 
                     if (publication.Live)
                     {
