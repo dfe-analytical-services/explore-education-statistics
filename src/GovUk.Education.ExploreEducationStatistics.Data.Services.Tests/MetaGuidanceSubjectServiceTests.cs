@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -966,10 +967,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static MetaGuidanceSubjectService SetupMetaGuidanceSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IFilterRepository filterRepository = null,
-            IIndicatorRepository indicatorRepository = null,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper = null,
-            ContentDbContext contentDbContext = null)
+            IFilterRepository? filterRepository = null,
+            IIndicatorRepository? indicatorRepository = null,
+            IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
+            ContentDbContext? contentDbContext = null)
         {
             return new MetaGuidanceSubjectService(
                 filterRepository ?? new FilterRepository(statisticsDbContext),
