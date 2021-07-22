@@ -114,7 +114,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         dataGuidanceFileWriter: provider.GetService<IDataGuidanceFileWriter>(),
                         blobStorageService: GetBlobStorageService(provider, "CoreStorage")
                     ))
-                .AddScoped<IFootnoteRepository, FootnoteRepository>()
+                .AddScoped<IFootnoteRepository, FootnoteRepository>(provider =>
+                    new FootnoteRepository(
+                        context: provider.GetService<PublicStatisticsDbContext>(),
+                        logger: provider.GetService<ILogger<FootnoteRepository>>()))
                 .AddScoped<IZipFileService, ZipFileService>(provider =>
                     new ZipFileService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
