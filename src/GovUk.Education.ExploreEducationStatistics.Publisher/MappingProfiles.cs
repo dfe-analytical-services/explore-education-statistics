@@ -38,6 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(
+                    dest => dest.Updates,
+                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
+                .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
