@@ -182,13 +182,13 @@ const ContentSectionIndex = ({
           <ul className="govuk-body-s">
             {headingsList.map(listItem => (
               <li key={listItem.id}>
-                <a href={`#${listItem.id}`}>{listItem.textContent}</a>
+                <a href={`#${listItem.id}`}>{listItem.textContent.trim()}</a>
                 {listItem.children.length > 0 && (
                   <ul>
                     {listItem.children.map(childListItem => (
                       <li key={childListItem.id}>
                         <a href={`#${childListItem.id}`}>
-                          {childListItem.textContent}
+                          {childListItem.textContent.trim()}
                         </a>
                       </li>
                     ))}
