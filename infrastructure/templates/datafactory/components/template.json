@@ -1481,21 +1481,21 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "Provider_Name",
+                                            "name": "Provider_Code",
                                             "type": "String"
                                         },
                                         "sink": {
-                                            "name": "Provider_Name",
+                                            "name": "Provider_Code",
                                             "type": "String"
                                         }
                                     },
                                     {
                                         "source": {
-                                            "name": "Provider_Code",
+                                            "name": "Provider_Name",
                                             "type": "String"
                                         },
                                         "sink": {
-                                            "name": "Provider_Code",
+                                            "name": "Provider_Name",
                                             "type": "String"
                                         }
                                     },
@@ -1531,21 +1531,21 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "School_Name",
+                                            "name": "School_Code",
                                             "type": "String"
                                         },
                                         "sink": {
-                                            "name": "School_Name",
+                                            "name": "School_Code",
                                             "type": "String"
                                         }
                                     },
                                     {
                                         "source": {
-                                            "name": "School_Code",
+                                            "name": "School_Name",
                                             "type": "String"
                                         },
                                         "sink": {
-                                            "name": "School_Code",
+                                            "name": "School_Name",
                                             "type": "String"
                                         }
                                     },
