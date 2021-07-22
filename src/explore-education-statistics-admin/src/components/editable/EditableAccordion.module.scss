@@ -10,6 +10,6 @@
 }
 
 // Override the default dnd style as it causes accordion sections within the dnd area to sometime open in the wrong direction.
-[data-rbd-droppable-id='releaseMainContent'][data-rbd-droppable-context-id] {
+.container [data-rbd-droppable-context-id] {
   overflow-anchor: auto;
 }
