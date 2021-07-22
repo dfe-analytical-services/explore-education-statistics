@@ -5,6 +5,7 @@ interface Props {
   children: Date | number | string;
   className?: string;
   format?: string;
+  testId?: string;
   parseFormat?: string;
 }
 
@@ -12,6 +13,7 @@ const FormattedDate = ({
   children,
   className,
   format = 'd MMMM yyyy',
+  testId,
   parseFormat,
 }: Props) => {
   let parsedDate: Date;
@@ -28,7 +30,11 @@ const FormattedDate = ({
     return null;
   }
 
-  return <time className={className}>{formatter(parsedDate, format)}</time>;
+  return (
+    <time data-testid={testId} className={className}>
+      {formatter(parsedDate, format)}
+    </time>
+  );
 };
 
 export default FormattedDate;
