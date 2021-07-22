@@ -181,16 +181,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
             var isOrdered = element.LocalName == "ol";
             // Add indentation to align list item children
             // with where the bullet/number ends.
-            var indentation = isOrdered ? "   " : "  ";
+            var baseIndent = isOrdered ? 2 : 1;
 
             var listItems = element.ChildNodes
-                .Where(node => node is IElement { LocalName: "li" });
+                .Where(node => node is IElement { LocalName: "li" })
+                .ToList();
 
             ParseNodes(
                 listItems,
                 (item, index) =>
                 {
                     _builder.Append(isOrdered ? $"{index + 1}. " : "- ");
+
+                    var indexWidth = (index + 1).ToString().Length;
+                    var indent = string.Empty.PadRight(indexWidth + baseIndent);
 
                     var converter = new HtmlToTextConverter();
                     var text = converter.Convert(item);
@@ -205,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                                     return;
                                 }
 
-                                _builder.AppendLine(indentation + line);
+                                _builder.AppendLine(indent + line);
                             }
                         );
                 }
