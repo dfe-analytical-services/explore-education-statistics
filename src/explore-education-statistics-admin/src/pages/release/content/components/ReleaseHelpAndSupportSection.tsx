@@ -70,12 +70,12 @@ const ReleaseHelpAndSupportSection = ({
             <p>No methodologies added.</p>
           )}
         </AccordionSection>
-        {release.type && release.type.title === ReleaseType.NationalStatistics && (
+        {release.type.title === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />
           </AccordionSection>
         )}
-        {release.type && release.type.title === ReleaseType.OfficialStatistics && (
+        {release.type.title === ReleaseType.OfficialStatistics && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
           </AccordionSection>

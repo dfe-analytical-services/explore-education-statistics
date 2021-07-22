@@ -2,16 +2,14 @@ import React from 'react';
 
 const OfficialStatisticsSection = () => (
   <>
-    <p className="govuk-body">
+    <p>
       These are Official Statistics and have been produced in line with the{' '}
       <a href="https://code.statisticsauthority.gov.uk/the-code/">
         Code of Practice for Official Statistics
       </a>
       .
     </p>
-    <p className="govuk-body">
-      This can be broadly interpreted to mean that these statistics are:
-    </p>
+    <p>This can be broadly interpreted to mean that these statistics are:</p>
     <ul>
       <li>managed impartially and objectively in the public interest</li>
 
@@ -21,7 +19,7 @@ const OfficialStatisticsSection = () => (
 
       <li>well explained and readily accessible</li>
     </ul>
-    <p className="govuk-body">
+    <p>
       Find out more about the standards we follow to produce these statistics
       through our{' '}
       <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
