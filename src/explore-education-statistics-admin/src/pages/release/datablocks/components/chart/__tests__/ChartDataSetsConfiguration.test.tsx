@@ -83,7 +83,7 @@ describe('ChartDataSetsConfiguration', () => {
   };
   const testSubjectMeta: FullTableMeta = mapFullTableMeta(testMeta);
 
-  const testtMetaMultipleFilters = {
+  const testMetaMultipleFilters = {
     ...testMeta,
     filters: {
       ...testMeta.filters,
@@ -113,7 +113,7 @@ describe('ChartDataSetsConfiguration', () => {
     },
   };
   const testSubjectMetaMultipleFilters: FullTableMeta = mapFullTableMeta(
-    testtMetaMultipleFilters,
+    testMetaMultipleFilters,
   );
 
   const testFormState: ChartBuilderForms = {
@@ -653,7 +653,7 @@ describe('ChartDataSetsConfiguration', () => {
       await waitFor(() => {
         const expected: DataSet[] = [
           {
-            filters: ['male'],
+            filters: ['male', 'secondary'],
             indicator: 'unauthorised-absence-sessions',
             location: {
               value: 'barnsley',
@@ -662,7 +662,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriod: '2020_AY',
           },
           {
-            filters: ['female'],
+            filters: ['male', 'primary'],
             indicator: 'unauthorised-absence-sessions',
             location: {
               value: 'barnsley',
@@ -671,7 +671,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriod: '2020_AY',
           },
           {
-            filters: ['secondary'],
+            filters: ['male', 'special'],
             indicator: 'unauthorised-absence-sessions',
             location: {
               value: 'barnsley',
@@ -680,7 +680,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriod: '2020_AY',
           },
           {
-            filters: ['primary'],
+            filters: ['female', 'secondary'],
             indicator: 'unauthorised-absence-sessions',
             location: {
               value: 'barnsley',
@@ -689,7 +689,16 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriod: '2020_AY',
           },
           {
-            filters: ['special'],
+            filters: ['female', 'primary'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
+          },
+          {
+            filters: ['female', 'special'],
             indicator: 'unauthorised-absence-sessions',
             location: {
               value: 'barnsley',
