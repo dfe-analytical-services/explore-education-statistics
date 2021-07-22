@@ -2,7 +2,7 @@ import React from 'react';
 
 const NationalStatisticsSection = () => (
   <>
-    <p className="govuk-body">
+    <p>
       The{' '}
       <a href="https://www.statisticsauthority.gov.uk/">
         United Kingdom Statistics Authority
@@ -13,7 +13,7 @@ const NationalStatisticsSection = () => (
       </a>{' '}
       and signifying compliance with the Code of Practice for Statistics.
     </p>
-    <p className="govuk-body">
+    <p>
       Designation signifying their compliance with the authority's{' '}
       <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
         Code of Practice for Statistics
@@ -26,12 +26,12 @@ const NationalStatisticsSection = () => (
       <li>produced according to sound methods</li>
       <li>well explained and readily accessible</li>
     </ul>
-    <p className="govuk-body">
+    <p>
       Once designated as National Statistics it's a statutory requirement for
       statistics to follow and comply with the Code of Practice for Statistics
       to be observed.
     </p>
-    <p className="govuk-body">
+    <p>
       Find out more about the standards we follow to produce these statistics
       through our{' '}
       <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
