@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -22,22 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     [Authorize]
     public class FootnoteController : ControllerBase
     {
-        private readonly IFilterService _filterService;
+        private readonly IFilterRepository _filterRepository;
         private readonly IFootnoteService _footnoteService;
-        private readonly IIndicatorGroupService _indicatorGroupService;
+        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly IReleaseService _releaseService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
-        public FootnoteController(IFilterService filterService,
+        public FootnoteController(IFilterRepository filterRepository,
             IFootnoteService footnoteService,
-            IIndicatorGroupService indicatorGroupService,
+            IIndicatorGroupRepository indicatorGroupRepository,
             IReleaseService releaseService,
             IReleaseDataFileRepository releaseDataFileRepository)
         {
-            _filterService = filterService;
+            _filterRepository = filterRepository;
             _footnoteService = footnoteService;
-            _indicatorGroupService = indicatorGroupService;
+            _indicatorGroupRepository = indicatorGroupRepository;
             _releaseService = releaseService;
             _releaseDataFileRepository = releaseDataFileRepository;
         }
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId)
+            return _indicatorGroupRepository.GetIndicatorGroups(subjectId)
                 .OrderBy(group => group.Label, LabelComparer)
                 .ToDictionary(
                     group => group.Id,
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         private Dictionary<Guid, FootnotesFilterMetaViewModel> GetFilters(Guid subjectId)
         {
-            return _filterService.GetFiltersIncludingItems(subjectId)
+            return _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
                     filter => filter.Id,
                     filter => new FootnotesFilterMetaViewModel

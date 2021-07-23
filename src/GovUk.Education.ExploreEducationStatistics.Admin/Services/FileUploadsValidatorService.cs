@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +20,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileUploadsValidatorService : IFileUploadsValidatorService
     {
-        private readonly ISubjectService _subjectService;
+        private readonly ISubjectRepository _subjectRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
 
-        public FileUploadsValidatorService(ISubjectService subjectService, IFileTypeService fileTypeService, ContentDbContext context)
+        public FileUploadsValidatorService(ISubjectRepository subjectRepository, IFileTypeService fileTypeService, ContentDbContext context)
         {
-            _subjectService = subjectService;
+            _subjectRepository = subjectRepository;
             _fileTypeService = fileTypeService;
             _context = context;
         }

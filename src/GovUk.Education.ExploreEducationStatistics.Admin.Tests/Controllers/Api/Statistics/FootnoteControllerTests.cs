@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -42,8 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Subjects = new List<SubjectFootnote>()
             };
 
-            var filterService = new Mock<IFilterService>();
-            var indicatorGroupService = new Mock<IIndicatorGroupService>();
+            var filterRepository = new Mock<IFilterRepository>();
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>();
             var footnoteService = new Mock<IFootnoteService>();
             var releaseService = new Mock<IReleaseService>();
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         .ToList()
                 });
 
-            filterService.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
+            filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
                 new List<Filter>
                 {
                     new Filter
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            indicatorGroupService.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds))).Returns(
+            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds))).Returns(
                 new List<IndicatorGroup>
                 {
                     new IndicatorGroup
@@ -153,10 +153,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         }
                     }
                 });
-            
-            _controller = new FootnoteController(filterService.Object,
+
+            _controller = new FootnoteController(filterRepository.Object,
                 footnoteService.Object,
-                indicatorGroupService.Object,
+                indicatorGroupRepository.Object,
                 releaseService.Object,
                 releaseDataFileRepository.Object);
         }

@@ -16,7 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -337,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null,
             IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
-            ISubjectService subjectService = null,
+            ISubjectRepository subjectRepository = null,
             IReleaseFileService releaseFileService = null,
             IReleaseDataFileService releaseDataFileService = null,
             IDataImportService dataImportService = null,
@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
             IContentService contentService = null,
-            IReleaseSubjectService releaseSubjectService = null)
+            IReleaseSubjectRepository releaseSubjectRepository = null)
         {
             return new ReleaseService(
                 context ?? new Mock<ContentDbContext>().Object,
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? new Mock<IUserService>().Object,
                 releaseRepository ?? new Mock<IReleaseRepository>().Object,
                 releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
-                subjectService ?? new Mock<ISubjectService>().Object,
+                subjectRepository ?? new Mock<ISubjectRepository>().Object,
                 releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,
@@ -365,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,
-                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
                 new SequentialGuidGenerator()
             );
         }

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class IndicatorGroupService : AbstractRepository<IndicatorGroup, Guid>, IIndicatorGroupService
+    public class IndicatorGroupRepository : AbstractRepository<IndicatorGroup, Guid>, IIndicatorGroupRepository
     {
-        public IndicatorGroupService(StatisticsDbContext context) : base(context)
+        public IndicatorGroupRepository(StatisticsDbContext context) : base(context)
         {
         }
 

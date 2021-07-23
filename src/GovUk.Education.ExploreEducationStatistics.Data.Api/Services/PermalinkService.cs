@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
@@ -22,19 +22,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly ISubjectService _subjectService;
+        private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseRepository _releaseRepository;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
-            ISubjectService subjectService,
+            ISubjectRepository subjectRepository,
             IReleaseRepository releaseRepository,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
-            _subjectService = subjectService;
+            _subjectRepository = subjectRepository;
             _releaseRepository = releaseRepository;
             _mapper = mapper;
         }
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
-            var publicationId = _subjectService.GetPublicationIdForSubject(request.Query.SubjectId).Result;
+            var publicationId = _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId).Result;
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
@@ -83,10 +83,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
-            var subject = await _subjectService.Get(permalink.Query.SubjectId);
-            var isValid = subject != null && await _subjectService.IsSubjectForLatestPublishedRelease(subject.Id);
+            var subject = await _subjectRepository.Get(permalink.Query.SubjectId);
+            var isValid = subject != null && await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id);
 
-            var publicationId = await _subjectService.FindPublicationIdForSubject(permalink.Query.SubjectId);
+            var publicationId = await _subjectRepository.FindPublicationIdForSubject(permalink.Query.SubjectId);
 
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 

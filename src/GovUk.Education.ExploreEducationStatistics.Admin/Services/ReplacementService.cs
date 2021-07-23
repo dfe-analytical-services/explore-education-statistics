@@ -16,7 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -34,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IFilterService _filterService;
-        private readonly IIndicatorService _indicatorService;
-        private readonly ILocationService _locationService;
+        private readonly IFilterRepository _filterRepository;
+        private readonly IIndicatorRepository _indicatorRepository;
+        private readonly ILocationRepository _locationRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
@@ -47,9 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReplacementService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IFilterService filterService,
-            IIndicatorService indicatorService,
-            ILocationService locationService,
+            IFilterRepository filterRepository,
+            IIndicatorRepository indicatorRepository,
+            ILocationRepository locationRepository,
             IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
@@ -58,9 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
-            _filterService = filterService;
-            _indicatorService = indicatorService;
-            _locationService = locationService;
+            _filterRepository = filterRepository;
+            _indicatorRepository = indicatorRepository;
+            _locationRepository = locationRepository;
             _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
             _timePeriodService = timePeriodService;
@@ -147,16 +147,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)
         {
-            var filtersIncludingItems = _filterService.GetFiltersIncludingItems(subjectId)
+            var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToList();
 
             var filters = filtersIncludingItems
                 .ToDictionary(filter => filter.Name, filter => filter);
 
-            var indicators = _indicatorService.GetIndicators(subjectId)
+            var indicators = _indicatorRepository.GetIndicators(subjectId)
                 .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
 
-            var observationalUnits = _locationService.GetObservationalUnits(subjectId);
+            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
 
             var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
 
@@ -507,7 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
             }
 
-            var locations = _locationService.GetObservationalUnits(geographicLevel, originalCodes);
+            var locations = _locationRepository.GetObservationalUnits(geographicLevel, originalCodes);
             var replacementLocations = replacementSubjectMeta.ObservationalUnits
                 .GetValueOrDefault(geographicLevel)
                 ?.ToDictionary(location => location.Code) ?? new Dictionary<string, IObservationalUnit>();

@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -362,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IMapper mapper = null,
             IUserService userService = null,
-            IReleaseSubjectService releaseSubjectService = null,
+            IReleaseSubjectRepository releaseSubjectRepository = null,
             IReleaseDataFileService releaseDataFilesService = null,
             IReleaseFileService releaseFileService = null,
             IPublishingService publishingService = null)
@@ -373,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 mapper ?? AdminMapper(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
                 releaseDataFilesService ?? new Mock<IReleaseDataFileService>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object

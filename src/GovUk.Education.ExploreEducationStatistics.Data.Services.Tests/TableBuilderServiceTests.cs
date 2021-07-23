@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -129,19 +129,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     )
                     .ReturnsAsync(subjectMeta);
 
-                var subjectService = new Mock<ISubjectService>();
+                var subjectRepository = new Mock<ISubjectRepository>();
 
-                subjectService
+                subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                subjectService
+                subjectRepository
                     .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
                     .ReturnsAsync(true);
 
-                var releaseService = new Mock<IReleaseRepository>();
+                var releaseRepository = new Mock<IReleaseRepository>();
 
-                releaseService
+                releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
                     .Returns(release);
 
@@ -149,8 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext,
                     observationService: observationService.Object,
                     resultSubjectMetaService: resultSubjectMetaService.Object,
-                    subjectService: subjectService.Object,
-                    releaseRepository: releaseService.Object
+                    subjectRepository: subjectRepository.Object,
+                    releaseRepository: releaseRepository.Object
                 );
 
                 var result = await service.Query(query);
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
 
-                MockUtils.VerifyAllMocks(observationService, resultSubjectMetaService, subjectService, releaseService);
+                MockUtils.VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository, releaseRepository);
             }
         }
 
@@ -190,28 +190,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var subjectService = new Mock<ISubjectService>();
+                var subjectRepository = new Mock<ISubjectRepository>();
 
-                subjectService
+                subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                var releaseService = new Mock<IReleaseRepository>();
+                var releaseRepository = new Mock<IReleaseRepository>();
 
-                releaseService
+                releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId));
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext,
-                    subjectService: subjectService.Object,
-                    releaseRepository: releaseService.Object
+                    subjectRepository: subjectRepository.Object,
+                    releaseRepository: releaseRepository.Object
                 );
 
                 var result = await service.Query(query);
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
-                MockUtils.VerifyAllMocks(subjectService, releaseService);
+                MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
             }
         }
 
@@ -234,29 +234,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var subjectService = new Mock<ISubjectService>();
+                var subjectRepository = new Mock<ISubjectRepository>();
 
-                subjectService
+                subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                var releaseService = new Mock<IReleaseRepository>();
+                var releaseRepository = new Mock<IReleaseRepository>();
 
-                releaseService
+                releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
                     .Returns(release);
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext,
-                    subjectService: subjectService.Object,
-                    releaseRepository: releaseService.Object
+                    subjectRepository: subjectRepository.Object,
+                    releaseRepository: releaseRepository.Object
                 );
 
                 var result = await service.Query(query);
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
-                MockUtils.VerifyAllMocks(subjectService, releaseService);
+                MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
             }
         }
 
@@ -458,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IObservationService observationService = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IResultSubjectMetaService resultSubjectMetaService = null,
-            ISubjectService subjectService = null,
+            ISubjectRepository subjectRepository = null,
             IUserService userService = null,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder = null,
             IReleaseRepository releaseRepository = null)
@@ -467,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 observationService ?? new Mock<IObservationService>().Object,
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 resultSubjectMetaService ?? new Mock<IResultSubjectMetaService>().Object,
-                subjectService ?? new Mock<ISubjectService>().Object,
+                subjectRepository ?? new Mock<ISubjectRepository>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
                 releaseRepository ?? new Mock<IReleaseRepository>().Object

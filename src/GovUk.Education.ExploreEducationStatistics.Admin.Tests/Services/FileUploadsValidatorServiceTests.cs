@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateFileForUpload_FileCannotBeEmpty()
         {
-            var (subjectService, fileTypeService) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
+            var (subjectRepository, fileTypeService) = Mocks();
+            var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, null);
 
             var file = CreateFormFile("test.csv", "test.csv");
 
@@ -41,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateFileForUpload_ExceptionThrownForDataFileType()
         {
-            var (subjectService, fileTypeService) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
+            var (subjectRepository, fileTypeService) = Mocks();
+            var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, null);
 
             var file = CreateFormFile("test.csv", "test.csv");
 
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateFileForUpload_FileTypeIsValid()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
+            var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, null);
 
             var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
@@ -69,9 +69,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateFileForUpload_FileTypeIsInvalid()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
+            var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, null);
 
             var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
@@ -87,11 +87,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateSubjectName_SubjectNameContainsSpecialCharacters()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var result = await service.ValidateSubjectName(Guid.NewGuid(), "Subject & Title");
 
@@ -121,11 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, contentDbContext);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, contentDbContext);
                 var result = await service.ValidateSubjectName(release.Id,  "Subject Title");
 
                 Assert.True(result.IsLeft);
@@ -136,11 +136,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UploadedDatafilesAreValid()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
                 var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
@@ -167,11 +167,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_DataFileIsEmpty()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateFormFile("test.csv", "test.csv");
                 var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
@@ -186,11 +186,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_MetadataFileIsEmpty()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
                 var metaFile = CreateFormFile("test.meta.csv", "test.meta.csv");
@@ -205,11 +205,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_DataFileNotCsv()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
                 var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
@@ -237,11 +237,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_MetadataFileNotCsv()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
                 var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
@@ -269,11 +269,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UploadedZippedDatafileIsValid()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var archiveFile = GetArchiveFile("data-zip-valid.zip");
 
@@ -292,11 +292,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UploadedZippedDatafileIsInvalid()
         {
-            var (subjectService, fileTypeService) = Mocks();
+            var (subjectRepository, fileTypeService) = Mocks();
 
             await using (var context = InMemoryApplicationDbContext())
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var archiveFile = GetArchiveFile("data-zip-invalid.zip");
 
@@ -313,10 +313,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static (Mock<ISubjectService>, Mock<IFileTypeService>) Mocks()
+        private static (Mock<ISubjectRepository>, Mock<IFileTypeService>) Mocks()
         {
             return (
-                new Mock<ISubjectService>(),
+                new Mock<ISubjectRepository>(),
                 new Mock<IFileTypeService>()
             );
         }

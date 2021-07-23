@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Newtonsoft.Json;
 
@@ -13,28 +13,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        private readonly IBoundaryLevelService _boundaryLevelService;
-        private readonly IFilterItemService _filterItemService;
-        private readonly IGeoJsonService _geoJsonService;
+        private readonly IBoundaryLevelRepository _boundaryLevelRepository;
+        private readonly IFilterItemRepository _filterItemRepository;
+        private readonly IGeoJsonRepository _geoJsonRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
-        protected AbstractSubjectMetaService(IBoundaryLevelService boundaryLevelService,
-            IFilterItemService filterItemService,
-            IGeoJsonService geoJsonService)
+        protected AbstractSubjectMetaService(IBoundaryLevelRepository boundaryLevelRepository,
+            IFilterItemRepository filterItemRepository,
+            IGeoJsonRepository geoJsonRepository)
         {
-            _boundaryLevelService = boundaryLevelService;
-            _filterItemService = filterItemService;
-            _geoJsonService = geoJsonService;
+            _boundaryLevelRepository = boundaryLevelRepository;
+            _filterItemRepository = filterItemRepository;
+            _geoJsonRepository = geoJsonRepository;
         }
 
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
-            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
+            return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel);
         }
 
         protected Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
         {
-            return _filterItemService.GetFilterItems(subjectId, observations, listFilterItems)
+            return _filterItemRepository.GetFilterItems(subjectId, observations, listFilterItems)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var codes = observationalUnits.Select(unit =>
                         unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
-                    geoJsonByCode = _geoJsonService.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code);
+                    geoJsonByCode = _geoJsonRepository.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code);
                 }
             }
 
@@ -189,12 +189,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
-            return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
+            return _filterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
         
         private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
         {
-            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel) != null;
+            return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel) != null;
         }
     }
 }

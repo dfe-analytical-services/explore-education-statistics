@@ -3,16 +3,16 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class SubjectService : AbstractRepository<Subject, Guid>, ISubjectService
+    public class SubjectRepository : AbstractRepository<Subject, Guid>, ISubjectRepository
     {
         private readonly IReleaseRepository _releaseRepository;
 
-        public SubjectService(
+        public SubjectRepository(
             StatisticsDbContext context,
             IReleaseRepository releaseRepository) : base(context)
         {

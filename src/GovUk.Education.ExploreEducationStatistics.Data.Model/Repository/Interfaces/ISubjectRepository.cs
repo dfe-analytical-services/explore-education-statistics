@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface ISubjectService : IRepository<Subject, Guid>
+    public interface ISubjectRepository : IRepository<Subject, Guid>
     {
         Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId);
 
