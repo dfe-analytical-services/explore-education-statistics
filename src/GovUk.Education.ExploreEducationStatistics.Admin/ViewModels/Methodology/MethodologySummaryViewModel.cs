@@ -18,13 +18,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public DateTime? Published { get; set; }
 
+        public TitleAndIdViewModel ScheduledWithRelease { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
 
         public string Title { get; set; }
-        
+
         public bool Amendment { get; set; }
-        
+
         public Guid PreviousVersionId { get; set; }
     }
 }

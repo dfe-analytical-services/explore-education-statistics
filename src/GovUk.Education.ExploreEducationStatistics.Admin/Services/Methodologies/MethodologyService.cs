@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(id, HydrateMethodologyForMethodologySummaryViewModel)
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(methodology =>
+                .OnSuccess(async methodology =>
                 {
                     var publicationLinks = methodology.MethodologyParent.Publications;
                     var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
@@ -89,8 +89,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToList();
 
                     var viewModel = _mapper.Map<MethodologySummaryViewModel>(methodology);
+
                     viewModel.OwningPublication = owningPublication;
                     viewModel.OtherPublications = otherPublications;
+                    
+                    if (methodology.ScheduledForPublishingWithRelease)
+                    {
+                        await _context.Entry(methodology)
+                            .Reference(m => m.ScheduledWithRelease)
+                            .LoadAsync();
+
+                        if (methodology.ScheduledWithRelease != null)
+                        {
+                            viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
+                                methodology.ScheduledWithRelease.Id,
+                                methodology.ScheduledWithRelease.Title);
+                        }
+                    }
+
                     return viewModel;
                 });
         }
@@ -116,6 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.InternalReleaseNote =
                         request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
+                    // TODO SOW4 EES-2164 Check that this Release exists and that it's not published before setting it
+                    methodology.ScheduledWithReleaseId = request.ScheduledWithReleaseId;
                     methodology.Status = request.Status;
 
                     if (request.Title != methodology.Title)

@@ -22,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -898,8 +899,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
+        public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy()
         {
+            var scheduledWithRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                TimePeriodCoverage = CalendarYear,
+                ReleaseName = "2021"
+            };
+
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
@@ -923,7 +931,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
-                // TODO SOW4 EES-2164 Add a ScheduledWithRelease here when implementing it
+                ScheduledWithReleaseId = scheduledWithRelease.Id,
                 Status = Approved,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -933,6 +941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Methodologies.AddAsync(methodology);
+                await context.Releases.AddAsync(scheduledWithRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -968,6 +977,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.Published);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
+
+                Assert.NotNull(viewModel.ScheduledWithRelease);
+                Assert.Equal(scheduledWithRelease.Id, viewModel.ScheduledWithRelease.Id);
+                Assert.Equal(scheduledWithRelease.Title, viewModel.ScheduledWithRelease.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -980,6 +993,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(model.Published);
                 Assert.Equal(Approved, model.Status);
                 Assert.Equal(WithRelease, model.PublishingStrategy);
+                Assert.Equal(scheduledWithRelease.Id, model.ScheduledWithReleaseId);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
