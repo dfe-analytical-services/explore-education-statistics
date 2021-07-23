@@ -4,14 +4,12 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class FilterItemService : AbstractRepository<FilterItem, Guid>, IFilterItemService
     {
-        public FilterItemService(StatisticsDbContext context,
-            ILogger<FilterItemService> logger) : base(context, logger)
+        public FilterItemService(StatisticsDbContext context) : base(context)
         {
         }
 
@@ -20,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             // Temporary measure hopefully!
             // The following query is optimal but since IQueryable observations can contain n number of conditions then LINQ
             // may not be capable of converting it so allow a less efficient query to be executed
-            
+
             if (!listFilterItems)
             {
                 // optimal query
@@ -31,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                            observations.Any(o => o.FilterItems.Any(
                                ofi => ofi.FilterItemId == fi.Id)));
             }
-            
+
             // sub-optimal query
             var allFilterItemsForSubject = _context.FilterItem
                 .Include(fi => fi.FilterGroup)

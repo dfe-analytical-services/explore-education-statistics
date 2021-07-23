@@ -121,8 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFootnoteRepository, FootnoteRepository>(provider =>
                     new FootnoteRepository(
-                        context: provider.GetService<PublicStatisticsDbContext>(),
-                        logger: provider.GetService<ILogger<FootnoteRepository>>()))
+                        context: provider.GetService<PublicStatisticsDbContext>()))
                 .AddScoped<IZipFileService, ZipFileService>(provider =>
                     new ZipFileService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")

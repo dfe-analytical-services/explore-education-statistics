@@ -351,7 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 }
             };
-            
+
             var footnote2 = new Footnote
             {
                 Content = "Test footnote 2",
@@ -396,7 +396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
@@ -421,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 };
-                
+
                 var newFootnote2 = new Footnote
                 {
                     Id = Guid.NewGuid(),
@@ -450,12 +450,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(newFootnote2.Id);
 
                 var service = SetupFootnoteService(
-                    statisticsDbContext, 
-                    contentDbContext, 
+                    statisticsDbContext,
+                    contentDbContext,
                     footnoteRepository: footnoteRepository.Object,
                     guidGenerator: guidGenerator.Object);
 
-                var result = 
+                var result =
                     await service.CopyFootnotes(release.Id, amendment.Id);
 
                 Assert.True(result.IsRight);
@@ -480,7 +480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         FirstOrDefault(r => r.ReleaseId == amendment.Id) != null)
                     .OrderBy(f => f.Content)
                     .ToList();
-                
+
                 Assert.Equal(2, newFootnotesFromDb.Count);
                 AssertFootnoteDetailsCopiedCorrectly(footnote1, newFootnotesFromDb[0]);
                 AssertFootnoteDetailsCopiedCorrectly(footnote2, newFootnotesFromDb[1]);
@@ -489,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             void AssertFootnoteDetailsCopiedCorrectly(Footnote originalFootnote, Footnote newFootnote)
             {
                 Assert.Equal(newFootnote.Content, originalFootnote.Content);
-                
+
                 Assert.Equal(
                     originalFootnote
                         .Filters
@@ -499,7 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .Filters
                         .SelectNullSafe(f => f.FilterId)
                         .ToList());
-                
+
                 Assert.Equal(
                     originalFootnote
                         .FilterGroups
@@ -509,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .FilterGroups
                         .SelectNullSafe(f => f.FilterGroupId)
                         .ToList());
-                
+
                 Assert.Equal(
                     originalFootnote
                         .FilterItems
@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .FilterItems
                         .SelectNullSafe(f => f.FilterItemId)
                         .ToList());
-                
+
                 Assert.Equal(
                     originalFootnote
                         .Subjects
@@ -529,7 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .Subjects
                         .SelectNullSafe(f => f.SubjectId)
                         .ToList());
-                
+
                 Assert.Equal(
                     originalFootnote
                         .Indicators
@@ -557,10 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                footnoteRepository ?? new FootnoteRepository(
-                    statisticsDbContext,
-                    new Mock<ILogger<FootnoteRepository>>().Object
-                ),
+                footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 guidGenerator ?? new SequentialGuidGenerator()
             );

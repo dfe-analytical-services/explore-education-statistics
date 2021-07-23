@@ -874,7 +874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(replacementPlan.Valid);
             }
         }
-        
+
         [Fact]
         public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalidButFixable()
         {
@@ -1156,7 +1156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(dataBlockPlan.Fixable);
             }
         }
-        
+
         [Fact]
         public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalidAndNotFixable()
         {
@@ -1702,7 +1702,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.AddRangeAsync(statsRelease);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalDefaultFilter, 
+                await statisticsDbContext.AddRangeAsync(originalDefaultFilter,
                     replacementDefaultFilter, replacementNewlyIntroducedFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.SaveChangesAsync();
@@ -3004,7 +3004,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(TableHeaderType.Indicator, replacedDataBlock.Table.TableHeaders.Rows.First().Type);
                 Assert.Equal(replacementIndicator.Id.ToString(),
                     replacedDataBlock.Table.TableHeaders.Rows.First().Value);
-                
+
                 Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups);
                 var replacementRowGroup = replacedDataBlock.Table.TableHeaders.RowGroups.First().ToList();
                 Assert.Equal(2, replacementRowGroup.Count());
@@ -3012,7 +3012,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementFilterItem1.Id.ToString(),replacementRowGroup[0].Value);
                 Assert.Equal(TableHeaderType.Filter, replacementRowGroup[1].Type);
                 Assert.Equal(replacementFilterItem2.Id.ToString(),replacementRowGroup[1].Value);
-                
+
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
                 Assert.Single(chartMajorAxis.DataSets);
@@ -3168,10 +3168,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                new FilterService(statisticsDbContext, new Mock<ILogger<FilterService>>().Object),
-                new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
+                new FilterService(statisticsDbContext),
+                new IndicatorService(statisticsDbContext),
                 locationService.Object,
-                new FootnoteRepository(statisticsDbContext, new Mock<ILogger<FootnoteRepository>>().Object),
+                new FootnoteRepository(statisticsDbContext),
                 releaseService.Object,
                 timePeriodService.Object,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),

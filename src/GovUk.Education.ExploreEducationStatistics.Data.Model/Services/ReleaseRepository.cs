@@ -3,15 +3,12 @@ using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class ReleaseRepository : AbstractRepository<Release, Guid>, IReleaseRepository
     {
-        public ReleaseRepository(StatisticsDbContext context,
-            ILogger<ReleaseRepository> logger) : base(context, logger)
+        public ReleaseRepository(StatisticsDbContext context) : base(context)
         {
         }
 

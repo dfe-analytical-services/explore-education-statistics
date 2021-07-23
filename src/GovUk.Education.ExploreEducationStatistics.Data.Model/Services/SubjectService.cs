@@ -1,12 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
@@ -16,8 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public SubjectService(
             StatisticsDbContext context,
-            ILogger<SubjectService> logger, 
-            IReleaseRepository releaseRepository) : base(context, logger)
+            IReleaseRepository releaseRepository) : base(context)
         {
             _releaseRepository = releaseRepository;
         }

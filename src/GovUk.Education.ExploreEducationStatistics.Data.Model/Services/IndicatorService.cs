@@ -4,14 +4,12 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class IndicatorService : AbstractRepository<Indicator, Guid>, IIndicatorService
     {
-        public IndicatorService(StatisticsDbContext context, ILogger<IndicatorService> logger)
-            : base(context, logger)
+        public IndicatorService(StatisticsDbContext context) : base(context)
         {
         }
 
