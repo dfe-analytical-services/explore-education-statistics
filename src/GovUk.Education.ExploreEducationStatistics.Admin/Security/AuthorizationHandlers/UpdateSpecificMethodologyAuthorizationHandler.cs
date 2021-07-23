@@ -36,9 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            // TODO SOW4 EES-2166 When Status is Approved, succeed for Approvers on the latest Release of the owning publication
+            // TODO SOW4 EES-2166 When Status is Approved, succeed for Approvers on the latest Release of the owning Publication
             // TODO SOW4 EES-2170 When Status is not Approved, succeed for Publication owners
-            // TODO SOW4 EES-2168 When Status is not Approved, succeed for Editors on the latest Release of the owning publication
+            // TODO SOW4 EES-2168 When Status is not Approved, succeed for Editors on the latest Release of the owning Publication
         }
     }
 }

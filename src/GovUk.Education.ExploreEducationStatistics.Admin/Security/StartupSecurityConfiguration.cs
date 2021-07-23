@@ -175,11 +175,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 // does this user have permission to mark a specific Methodology as Draft?
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificMethodologyAsDraft.ToString(), policy =>
-                    policy.Requirements.Add(new MarkSpecificMethodologyAsDraftRequirement()));
+                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftRequirement()));
 
                 // does this user have permission to approve a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificMethodology.ToString(), policy =>
-                    policy.Requirements.Add(new ApproveSpecificMethodologyRequirement()));
+                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyRequirement()));
 
                 // does this user have permission to create an Amendment of a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(), policy =>
@@ -244,8 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MarkSpecificMethodologyAsDraftAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ApproveSpecificMethodologyAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificMethodologyAuthorizationHandler>();
         }

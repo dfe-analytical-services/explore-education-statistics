@@ -228,6 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
+                    // TODO SOW4 EES-2168 Drop claim ApproveAllMethodologies from the Analyst role
                     new IdentityRoleClaim<string>
                     {
                         Id = -28,
