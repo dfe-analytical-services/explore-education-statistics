@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 

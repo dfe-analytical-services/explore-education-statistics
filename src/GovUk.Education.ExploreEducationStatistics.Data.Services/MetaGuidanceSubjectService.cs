@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -20,20 +20,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class MetaGuidanceSubjectService : IMetaGuidanceSubjectService
     {
-        private readonly IFilterService _filterService;
-        private readonly IIndicatorService _indicatorService;
+        private readonly IFilterRepository _filterRepository;
+        private readonly IIndicatorRepository _indicatorRepository;
         private readonly StatisticsDbContext _context;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
-        public MetaGuidanceSubjectService(IFilterService filterService,
-            IIndicatorService indicatorService,
+        public MetaGuidanceSubjectService(IFilterRepository filterRepository,
+            IIndicatorRepository indicatorRepository,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IReleaseDataFileRepository releaseDataFileRepository)
         {
-            _filterService = filterService;
-            _indicatorService = indicatorService;
+            _filterRepository = filterRepository;
+            _indicatorRepository = indicatorRepository;
             _context = context;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _releaseDataFileRepository = releaseDataFileRepository;
@@ -119,14 +119,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private List<LabelValue> GetVariables(Guid subjectId)
         {
-            var filters = _filterService.FindMany(filter => filter.SubjectId == subjectId)
+            var filters = _filterRepository.FindMany(filter => filter.SubjectId == subjectId)
                 .Select(filter =>
                     new LabelValue(
                         string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
                         filter.Name))
                 .ToList();
 
-            var indicators = _indicatorService.GetIndicators(subjectId)
+            var indicators = _indicatorRepository.GetIndicators(subjectId)
                 .Select(indicator => new LabelValue(indicator.Label, indicator.Name));
 
             return filters.Concat(indicators)

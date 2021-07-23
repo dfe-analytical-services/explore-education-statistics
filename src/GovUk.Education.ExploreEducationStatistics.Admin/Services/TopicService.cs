@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        private readonly IReleaseSubjectService _releaseSubjectService;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IPublishingService _publishingService;
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IUserService userService,
-            IReleaseSubjectService releaseSubjectService,
+            IReleaseSubjectRepository releaseSubjectRepository,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IPublishingService publishingService)
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _userService = userService;
-            _releaseSubjectService = releaseSubjectService;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
             _publishingService = publishingService;
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             await _releaseDataFileService.DeleteAll(release.Id, forceDelete: true);
                             await _releaseFileService.DeleteAll(release.Id, forceDelete: true);
-                            await _releaseSubjectService.DeleteAllReleaseSubjects(release.Id);
+                            await _releaseSubjectRepository.DeleteAllReleaseSubjects(release.Id);
                         }
 
                         var publicationIds = topic.Publications

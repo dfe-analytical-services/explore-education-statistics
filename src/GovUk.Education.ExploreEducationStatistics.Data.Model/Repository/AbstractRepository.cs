@@ -8,12 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
     public abstract class AbstractRepository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class
     {

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class FilterService : AbstractRepository<Filter, Guid>, IFilterService
+    public class FilterRepository : AbstractRepository<Filter, Guid>, IFilterRepository
     {
-        public FilterService(StatisticsDbContext context) : base(context)
+        public FilterRepository(StatisticsDbContext context) : base(context)
         {
         }
 

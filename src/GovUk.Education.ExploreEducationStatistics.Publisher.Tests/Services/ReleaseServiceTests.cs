@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -1437,14 +1437,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicStatisticsDbContext statisticsDbContext = null,
             IBlobStorageService publicBlobStorageService = null,
             IMethodologyService methodologyService = null,
-            IReleaseSubjectService releaseSubjectService = null)
+            IReleaseSubjectRepository releaseSubjectRepository = null)
         {
             return new ReleaseService(
                 contentDbContext,
                 statisticsDbContext ?? new Mock<PublicStatisticsDbContext>().Object,
                 publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
                 methodologyService ?? new Mock<IMethodologyService>().Object,
-                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
                 new Mock<ILogger<ReleaseService>>().Object,
                 MapperForProfile<MappingProfiles>());
         }

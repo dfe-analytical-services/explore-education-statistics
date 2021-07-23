@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var subjectDeleter = new Mock<ReleaseSubjectService.SubjectDeleter>();
+                var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
 
                 subjectDeleter
                     .Setup(
@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var subjectDeleter = new Mock<ReleaseSubjectService.SubjectDeleter>();
+                var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
 
                 subjectDeleter
                     .Setup(
@@ -268,15 +268,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private ReleaseSubjectService BuildReleaseSubjectService(
+        private ReleaseSubjectRepository BuildReleaseSubjectService(
             StatisticsDbContext statisticsDbContext,
             IFootnoteRepository footnoteRepository = null,
-            ReleaseSubjectService.SubjectDeleter subjectDeleter = null)
+            ReleaseSubjectRepository.SubjectDeleter subjectDeleter = null)
         {
-            return new ReleaseSubjectService(
+            return new ReleaseSubjectRepository(
                 statisticsDbContext,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
-                subjectDeleter ?? new Mock<ReleaseSubjectService.SubjectDeleter>().Object
+                subjectDeleter ?? new Mock<ReleaseSubjectRepository.SubjectDeleter>().Object
             );
         }
     }

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 {
-    public class SubjectServiceTests
+    public class SubjectRepositoryTests
     {
         [Fact]
         public async Task IsSubjectForLatestPublishedRelease()
@@ -249,11 +248,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             }
         }
 
-        private SubjectService BuildSubjectService(
+        private SubjectRepository BuildSubjectService(
             StatisticsDbContext statisticsDbContext,
             IReleaseRepository releaseRepository = null)
         {
-            return new SubjectService(
+            return new SubjectRepository(
                 statisticsDbContext,
                 releaseRepository ?? new Mock<IReleaseRepository>().Object
             );

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface IGeoJsonService
+    public interface IGeoJsonRepository
     {
         GeoJson Find(long boundaryLevelId, string code);
 

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class BoundaryLevelService : AbstractRepository<BoundaryLevel, long>, IBoundaryLevelService
+    public class BoundaryLevelRepository : AbstractRepository<BoundaryLevel, long>, IBoundaryLevelRepository
     {
         private readonly DataServiceMemoryCache<BoundaryLevel> _cache;
 
-        public BoundaryLevelService(
+        public BoundaryLevelRepository(
             StatisticsDbContext context,
             DataServiceMemoryCache<BoundaryLevel> cache)
             : base(context)

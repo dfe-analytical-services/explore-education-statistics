@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                var (boundaryLevelService, filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
+                var (boundaryLevelRepository, filterRepository, filterItemRepository, geoJsonRepository, indicatorGroupRepository, locationRepository, observationService, timePeriodService, userService) = Mocks();
 
-                var service = new SubjectMetaService(boundaryLevelService.Object,
-                    filterService.Object,
-                    filterItemService.Object,
-                    geoJsonService.Object,
-                    indicatorGroupService.Object,
-                    locationService.Object,
+                var service = new SubjectMetaService(boundaryLevelRepository.Object,
+                    filterRepository.Object,
+                    filterItemRepository.Object,
+                    geoJsonRepository.Object,
+                    indicatorGroupRepository.Object,
+                    locationRepository.Object,
                     new Mock<ILogger<SubjectMetaService>>().Object,
                     observationService.Object,
                     new PersistenceHelper<StatisticsDbContext>(context),
@@ -84,16 +81,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 context.SaveChanges();
 
-                var (boundaryLevelService,filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
+                var (boundaryLevelRepository,filterRepository, filterItemRepository, geoJsonRepository, indicatorGroupRepository, locationRepository, observationService, timePeriodService, userService) = Mocks();
 
                 userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectData)).ReturnsAsync(false);
 
-                var service = new SubjectMetaService(boundaryLevelService.Object,
-                    filterService.Object,
-                    filterItemService.Object,
-                    geoJsonService.Object,
-                    indicatorGroupService.Object,
-                    locationService.Object,
+                var service = new SubjectMetaService(boundaryLevelRepository.Object,
+                    filterRepository.Object,
+                    filterItemRepository.Object,
+                    geoJsonRepository.Object,
+                    indicatorGroupRepository.Object,
+                    locationRepository.Object,
                     new Mock<ILogger<SubjectMetaService>>().Object,
                     observationService.Object,
                     new PersistenceHelper<StatisticsDbContext>(context),
@@ -105,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.IsAssignableFrom<ForbidResult>(result.Result.Left);
             }
         }
-        
+
         [Fact]
         public void GetSubjectMeta_EmptyModelReturnedForSubject()
         {
@@ -137,19 +134,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 context.SaveChanges();
 
-                var (boundaryLevelService,filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
-                
-                filterService.Setup(s => s.GetFiltersIncludingItems(subject.Id)).Returns(Enumerable.Empty<Filter>());
-                indicatorGroupService.Setup(s => s.GetIndicatorGroups(subject.Id)).Returns(Enumerable.Empty<IndicatorGroup>());
-                locationService.Setup(s => s.GetObservationalUnits(subject.Id)).Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
+                var (boundaryLevelRepository,filterRepository, filterItemRepository, geoJsonRepository, indicatorGroupRepository, locationRepository, observationService, timePeriodService, userService) = Mocks();
+
+                filterRepository.Setup(s => s.GetFiltersIncludingItems(subject.Id)).Returns(Enumerable.Empty<Filter>());
+                indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(subject.Id)).Returns(Enumerable.Empty<IndicatorGroup>());
+                locationRepository.Setup(s => s.GetObservationalUnits(subject.Id)).Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
                 timePeriodService.Setup(s => s.GetTimePeriods(subject.Id)).Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
-                var service = new SubjectMetaService(boundaryLevelService.Object,
-                    filterService.Object,
-                    filterItemService.Object,
-                    geoJsonService.Object,
-                    indicatorGroupService.Object,
-                    locationService.Object,
+                var service = new SubjectMetaService(boundaryLevelRepository.Object,
+                    filterRepository.Object,
+                    filterItemRepository.Object,
+                    geoJsonRepository.Object,
+                    indicatorGroupRepository.Object,
+                    locationRepository.Object,
                     new Mock<ILogger<SubjectMetaService>>().Object,
                     observationService.Object,
                     new PersistenceHelper<StatisticsDbContext>(context),
@@ -162,22 +159,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static (Mock<IBoundaryLevelService>,
-            Mock<IFilterService>,
-            Mock<IFilterItemService>,
-            Mock<IGeoJsonService>,
-            Mock<IIndicatorGroupService>,
-            Mock<ILocationService>,
+        private static (Mock<IBoundaryLevelRepository>,
+            Mock<IFilterRepository>,
+            Mock<IFilterItemRepository>,
+            Mock<IGeoJsonRepository>,
+            Mock<IIndicatorGroupRepository>,
+            Mock<ILocationRepository>,
             Mock<IObservationService>,
             Mock<ITimePeriodService>,
             Mock<IUserService>) Mocks()
         {
-            return (new Mock<IBoundaryLevelService>(),
-                new Mock<IFilterService>(),
-                new Mock<IFilterItemService>(),
-                new Mock<IGeoJsonService>(), 
-                new Mock<IIndicatorGroupService>(),
-                new Mock<ILocationService>(),
+            return (new Mock<IBoundaryLevelRepository>(),
+                new Mock<IFilterRepository>(),
+                new Mock<IFilterItemRepository>(),
+                new Mock<IGeoJsonRepository>(),
+                new Mock<IIndicatorGroupRepository>(),
+                new Mock<ILocationRepository>(),
                 new Mock<IObservationService>(),
                 new Mock<ITimePeriodService>(),
                 new Mock<IUserService>());
