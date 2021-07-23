@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -13,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             var methodology = new Methodology
             {
-                Status = Approved,
                 PublishingStrategy = Immediately
             };
 
@@ -23,21 +23,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void ScheduledForPublishingImmediately_FalseWhenPublishingStrategyIsWithRelease()
         {
-            var liveRelease = new Release
+            var release = new Release
             {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow
+                Id = Guid.NewGuid()
             };
 
             var methodology = new Methodology
             {
-                Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id,
-                ScheduledWithRelease = liveRelease
+                ScheduledWithReleaseId = release.Id,
+                ScheduledWithRelease = release
             };
 
             Assert.False(methodology.ScheduledForPublishingImmediately);
+        }
+
+        [Fact]
+        public void ScheduledForPublishingWithRelease_FalseWhenPublishingStrategyIsImmediately()
+        {
+            var methodology = new Methodology
+            {
+                PublishingStrategy = Immediately
+            };
+
+            Assert.False(methodology.ScheduledForPublishingWithRelease);
+        }
+
+        [Fact]
+        public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var methodology = new Methodology
+            {
+                PublishingStrategy = WithRelease,
+                ScheduledWithReleaseId = release.Id,
+                ScheduledWithRelease = release
+            };
+
+            Assert.True(methodology.ScheduledForPublishingWithRelease);
         }
 
         [Fact]
@@ -93,7 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             var methodology = new Methodology
             {
-                Status = Approved,
                 PublishingStrategy = WithRelease,
                 ScheduledWithReleaseId = Guid.NewGuid()
             };

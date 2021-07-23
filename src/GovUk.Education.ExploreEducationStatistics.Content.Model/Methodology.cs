@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -14,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         Draft,
         Approved
     }
-    
+
     public enum MethodologyPublishingStrategy
     {
         Immediately,
@@ -23,9 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class Methodology
     {
-        [Key] 
-        [Required] 
-        public Guid Id { get; set; }
+        [Key] [Required] public Guid Id { get; set; }
 
         public string Title => AlternativeTitle ?? MethodologyParent.OwningPublicationTitle;
 
@@ -69,22 +66,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool Approved => Status == MethodologyStatus.Approved;
 
-        public bool ScheduledForPublishingImmediately => PublishingStrategy == MethodologyPublishingStrategy.Immediately;
+        public bool ScheduledForPublishingWithRelease => PublishingStrategy == WithRelease;
+
+        public bool ScheduledForPublishingImmediately => PublishingStrategy == Immediately;
 
         public bool ScheduledForPublishingWithPublishedRelease
         {
             get
             {
-                if (PublishingStrategy != MethodologyPublishingStrategy.WithRelease)
+                if (PublishingStrategy != WithRelease)
                 {
                     return false;
                 }
-                
-                if (ScheduledWithReleaseId != null && ScheduledWithRelease == null)
+
+                if (ScheduledWithReleaseId == null || ScheduledWithRelease == null)
                 {
                     throw new InvalidOperationException("ScheduledWithRelease field not included in Methodology");
                 }
-                
+
                 return ScheduledWithRelease.Live;
             }
         }
@@ -115,11 +114,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Annexes = Annexes
                 .Select(c => c.Clone(createdDate))
                 .ToList();
-            
+
             copy.Content = Content
                 .Select(c => c.Clone(createdDate))
                 .ToList();
-            
+
             return copy;
         }
     }
