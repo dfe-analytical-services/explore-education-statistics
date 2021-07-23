@@ -9,11 +9,11 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
-import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
+import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
@@ -21,7 +21,7 @@ import React, { ReactNode, useEffect, useMemo } from 'react';
 
 const formId = 'chartDataSetsConfigurationForm';
 
-interface FormValues {
+export interface FormValues {
   filters: Dictionary<string>;
   indicator: string;
   location: string;
@@ -68,21 +68,6 @@ const ChartDataSetsConfiguration = ({
     return !units.every(unit => unit === units[0]);
   }, [dataSets, meta.indicators]);
 
-  const getSelectedFilters = (values: FormValues) => {
-    const filterTypes = Object.keys(meta.filters);
-    const newFilters: string[] = [];
-    filterTypes.forEach(filterType => {
-      if (!values.filters[filterType]) {
-        meta.filters[filterType].options.forEach(option => {
-          newFilters.push(option.value);
-        });
-      } else {
-        newFilters.push(values.filters[filterType]);
-      }
-    });
-    return newFilters;
-  };
-
   useEffect(() => {
     updateForm({
       formKey: 'dataSets',
@@ -121,42 +106,11 @@ const ChartDataSetsConfiguration = ({
           timePeriod: Yup.string(),
         })}
         onSubmit={values => {
-          const selectedDataSets: DataSet[] = [];
-          const selectedIndicators = values.indicator
-            ? [values.indicator]
-            : indicatorOptions.map(indicator => indicator.value);
-          const selectedFilters = getSelectedFilters(values);
-
-          // Convert empty strings from form values to undefined
-          const timePeriod: DataSet['timePeriod'] = values.timePeriod
-            ? values.timePeriod
-            : undefined;
-
-          const location: DataSet['location'] = values.location
-            ? LocationFilter.parseCompositeId(values.location)
-            : undefined;
-
-          if (!selectedFilters.length) {
-            selectedIndicators.forEach(option => {
-              selectedDataSets.push({
-                filters: [],
-                indicator: option,
-                location,
-                timePeriod,
-              });
-            });
-          } else {
-            selectedFilters.forEach(filter => {
-              selectedIndicators.forEach(option => {
-                selectedDataSets.push({
-                  filters: [filter],
-                  indicator: option,
-                  location,
-                  timePeriod,
-                });
-              });
-            });
-          }
+          const selectedDataSets = getSelectedDataSets({
+            filters: meta.filters,
+            indicatorOptions,
+            values,
+          });
 
           selectedDataSets.forEach(newDataSet => {
             if (
