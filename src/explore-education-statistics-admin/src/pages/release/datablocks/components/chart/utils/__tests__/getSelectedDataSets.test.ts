@@ -1,12 +1,13 @@
-import formatSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/formatSelectedDataSets';
+import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
 } from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 
-describe('formatSelectedDataSets', () => {
-  const testOneFilter = {
+describe('getSelectedDataSets', () => {
+  const testOneFilterMeta: FullTableMeta['filters'] = {
     'School type': {
       name: 'School type',
       options: [
@@ -26,8 +27,8 @@ describe('formatSelectedDataSets', () => {
     },
   };
 
-  const testTwoFilters = {
-    ...testOneFilter,
+  const testTwoFilterMeta: FullTableMeta['filters'] = {
+    ...testOneFilterMeta,
     'Another category1': {
       name: 'Another category1',
       options: [
@@ -43,8 +44,8 @@ describe('formatSelectedDataSets', () => {
     },
   };
 
-  const testThreeFilters = {
-    ...testTwoFilters,
+  const testThreeFilterMeta: FullTableMeta['filters'] = {
+    ...testTwoFilterMeta,
     'Another category2': {
       name: 'Another category2',
       options: [
@@ -60,7 +61,7 @@ describe('formatSelectedDataSets', () => {
     },
   };
 
-  const testIndicatorOptions = [
+  const testIndicatorOptions: Indicator[] = [
     {
       value: 'indicator-1-id',
       label: 'indicator 1',
@@ -68,21 +69,20 @@ describe('formatSelectedDataSets', () => {
   ];
 
   test('returns the correct data sets when a filter, location, indicator and time period are selected', () => {
-    const testValues = {
-      filters: {
-        'School type': 'secondary-id',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testOneFilter,
+    const result = getSelectedDataSets({
+      filters: testOneFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': 'secondary-id',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
     const expected = [
@@ -100,26 +100,25 @@ describe('formatSelectedDataSets', () => {
     expect(result).toEqual(expected);
   });
 
-  test('returns the correct data sets when multiple filters are selected', () => {
-    const testValues = {
-      filters: {
-        'School type': 'secondary-id',
-        'Another category1': 'another-category1-option2-id',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testTwoFilters,
+  test('returns the correct data sets when multiple individual filters are selected', () => {
+    const result = getSelectedDataSets({
+      filters: testTwoFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': 'secondary-id',
+          'Another category1': 'another-category1-option2-id',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
-    const expected = [
+    expect(result).toEqual([
       {
         filters: ['secondary-id', 'another-category1-option2-id'],
         indicator: 'indicator-1-id',
@@ -129,29 +128,27 @@ describe('formatSelectedDataSets', () => {
         },
         timePeriod: 'time-id',
       },
-    ];
-    expect(result).toEqual(expected);
+    ]);
   });
 
-  test('returns the correct data sets when "All options" are selected for a filter', () => {
-    const testValues = {
-      filters: {
-        'School type': '',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testOneFilter,
+  test('returns the correct data sets when "All" options are selected for a filter', () => {
+    const result = getSelectedDataSets({
+      filters: testOneFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': '',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
-    const expected = [
+    expect(result).toEqual([
       {
         filters: ['secondary-id'],
         indicator: 'indicator-1-id',
@@ -179,31 +176,28 @@ describe('formatSelectedDataSets', () => {
         },
         timePeriod: 'time-id',
       },
-    ];
-
-    expect(result).toEqual(expected);
+    ]);
   });
 
-  test('returns the correct data sets when "All options" are selected for a two filters', () => {
-    const testValues = {
-      filters: {
-        'School type': '',
-        'Another category1': '',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testTwoFilters,
+  test('returns the correct data sets when "All" options are selected for two filters', () => {
+    const result = getSelectedDataSets({
+      filters: testTwoFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': '',
+          'Another category1': '',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
-    const expected = [
+    expect(result).toEqual([
       {
         filters: ['secondary-id', 'another-category1-option1-id'],
         indicator: 'indicator-1-id',
@@ -258,32 +252,29 @@ describe('formatSelectedDataSets', () => {
         },
         timePeriod: 'time-id',
       },
-    ];
-
-    expect(result).toEqual(expected);
+    ]);
   });
 
-  test('returns the correct data sets when "All options" are selected for three filters', () => {
-    const testValues = {
-      filters: {
-        'School type': '',
-        'Another category1': '',
-        'Another category2': '',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testThreeFilters,
+  test('returns the correct data sets when "All" options are selected for three filters', () => {
+    const result = getSelectedDataSets({
+      filters: testThreeFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': '',
+          'Another category1': '',
+          'Another category2': '',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
-    const expected = [
+    expect(result).toEqual([
       {
         filters: [
           'secondary-id',
@@ -440,32 +431,29 @@ describe('formatSelectedDataSets', () => {
         },
         timePeriod: 'time-id',
       },
-    ];
-
-    expect(result).toEqual(expected);
+    ]);
   });
 
-  test('returns the correct data sets when"All options" is selected for a filter and some other filters are selected', () => {
-    const testValues = {
-      filters: {
-        'School type': '',
-        'Another category1': 'another-category1-option2-id',
-        'Another category2': 'another-category1-option1-id',
-      },
-      indicator: 'indicator-1-id',
-      location: LocationFilter.createId({
-        value: 'location-id',
-        level: 'localAuthority',
-      }),
-      timePeriod: 'time-id',
-    };
-    const result = formatSelectedDataSets({
-      filters: testThreeFilters,
+  test('returns the correct data sets when "All" option is selected for a filter and some other filters are selected', () => {
+    const result = getSelectedDataSets({
+      filters: testThreeFilterMeta,
       indicatorOptions: testIndicatorOptions,
-      values: testValues,
+      values: {
+        filters: {
+          'School type': '',
+          'Another category1': 'another-category1-option2-id',
+          'Another category2': 'another-category1-option1-id',
+        },
+        indicator: 'indicator-1-id',
+        location: LocationFilter.createId({
+          value: 'location-id',
+          level: 'localAuthority',
+        }),
+        timePeriod: 'time-id',
+      },
     });
 
-    const expected = [
+    expect(result).toEqual([
       {
         filters: [
           'secondary-id',
@@ -505,8 +493,6 @@ describe('formatSelectedDataSets', () => {
         },
         timePeriod: 'time-id',
       },
-    ];
-
-    expect(result).toEqual(expected);
+    ]);
   });
 });

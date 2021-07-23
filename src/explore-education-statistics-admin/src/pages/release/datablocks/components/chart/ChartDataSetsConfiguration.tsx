@@ -13,7 +13,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
-import formatSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/formatSelectedDataSets';
+import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
@@ -106,7 +106,7 @@ const ChartDataSetsConfiguration = ({
           timePeriod: Yup.string(),
         })}
         onSubmit={values => {
-          const selectedDataSets = formatSelectedDataSets({
+          const selectedDataSets = getSelectedDataSets({
             filters: meta.filters,
             indicatorOptions,
             values,
