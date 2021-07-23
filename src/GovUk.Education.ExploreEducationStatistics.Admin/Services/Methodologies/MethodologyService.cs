@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -179,6 +180,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
                 .OnSuccessDo(DeleteMethodologyVersion)
                 .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
+        }
+
+        // TODO SOW4 EES-2264 WIP - Unit test this, and link it to Controller endpoint or add it to an existing view model
+        private async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+            Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id, queryable =>
+                    queryable.Include(m => m.MethodologyParent)
+                        .ThenInclude(mp => mp.Publications))
+                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(async methodology =>
+                {
+                    // Get all Publications using the Methodology including adopting Publications
+                    var publicationIds =
+                        methodology.MethodologyParent.Publications.Select(pm => pm.PublicationId);
+
+                    // Get the Releases of those publications that are not published
+                    return await _context.Releases.Where(r => publicationIds.Contains(r.PublicationId) && !r.Live)
+                        .Select(release => new TitleAndIdViewModel(release.Id, release.Title))
+                        .ToListAsync();
+                });
         }
 
         private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(
