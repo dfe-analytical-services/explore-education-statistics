@@ -73,7 +73,6 @@ export interface BasicLink {
 
 export interface ReleaseNote {
   id: string;
-  releaseId: string;
   on: Date;
   reason: string;
 }

@@ -41,6 +41,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     release.publication.otherReleases.length +
     release.publication.legacyReleases.length;
 
+  // Re-order updates in descending order in-case the cached
+  // release from the content API has not been updated to
+  // have the updates in the correct order.
+  const updates = orderBy(release.updates, 'on', 'desc');
+
   return (
     <Page
       title={release.publication.title}
@@ -103,12 +108,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <time>{formatPartialDate(release.nextReleaseDate)}</time>
                 </SummaryListItem>
               )}
-            {release.updates && release.updates.length > 0 && (
+
+            {updates.length && (
               <SummaryListItem term="Last updated">
-                <FormattedDate>{release.updates[0].on}</FormattedDate>
+                <FormattedDate>{updates[0].on}</FormattedDate>
 
                 <Details
                   id="releaseLastUpdates"
+                  summary={`See all updates (${updates.length})`}
                   onToggle={open => {
                     if (open) {
                       logEvent({
@@ -118,21 +125,24 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                       });
                     }
                   }}
-                  summary={`See all updates (${release.updates.length})`}
                 >
-                  <ol className="govuk-list">
-                    {orderBy(release.updates, 'on', 'desc').map(update => (
+                  <ol className="govuk-list" data-testid="all-updates">
+                    {updates.map(update => (
                       <li key={update.id}>
-                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                        <FormattedDate
+                          className="govuk-body govuk-!-font-weight-bold"
+                          testId="update-on"
+                        >
                           {update.on}
                         </FormattedDate>
-                        <p>{update.reason}</p>
+                        <p data-testid="update-reason">{update.reason}</p>
                       </li>
                     ))}
                   </ol>
                 </Details>
               </SummaryListItem>
             )}
+
             <SummaryListItem term="Receive updates">
               <Link
                 className="dfe-print-hidden govuk-!-font-weight-bold"

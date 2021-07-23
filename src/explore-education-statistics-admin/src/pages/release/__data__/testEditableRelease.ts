@@ -57,7 +57,6 @@ export const testEditableRelease: EditableRelease = {
     {
       id: '262cf6c8-db96-40d8-8fb1-b55028a9f55b',
       reason: 'First published',
-      releaseId: '',
       on: new Date(),
     },
   ],
