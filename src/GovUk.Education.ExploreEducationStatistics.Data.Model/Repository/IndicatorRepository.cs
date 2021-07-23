@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class IndicatorService : AbstractRepository<Indicator, Guid>, IIndicatorService
+    public class IndicatorRepository : AbstractRepository<Indicator, Guid>, IIndicatorRepository
     {
-        public IndicatorService(StatisticsDbContext context) : base(context)
+        public IndicatorRepository(StatisticsDbContext context) : base(context)
         {
         }
 

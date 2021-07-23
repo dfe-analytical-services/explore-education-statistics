@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using Microsoft.Extensions.Logging;
-using Moq;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests

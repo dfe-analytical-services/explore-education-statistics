@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class LocationService : AbstractRepository<Location, Guid>, ILocationService
+    public class LocationRepository : AbstractRepository<Location, Guid>, ILocationRepository
     {
-        public LocationService(StatisticsDbContext context) : base(context)
+        public LocationRepository(StatisticsDbContext context) : base(context)
         {
         }
 

@@ -16,7 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
         private readonly IReleaseFileRepository _releaseFileRepository;
-        private readonly ISubjectService _subjectService;
+        private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IDataImportService _dataImportService;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IContentService _contentService;
-        private readonly IReleaseSubjectService _releaseSubjectService;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IReleaseRepository repository,
             IReleaseFileRepository releaseFileRepository,
-            ISubjectService subjectService,
+            ISubjectRepository subjectRepository,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService,
             IReleaseChecklistService releaseChecklistService,
             IContentService contentService,
-            IReleaseSubjectService releaseSubjectService,
+            IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator)
         {
             _context = context;
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _repository = repository;
             _releaseFileRepository = releaseFileRepository;
-            _subjectService = subjectService;
+            _subjectRepository = subjectRepository;
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
             _dataImportService = dataImportService;
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataBlockService = dataBlockService;
             _releaseChecklistService = releaseChecklistService;
             _contentService = contentService;
-            _releaseSubjectService = releaseSubjectService;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
         }
 
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _releaseSubjectService.SoftDeleteAllReleaseSubjects(releaseId);
+                    await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(releaseId);
                 });
         }
 
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async file =>
                 {
                     var subject = file.SubjectId.HasValue
-                        ? await _subjectService.Get(file.SubjectId.Value)
+                        ? await _subjectRepository.Get(file.SubjectId.Value)
                         : null;
 
                     var footnotes = subject == null
@@ -527,7 +527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async deletePlan =>
                         {
                             await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                            await _releaseSubjectService.SoftDeleteReleaseSubject(releaseId,
+                            await _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId,
                                 deletePlan.SubjectId);
 
                             return await _releaseDataFileService.Delete(releaseId, fileId);

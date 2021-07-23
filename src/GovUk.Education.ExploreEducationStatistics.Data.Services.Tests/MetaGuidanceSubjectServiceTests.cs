@@ -10,8 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -966,14 +966,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static MetaGuidanceSubjectService SetupMetaGuidanceSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IFilterService filterService = null,
-            IIndicatorService indicatorService = null,
+            IFilterRepository filterRepository = null,
+            IIndicatorRepository indicatorRepository = null,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper = null,
             ContentDbContext contentDbContext = null)
         {
             return new MetaGuidanceSubjectService(
-                filterService ?? new FilterService(statisticsDbContext),
-                indicatorService ?? new IndicatorService(statisticsDbContext),
+                filterRepository ?? new FilterRepository(statisticsDbContext),
+                indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 contentDbContext != null

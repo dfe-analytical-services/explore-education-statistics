@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IResultSubjectMetaService _resultSubjectMetaService;
-        private readonly ISubjectService _subjectService;
+        private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
         private readonly IReleaseRepository _releaseRepository;
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IResultSubjectMetaService resultSubjectMetaService,
-            ISubjectService subjectService,
+            ISubjectRepository subjectRepository,
             IUserService userService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository)
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _resultSubjectMetaService = resultSubjectMetaService;
-            _subjectService = subjectService;
+            _subjectRepository = subjectRepository;
             _userService = userService;
             _resultBuilder = resultBuilder;
             _releaseRepository = releaseRepository;
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            var publicationId = await _subjectService.GetPublicationIdForSubject(queryContext.SubjectId);
+            var publicationId = await _subjectRepository.GetPublicationIdForSubject(queryContext.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
+            if (await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id) ||
                 await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;

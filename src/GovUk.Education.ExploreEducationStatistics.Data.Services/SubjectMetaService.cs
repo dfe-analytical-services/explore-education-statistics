@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -23,32 +23,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class SubjectMetaService : AbstractSubjectMetaService,
         ISubjectMetaService
     {
-        private readonly IFilterService _filterService;
-        private readonly IFilterItemService _filterItemService;
-        private readonly IIndicatorGroupService _indicatorGroupService;
-        private readonly ILocationService _locationService;
+        private readonly IFilterRepository _filterRepository;
+        private readonly IFilterItemRepository _filterItemRepository;
+        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
+        private readonly ILocationRepository _locationRepository;
         private readonly ILogger _logger;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
 
-        public SubjectMetaService(IBoundaryLevelService boundaryLevelService,
-            IFilterService filterService,
-            IFilterItemService filterItemService,
-            IGeoJsonService geoJsonService,
-            IIndicatorGroupService indicatorGroupService,
-            ILocationService locationService,
+        public SubjectMetaService(IBoundaryLevelRepository boundaryLevelRepository,
+            IFilterRepository filterRepository,
+            IFilterItemRepository filterItemRepository,
+            IGeoJsonRepository geoJsonRepository,
+            IIndicatorGroupRepository indicatorGroupRepository,
+            ILocationRepository locationRepository,
             ILogger<SubjectMetaService> logger,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
-            IUserService userService) : base(boundaryLevelService, filterItemService, geoJsonService)
+            IUserService userService) : base(boundaryLevelRepository, filterItemRepository, geoJsonRepository)
         {
-            _filterService = filterService;
-            _filterItemService = filterItemService;
-            _indicatorGroupService = indicatorGroupService;
-            _locationService = locationService;
+            _filterRepository = filterRepository;
+            _filterItemRepository = filterItemRepository;
+            _indicatorGroupRepository = indicatorGroupRepository;
+            _locationRepository = locationRepository;
             _logger = logger;
             _observationService = observationService;
             _persistenceHelper = persistenceHelper;
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
         {
-            return _filterService.GetFiltersIncludingItems(subjectId)
+            return _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
                     filter => filter.Label.PascalCase(),
                     filter => new FilterMetaViewModel
@@ -179,20 +179,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(Guid subjectId)
         {
-            var observationalUnits = _locationService.GetObservationalUnits(subjectId);
+            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
             return BuildObservationalUnitsViewModels(observationalUnits);
         }
 
         private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
-            var observationalUnits = _locationService.GetObservationalUnits(observations);
+            var observationalUnits = _locationRepository.GetObservationalUnits(observations);
             return BuildObservationalUnitsViewModels(observationalUnits);
         }
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId)
+            return _indicatorGroupRepository.GetIndicatorGroups(subjectId)
                 .OrderBy(group => group.Label, LabelComparer)
                 .ToDictionary(
                     group => group.Label.PascalCase(),
@@ -241,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private string GetTotalValue(Filter filter)
         {
-            return _filterItemService.GetTotal(filter)?.Id.ToString() ?? string.Empty;
+            return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
         }
 
         private static LabelValue MapObservationalUnitToLabelValue(IObservationalUnit unit)

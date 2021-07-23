@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class GeoJsonService : IGeoJsonService
+    public class GeoJsonRepository : IGeoJsonRepository
     {
         private readonly DataServiceMemoryCache<GeoJson> _cache;
         private readonly StatisticsDbContext _context;
 
-        public GeoJsonService(StatisticsDbContext context,
+        public GeoJsonRepository(StatisticsDbContext context,
             DataServiceMemoryCache<GeoJson> cache)
         {
             _context = context;
