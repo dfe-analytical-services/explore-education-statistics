@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IReleaseService releaseService = null)
         {
             return new PublicationService(
-                releaseRepository ?? new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object),
+                releaseRepository ?? new ReleaseRepository(context),
                 releaseService ?? new Mock<IReleaseService>().Object
             );
         }

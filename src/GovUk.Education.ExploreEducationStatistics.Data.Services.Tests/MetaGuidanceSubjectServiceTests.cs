@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -973,13 +972,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ContentDbContext contentDbContext = null)
         {
             return new MetaGuidanceSubjectService(
-                filterService ?? new FilterService(statisticsDbContext, new Mock<ILogger<FilterService>>().Object),
-                indicatorService ?? new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
+                filterService ?? new FilterService(statisticsDbContext),
+                indicatorService ?? new IndicatorService(statisticsDbContext),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 contentDbContext != null
                     ? new ReleaseDataFileRepository(contentDbContext)
-                    : new Mock<IReleaseDataFileRepository>().Object
+                    : Mock.Of<IReleaseDataFileRepository>()
             );
         }
     }

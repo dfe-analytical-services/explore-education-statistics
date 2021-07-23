@@ -1007,7 +1007,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
         private static FootnoteRepository BuildFootnoteRepository(StatisticsDbContext context)
         {
-            return new FootnoteRepository(context, new Mock<ILogger<FootnoteRepository>>().Object);
+            return new FootnoteRepository(context);
         }
     }
 }

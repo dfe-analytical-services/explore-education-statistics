@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
@@ -20,12 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         protected readonly StatisticsDbContext _context;
 
-        protected readonly ILogger _logger;
-
-        protected AbstractRepository(StatisticsDbContext context, ILogger logger)
+        protected AbstractRepository(StatisticsDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         protected DbSet<TEntity> DbSet()
@@ -54,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return Find(id) != null;
         }
-        
+
         public TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include)
         {
             var queryable = DbSet().AsQueryable();
@@ -68,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return DbSet().Find(id);
         }
-        
+
         public async Task<TEntity> FindAsync(TKey id)
         {
             return await DbSet().FindAsync(id);
@@ -88,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             // TODO EES-711 - this code needs improving following upgrade to EF for Core 3
             var idField = typeof(TEntity).GetProperty("Id");
-            
+
             var list = ids.ToList();
             var parameter = Expression.Parameter(typeof(TEntity), "e");
             var methodInfo = typeof(List<TKey>).GetMethod("Contains");
@@ -119,25 +115,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(expression)
                 .FirstOrDefault();
         }
-        
+
         public TEntity Remove(TKey id)
         {
             var entity = Find(id) ?? throw new ArgumentException("Entity not found", nameof(id));
             return DbSet().Remove(entity).Entity;
         }
-        
+
         public async Task<TEntity> RemoveAsync(TKey id)
         {
             var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
             return DbSet().Remove(entity).Entity;
         }
-        
+
         protected async Task<TEntity> UpdateAsync(TKey id)
         {
             var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
             return DbSet().Update(entity).Entity;
         }
-        
+
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<Guid> values)
         {
             return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListGuidType");

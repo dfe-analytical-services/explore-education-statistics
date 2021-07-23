@@ -6,14 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class FootnoteRepository : AbstractRepository<Footnote, Guid>, IFootnoteRepository
     {
-        public FootnoteRepository(StatisticsDbContext context,
-            ILogger<FootnoteRepository> logger) : base(context, logger)
+        public FootnoteRepository(StatisticsDbContext context) : base(context)
         {}
 
         public IEnumerable<Footnote> GetFilteredFootnotes(

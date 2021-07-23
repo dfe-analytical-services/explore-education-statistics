@@ -255,7 +255,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             return new SubjectService(
                 statisticsDbContext,
-                new Mock<ILogger<SubjectService>>().Object,
                 releaseRepository ?? new Mock<IReleaseRepository>().Object
             );
         }
