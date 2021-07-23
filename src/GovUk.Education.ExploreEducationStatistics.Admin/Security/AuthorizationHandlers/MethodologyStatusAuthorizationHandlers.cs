@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     return;
                 }
 
-                // TODO SOW4 EES-2168 Succeed for Approvers on the latest Release of the owning Publication
+                // TODO SOW4 EES-2162 Succeed for Approvers on the latest Release of the owning Publication
             }
         }
 
