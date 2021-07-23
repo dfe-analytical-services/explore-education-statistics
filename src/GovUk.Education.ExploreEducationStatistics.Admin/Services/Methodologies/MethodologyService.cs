@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id, 
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id,
                     HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
@@ -112,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // Leave slug
                         return methodology;
                     }
+
                     var slug = SlugFromTitle(request.Title);
                     return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).OnSuccess(_ =>
                     {
@@ -123,7 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     _context.Methodologies.Update(methodology);
 
-                    methodology.InternalReleaseNote = request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
+                    methodology.InternalReleaseNote =
+                        request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
                     methodology.AlternativeTitle = request.Title;
@@ -133,13 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     {
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
 
-                        // TODO SOW4 EES-2166 EES-2200
-                        // Until it's possible to create an amendment we still allow un-approving and re-approving.
-                        // This means the methodology may already have a published date that it was first published on,
-                        // so don't overwrite it. Later this can be changed to:
-                        // methodology.Published = DateTime.UtcNow;
-
-                        methodology.Published ??= DateTime.UtcNow;
+                        methodology.Published = DateTime.UtcNow;
 
                         // Invalidate the 'All Methodologies' cache item
                         await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
@@ -154,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId, 
+                .CheckEntityExists<Methodology>(methodologyId,
                     query => query.Include(m => m.MethodologyParent))
                 .OnSuccess(_userService.CheckCanDeleteMethodology)
                 .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
@@ -162,13 +158,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
         }
 
-        private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(Methodology methodology)
+        private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(
+            Methodology methodology)
         {
             var methodologyFileIds = await _context
-                    .MethodologyFiles
-                    .Where(f => f.MethodologyId == methodology.Id)
-                    .Select(f => f.FileId)
-                    .ToListAsync();
+                .MethodologyFiles
+                .Where(f => f.MethodologyId == methodology.Id)
+                .Select(f => f.FileId)
+                .ToListAsync();
 
             if (methodologyFileIds.Count > 0)
             {
@@ -177,20 +174,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             return Unit.Instance;
         }
-        
+
         private async Task DeleteMethodologyVersion(Methodology methodology)
         {
             _context.Methodologies.Remove(methodology);
             await _context.SaveChangesAsync();
         }
-        
+
         private async Task DeleteMethodologyParentIfOrphaned(Methodology methodology)
         {
             var methodologyParent = await _context
                 .MethodologyParents
                 .Include(p => p.Versions)
                 .SingleAsync(p => p.Id == methodology.MethodologyParentId);
-                    
+
             if (methodologyParent.Versions.Count == 0)
             {
                 _context.MethodologyParents.Remove(methodologyParent);
@@ -253,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Where(m => m.Id == id)
                 .Select(m => m.MethodologyParentId)
                 .SingleAsync();
-            
+
             if (await _context
                 .MethodologyParents
                 .AnyAsync(p => p.Slug == slug && p.Id != methodologyParentId))
@@ -263,8 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             return Unit.Instance;
         }
-        
-        private static IIncludableQueryable<Methodology, Publication> HydrateMethodologyForMethodologySummaryViewModel(IQueryable<Methodology> queryable)
+
+        private static IIncludableQueryable<Methodology, Publication> HydrateMethodologyForMethodologySummaryViewModel(
+            IQueryable<Methodology> queryable)
         {
             return queryable
                 .Include(methodology => methodology.MethodologyParent)
