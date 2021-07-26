@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.AddCommentAsync(
+                        return service.AddComment(
                             _release.Id,
                             ContentSectionId,
                             ContentBlockId,
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.DeleteCommentAsync(
+                        return service.DeleteComment(
                             _comment.Id);
                     }
                 );
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateCommentAsync(
+                        return service.UpdateComment(
                             _comment.Id,
                             new CommentSaveRequest());
                     }

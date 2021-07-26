@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
             return await _contentService
-                .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
+                .GetComments(releaseId, contentSectionId, contentBlockId)
                 .HandleFailuresOrOk();
         }
 
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest)
         {
             return await _contentService
-                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, saveRequest)
+                .AddComment(releaseId, contentSectionId, contentBlockId, saveRequest)
                 .HandleFailuresOrOk();
         }
 
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             }
 
             return await _contentService
-                .UpdateCommentAsync(commentId, saveRequest)
+                .UpdateComment(commentId, saveRequest)
                 .HandleFailuresOrOk();
         }
 
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult> DeleteComment(Guid commentId)
         {
             return await _contentService
-                .DeleteCommentAsync(commentId)
+                .DeleteComment(commentId)
                 .HandleFailuresOrNoContent();
         }
     }

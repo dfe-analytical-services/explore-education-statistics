@@ -53,17 +53,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);
 
-        Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
+        Task<Either<ActionResult, List<CommentViewModel>>> GetComments(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
 
-        Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(
+        Task<Either<ActionResult, CommentViewModel>> AddComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest);
 
         Task<Either<ActionResult, CommentViewModel>> ResolveComment(Guid commentId, bool resolve);
 
-        Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId, 
+        Task<Either<ActionResult, CommentViewModel>> UpdateComment(Guid commentId,
             CommentSaveRequest saveRequest);
 
-        Task<Either<ActionResult, bool>> DeleteCommentAsync(Guid commentId);
+        Task<Either<ActionResult, bool>> DeleteComment(Guid commentId);
     }
 }

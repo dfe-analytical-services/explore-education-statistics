@@ -369,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(comment => _mapper.Map<CommentViewModel>(comment));
         }
 
-        public Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
+        public Task<Either<ActionResult, List<CommentViewModel>>> GetComments(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId
         )
         {
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             );
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId,
+        public Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseId,
             Guid contentSectionId,
             Guid contentBlockId,
             CommentSaveRequest saveRequest)
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId,
+        public Task<Either<ActionResult, CommentViewModel>> UpdateComment(Guid commentId,
             CommentSaveRequest saveRequest)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 );
         }
 
-        public Task<Either<ActionResult, bool>> DeleteCommentAsync(Guid commentId)
+        public Task<Either<ActionResult, bool>> DeleteComment(Guid commentId)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
                 .OnSuccess(_userService.CheckCanUpdateComment)
