@@ -420,13 +420,12 @@ const ReleaseDataUploadsSection = ({
           onCancel={() => setCancelDataFile(undefined)}
           onConfirm={async () => {
             try {
+              setCancelDataFile(undefined);
+              setFileCancelling(cancelDataFile, true);
               await releaseDataFileService.cancelImport(
                 releaseId,
                 cancelDataFile.id,
               );
-
-              setCancelDataFile(undefined);
-              setFileCancelling(cancelDataFile, true);
             } catch (err) {
               logger.error(err);
               setFileCancelling(cancelDataFile, false);
