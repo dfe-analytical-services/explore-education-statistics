@@ -400,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
             }
 
-            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

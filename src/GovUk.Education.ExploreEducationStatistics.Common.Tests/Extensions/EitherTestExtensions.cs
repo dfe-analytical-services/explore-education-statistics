@@ -9,8 +9,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
     {
         public static void AssertNotFound<T>(this Either<ActionResult, T> result)
         {
-            var actionResult = result.AssertLeft("Expecting result to be Left when asserting NotFound");
-            Assert.IsType<NotFoundResult>(actionResult);
+            result.AssertActionResultOfType<NotFoundResult, T>();
+        }
+        
+        public static void AssertForbidden<T>(this Either<ActionResult, T> result)
+        {
+            result.AssertActionResultOfType<ForbidResult, T>();
         }
         
         public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)
@@ -31,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
             
             return either.Left;
+        }
+        
+        private static void AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
+            where TActionResult : ActionResult
+        {
+            var actionResult = result.AssertLeft($"Expecting result to be Left when asserting result of " +
+                                                 $"type {typeof(TActionResult)}");
+            Assert.IsType<TActionResult>(actionResult);
         }
     }
 }

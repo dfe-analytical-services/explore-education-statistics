@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, Unit>> UnlinkAndDeleteIfOrphaned(Guid methodologyId, IEnumerable<Guid> fileIds)
+        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyId, IEnumerable<Guid> fileIds)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
