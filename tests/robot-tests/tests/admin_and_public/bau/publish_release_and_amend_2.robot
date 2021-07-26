@@ -189,7 +189,7 @@ Select start date and end date
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
-    user checks previous table tool step contains    4    Time period    2012/13 to 2012/13
+    user checks previous table tool step contains    4    Time period    2012/13
 
 Select Indicators
     [Tags]    HappyPath

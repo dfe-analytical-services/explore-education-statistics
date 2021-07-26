@@ -77,6 +77,16 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     return matchingOption ? matchingOption.label : '';
   };
 
+  const getDisplayTimePeriod = (
+    startValue: string,
+    endValue: string,
+  ): string => {
+    if (startValue === endValue) {
+      return getOptionLabel(startValue);
+    }
+    return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
+  };
+
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
@@ -180,9 +190,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 <SummaryListItem term="Time period">
                   {form.values.start &&
                     form.values.end &&
-                    `${getOptionLabel(form.values.start)} to ${getOptionLabel(
-                      form.values.end,
-                    )}`}
+                    getDisplayTimePeriod(form.values.start, form.values.end)}
                 </SummaryListItem>
               </SummaryList>
             </div>
