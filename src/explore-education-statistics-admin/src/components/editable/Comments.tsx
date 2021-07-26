@@ -97,14 +97,25 @@ const Comments = ({
       });
   };
 
+  const resolveComment = (commentId: string, resolved: boolean) => {
+    const index = comments.findIndex(comment => comment.id === commentId);
+    releaseContentCommentService
+      .updateContentSectionComment(comments[index], resolved)
+      .then(savedComment => {
+        const newComments = [...comments];
+        newComments[index] = savedComment;
+        onChange(blockId, newComments);
+      });
+  };
+
   return (
     <div className={styles.container}>
       <Details
         onToggle={isOpen => onToggle && onToggle(isOpen)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
-          comments.length
-        })`}
+          comments.filter(comment => !comment.resolved).length
+        } unresolved)`}
       >
         {canComment && (
           <Formik<FormValues>
@@ -133,21 +144,73 @@ const Comments = ({
 
         <ul className={styles.commentsContainer}>
           {orderBy(comments, ['created'], ['desc']).map(comment => {
-            const { createdBy } = comment;
+            const { createdBy, resolvedBy } = comment;
 
-            return (
+            return comment.resolved ? (
+              <li className="govuk-body-s">
+                <p className="govuk-!-margin-0">
+                  <strong>Comment resolved</strong>
+                </p>
+                <p className="govuk-!-margin-0">
+                  <FormattedDate format="dd/MM/yy HH:mm">
+                    {comment.resolved}
+                  </FormattedDate>
+                </p>
+                <p className="govuk-!-margin-0">
+                  {`by ${resolvedBy?.firstName} ${resolvedBy?.lastName}`}
+                </p>
+                <Details className="govuk-!-margin-0" summary="See comment">
+                  <p className="govuk-!-margin-0">
+                    <strong>
+                      {`${createdBy.firstName} ${createdBy.lastName}`}
+                    </strong>
+                  </p>
+                  <p className="govuk-!-margin-0">
+                    {'Created: '}
+                    <FormattedDate format="dd/MM/yy HH:mm">
+                      {comment.created}
+                    </FormattedDate>
+                  </p>
+                  {comment.updated && (
+                    <p className="govuk-!-margin-0">
+                      {'Updated: '}
+                      <FormattedDate format="dd/MM/yy HH:mm">
+                        {comment.updated}
+                      </FormattedDate>
+                    </p>
+                  )}
+                  <p className="govuk-!-margin-top-3">{comment.content}</p>
+                </Details>
+                <ButtonText
+                  onClick={() => {
+                    resolveComment(comment.id, false);
+                  }}
+                >
+                  Unresolve
+                </ButtonText>
+                <hr />
+              </li>
+            ) : (
               <li key={comment.id} className="govuk-body-s">
                 <p className="govuk-!-margin-0">
                   <strong>
                     {`${createdBy.firstName} ${createdBy.lastName}`}
                   </strong>
                 </p>
-                <p>
-                  {comment.updated ? 'Updated: ' : ''}
-                  <FormattedDate format="d MMMM yyyy HH:mm">
-                    {comment.updated || comment.created}
+                <p className="govuk-!-margin-0">
+                  {'Created: '}
+                  <FormattedDate format="dd/MM/yy HH:mm">
+                    {comment.created}
                   </FormattedDate>
                 </p>
+                {comment.updated && (
+                  <p className="govuk-!-margin-0">
+                    {'Updated: '}
+                    <FormattedDate format="dd/MM/yy HH:mm">
+                      {comment.updated}
+                    </FormattedDate>
+                  </p>
+                )}
 
                 {editingComment?.id === comment.id ? (
                   <Formik<FormValues>
@@ -186,24 +249,34 @@ const Comments = ({
                   </Formik>
                 ) : (
                   <>
-                    <p>{comment.content}</p>
-
-                    {canComment && user?.id === createdBy.id && (
+                    <p className="govuk-!-margin-top-3">{comment.content}</p>
+                    {canComment && (
                       <ButtonGroup>
-                        <ButtonText
-                          onClick={() => {
-                            setEditingComment(comment);
-                          }}
-                        >
-                          Edit
-                        </ButtonText>
+                        {user?.id === createdBy.id && (
+                          <>
+                            <ButtonText
+                              onClick={() => {
+                                setEditingComment(comment);
+                              }}
+                            >
+                              Edit
+                            </ButtonText>
+                            <ButtonText
+                              onClick={() => {
+                                removeComment(comment.id);
+                              }}
+                            >
+                              Delete
+                            </ButtonText>
+                          </>
+                        )}
 
                         <ButtonText
                           onClick={() => {
-                            removeComment(comment.id);
+                            resolveComment(comment.id, true);
                           }}
                         >
-                          Delete
+                          Resolve
                         </ButtonText>
                       </ButtonGroup>
                     )}

@@ -11,6 +11,13 @@ export interface Comment {
   };
   created: string;
   updated?: string;
+  resolved?: string;
+  resolvedBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export type EditableContentBlock = ContentBlock & {

@@ -14,15 +14,29 @@ exports[`Comments renders list of comments when comments are opened 1`] = `
         John Smith
       </strong>
     </p>
-    <p>
-      
+    <p
+      class="govuk-!-margin-0"
+    >
+      Created: 
       <time>
-        6 June 2020 12:00
+        06/06/20 12:00
       </time>
     </p>
-    <p>
+    <p
+      class="govuk-!-margin-top-3"
+    >
       Test comment 1
     </p>
+    <div
+      class="group"
+    >
+      <button
+        class="button"
+        type="button"
+      >
+        Resolve
+      </button>
+    </div>
     <hr />
   </li>
   <li
@@ -35,15 +49,37 @@ exports[`Comments renders list of comments when comments are opened 1`] = `
         Jane Roberts
       </strong>
     </p>
-    <p>
-      Updated: 
+    <p
+      class="govuk-!-margin-0"
+    >
+      Created: 
       <time>
-        7 June 2020 15:00
+        06/06/20 11:00
       </time>
     </p>
-    <p>
+    <p
+      class="govuk-!-margin-0"
+    >
+      Updated: 
+      <time>
+        07/06/20 15:00
+      </time>
+    </p>
+    <p
+      class="govuk-!-margin-top-3"
+    >
       Test comment 2
     </p>
+    <div
+      class="group"
+    >
+      <button
+        class="button"
+        type="button"
+      >
+        Resolve
+      </button>
+    </div>
     <hr />
   </li>
 </ul>

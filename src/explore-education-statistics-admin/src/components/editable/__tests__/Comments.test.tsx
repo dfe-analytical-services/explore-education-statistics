@@ -60,7 +60,7 @@ describe('Comments', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: 'Add / View comments (2)',
+        name: 'Add / View comments (2 unresolved)',
       }),
     );
 
@@ -69,11 +69,12 @@ describe('Comments', () => {
     expect(comments).toHaveLength(2);
 
     expect(comments[0]).toHaveTextContent('John Smith');
-    expect(comments[0]).toHaveTextContent('6 June 2020');
+    expect(comments[0]).toHaveTextContent('Created: 06/06/20');
     expect(comments[0]).toHaveTextContent('Test comment 1');
 
     expect(comments[1]).toHaveTextContent('Jane Roberts');
-    expect(comments[1]).toHaveTextContent('Updated: 7 June 2020');
+    expect(comments[1]).toHaveTextContent('Created: 06/06/20');
+    expect(comments[1]).toHaveTextContent('Updated: 07/06/20');
     expect(comments[1]).toHaveTextContent('Test comment 2');
 
     expect(screen.getByRole('list')).toMatchSnapshot();
