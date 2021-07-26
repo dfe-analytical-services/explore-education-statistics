@@ -109,7 +109,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 </SummaryListItem>
               )}
 
-            {updates.length && (
+            {updates.length > 0 ? (
               <SummaryListItem term="Last updated">
                 <FormattedDate>{updates[0].on}</FormattedDate>
 
@@ -141,7 +141,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   </ol>
                 </Details>
               </SummaryListItem>
-            )}
+            ) : null}
 
             <SummaryListItem term="Receive updates">
               <Link
