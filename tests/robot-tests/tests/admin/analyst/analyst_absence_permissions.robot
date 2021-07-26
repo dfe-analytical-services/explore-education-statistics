@@ -85,7 +85,7 @@ Validate Analyst1 can see 'Content' page accordion sections
     user checks accordion is in position    Pupil referral unit absence    8    id:releaseMainContent
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:releaseMainContent
     user checks there are x accordion sections    9    id:releaseMainContent
-
     user checks accordion is in position    Methodology    1    id:helpAndSupport
-    user checks accordion is in position    Contact us    2    id:helpAndSupport
-    user checks there are x accordion sections    2    id:helpAndSupport
+    user checks accordion is in position    Official Statistics    2    id:helpAndSupport
+    user checks accordion is in position    Contact us    3    id:helpAndSupport
+    user checks there are x accordion sections    3    id:helpAndSupport
