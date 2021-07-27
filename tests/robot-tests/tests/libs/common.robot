@@ -1,6 +1,7 @@
 *** Settings ***
 Library     SeleniumLibrary    timeout=${timeout}    implicit_wait=${implicit_wait}    run_on_failure=do this on failure
 Library     OperatingSystem
+Library     Collections
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
@@ -478,6 +479,32 @@ user checks summary list contains
     ${element}=    get child element    ${parent}
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_MEDIUM}
+
+user checks select contains x options
+    [Arguments]    ${locator}    ${num}
+    ${options}=    get list items    ${locator}
+    length should be    ${options}    ${num}
+
+user checks select contains at least x options
+    [Arguments]    ${locator}    ${num}
+    ${options}=    get list items    ${locator}
+    ${length}=    get length    ${options}
+    should be true    ${options} > ${num}
+
+user checks select contains option
+    [Arguments]    ${locator}    ${label}
+    ${options}=    get list items    ${locator}
+    list should contain value    ${options}    ${label}
+
+user checks select does not contain option
+    [Arguments]    ${locator}    ${label}
+    ${options}=    get list items    ${locator}
+    list should not contain value    ${options}    ${label}
+
+user checks selected option label
+    [Arguments]    ${locator}    ${label}
+    ${selected_label}=    get selected list label    ${locator}
+    should be equal    ${selected_label}    ${label}
 
 user chooses select option
     [Arguments]    ${locator}    ${label}
