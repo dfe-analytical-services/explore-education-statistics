@@ -101,7 +101,7 @@ user creates a fully populated draft release
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until page does not contain loading spinner
-    user clicks footnote radio    ${SUBJECT_NAME}    Applies to all data
+    user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote
     user clicks button    Save footnote

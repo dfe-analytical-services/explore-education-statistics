@@ -662,6 +662,20 @@ user checks checkbox input is not checked
     user waits until page contains element    ${selector}
     checkbox should not be selected    ${selector}
 
+user checks list has x items
+    [Arguments]    ${locator}    ${num}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${items}=    get child elements    ${list}    css:li
+    length should be    ${items}    ${num}
+
+user checks list item contains
+    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    user checks element should contain    ${item}    ${content}
+
 user checks breadcrumb count should be
     [Arguments]    ${count}
     user waits until page contains element    css:[data-testid="breadcrumbs--list"] li    limit=${count}

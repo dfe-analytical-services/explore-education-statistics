@@ -329,28 +329,26 @@ user checks scheduled releases tab publication has release
     user checks page contains element
     ...    xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
 
-user clicks footnote radio
+user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
     user clicks element
     ...    xpath://*[@data-testid="footnote-subject ${subject_label}"]//label[text()="${radio_label}"]/../input[@type="radio"]
 
-user clicks footnote checkbox
-    [Arguments]    ${label}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    ${checkbox}=    get child element    ${parent}    xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+user opens footnote subject dropdown
+    [Arguments]    ${subject_label}    ${dropdown_label}
+    user opens details dropdown    ${dropdown_label}    testid:footnote-subject ${subject_label}
+
+user clicks footnote subject checkbox
+    [Arguments]    ${subject_label}    ${dropdown_label}    ${label}
+    user waits until page contains element    testid:footnote-subject ${subject_label}
+    ${details}=    user gets details content element    ${dropdown_label}    testid:footnote-subject ${subject_label}
+    user waits until page contains element    label:${label}
+    user waits until parent contains element    ${details}    label:${label}
+    ${checkbox}=    get child element    ${details}    label:${label}
     page should contain checkbox    ${checkbox}
     user scrolls to element    ${checkbox}
     wait until element is enabled    ${checkbox}
     user clicks element    ${checkbox}
-
-user checks footnote checkbox is selected
-    [Arguments]    ${label}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
-    ${checkbox}=    get child element    ${parent}
-    ...    xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
-    wait until element is enabled    ${checkbox}
     checkbox should be selected    ${checkbox}
 
 user opens nth editable accordion section
@@ -434,10 +432,11 @@ user gets meta guidance data file content editor
 
 user enters text into meta guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
     ${editor}=    user gets meta guidance data file content editor    ${accordion_heading}
-    user checks page does not contain testid    fileGuidanceContent-focused
     user clicks element    ${editor}
-    user waits until page contains testid    fileGuidanceContent-focused
+    user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release

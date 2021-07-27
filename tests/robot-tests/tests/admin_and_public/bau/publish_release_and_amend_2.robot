@@ -97,9 +97,8 @@ Add footnote to second Subject
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${SECOND_SUBJECT}    Applies to all data
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    Footnote 1 ${SECOND_SUBJECT}
+    user clicks footnote subject radio    ${SECOND_SUBJECT}    Applies to all data
+    user enters text into element    label:Footnote    Footnote 1 ${SECOND_SUBJECT}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -107,11 +106,10 @@ Add second footnote to second Subject
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${SECOND_SUBJECT}    Applies to specific data
-    user opens details dropdown    Indicators    testid:footnote-subject ${SECOND_SUBJECT}
-    user clicks footnote checkbox    Admission Numbers
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    Footnote 2 ${SECOND_SUBJECT}
+    user clicks footnote subject radio    ${SECOND_SUBJECT}    Applies to specific data
+    user opens footnote subject dropdown    ${SECOND_SUBJECT}    Indicators
+    user clicks footnote subject checkbox    ${SECOND_SUBJECT}    Indicators    Admission Numbers
+    user enters text into element    label:Footnote    Footnote 2 ${SECOND_SUBJECT}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -120,9 +118,8 @@ Add footnote to subject
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${SUBJECT_NAME}    Applies to all data
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    Footnote 1 ${SUBJECT_NAME}
+    user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
+    user enters text into element    label:Footnote    Footnote 1 ${SUBJECT_NAME}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -131,12 +128,11 @@ Add second footnote to subject
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${SUBJECT_NAME}    Applies to specific data
-    user opens details dropdown    Cheese    testid:footnote-subject ${SUBJECT_NAME}
-    user clicks footnote checkbox    Stilton
-    user clicks footnote checkbox    Feta
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    Footnote 2 ${SUBJECT_NAME}
+    user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_NAME}    Cheese
+    user clicks footnote subject checkbox    ${SUBJECT_NAME}    Cheese    Stilton
+    user clicks footnote subject checkbox    ${SUBJECT_NAME}    Cheese    Feta
+    user enters text into element    label:Footnote    Footnote 2 ${SUBJECT_NAME}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -498,21 +494,20 @@ Add footnote to "upload file test filter" subject file
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${THIRD_SUBJECT}    Applies to all data
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    upload file test filter footnote
+    user clicks footnote subject radio    ${THIRD_SUBJECT}    Applies to all data
+    user clicks element    label:Footnote
+    user enters text into element    label:Footnote    upload file test filter footnote
     user clicks button    Save footnote
-    user waits until page contains testid    footnote upload file test filter footnote
+    user waits until page contains element    testid:Footnote - upload file test filter footnote
     user waits until h2 is visible    Footnotes
 
 Update Seven filters footnote
     [Tags]    HappyPath
-    user clicks link    Edit footnote    testid:footnote Footnote 1 ${SUBJECT_NAME}
-    user clicks element    id:footnoteForm-content
-    user enters text into element    id:footnoteForm-content    Updating ${SUBJECT_NAME} footnote
-    textarea should contain    id:footnoteForm-content    Updating ${SUBJECT_NAME} footnote
+    user clicks link    Edit footnote    testid:Footnote - Footnote 1 ${SUBJECT_NAME}
+    user clicks element    label:Footnote
+    user enters text into element    label:Footnote    Updating ${SUBJECT_NAME} footnote
     user clicks button    Save footnote
-    user waits until page contains testid    footnote Updating ${SUBJECT_NAME} footnote
+    user waits until page contains element    testid:Footnote - Updating ${SUBJECT_NAME} footnote
 
 Go to "Sign off" to approve release for immedate publication
     [Tags]    HappyPath
