@@ -15,24 +15,24 @@ const DataUploadCancelButton = ({ releaseId, fileId }: Props) => {
   const [{ error }, cancelImport] = useAsyncCallback(() =>
     releaseDataFileService.cancelImport(releaseId, fileId),
   );
-  const [showCancelModal, setShowCancelModal] = useToggle(false);
-  const [showCancelButton, setShowCancelButton] = useToggle(true);
+  const [showCancelModal, toggleShowCancelModal] = useToggle(false);
+  const [showCancelButton, toggleShowCancelButton] = useToggle(true);
 
   return (
     <>
       {showCancelButton && (
-        <ButtonText onClick={() => setShowCancelModal(true)}>Cancel</ButtonText>
+        <ButtonText onClick={toggleShowCancelModal.on}>Cancel</ButtonText>
       )}
       {error && <ErrorMessage>Cancellation failed</ErrorMessage>}
       <ModalConfirm
         open={showCancelModal}
         title="Confirm cancellation of selected data file"
-        onExit={() => setShowCancelModal(false)}
-        onCancel={() => setShowCancelModal(false)}
+        onExit={toggleShowCancelModal.off}
+        onCancel={toggleShowCancelModal.off}
         onConfirm={async () => {
           await cancelImport();
-          setShowCancelModal(false);
-          setShowCancelButton(false);
+          toggleShowCancelModal.off();
+          toggleShowCancelButton.off();
         }}
       >
         <p>This file upload will be cancelled and may then be removed.</p>
