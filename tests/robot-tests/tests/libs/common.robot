@@ -27,30 +27,7 @@ do this on failure
         set selenium timeout    3
     END
 
-custom testid locator strategy
-    [Arguments]    ${browser}    ${test_id}    ${tag}    ${constraints}
-    ${elements}=    get webelements    css:[data-testid="${test_id}"]
-    [Return]    ${elements}
-
-custom label locator strategy
-    [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
-    ${label_els}=    get webelements    xpath://label[text()="${label}"]
-    ${label_count}=    get length    ${label_els}
-    # Return an empty list if no matching elements
-    ${elements}=    create list
-
-    IF    ${label_count} > 0
-        ${input_id}=    get element attribute    ${label_els}[0]    for
-        ${elements}=    get webelements    id:${input_id}
-    END
-    [Return]    ${elements}
-
-set custom locator strategies
-    add location strategy    testid    custom testid locator strategy
-    add location strategy    label    custom label locator strategy
-
 user opens the browser
-    set custom locator strategies
     IF    "${browser}" == "chrome"
         user opens chrome
     END

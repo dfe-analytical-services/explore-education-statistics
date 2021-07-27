@@ -5,20 +5,55 @@ import datetime
 from logging import warning
 from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
-from SeleniumLibrary import ElementFinder
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.remote.webelement import WebElement
+from typing import Union
+import utilities_init
 import os
 import re
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
-element_finder = ElementFinder(sl)
+element_finder = sl._element_finder
 waiting = WaitingKeywords(sl)
+
+# Should only initialise some parts once e.g. registration
+# of custom locators onto the framework's ElementFinder
+if not utilities_init.initialised:
+    def _normalize_parent_locator(parent_locator: object) -> Union[str, WebElement]:
+        if not isinstance(parent_locator, str) and not isinstance(parent_locator, WebElement):
+            return 'css:body'
+
+        return parent_locator
+
+    def _find_by_label(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
+        parent_locator = _normalize_parent_locator(parent_locator)
+
+        labels = get_child_elements(parent_locator, f'xpath:.//label[text()="{criteria}"]')
+
+        if len(labels) == 0:
+            return []
+
+        for_id = labels[0].get_attribute('for')
+        return get_child_elements(parent_locator, f'id:{for_id}')
+
+
+    def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
+        parent_locator = _normalize_parent_locator(parent_locator)
+
+        return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
+
+    # Register locator strategies
+
+    element_finder.register('label', _find_by_label, persist=True)
+    element_finder.register('testid', _find_by_testid, persist=True)
+
+    utilities_init.initialised = True
 
 
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
+
 
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
@@ -109,7 +144,7 @@ def get_child_elements(parent_locator: object, child_locator: str):
     try:
         child_locator = __normalise_child_locator(parent_locator, child_locator)
         parent_el = __get_parent_webelement_from_locator(parent_locator)
-        return element_finder.find(child_locator, required=True, first_only=False, parent=parent_el)
+        return element_finder.find_elements(child_locator, parent=parent_el)
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
