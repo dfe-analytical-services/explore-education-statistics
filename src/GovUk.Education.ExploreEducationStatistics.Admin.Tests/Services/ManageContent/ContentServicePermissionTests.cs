@@ -87,6 +87,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
+        public async Task ResolveComment()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_comment, CanResolveSpecificComment)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.ResolveComment(
+                            _comment.Id,
+                            true);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task UpdateComment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()

@@ -240,6 +240,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(release, SecurityPolicies.CanPublishSpecificRelease);
         }
 
+        public static Task<Either<ActionResult, Comment>> CheckCanResolveComment(
+            this IUserService userService, Comment comment)
+        {
+            return userService.CheckPolicy(comment, SecurityPolicies.CanResolveSpecificComment);
+        }
+
         public static Task<Either<ActionResult, Comment>> CheckCanUpdateComment(
             this IUserService userService, Comment comment)
         {

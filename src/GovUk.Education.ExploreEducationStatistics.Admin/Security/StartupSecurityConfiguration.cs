@@ -115,6 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPreReleaseSummary.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPreReleaseSummaryRequirement()));
 
+                // does this user have permission to resolve a specific Comment?
+                options.AddPolicy(SecurityPolicies.CanResolveSpecificComment.ToString(), policy =>
+                    policy.Requirements.Add(new ResolveSpecificCommentRequirement()));
+
                 // does this user have permission to update a specific Comment?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificCommentRequirement()));
@@ -222,6 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();

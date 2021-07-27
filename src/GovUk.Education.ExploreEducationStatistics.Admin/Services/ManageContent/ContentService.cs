@@ -427,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, CommentViewModel>> ResolveComment(Guid commentId, bool resolve)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
-                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccessDo(_userService.CheckCanResolveComment)
                 .OnSuccess(async comment =>
                 {
                     _context.Comment.Update(comment);
