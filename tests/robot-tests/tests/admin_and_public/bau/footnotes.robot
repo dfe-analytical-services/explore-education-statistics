@@ -110,8 +110,8 @@ Select locations (data block)
 Select time period
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose time period
-    user selects from list by label    id:timePeriodForm-start    2020 Week 13
-    user selects from list by label    id:timePeriodForm-end    2021 Week 24
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
 
 Select indicators (data block)
@@ -158,7 +158,7 @@ Add data block to release
     user scrolls to element    xpath://button[text()="Add secondary stats"]
     user clicks button    Add secondary stats
     user waits until page contains element    secondaryStats-dataBlockSelectForm-selectedDataBlock
-    user selects from list by label    secondaryStats-dataBlockSelectForm-selectedDataBlock
+    user chooses select option    secondaryStats-dataBlockSelectForm-selectedDataBlock
     ...    ${FOOTNOTE_DATABLOCK_NAME}
     user waits until page contains element    css:table
     user clicks button    Embed
@@ -301,8 +301,8 @@ Select locations (table tool)
 Select time period (table tool)
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose time period
-    user selects from list by label    id:timePeriodForm-start    2020 Week 13
-    user selects from list by label    id:timePeriodForm-end    2021 Week 24
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
 
 Select indicators (table tool)

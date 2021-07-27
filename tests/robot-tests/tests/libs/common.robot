@@ -479,7 +479,7 @@ user checks summary list contains
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_MEDIUM}
 
-user selects from list by label
+user chooses select option
     [Arguments]    ${locator}    ${label}
     user waits until page contains element    ${locator}
     select from list by label    ${locator}    ${label}

@@ -120,8 +120,8 @@ Select locations
 
 Select time period
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2019
-    user selects from list by label    id:timePeriodForm-end    2019
+    user chooses select option    id:timePeriodForm-start    2019
+    user chooses select option    id:timePeriodForm-end    2019
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
 

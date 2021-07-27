@@ -277,33 +277,33 @@ def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
             f'Found text "{elem.text}"')
 
 
-def user_checks_list_contains_x_elements(list_locator, num):
+def user_checks_select_contains_x_options(list_locator, num):
     labels = sl.get_list_items(list_locator)
     if len(labels) != int(num):
         raise_assertion_error(f'Found {len(labels)} in list, not {num}. Locator: "{list_locator}"')
 
 
-def user_checks_list_contains_at_least_x_elements(list_locator, num):
+def user_checks_select_contains_at_least_x_options(list_locator, num):
     labels = sl.get_list_items(list_locator)
     if len(labels) < int(num):
         raise_assertion_error(f'Found {len(labels)} in list, not {num}. Locator: "{list_locator}"')
 
 
-def user_checks_list_contains_label(list_locator, label):
+def user_checks_select_contains_option(list_locator, label):
     labels = sl.get_list_items(list_locator)
     if label not in labels:
         raise_assertion_error(
             f'"{label}" wasn\'t found amongst list items "{labels}" from locator "{list_locator}"')
 
 
-def user_checks_list_does_not_contain_label(list_locator, label):
+def user_checks_select_does_not_contain_option(list_locator, label):
     labels = sl.get_list_items(list_locator)
     if label in labels:
         raise_assertion_error(
             f'"{label}" was found amongst list items "{labels}" from locator "{list_locator}"')
 
 
-def user_checks_selected_list_label(list_locator, label):
+def user_checks_selected_option_label(list_locator, label):
     selected_label = sl.get_selected_list_label(list_locator)
     if selected_label != label:
         raise_assertion_error(

@@ -184,8 +184,8 @@ Click next step button
 
 Select start date and end date
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2012/13
-    user selects from list by label    id:timePeriodForm-end    2012/13
+    user chooses select option    id:timePeriodForm-start    2012/13
+    user chooses select option    id:timePeriodForm-end    2012/13
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
@@ -553,8 +553,8 @@ Click the next step button
 
 Select start date + end date
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2020 Week 13
-    user selects from list by label    id:timePeriodForm-end    2021 Week 24
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element    id:filtersForm-indicators

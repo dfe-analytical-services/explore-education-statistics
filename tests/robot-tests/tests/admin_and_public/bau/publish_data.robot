@@ -111,8 +111,8 @@ Select locations
 Select time period
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose time period
-    user selects from list by label    id:timePeriodForm-start    2005
-    user selects from list by label    id:timePeriodForm-end    2020
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
 
 Select indicators
@@ -227,8 +227,8 @@ Select locations in table tool
 
 Select time period in table tool
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2014
-    user selects from list by label    id:timePeriodForm-end    2018
+    user chooses select option    id:timePeriodForm-start    2014
+    user chooses select option    id:timePeriodForm-end    2018
     user clicks element    id:timePeriodForm-submit
 
 Select indicators in table tool

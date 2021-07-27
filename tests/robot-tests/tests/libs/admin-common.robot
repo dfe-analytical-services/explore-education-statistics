@@ -66,9 +66,9 @@ user selects theme and topic from admin dashboard
     user waits until page contains link    Manage publications and releases    90
     user clicks link    Manage publications and releases
     user waits until page contains element    id:publicationsReleases-themeTopic-themeId    60
-    user selects from list by label    id:publicationsReleases-themeTopic-themeId    ${theme}
+    user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
     user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
-    user selects from list by label    id:publicationsReleases-themeTopic-topicId    ${topic}
+    user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
     user waits until h2 is visible    ${theme}    60
     user waits until h3 is visible    ${topic}    60
 
@@ -134,7 +134,7 @@ user creates release for publication
     user waits until page contains title caption    ${publication}
     user waits until h1 is visible    Create new release    60
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    60
-    user selects from list by label    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
     user clicks radio    National Statistics
     user clicks radio if exists    Create new template
@@ -396,7 +396,7 @@ user adds data block to editable accordion section
     user waits for page to finish loading
     user clicks button    Add data block    ${section}
     ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
-    user selects from list by label    ${block_list}    Dates data block name
+    user chooses select option    ${block_list}    Dates data block name
     user waits until parent contains element    ${section}    css:table
     user clicks button    Embed    ${section}
 
@@ -568,9 +568,9 @@ user changes methodology status to Approved
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user selects from list by label    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
+    user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="selectedPublicationRole"]
-    user selects from list by label    css:[name="selectedPublicationRole"]    Owner
+    user chooses select option    css:[name="selectedPublicationRole"]    Owner
     user clicks button    Add publication access
     user waits until page does not contain loading spinner
 
@@ -578,9 +578,9 @@ user gives release access to analyst
     [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="selectedReleaseId"]
-    user selects from list by label    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
+    user chooses select option    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
     user waits until element is enabled    css:[name="selectedReleaseRole"]
-    user selects from list by label    css:[name="selectedReleaseRole"]    ${ROLE}
+    user chooses select option    css:[name="selectedReleaseRole"]    ${ROLE}
     user clicks button    Add release access
     user waits until page does not contain loading spinner
 
