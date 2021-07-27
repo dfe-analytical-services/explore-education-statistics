@@ -5,32 +5,27 @@ import methodologyService, {
 } from '@admin/services/methodologyService';
 import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
-import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
+import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
   status: MethodologyStatus;
   latestInternalReleaseNote: string;
+  publishingStrategy?: 'WithRelease' | 'Immediately';
+  withReleaseId?: string;
 }
 
 const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
   Approved: 'Approved',
 };
-
-const formId = 'methodologyStatusForm';
 
 const MethodologyStatusPage = ({
   match,
@@ -110,69 +105,12 @@ const MethodologyStatusPage = ({
                 )}
               </>
             ) : (
-              <Formik<FormValues>
-                initialValues={{
-                  status: model.summary.status,
-                  latestInternalReleaseNote: '',
-                }}
-                onSubmit={handleSubmit}
-                validationSchema={Yup.object<FormValues>({
-                  status: Yup.mixed().required('Choose a status'),
-                  latestInternalReleaseNote: Yup.string().when('status', {
-                    is: 'Approved',
-                    then: Yup.string().required('Enter an internal note'),
-                  }),
-                })}
-              >
-                {form => {
-                  return (
-                    <Form id={formId}>
-                      <h2>Edit methodology status</h2>
-
-                      <FormFieldRadioGroup<FormValues, MethodologyStatus>
-                        legend="Status"
-                        hint={
-                          isPublished &&
-                          'Once approved, changes will be available to the public immediately.'
-                        }
-                        name="status"
-                        options={[
-                          {
-                            label: 'In draft',
-                            value: 'Draft',
-                          },
-                          {
-                            label: 'Approved for publication',
-                            value: 'Approved',
-                            conditional: (
-                              <FormFieldTextArea<FormValues>
-                                name="latestInternalReleaseNote"
-                                className="govuk-!-width-one-half"
-                                label="Internal note"
-                                hint="Please include any relevant information"
-                                rows={2}
-                              />
-                            ),
-                          },
-                        ]}
-                        orderDirection={[]}
-                      />
-
-                      <ButtonGroup>
-                        <Button type="submit">Update status</Button>
-                        <ButtonText
-                          onClick={() => {
-                            form.resetForm();
-                            toggleForm.off();
-                          }}
-                        >
-                          Cancel
-                        </ButtonText>
-                      </ButtonGroup>
-                    </Form>
-                  );
-                }}
-              </Formik>
+              <MethodologyStatusForm
+                isPublished={isPublished}
+                methodologySummary={model.summary}
+                onCancel={toggleForm.off}
+                onSubmit={(values, actions) => handleSubmit(values, actions)}
+              />
             )}
           </>
         ) : (
