@@ -440,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             imageService.Setup(mock =>
-                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
+                    mock.Delete(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -463,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
 
                 imageService.Verify(mock =>
-                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
+                    mock.Delete(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -1058,7 +1058,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     AsArray(methodologyVersion2File1Link.File.Id, methodologyVersion2File2Link.File.Id);
 
                 methodologyImageService
-                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[1].Id,
+                    .Setup(s => s.Delete(methodologyParent.Versions[1].Id,
                         methodologyVersion2FileIds))
                     .ReturnsAsync(Unit.Instance);
                 
@@ -1143,7 +1143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var relatedMethodologyFileLinks = AsArray(relatedFileMethodologyLink.File.Id);
 
                 methodologyImageService
-                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[0].Id, relatedMethodologyFileLinks))
+                    .Setup(s => s.Delete(methodologyParent.Versions[0].Id, relatedMethodologyFileLinks))
                     .ReturnsAsync(Unit.Instance);
                 
                 var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);

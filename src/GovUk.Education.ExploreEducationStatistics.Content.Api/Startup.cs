@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

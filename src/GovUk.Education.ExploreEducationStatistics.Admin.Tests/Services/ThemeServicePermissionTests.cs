@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -233,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublishingService publishingService = null)
         {
             return new ThemeService(
+                Mock.Of<IConfiguration>(),
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,

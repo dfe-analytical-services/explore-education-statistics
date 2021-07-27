@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     userService =>
                     {
                         var service = SetupMethodologyImageService(userService: userService.Object);
-                        return service.UnlinkAndDeleteIfOrphaned(methodologyId: _methodology.Id,
+                        return service.Delete(methodologyId: _methodology.Id,
                             fileIds: new List<Guid>());
                     }
                 );

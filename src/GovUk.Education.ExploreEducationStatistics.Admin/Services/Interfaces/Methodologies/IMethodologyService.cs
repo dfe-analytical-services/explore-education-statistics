@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request);
 
-        Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId);
+        Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false);
     }
 }

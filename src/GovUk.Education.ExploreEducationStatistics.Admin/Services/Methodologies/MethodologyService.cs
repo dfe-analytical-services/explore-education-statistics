@@ -151,12 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId)
+        public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false)
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId, 
                     query => query.Include(m => m.MethodologyParent))
-                .OnSuccess(_userService.CheckCanDeleteMethodology)
+                .OnSuccess(methodology => _userService.CheckCanDeleteMethodology(methodology, forceDelete))
                 .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
                 .OnSuccessDo(DeleteMethodologyVersion)
                 .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             if (methodologyFileIds.Count > 0)
             {
-                return await _methodologyImageService.UnlinkAndDeleteIfOrphaned(methodology.Id, methodologyFileIds);
+                return await _methodologyImageService.Delete(methodology.Id, methodologyFileIds);
             }
 
             return Unit.Instance;
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (unusedImages.Any())
                     {
-                        return await _methodologyImageService.UnlinkAndDeleteIfOrphaned(methodologyId, unusedImages);
+                        return await _methodologyImageService.Delete(methodologyId, unusedImages);
                     }
 
                     return Unit.Instance;

@@ -49,6 +49,9 @@
     },
     "branch": {
       "value": "dev"
+    },
+    "enableThemeDeletion": {
+      "value": true
     }
   }
 }

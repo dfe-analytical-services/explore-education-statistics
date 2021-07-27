@@ -43,6 +43,9 @@
     },
     "publicAppHotjarId": {
       "value": "1341531"
+    },
+    "enableThemeDeletion": {
+      "value": true
     }
   }
 }
