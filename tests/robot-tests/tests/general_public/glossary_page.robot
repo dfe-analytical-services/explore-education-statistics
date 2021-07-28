@@ -29,7 +29,7 @@ Search for Pupil referral unit
     [Tags]    HappyPath
     user verifies accordion is closed    P
 
-    user enters text into element    id:pageSearchForm-input    Pupil referral unit
+    user enters text into element    id:pageSearchForm-input    Permanent exclusion
     user waits until element contains    id:pageSearchForm-resultsLabel    Found 1 result
     user clicks element    id:pageSearchForm-option-0
 
@@ -37,8 +37,10 @@ Search for Pupil referral unit
 
     ${section}=    user gets accordion section content element    P
 
-    user waits until parent contains element    ${section}    id:pupil-referral-unit
-    user checks element is visible    id:pupil-referral-unit
-    user checks element should contain    id:pupil-referral-unit    Pupil referral unit (PRUs)
+    user waits until parent contains element    ${section}    id:permanent-exclusion
+    user checks element is visible    id:permanent-exclusion
+    user checks element should contain    id:permanent-exclusion    Permanent exclusion
     user checks element should contain    ${section}
-    ...    An alternative education provision specifically organised to provide education for children who are not able to attend school and may not otherwise receive a suitable education.
+    ...    When a pupil is not allowed to attend (or is excluded from) a school and cannot go back to that specific school unless their exclusion is overturned.
+
+
