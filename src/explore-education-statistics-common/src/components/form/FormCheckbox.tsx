@@ -14,7 +14,7 @@ export interface FormCheckboxProps {
   className?: string;
   conditional?: ReactNode;
   id: string;
-  hint?: string;
+  hint?: string | ReactNode;
   label: string;
   boldLabel?: boolean;
   name: string;

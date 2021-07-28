@@ -11,8 +11,9 @@ export type RadioChangeEventHandler = (
 
 export interface FormRadioProps {
   checked?: boolean;
-  defaultChecked?: boolean;
   conditional?: ReactNode;
+  defaultChecked?: boolean;
+  displayLabel?: ReactNode;
   hiddenConditional?: boolean;
   hint?: string | ReactNode;
   id: string;
@@ -26,8 +27,9 @@ export interface FormRadioProps {
 
 const FormRadio = ({
   checked,
-  defaultChecked,
   conditional,
+  defaultChecked,
+  displayLabel,
   hiddenConditional,
   hint,
   id,
@@ -69,7 +71,8 @@ const FormRadio = ({
           value={value}
         />
         <label className="govuk-label govuk-radios__label" htmlFor={id}>
-          {label}
+          {displayLabel && displayLabel}
+          {!displayLabel && label}
         </label>
         {hint && (
           <span
