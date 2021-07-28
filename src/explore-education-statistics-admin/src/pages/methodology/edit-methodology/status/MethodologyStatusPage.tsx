@@ -109,7 +109,7 @@ const MethodologyStatusPage = ({
                 isPublished={isPublished}
                 methodologySummary={model.summary}
                 onCancel={toggleForm.off}
-                onSubmit={(values, actions) => handleSubmit(values, actions)}
+                onSubmit={handleSubmit}
               />
             )}
           </>

@@ -11,12 +11,12 @@ import { BasicMethodology } from 'src/services/methodologyService';
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: Release[] = [
     {
-      id: 'test-release-1',
-      title: 'Test Release 1',
-    } as Release,
-    {
       id: 'test-release-2',
       title: 'Test Release 2',
+    } as Release,
+    {
+      id: 'test-release-1',
+      title: 'Test Release 1',
     } as Release,
   ];
 
@@ -37,21 +37,20 @@ describe('MethodologyStatusForm', () => {
     expect(screen.getByText('Edit methodology status')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
 
-    const statuses = within(
-      screen.getByRole('group', { name: 'Status' }),
-    ).getAllByRole('radio');
+    const statusGroup = within(screen.getByRole('group', { name: 'Status' }));
+    const statuses = statusGroup.getAllByRole('radio');
 
     expect(statuses).toHaveLength(2);
     expect(statuses[0]).toHaveAttribute('value', 'Draft');
     expect(statuses[0]).toBeEnabled();
     expect(statuses[0]).toBeChecked();
-    expect(screen.getByLabelText('In draft')).toBeInTheDocument();
+    expect(statuses[0]).toEqual(statusGroup.getByLabelText('In draft'));
 
     expect(statuses[1]).toHaveAttribute('value', 'Approved');
     expect(statuses[1]).toBeEnabled();
-    expect(
-      screen.getByLabelText('Approved for publication'),
-    ).toBeInTheDocument();
+    expect(statuses[1]).toEqual(
+      statusGroup.getByLabelText('Approved for publication'),
+    );
 
     expect(
       screen.queryByRole('group', { name: 'When to publish' }),
@@ -104,26 +103,37 @@ describe('MethodologyStatusForm', () => {
 
     expect(screen.getByText('When to publish')).toBeInTheDocument();
 
-    const publishStatuses = within(
+    const publishStatusGroup = within(
       screen.getByRole('group', { name: 'When to publish' }),
-    ).getAllByRole('radio');
+    );
+    const publishStatuses = publishStatusGroup.getAllByRole('radio');
 
     expect(publishStatuses[0]).toBeChecked();
     expect(publishStatuses[0]).toBeEnabled();
-    expect(
-      screen.getByLabelText('With a specific release'),
-    ).toBeInTheDocument();
+    expect(publishStatuses[0]).toEqual(
+      publishStatusGroup.getByLabelText('With a specific release'),
+    );
 
     expect(publishStatuses[1]).not.toBeChecked();
     expect(publishStatuses[1]).toBeEnabled();
-    expect(screen.getByLabelText('Immediately')).toBeInTheDocument();
+    expect(publishStatuses[1]).toEqual(
+      publishStatusGroup.getByLabelText('Immediately'),
+    );
 
     const releaseSelect = screen.getByLabelText('Select release');
     expect(releaseSelect.children.length).toBe(3);
+    expect(releaseSelect.children[0]).toHaveTextContent('Choose a release');
+    expect(releaseSelect.children[0]).toHaveValue('');
+    expect(releaseSelect.children[1]).toHaveTextContent('Test Release 1');
+    expect(releaseSelect.children[1]).toHaveValue('test-release-1');
+    expect(releaseSelect.children[2]).toHaveTextContent('Test Release 2');
+    expect(releaseSelect.children[2]).toHaveValue('test-release-2');
+
+    expect(releaseSelect).toHaveDisplayValue('Test Release 2');
     expect(releaseSelect).toHaveValue('test-release-2');
   });
 
-  test('Shows validation error if internal note is empty and status is approved', async () => {
+  test('shows validation error if internal note is empty and status is approved', async () => {
     render(
       <MethodologyStatusForm
         methodologySummary={
@@ -151,7 +161,7 @@ describe('MethodologyStatusForm', () => {
     });
   });
 
-  test('Shows validation error if a release is not selected when publish strategy is with release', async () => {
+  test('shows validation error if a release is not selected when publish strategy is with release', async () => {
     render(
       <MethodologyStatusForm
         methodologySummary={
@@ -172,12 +182,12 @@ describe('MethodologyStatusForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Select a release' }),
+        screen.getByRole('link', { name: 'Choose a release' }),
       ).toHaveAttribute('href', '#methodologyStatusForm-withReleaseId');
     });
   });
 
-  test('Fails to submit with invalid values', async () => {
+  test('fails to submit with invalid values', async () => {
     const handleSubmit = jest.fn();
 
     render(
@@ -203,14 +213,14 @@ describe('MethodologyStatusForm', () => {
         screen.getByRole('link', { name: 'Enter an internal note' }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('link', { name: 'Select a release' }),
+        screen.getByRole('link', { name: 'Choose a release' }),
       ).toBeInTheDocument();
 
       expect(handleSubmit).not.toHaveBeenCalled();
     });
   });
 
-  test('Successfully submits with valid values', async () => {
+  test('successfully submits with valid values', async () => {
     const handleSubmit = jest.fn();
 
     render(

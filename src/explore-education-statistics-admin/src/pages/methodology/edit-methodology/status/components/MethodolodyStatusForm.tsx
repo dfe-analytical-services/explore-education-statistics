@@ -74,7 +74,7 @@ const MethodologyStatusForm = ({
         }) as StringSchema<FormValues['publishingStrategy']>,
         withReleaseId: Yup.string().when('publishingStrategy', {
           is: 'WithRelease',
-          then: Yup.string().required('Select a release'),
+          then: Yup.string().required('Choose a release'),
         }),
       })}
     >
