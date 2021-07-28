@@ -13,6 +13,7 @@ interface Props {
   editable?: boolean;
   onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
+  testId?: string;
 }
 
 const MethodologyEditableBlock = ({
@@ -22,6 +23,7 @@ const MethodologyEditableBlock = ({
   editable = true,
   onSave,
   onDelete,
+  testId,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -64,6 +66,7 @@ const MethodologyEditableBlock = ({
           onImageUploadCancel={
             allowImages ? handleImageUploadCancel : undefined
           }
+          testId={testId}
         />
       );
     default:

@@ -152,6 +152,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
                     type="button"
                     onClick={toggleEditingHeading}
                     variant="secondary"
+                    testId={`${heading}-editSectionTitleButton`}
                   >
                     Edit section title
                   </Button>
@@ -161,7 +162,11 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
               {onRemoveSection && (
                 <>
-                  <Button onClick={toggleRemoveModal.on} variant="warning">
+                  <Button
+                    onClick={toggleRemoveModal.on}
+                    variant="warning"
+                    testId={`${heading}-removeSectionButton`}
+                  >
                     Remove this section
                   </Button>
 

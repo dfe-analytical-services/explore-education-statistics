@@ -5,16 +5,18 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
-export interface EditableBlockProps {
+export interface Props {
   onEdit?: () => void;
   onDelete?: () => void;
+  testId?: string;
 }
 
 const EditableBlockWrapper = ({
   children,
   onEdit,
   onDelete,
-}: EditableBlockProps & { children: ReactNode }) => {
+  testId,
+}: Props & { children: ReactNode }) => {
   const [showConfirmDelete, toggleConfirmDelete] = useToggle(false);
 
   return (
@@ -23,7 +25,11 @@ const EditableBlockWrapper = ({
 
       <ButtonGroup className={styles.buttons}>
         {onEdit && (
-          <Button variant="secondary" onClick={() => onEdit()}>
+          <Button
+            variant="secondary"
+            onClick={() => onEdit()}
+            testId={`${testId ? `${testId}-` : ''}editBlockButton`}
+          >
             Edit block
           </Button>
         )}
