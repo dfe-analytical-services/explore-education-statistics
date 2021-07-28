@@ -20,6 +20,16 @@ describe('ReleaseMetaGuidancePageContent', () => {
         { value: 'filter_1', label: 'Filter 1' },
         { value: 'indicator_1', label: 'Indicator 1' },
       ],
+      footnotes: [
+        {
+          id: 'footnote-1',
+          label: 'Footnote 1',
+        },
+        {
+          id: 'footnote-2',
+          label: 'Footnote 2',
+        },
+      ],
     },
     {
       id: 'subject-2',
@@ -34,6 +44,12 @@ describe('ReleaseMetaGuidancePageContent', () => {
       variables: [
         { value: 'filter_2', label: 'Filter 2' },
         { value: 'indicator_2', label: 'Indicator 2' },
+      ],
+      footnotes: [
+        {
+          id: 'footnote-3',
+          label: 'Footnote 3',
+        },
       ],
     },
   ];
@@ -119,26 +135,36 @@ describe('ReleaseMetaGuidancePageContent', () => {
     ).toBeInTheDocument();
 
     userEvent.click(
-      subject1.getByRole('button', {
-        name: 'Variable names and descriptions',
-      }),
+      subject1.getByRole('button', { name: 'Variable names and descriptions' }),
     );
 
-    const section1VariableRows = subject1.getAllByRole('row');
+    const section1VariableRows = within(
+      subject1.getByTestId('Variables'),
+    ).getAllByRole('row');
 
-    const section1VariableRow1Cells = within(
+    const subject1VariableRow1Cells = within(
       section1VariableRows[1],
     ).getAllByRole('cell');
 
-    expect(section1VariableRow1Cells[0]).toHaveTextContent('filter_1');
-    expect(section1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
+    expect(subject1VariableRow1Cells[0]).toHaveTextContent('filter_1');
+    expect(subject1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
 
-    const section1VariableRow2Cells = within(
+    const subject1VariableRow2Cells = within(
       section1VariableRows[2],
     ).getAllByRole('cell');
 
-    expect(section1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
-    expect(section1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
+    expect(subject1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
+    expect(subject1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
+
+    userEvent.click(subject1.getByRole('button', { name: 'Footnotes' }));
+
+    const subject1Footnotes = within(
+      subject1.getByTestId('Footnotes'),
+    ).getAllByRole('listitem');
+
+    expect(subject1Footnotes).toHaveLength(2);
+    expect(subject1Footnotes[0]).toHaveTextContent('Footnote 1');
+    expect(subject1Footnotes[1]).toHaveTextContent('Footnote 2');
 
     // Subject 2
 
@@ -158,26 +184,35 @@ describe('ReleaseMetaGuidancePageContent', () => {
     ).toBeInTheDocument();
 
     userEvent.click(
-      subject2.getByRole('button', {
-        name: 'Variable names and descriptions',
-      }),
+      subject2.getByRole('button', { name: 'Variable names and descriptions' }),
     );
 
-    const section2VariableRows = subject2.getAllByRole('row');
+    const subject2VariableRows = within(
+      subject2.getByTestId('Variables'),
+    ).getAllByRole('row');
 
-    const section2VariableRow1Cells = within(
-      section2VariableRows[1],
+    const subject2VariableRow1Cells = within(
+      subject2VariableRows[1],
     ).getAllByRole('cell');
 
-    expect(section2VariableRow1Cells[0]).toHaveTextContent('filter_2');
-    expect(section2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
+    expect(subject2VariableRow1Cells[0]).toHaveTextContent('filter_2');
+    expect(subject2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
 
-    const section2VariableRow2Cells = within(
-      section2VariableRows[2],
+    const subject2VariableRow2Cells = within(
+      subject2VariableRows[2],
     ).getAllByRole('cell');
 
-    expect(section2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
-    expect(section2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+    expect(subject2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
+    expect(subject2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+
+    userEvent.click(subject2.getByRole('button', { name: 'Footnotes' }));
+
+    const subject2Footnotes = within(
+      subject2.getByTestId('Footnotes'),
+    ).getAllByRole('listitem');
+
+    expect(subject2Footnotes).toHaveLength(1);
+    expect(subject2Footnotes[0]).toHaveTextContent('Footnote 3');
   });
 
   test('renders single time period when `from` and `to` are the same', () => {
@@ -246,6 +281,54 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
     expect(
       within(subjects[0]).queryByTestId('Time periods'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render empty variables section', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            variables: [],
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    expect(
+      within(subjects[0]).queryByRole('button', {
+        name: 'Variable names and descriptions',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(subjects[0]).queryByTestId('Variables'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render empty footnotes section', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            footnotes: [],
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    expect(
+      within(subjects[0]).queryByRole('button', { name: 'Footnotes' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(subjects[0]).queryByTestId('Footnotes'),
     ).not.toBeInTheDocument();
   });
 

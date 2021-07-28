@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
-  const { filename, variables } = subject;
+  const { filename, variables, footnotes } = subject;
 
   const geographicLevels = useMemo(
     () => subject.geographicLevels.sort().join('; '),
@@ -64,26 +64,44 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
         {contentItem}
       </SummaryList>
 
-      <Details summary="Variable names and descriptions">
-        <p>Variable names and descriptions for this file are provided below:</p>
+      {variables.length && (
+        <Details
+          summary="Variable names and descriptions"
+          className="govuk-!-margin-bottom-4"
+        >
+          <p>
+            Variable names and descriptions for this file are provided below:
+          </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Variable name</th>
-              <th scope="col">Variable description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {variables.map(({ value, label }) => (
-              <tr key={value}>
-                <td className={styles.tableOverflowWrap}>{value}</td>
-                <td>{label}</td>
+          <table data-testid="Variables">
+            <thead>
+              <tr>
+                <th scope="col">Variable name</th>
+                <th scope="col">Variable description</th>
               </tr>
+            </thead>
+            <tbody>
+              {variables.map(({ value, label }, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <tr key={index}>
+                  <td className={styles.tableOverflowWrap}>{value}</td>
+                  <td>{label}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Details>
+      )}
+
+      {footnotes.length > 0 && (
+        <Details summary="Footnotes">
+          <ol data-testid="Footnotes">
+            {footnotes.map(footnote => (
+              <li key={footnote.id}>{footnote.label}</li>
             ))}
-          </tbody>
-        </table>
-      </Details>
+          </ol>
+        </Details>
+      )}
     </>
   );
 };

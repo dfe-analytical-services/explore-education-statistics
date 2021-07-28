@@ -276,7 +276,7 @@ Validate Regional and local authority (LA) breakdown chart
     ${datablock}=    set variable    css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart    ${datablock}
 
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Vale of White Horse
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Vale of White Horse
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
@@ -290,7 +290,7 @@ Validate Regional and local authority (LA) breakdown chart
     user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.4%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Harlow
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Harlow
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
@@ -304,7 +304,7 @@ Validate Regional and local authority (LA) breakdown chart
     user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.1%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Newham
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Newham
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}

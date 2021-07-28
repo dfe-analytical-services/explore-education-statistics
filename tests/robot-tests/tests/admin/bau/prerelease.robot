@@ -453,8 +453,8 @@ user chooses location, time period and filters
     lists should be equal    ${timePeriodStartList}    ${expectedList}
     lists should be equal    ${timePeriodEndList}    ${expectedList}
 
-    user selects from list by label    id:timePeriodForm-start    2005
-    user selects from list by label    id:timePeriodForm-end    2017
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2017
     user clicks element    id:timePeriodForm-submit
 
     user waits until table tool wizard step is available    Choose your filters
