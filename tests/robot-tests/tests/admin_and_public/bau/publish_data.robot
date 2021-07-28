@@ -56,10 +56,6 @@ Go to "Sign off" page and approve release
     user clicks link    Sign off
     user approves release for immediate publication
 
-Return to Admin Dashboard
-    [Tags]    HappyPath
-    user navigates to admin dashboard    Bau1
-
 Create another release for the same publication
     [Tags]    HappyPath
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}

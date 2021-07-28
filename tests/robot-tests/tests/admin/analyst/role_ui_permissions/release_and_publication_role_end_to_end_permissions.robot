@@ -109,10 +109,6 @@ Check publication owner can edit release status to "In draft"
     ...    Moving back to Draft state (publication owner)
     user clicks button    Update status
 
-User goes back to admin dashboard
-    [Tags]    HappyPath
-    user goes to url    %{ADMIN_URL}
-
 Check that a publication owner can make a new release
     [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}

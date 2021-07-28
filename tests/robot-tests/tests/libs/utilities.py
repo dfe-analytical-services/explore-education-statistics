@@ -11,6 +11,7 @@ from typing import Union
 import utilities_init
 import os
 import re
+from urllib.parse import urlparse
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = sl._element_finder
@@ -287,6 +288,38 @@ def remove_substring_from_right_of_string(string, substring):
 def user_clicks_element_if_exists(selector):
     if element_finder.find(selector, required=False) is not None:
         sl.click_element(selector)
+
+
+def user_is_on_admin_dashboard(admin_url: str) -> bool:
+    current_url = sl.get_location()
+    url_parts = urlparse(current_url)
+    left_part = f"{url_parts.scheme}://{url_parts.netloc}{url_parts.path}"
+    if left_part.endswith('/'):
+        left_part = left_part[:-1]
+    return left_part == admin_url or left_part == f"{admin_url}/dashboard"
+
+
+def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, theme: str, topic: str) -> bool:
+    if not user_is_on_admin_dashboard(admin_url):
+        return False
+    selected_theme = sl.get_selected_list_label('id:publicationsReleases-themeTopic-themeId')
+    if selected_theme != theme:
+        return False
+    selected_topic = sl.get_selected_list_label('id:publicationsReleases-themeTopic-topicId')
+    return selected_topic == topic
+
+
+def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
+    if user_is_on_admin_dashboard(admin_url):
+        return
+
+    home_button = element_finder.find("xpath://a[@href='/dashboard']", required=False, first_only=True)
+    
+    if home_button is not None:
+        home_button.click()
+        return
+
+    sl.go_to(admin_url)
 
 
 def _normalise_child_locator(parent_locator: object, child_locator: str) -> str:

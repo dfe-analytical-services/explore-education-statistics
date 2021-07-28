@@ -12,13 +12,7 @@ user signs in as bau1
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible    Sign in
     user signs in as    ADMIN
-
-    user waits until h1 is visible    Dashboard
-    user waits until page contains title caption    Welcome Bau1
-    user waits until page contains element
-    ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
-    ...    %{WAIT_LONG}
-
+    user navigates to admin dashboard    Bau1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
@@ -32,14 +26,7 @@ user signs in as analyst1
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible    Sign in
     user signs in as    ANALYST
-    user waits until h1 is visible    Dashboard
-    user waits until page contains title caption    Welcome Analyst1
-    user waits until page contains element    css:[id="publicationsReleases-themeTopic-themeId"]    60
-
-    # @TODO: Luke - See if this test id is being stripped out of the DOM by React
-    # no selector with this data-test id is present
-    # user waits until page contains element    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']    %{WAIT_LONG}
-
+    user navigates to admin dashboard    Analyst1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
@@ -59,18 +46,16 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]    ${theme}    ${topic}
-    ${current_url}=    Get Location
-    IF    "${current_url}" != "%{ADMIN_URL}"
-        user navigates to admin dashboard
+    user navigates to admin dashboard
+    ${correct_theme_and_topic_selected}=    user is on admin dashboard with theme and topic selected    %{ADMIN_URL}
+    ...    ${theme}    ${topic}
+    IF    ${correct_theme_and_topic_selected} is ${FALSE}
+        user selects from list by label    id:publicationsReleases-themeTopic-themeId    ${theme}
+        user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
+        user selects from list by label    id:publicationsReleases-themeTopic-topicId    ${topic}
+        user waits until h2 is visible    ${theme}    60
+        user waits until h3 is visible    ${topic}    60
     END
-    user waits until page contains link    Manage publications and releases    90
-    user clicks link    Manage publications and releases
-    user waits until page contains element    id:publicationsReleases-themeTopic-themeId    60
-    user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
-    user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
-    user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
-    user waits until h2 is visible    ${theme}    60
-    user waits until h3 is visible    ${topic}    60
 
 user navigates to editable release summary from admin dashboard
     [Arguments]
@@ -148,7 +133,6 @@ user opens publication on the admin dashboard
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    user navigates to admin dashboard
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
@@ -177,6 +161,37 @@ user views methodology for open publication accordion
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks link    Edit this methodology
     user waits until h2 is visible    Methodology summary
+
+user approves methodology for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ...    ${methodology_title}=${publication}
+
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks link    Edit this methodology    ${accordion}
+    user waits until page contains title caption    Edit methodology
+    user waits until h2 is visible    Methodology summary
+    user clicks link    Sign off
+    user waits until h2 is visible    Methodology status
+    user clicks button    Edit status
+    user waits until h2 is visible    Edit methodology status
+    user clicks radio    Approved for publication
+    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Test release note
+    user clicks button    Update status
+    user waits until h2 is visible    Methodology status
+    user checks page contains tag    Approved
+
+user creates approved methodology for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+
+    user creates methodology for publication    ${publication}    ${theme}    ${topic}
+    user approves methodology for publication    ${publication}    ${theme}    ${topic}
 
 user links publication to external methodology
     [Arguments]
@@ -237,50 +252,6 @@ user adds basic release content
     user adds text block to editable accordion section    Test section one    css:#releaseMainContent
     user adds content to accordion section text block    Test section one    1    Test content block for ${publication}
     ...    css:#releaseMainContent
-
-user creates approved methodology
-    [Arguments]    ${title}
-    user waits until h1 is visible    Manage methodologies
-    user waits until page contains element    id:approved-methodologies-tab
-    user clicks element    id:approved-methodologies-tab
-    ${is_approved}=    run keyword and return status    user waits until page contains element
-    ...    xpath://section[@id="approved-methodologies"]//a[text()="${title}"]    1
-    user clicks element    id:draft-methodologies-tab
-    ${is_draft}=    run keyword and return status    user waits until page contains element
-    ...    xpath://section[@id="draft-methodologies"]//a[text()="${title}"]    1
-    IF    ${is_approved} == False and ${is_draft} == False
-        user creates methodology    ${title}
-        user approves methodology    ${title}
-    END
-    IF    ${is_draft} == True
-        user clicks element    id:draft-methodologies-tab
-        user clicks link    ${title}
-        user approves methodology    ${title}
-    END
-
-user creates methodology
-    [Arguments]    ${title}
-    user waits until h1 is visible    Manage methodologies
-    user clicks link    Create new methodology
-    user waits until h1 is visible    Create new methodology
-    user enters text into element    id:createMethodologyForm-title    ${title}
-    user clicks button    Create methodology
-    user waits until page contains title caption    Edit methodology
-    user waits until h1 is visible    ${title}
-
-user approves methodology
-    [Arguments]    ${title}
-    user waits until page contains title caption    Edit methodology
-    user waits until h1 is visible    ${title}
-    user clicks link    Sign off
-    user clicks button    Edit status
-    user waits until h2 is visible    Edit methodology status
-    user clicks radio    Approved for publication
-    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Test release note
-    user clicks button    Update status
-
-    user waits until h2 is visible    Methodology status
-    user checks page contains tag    Approved
 
 user creates public prerelease access list
     [Arguments]    ${content}
@@ -478,7 +449,7 @@ user approves release for immediate publication
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
-    user goes to url    %{ADMIN_URL}
+    user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""
         user waits until page contains title caption    Welcome ${USER}
@@ -611,3 +582,13 @@ user goes to manage user
     # stale element exception if you don't wait until it's enabled
     user waits until element is enabled    css:[name="selectedPublicationId"]
     user waits until element is enabled    css:[name="selectedReleaseId"]
+
+user waits until modal is visible
+    [Arguments]
+    ...    ${MODAL_TITLE}
+    ...    ${MODAL_TEXT}=${EMPTY}
+
+    user waits until parent contains element    css:.ReactModal__Content    xpath://h1[.="${MODAL_TITLE}"]
+    IF    "${MODAL_TEXT}" != "${EMPTY}"
+        user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
+    END

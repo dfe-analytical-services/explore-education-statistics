@@ -42,8 +42,6 @@ Add metadata guidance
     user waits until h2 is visible    Public metadata guidance document
 
     user waits until page contains element    id:metaGuidance-dataFiles
-    user waits until page contains accordion section    UI test subject
-    user opens accordion section    UI test subject
 
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels

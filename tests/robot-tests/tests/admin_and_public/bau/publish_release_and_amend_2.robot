@@ -17,7 +17,6 @@ ${THIRD_SUBJECT}        upload file test with filter subject
 *** Test Cases ***
 Create publication
     [Tags]    HappyPath
-    user navigates to admin dashboard
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
@@ -32,9 +31,6 @@ Add methodology content
     user clicks link    Manage content
     user clicks button    Add new section
     user clicks button    New section
-    # NOTE: scroll to element is here to avoid selenium clicking the
-    # set page view text box on the methodology page
-    user scrolls to element    xpath://button[text()="Add text block"]
     user clicks button    Add text block
     user clicks button    Edit block
     user presses keys    Adding Methodology content
