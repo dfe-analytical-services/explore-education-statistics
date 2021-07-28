@@ -28,6 +28,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
@@ -68,9 +69,7 @@ const ReleaseDataUploadsSection = ({
   onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [cancelDataFile, setCancelDataFile] = useState<DataFile>();
   const [activeFileId, setActiveFileId] = useState<string>();
-
   const {
     value: dataFiles = [],
     setState: setDataFilesState,
@@ -88,19 +87,6 @@ const ReleaseDataUploadsSection = ({
           : {
               ...file,
               isDeleting: deleting,
-            },
-      ),
-    );
-  };
-
-  const setFileCancelling = (dataFile: DataFile, cancelling: boolean) => {
-    setDataFiles(
-      dataFiles.map(file =>
-        file.fileName !== dataFile.fileName
-          ? file
-          : {
-              ...file,
-              isCancelling: cancelling,
             },
       ),
     );
@@ -326,13 +312,12 @@ const ReleaseDataUploadsSection = ({
                           </ButtonText>
                         </>
                       )}
-
-                    {dataFile.permissions.canCancelImport &&
-                      !dataFile.isCancelling && (
-                        <ButtonText onClick={() => setCancelDataFile(dataFile)}>
-                          Cancel
-                        </ButtonText>
-                      )}
+                    {dataFile.permissions.canCancelImport && (
+                      <DataUploadCancelButton
+                        releaseId={releaseId}
+                        fileId={dataFile.id}
+                      />
+                    )}
                   </DataFileDetailsTable>
                 </div>
               </AccordionSection>
@@ -409,31 +394,6 @@ const ReleaseDataUploadsSection = ({
               } will be removed or updated.`}
             </p>
           )}
-        </ModalConfirm>
-      )}
-
-      {cancelDataFile && (
-        <ModalConfirm
-          open
-          title="Confirm cancellation of selected data file"
-          onExit={() => setCancelDataFile(undefined)}
-          onCancel={() => setCancelDataFile(undefined)}
-          onConfirm={async () => {
-            try {
-              await releaseDataFileService.cancelImport(
-                releaseId,
-                cancelDataFile.id,
-              );
-
-              setCancelDataFile(undefined);
-              setFileCancelling(cancelDataFile, true);
-            } catch (err) {
-              logger.error(err);
-              setFileCancelling(cancelDataFile, false);
-            }
-          }}
-        >
-          <p>This file upload will be cancelled and may then be removed.</p>
         </ModalConfirm>
       )}
     </>
