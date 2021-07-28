@@ -31,4 +31,18 @@
   max-height: 300px;
   overflow: auto;
   padding-left: 0;
+
+  dl {
+    font-size: 1rem;
+    line-height: 1.25;
+    margin: 0;
+  }
+  dt {
+    display: inline-block;
+    margin-right: 5px;
+  }
+  dd {
+    display: inline;
+    margin: 0;
+  }
 }

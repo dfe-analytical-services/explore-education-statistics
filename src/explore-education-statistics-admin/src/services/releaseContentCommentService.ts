@@ -27,15 +27,8 @@ const releaseContentCommentService = {
     );
   },
 
-  updateContentSectionComment(
-    comment: UpdateComment,
-    resolved: boolean | null = null,
-  ): Promise<Comment> {
-    return client.put(
-      `/comment/${comment.id}`,
-      comment,
-      resolved != null ? { params: { resolved } } : {},
-    );
+  updateContentSectionComment(comment: UpdateComment): Promise<Comment> {
+    return client.put(`/comment/${comment.id}`, comment);
   },
 
   deleteContentSectionComment(commentId: string): Promise<void> {

@@ -205,12 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 #pragma warning restore 612
                                 LastName = ""
                             }
-                            : comment.CreatedBy))
-                .ForMember(dest => dest.ResolvedBy,
-                    m => m.MapFrom(comment =>
-                        comment.ResolvedById == null
-                            ? null
-                            : comment.ResolvedBy));
+                            : comment.CreatedBy));
 
             CreateMap<ContentSection, ContentSectionViewModel>()
                 .ForMember(dest => dest.Content,

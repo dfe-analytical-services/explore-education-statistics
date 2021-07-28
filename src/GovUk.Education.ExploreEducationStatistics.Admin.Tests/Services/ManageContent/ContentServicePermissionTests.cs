@@ -48,76 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             }
         };
 
-        private readonly Comment _comment = new Comment
-        {
-            Id = Guid.NewGuid()
-        };
-
-        [Fact]
-        public async Task AddComment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.AddComment(
-                            _release.Id,
-                            ContentSectionId,
-                            ContentBlockId,
-                            new CommentSaveRequest());
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task DeleteComment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.DeleteComment(
-                            _comment.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task ResolveComment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_comment, CanResolveSpecificComment)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.ResolveComment(
-                            _comment.Id,
-                            true);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateComment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateComment(
-                            _comment.Id,
-                            new CommentSaveRequest());
-                    }
-                );
-        }
-
         [Fact]
         public async Task AddContentBlock()
         {
@@ -127,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.AddContentBlockAsync(
+                        return service.AddContentBlock(
                             _release.Id,
                             ContentSectionId,
                             new ContentBlockAddRequest());
@@ -191,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.RemoveContentBlockAsync(
+                        return service.RemoveContentBlock(
                             _release.Id,
                             ContentSectionId,
                             ContentBlockId);
@@ -208,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.RemoveContentSectionAsync(
+                        return service.RemoveContentSection(
                             _release.Id,
                             ContentSectionId);
                     }
@@ -224,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.ReorderContentBlocksAsync(
+                        return service.ReorderContentBlocks(
                             _release.Id,
                             ContentSectionId,
                             new Dictionary<Guid, int>());
@@ -241,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.ReorderContentSectionsAsync(
+                        return service.ReorderContentSections(
                             _release.Id,
                             new Dictionary<Guid, int>());
                     }
@@ -257,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateContentSectionHeadingAsync(
+                        return service.UpdateContentSectionHeading(
                             _release.Id,
                             ContentSectionId,
                             "");
@@ -274,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateTextBasedContentBlockAsync(
+                        return service.UpdateTextBasedContentBlock(
                             _release.Id,
                             ContentSectionId,
                             ContentBlockId,
@@ -292,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateDataBlockAsync(
+                        return service.UpdateDataBlock(
                             _release.Id,
                             ContentSectionId,
                             ContentBlockId,
@@ -320,7 +250,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
             MockUtils.SetupCall(mock, _release.Id, _release);
-            MockUtils.SetupCall(mock, _comment.Id, _comment);
             return mock;
         }
     }

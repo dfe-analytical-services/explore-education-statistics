@@ -44,13 +44,31 @@ describe('Comments', () => {
               id: 'comment-2',
               content: 'Test comment 2',
               createdBy: {
-                id: 'user-1',
+                id: 'user-2',
                 email: 'test2@test.com',
                 firstName: 'Jane',
                 lastName: 'Roberts',
               },
               created: '2020-06-06T11:00:00',
               updated: '2020-06-07T15:00:00',
+            },
+            {
+              id: 'comment-3',
+              content: 'Test comment 3',
+              createdBy: {
+                id: 'user-3',
+                email: 'test3@test.com',
+                firstName: 'John',
+                lastName: 'Cale',
+              },
+              created: '2020-06-08T12:00:00',
+              resolved: '2020-06-10T12:00:00',
+              resolvedBy: {
+                id: 'user-1',
+                email: 'test@test.com',
+                firstName: 'John',
+                lastName: 'Smith',
+              },
             },
           ]}
           onChange={noop}
@@ -66,18 +84,27 @@ describe('Comments', () => {
 
     const comments = screen.getAllByRole('listitem');
 
-    expect(comments).toHaveLength(2);
+    expect(comments).toHaveLength(3);
 
-    expect(comments[0]).toHaveTextContent('John Smith');
-    expect(comments[0]).toHaveTextContent('Created: 06/06/20');
-    expect(comments[0]).toHaveTextContent('Test comment 1');
+    expect(comments[0]).toHaveTextContent('Comment resolved');
+    expect(comments[0]).toHaveTextContent('On: 10/06/20 12:00');
+    expect(comments[0]).toHaveTextContent('By: John Smith');
+    expect(comments[0]).toHaveTextContent('See comment');
+    expect(comments[0]).toHaveTextContent('Created: 08/06/20 12:00');
+    expect(comments[0]).not.toHaveTextContent('Updated:');
+    expect(comments[0]).toHaveTextContent('Test comment 3');
 
-    expect(comments[1]).toHaveTextContent('Jane Roberts');
-    expect(comments[1]).toHaveTextContent('Created: 06/06/20');
-    expect(comments[1]).toHaveTextContent('Updated: 07/06/20');
-    expect(comments[1]).toHaveTextContent('Test comment 2');
+    expect(comments[1]).toHaveTextContent('John Smith');
+    expect(comments[1]).toHaveTextContent('Created: 06/06/20 12:00');
+    expect(comments[1]).toHaveTextContent('Test comment 1');
+    expect(comments[1]).not.toHaveTextContent('Updated:');
+    expect(comments[1]).not.toHaveTextContent('Comment resolved');
 
-    expect(screen.getByRole('list')).toMatchSnapshot();
+    expect(comments[2]).toHaveTextContent('Jane Roberts');
+    expect(comments[2]).toHaveTextContent('Created: 06/06/20 11:00');
+    expect(comments[2]).toHaveTextContent('Updated: 07/06/20 15:00');
+    expect(comments[2]).toHaveTextContent('Test comment 2');
+    expect(comments[2]).not.toHaveTextContent('Comment resolved');
   });
 
   test('adding comment calls the `onChange` handler with new comments list', async () => {
@@ -430,6 +457,177 @@ describe('Comments', () => {
             updated: '2020-06-06T15:00:00',
           },
         ] as Comment[]);
+      });
+    });
+  });
+
+  describe('resolving comment', () => {
+    const testUser: User = {
+      id: 'user-1',
+      name: 'Lou Reed',
+      permissions: {} as GlobalPermissions,
+    };
+
+    test('resolve comment', async () => {
+      const testComments = [
+        {
+          id: 'comment-1',
+          content: 'Test comment 1',
+          createdBy: {
+            id: 'user-1',
+            email: 'test@test.com',
+            firstName: 'Lou',
+            lastName: 'Reed',
+          },
+          created: '2020-06-06T12:00:00',
+        },
+      ];
+
+      const handleChange = jest.fn();
+
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser,
+          }}
+        >
+          <ReleaseContextProvider release={testRelease}>
+            <Comments
+              blockId="test-block"
+              sectionId="section-1"
+              comments={testComments}
+              onChange={handleChange}
+            />
+          </ReleaseContextProvider>
+        </AuthContext.Provider>,
+      );
+
+      const comments = screen.getAllByRole('listitem', {
+        hidden: true,
+      });
+
+      expect(
+        within(comments[0]).queryByRole('button', {
+          name: 'Unresolve',
+          hidden: true,
+        }),
+      ).toBeNull();
+
+      expect(
+        within(comments[0]).getByRole('button', {
+          name: 'Resolve',
+          hidden: true,
+        }),
+      ).toBeInTheDocument();
+
+      const newComments: Comment[] = [...testComments];
+      newComments[0].resolved = '2020-06-20T12:00:00';
+      newComments[0].resolvedBy = {
+        id: 'user-2',
+        email: 'test@test.com',
+        firstName: 'Jane',
+        lastName: 'Roberts',
+      };
+      newComments[0].setResolved = true;
+
+      releaseContentCommentService.updateContentSectionComment.mockImplementation(
+        () => Promise.resolve<Comment>(newComments[0]),
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Resolve',
+          hidden: true,
+        }),
+      );
+
+      await waitFor(() => {
+        expect(handleChange).toHaveBeenCalledWith('test-block', [
+          ...newComments,
+        ]);
+      });
+    });
+
+    test('unresolve comment', async () => {
+      const testComments = [
+        {
+          id: 'comment-2',
+          content: 'Test comment 2',
+          createdBy: {
+            id: 'user-2',
+            email: 'test2@test.com',
+            firstName: 'Jane',
+            lastName: 'Roberts',
+          },
+          created: '2020-06-06T11:00:00',
+          updated: '2020-06-07T12:00:00',
+          resolved: '2020-06-10T14:00:00',
+          resolvedBy: {
+            id: 'user-1',
+            email: 'test@test.com',
+            firstName: 'Lou',
+            lastName: 'Reed',
+          },
+        },
+      ];
+
+      const handleChange = jest.fn();
+
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser,
+          }}
+        >
+          <ReleaseContextProvider release={testRelease}>
+            <Comments
+              blockId="test-block"
+              sectionId="section-1"
+              comments={testComments}
+              onChange={handleChange}
+            />
+          </ReleaseContextProvider>
+        </AuthContext.Provider>,
+      );
+
+      const comments = screen.getAllByRole('listitem', {
+        hidden: true,
+      });
+
+      expect(
+        within(comments[0]).queryByRole('button', {
+          name: 'Resolve',
+          hidden: true,
+        }),
+      ).toBeNull();
+
+      expect(
+        within(comments[0]).getByRole('button', {
+          name: 'Unresolve',
+          hidden: true,
+        }),
+      ).toBeInTheDocument();
+
+      const newComments: Comment[] = [...testComments];
+      newComments[0].resolved = undefined;
+      newComments[0].resolvedBy = undefined;
+      newComments[0].setResolved = false;
+
+      releaseContentCommentService.updateContentSectionComment.mockImplementation(
+        () => Promise.resolve<Comment>(newComments[0]),
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Unresolve',
+          hidden: true,
+        }),
+      );
+
+      await waitFor(() => {
+        expect(handleChange).toHaveBeenCalledWith('test-block', [
+          ...newComments,
+        ]);
       });
     });
   });

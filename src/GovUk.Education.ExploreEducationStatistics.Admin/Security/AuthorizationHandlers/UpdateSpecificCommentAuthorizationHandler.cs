@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#nullable enable
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
@@ -14,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
     }
 
-    public class
-        UpdateSpecificCommentAuthorizationHandler : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
+    public class UpdateSpecificCommentAuthorizationHandler
+        : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseStatusRepository _releaseStatusRepository;
@@ -60,15 +61,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        private static Release GetRelease(ContentDbContext context, Comment comment)
+        private static Release? GetRelease(ContentDbContext context, Comment comment)
         {
             var contentBlock = context.ContentBlocks
                 .Include(block => block.ContentSection)
-                .ThenInclude(contentSection => contentSection.Release)
+                .ThenInclude(contentSection => contentSection!.Release)
                 .ThenInclude(section => section.Release)
                 .First(block => block.Id == comment.ContentBlockId);
 
-            return contentBlock.ContentSection.Release.Release;
+            return contentBlock.ContentSection?.Release.Release;
         }
     }
 

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -15,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -50,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
@@ -68,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 2
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -96,16 +93,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
                         {
                             Heading = "New section",
                             Order = 1,
-                            Content = new List<ContentBlock>
-                            {
+                            Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
                                     Created = new DateTime(2001, 1, 1)
@@ -115,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Created = new DateTime(2002, 2, 2)
                                 },
                                 new DataBlock()
-                            }
+                            )
                         }
                     },
                     new ReleaseContentSection
@@ -124,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Heading = "New section",
                             Order = 2,
-                            Content = new List<ContentBlock>
-                            {
+                            Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
                                     Created = new DateTime(2003, 3, 3)
@@ -135,14 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Created = new DateTime(2004, 4, 4)
                                 },
                                 new DataBlock()
-                            }
+                            )
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
@@ -173,301 +166,128 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task AddComment()
+        public async Task GetContentSections()
         {
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
                         {
                             Heading = "New section",
                             Order = 1,
-                            Content = new List<ContentBlock>
-                            {
+                            Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
-                                    Created = new DateTime(2001, 1, 1),
-                                    Comments = new List<Comment>
-                                    {
-                                        new Comment {Content = "Existing comment"}
-                                    }
+                                    Created = new DateTime(2001, 1, 1)
+                                },
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2002, 2, 2)
+                                },
+                                new DataBlock()
+                            )
+                        }
+                    },
+                    new ReleaseContentSection
+                    {
+                        ContentSection = new ContentSection
+                        {
+                            Heading = "New section",
+                            Order = 2,
+                            Content = AsList<ContentBlock>(
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2003, 3, 3)
                                 }
-                            }
+                            )
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
-
-                var result = await service.AddComment(
-                    release.Id,
-                    release.Content[0].ContentSection.Id,
-                    release.Content[0].ContentSection.Content[0].Id,
-                    new CommentSaveRequest { Content = "New comment" });
+                var result = await service.GetContentSections(release.Id);
 
                 var viewModel = result.AssertRight();
-                Assert.Equal("New comment", viewModel.Content);
-                Assert.Null(viewModel.Resolved);
 
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Equal(2, comments.Count);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal("New comment", comments[1].Content);
+                Assert.Equal(2, viewModel.Count);
+                Assert.Equal(release.Content[0].ContentSection.Id, viewModel[0].Id);
+                Assert.Equal(release.Content[1].ContentSection.Id, viewModel[1].Id);
+
+                Assert.Equal(3, viewModel[0].Content.Count);
+                Assert.Single(viewModel[1].Content);
             }
         }
 
         [Fact]
-        public async Task ResolveComment_True()
+        public async Task GetContentSections_NoContentBlocks()
         {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-            };
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
                         {
-                            Content = new List<ContentBlock>
-                            {
-                                new HtmlBlock
-                                {
-                                    Comments = new List<Comment>
-                                    {
-                                        comment
-                                    }
-                                }
-                            }
+                            Heading = "New section",
+                            Order = 1,
+                            Content = AsList<ContentBlock>()
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userId = Guid.NewGuid();
-                var service = SetupContentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.ResolveComment(comment.Id, true);
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetContentSections(release.Id);
 
                 var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment", viewModel.Content);
-                Assert.NotNull(viewModel.Resolved);
 
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.Equal(userId, comments[0].ResolvedById);
+                Assert.Single(viewModel);
+                Assert.Equal(release.Content[0].ContentSection.Id, viewModel[0].Id);
+                Assert.Empty(viewModel[0].Content);
             }
         }
 
         [Fact]
-        public async Task ResolveComment_False()
+        public async Task GetContentSections_NoContentSections()
         {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-            };
-            var release = new Release
-            {
-                Content = new List<ReleaseContentSection>
-                {
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Content = new List<ContentBlock>
-                            {
-                                new HtmlBlock
-                                {
-                                    Comments = new List<Comment>
-                                    {
-                                        comment
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+            var release = new Release();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userId = Guid.NewGuid();
-                var service = SetupContentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.ResolveComment(comment.Id, false);
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetContentSections(release.Id);
 
                 var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment", viewModel.Content);
-                Assert.Null(viewModel.Resolved);
-                Assert.Null(viewModel.ResolvedBy);
 
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.Null(comments[0].ResolvedById);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateComment()
-        {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-            };
-            var release = new Release
-            {
-                Content = new List<ReleaseContentSection>
-                {
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Content = new List<ContentBlock>
-                            {
-                                new HtmlBlock
-                                {
-                                    Comments = new List<Comment>
-                                    {
-                                        comment
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userId = Guid.NewGuid();
-                var service = SetupContentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.UpdateComment(comment.Id,
-                    new CommentSaveRequest { Content = "Existing comment updated" });
-
-                var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment updated", viewModel.Content);
-                Assert.Null(viewModel.Resolved);
-                Assert.Null(viewModel.ResolvedBy);
-
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment updated", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.Null(comments[0].ResolvedById);
-            }
-        }
-
-        [Fact]
-        public async Task DeleteComment()
-        {
-            var comment1 = new Comment
-            {
-                Content = "Comment 1",
-                CreatedById = Guid.NewGuid(),
-            };
-            var comment2 = new Comment
-            {
-                Content = "Comment 2",
-                CreatedById = Guid.NewGuid(),
-            };
-            var comment3 = new Comment
-            {
-                Content = "Comment 3",
-                CreatedById = Guid.NewGuid(),
-            };
-            var release = new Release
-            {
-                Content = new List<ReleaseContentSection>
-                {
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Content = new List<ContentBlock>
-                            {
-                                new HtmlBlock
-                                {
-                                    Comments = new List<Comment>
-                                    {
-                                        comment1, comment2, comment3
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupContentService(contentDbContext);
-                var result = await service.DeleteComment(comment2.Id);
-
-                var viewModel = result.AssertRight();
-                Assert.True(viewModel);
-
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Equal(2, comments.Count);
-                Assert.Equal("Comment 1", comments[0].Content);
-                Assert.Equal(comment1.CreatedById, comments[0].CreatedById);
-                Assert.Equal("Comment 3", comments[1].Content);
-                Assert.Equal(comment3.CreatedById, comments[1].CreatedById);
+                Assert.Empty(viewModel);
             }
         }
 
@@ -475,14 +295,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IReleaseContentSectionRepository releaseContentSectionRepository = null,
-            IUserService userService = null,
-            Guid? userId = null)
+            IUserService userService = null)
         {
             return new ContentService(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService(userId).Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
                 AdminMapper()
             );
         }

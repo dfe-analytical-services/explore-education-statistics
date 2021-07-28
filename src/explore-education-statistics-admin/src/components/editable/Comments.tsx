@@ -48,64 +48,58 @@ const Comments = ({
   const { user } = useAuthContext();
   const { releaseId } = useReleaseContext();
 
-  const addComment = (content: string) => {
+  const addComment = async (content: string) => {
     const additionalComment: AddComment = {
       content,
     };
 
     if (releaseId && sectionId) {
-      releaseContentCommentService
-        .addContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          additionalComment,
-        )
-        .then(newComment => {
-          onChange(blockId, [newComment, ...comments]);
-        });
+      const newComment = await releaseContentCommentService.addContentSectionComment(
+        releaseId,
+        sectionId,
+        blockId,
+        additionalComment,
+      );
+      onChange(blockId, [newComment, ...comments]);
     }
   };
 
-  const removeComment = (commentId: string) => {
+  const removeComment = async (commentId: string) => {
     const index = comments.findIndex(comment => comment.id === commentId);
-    releaseContentCommentService
-      .deleteContentSectionComment(commentId)
-      .then(() => {
-        const newComments = [...comments];
-        newComments.splice(index, 1);
-        onChange(blockId, newComments);
-      });
+    await releaseContentCommentService.deleteContentSectionComment(commentId);
+
+    const newComments = [...comments];
+    newComments.splice(index, 1);
+    onChange(blockId, newComments);
   };
 
-  const updateComment = (commentId: string, content: string) => {
+  const updateComment = async (commentId: string, content: string) => {
     const index = comments.findIndex(comment => comment.id === commentId);
     const editedComment: UpdateComment = {
       ...comments[index],
       content,
     };
 
-    releaseContentCommentService
-      .updateContentSectionComment(editedComment)
-      .then(savedComment => {
-        const newComments = [...comments];
-        newComments[index] = savedComment;
+    const savedComment = await releaseContentCommentService.updateContentSectionComment(
+      editedComment,
+    );
 
-        onChange(blockId, newComments);
-
-        setEditingComment(undefined);
-      });
+    const newComments = [...comments];
+    newComments[index] = savedComment;
+    onChange(blockId, newComments);
+    setEditingComment(undefined);
   };
 
-  const resolveComment = (commentId: string, resolved: boolean) => {
+  const setResolved = async (commentId: string, resolved: boolean) => {
     const index = comments.findIndex(comment => comment.id === commentId);
-    releaseContentCommentService
-      .updateContentSectionComment(comments[index], resolved)
-      .then(savedComment => {
-        const newComments = [...comments];
-        newComments[index] = savedComment;
-        onChange(blockId, newComments);
-      });
+    const newComment = { ...comments[index], setResolved: resolved };
+    const savedComment = await releaseContentCommentService.updateContentSectionComment(
+      newComment,
+    );
+
+    const newComments = [...comments];
+    newComments[index] = savedComment;
+    onChange(blockId, newComments);
   };
 
   return (
@@ -147,70 +141,88 @@ const Comments = ({
             const { createdBy, resolvedBy } = comment;
 
             return comment.resolved ? (
-              <li className="govuk-body-s">
+              <li key={comment.id}>
                 <p className="govuk-!-margin-0">
-                  <strong>Comment resolved</strong>
+                  <strong>
+                    Comment resolved <span aria-hidden>✓</span>
+                  </strong>
                 </p>
-                <p className="govuk-!-margin-0">
-                  <FormattedDate format="dd/MM/yy HH:mm">
-                    {comment.resolved}
-                  </FormattedDate>
-                </p>
-                <p className="govuk-!-margin-0">
-                  {`by ${resolvedBy?.firstName} ${resolvedBy?.lastName}`}
-                </p>
-                <Details className="govuk-!-margin-0" summary="See comment">
+                <dl>
+                  <dt>{'On: '}</dt>
+                  <dd>
+                    <FormattedDate format="dd/MM/yy HH:mm">
+                      {comment.resolved}
+                    </FormattedDate>
+                  </dd>
+                  <br />
+                  <dt>{'By: '}</dt>
+                  <dd>{`${resolvedBy?.firstName} ${resolvedBy?.lastName}`}</dd>
+                </dl>
+                <Details
+                  summary="See comment"
+                  className="govuk-!-margin-bottom-0"
+                >
                   <p className="govuk-!-margin-0">
                     <strong>
                       {`${createdBy.firstName} ${createdBy.lastName}`}
                     </strong>
                   </p>
-                  <p className="govuk-!-margin-0">
-                    {'Created: '}
-                    <FormattedDate format="dd/MM/yy HH:mm">
-                      {comment.created}
-                    </FormattedDate>
-                  </p>
-                  {comment.updated && (
-                    <p className="govuk-!-margin-0">
-                      {'Updated: '}
+                  <dl>
+                    <dt>{'Created: '}</dt>
+                    <dd>
                       <FormattedDate format="dd/MM/yy HH:mm">
-                        {comment.updated}
+                        {comment.created}
                       </FormattedDate>
-                    </p>
-                  )}
+                    </dd>
+                    {comment.updated && (
+                      <>
+                        <dt>{'Updated: '}</dt>
+                        <dd>
+                          <FormattedDate format="dd/MM/yy HH:mm">
+                            {comment.updated}
+                          </FormattedDate>
+                        </dd>
+                      </>
+                    )}
+                  </dl>
                   <p className="govuk-!-margin-top-3">{comment.content}</p>
                 </Details>
-                <ButtonText
-                  onClick={() => {
-                    resolveComment(comment.id, false);
-                  }}
-                >
-                  Unresolve
-                </ButtonText>
+                {canComment && (
+                  <ButtonText
+                    onClick={() => {
+                      setResolved(comment.id, false);
+                    }}
+                  >
+                    Unresolve
+                  </ButtonText>
+                )}
                 <hr />
               </li>
             ) : (
-              <li key={comment.id} className="govuk-body-s">
+              <li key={comment.id}>
                 <p className="govuk-!-margin-0">
                   <strong>
                     {`${createdBy.firstName} ${createdBy.lastName}`}
                   </strong>
                 </p>
-                <p className="govuk-!-margin-0">
-                  {'Created: '}
-                  <FormattedDate format="dd/MM/yy HH:mm">
-                    {comment.created}
-                  </FormattedDate>
-                </p>
-                {comment.updated && (
-                  <p className="govuk-!-margin-0">
-                    {'Updated: '}
+                <dl>
+                  <dt>{'Created: '}</dt>
+                  <dd>
                     <FormattedDate format="dd/MM/yy HH:mm">
-                      {comment.updated}
+                      {comment.created}
                     </FormattedDate>
-                  </p>
-                )}
+                  </dd>
+                  {comment.updated && (
+                    <>
+                      <dt>{'Updated: '}</dt>
+                      <dd>
+                        <FormattedDate format="dd/MM/yy HH:mm">
+                          {comment.updated}
+                        </FormattedDate>
+                      </dd>
+                    </>
+                  )}
+                </dl>
 
                 {editingComment?.id === comment.id ? (
                   <Formik<FormValues>
@@ -273,7 +285,7 @@ const Comments = ({
 
                         <ButtonText
                           onClick={() => {
-                            resolveComment(comment.id, true);
+                            setResolved(comment.id, true);
                           }}
                         >
                           Resolve
