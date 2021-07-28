@@ -4,11 +4,11 @@ Resource            ../libs/public-common.robot
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Failing
 
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}/methodology
     user waits until h1 is visible    Methodologies
@@ -18,7 +18,7 @@ Navigate to Pupil absence in schools in England methodology page
     user opens details dropdown    Pupil absence
 
 User navigates to absence methodology page
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user checks page contains methodology link
     ...    Pupil absence
     ...    Pupil absence in schools in England
@@ -31,11 +31,11 @@ User navigates to absence methodology page
     user waits until h1 is visible    Pupil absence statistics: methodology
 
 Validate Published date, Last updated date
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user checks testid element contains    published-date    22 March 2018
 
 Validate accordion sections order
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user checks accordion is in position    1. Overview of absence statistics    1    id:content
     user checks accordion is in position    2. National Statistics badging    2    id:content
     user checks accordion is in position    3. Methodology    3    id:content
@@ -53,12 +53,12 @@ Validate accordion sections order
     user checks accordion is in position    Annex F - Absence rates over time    6    id:annexes
 
 Validate page has Print this page link
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user waits until page contains button    Print this page
 
 Search for "pupil"
     [Documentation]    EES-807
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user verifies accordion is closed    1. Overview of absence statistics
 
     user clicks element    id:pageSearchForm-input
@@ -72,7 +72,7 @@ Search for "pupil"
 
 Search for "specific enquiry"
     [Documentation]    EES-807
-    [Tags]    HappyPath  Failing  NotAgainstDev
+    [Tags]    HappyPath
     user verifies accordion is closed    7. Contacts
 
     user clears element text    id:pageSearchForm-input
