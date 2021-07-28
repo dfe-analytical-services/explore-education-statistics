@@ -121,12 +121,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         await file.WriteLineAsync($"Content summary: {content}");
                     }
 
-                    // TODO EES-1768 - Add footnotes
-
                     var variables = subject.Variables
-                        .Where(variable =>
-                            !variable.Label.IsNullOrWhitespace()
-                            || !variable.Value.IsNullOrWhitespace())
+                        .Where(
+                            variable =>
+                                !variable.Label.IsNullOrWhitespace()
+                                || !variable.Value.IsNullOrWhitespace()
+                        )
                         .ToList();
 
                     if (variables.Any())
@@ -173,6 +173,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                 );
                             }
                         );
+                    }
+
+                    var footnotes = subject.Footnotes
+                        .Where(footnote => !footnote.Label.IsNullOrWhitespace())
+                        .ToList();
+
+                    if (footnotes.Any())
+                    {
+                        await file.WriteLineAsync();
+                        await file.WriteLineAsync("Footnotes:");
+                        await file.WriteLineAsync();
+
+                        await footnotes
+                            .ForEachAsync(
+                                async (footnote, footnoteIndex) =>
+                                {
+                                    var listItemStart = $"{footnoteIndex + 1}. ";
+
+                                    await file.WriteAsync(listItemStart);
+
+                                    var indent = string.Empty.PadRight(listItemStart.Length);
+
+                                    await footnote.Label
+                                        .ToLines()
+                                        .ForEachAsync(
+                                            async (line, lineIndex) =>
+                                            {
+                                                if (lineIndex == 0)
+                                                {
+                                                    await file.WriteLineAsync(line);
+                                                    return;
+                                                }
+
+                                                await file.WriteLineAsync(indent + line);
+                                            }
+                                        );
+                                }
+                            );
                     }
 
                     // Add some extra lines between data files

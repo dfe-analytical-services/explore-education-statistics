@@ -212,6 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         new LabelValue("Age at end", "age_end"),
                         new LabelValue("Number of leavers", "number_of_leavers"),
                         new LabelValue("Percentage of leavers by accommodation type", "percentage_of_leavers"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 1 Footnote 1"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 1 Footnote 2"),
                     }
                 },
                 new MetaGuidanceSubjectViewModel
@@ -234,6 +239,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         new LabelValue("Activity", "category"),
                         new LabelValue("Gender", "gender"),
                         new LabelValue("Labour market status", "labour_market_status"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 2 Footnote 1"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 2 Footnote 2"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 2 Footnote 3"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Subject 2 Footnote 4"),
                     }
                 }
             };
@@ -306,6 +318,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         new LabelValue("Age at end", "age_end"),
                         new LabelValue("Number of leavers", "number_of_leavers"),
                         new LabelValue("Percentage of leavers by accommodation type", "percentage_of_leavers"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 1"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 2"),
                     }
                 }
             };
@@ -413,6 +430,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Variables = new List<LabelValue>
                     {
                         new LabelValue("Accommodation type", "accommodation_type"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 1")
                     }
                 }
             };
@@ -467,10 +488,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Filename = "test-1.csv",
                     Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels(),
-                    Variables = new List<LabelValue>()
                 }
             };
 
@@ -581,10 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Filename = "test-1.csv",
                     Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
                     TimePeriods = new TimePeriodLabels("2018", ""),
-                    Variables = new List<LabelValue>()
                 }
             };
 
@@ -638,12 +652,150 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     Filename = "test-1.csv",
                     Name = "Test data 1",
+                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    Variables = new List<LabelValue>
+                    {
+                        new LabelValue("", "")
+                    }
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithOverTenFootnotesAndMultiline()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
                     Content = "",
                     GeographicLevels = new List<string>(),
                     TimePeriods = new TimePeriodLabels("2018", ""),
                     Variables = new List<LabelValue>
                     {
-                        new LabelValue("", "")
+                        new LabelValue("Accommodation type", "accommodation_type"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 1"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 2"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 3"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 4"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 5"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 6"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 7"),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 8"),
+                        new FootnoteViewModel(
+                            Guid.NewGuid(), string.Join("\n", "Footnote 9", "over some", "lines.")),
+                        new FootnoteViewModel(Guid.NewGuid(), "Footnote 10"),
+                        new FootnoteViewModel(
+                            Guid.NewGuid(), string.Join("\n", "Footnote 11", "over some", "other lines.")),
+                    }
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+
+            releaseService
+                .Setup(s => s.Get(release.Id))
+                .ReturnsAsync(release);
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            var writer = BuildDataGuidanceFileWriter(
+                releaseService: releaseService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            var path = GenerateFilePath();
+            var file = await writer.WriteFile(release.Id, path);
+
+            using var reader = new StreamReader(file);
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Equal(text, await reader.ReadToEndAsync());
+
+            Snapshot.Match(text);
+            MockUtils.VerifyAllMocks(releaseService, metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteFile_FileWithEmptyFootnote()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var subjects = new List<MetaGuidanceSubjectViewModel>
+            {
+                new MetaGuidanceSubjectViewModel
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    Variables = new List<LabelValue>
+                    {
+                        new LabelValue("Accommodation type", "accommodation_type"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new FootnoteViewModel(Guid.NewGuid(), "")
                     }
                 }
             };
