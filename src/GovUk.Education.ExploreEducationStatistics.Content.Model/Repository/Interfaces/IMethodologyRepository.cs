@@ -6,10 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 {
     public interface IMethodologyRepository
     {
-        Task<Methodology> CreateMethodologyForPublication(
-            Guid publicationId, 
-            DateTime createdDate, 
-            Guid createdByUserId);
+        Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId);
 
         Task<List<Methodology>> GetLatestByPublication(Guid publicationId);
 

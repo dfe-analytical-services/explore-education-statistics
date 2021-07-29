@@ -24,10 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _methodologyParentRepository = methodologyParentRepository;
         }
 
-        public async Task<Methodology> CreateMethodologyForPublication(
-            Guid publicationId, 
-            DateTime createdDate, 
-            Guid createdByUserId)
+        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId)
         {
             var publication = await _contentDbContext
                 .Publications
@@ -49,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                         }
                     }
                 },
-                Created = createdDate,
+                Created = DateTime.UtcNow,
                 CreatedById = createdByUserId
             })).Entity;
 

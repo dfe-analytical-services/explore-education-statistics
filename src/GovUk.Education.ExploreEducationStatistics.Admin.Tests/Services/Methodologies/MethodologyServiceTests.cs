@@ -28,7 +28,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static Moq.MockBehavior;
-using Range = Moq.Range;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -67,13 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 };
 
                 repository
-                    .Setup(s => s.CreateMethodologyForPublication(
-                        publication.Id, 
-                        It.IsInRange(
-                            DateTime.UtcNow.AddMilliseconds(-1500), 
-                            DateTime.UtcNow.AddMilliseconds(1500), 
-                            Range.Inclusive),
-                        UserId))
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
                 var result = await service.CreateMethodology(publication.Id);
