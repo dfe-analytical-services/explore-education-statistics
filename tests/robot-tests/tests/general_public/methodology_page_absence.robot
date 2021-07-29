@@ -4,7 +4,7 @@ Resource            ../libs/public-common.robot
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Failing
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod    NotAgainstDev
 
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
