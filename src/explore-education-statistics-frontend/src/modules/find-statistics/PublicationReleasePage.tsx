@@ -193,27 +193,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     View data and files
                   </a>
                 </li>
-                {release.publication.methodologies.map(methodology => (
-                  <li key={methodology.id}>
-                    <Link
-                      to="/methodology/[methodology]"
-                      as={`/methodology/${methodology.slug}`}
-                    >
-                      {methodology.title}
-                    </Link>
-                  </li>
-                ))}
-                {release.publication.externalMethodology && (
-                  <li>
-                    <Link
-                      to={release.publication.externalMethodology.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {release.publication.externalMethodology.title}
-                    </Link>
-                  </li>
-                )}
                 {release.hasMetaGuidance && (
                   <li>
                     <Link
@@ -298,14 +277,47 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 )}
               </ul>
             </nav>
-            {release.relatedInformation.length !== 0 && (
+            {release.publication.methodologies.length > 0 && (
               <>
-                <h2
+                <h3
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="methodologies"
+                >
+                  Methodologies
+                </h3>
+                <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                  {release.publication.methodologies.map(methodology => (
+                    <li key={methodology.id}>
+                      <Link
+                        to="/methodology/[methodology]"
+                        as={`/methodology/${methodology.slug}`}
+                      >
+                        {methodology.title}
+                      </Link>
+                    </li>
+                  ))}
+                  {release.publication.externalMethodology && (
+                    <li>
+                      <Link
+                        to={release.publication.externalMethodology.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {release.publication.externalMethodology.title}
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </>
+            )}
+            {release.relatedInformation.length > 0 && (
+              <>
+                <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
                   id="related-pages"
                 >
                   Related pages
-                </h2>
+                </h3>
                 <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
                     {release.relatedInformation &&
