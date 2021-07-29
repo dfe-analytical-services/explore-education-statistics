@@ -2,6 +2,7 @@
 Library             Collections
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser

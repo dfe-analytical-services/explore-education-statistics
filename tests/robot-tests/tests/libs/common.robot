@@ -171,9 +171,15 @@ user waits until page does not contain loading spinner
     user waits until page does not contain element    css:[class^="LoadingSpinner"]    60
 
 user sets focus to element
-    [Arguments]    ${selector}
-    wait until page contains element    ${selector}
-    set focus to element    ${selector}
+    [Arguments]    ${selector}    ${parent}=css:body
+    ${webelement}=    is webelement    ${selector}
+    IF    ${webelement} is ${TRUE}
+        ${element}=    set variable    ${selector}
+    ELSE
+        user waits until parent contains element    ${parent}    ${selector}
+        ${element}=    get child element    ${parent}    ${selector}
+    END
+    set focus to element    ${element}
 
 user waits until page contains
     [Arguments]    ${pageText}    ${wait}=${timeout}
@@ -385,17 +391,17 @@ user checks page does not contain element
     page should not contain element    ${element}
 
 user clicks element
-    [Arguments]    ${element}
-    wait until page contains element    ${element}
+    [Arguments]
+    ...    ${selector}
+    ...    ${parent}=css:body
+    ${element}=    find element    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
     click element    ${element}
 
 user clicks link
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    link:${text}
-    ${element}=    get child element    ${parent}    link:${text}
-    user clicks element    ${element}
+    user clicks element    link:${text}    ${parent}
 
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body
@@ -523,12 +529,14 @@ user clears element text
     sleep    0.1
 
 user presses keys
-    [Arguments]    ${keys}    ${selector}=${EMPTY}
+    [Arguments]
+    ...    ${keys}
+    ...    ${selector}=${EMPTY}
     IF    '${selector}' != '${EMPTY}'
-        user waits until page contains element    ${selector}
-        user waits until element is visible    ${selector}
-        user sets focus to element    ${selector}
-        user clicks element    ${selector}
+        ${element}=    find element    ${selector}
+        user waits until element is visible    ${element}
+        user sets focus to element    ${element}
+        user clicks element    ${element}
     END
     press keys    ${NONE}    ${keys}    # No selector as sometimes leads to text not being input
     sleep    0.1
@@ -718,3 +726,17 @@ check that variable is not empty
 user waits until table tool wizard step is available
     [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
+
+find element
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${parent}=css:body
+
+    ${is_webelement}=    is webelement    ${selector_or_webelement}
+    IF    ${is_webelement} is ${TRUE}
+        ${element}=    set variable    ${selector_or_webelement}
+    ELSE
+        user waits until parent contains element    ${parent}    ${selector_or_webelement}
+        ${element}=    get child element    ${parent}    ${selector_or_webelement}
+    END
+    [Return]    ${element}

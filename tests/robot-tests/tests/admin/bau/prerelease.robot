@@ -2,6 +2,7 @@
 Library             Collections
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/tables-common.robot
 
 Suite Setup         user signs in as bau1
@@ -50,8 +51,8 @@ Add metadata guidance
 
     user opens details dropdown    Variable names and descriptions
 
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
+    user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
+    user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
     user checks results table cell contains    1    1    admission_numbers    id:metaGuidance-dataFiles
     user checks results table cell contains    1    2    Admission Numbers    id:metaGuidance-dataFiles

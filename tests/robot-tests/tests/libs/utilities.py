@@ -60,7 +60,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
     try:
-        child_locator = _normalise_child_locator(parent_locator, child_locator)
+        child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
@@ -95,7 +95,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
                                                      timeout: int = None, error: str = None,
                                                      limit: int = None):
     try:
-        child_locator = _normalise_child_locator(parent_locator, child_locator)
+        child_locator = _normalise_child_locator(child_locator)
 
         def parent_does_not_contain_matching_element() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
@@ -132,12 +132,16 @@ def get_child_element(parent_locator: object, child_locator: str):
     try:
         children = get_child_elements(parent_locator, child_locator)
 
+        if len(children) == 0:
+            raise_assertion_error(f"Found no elements matching child locator {child_locator} under parent "
+                                  f"locator {parent_locator} in utilities.py#get_child_element()")
+
         if len(children) > 1:
             warning(f"Found {len(children)} child elements matching child locator {child_locator} "
                     f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
                     f"was expecting only one. Consider making the parent selector more specific. "
                     f"Returning the first element found.")
-
+            
         return children[0]
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
@@ -147,7 +151,7 @@ def get_child_element(parent_locator: object, child_locator: str):
 
 def get_child_elements(parent_locator: object, child_locator: str):
     try:
-        child_locator = _normalise_child_locator(parent_locator, child_locator)
+        child_locator = _normalise_child_locator(child_locator)
         parent_el = _get_parent_webelement_from_locator(parent_locator)
         return element_finder.find_elements(child_locator, parent=parent_el)
     except Exception as err:
@@ -322,19 +326,17 @@ def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
     sl.go_to(admin_url)
 
 
-def _normalise_child_locator(parent_locator: object, child_locator: str) -> str:
-    if isinstance(parent_locator, str):
-        return child_locator
-    elif isinstance(parent_locator, WebElement):
-        # the below substitution is necessary if the parent is a Selenium WebElement in order to
-        # correctly find the parent's descendants.  Without the preceding dot, the double forward
-        # slash breaks out of the parent container and returns the xpath query to the root of the
-        # DOM, leading to false positives or incorrectly found DOM elements.  The below
-        # substitution covers both selectors beginning with "xpath://" and "//", as the double
-        # forward slashes without the "xpath:" prefix are inferred as being xpath expressions.
-        return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
-    else:
-        raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
+def is_webelement(variable: object) -> bool:
+    return isinstance(variable, WebElement)
+
+
+def _normalise_child_locator(child_locator: str) -> str:
+    # the below substitution is necessary in order to correctly find the parent's descendants.  Without the 
+    # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query 
+    # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below 
+    # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward 
+    # slashes without the "xpath:" prefix are inferred as being xpath expressions.
+    return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
 
 
 def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = '') -> WebElement:

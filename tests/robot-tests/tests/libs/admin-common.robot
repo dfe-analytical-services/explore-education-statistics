@@ -50,9 +50,9 @@ user selects theme and topic from admin dashboard
     ${correct_theme_and_topic_selected}=    user is on admin dashboard with theme and topic selected    %{ADMIN_URL}
     ...    ${theme}    ${topic}
     IF    ${correct_theme_and_topic_selected} is ${FALSE}
-        user selects from list by label    id:publicationsReleases-themeTopic-themeId    ${theme}
+        user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
         user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
-        user selects from list by label    id:publicationsReleases-themeTopic-topicId    ${topic}
+        user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
         user waits until h2 is visible    ${theme}    60
         user waits until h3 is visible    ${topic}    60
     END
@@ -234,7 +234,8 @@ user adds basic release content
     user waits until element contains    id:releaseSummary    This section is empty    60
     user clicks button    Edit block    id:releaseSummary
     user presses keys    Test summary text for ${publication}
-    user clicks element    css:body    # To ensure Save button gets clicked
+    # To ensure Save button gets clicked
+    user sets focus to element    xpath://button[.="Save"]    id:releaseSummary
     user clicks button    Save    id:releaseSummary
     user waits until element contains    id:releaseSummary    Test summary text for ${publication}    60
 
@@ -321,77 +322,6 @@ user clicks footnote subject checkbox
     wait until element is enabled    ${checkbox}
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
-
-user opens nth editable accordion section
-    [Arguments]    ${section_num}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    ${section}=    get child element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    ${header_button}=    get child element    ${section}    css:h2 > button[aria-expanded]
-    ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
-    IF    '${is_expanded}' != 'true'
-        user clicks element    ${header_button}
-    END
-    user checks element attribute value should be    ${header_button}    aria-expanded    true
-
-user changes accordion section title
-    [Arguments]    ${section_num}    ${title}    ${parent}=id:releaseMainContent
-    user opens nth editable accordion section    ${section_num}    ${parent}
-    ${section}=    get child element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    user clicks button    Edit section title    ${section}
-    user waits until parent contains element    ${section}    css:input[name="heading"]
-    ${input}=    get child element    ${section}    css:input[name="heading"]
-    user enters text into element    ${input}    ${title}
-    user clicks button    Save section title    ${section}
-    user waits until parent contains element    ${section}    xpath:.//h2/button[@aria-expanded and text()="${title}"]
-
-user checks accordion section contains x blocks
-    [Arguments]    ${section_name}    ${num_blocks}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${blocks}=    get child elements    ${section}    css:[data-testid="editableSectionBlock"]
-    length should be    ${blocks}    ${num_blocks}
-
-user adds text block to editable accordion section
-    [Arguments]    ${section_name}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    user clicks button    Add text block    ${section}
-    user waits until element contains    ${section}    This section is empty
-
-user adds data block to editable accordion section
-    [Arguments]    ${section_name}    ${block_name}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    user waits for page to finish loading
-    user clicks button    Add data block    ${section}
-    ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
-    user chooses select option    ${block_list}    Dates data block name
-    user waits until parent contains element    ${section}    css:table
-    user clicks button    Embed    ${section}
-
-user adds content to accordion section text block
-    [Arguments]    ${section_name}    ${block_num}    ${content}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user clicks button    Edit block    ${block}
-    user presses keys    CTRL+a
-    user presses keys    BACKSPACE
-    user presses keys    ${content}
-    user clicks button    Save    ${block}
-    user waits until element contains    ${block}    ${content}
-
-user checks accordion section text block contains
-    [Arguments]    ${section_name}    ${block_num}    ${content}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user waits until element contains    ${block}    ${content}
-
-user deletes editable accordion section content block
-    [Arguments]    ${section_name}    ${block_num}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user clicks button    Remove block    ${block}
-    user clicks button    Confirm
 
 user gets meta guidance data file content editor
     [Arguments]    ${accordion_heading}
@@ -513,12 +443,6 @@ user approves release for scheduled release
     user clicks button    Update status
     user waits until h1 is visible    Confirm publish date
     user clicks button    Confirm
-
-user creates new content section
-    [Arguments]    ${SECTION_NUMBER}    ${CONTENT_SECTION_NAME}
-    user waits until button is enabled    Add new section
-    user clicks button    Add new section
-    user changes accordion section title    ${SECTION_NUMBER}    ${CONTENT_SECTION_NAME}
 
 user verifies release summary
     [Arguments]    ${PUBLICATION_NAME}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}

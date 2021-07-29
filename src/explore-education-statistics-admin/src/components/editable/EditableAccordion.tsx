@@ -134,7 +134,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
           onClick={onAddSection}
           className={styles.addSectionButton}
           disabled={isReordering}
-          testId={`${sectionName ? `${sectionName}-` : ''}addNewSectionButton`}
+          testId={`${id ? `${id}-` : ''}addNewSectionButton`}
         >
           Add new section
         </Button>
