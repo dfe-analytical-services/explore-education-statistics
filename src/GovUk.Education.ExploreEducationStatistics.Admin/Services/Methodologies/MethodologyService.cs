@@ -68,7 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
-                .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(publicationId))
+                .OnSuccess(() => _methodologyRepository.CreateMethodologyForPublication(
+                    publicationId, 
+                    DateTime.UtcNow, 
+                    _userService.GetUserId())
+                )
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 

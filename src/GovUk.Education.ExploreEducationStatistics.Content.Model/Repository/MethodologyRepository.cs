@@ -16,18 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IMethodologyParentRepository _methodologyParentRepository;
-        private readonly IUserService _userService;
 
         public MethodologyRepository(ContentDbContext contentDbContext,
-            IMethodologyParentRepository methodologyParentRepository, 
-            IUserService userService)
+            IMethodologyParentRepository methodologyParentRepository)
         {
             _contentDbContext = contentDbContext;
             _methodologyParentRepository = methodologyParentRepository;
-            _userService = userService;
         }
 
-        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId)
+        public async Task<Methodology> CreateMethodologyForPublication(
+            Guid publicationId, 
+            DateTime createdDate, 
+            Guid createdByUserId)
         {
             var publication = await _contentDbContext
                 .Publications
@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                         }
                     }
                 },
-                Created = DateTime.UtcNow,
-                CreatedById = _userService.GetUserId()
+                Created = createdDate,
+                CreatedById = createdByUserId
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();
