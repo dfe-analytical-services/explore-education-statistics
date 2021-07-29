@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IFastTrackService _fastTrackService;
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
-        private readonly IDownloadService _downloadService;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
@@ -29,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public ContentService(IBlobStorageService publicBlobStorageService,
             ICacheService cacheService,
             IFastTrackService fastTrackService,
-            IDownloadService downloadService,
             IReleaseService releaseService,
             IPublicationService publicationService)
         {
@@ -38,7 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _fastTrackService = fastTrackService;
             _releaseService = releaseService;
             _publicationService = publicationService;
-            _downloadService = downloadService;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -88,7 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await DeleteAllContent();
-            await CacheTrees(context);
 
             var publications = _publicationService.GetPublicationsWithPublishedReleases();
 
@@ -107,8 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
-            await CacheTrees(context, releaseIds);
-
             var releases = await _releaseService.List(releaseIds);
             var publications = releases.Select(release => release.Publication).ToList();
 
@@ -128,7 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var publication = await _publicationService.Get(publicationId);
 
-            await CacheTrees(context);
             await CachePublication(publication.Id, context);
             await _publicationService.SetPublishedDate(publication.Id, context.Published);
         }
@@ -137,8 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             // Invalidate the 'All Methodologies' cache item in case any methodologies are affected by the changes
             await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
-
-            await CacheTrees(context);
         }
 
         private async Task DeleteAllContent()
@@ -147,22 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteAllContentAsyncExcludingStaging();
         }
 
-        private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
-        {
-            // This assumes the files have been copied first
-            var tree = await _downloadService.GetTree(includedReleaseIds);
-            await Upload(PublicContentDownloadTreePath, context, tree, _jsonSerializerSettingsCamelCase);
-        }
-
         private async Task CacheFastTracks(Release release, PublishContext context)
         {
             await _fastTrackService.CreateAllByRelease(release.Id, context);
-        }
-
-        private async Task CachePublicationTree(PublishContext context, params Guid[] includedReleaseIds)
-        {
-            var tree = _publicationService.GetTree(includedReleaseIds);
-            await Upload(PublicContentPublicationsTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
@@ -181,12 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var viewModel = await _releaseService.GetReleaseViewModel(release.Id, context);
             await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
-        }
-
-        private async Task CacheTrees(PublishContext context, params Guid[] includedReleaseIds)
-        {
-            await CacheDownloadTree(context, includedReleaseIds);
-            await CachePublicationTree(context, includedReleaseIds);
         }
 
         private async Task DeleteAllContentAsyncExcludingStaging()

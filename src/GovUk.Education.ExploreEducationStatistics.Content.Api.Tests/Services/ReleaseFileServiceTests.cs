@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -430,14 +433,537 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
+        [Fact]
+        public async Task ListDownloadFiles()
+        {
+            var release = new Release()
+            {
+                ReleaseName = "2020",
+                Slug = "2020",
+                Publication = new Publication
+                {
+                    Slug = "test-publication"
+                }
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Name = "Test data 1",
+                Release = release,
+                Summary = "Test data 1 summary",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test-data-1.csv",
+                    Created = DateTime.Now,
+                    CreatedBy = new User
+                    {
+                        Email = "user1@test.com"
+                    }
+                }
+            };
+            var releaseFile2 = new ReleaseFile
+            {
+                Name = "Test ancillary 1",
+                Release = release,
+                Summary = "Test ancillary 1 summary",
+                File = new File
+                {
+                    Type = FileType.Ancillary,
+                    Filename = "test-ancillary-1.pdf",
+                    Created = DateTime.Now,
+                    CreatedBy = new User
+                    {
+                        Email = "user2@test.com"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+                var dataFilePath = releaseFile1.File.PublicPath(release.Id);
+                var ancillaryFilePath = releaseFile2.File.PublicPath(release.Id);
+                var allFilesZipPath = release.AllFilesZipPath();
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService
+                    .Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: dataFilePath,
+                            size: "9.9 MB",
+                            contentType: "text/csv",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, ancillaryFilePath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, ancillaryFilePath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: ancillaryFilePath,
+                            size: "100 KB",
+                            contentType: "application/pdf",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: allFilesZipPath,
+                            size: "5 MB",
+                            contentType: "application/zip",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object
+                );
+
+                var result = await service.ListDownloadFiles(release);
+
+                Assert.Equal(3, result.Count);
+                Assert.Equal("All files", result[0].Name);
+                Assert.Equal("test-publication_2020.zip", result[0].FileName);
+                Assert.Equal("5 MB", result[0].Size);
+                Assert.Equal(FileType.Ancillary, result[0].Type);
+                Assert.Null(result[0].Created);
+                Assert.Null(result[0].UserName);
+
+                Assert.Equal("Test ancillary 1", result[1].Name);
+                Assert.Equal("test-ancillary-1.pdf", result[1].FileName);
+                Assert.Equal("Test ancillary 1 summary", result[1].Summary);
+                Assert.Equal("100 KB", result[1].Size);
+                Assert.Equal(FileType.Ancillary, result[1].Type);
+                Assert.Null(result[1].Created);
+                Assert.Null(result[1].UserName);
+
+                Assert.Equal("Test data 1", result[2].Name);
+                Assert.Equal("test-data-1.csv", result[2].FileName);
+                Assert.Equal("Test data 1 summary", result[2].Summary);
+                Assert.Equal("9.9 MB", result[2].Size);
+                Assert.Equal(FileType.Data, result[2].Type);
+                Assert.Null(result[2].Created);
+                Assert.Null(result[2].UserName);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+            }
+        }
+
+        [Fact]
+        public async Task ListDownloadFiles_FiltersOutInvalidFileTypes()
+        {
+            var release = new Release()
+            {
+                ReleaseName = "2020",
+                Slug = "2020",
+                Publication = new Publication
+                {
+                    Slug = "test-publication"
+                }
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Name = "Test data 1",
+                Release = release,
+                Summary = "Test data 1 summary",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test-data-1.csv",
+                }
+            };
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Type = FileType.Chart,
+                    Filename = "test-chart-1.jpg",
+                }
+            };
+            var releaseFile3 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Type = FileType.Image,
+                    Filename = "test-image-1.jpg",
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2, releaseFile3);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+                var dataFilePath = releaseFile1.File.PublicPath(release.Id);
+                var allFilesZipPath = release.AllFilesZipPath();
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService
+                    .Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: dataFilePath,
+                            size: "10 MB",
+                            contentType: "text/csv",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: allFilesZipPath,
+                            size: "5 MB",
+                            contentType: "application/zip",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object
+                );
+
+                var result = await service.ListDownloadFiles(release);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal("All files", result[0].Name);
+                Assert.Equal("test-publication_2020.zip", result[0].FileName);
+                Assert.Equal("5 MB", result[0].Size);
+                Assert.Equal(FileType.Ancillary, result[0].Type);
+                Assert.Null(result[0].Created);
+                Assert.Null(result[0].UserName);
+
+                Assert.Equal("Test data 1", result[1].Name);
+                Assert.Equal("test-data-1.csv", result[1].FileName);
+                Assert.Equal("Test data 1 summary", result[1].Summary);
+                Assert.Equal("10 MB", result[1].Size);
+                Assert.Equal(FileType.Data, result[1].Type);
+                Assert.Null(result[1].Created);
+                Assert.Null(result[1].UserName);
+            }
+        }
+
+        [Fact]
+        public async Task ListDownloadFiles_MissingFileBlob()
+        {
+            var release = new Release()
+            {
+                ReleaseName = "2020",
+                Slug = "2020",
+                Publication = new Publication
+                {
+                    Slug = "test-publication"
+                }
+            };
+            var releaseFile1 = new ReleaseFile
+            {
+                Name = "Test data 1",
+                Release = release,
+                Summary = "Test data 1 summary",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test-data-1.csv",
+                    Created = DateTime.Now,
+                    CreatedBy = new User
+                    {
+                        Email = "user1@test.com"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+                var dataFilePath = releaseFile1.File.PublicPath(release.Id);
+                var allFilesZipPath = release.AllFilesZipPath();
+
+                // File blob is missing
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(false);
+
+                // All files zip can still be fetched as the
+                // missing file may be in there instead.
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: allFilesZipPath,
+                            size: "5 MB",
+                            contentType: "application/zip",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object
+                );
+
+                var result = await service.ListDownloadFiles(release);
+
+                Assert.Equal(2, result.Count);
+
+                Assert.Equal("All files", result[0].Name);
+                Assert.Equal("test-publication_2020.zip", result[0].FileName);
+                Assert.Equal("5 MB", result[0].Size);
+                Assert.Equal(FileType.Ancillary, result[0].Type);
+                Assert.Null(result[0].Created);
+                Assert.Null(result[0].UserName);
+
+                Assert.Equal("Test data 1", result[1].Name);
+                Assert.Equal("test-data-1.csv", result[1].FileName);
+                Assert.Equal("Test data 1 summary", result[1].Summary);
+                Assert.Equal("0.00 B", result[1].Size);
+                Assert.Equal(FileType.Data, result[1].Type);
+                Assert.Null(result[0].Created);
+                Assert.Null(result[0].UserName);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+            }
+        }
+
+        [Fact]
+        public async Task ListDownloadFiles_MissingAllFilesBlob()
+        {
+            var release = new Release()
+            {
+                ReleaseName = "2020",
+                Slug = "2020",
+                Publication = new Publication
+                {
+                    Slug = "test-publication"
+                }
+            };
+            var releaseFile1 = new ReleaseFile
+            {
+                Name = "Test data 1",
+                Release = release,
+                Summary = "Test data 1 summary",
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Filename = "test-data-1.csv",
+                    Created = DateTime.Now,
+                    CreatedBy = new User
+                    {
+                        Email = "user1@test.com"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+                var dataFilePath = releaseFile1.File.PublicPath(release.Id);
+                var allFilesZipPath = release.AllFilesZipPath();
+
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(true);
+
+                blobStorageService
+                    .Setup(
+                        mock =>
+                            mock.GetBlob(PublicReleaseFiles, dataFilePath)
+                    )
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: dataFilePath,
+                            size: "9.9 MB",
+                            contentType: "text/csv",
+                            contentLength: 0L,
+                            meta: new Dictionary<string, string>()
+                        )
+                    );
+
+                // All files blob is missing
+                blobStorageService.Setup(
+                        mock =>
+                            mock.CheckBlobExists(PublicReleaseFiles, allFilesZipPath)
+                    )
+                    .ReturnsAsync(false);
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object
+                );
+
+                var result = await service.ListDownloadFiles(release);
+
+                Assert.Equal(2, result.Count);
+
+                Assert.Equal("All files", result[0].Name);
+                Assert.Equal("test-publication_2020.zip", result[0].FileName);
+                Assert.Equal("0.00 B", result[0].Size);
+                Assert.Equal(FileType.Ancillary, result[0].Type);
+                Assert.Null(result[0].Created);
+                Assert.Null(result[0].UserName);
+
+                Assert.Equal("Test data 1", result[1].Name);
+                Assert.Equal("test-data-1.csv", result[1].FileName);
+                Assert.Equal("Test data 1 summary", result[1].Summary);
+                Assert.Equal("9.9 MB", result[1].Size);
+                Assert.Equal(FileType.Data, result[1].Type);
+                Assert.Null(result[1].Created);
+                Assert.Null(result[1].UserName);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+            }
+        }
+
+        [Fact]
+        public async Task ListDownloadFiles_NoFiles()
+        {
+            var release = new Release()
+            {
+                ReleaseName = "2020",
+                Slug = "2020",
+                Publication = new Publication
+                {
+                    Slug = "test-publication"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object
+                );
+
+                var result = await service.ListDownloadFiles(release);
+
+                Assert.Empty(result);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+            }
+        }
+
         private static ReleaseFileService SetupReleaseFileService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IBlobStorageService? blobStorageService = null)
         {
-            return new ReleaseFileService(
+            return new (
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? new Mock<IBlobStorageService>().Object
+                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                Mock.Of<ILogger<ReleaseFileService>>()
             );
         }
     }
