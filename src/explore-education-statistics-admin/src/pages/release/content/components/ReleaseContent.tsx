@@ -270,12 +270,12 @@ const ReleaseContent = () => {
             </dl>
             {allMethodologies.length > 0 && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
                   id="methodologies"
                 >
                   Methodologies
-                </h2>
+                </h3>
                 <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>

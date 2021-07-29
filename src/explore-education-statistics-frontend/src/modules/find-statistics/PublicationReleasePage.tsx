@@ -279,12 +279,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </nav>
             {release.publication.methodologies.length > 0 && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
                   id="methodologies"
                 >
                   Methodologies
-                </h2>
+                </h3>
                 <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                   {release.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
@@ -312,12 +312,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             )}
             {release.relatedInformation.length > 0 && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
                   id="related-pages"
                 >
                   Related pages
-                </h2>
+                </h3>
                 <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
                     {release.relatedInformation &&
