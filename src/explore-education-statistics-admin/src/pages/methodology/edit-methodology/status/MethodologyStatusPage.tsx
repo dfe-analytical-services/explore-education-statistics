@@ -8,7 +8,6 @@ import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
@@ -52,7 +51,7 @@ const MethodologyStatusPage = ({
     };
   }, [methodologyId]);
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
+  const handleSubmit = async (values: FormValues) => {
     if (!model) {
       return;
     }
@@ -76,7 +75,7 @@ const MethodologyStatusPage = ({
     });
 
     toggleForm.off();
-  });
+  };
 
   const isEditable = model?.canApprove || model?.canMarkAsDraft;
   const isPublished = model?.summary.published;

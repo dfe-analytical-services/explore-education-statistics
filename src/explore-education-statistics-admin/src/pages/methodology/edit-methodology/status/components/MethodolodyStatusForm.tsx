@@ -11,7 +11,8 @@ import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import Yup from '@common/validation/yup';
-import { Formik, FormikHelpers } from 'formik';
+import useFormSubmit from '@common/hooks/useFormSubmit';
+import { Formik } from 'formik';
 import React from 'react';
 import { StringSchema } from 'yup';
 
@@ -40,7 +41,7 @@ interface Props {
   showWithRelease?: boolean; // EES-2163 - flag for showing publishing strategy sections for testing, remove when BE done.
   unPublishedReleases?: Release[];
   onCancel: () => void;
-  onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
+  onSubmit: (values: FormValues) => void;
 }
 
 const MethodologyStatusForm = ({
@@ -61,7 +62,7 @@ const MethodologyStatusForm = ({
           methodologySummary.publishingStrategy ?? 'Immediately',
         withReleaseId: methodologySummary.withReleaseId,
       }}
-      onSubmit={onSubmit}
+      onSubmit={useFormSubmit<FormValues>(onSubmit)}
       validationSchema={Yup.object<FormValues>({
         status: Yup.mixed().required('Choose a status'),
         latestInternalReleaseNote: Yup.string().when('status', {
