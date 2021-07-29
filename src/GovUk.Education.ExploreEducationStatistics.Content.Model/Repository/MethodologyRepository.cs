@@ -114,11 +114,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             
             // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
             // that are owned by this Publication
-            var ownedMethodologyParents = _contentDbContext
+            var ownedMethodologyParents = await _contentDbContext
                 .PublicationMethodologies
                 .Include(m => m.MethodologyParent)
                 .Where(m => m.PublicationId == publicationId && m.Owner)
-                .Select(m => m.MethodologyParent);
+                .Select(m => m.MethodologyParent)
+                .ToListAsync();
 
             await ownedMethodologyParents.ForEachAsync(async methodologyParent =>
             {

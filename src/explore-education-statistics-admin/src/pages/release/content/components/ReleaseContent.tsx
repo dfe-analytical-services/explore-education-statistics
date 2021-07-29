@@ -190,15 +190,6 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              {allMethodologies.map(methodology => (
-                <li key={methodology.key}>
-                  {editingMode === 'edit' ? (
-                    <a>{methodology.title}</a>
-                  ) : (
-                    <Link to={methodology.url}>{methodology.title}</Link>
-                  )}
-                </li>
-              ))}
               {release.hasMetaGuidance && (
                 <li>
                   <Link
@@ -277,6 +268,27 @@ const ReleaseContent = () => {
                 )}
               </dd>
             </dl>
+            {allMethodologies.length > 0 && (
+              <>
+                <h2
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="methodologies"
+                >
+                  Methodologies
+                </h2>
+                <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                  {allMethodologies.map(methodology => (
+                    <li key={methodology.key}>
+                      {editingMode === 'edit' ? (
+                        <a>{methodology.title}</a>
+                      ) : (
+                        <Link to={methodology.url}>{methodology.title}</Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
             <RelatedPagesSection release={release} />
           </RelatedAside>
         </div>
