@@ -2,7 +2,6 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -11,6 +10,7 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
+import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
@@ -26,6 +26,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       title={data.title}
       description="Find out how and why we collect, process and publish these statistics"
       breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
+      caption="Methodology"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
