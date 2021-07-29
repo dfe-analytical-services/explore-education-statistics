@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IMethodologyParentRepository _methodologyParentRepository;
+        private readonly IUserService _userService;
 
         public MethodologyRepository(ContentDbContext contentDbContext,
-            IMethodologyParentRepository methodologyParentRepository)
+            IMethodologyParentRepository methodologyParentRepository, 
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _methodologyParentRepository = methodologyParentRepository;
+            _userService = userService;
         }
 
         public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId)
@@ -44,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                             PublicationId = publicationId
                         }
                     }
-                }
+                },
+                Created = DateTime.UtcNow,
+                CreatedById = _userService.GetUserId()
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();

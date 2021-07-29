@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 {
     public class MethodologyRepositoryTests
     {
+        private static readonly Guid UserId = Guid.NewGuid();
+        
         [Fact]
         public async Task CreateMethodologyForPublication()
         {
@@ -61,6 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(savedPublication, methodology.MethodologyParent.Publications[0].Publication);
                 Assert.Equal(savedPublication.Title, methodology.Title);
                 Assert.Equal(savedPublication.Slug, methodology.Slug);
+                Assert.NotNull(methodology.Created);
+                Assert.InRange(DateTime.UtcNow.Subtract((DateTime) methodology.Created).Milliseconds, 0, 1500);
+                Assert.Equal(UserId, methodology.CreatedById);
             }
         }
 
@@ -1496,7 +1501,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             return new MethodologyRepository(
                 contentDbContext,
-                methodologyParentRepository ?? new Mock<IMethodologyParentRepository>().Object);
+                methodologyParentRepository ?? new Mock<IMethodologyParentRepository>().Object,
+                MockUtils.AlwaysTrueUserService(UserId).Object);
         }
     }
 }
