@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Slug = "the-publication-slug"
             };
 
+            var userId = Guid.NewGuid();
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -39,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyRepository(contentDbContext);
-                var methodology = await service.CreateMethodologyForPublication(publication.Id);
+                var methodology = await service.CreateMethodologyForPublication(publication.Id, userId);
                 await contentDbContext.SaveChangesAsync();
                 methodologyId = methodology.Id;
             }
@@ -61,6 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(savedPublication, methodology.MethodologyParent.Publications[0].Publication);
                 Assert.Equal(savedPublication.Title, methodology.Title);
                 Assert.Equal(savedPublication.Slug, methodology.Slug);
+                Assert.NotNull(methodology.Created);
+                Assert.InRange(DateTime.UtcNow.Subtract((DateTime) methodology.Created).Milliseconds, 0, 1500);
+                Assert.Equal(userId, methodology.CreatedById);
             }
         }
 

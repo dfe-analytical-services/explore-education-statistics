@@ -33,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
+        private static readonly Guid UserId = Guid.NewGuid();
+        
         [Fact]
         public async Task CreateMethodology()
         {
@@ -64,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 };
 
                 repository
-                    .Setup(s => s.CreateMethodologyForPublication(publication.Id))
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
                 var result = await service.CreateMethodology(publication.Id);
@@ -1188,7 +1190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object,
-                userService ?? AlwaysTrueUserService().Object);
+                userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }
 }
