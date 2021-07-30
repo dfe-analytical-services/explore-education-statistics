@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
@@ -71,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 context.SaveChanges();
 
-                var repository = new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object);
+                var repository = new ReleaseRepository(context);
 
                 var result = repository.GetLatestPublishedRelease(publicationAId);
                 Assert.Equal(publicationARelease1, result);
@@ -87,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                var repository = new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object);
+                var repository = new ReleaseRepository(context);
 
                 var result = repository.GetLatestPublishedRelease(Guid.NewGuid());
                 Assert.Null(result);

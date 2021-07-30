@@ -141,41 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Mock<IConfiguration> ConfigurationMock()
         {
-            var notifyInviteTemplateSection = new Mock<IConfigurationSection>();
-            var publicationRoleTemplateSection = new Mock<IConfigurationSection>();
-            var releaseRoleTemplateSection = new Mock<IConfigurationSection>();
-            var adminUriSection = new Mock<IConfigurationSection>();
-            var configuration = new Mock<IConfiguration>();
-
-            notifyInviteTemplateSection.Setup(m => m.Value)
-                .Returns("invite-template-id");
-
-            publicationRoleTemplateSection.Setup(m => m.Value)
-                .Returns("publication-role-template-id");
-
-            releaseRoleTemplateSection.Setup(m => m.Value)
-                .Returns("release-role-template-id");
-
-            adminUriSection.Setup(m => m.Value)
-                .Returns("admin-uri");
-
-            configuration
-                .Setup(m => m.GetSection("NotifyInviteTemplateId"))
-                .Returns(notifyInviteTemplateSection.Object);
-
-            configuration
-                .Setup(m => m.GetSection("NotifyPublicationRoleTemplateId"))
-                .Returns(publicationRoleTemplateSection.Object);
-
-            configuration
-                .Setup(m => m.GetSection("NotifyReleaseRoleTemplateId"))
-                .Returns(releaseRoleTemplateSection.Object);
-
-            configuration
-                .Setup(m => m.GetSection("AdminUri"))
-                .Returns(adminUriSection.Object);
-
-            return configuration;
+            return CreateMockConfiguration(
+                new Tuple<string, string>("NotifyInviteTemplateId", "invite-template-id"),
+                new Tuple<string, string>("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
+                new Tuple<string, string>("NotifyReleaseRoleTemplateId", "release-role-template-id"),
+                new Tuple<string, string>("AdminUri", "admin-uri"));
         }
 
         private static EmailTemplateService SetupEmailTemplateService(

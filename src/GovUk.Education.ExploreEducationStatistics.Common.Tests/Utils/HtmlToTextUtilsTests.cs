@@ -216,6 +216,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
+        public async Task HtmlToText_OrderedList_OverTenItemsWithMultiline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <ol>
+                    <li>List item 1</li>
+                    <li>List item 2</li>
+                    <li>List item 3</li>
+                    <li>List item 4</li>
+                    <li>List item 5</li>
+                    <li>List item 6</li>
+                    <li>List item 7</li>
+                    <li>List item 8</li>
+                    <li>
+                        <p>List item 9</p>
+                        <p>Over multiple lines</p>
+                    </li>
+                    <li>List item 10</li>
+                    <li>
+                        <p>List item 11</p>
+                        <p>Over multiple lines</p>
+                    </li>
+                </ol>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
         public async Task HtmlToText_UnorderedList_WithNestedText()
         {
             var text = await HtmlToTextUtils.HtmlToText(
@@ -271,6 +299,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                                 </ul>
                             </li>
                         </ul>
+                    </li>
+                </ul>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_UnorderedList_OverTenItemsWithMultiline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <ul>
+                    <li>List item 1</li>
+                    <li>List item 2</li>
+                    <li>List item 3</li>
+                    <li>List item 4</li>
+                    <li>List item 5</li>
+                    <li>List item 6</li>
+                    <li>List item 7</li>
+                    <li>List item 8</li>
+                    <li>
+                        <p>List item 9</p>
+                        <p>Over multiple lines</p>
+                    </li>
+                    <li>List item 10</li>
+                    <li>
+                        <p>List item 11</p>
+                        <p>Over multiple lines</p>
                     </li>
                 </ul>");
 

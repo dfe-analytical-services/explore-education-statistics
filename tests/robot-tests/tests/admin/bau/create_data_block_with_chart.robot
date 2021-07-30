@@ -68,8 +68,8 @@ Select time period
     lists should be equal    ${timePeriodStartList}    ${expectedList}
     lists should be equal    ${timePeriodEndList}    ${expectedList}
 
-    user selects from list by label    id:timePeriodForm-start    2005
-    user selects from list by label    id:timePeriodForm-end    2020
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user checks previous table tool step contains    3    Time period    2005 to 2020
@@ -184,7 +184,7 @@ Embed data block into release content
 
     user creates new content section    1    ${CONTENT_SECTION_NAME}
     user clicks button    Add data block
-    user selects from list by label    css:select[name="selectedDataBlock"]    ${DATABLOCK_NAME}
+    user chooses select option    css:select[name="selectedDataBlock"]    ${DATABLOCK_NAME}
     user waits until element is visible    css:table
     user clicks button    Embed
     # Wait for table to update
@@ -294,7 +294,7 @@ Configure basic line chart
 
     user clicks link    Data sets
     user waits until h3 is visible    Data sets
-    user selects from list by label    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
 Validate basic line chart preview
@@ -614,7 +614,7 @@ Validate basic geographic chart preview
     user checks map chart height    ${preview}    700
     user checks map chart width    ${preview}    600
 
-    user selects from list by label    ${preview}-map-selectedLocation    Nailsea Youngwood
+    user chooses select option    ${preview}-map-selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    ${preview}
     user checks chart tooltip label contains    ${preview}    Nailsea Youngwood
@@ -648,7 +648,7 @@ Save and validate geographic chart embeds correctly
     user checks map chart height    ${datablock}    700
     user checks map chart width    ${datablock}    600
 
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Nailsea Youngwood
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Nailsea Youngwood
 
     user mouses over selected map feature    ${datablock}
     user checks chart tooltip label contains    ${datablock}    Nailsea Youngwood

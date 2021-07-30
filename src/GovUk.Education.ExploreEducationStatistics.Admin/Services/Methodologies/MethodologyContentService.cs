@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
                 .OnSuccess(CheckCanViewMethodology)
+                .OnSuccess(HydrateMethodologyForManageMethodologyContentViewModel)
                 .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
 
@@ -66,8 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(methodology =>
                 {
                     var sections =
-                        (methodology.Annexes ?? new List<ContentSection>())
-                        .Concat(methodology.Content ?? new List<ContentSection>());
+                        (methodology.Annexes)
+                        .Concat(methodology.Content);
 
                     return sections
                         .SelectMany(section => section.Content)
@@ -82,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
                 .OnSuccess(CheckCanViewMethodology)
-                .OnSuccess(EnsureMethodologyContentAndAnnexListsNotNull)
                 .OnSuccess(methodology =>
                 {
                     var content = ContentListSelector[contentType](methodology);
@@ -106,7 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
                 .OnSuccess(CheckCanUpdateMethodology)
-                .OnSuccess(EnsureMethodologyContentAndAnnexListsNotNull)
                 .OnSuccess(methodology => FindContentList(methodology, newSectionOrder.Keys.ToList()))
                 .OnSuccess(async tuple =>
                 {
@@ -132,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
                 .OnSuccess(CheckCanUpdateMethodology)
-                .OnSuccess(EnsureMethodologyContentAndAnnexListsNotNull)
                 .OnSuccess(async methodology =>
                 {
                     var content = ContentListSelector[contentType](methodology);
@@ -385,7 +383,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(EnsureMethodologyContentAndAnnexListsNotNull)
                 .OnSuccess(methodology => FindContentList(methodology, contentSectionId))
                 .OnSuccess(tuple =>
                 {
@@ -442,21 +439,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => tuple);
         }
 
-        private Either<ActionResult, Methodology> EnsureMethodologyContentAndAnnexListsNotNull(Methodology methodology)
-        {
-            if (methodology.Content == null)
-            {
-                methodology.Content = new List<ContentSection>();
-            }
-
-            if (methodology.Annexes == null)
-            {
-                methodology.Annexes = new List<ContentSection>();
-            }
-
-            return methodology;
-        }
-
         private Either<ActionResult, Tuple<Methodology, ContentSection>> EnsureContentBlockListNotNull(
             Tuple<Methodology, ContentSection> tuple)
         {
@@ -466,6 +448,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return tuple;
+        }
+
+        private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForManageMethodologyContentViewModel(
+            Methodology methodology)
+        {
+            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
+            await _context
+                .Entry(methodology)
+                .Reference(m => m.MethodologyParent)
+                .LoadAsync();
+
+            return methodology;
         }
 
         private Either<ActionResult, Tuple<Methodology, List<ContentSection>>> FindContentList(Methodology methodology,

@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology1Version1 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 1 Version 1",
+                AlternativeTitle = "Methodology 1 Version 1",
                 Version = 0,
                 Status = Draft,
             };
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology2Version1 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 2 Version 1",
+                AlternativeTitle = "Methodology 2 Version 1",
                 Version = 0,
                 Status = Approved,
             };
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodology2Version2 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                Title = "Methodology 2 Version 2",
+                AlternativeTitle = "Methodology 2 Version 2",
                 Version = 1,
                 Status = Approved,
                 PreviousVersionId = methodology2Version1.Id

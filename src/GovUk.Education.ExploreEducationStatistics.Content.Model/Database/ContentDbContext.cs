@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(pm => pm.MethodologyParent)
                 .WithMany(m => m.Publications)
                 .HasForeignKey(pm => pm.MethodologyParentId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)

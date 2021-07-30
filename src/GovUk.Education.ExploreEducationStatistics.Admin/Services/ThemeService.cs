@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
@@ -27,8 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly ITopicService _topicService;
         private readonly IPublishingService _publishingService;
+        private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
+            IConfiguration configuration,
             ContentDbContext context,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -42,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _topicService = topicService;
             _publishingService = publishingService;
+            _themeDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
         }
 
         public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(ThemeSaveViewModel created)
@@ -139,31 +144,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         q => q.Include(t => t.Topics)
                     )
                 )
-                .OnSuccessVoid(
-                    async theme =>
-                    {
-                        // For now we only want to delete test themes as we
-                        // don't really have a mechanism to clean things up
-                        // properly across the entire application.
-                        // TODO: EES-1295 ability to completely delete releases
-                        if (!theme.Title.StartsWith("UI test theme"))
-                        {
-                            return;
-                        }
+                .OnSuccessDo(CheckCanDeleteTheme)
+                .OnSuccessVoid(async theme =>
+                {
+                    var topicIds = theme.Topics.Select(topic => topic.Id).ToList();
+                    await topicIds.ForEachAsync(_topicService.DeleteTopic);
 
-                        var topicIds = theme.Topics.Select(topic => topic.Id).ToList();
+                    _context.Themes.Remove(theme);
+                    await _context.SaveChangesAsync();
 
-                        foreach (var topicId in topicIds)
-                        {
-                            await _topicService.DeleteTopic(topicId);
-                        }
+                    await _publishingService.TaxonomyChanged();
+                });
+        }
 
-                        _context.Themes.Remove(theme);
-                        await _context.SaveChangesAsync();
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme(Theme theme)
+        {
+            if (!_themeDeletionAllowed)
+            {
+                return new ForbidResult();
+            }
+                        
+            // For now we only want to delete test themes as we
+            // don't really have a mechanism to clean things up
+            // properly across the entire application.
+            // TODO: EES-1295 ability to completely delete releases
+            if (!theme.Title.StartsWith("UI test theme"))
+            {
+                return new ForbidResult();
+            }
 
-                        await _publishingService.TaxonomyChanged();
-                    }
-                );
+            return Unit.Instance;
         }
 
         private async Task<List<Theme>> GetUserThemes()

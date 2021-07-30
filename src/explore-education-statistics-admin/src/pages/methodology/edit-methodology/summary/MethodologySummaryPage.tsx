@@ -36,6 +36,12 @@ const MethodologySummaryPage = ({
               </SummaryListItem>
               <SummaryListItem term="Status">
                 <Tag>{currentMethodology.status}</Tag>
+                {currentMethodology.amendment && (
+                  <>
+                    {' '}
+                    <Tag>Amendment</Tag>
+                  </>
+                )}
               </SummaryListItem>
               <SummaryListItem term="Published on">
                 {currentMethodology.published ? (

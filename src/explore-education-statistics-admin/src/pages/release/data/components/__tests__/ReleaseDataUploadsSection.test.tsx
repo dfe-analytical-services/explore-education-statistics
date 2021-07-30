@@ -82,6 +82,25 @@ describe('ReleaseDataUploadsSection', () => {
     },
   };
 
+  const testUploadedZipFile: DataFile = {
+    id: 'zip-file-1',
+    title: 'Test zip title',
+    userName: 'user1@test.com',
+    fileName: 'test-data.zip',
+    metaFileId: 'file-1-meta',
+    metaFileName: 'test-data.meta.zip',
+    rows: 300,
+    fileSize: {
+      size: 150,
+      unit: 'Kb',
+    },
+    created: '2020-08-18T12:00:00',
+    status: 'QUEUED',
+    permissions: {
+      canCancelImport: true,
+    },
+  };
+
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
     percentageComplete: 0,
@@ -501,9 +520,6 @@ describe('ReleaseDataUploadsSection', () => {
   describe('uploading data file', () => {
     beforeEach(() => {
       releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
-      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
-        testQueuedImportStatus,
-      );
     });
 
     test('show validation message when no subject title', async () => {
@@ -649,7 +665,9 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.uploadDataFiles.mockResolvedValue(
         testUploadedDataFile,
       );
-
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
       render(
         <MemoryRouter>
           <ReleaseDataUploadsSection
@@ -744,8 +762,11 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
-      releaseDataFileService.uploadZipDataFile.mockResolvedValue(
-        testUploadedDataFile,
+      releaseDataFileService.uploadZipDataFile.mockResolvedValue({
+        ...testUploadedZipFile,
+      });
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
       );
 
       render(
@@ -764,7 +785,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       await userEvent.type(
         screen.getByLabelText('Subject title'),
-        'Test title',
+        'Test zip title',
       );
 
       userEvent.click(screen.getByLabelText('ZIP file'));
@@ -780,69 +801,72 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadZipDataFile).toHaveBeenCalledWith(
           'release-1',
           {
-            title: 'Test title',
+            title: 'Test zip title',
             zipFile,
           } as UploadZipDataFileRequest,
         );
-
-        const sections = screen.getAllByTestId('accordionSection');
-
-        expect(sections).toHaveLength(3);
-
-        const section1 = within(sections[0]);
-
-        expect(
-          section1.getByRole('button', { name: 'Test data 1' }),
-        ).toBeInTheDocument();
-
-        const section2 = within(sections[1]);
-
-        expect(
-          section2.getByRole('button', { name: 'Test data 2' }),
-        ).toBeInTheDocument();
-
-        expect(section2.getByTestId('Subject title')).toHaveTextContent(
-          'Test data 2',
-        );
-
-        const section3 = within(sections[2]);
-
-        expect(
-          section3.getByRole('button', { name: 'Test title' }),
-        ).toBeInTheDocument();
-
-        expect(section3.getByTestId('Subject title')).toHaveTextContent(
-          'Test title',
-        );
-
-        expect(section3.getByTestId('Data file')).toHaveTextContent(
-          'test-data.csv',
-        );
-        expect(section3.getByTestId('Metadata file')).toHaveTextContent(
-          'test-data.meta.csv',
-        );
-        expect(section3.getByTestId('Data file size')).toHaveTextContent('');
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
-        expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
-        expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-          'user1@test.com',
-        );
-        expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-          '18 August 2020 12:00',
-        );
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+      const section1 = within(sections[0]);
+      const section2 = within(sections[1]);
+      const section3 = within(sections[2]);
+
+      expect(sections).toHaveLength(3);
+
+      expect(
+        section1.getByRole('button', { name: 'Test data 1' }),
+      ).toBeInTheDocument();
+
+      expect(
+        section2.getByRole('button', { name: 'Test data 2' }),
+      ).toBeInTheDocument();
+
+      expect(section2.getByTestId('Subject title')).toHaveTextContent(
+        'Test data 2',
+      );
+
+      expect(
+        section3.getByRole('button', { name: 'Test zip title' }),
+      ).toBeInTheDocument();
+
+      expect(section3.getByTestId('Subject title')).toHaveTextContent(
+        'Test zip title',
+      );
+
+      expect(section3.getByTestId('Data file')).toHaveTextContent(
+        'test-data.zip',
+      );
+      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
+        'test-data.meta.zip',
+      );
+      expect(section3.getByTestId('Data file size')).toHaveTextContent('');
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
+      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+        'user1@test.com',
+      );
+      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+        '18 August 2020 12:00',
+      );
     });
 
     test('updates the zip file size and rows when status changes', async () => {
-      releaseDataFileService.uploadZipDataFile.mockResolvedValue(
-        testUploadedDataFile,
-      );
+      releaseDataFileService.uploadZipDataFile.mockResolvedValue({
+        ...testUploadedZipFile,
+      });
 
-      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[0]);
+      const testUpdatedZipFile: DataFile = {
+        ...testUploadedZipFile,
+        status: 'STAGE_1',
+      };
+      releaseDataFileService.getDataFile
+        .mockResolvedValue(testUploadedZipFile)
+        .mockResolvedValueOnce(testUpdatedZipFile);
 
-      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
-        testImportingImportStatus,
-      );
+      releaseDataFileService.getDataFileImportStatus
+        .mockResolvedValue(testQueuedImportStatus)
+        .mockResolvedValueOnce(testImportingImportStatus);
 
       permissionService.getDataFilePermissions.mockResolvedValue(
         {} as DataFilePermissions,
@@ -892,11 +916,15 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(releaseDataFileService.getDataFile).toHaveBeenCalledWith(
           'release-1',
-          testUploadedDataFile.id,
+          testUploadedZipFile.id,
         ),
       );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent('50 Kb');
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
+      await waitFor(() => {
+        expect(section3.getByTestId('Data file size')).toHaveTextContent(
+          '150 Kb',
+        );
+        expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+      });
     });
 
     describe('permissions during upload', () => {
@@ -909,6 +937,9 @@ describe('ReleaseDataUploadsSection', () => {
             },
           },
         ]);
+        releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+          testQueuedImportStatus,
+        );
 
         render(
           <MemoryRouter>
@@ -940,6 +971,9 @@ describe('ReleaseDataUploadsSection', () => {
             },
           },
         ]);
+        releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+          testQueuedImportStatus,
+        );
 
         render(
           <MemoryRouter>
@@ -1019,57 +1053,53 @@ describe('ReleaseDataUploadsSection', () => {
       ).toBeInTheDocument();
     });
 
-    test(
-      'confirming the cancellation modal initiates cancellation and ' +
-        'removes the Cancel link',
-      async () => {
-        releaseDataFileService.getDataFiles.mockResolvedValue([
-          testUploadedDataFile,
-        ]);
+    test('confirming the cancellation modal initiates cancellation and removes the Cancel link', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        testUploadedDataFile,
+      ]);
 
-        render(
-          <MemoryRouter>
-            <ReleaseDataUploadsSection
-              publicationId="publication-1"
-              releaseId="release-1"
-              canUpdateRelease
-            />
-          </MemoryRouter>,
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() =>
+        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+      );
+
+      const section = getAccordionSection(0);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
+          'release-1',
+          testUploadedDataFile.id,
         );
+      });
 
-        await waitFor(() =>
-          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
-        );
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
 
-        const section = getAccordionSection(0);
-
-        userEvent.click(section.getByRole('button', { name: 'Cancel' }));
-
-        await waitFor(() => {
-          expect(screen.getByRole('dialog')).toBeInTheDocument();
-        });
-
-        const modal = within(screen.getByRole('dialog'));
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
-
-        await waitFor(() => {
-          expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
-            'release-1',
-            testUploadedDataFile.id,
-          );
-        });
-
-        await waitFor(() => {
-          expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-          expect(
-            section.queryByRole('button', { name: 'Cancel' }),
-          ).not.toBeInTheDocument();
-        });
-      },
-    );
+      await waitFor(() => {
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).not.toBeInTheDocument();
+      });
+    });
 
     test('cancelling the cancellation modal calls off the import cancellation', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
@@ -1113,6 +1143,58 @@ describe('ReleaseDataUploadsSection', () => {
         expect(
           section.queryByRole('button', { name: 'Cancel' }),
         ).toBeInTheDocument();
+      });
+    });
+
+    test('show error message and close modal if cancellation fails', async () => {
+      releaseDataFileService.cancelImport.mockRejectedValue(
+        new Error('oh no!'),
+      );
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        testUploadedDataFile,
+      ]);
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() =>
+        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+      );
+
+      const section = getAccordionSection(0);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
+          'release-1',
+          testUploadedDataFile.id,
+        );
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).not.toBeInTheDocument();
+
+        expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
       });
     });
   });

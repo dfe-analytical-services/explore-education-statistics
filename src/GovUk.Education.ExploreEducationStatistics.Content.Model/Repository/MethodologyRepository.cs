@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _methodologyParentRepository = methodologyParentRepository;
         }
 
-        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId)
+        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId)
         {
             var publication = await _contentDbContext
                 .Publications
@@ -32,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             var methodology = (await _contentDbContext.Methodologies.AddAsync(new Methodology
             {
                 PublishingStrategy = Immediately,
-                Slug = publication.Slug,
-                Title = publication.Title,
                 MethodologyParent = new MethodologyParent
                 {
+                    Slug = publication.Slug,
+                    OwningPublicationTitle = publication.Title,
                     Publications = new List<PublicationMethodology>
                     {
                         new PublicationMethodology
@@ -44,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                             PublicationId = publicationId
                         }
                     }
-                }
+                },
+                Created = DateTime.UtcNow,
+                CreatedById = createdByUserId
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();
@@ -101,6 +104,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .FindAsync(methodologyId);
 
             return await IsPubliclyAccessible(methodology);
+        }
+
+        // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
+        // where appropriate.  MethodologyParents always keep track of their owning Publication's title for
+        // optimisation purposes, but MethodologyParent.Slug is used for the actual Slug for all of its Methodology
+        // Versions.  It's therefore important to keep it up-to-date with changes to its owning Publication's Slug too, 
+        // but only if none of its Versions are yet publicly accessible.
+        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug)
+        {
+            var slugChanged = originalSlug != updatedSlug;
+            
+            // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
+            // that are owned by this Publication
+            var ownedMethodologyParents = await _contentDbContext
+                .PublicationMethodologies
+                .Include(m => m.MethodologyParent)
+                .Where(m => m.PublicationId == publicationId && m.Owner)
+                .Select(m => m.MethodologyParent)
+                .ToListAsync();
+
+            await ownedMethodologyParents.ForEachAsync(async methodologyParent =>
+            {
+                methodologyParent.OwningPublicationTitle = updatedTitle;
+
+                if (slugChanged && methodologyParent.Slug == originalSlug && !await IsPubliclyAccessible(methodologyParent))
+                {
+                    methodologyParent.Slug = updatedSlug;
+                }
+            });
+                        
+            _contentDbContext.MethodologyParents.UpdateRange(ownedMethodologyParents);
+            await _contentDbContext.SaveChangesAsync();
+        }
+        
+        private async Task<bool> IsPubliclyAccessible(MethodologyParent methodologyParent)
+        {
+            await _contentDbContext
+                .Entry(methodologyParent)
+                .Collection(mp => mp.Versions)
+                .LoadAsync();
+
+            foreach (var version in methodologyParent.Versions)
+            {
+                if (await IsPubliclyAccessible(version))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private async Task<bool> IsPubliclyAccessible(Methodology methodology)

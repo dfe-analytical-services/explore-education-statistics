@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -92,11 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
+            services.AddTransient<ICacheService, BlobStorageCacheService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
-            services.AddTransient<IFilterService, FilterService>();
-            services.AddTransient<IIndicatorService, IndicatorService>();
+            services.AddTransient<IFilterRepository, FilterRepository>();
+            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
@@ -126,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

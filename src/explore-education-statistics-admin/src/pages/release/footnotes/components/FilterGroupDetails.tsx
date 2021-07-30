@@ -64,7 +64,7 @@ const FilterGroupDetails = ({
               {!hideGrouping && (
                 <FormFieldCheckbox
                   name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
-                  label={`${filterGroup.label} ${groupValue ? '(All)' : ''}`}
+                  label={`${filterGroup.label}${groupValue ? ' (All)' : ''}`}
                   small
                   boldLabel
                   formGroup={false}

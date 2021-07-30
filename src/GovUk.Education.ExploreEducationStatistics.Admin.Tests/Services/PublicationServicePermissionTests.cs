@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -247,17 +248,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService> userService,
             Mock<IPublicationRepository> publicationRepository,
             Mock<IPublishingService> publishingService,
+            Mock<IMethodologyRepository> methodologyRepository,
             Mock<IPersistenceHelper<ContentDbContext>>) mocks)
         {
-            var (context, mapper, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
+            var (context, mapper, userService, publicationRepository, publishingService, methodologyRepository, persistenceHelper) = mocks;
 
             return new PublicationService(
                 context.Object,
                 mapper.Object,
-                userService.Object,
-                publicationRepository.Object,
-                publishingService.Object,
-                persistenceHelper.Object);
+                persistenceHelper.Object,
+                userService.Object, 
+                publicationRepository.Object, 
+                publishingService.Object, 
+                methodologyRepository.Object);
         }
 
         private (
@@ -266,6 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
             Mock<IPublishingService> PublishingService,
+            Mock<IMethodologyRepository> MethodologyRepository,
             Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -278,6 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
                 new Mock<IPublishingService>(),
+                new Mock<IMethodologyRepository>(),
                 persistenceHelper);
         }
     }

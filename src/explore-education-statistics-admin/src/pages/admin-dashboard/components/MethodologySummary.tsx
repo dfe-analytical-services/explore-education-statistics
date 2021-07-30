@@ -25,15 +25,15 @@ import { generatePath, useHistory } from 'react-router';
 export interface Props {
   publication: MyPublication;
   topicId: string;
-  allowAmendments?: boolean;
   onChangePublication: () => void;
+  allowAmendments?: boolean;
 }
 
 const MethodologySummary = ({
   publication,
   topicId,
-  allowAmendments = false,
   onChangePublication,
+  allowAmendments = true,
 }: Props) => {
   const history = useHistory();
   const [
@@ -41,10 +41,10 @@ const MethodologySummary = ({
     setShowAddEditExternalMethodologyForm,
   ] = useState<boolean>();
   const [amendMethodologyId, setAmendMethodologyId] = useState<string>();
-  const [
-    cancelAmendmentMethodologyId,
-    setCancelAmendmentMethodologyId,
-  ] = useState<string>();
+  const [deleteMethodologyDetails, setDeleteMethodologyDetails] = useState<{
+    methodologyId: string;
+    amendment: boolean;
+  }>();
 
   const {
     contact,
@@ -120,7 +120,11 @@ const MethodologySummary = ({
           >
             <SummaryList className="govuk-!-margin-bottom-3">
               <SummaryListItem term="Publish date">
-                <FormattedDate>{methodology.published || ''}</FormattedDate>
+                {methodology.published ? (
+                  <FormattedDate>{methodology.published}</FormattedDate>
+                ) : (
+                  'Not yet published'
+                )}
               </SummaryListItem>
               {methodology.internalReleaseNote && (
                 <SummaryListItem term="Internal release note">
@@ -173,10 +177,10 @@ const MethodologySummary = ({
                           .canMakeAmendmentOfMethodology && (
                           <Button
                             type="button"
-                            variant="secondary"
                             onClick={() =>
                               setAmendMethodologyId(methodology.id)
                             }
+                            variant="secondary"
                           >
                             Amend methodology
                           </Button>
@@ -186,17 +190,19 @@ const MethodologySummary = ({
                 )}
               </div>
               <div className="govuk-grid-column-one-third dfe-align--right">
-                {methodology.permissions.canCancelMethodologyAmendment &&
-                  methodology.amendment && (
-                    <Button
-                      className="govuk-button--warning"
-                      onClick={() =>
-                        setCancelAmendmentMethodologyId(methodology.id)
-                      }
-                    >
-                      Cancel amendment
-                    </Button>
-                  )}
+                {methodology.permissions.canDeleteMethodology && (
+                  <Button
+                    onClick={() =>
+                      setDeleteMethodologyDetails({
+                        methodologyId: methodology.id,
+                        amendment: methodology.amendment,
+                      })
+                    }
+                    className="govuk-button--warning"
+                  >
+                    {methodology.amendment ? 'Cancel amendment' : 'Remove'}
+                  </Button>
+                )}
               </div>
             </div>
           </Details>
@@ -307,23 +313,33 @@ const MethodologySummary = ({
           </p>
         </ModalConfirm>
       )}
-      {cancelAmendmentMethodologyId && (
+      {deleteMethodologyDetails && (
         <ModalConfirm
-          title="Confirm you want to cancel this amended methodology"
+          title={
+            deleteMethodologyDetails.amendment
+              ? 'Confirm you want to cancel this amended methodology'
+              : 'Confirm you want to remove this methodology'
+          }
           onConfirm={async () => {
             await methodologyService.deleteMethodology(
-              cancelAmendmentMethodologyId,
+              deleteMethodologyDetails?.methodologyId,
             );
-            setCancelAmendmentMethodologyId(undefined);
+            setDeleteMethodologyDetails(undefined);
             onChangePublication();
           }}
-          onCancel={() => setCancelAmendmentMethodologyId(undefined)}
-          onExit={() => setCancelAmendmentMethodologyId(undefined)}
+          onCancel={() => setDeleteMethodologyDetails(undefined)}
+          onExit={() => setDeleteMethodologyDetails(undefined)}
           open
         >
           <p>
-            By cancelling the amendments you will lose any changes made, and the
-            original methodology will remain unchanged.
+            {deleteMethodologyDetails.amendment ? (
+              <>
+                By cancelling the amendments you will lose any changes made, and
+                the original methodology will remain unchanged.
+              </>
+            ) : (
+              <>By removing this methodology you will lose any changes made.</>
+            )}
           </p>
         </ModalConfirm>
       )}

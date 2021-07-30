@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
-        private readonly IReleaseSubjectService _releaseSubjectService;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
 
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             PublicStatisticsDbContext publicStatisticsDbContext,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
-            IReleaseSubjectService releaseSubjectService,
+            IReleaseSubjectRepository releaseSubjectRepository,
             ILogger<ReleaseService> logger,
             IMapper mapper)
         {
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicStatisticsDbContext = publicStatisticsDbContext;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
-            _releaseSubjectService = releaseSubjectService;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _logger = logger;
             _mapper = mapper;
         }
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var previousVersion in previousVersions)
             {
-                await _releaseSubjectService.SoftDeleteAllReleaseSubjects(previousVersion);
+                await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(previousVersion);
             }
 
             // Remove Statistical Releases for each of the Content Releases

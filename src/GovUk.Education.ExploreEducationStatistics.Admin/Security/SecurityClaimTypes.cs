@@ -50,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         UpdateAllMethodologies,
         ApproveAllMethodologies,
         MarkAllMethodologiesDraft,
-        MakeAmendmentsOfAllMethodologies
+        MakeAmendmentsOfAllMethodologies,
+        DeleteAllMethodologies
     }
 }

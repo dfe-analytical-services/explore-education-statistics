@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -118,9 +118,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "2018-19-q1",
             Published = new DateTime(2019, 2, 1),
             ApprovalStatus = Approved,
+            Updates = new List<Update>
+            {
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On =  new DateTime(2020, 1, 1),
+                    Reason = "First update"
+                }
+            },
             Version = 1,
             PreviousVersionId = new Guid("36725e6b-8682-480b-a04a-0564253b7160"),
-            SoftDeleted = false
+            SoftDeleted = false,
         };
 
         private static readonly Release PublicationARelease1V2Deleted = new Release
@@ -142,6 +151,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "2018-19-q1",
             Published = null,
             ApprovalStatus = Approved,
+            Updates = new List<Update>
+            {
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On =  new DateTime(2020, 1, 1),
+                    Reason = "First update"
+                }
+            },
             Version = 2,
             PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
             SoftDeleted = true
@@ -158,6 +176,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "2018-19-q1",
             Published = null,
             ApprovalStatus = Approved,
+            Updates = new List<Update>
+            {
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On =  new DateTime(2020, 1, 1),
+                    Reason = "First update"
+                },
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On =  new DateTime(2020, 2, 1),
+                    Reason = "Second update"
+                }
+            },
             Version = 3,
             PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
             SoftDeleted = false
@@ -975,6 +1008,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
+                Assert.Single(result.Updates);
+                Assert.Equal(new DateTime(2020, 1, 1), result.Updates[0].On);
+                Assert.Equal("First update", result.Updates[0].Reason);
+
                 Assert.Single(result.DownloadFiles);
                 Assert.False(result.DownloadFiles[0].Id.HasValue);
                 Assert.Equal("zip", result.DownloadFiles[0].Extension);
@@ -1123,6 +1160,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("Release 1 v3 Guidance", result.MetaGuidance);
 
                 Assert.Empty(result.RelatedInformation);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseViewModel_AmendedReleaseNotYetPublishedHasUpdatesInDescendingOrder()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.AddRangeAsync(ContentSections);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentBlocks);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            publicBlobStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicReleaseFiles,
+                        PublicationARelease1V3NotPublished.AllFilesZipPath()))
+                .ReturnsAsync(true);
+
+            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
+                    PublicationARelease1V3NotPublished.AllFilesZipPath()))
+                .ReturnsAsync(new BlobInfo
+                (
+                    path: PublicationARelease3.AllFilesZipPath(),
+                    size: "0 b",
+                    contentType: "application/x-zip-compressed",
+                    contentLength: 0L,
+                    meta: GetMetaValuesReleaseDateTime(
+                        releaseDateTime: DateTime.Now),
+                    created: null
+                ));
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    publicBlobStorageService: publicBlobStorageService.Object);
+
+                var context = PublishContext();
+                var result = await service.GetReleaseViewModel(PublicationARelease1V3NotPublished.Id, context);
+
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+                Assert.Equal(PublicationARelease1V3NotPublished.Id, result.Id);
+                Assert.Equal("Academic Year Q1 2018/19", result.Title);
+
+                Assert.Equal(2, result.Updates.Count);
+                Assert.Equal(new DateTime(2020, 2, 1), result.Updates[0].On);
+                Assert.Equal("Second update", result.Updates[0].Reason);
+
+                Assert.Equal(new DateTime(2020, 1, 1), result.Updates[1].On);
+                Assert.Equal("First update", result.Updates[1].Reason);
             }
         }
 
@@ -1342,14 +1437,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicStatisticsDbContext statisticsDbContext = null,
             IBlobStorageService publicBlobStorageService = null,
             IMethodologyService methodologyService = null,
-            IReleaseSubjectService releaseSubjectService = null)
+            IReleaseSubjectRepository releaseSubjectRepository = null)
         {
             return new ReleaseService(
                 contentDbContext,
                 statisticsDbContext ?? new Mock<PublicStatisticsDbContext>().Object,
                 publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
                 methodologyService ?? new Mock<IMethodologyService>().Object,
-                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
                 new Mock<ILogger<ReleaseService>>().Object,
                 MapperForProfile<MappingProfiles>());
         }

@@ -50,7 +50,7 @@ const IndicatorDetails = ({
                   className="govuk-checkboxes--small"
                   id={`indicatorGroup-${indicatorGroupId}`}
                   name={`${valuePath}.indicatorGroups[${indicatorGroupId}].selected`}
-                  label={`${indicatorGroup.label} ${groupValue && '(All)' : ''}`}
+                  label={`${indicatorGroup.label}${groupValue && ' (All)' : ''}`}
                   boldLabel
                   disabled={parentSelected}
                 /> */

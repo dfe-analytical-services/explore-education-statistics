@@ -45,8 +45,8 @@ Select Location Country, England
 
 Select Start date and End date
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2013/14
-    user selects from list by label    id:timePeriodForm-end    2016/17
+    user chooses select option    id:timePeriodForm-start    2013/14
+    user chooses select option    id:timePeriodForm-end    2016/17
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
@@ -117,8 +117,8 @@ Select locations LAs Barnet, Barnsley, Bedford
 
 Select new start and end date
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2014/15
-    user selects from list by label    id:timePeriodForm-end    2015/16
+    user chooses select option    id:timePeriodForm-start    2014/15
+    user chooses select option    id:timePeriodForm-end    2015/16
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
     user waits until page contains element    id:filtersForm-indicators

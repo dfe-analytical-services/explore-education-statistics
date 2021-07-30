@@ -6,8 +6,9 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -16,6 +17,9 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -35,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             );
 
-            Assert.True(result.IsRight);
+            result.AssertRight();
             Assert.Equal("Test theme", result.Right.Title);
             Assert.Equal("test-theme", result.Right.Slug);
             Assert.Equal("Test summary", result.Right.Summary);
@@ -113,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
                 Assert.Equal("Updated theme", result.Right.Title);
                 Assert.Equal("updated-theme", result.Right.Slug);
                 Assert.Equal("Updated summary", result.Right.Summary);
@@ -195,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupThemeService(context);
                 var result = await service.GetTheme(theme.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
                 Assert.Equal(theme.Id, result.Right.Id);
                 Assert.Equal("Test theme", result.Right.Title);
                 Assert.Equal("test-theme", result.Right.Slug);
@@ -272,17 +276,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var theme = new Theme
             {
                 Title = "UI test theme",
-                Topics = new List<Topic>()
+                Topics = AsList(new Topic
                 {
-                    new Topic
-                    {
-                        Title = "UI test topic 1"
-                    },
-                    new Topic
-                    {
-                        Title = "UI test topic 2"
-                    }
-                }
+                    Id = Guid.NewGuid(),
+                    Title = "UI test topic 1"
+                },
+                new Topic
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "UI test topic 2"
+                })
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -290,25 +293,173 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(theme);
+                await context.SaveChangesAsync();
+                
+                Assert.Equal(1, context.Themes.Count());
+                Assert.Equal(2, context.Topics.Count());
+            }
 
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>(Strict);
+
+                topicService
+                    .Setup(s => s.DeleteTopic(theme.Topics[0].Id))
+                    .ReturnsAsync(Unit.Instance);
+                
+                topicService
+                    .Setup(s => s.DeleteTopic(theme.Topics[1].Id))
+                    .ReturnsAsync(Unit.Instance);
+
+                var service = SetupThemeService(context, topicService: topicService.Object);
+                var result = await service.DeleteTheme(theme.Id);
+                VerifyAllMocks(topicService);
+                
+                result.AssertRight();
+                Assert.Equal(0, context.Themes.Count());
+            }
+        }
+
+        [Fact]
+        public async Task DeleteTheme_DisallowedByNamingConvention()
+        {
+            var theme = new Theme
+            {
+                Title = "Non-conforming title",
+                Topics = AsList(new Topic
+                {
+                    Title = "UI test topic 1"
+                },
+                new Topic
+                {
+                    Title = "UI test topic 2"
+                })
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(theme);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var topicService = new Mock<ITopicService>();
+                var topicService = new Mock<ITopicService>(Strict);
+                var service = SetupThemeService(context, topicService: topicService.Object);
+                
+                var result = await service.DeleteTheme(theme.Id);
+                VerifyAllMocks(topicService);
+                result.AssertForbidden();
 
-                topicService.Setup(s => s.DeleteTopic(theme.Topics[0].Id));
-                topicService.Setup(s => s.DeleteTopic(theme.Topics[0].Id));
+                Assert.Equal(1, context.Themes.Count());
+            }
+        }        
+        
+        [Fact]
+        public async Task DeleteTheme_DisallowedByConfiguration()
+        {
+            var theme = new Theme
+            {
+                Title = "UI test theme",
+                Topics = AsList(new Topic
+                {
+                    Title = "UI test topic 1"
+                },
+                new Topic
+                {
+                    Title = "UI test topic 2"
+                })
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>(Strict);
+                
+                var service = SetupThemeService(
+                    context, 
+                    topicService: topicService.Object, 
+                    enableThemeDeletion: false);
+                
+                var result = await service.DeleteTheme(theme.Id);
+                VerifyAllMocks(topicService);
+                result.AssertForbidden();
+
+                Assert.Equal(1, context.Themes.Count());
+            }
+        }
+        
+        [Fact]
+        public async Task DeleteTheme_OtherThemesUnaffected()
+        {
+            var theme = new Theme
+            {
+                Title = "UI test theme",
+                Topics = AsList(new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 1"
+                    },
+                    new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 2"
+                    })
+            };
+            
+            var otherTheme = new Theme
+            {
+                Title = "UI test theme",
+                Topics = AsList(new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 1"
+                    },
+                    new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 2"
+                    })
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(theme, otherTheme);
+                await context.SaveChangesAsync();
+                
+                Assert.Equal(2, context.Themes.Count());
+                Assert.Equal(4, context.Topics.Count());
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>(Strict);
+
+                topicService
+                    .Setup(s => s.DeleteTopic(theme.Topics[0].Id))
+                    .ReturnsAsync(Unit.Instance);
+                
+                topicService
+                    .Setup(s => s.DeleteTopic(theme.Topics[1].Id))
+                    .ReturnsAsync(Unit.Instance);
 
                 var service = SetupThemeService(context, topicService: topicService.Object);
                 var result = await service.DeleteTheme(theme.Id);
-
-                Assert.True(result.IsRight);
-
-                Assert.Equal(0, context.Themes.Count());
-
-                topicService.VerifyAll();
+                VerifyAllMocks(topicService);
+                
+                result.AssertRight();
+                Assert.Equal(otherTheme.Id, context.Themes.Select(t => t.Id).Single());
             }
         }
 
@@ -318,13 +469,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
             ITopicService topicService = null,
-            IPublishingService publishingService = null)
+            IPublishingService publishingService = null,
+            bool enableThemeDeletion = true)
         {
+            var configuration =
+                CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
+            
             return new ThemeService(
+                configuration.Object,
                 context,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 topicService ?? new Mock<ITopicService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object
             );

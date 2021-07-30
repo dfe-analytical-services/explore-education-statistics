@@ -41,6 +41,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     release.publication.otherReleases.length +
     release.publication.legacyReleases.length;
 
+  // Re-order updates in descending order in-case the cached
+  // release from the content API has not been updated to
+  // have the updates in the correct order.
+  const updates = orderBy(release.updates, 'on', 'desc');
+
   return (
     <Page
       title={release.publication.title}
@@ -103,12 +108,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <time>{formatPartialDate(release.nextReleaseDate)}</time>
                 </SummaryListItem>
               )}
-            {release.updates && release.updates.length > 0 && (
+
+            {updates.length > 0 ? (
               <SummaryListItem term="Last updated">
-                <FormattedDate>{release.updates[0].on}</FormattedDate>
+                <FormattedDate>{updates[0].on}</FormattedDate>
 
                 <Details
                   id="releaseLastUpdates"
+                  summary={`See all updates (${updates.length})`}
                   onToggle={open => {
                     if (open) {
                       logEvent({
@@ -118,21 +125,24 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                       });
                     }
                   }}
-                  summary={`See all updates (${release.updates.length})`}
                 >
-                  <ol className="govuk-list">
-                    {orderBy(release.updates, 'on', 'desc').map(update => (
+                  <ol className="govuk-list" data-testid="all-updates">
+                    {updates.map(update => (
                       <li key={update.id}>
-                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                        <FormattedDate
+                          className="govuk-body govuk-!-font-weight-bold"
+                          testId="update-on"
+                        >
                           {update.on}
                         </FormattedDate>
-                        <p>{update.reason}</p>
+                        <p data-testid="update-reason">{update.reason}</p>
                       </li>
                     ))}
                   </ol>
                 </Details>
               </SummaryListItem>
-            )}
+            ) : null}
+
             <SummaryListItem term="Receive updates">
               <Link
                 className="dfe-print-hidden govuk-!-font-weight-bold"
@@ -183,27 +193,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     View data and files
                   </a>
                 </li>
-                {release.publication.methodologies.map(methodology => (
-                  <li key={methodology.id}>
-                    <Link
-                      to="/methodology/[methodology]"
-                      as={`/methodology/${methodology.slug}`}
-                    >
-                      {methodology.title}
-                    </Link>
-                  </li>
-                ))}
-                {release.publication.externalMethodology && (
-                  <li>
-                    <Link
-                      to={release.publication.externalMethodology.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {release.publication.externalMethodology.title}
-                    </Link>
-                  </li>
-                )}
                 {release.hasMetaGuidance && (
                   <li>
                     <Link
@@ -288,14 +277,47 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 )}
               </ul>
             </nav>
-            {release.relatedInformation.length !== 0 && (
+            {release.publication.methodologies.length > 0 && (
               <>
-                <h2
+                <h3
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="methodologies"
+                >
+                  Methodologies
+                </h3>
+                <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                  {release.publication.methodologies.map(methodology => (
+                    <li key={methodology.id}>
+                      <Link
+                        to="/methodology/[methodology]"
+                        as={`/methodology/${methodology.slug}`}
+                      >
+                        {methodology.title}
+                      </Link>
+                    </li>
+                  ))}
+                  {release.publication.externalMethodology && (
+                    <li>
+                      <Link
+                        to={release.publication.externalMethodology.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {release.publication.externalMethodology.title}
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </>
+            )}
+            {release.relatedInformation.length > 0 && (
+              <>
+                <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
                   id="related-pages"
                 >
                   Related pages
-                </h2>
+                </h3>
                 <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
                     {release.relatedInformation &&

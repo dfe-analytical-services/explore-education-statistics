@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -14,18 +17,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishStagedReleaseContentFunction
     {
+        private readonly ICacheService _cacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
-        public PublishStagedReleaseContentFunction(IContentService contentService,
+        public PublishStagedReleaseContentFunction(ICacheService cacheService,
+            IContentService contentService,
             INotificationsService notificationsService,
             IReleaseStatusService releaseStatusService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
+            _cacheService = cacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseStatusService = releaseStatusService;
@@ -86,7 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
-                    
+
+                    // Invalidate the 'All Methodologies' cache item in case any methodologies
+                    // are now accessible for the first time after publishing these releases
+                    await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
+
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
                     await _notificationsService.NotifySubscribers(releaseIds);
@@ -104,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation(
                 "{0} completed. {1}",
                 executionContext.FunctionName,
-                timer.FormatNextOccurrences((1)));
+                timer.FormatNextOccurrences(1));
         }
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()

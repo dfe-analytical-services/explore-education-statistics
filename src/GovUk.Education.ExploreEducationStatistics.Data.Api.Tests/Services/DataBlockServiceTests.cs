@@ -1,23 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
@@ -63,8 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var path = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
-
             var tableResult = new TableBuilderResultViewModel
             {
                 Results = new List<ObservationViewModel>
@@ -73,16 +71,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
-            blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
-                .ThrowsAsync(new FileNotFoundException());
-
-            blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
-
-            var tableBuilderService = new Mock<ITableBuilderService>();
+            cacheService
+                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
+                    Task<Either<ActionResult, TableBuilderResultViewModel>>>(
+                    PublicContent,
+                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -96,18 +92,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                tableBuilderService: tableBuilderService.Object,
-                blobStorageService: blobStorageService.Object
+                cacheService: cacheService.Object,
+                tableBuilderService: tableBuilderService.Object
             );
 
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
 
-            Assert.True(result.IsRight);
+            Assert.Single(result.Results);
 
-            Assert.IsType<TableBuilderResultViewModel>(result.Right);
-            Assert.Single(result.Right.Results);
-
-            MockUtils.VerifyAllMocks(blobStorageService, tableBuilderService);
+            VerifyAllMocks(cacheService, tableBuilderService);
         }
 
         [Fact]
@@ -151,8 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var path = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
-
             var tableResult = new TableBuilderResultViewModel
             {
                 Results = new List<ObservationViewModel>
@@ -161,16 +152,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
-            blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
-                .ThrowsAsync(new FileNotFoundException());
-
-            blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
-
-            var tableBuilderService = new Mock<ITableBuilderService>();
+            cacheService
+                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
+                    Task<Either<ActionResult, TableBuilderResultViewModel>>>(
+                    PublicContent,
+                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -187,18 +176,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                tableBuilderService: tableBuilderService.Object,
-                blobStorageService: blobStorageService.Object
+                cacheService: cacheService.Object,
+                tableBuilderService: tableBuilderService.Object
             );
 
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
 
-            Assert.True(result.IsRight);
+            Assert.Single(result.Results);
 
-            Assert.IsType<TableBuilderResultViewModel>(result.Right);
-            Assert.Single(result.Right.Results);
-
-            MockUtils.VerifyAllMocks(blobStorageService, tableBuilderService);
+            VerifyAllMocks(cacheService, tableBuilderService);
         }
 
         [Fact]
@@ -238,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var path = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
+            var cacheKey = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
 
             var tableResult = new TableBuilderResultViewModel
             {
@@ -248,117 +234,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>();
+            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
-            blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
+            cacheService
+                .Setup(s => s.GetItem(
+                    PublicContent,
+                    It.Is<DataBlockTableResultCacheKey>(key => key.Key == cacheKey),
+                    It.IsAny<Func<Task<Either<ActionResult, TableBuilderResultViewModel>>>>()))
                 .ReturnsAsync(tableResult);
-
-            var tableBuilderService = new Mock<ITableBuilderService>();
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                tableBuilderService: tableBuilderService.Object,
-                blobStorageService: blobStorageService.Object
+                cacheService: cacheService.Object,
+                tableBuilderService: tableBuilderService.Object
             );
 
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
 
-            Assert.True(result.IsRight);
+            Assert.Single(result.Results);
 
-            Assert.IsType<TableBuilderResultViewModel>(result.Right);
-            Assert.Single(result.Right.Results);
-
-            MockUtils.VerifyAllMocks(blobStorageService, tableBuilderService);
-        }
-
-        [Fact]
-        public async Task GetDataBlockTableResult_DeletesInvalidCachedResult()
-        {
-            var subjectId = Guid.NewGuid();
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Slug = "release-slug",
-                    Publication = new Publication
-                    {
-                        Slug = "publication-slug"
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = new ObservationQueryContext
-                    {
-                        SubjectId = subjectId,
-                    },
-                    Charts = new List<IChart>
-                    {
-                        new LineChart()
-                    }
-                }
-            };
-
-            await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
-
-            await contentDbContext.AddAsync(releaseContentBlock);
-            await contentDbContext.SaveChangesAsync();
-
-            var path = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
-
-            var tableResult = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new ObservationViewModel()
-                }
-            };
-
-            var blobStorageService = new Mock<IBlobStorageService>();
-
-            blobStorageService
-                .Setup(s =>
-                    s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
-                .ThrowsAsync(new JsonException("Could not deserialize the JSON"));
-
-            blobStorageService
-                .Setup(s => s.DeleteBlob(PublicContent, path));
-
-            blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
-
-            var tableBuilderService = new Mock<ITableBuilderService>();
-
-            tableBuilderService
-                .Setup(
-                    s =>
-                        s.Query(
-                            _releaseId,
-                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId)
-                        )
-                )
-                .ReturnsAsync(tableResult);
-
-
-            var service = BuildDataBlockService(
-                contentDbContext,
-                tableBuilderService: tableBuilderService.Object,
-                blobStorageService: blobStorageService.Object
-            );
-
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
-
-            Assert.True(result.IsRight);
-
-            Assert.IsType<TableBuilderResultViewModel>(result.Right);
-            Assert.Single(result.Right.Results);
-
-            MockUtils.VerifyAllMocks(blobStorageService, tableBuilderService);
+            VerifyAllMocks(cacheService, tableBuilderService);
         }
 
         [Fact]
@@ -389,23 +285,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var result = await service.GetDataBlockTableResult(releaseContentBlock);
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
 
-
-        private DataBlockService BuildDataBlockService(
+        private static DataBlockService BuildDataBlockService(
             ContentDbContext contentDbContext,
-            IBlobStorageService blobStorageService = null,
+            ICacheService cacheService = null,
             ITableBuilderService tableBuilderService = null,
             IUserService userService = null)
         {
             return new DataBlockService(
                 contentDbContext,
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
+                cacheService ?? new Mock<ICacheService>().Object,
                 tableBuilderService ?? new Mock<ITableBuilderService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
-                new Mock<ILogger<DataBlockService>>().Object
+                userService ?? AlwaysTrueUserService().Object
             );
         }
     }

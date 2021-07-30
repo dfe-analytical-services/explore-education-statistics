@@ -507,6 +507,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                             ClaimType = "CancelAllFileImports",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -38,
+                            ClaimType = "MakeAmendmentsOfAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -39,
+                            ClaimType = "DeleteAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });
                 });
 

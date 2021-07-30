@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -82,10 +83,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     }
                 );
         }
+        
+        [Fact]
+        public async Task DeleteMethodology()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanDeleteSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology).Object,
+                            userService: userService.Object);
+                        return service.DeleteMethodology(_methodology.Id);
+                    }
+                );
+        }
 
         private MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+            ICacheService cacheService = null,
             IMethodologyContentService methodologyContentService = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IMethodologyRepository methodologyRepository = null,
@@ -97,6 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 AdminMapper(),
+                cacheService ?? new Mock<ICacheService>().Object,
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object,

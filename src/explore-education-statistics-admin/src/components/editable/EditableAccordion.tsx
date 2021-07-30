@@ -84,7 +84,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
   }
 
   return (
-    <>
+    <div className={styles.container}>
       <h2 className={classNames('govuk-heading-l', styles.heading)}>
         {sectionName}
 
@@ -138,7 +138,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
           Add new section
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 

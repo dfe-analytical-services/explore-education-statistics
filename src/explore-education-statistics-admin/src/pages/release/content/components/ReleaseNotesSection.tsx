@@ -29,7 +29,6 @@ interface EditFormValues {
 
 const emptyReleaseNote: ReleaseNote = {
   id: '',
-  releaseId: '',
   on: new Date(),
   reason: '',
 };

@@ -165,8 +165,8 @@ Validate Key Statistics data block -- Charts tab
 Validate Key Statistics data block -- Data tables tab
     [Tags]    HappyPath
     user clicks element    id:releaseHeadlines-tables-tab
-    user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Table showing 'Absence by characteristic' in England between 2012/13 and 2016/17
+    user waits until element contains    css:[data-testid="dataTableCaption"]    
+    ...    Table showing 'Absence by characteristic' in England between 2012/13 and 2016/17  30
 
     user checks table column heading contains    1    1    2012/13    css:#releaseHeadlines-tables table
     user checks table column heading contains    1    2    2013/14    css:#releaseHeadlines-tables table
@@ -213,8 +213,12 @@ Validate accordion sections order
     user checks accordion is in position    Pupil referral unit absence    8    id:content
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
 
+    user scrolls to element  id:help-and-support
     user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks accordion is in position    Official Statistics    2    id:help-and-support
+    user checks accordion is in position    Contact us    3    id:help-and-support
+    user checks there are x accordion sections    3    id:help-and-support
+
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
@@ -272,7 +276,7 @@ Validate Regional and local authority (LA) breakdown chart
     ${datablock}=    set variable    css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart    ${datablock}
 
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Vale of White Horse
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Vale of White Horse
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
@@ -286,7 +290,7 @@ Validate Regional and local authority (LA) breakdown chart
     user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.4%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Harlow
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Harlow
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
@@ -300,7 +304,7 @@ Validate Regional and local authority (LA) breakdown chart
     user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.1%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
-    user selects from list by label    ${datablock} select[name="selectedLocation"]    Newham
+    user chooses select option    ${datablock} select[name="selectedLocation"]    Newham
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}

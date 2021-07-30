@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -27,42 +27,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IBoundaryLevelService _boundaryLevelService;
+        private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IIndicatorService _indicatorService;
-        private readonly ILocationService _locationService;
+        private readonly IIndicatorRepository _indicatorRepository;
+        private readonly ILocationRepository _locationRepository;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
-        private readonly ISubjectService _subjectService;
+        private readonly ISubjectRepository _subjectRepository;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public ResultSubjectMetaService(ContentDbContext contentDbContext,
-            IBoundaryLevelService boundaryLevelService,
-            IFilterItemService filterItemService,
+            IBoundaryLevelRepository boundaryLevelRepository,
+            IFilterItemRepository filterItemRepository,
             IFootnoteRepository footnoteRepository,
-            IGeoJsonService geoJsonService,
-            IIndicatorService indicatorService,
-            ILocationService locationService,
+            IGeoJsonRepository geoJsonRepository,
+            IIndicatorRepository indicatorRepository,
+            ILocationRepository locationRepository,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            ISubjectService subjectService,
+            ISubjectRepository subjectRepository,
             ILogger<ResultSubjectMetaService> logger,
             IMapper mapper,
-            IReleaseDataFileRepository releaseDataFileRepository) : base(boundaryLevelService, filterItemService, geoJsonService)
+            IReleaseDataFileRepository releaseDataFileRepository) : base(boundaryLevelRepository, filterItemRepository, geoJsonRepository)
         {
             _contentDbContext = contentDbContext;
-            _boundaryLevelService = boundaryLevelService;
+            _boundaryLevelRepository = boundaryLevelRepository;
             _footnoteRepository = footnoteRepository;
-            _indicatorService = indicatorService;
-            _locationService = locationService;
+            _indicatorRepository = indicatorRepository;
+            _locationRepository = locationRepository;
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
-            _subjectService = subjectService;
+            _subjectRepository = subjectRepository;
             _logger = logger;
             _mapper = mapper;
             _releaseDataFileRepository = releaseDataFileRepository;
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
 
-                    var observationalUnits = _locationService.GetObservationalUnits(observations);
+                    var observationalUnits = _locationRepository.GetObservationalUnits(observations);
                     _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
-                    var publicationId = await _subjectService.GetPublicationIdForSubject(subject.Id);
+                    var publicationId = await _subjectRepository.GetPublicationIdForSubject(subject.Id);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
@@ -161,14 +161,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IEnumerable<GeographicLevel> geographicLevels)
         {
             var boundaryLevels = boundaryLevelId.HasValue
-                ? _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
-                : _boundaryLevelService.FindByGeographicLevels(geographicLevels);
+                ? _boundaryLevelRepository.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
+                : _boundaryLevelRepository.FindByGeographicLevels(geographicLevels);
             return boundaryLevels.Select(level => _mapper.Map<BoundaryLevelIdLabel>(level));
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
-            var indicators = _indicatorService.GetIndicators(query.SubjectId, query.Indicators);
+            var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
             return BuildIndicatorViewModels(indicators);
         }
 

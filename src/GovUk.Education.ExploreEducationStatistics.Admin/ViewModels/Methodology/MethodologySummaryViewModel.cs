@@ -22,5 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public MethodologyStatus Status { get; set; }
 
         public string Title { get; set; }
+        
+        public bool Amendment { get; set; }
+        
+        public Guid PreviousVersionId { get; set; }
     }
 }

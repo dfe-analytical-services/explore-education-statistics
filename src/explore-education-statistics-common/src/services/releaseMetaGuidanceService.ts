@@ -15,6 +15,10 @@ export interface SubjectMetaGuidance {
     label: string;
     value: string;
   }[];
+  footnotes: {
+    id: string;
+    label: string;
+  }[];
 }
 
 export interface ReleaseMetaGuidanceSummary extends ReleaseSummary {

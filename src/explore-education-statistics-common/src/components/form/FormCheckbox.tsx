@@ -59,8 +59,13 @@ const FormCheckbox = ({
           value={value}
           disabled={disabled}
         />
-        <label className="govuk-label govuk-checkboxes__label" htmlFor={id}>
-          {boldLabel ? <strong>{label}</strong> : label}
+        <label
+          className={classNames('govuk-label govuk-checkboxes__label', {
+            'govuk-!-font-weight-bold': boldLabel,
+          })}
+          htmlFor={id}
+        >
+          {label}
         </label>
         {hint && (
           <span

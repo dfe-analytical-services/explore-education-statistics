@@ -104,5 +104,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     && types.Contains(methodologyFile.File.Type))
                 .ToListAsync();
         }
+
+        public Task<List<MethodologyFile>> GetMethodologyLinksToFile(Guid fileId)
+        {
+            return _contentDbContext
+                .MethodologyFiles
+                .Where(f => f.FileId == fileId)
+                .ToListAsync();
+        }
     }
 }

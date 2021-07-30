@@ -18,8 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
@@ -94,8 +94,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
+            services.AddTransient<ICacheService, BlobStorageCacheService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
-            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
+            services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPublicationService, PublicationService>();
@@ -114,17 +115,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     );
                 }
             );
-            services.AddTransient<IFilterItemService, FilterItemService>();
-            services.AddTransient<IFilterService, FilterService>();
+            services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+            services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IGeoJsonService, GeoJsonService>();
-            services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
-            services.AddTransient<IIndicatorService, IndicatorService>();
-            services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+            services.AddTransient<ILocationRepository, LocationRepository>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
-            services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
@@ -178,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

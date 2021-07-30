@@ -25,8 +25,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -248,8 +248,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<ReleaseSubjectService.SubjectDeleter, ReleaseSubjectService.SubjectDeleter>();
-            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+            services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
+            services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
@@ -258,6 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
+            services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -290,17 +291,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
             services.AddTransient<IEmailService, EmailService>();
 
-            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
+            services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
+            services.AddTransient<ICacheService, BlobStorageCacheService>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
-            services.AddTransient<IFilterService, FilterService>();
-            services.AddTransient<IFilterItemService, FilterItemService>();
+            services.AddTransient<IFilterRepository, FilterRepository>();
+            services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IGeoJsonService, GeoJsonService>();
-            services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
-            services.AddTransient<IIndicatorService, IndicatorService>();
-            services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+            services.AddTransient<ILocationRepository, LocationRepository>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
@@ -309,8 +311,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
-            services.AddTransient<Data.Model.Services.Interfaces.IReleaseRepository, Data.Model.Services.ReleaseRepository>();
-            services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<Data.Model.Repository.Interfaces.IReleaseRepository, Data.Model.Repository.ReleaseRepository>();
+            services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
@@ -398,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
             }
 
-            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

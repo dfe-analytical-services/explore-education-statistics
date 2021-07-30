@@ -489,6 +489,10 @@
       "type": "bool",
       "defaultValue": false
     },
+    "enableThemeDeletion": {
+      "type": "bool",
+      "defaultValue": false
+    },
     "timeZone": {
       "type": "string",
       "defaultValue": "GMT Standard Time"
@@ -1650,7 +1654,8 @@
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "enableThemeDeletion": "[parameters('enableThemeDeletion')]"
       }
     },
     {

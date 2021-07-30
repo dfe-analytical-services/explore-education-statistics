@@ -8,8 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
@@ -45,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
+                .AddScoped<ICacheService, BlobStorageCacheService>(provider =>
+                    new BlobStorageCacheService(
+                        blobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        logger: provider.GetRequiredService<ILogger<BlobStorageCacheService>>()))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
@@ -59,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        cacheService: provider.GetService<ICacheService>(),
                         fastTrackService: provider.GetService<IFastTrackService>(),
                         downloadService: provider.GetRequiredService<IDownloadService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
@@ -70,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicStatisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetService<IMethodologyService>(),
-                        releaseSubjectService: provider.GetService<IReleaseSubjectService>(),
+                        releaseSubjectRepository: provider.GetService<IReleaseSubjectRepository>(),
                         logger: provider.GetRequiredService<ILogger<ReleaseService>>(),
                         mapper: provider.GetRequiredService<IMapper>()
                     ))
@@ -99,12 +104,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                             logger: provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
-                .AddScoped<IReleaseSubjectService, ReleaseSubjectService>(provider =>
-                    new ReleaseSubjectService(
+                .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
+                    new ReleaseSubjectRepository(
                         statisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
-                        footnoteRepository: provider.GetService<IFootnoteRepository>()))
-                .AddScoped<IFilterService, FilterService>()
-                .AddScoped<IIndicatorService, IndicatorService>()
+                        footnoteRepository: new FootnoteRepository(provider.GetService<PublicStatisticsDbContext>())
+                    ))
+                .AddScoped<IFilterRepository, FilterRepository>()
+                .AddScoped<IFootnoteRepository, FootnoteRepository>()
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
                 .AddScoped<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>()
                 .AddScoped<IDataGuidanceFileWriter, DataGuidanceFileWriter>()
@@ -114,10 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         dataGuidanceFileWriter: provider.GetService<IDataGuidanceFileWriter>(),
                         blobStorageService: GetBlobStorageService(provider, "CoreStorage")
                     ))
-                .AddScoped<IFootnoteRepository, FootnoteRepository>(provider =>
-                    new FootnoteRepository(
-                        context: provider.GetService<PublicStatisticsDbContext>(),
-                        logger: provider.GetService<ILogger<FootnoteRepository>>()))
                 .AddScoped<IZipFileService, ZipFileService>(provider =>
                     new ZipFileService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")

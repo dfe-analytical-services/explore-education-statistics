@@ -72,9 +72,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ReleaseTypeViewModel Type { get; set; }
 
-        public List<ReleaseNoteViewModel> Updates { get; set; }
+        public List<ReleaseNoteViewModel> Updates { get; set; } = new List<ReleaseNoteViewModel>();
 
-        public List<ContentSectionViewModel> Content { get; set; }
+        public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
 
         public ContentSectionViewModel SummarySection { get; set; }
 
@@ -84,13 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; }
 
-        public List<FileInfo> DownloadFiles { get; set; }
+        public List<FileInfo> DownloadFiles { get; set; } = new List<FileInfo>();
 
         public string MetaGuidance { get; set; }
 
         public string PreReleaseAccessList { get; set; }
 
-        public List<LinkViewModel> RelatedInformation { get; set; }
+        public List<LinkViewModel> RelatedInformation { get; set; } = new List<LinkViewModel>();
 
         private DateTime? _dataLastPublished;
 

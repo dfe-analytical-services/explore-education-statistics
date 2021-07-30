@@ -66,9 +66,9 @@ user selects theme and topic from admin dashboard
     user waits until page contains link    Manage publications and releases    90
     user clicks link    Manage publications and releases
     user waits until page contains element    id:publicationsReleases-themeTopic-themeId    60
-    user selects from list by label    id:publicationsReleases-themeTopic-themeId    ${theme}
+    user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
     user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
-    user selects from list by label    id:publicationsReleases-themeTopic-topicId    ${topic}
+    user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
     user waits until h2 is visible    ${theme}    60
     user waits until h3 is visible    ${topic}    60
 
@@ -134,7 +134,7 @@ user creates release for publication
     user waits until page contains title caption    ${publication}
     user waits until h1 is visible    Create new release    60
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    60
-    user selects from list by label    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
     user clicks radio    National Statistics
     user clicks radio if exists    Create new template
@@ -329,28 +329,26 @@ user checks scheduled releases tab publication has release
     user checks page contains element
     ...    xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
 
-user clicks footnote radio
+user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
     user clicks element
     ...    xpath://*[@data-testid="footnote-subject ${subject_label}"]//label[text()="${radio_label}"]/../input[@type="radio"]
 
-user clicks footnote checkbox
-    [Arguments]    ${label}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    ${checkbox}=    get child element    ${parent}    xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+user opens footnote subject dropdown
+    [Arguments]    ${subject_label}    ${dropdown_label}
+    user opens details dropdown    ${dropdown_label}    testid:footnote-subject ${subject_label}
+
+user clicks footnote subject checkbox
+    [Arguments]    ${subject_label}    ${dropdown_label}    ${label}
+    user waits until page contains element    testid:footnote-subject ${subject_label}
+    ${details}=    user gets details content element    ${dropdown_label}    testid:footnote-subject ${subject_label}
+    user waits until page contains element    label:${label}
+    user waits until parent contains element    ${details}    label:${label}
+    ${checkbox}=    get child element    ${details}    label:${label}
     page should contain checkbox    ${checkbox}
     user scrolls to element    ${checkbox}
     wait until element is enabled    ${checkbox}
     user clicks element    ${checkbox}
-
-user checks footnote checkbox is selected
-    [Arguments]    ${label}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
-    ${checkbox}=    get child element    ${parent}
-    ...    xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
-    wait until element is enabled    ${checkbox}
     checkbox should be selected    ${checkbox}
 
 user opens nth editable accordion section
@@ -396,7 +394,7 @@ user adds data block to editable accordion section
     user waits for page to finish loading
     user clicks button    Add data block    ${section}
     ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
-    user selects from list by label    ${block_list}    Dates data block name
+    user chooses select option    ${block_list}    Dates data block name
     user waits until parent contains element    ${section}    css:table
     user clicks button    Embed    ${section}
 
@@ -434,10 +432,11 @@ user gets meta guidance data file content editor
 
 user enters text into meta guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
     ${editor}=    user gets meta guidance data file content editor    ${accordion_heading}
-    user checks page does not contain testid    fileGuidanceContent-focused
     user clicks element    ${editor}
-    user waits until page contains testid    fileGuidanceContent-focused
+    user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release
@@ -568,9 +567,9 @@ user changes methodology status to Approved
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user selects from list by label    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
+    user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="selectedPublicationRole"]
-    user selects from list by label    css:[name="selectedPublicationRole"]    Owner
+    user chooses select option    css:[name="selectedPublicationRole"]    Owner
     user clicks button    Add publication access
     user waits until page does not contain loading spinner
 
@@ -578,9 +577,9 @@ user gives release access to analyst
     [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="selectedReleaseId"]
-    user selects from list by label    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
+    user chooses select option    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
     user waits until element is enabled    css:[name="selectedReleaseRole"]
-    user selects from list by label    css:[name="selectedReleaseRole"]    ${ROLE}
+    user chooses select option    css:[name="selectedReleaseRole"]    ${ROLE}
     user clicks button    Add release access
     user waits until page does not contain loading spinner
 

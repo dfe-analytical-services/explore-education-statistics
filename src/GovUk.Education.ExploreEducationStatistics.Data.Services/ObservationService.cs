@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -19,10 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
+        private readonly ILogger<ObservationService> _logger;
+
         public ObservationService(
             StatisticsDbContext context,
-            ILogger<ObservationService> logger) : base(context, logger)
+            ILogger<ObservationService> logger) : base(context)
         {
+            _logger = logger;
         }
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
@@ -31,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var phasesStopwatch = Stopwatch.StartNew();
 
             var locationsQuery = query.Locations;
-            
+
             var localAuthorityOldCodes = locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList();
             var localAuthorityCodes = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
 
@@ -128,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             phasesStopwatch.Restart();
 
             var batchesOfIds = ids.Batch(10000).ToList();
-            
+
             var observations = batchesOfIds.SelectMany(batchOfIds =>
             {
                 var observationBatch = _context
@@ -145,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return observationBatch;
             })
                 .ToList();
-            
+
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
             return observations;
         }
