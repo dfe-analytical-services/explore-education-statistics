@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -105,18 +107,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseSubjectRepository releaseSubjectRepository = null,
             IReleaseDataFileService releaseDataFileService = null,
             IReleaseFileService releaseFileService = null,
-            IPublishingService publishingService = null)
+            IPublishingService publishingService = null,
+            IMethodologyService methodologyService = null)
         {
             return new TopicService(
-                contentContext ?? new Mock<ContentDbContext>().Object,
-                statisticsContext ?? new Mock<StatisticsDbContext>().Object,
+                Mock.Of<IConfiguration>(),
+                contentContext ?? Mock.Of<ContentDbContext>(),
+                statisticsContext ?? Mock.Of<StatisticsDbContext>(),
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Topic>(_topic.Id, _topic).Object,
                 mapper ?? AdminMapper(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                publishingService ?? new Mock<IPublishingService>().Object
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(),
+                publishingService ?? Mock.Of<IPublishingService>(),
+                methodologyService ?? Mock.Of<IMethodologyService>()
             );
         }
     }

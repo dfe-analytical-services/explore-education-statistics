@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
@@ -140,6 +141,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                         verifyNoOtherCallsMethod.Invoke(mock, null);
                     }
                 });
+        }
+
+        public static Mock<IConfiguration> CreateMockConfiguration(params Tuple<string, string>[] keysAndValues)
+        {
+            var configuration = new Mock<IConfiguration>();
+            
+            foreach (var keyValue in keysAndValues)
+            {
+                var (key, value) = keyValue;
+                
+                var section = new Mock<IConfigurationSection>();
+            
+                section
+                    .Setup(s => s.Value)
+                    .Returns(value);
+            
+                configuration
+                    .Setup(c => c.GetSection(key))
+                    .Returns(section.Object);
+            }
+
+            return configuration;
         }
     }
 }

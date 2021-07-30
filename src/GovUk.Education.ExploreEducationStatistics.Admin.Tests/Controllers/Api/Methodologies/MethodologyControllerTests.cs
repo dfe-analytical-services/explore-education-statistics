@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
-                .Setup(s => s.DeleteMethodology(_id))
+                .Setup(s => s.DeleteMethodology(_id, false))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
             
             var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);

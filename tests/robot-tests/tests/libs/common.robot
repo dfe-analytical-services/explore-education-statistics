@@ -1,6 +1,7 @@
 *** Settings ***
 Library     SeleniumLibrary    timeout=${timeout}    implicit_wait=${implicit_wait}    run_on_failure=do this on failure
 Library     OperatingSystem
+Library     Collections
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
@@ -27,30 +28,7 @@ do this on failure
         set selenium timeout    3
     END
 
-custom testid locator strategy
-    [Arguments]    ${browser}    ${test_id}    ${tag}    ${constraints}
-    ${elements}=    get webelements    css:[data-testid="${test_id}"]
-    [Return]    ${elements}
-
-custom label locator strategy
-    [Arguments]    ${browser}    ${label}    ${tag}    ${constraints}
-    ${label_els}=    get webelements    xpath://label[text()="${label}"]
-    ${label_count}=    get length    ${label_els}
-    # Return an empty list if no matching elements
-    ${elements}=    create list
-
-    IF    ${label_count} > 0
-        ${input_id}=    get element attribute    ${label_els}[0]    for
-        ${elements}=    get webelements    id:${input_id}
-    END
-    [Return]    ${elements}
-
-set custom locator strategies
-    add location strategy    testid    custom testid locator strategy
-    add location strategy    label    custom label locator strategy
-
 user opens the browser
-    set custom locator strategies
     IF    "${browser}" == "chrome"
         user opens chrome
     END
@@ -502,7 +480,33 @@ user checks summary list contains
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_MEDIUM}
 
-user selects from list by label
+user checks select contains x options
+    [Arguments]    ${locator}    ${num}
+    ${options}=    get list items    ${locator}
+    length should be    ${options}    ${num}
+
+user checks select contains at least x options
+    [Arguments]    ${locator}    ${num}
+    ${options}=    get list items    ${locator}
+    ${length}=    get length    ${options}
+    should be true    ${options} > ${num}
+
+user checks select contains option
+    [Arguments]    ${locator}    ${label}
+    ${options}=    get list items    ${locator}
+    list should contain value    ${options}    ${label}
+
+user checks select does not contain option
+    [Arguments]    ${locator}    ${label}
+    ${options}=    get list items    ${locator}
+    list should not contain value    ${options}    ${label}
+
+user checks selected option label
+    [Arguments]    ${locator}    ${label}
+    ${selected_label}=    get selected list label    ${locator}
+    should be equal    ${selected_label}    ${label}
+
+user chooses select option
     [Arguments]    ${locator}    ${label}
     user waits until page contains element    ${locator}
     select from list by label    ${locator}    ${label}
@@ -657,6 +661,20 @@ user checks checkbox input is not checked
     [Arguments]    ${selector}
     user waits until page contains element    ${selector}
     checkbox should not be selected    ${selector}
+
+user checks list has x items
+    [Arguments]    ${locator}    ${num}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${items}=    get child elements    ${list}    css:li
+    length should be    ${items}    ${num}
+
+user checks list item contains
+    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    user checks element should contain    ${item}    ${content}
 
 user checks breadcrumb count should be
     [Arguments]    ${count}

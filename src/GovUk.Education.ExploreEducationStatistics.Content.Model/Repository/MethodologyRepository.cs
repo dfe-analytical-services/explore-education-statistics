@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _methodologyParentRepository = methodologyParentRepository;
         }
 
-        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId)
+        public async Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId)
         {
             var publication = await _contentDbContext
                 .Publications
@@ -44,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                             PublicationId = publicationId
                         }
                     }
-                }
+                },
+                Created = DateTime.UtcNow,
+                CreatedById = createdByUserId
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();
@@ -114,11 +117,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             
             // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
             // that are owned by this Publication
-            var ownedMethodologyParents = _contentDbContext
+            var ownedMethodologyParents = await _contentDbContext
                 .PublicationMethodologies
                 .Include(m => m.MethodologyParent)
                 .Where(m => m.PublicationId == publicationId && m.Owner)
-                .Select(m => m.MethodologyParent);
+                .Select(m => m.MethodologyParent)
+                .ToListAsync();
 
             await ownedMethodologyParents.ForEachAsync(async methodologyParent =>
             {

@@ -51,7 +51,7 @@ const FootnotesList = ({
           <div
             key={id}
             className={styles.itemContainer}
-            data-testid={`footnote ${content}`}
+            data-testid={`Footnote - ${content}`}
           >
             <div className={styles.row}>
               <div className={styles.rowContent}>{content}</div>

@@ -96,12 +96,12 @@ const RelatedPagesSection = ({ release }: Props) => {
     <>
       {(editingMode === 'edit' || links.length > 0) && (
         <>
-          <h2
+          <h3
             className="govuk-heading-s govuk-!-margin-top-6"
             id="related-pages"
           >
             Related pages
-          </h2>
+          </h3>
           <nav role="navigation" aria-labelledby="related-content">
             <ul className="govuk-list">
               {links.map(({ id, description, url }) => (

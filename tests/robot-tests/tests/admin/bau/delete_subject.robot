@@ -53,7 +53,7 @@ Create indicator footnote for new subject
     user waits until h2 is visible    Create footnote
 
     user waits until page contains testid    footnote-subject UI test subject
-    user clicks footnote radio    UI test subject    Applies to specific data
+    user clicks footnote subject radio    UI test subject    Applies to specific data
     user opens details dropdown    Indicators
     user clicks checkbox    Admission Numbers
     user clicks element    id:footnoteForm-content
@@ -67,7 +67,7 @@ Create Random Filter Total footnote for new subject
     user waits until h2 is visible    Create footnote
 
     user waits until page contains testid    footnote-subject UI test subject
-    user clicks footnote radio    UI test subject    Applies to specific data
+    user clicks footnote subject radio    UI test subject    Applies to specific data
     user opens details dropdown    Random Filter
     user clicks checkbox    Total
     user clicks element    id:footnoteForm-content
@@ -81,7 +81,7 @@ Create Random Filter Select all footnote for new subject
     user waits until h2 is visible    Create footnote
 
     user waits until page contains testid    footnote-subject UI test subject
-    user clicks footnote radio    UI test subject    Applies to specific data
+    user clicks footnote subject radio    UI test subject    Applies to specific data
     user opens details dropdown    Random Filter
     user clicks checkbox    Select all
     user clicks element    id:footnoteForm-content
@@ -120,8 +120,8 @@ Select locations
 
 Select time period
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2019
-    user selects from list by label    id:timePeriodForm-end    2019
+    user chooses select option    id:timePeriodForm-start    2019
+    user chooses select option    id:timePeriodForm-end    2019
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
 

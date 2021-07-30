@@ -107,8 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
                     new ReleaseSubjectRepository(
                         statisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
-                        footnoteRepository: provider.GetService<IFootnoteRepository>()))
+                        footnoteRepository: new FootnoteRepository(provider.GetService<PublicStatisticsDbContext>())
+                    ))
                 .AddScoped<IFilterRepository, FilterRepository>()
+                .AddScoped<IFootnoteRepository, FootnoteRepository>()
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
                 .AddScoped<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>()
@@ -119,9 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         dataGuidanceFileWriter: provider.GetService<IDataGuidanceFileWriter>(),
                         blobStorageService: GetBlobStorageService(provider, "CoreStorage")
                     ))
-                .AddScoped<IFootnoteRepository, FootnoteRepository>(provider =>
-                    new FootnoteRepository(
-                        context: provider.GetService<PublicStatisticsDbContext>()))
                 .AddScoped<IZipFileService, ZipFileService>(provider =>
                     new ZipFileService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")

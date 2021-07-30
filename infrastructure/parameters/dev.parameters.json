@@ -65,6 +65,9 @@
     "enableSwagger": {
        "value": true
     },
+    "enableThemeDeletion": {
+      "value": true
+    },
     "branch": {
        "value": "dev"
     },

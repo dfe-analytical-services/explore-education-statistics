@@ -74,7 +74,7 @@ Check publication owner can add a footnote to ${SUBJECT_NAME}
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until page does not contain loading spinner
-    user clicks footnote radio    ${SUBJECT_NAME}    Applies to all data
+    user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote from the publication owner! (analyst)
     user clicks button    Save footnote
@@ -157,7 +157,7 @@ Add a Footnote as a release approver
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
-    user clicks footnote radio    ${SUBJECT_NAME}    Applies to all data
+    user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content
     ...    A footnote as analyst1 User1 with the release approver role

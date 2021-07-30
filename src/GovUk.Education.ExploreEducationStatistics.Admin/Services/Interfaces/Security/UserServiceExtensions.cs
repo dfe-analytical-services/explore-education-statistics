@@ -83,8 +83,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         }
 
         public static Task<Either<ActionResult, Methodology>> CheckCanDeleteMethodology(
-            this IUserService userService, Methodology methodology)
+            this IUserService userService, Methodology methodology, bool ignoreCheck = false)
         {
+            if (ignoreCheck)
+            {
+                return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
+            }
             return userService.CheckPolicy(methodology, SecurityPolicies.CanDeleteSpecificMethodology);
         }
 

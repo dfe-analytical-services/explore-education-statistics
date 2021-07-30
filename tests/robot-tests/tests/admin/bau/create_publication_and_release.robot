@@ -72,8 +72,8 @@ Go to edit publication
 Update publication
     [Tags]    HappyPath
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME}
-    user selects from list by label    id:publicationForm-themeId    ${CREATED_THEME_NAME}
-    user selects from list by label    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
+    user chooses select option    id:publicationForm-themeId    ${CREATED_THEME_NAME}
+    user chooses select option    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
     user enters text into element    id:publicationForm-teamName    Special educational needs statistics team
     user enters text into element    id:publicationForm-teamEmail    sen.statistics@education.gov.uk
     user enters text into element    id:publicationForm-contactName    Sean Gibson
@@ -102,7 +102,7 @@ Create new release
     user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
-    user selects from list by label    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
     user clicks radio    National Statistics
     user clicks button    Create new release
@@ -122,7 +122,7 @@ Edit release summary
     user clicks link    Edit release summary
     user waits until h2 is visible    Edit release summary
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
-    user selects from list by label    id:releaseSummaryForm-timePeriodCoverageCode    Summer Term
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
     user clicks radio    Official Statistics
     user clicks button    Update release summary

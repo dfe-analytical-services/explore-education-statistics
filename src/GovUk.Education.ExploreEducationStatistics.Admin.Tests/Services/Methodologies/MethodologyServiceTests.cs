@@ -33,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
+        private static readonly Guid UserId = Guid.NewGuid();
+        
         [Fact]
         public async Task CreateMethodology()
         {
@@ -64,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 };
 
                 repository
-                    .Setup(s => s.CreateMethodologyForPublication(publication.Id))
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
                 var result = await service.CreateMethodology(publication.Id);
@@ -441,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             imageService.Setup(mock =>
-                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
+                    mock.Delete(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -464,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 imageService.Verify(mock =>
-                    mock.UnlinkAndDeleteIfOrphaned(methodology.Id, new List<Guid>
+                    mock.Delete(methodology.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -1053,7 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     AsArray(methodologyVersion2File1Link.File.Id, methodologyVersion2File2Link.File.Id);
 
                 methodologyImageService
-                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[1].Id,
+                    .Setup(s => s.Delete(methodologyParent.Versions[1].Id,
                         methodologyVersion2FileIds))
                     .ReturnsAsync(Unit.Instance);
 
@@ -1138,8 +1140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var relatedMethodologyFileLinks = AsArray(relatedFileMethodologyLink.File.Id);
 
                 methodologyImageService
-                    .Setup(s => s.UnlinkAndDeleteIfOrphaned(methodologyParent.Versions[0].Id,
-                        relatedMethodologyFileLinks))
+                    .Setup(s => s.Delete(methodologyParent.Versions[0].Id, relatedMethodologyFileLinks))
                     .ReturnsAsync(Unit.Instance);
 
                 var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
@@ -1185,7 +1186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
                 methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object,
-                userService ?? AlwaysTrueUserService().Object);
+                userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }
 }

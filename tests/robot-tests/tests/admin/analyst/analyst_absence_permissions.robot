@@ -12,10 +12,10 @@ Validate Analyst1 can see correct themes and topics
     user selects theme and topic from admin dashboard    Pupils and schools    Pupil absence
     user waits until page contains accordion section    Pupil absence in schools in England    60
 
-    user checks list contains label    id:publicationsReleases-themeTopic-themeId    Pupils and schools
-    user checks list contains x elements    id:publicationsReleases-themeTopic-topicId    2
-    user checks list contains label    id:publicationsReleases-themeTopic-topicId    Exclusions
-    user checks list contains label    id:publicationsReleases-themeTopic-topicId    Pupil absence
+    user checks select contains option    id:publicationsReleases-themeTopic-themeId    Pupils and schools
+    user checks select contains x options    id:publicationsReleases-themeTopic-topicId    2
+    user checks select contains option    id:publicationsReleases-themeTopic-topicId    Exclusions
+    user checks select contains option    id:publicationsReleases-themeTopic-topicId    Pupil absence
 
 Validate Analyst1 can see correct draft and scheduled releases tabs
     [Tags]    HappyPath
@@ -56,7 +56,7 @@ Validate Analyst1 can see 'Content' page
 
 Validate Analyst1 can see 'Content' page key stats
     [Tags]    HappyPath
-    user waits until page contains element    id:releaseHeadlines    360
+    user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}
     user waits until page does not contain loading spinner
     user scrolls to element    id:releaseHeadlines
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
@@ -85,7 +85,7 @@ Validate Analyst1 can see 'Content' page accordion sections
     user checks accordion is in position    Pupil referral unit absence    8    id:releaseMainContent
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:releaseMainContent
     user checks there are x accordion sections    9    id:releaseMainContent
-
     user checks accordion is in position    Methodology    1    id:helpAndSupport
-    user checks accordion is in position    Contact us    2    id:helpAndSupport
-    user checks there are x accordion sections    2    id:helpAndSupport
+    user checks accordion is in position    Official Statistics    2    id:helpAndSupport
+    user checks accordion is in position    Contact us    3    id:helpAndSupport
+    user checks there are x accordion sections    3    id:helpAndSupport

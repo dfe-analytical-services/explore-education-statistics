@@ -94,8 +94,8 @@ Create data block table
     user clicks element    id:locationFiltersForm-submit
 
     user waits until table tool wizard step is available    Choose time period
-    user selects from list by label    id:timePeriodForm-start    2020 Week 13
-    user selects from list by label    id:timePeriodForm-end    2020 Week 16
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2020 Week 16
     user clicks element    id:timePeriodForm-submit
 
     user waits until table tool wizard step is available    Choose your filters

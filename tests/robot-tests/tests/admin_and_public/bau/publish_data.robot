@@ -9,9 +9,22 @@ Suite Teardown      user closes the browser
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}=    UI tests - publish data %{RUN_IDENTIFIER}
-${SUBJECT_NAME}=        UI test subject
+${TOPIC_NAME}=                          %{TEST_TOPIC_NAME}
+${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}=                      Financial Year 3000-01
+${RELEASE_2_NAME}=                      Financial Year 3001-02
+${SUBJECT_1_NAME}=                      UI test subject 1
+${SUBJECT_2_NAME}=                      UI test subject 2
+${FOOTNOTE_ALL}=                        Footnote for all subjects
+${FOOTNOTE_ALL_INDICATOR}=              Footnote for all subjects - indicator
+${FOOTNOTE_ALL_INDICATOR_UPDATED}=      Footnote for all subjects - updated indicator
+${FOOTNOTE_ALL_FILTER}=                 Footnote for all subjects - filters
+${FOOTNOTE_SUBJECT_1}=                  Footnote for subject 1
+${FOOTNOTE_SUBJECT_1_INDICATOR}=        Footnote for subject 1 - indicator
+${FOOTNOTE_SUBJECT_1_FILTER}=           Footnote for subject 1 - filter
+${FOOTNOTE_SUBJECT_1_FILTER_GROUP}=     Footnote for subject 1 - filter group
+${FOOTNOTE_SUBJECT_1_FILTER_ITEM}=      Footnote for subject 1 - filter item
+${FOOTNOTE_SUBJECT_1_MIXTURE}=          Footnote for subject 1 - mixture of all
 
 *** Test Cases ***
 Create new publication and release via API
@@ -22,7 +35,7 @@ Create new publication and release via API
 Navigate to release
     [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01 (not Live)
+    ...    ${RELEASE_1_NAME} (not Live)
 
 Add public prerelease access list
     [Tags]    HappyPath
@@ -61,21 +74,268 @@ Verify new release summary
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
-Upload subject to new release
+Upload subjects to release
     [Tags]    HappyPath
     user clicks link    Data and files
-    user uploads subject    ${SUBJECT_NAME}    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
+    user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
-Add meta guidance to subject
+Navigate to Footnotes page
     [Tags]    HappyPath
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subjects
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to all data
+    user enters text into element    label:Footnote    ${FOOTNOTE_ALL}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subject indicators
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
+
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Indicators    Admission Numbers
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subject filters
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Select all
+
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Random Filter
+    user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Random Filter    Select all
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_FILTER}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 indicators
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filters
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Select all
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Select all
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filter groups
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Individual
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filter items
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary and secondary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Total
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 with mixture of indicators and filters
+    [Tags]    HappyPath
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Percentage of persistent absentees
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Unauthorised absence rate
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded secondary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Total
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
+
+    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_MIXTURE}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Confirm created footnotes
+    [Tags]    HappyPath
+    user waits until h2 is visible    Footnotes
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL_FILTER}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_MIXTURE}
+
+Add meta guidance to subjects
+    [Tags]    HappyPath
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
     user clicks link    Metadata guidance
     user waits until h2 is visible    Public metadata guidance document
 
     user waits until page contains element    id:metaGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user opens accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    ${SUBJECT_NAME} meta guidance content
+    user waits until page contains accordion section    ${SUBJECT_1_NAME}
+    user enters text into meta guidance data file content editor    ${SUBJECT_1_NAME}
+    ...    ${SUBJECT_1_NAME} meta guidance content
+
+    user waits until page contains accordion section    ${SUBJECT_2_NAME}
+    user enters text into meta guidance data file content editor    ${SUBJECT_2_NAME}
+    ...    ${SUBJECT_2_NAME} meta guidance content
+
+Validate meta guidance variables and descriptions
+    [Tags]    HappyPath
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    ...    id:metaGuidance-dataFiles
+    user opens details dropdown    Variable names and descriptions    ${subject_1_content}
+
+    ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
+    user checks table body has x rows    9    ${subject_1_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+
+    user checks results table cell contains    1    1    colour    ${subject_1_variables}
+    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+
+    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+
+    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+
+    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+
+    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    ...    id:metaGuidance-dataFiles
+    user opens details dropdown    Variable names and descriptions    ${subject_2_content}
+
+    ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
+    user checks table body has x rows    2    ${subject_2_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
+
+    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+
+    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+
+Validate meta guidance footnotes
+    [Tags]    HappyPath
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    ...    id:metaGuidance-dataFiles
+    user opens details dropdown    Footnotes    ${subject_1_content}
+
+    user checks list has x items    testid:Footnotes    9    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    4    ${FOOTNOTE_SUBJECT_1}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    5    ${FOOTNOTE_SUBJECT_1_INDICATOR}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    6    ${FOOTNOTE_SUBJECT_1_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    7    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    8    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    ...    id:metaGuidance-dataFiles
+    user opens details dropdown    Footnotes    ${subject_2_content}
+
+    user checks list has x items    testid:Footnotes    3    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
+
+Save meta guidance
+    [Tags]    HappyPath
     user clicks button    Save guidance
 
 Navigate to Data blocks page
@@ -89,10 +349,10 @@ Create new data block
     user waits until h2 is visible    Create data block
     user waits until table tool wizard step is available    Choose a subject
 
-Select subject "${SUBJECT_NAME}"
+Select subject "${SUBJECT_2_NAME}"
     [Tags]    HappyPath
-    user waits until page contains    ${SUBJECT_NAME}
-    user clicks radio    ${SUBJECT_NAME}
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
     user clicks element    id:publicationSubjectForm-submit
 
 Select locations
@@ -111,19 +371,29 @@ Select locations
 Select time period
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose time period
-    user selects from list by label    id:timePeriodForm-start    2005
-    user selects from list by label    id:timePeriodForm-end    2020
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
 
-Select indicators
+Select indicators and filters
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
+
+    user opens details dropdown    Random Filter
+    user clicks category checkbox    Random Filter    Not specified
 
 Create table
     [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
+
+Check created table has footnotes
+    [Tags]    HappyPath
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a highlight
     [Tags]    HappyPath
@@ -139,12 +409,37 @@ Save data block as a highlight
     user clicks button    Save data block
     user waits until page contains    Delete this data block
 
-Add public prerelease access list for new release
+Edit footnote
+    [Tags]    HappyPath
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
+
+    user waits until h2 is visible    Edit footnote
+    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user clicks button    Save footnote
+    user waits until page contains    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
+
+Check footnote was updated on data block
+    [Tags]    HappyPath
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+
+    user clicks link    Edit block    css:tbody > tr:first-child
+    user waits until table is visible
+
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Add public prerelease access list for release
     [Tags]    HappyPath
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 
-Approve new release
+Approve release
     [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
@@ -172,24 +467,24 @@ Navigate to published release page
 
 Check latest release is correct
     [Tags]    HappyPath
-    user waits until page contains title caption    Financial Year 3001-02    90
+    user waits until page contains title caption    ${RELEASE_2_NAME}    90
     user checks page contains    This is the latest data
     user checks page contains    See other releases (1)
 
     user opens details dropdown    See other releases (1)
-    user checks page contains other release    Financial Year 3000-01
-    user checks page does not contain other release    Financial Year 3001-02
+    user checks page contains other release    ${RELEASE_1_NAME}
+    user checks page does not contain other release    ${RELEASE_2_NAME}
 
-    user clicks link    Financial Year 3000-01
+    user clicks link    ${RELEASE_1_NAME}
 
 Check other release is correct
     [Tags]    HappyPath
-    user waits until page contains title caption    Financial Year 3000-01
+    user waits until page contains title caption    ${RELEASE_1_NAME}
 
-    user waits until page contains link    View latest data: Financial Year 3001-02
+    user waits until page contains link    View latest data: ${RELEASE_2_NAME}
     user checks page contains    See other releases (1)
-    user checks page contains other release    Financial Year 3001-02
-    user checks page does not contain other release    Financial Year 3000-01
+    user checks page contains other release    ${RELEASE_2_NAME}
+    user checks page does not contain other release    ${RELEASE_1_NAME}
 
 Go to Table Tool page
     [Tags]    HappyPath
@@ -204,16 +499,15 @@ Select publication in table tool
     user waits until table tool wizard step is available    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
-Select subject "${SUBJECT_NAME}" in table tool
+Select subject "${SUBJECT_2_NAME}" in table tool
     [Tags]    HappyPath
     user clicks link    Create your own table
     user waits until table tool wizard step is available    Choose a subject
-
-    user waits until page contains    ${SUBJECT_NAME}
-    user clicks radio    ${SUBJECT_NAME}
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
-    user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
+    user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
     [Tags]    HappyPath
@@ -227,14 +521,17 @@ Select locations in table tool
 
 Select time period in table tool
     [Tags]    HappyPath
-    user selects from list by label    id:timePeriodForm-start    2014
-    user selects from list by label    id:timePeriodForm-end    2018
+    user chooses select option    id:timePeriodForm-start    2014
+    user chooses select option    id:timePeriodForm-end    2018
     user clicks element    id:timePeriodForm-submit
 
-Select indicators in table tool
+Select indicators and filters in table tool
     [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
+
+    user opens details dropdown    Random Filter
+    user clicks category checkbox    Random Filter    Not specified
     user clicks element    id:filtersForm-submit
 
 Validate table
@@ -260,6 +557,13 @@ Validate table
     user checks table cell in offset row contains    ${row}    0    4    8,530
     user checks table cell in offset row contains    ${row}    0    5    3,962
 
+Validate table has footnotes
+    [Tags]    HappyPath
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
 Select table highlight from subjects step
     [Tags]    HappyPath
     user clicks element    testid:wizardStep-2-goToButton
@@ -279,7 +583,7 @@ Select table highlight from subjects step
     user clicks link    Test highlight name
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
     [Tags]    HappyPath
@@ -340,3 +644,119 @@ Validate table rows for table highlight
     user checks table cell in offset row contains    ${row}    2    1    6,060
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
+
+Validate table highlight has footnotes
+    [Tags]    HappyPath
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Go to release page
+    [Tags]    HappyPath
+    user opens accordion section    Related information
+    user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
+
+    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until page contains title caption    ${RELEASE_2_NAME}
+
+Go to meta guidance document
+    [Tags]    HappyPath
+    user clicks link    Metadata guidance document
+
+    user waits until page contains title caption    ${RELEASE_2_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    Metadata guidance document
+
+Validate meta guidance document file details
+    [Tags]    HappyPath
+    user waits until page contains accordion section    ${SUBJECT_1_NAME}
+    user waits until page contains accordion section    ${SUBJECT_2_NAME}
+    user checks there are x accordion sections    2
+
+    user opens accordion section    ${SUBJECT_1_NAME}
+
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    user checks summary list contains    Filename    tiny-two-filters.csv    ${subject_1_content}
+    user checks summary list contains    Geographic levels    National    ${subject_1_content}
+    user checks summary list contains    Time period    2017/18    ${subject_1_content}
+    user checks summary list contains    Content    UI test subject 1 meta guidance content    ${subject_1_content}
+
+    user opens accordion section    ${SUBJECT_2_NAME}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    user checks summary list contains    Filename    upload-file-test.csv    ${subject_2_content}
+    user checks summary list contains    Geographic levels
+    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    ${subject_2_content}
+    user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
+    user checks summary list contains    Content    UI test subject 2 meta guidance content    ${subject_2_content}
+
+Validate meta guidance document variables
+    [Tags]    HappyPath
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    user opens details dropdown    Variable names and descriptions    ${subject_1_content}
+
+    ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
+    user checks table body has x rows    9    ${subject_1_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+
+    user checks results table cell contains    1    1    colour    ${subject_1_variables}
+    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+
+    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+
+    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+
+    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+
+    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    user opens details dropdown    Variable names and descriptions    ${subject_2_content}
+
+    ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
+    user checks table body has x rows    2    ${subject_2_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
+
+    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+
+    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+
+Validate meta guidance document footnotes
+    [Tags]    HappyPath
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    user opens details dropdown    Footnotes    ${subject_1_content}
+
+    user checks list has x items    testid:Footnotes    9    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    4    ${FOOTNOTE_SUBJECT_1}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    5    ${FOOTNOTE_SUBJECT_1_INDICATOR}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    6    ${FOOTNOTE_SUBJECT_1_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    7    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    8    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    user opens details dropdown    Footnotes    ${subject_2_content}
+
+    user checks list has x items    testid:Footnotes    3    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
