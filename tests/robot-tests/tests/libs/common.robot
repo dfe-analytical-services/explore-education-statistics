@@ -167,8 +167,13 @@ user waits for page to finish loading
     sleep    0.2
 
 user waits until page does not contain loading spinner
-    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not disappear in 30 seconds.')
-    user waits until page does not contain element    css:[class^="LoadingSpinner"]    60
+    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not
+    # disappear in 30 seconds.')
+
+    # Also, we're only interested in loading spinners that aren't lazy loaders that are waiting for user interaction
+    # prior to loading their content.
+    user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
+    ...    60
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
@@ -329,13 +334,25 @@ user checks element contains button
     [Arguments]
     ...    ${element}
     ...    ${button_text}
-    user waits until parent contains element    ${element}    xpath:.//button[text()="${button_text}"]
+    user waits until parent contains element    ${element}    xpath://button[text()="${button_text}"]
 
 user checks element does not contain button
     [Arguments]
     ...    ${element}
     ...    ${button_text}
-    user waits until parent does not contain element    ${element}    xpath:.//button[text()="${button_text}"]
+    user waits until parent does not contain element    ${element}    xpath://button[text()="${button_text}"]
+
+user checks element contains link
+    [Arguments]
+    ...    ${element}
+    ...    ${link_text}
+    user waits until parent contains element    ${element}    xpath://a[text()="${link_text}"]
+
+user checks element does not contain link
+    [Arguments]
+    ...    ${element}
+    ...    ${link_text}
+    user waits until parent does not contain element    ${element}    xpath://a[text()="${link_text}"]
 
 user waits until element is visible
     [Arguments]    ${selector}    ${wait}=${timeout}
@@ -394,7 +411,7 @@ user clicks element
     [Arguments]
     ...    ${selector}
     ...    ${parent}=css:body
-    ${element}=    find element    ${selector}    ${parent}
+    ${element}=    get webelement    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
     click element    ${element}
@@ -533,7 +550,7 @@ user presses keys
     ...    ${keys}
     ...    ${selector}=${EMPTY}
     IF    '${selector}' != '${EMPTY}'
-        ${element}=    find element    ${selector}
+        ${element}=    get webelement    ${selector}
         user waits until element is visible    ${element}
         user sets focus to element    ${element}
         user clicks element    ${element}
@@ -567,6 +584,7 @@ user opens details dropdown
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains element    ${parent}
     ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]    60
+    ${details}=    get child element    ${parent}    xpath:.//details[summary[contains(., "${text}")]]
     ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
     user waits until element is visible    ${summary}    60
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
@@ -574,6 +592,7 @@ user opens details dropdown
         user clicks element    ${summary}
     END
     user checks element attribute value should be    ${summary}    aria-expanded    true
+    [Return]    ${details}
 
 user closes details dropdown
     [Arguments]    ${text}    ${parent}=css:body
@@ -727,7 +746,7 @@ user waits until table tool wizard step is available
     [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
 
-find element
+get webelement
     [Arguments]
     ...    ${selector_or_webelement}
     ...    ${parent}=css:body

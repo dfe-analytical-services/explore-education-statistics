@@ -331,12 +331,15 @@ def is_webelement(variable: object) -> bool:
 
 
 def _normalise_child_locator(child_locator: str) -> str:
-    # the below substitution is necessary in order to correctly find the parent's descendants.  Without the 
-    # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query 
-    # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below 
-    # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward 
-    # slashes without the "xpath:" prefix are inferred as being xpath expressions.
-    return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
+    if isinstance(child_locator, str):
+        # the below substitution is necessary in order to correctly find the parent's descendants.  Without the 
+        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query 
+        # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below 
+        # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward 
+        # slashes without the "xpath:" prefix are inferred as being xpath expressions.
+        return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
+    
+    raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 
 def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = '') -> WebElement:

@@ -133,6 +133,7 @@ user opens publication on the admin dashboard
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
+    user waits until page does not contain loading spinner
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
@@ -172,17 +173,23 @@ user approves methodology for publication
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks link    Edit this methodology    ${accordion}
-    user waits until page contains title caption    Edit methodology
-    user waits until h2 is visible    Methodology summary
+    approve methodology from methodology view
+
+user approves methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ...    ${methodology_title}=${publication}
+
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks link    Edit this amendment    ${accordion}
+    approve methodology from methodology view
+
+approve methodology from methodology view
     user clicks link    Sign off
-    user waits until h2 is visible    Methodology status
-    user clicks button    Edit status
-    user waits until h2 is visible    Edit methodology status
-    user clicks radio    Approved for publication
-    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Test release note
-    user clicks button    Update status
-    user waits until h2 is visible    Methodology status
-    user checks page contains tag    Approved
+    user changes methodology status to Approved
 
 user creates approved methodology for publication
     [Arguments]
@@ -458,6 +465,8 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks button    Update status
+    user waits until h2 is visible    Methodology status
+    user checks page contains tag    Approved
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
