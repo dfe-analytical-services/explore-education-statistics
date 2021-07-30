@@ -56,7 +56,7 @@ Validate Analyst1 can see 'Content' page
 
 Validate Analyst1 can see 'Content' page key stats
     [Tags]    HappyPath
-    user waits until page contains element    id:releaseHeadlines    360
+    user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}
     user waits until page does not contain loading spinner
     user scrolls to element    id:releaseHeadlines
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
