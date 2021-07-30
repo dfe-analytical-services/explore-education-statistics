@@ -164,5 +164,22 @@ Check release approver can create a release note
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
+    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
+
+Navigate to administration as bau1 and swap release approver role for publication owner now that the publication is live
+    [Tags]    HappyPath
+    user changes to bau1
+    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+
+Check publication owner can create and cancel Methodology amendments on a live Publication
+    [Tags]    HappyPath
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user cancels methodology amendment for publication    ${PUBLICATION_NAME}
+
+Check publication owner can approve Methodology amendments on a live Publication
+    [Tags]    HappyPath
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user approves methodology amendment for publication    ${PUBLICATION_NAME}

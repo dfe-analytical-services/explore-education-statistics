@@ -178,9 +178,9 @@ user approves methodology for publication
 user approves methodology amendment for publication
     [Arguments]
     ...    ${publication}
+    ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ...    ${methodology_title}=${publication}
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
@@ -199,6 +199,31 @@ user creates approved methodology for publication
 
     user creates methodology for publication    ${publication}    ${theme}    ${topic}
     user approves methodology for publication    ${publication}    ${theme}    ${topic}
+
+user creates methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks button    Amend methodology    ${accordion}
+    user waits until modal is visible    Confirm you want to amend this live methodology
+    user clicks button    Confirm
+    user waits until h2 is visible    Methodology summary
+
+user cancels methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks button    Cancel amendment    ${accordion}
+    user waits until modal is visible    Confirm you want to cancel this amended methodology
+    user clicks button    Confirm
 
 user links publication to external methodology
     [Arguments]

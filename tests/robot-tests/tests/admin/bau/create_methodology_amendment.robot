@@ -99,12 +99,7 @@ Verify the readonly content for the original Methodology is as expected
 
 Create a Methodology Amendment
     [Tags]    HappyPath
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks button    Amend methodology    ${accordion}
-    user waits until modal is visible    Confirm you want to amend this live methodology
-    user clicks button    Confirm
-    user waits until h2 is visible    Methodology summary
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user checks page contains tag    Draft
     user checks page contains tag    Amendment
 
@@ -178,18 +173,8 @@ Visit the approved Amendment and check that its readonly content is as expected
 
 Create and cancel an Amendment
     [Tags]    HappyPath
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks button    Amend methodology    ${accordion}
-    user waits until modal is visible    Confirm you want to amend this live methodology
-    user clicks button    Confirm
-    user waits until h2 is visible    Methodology summary
-
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks button    Cancel amendment    ${accordion}
-    user waits until modal is visible    Confirm you want to cancel this amended methodology
-    user clicks button    Confirm
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user cancels methodology amendment for publication    ${PUBLICATION_NAME}
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
@@ -208,27 +193,34 @@ user verifies original Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology content
-    user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded content image"]
+    user waits until parent contains element    ${section}
+    ...    xpath://img[@alt="Alt text for the uploaded content image"]
 
-    ${section}=    user opens accordion section    Methodology annex section 1    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    ${section}=    user opens accordion section    Methodology annex section 1
+    ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology annex
     user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded annex image"]
 
-    ${section}=    user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    ${section}=    user opens accordion section    Methodology annex section 2
+    ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 1
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2
-    user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded annex image 2"]
-    user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded annex image 3"]
+    user waits until parent contains element    ${section}
+    ...    xpath://img[@alt="Alt text for the uploaded annex image 2"]
+    user waits until parent contains element    ${section}
+    ...    xpath://img[@alt="Alt text for the uploaded annex image 3"]
 
 user verifies amended Methodololgy readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology content
-    user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded content image"]
+    user waits until parent contains element    ${section}
+    ...    xpath://img[@alt="Alt text for the uploaded content image"]
     user waits until parent contains element    ${section}
     ...    xpath://img[@alt="Alt text for the uploaded content image 2"]
 
-    ${section}=    user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    ${section}=    user opens accordion section    Methodology annex section 2
+    ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2
 
 teardown suite
