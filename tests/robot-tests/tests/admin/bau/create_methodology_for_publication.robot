@@ -116,6 +116,7 @@ Check the controls available are as expected for an approved Methodology that is
 
 Unapprove the Methodology
     [Tags]    HappyPath
+    user views methodology for publication    ${PUBLICATION_NAME}
     user clicks link    Sign off
     user changes methodology status to Draft
 

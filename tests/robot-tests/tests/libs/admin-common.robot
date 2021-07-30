@@ -473,7 +473,7 @@ user changes methodology status to Draft
     user clicks element    id:methodologyStatusForm-status-Draft
     user clicks button    Update status
     user waits until h2 is visible    Methodology status
-    user checks page contains tag    Draft
+    user checks page contains tag    In Draft
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
