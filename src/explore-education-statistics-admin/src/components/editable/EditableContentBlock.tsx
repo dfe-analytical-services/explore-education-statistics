@@ -32,7 +32,6 @@ interface EditableContentBlockProps {
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
   useMarkdown?: boolean;
-  testId?: string;
 }
 
 const EditableContentBlock = ({
@@ -49,7 +48,6 @@ const EditableContentBlock = ({
   onDelete,
   transformImageAttributes,
   useMarkdown,
-  testId,
 }: EditableContentBlockProps) => {
   const content = useMemo(() => (useMarkdown ? toHtml(value) : value), [
     useMarkdown,
@@ -112,7 +110,6 @@ const EditableContentBlock = ({
     <EditableBlockWrapper
       onEdit={editable ? toggleEditing.on : undefined}
       onDelete={editable ? onDelete : undefined}
-      testId={testId}
     >
       <div
         className={classNames(styles.preview, {

@@ -22,7 +22,7 @@ export interface EditableSectionBlockProps<
   onBlocksChange?: (nextBlocks: T[]) => void;
   onBlockCommentsChange?: CommentsChangeHandler;
   renderBlock: (block: T) => ReactNode;
-  renderEditableBlock: (block: T, index: number) => ReactNode;
+  renderEditableBlock: (block: T) => ReactNode;
 }
 
 const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
@@ -112,7 +112,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
                 />
               )}
 
-              {renderEditableBlock(block, index)}
+              {renderEditableBlock(block)}
             </BlockDraggable>
           </div>
         ))}

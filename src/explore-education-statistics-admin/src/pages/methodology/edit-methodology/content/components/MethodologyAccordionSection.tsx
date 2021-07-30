@@ -151,7 +151,7 @@ const MethodologyAccordionSection = ({
         renderBlock={block => (
           <MethodologyBlock methodologyId={methodologyId} block={block} />
         )}
-        renderEditableBlock={(block, index) => (
+        renderEditableBlock={block => (
           <MethodologyEditableBlock
             allowImages
             block={block}
@@ -159,17 +159,12 @@ const MethodologyAccordionSection = ({
             methodologyId={methodologyId}
             onSave={updateBlockInAccordionSection}
             onDelete={removeBlockFromAccordionSection}
-            testId={`${heading}-editableContentBlock${index + 1}`}
           />
         )}
       />
       {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-          <Button
-            variant="secondary"
-            onClick={addBlockToAccordionSection}
-            testId={`${heading}-addTextBlockButton`}
-          >
+          <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block
           </Button>
         </div>
