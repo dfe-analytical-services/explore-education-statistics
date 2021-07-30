@@ -411,7 +411,7 @@ user clicks element
     [Arguments]
     ...    ${selector}
     ...    ${parent}=css:body
-    ${element}=    get webelement    ${selector}    ${parent}
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
     click element    ${element}
@@ -550,7 +550,7 @@ user presses keys
     ...    ${keys}
     ...    ${selector}=${EMPTY}
     IF    '${selector}' != '${EMPTY}'
-        ${element}=    get webelement    ${selector}
+        ${element}=    lookup or return webelement    ${selector}
         user waits until element is visible    ${element}
         user sets focus to element    ${element}
         user clicks element    ${element}
@@ -746,7 +746,7 @@ user waits until table tool wizard step is available
     [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
 
-get webelement
+lookup or return webelement
     [Arguments]
     ...    ${selector_or_webelement}
     ...    ${parent}=css:body
