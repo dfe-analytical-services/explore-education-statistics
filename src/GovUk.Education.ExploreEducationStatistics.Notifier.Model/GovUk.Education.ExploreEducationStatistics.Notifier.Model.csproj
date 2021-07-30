@@ -2,7 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>9.0</LangVersion>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
+    </ItemGroup>
 </Project>
