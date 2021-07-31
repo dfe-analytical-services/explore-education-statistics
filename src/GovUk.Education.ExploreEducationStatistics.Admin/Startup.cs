@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
-            services.AddTransient<ICacheService, BlobStorageCacheService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterRepository, FilterRepository>();

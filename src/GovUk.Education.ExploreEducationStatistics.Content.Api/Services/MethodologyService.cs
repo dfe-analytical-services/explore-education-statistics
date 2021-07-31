@@ -25,19 +25,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IMethodologyRepository _methodologyRepository;
 
         public MethodologyService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            ICacheService cacheService,
+            IBlobCacheService blobCacheService,
             IMethodologyRepository methodologyRepository)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _methodologyRepository = methodologyRepository;
         }
 
@@ -70,10 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
-            return await _cacheService.GetItem(
-                blobContainer: PublicContent,
-                cacheKey: AllMethodologiesCacheKey.Instance,
-                entityProvider: async () =>
+            return await _blobCacheService.GetItem(
+                cacheKey: new AllMethodologiesCacheKey(PublicContent),
+                itemSupplier: async () =>
                 {
                     var themes = await _contentDbContext.Themes
                         .Include(theme => theme.Topics)

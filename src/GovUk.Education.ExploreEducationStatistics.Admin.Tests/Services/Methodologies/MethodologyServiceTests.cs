@@ -1083,13 +1083,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
             cacheService.Setup(mock =>
-                    mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
+                    mock.DeleteItem(new AllMethodologiesCacheKey(PublicContent)))
                 .Returns(Task.CompletedTask);
 
             contentService.Setup(mock =>
@@ -1106,7 +1106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
+                    blobCacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
@@ -1326,6 +1326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
+
                 var result = await service.UpdateMethodology(methodology.Id, request);
                 result.AssertNotFound();
             }
@@ -1390,7 +1391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy_ReleaseNotRelated()
         {
-            // Release is not from the same publication as the one linked to the methodology 
+            // Release is not from the same publication as the one linked to the methodology
             var scheduledWithRelease = new Release
             {
                 Id = Guid.NewGuid(),
@@ -1904,7 +1905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
-                // unaffected. 
+                // unaffected.
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
 
@@ -1917,7 +1918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            ICacheService? cacheService = null,
+            IBlobCacheService? blobCacheService = null,
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyRepository? methodologyRepository = null,
@@ -1929,8 +1930,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),
-                cacheService ?? new Mock<ICacheService>(Strict).Object,
-                methodologyContentService ?? new Mock<IMethodologyContentService>(Strict).Object,
+                blobCacheService ?? new Mock<IBlobCacheService>().Object,
+                methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? new Mock<IMethodologyRepository>(Strict).Object,
                 methodologyImageService ?? new Mock<IMethodologyImageService>(Strict).Object,

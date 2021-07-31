@@ -17,28 +17,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishStagedReleaseContentFunction
     {
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
-        public PublishStagedReleaseContentFunction(ICacheService cacheService,
+        public PublishStagedReleaseContentFunction(IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseStatusService releaseStatusService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseStatusService = releaseStatusService;
             _publishingService = publishingService;
             _releaseService = releaseService;
         }
-        
+
         /// <summary>
         /// Azure function which publishes the content for a Release at a scheduled time by moving it from a staging directory.
         /// </summary>
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                     // Invalidate the 'All Methodologies' cache item in case any methodologies
                     // are now accessible for the first time after publishing these releases
-                    await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
+                    await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey(PublicContent));
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);

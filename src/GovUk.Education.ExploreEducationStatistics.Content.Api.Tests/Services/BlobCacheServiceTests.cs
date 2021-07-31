@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -17,7 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
-    public class BlobStorageCacheServiceTests
+    public class BlobCacheServiceTests
     {
         private class SampleClass
         {
@@ -29,20 +30,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             }
         }
 
-        private class SampleCacheKey : ICacheKey
+        private class SampleCacheKey : IBlobCacheKey
         {
+            public IBlobContainer Container { get; }
             public string Key { get; }
 
-            public SampleCacheKey(Guid id)
+            public SampleCacheKey(IBlobContainer container, Guid id)
             {
+                Container = container;
                 Key = id.ToString();
             }
         }
 
         [Fact]
+        public async Task SetItem()
+        {
+            var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.Setup(mock =>
+                    mock.UploadAsJson(PublicContent, cacheKey.Key, "test item", null))
+                .Returns(Task.CompletedTask);
+
+            var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
+
+            await service.SetItem(cacheKey, "test item");
+
+            VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
         public async Task DeleteItem()
         {
-            var cacheKey = new SampleCacheKey(Guid.NewGuid());
+            var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -53,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            await service.DeleteItem(PublicContent, cacheKey);
+            await service.DeleteItem(cacheKey);
 
             VerifyAllMocks(blobStorageService);
         }
@@ -63,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -75,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(PublicContent,
+            var result = await service.GetItem(
                 cacheKey,
                 (Func<SampleClass>) (() =>
                     throw new ArgumentException("Unexpected call to provider when cached entity exists")));
@@ -90,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -110,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(PublicContent,
+            var result = await service.GetItem(
                 cacheKey,
                 () => entity);
 
@@ -124,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -144,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = (await service.GetItem(PublicContent,
+            var result = (await service.GetItem(
                 cacheKey,
                 () => Task.FromResult(new Either<ActionResult, SampleClass>(entity)))).AssertRight();
 
@@ -158,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -170,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(PublicContent,
+            var result = await service.GetItem(
                 cacheKey,
                 () => Task.FromResult(new Either<ActionResult, SampleClass>(new NotFoundResult())));
 
@@ -184,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -205,7 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
             var result = await service.GetItem(
-                PublicContent,
                 cacheKey,
                 () => entity);
 
@@ -219,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             var entity = new SampleClass();
 
-            var cacheKey = new SampleCacheKey(entity.Id);
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -245,7 +265,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
             var result = await service.GetItem(
-                PublicContent,
                 cacheKey,
                 () => entity);
 
@@ -254,13 +273,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             VerifyAllMocks(blobStorageService);
         }
 
-        private static BlobStorageCacheService SetupBlobStorageCacheService(
+        private static BlobCacheService SetupBlobStorageCacheService(
             IBlobStorageService? blobStorageService = null,
-            ILogger<BlobStorageCacheService>? logger = null)
+            ILogger<BlobCacheService>? logger = null)
         {
-            return new BlobStorageCacheService(
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
-                logger ?? new Mock<ILogger<BlobStorageCacheService>>().Object
+            return new (
+                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                logger ?? Mock.Of<ILogger<BlobCacheService>>()
             );
         }
     }

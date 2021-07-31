@@ -20,18 +20,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class DataBlockService : IDataBlockService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IUserService _userService;
 
         public DataBlockService(
             ContentDbContext contentDbContext,
-            ICacheService cacheService,
+            IBlobCacheService blobCacheService,
             ITableBuilderService tableBuilderService,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _tableBuilderService = tableBuilderService;
             _userService = userService;
         }
@@ -56,10 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     {
                         if (block.ContentBlock is DataBlock dataBlock)
                         {
-                            return await _cacheService.GetItem(
-                                blobContainer: PublicContent,
+                            return await _blobCacheService.GetItem(
                                 cacheKey: new DataBlockTableResultCacheKey(block),
-                                entityProvider: async () =>
+                                itemSupplier: async () =>
                                 {
                                     var query = dataBlock.Query.Clone();
                                     query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);

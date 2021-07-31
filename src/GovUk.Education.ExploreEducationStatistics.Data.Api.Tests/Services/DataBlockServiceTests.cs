@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
@@ -71,13 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
                 .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
                     Task<Either<ActionResult, TableBuilderResultViewModel>>>(
-                    PublicContent,
                     new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
@@ -92,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                cacheService: cacheService.Object,
+                blobCacheService: cacheService.Object,
                 tableBuilderService: tableBuilderService.Object
             );
 
@@ -152,13 +150,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
                 .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
                     Task<Either<ActionResult, TableBuilderResultViewModel>>>(
-                    PublicContent,
                     new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
@@ -176,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                cacheService: cacheService.Object,
+                blobCacheService: cacheService.Object,
                 tableBuilderService: tableBuilderService.Object
             );
 
@@ -234,19 +231,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var cacheService = new Mock<ICacheService>(MockBehavior.Strict);
+            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             cacheService
                 .Setup(s => s.GetItem(
-                    PublicContent,
                     It.Is<DataBlockTableResultCacheKey>(key => key.Key == cacheKey),
                     It.IsAny<Func<Task<Either<ActionResult, TableBuilderResultViewModel>>>>()))
                 .ReturnsAsync(tableResult);
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                cacheService: cacheService.Object,
+                blobCacheService: cacheService.Object,
                 tableBuilderService: tableBuilderService.Object
             );
 
@@ -290,13 +286,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         private static DataBlockService BuildDataBlockService(
             ContentDbContext contentDbContext,
-            ICacheService cacheService = null,
+            IBlobCacheService blobCacheService = null,
             ITableBuilderService tableBuilderService = null,
             IUserService userService = null)
         {
             return new DataBlockService(
                 contentDbContext,
-                cacheService ?? new Mock<ICacheService>().Object,
+                blobCacheService ?? new Mock<IBlobCacheService>().Object,
                 tableBuilderService ?? new Mock<ITableBuilderService>().Object,
                 userService ?? AlwaysTrueUserService().Object
             );
