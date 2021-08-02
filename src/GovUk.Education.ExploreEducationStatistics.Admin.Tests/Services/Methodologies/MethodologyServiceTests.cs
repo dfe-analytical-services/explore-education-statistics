@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        // TODO SOW4 EES-2156 - add test for updating AlternativeTitles explicitly
+        // TODO SOW4 EES-2159 - add test for updating AlternativeTitles explicitly
         [Fact]
         public async Task UpdateMethodology()
         {

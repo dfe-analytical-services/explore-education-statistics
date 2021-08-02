@@ -63,7 +63,15 @@ const testMethodologyCanAmend: MyMethodology = {
     canMakeAmendmentOfMethodology: true,
   },
 };
-const testMethodologyCanCancelAmend: MyMethodology = {
+const testMethodologyCanRemove: MyMethodology = {
+  ...testMethodology,
+  amendment: false,
+  permissions: {
+    ...testMethodology.permissions,
+    canDeleteMethodology: true,
+  },
+};
+const testMethodologyCanRemoveAmendment: MyMethodology = {
   ...testMethodology,
   amendment: true,
   permissions: {
@@ -110,15 +118,17 @@ const testPublicationWithExternalMethodology = {
   ...testPublicationNoMethodology,
   externalMethodology,
 };
-
 const testPublicationWithMethodologyCanAmend = {
   ...testPublicationWithMethodology,
   methodologies: [testMethodologyCanAmend],
 };
-
 const testPublicationWithMethodologyCanCancelAmend = {
   ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanCancelAmend],
+  methodologies: [testMethodologyCanRemoveAmendment],
+};
+const testPublicationWithMethodologyCanRemove = {
+  ...testPublicationWithMethodology,
+  methodologies: [testMethodologyCanRemove],
 };
 
 const testTopicId = 'topic-id';
@@ -249,7 +259,7 @@ describe('MethodologySummary', () => {
       expect(screen.queryByText('No methodologies added.')).toBeInTheDocument();
     });
 
-    test('clicking the link methodology button shows the form', async () => {
+    test('clicking the link external methodology button shows the form', async () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -424,6 +434,83 @@ describe('MethodologySummary', () => {
     );
   });
 
+  describe('Removing a non-amendment methodology', () => {
+    test('the remove methodology button is shown if user has permission', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanRemove}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByText('Remove', { selector: 'button' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByText('Amend methodology', { selector: 'button' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('shows the confirm modal when clicking the Remove button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanRemove}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(screen.getByText('Remove', { selector: 'button' }));
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Confirm you want to remove this methodology'),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByText(
+            'By removing this methodology you will lose any changes made.',
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText('Confirm', { selector: 'button' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('calls the service to remove the Methodology when the confirm button is clicked', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithMethodologyCanRemove}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+      userEvent.click(screen.getByText('Remove', { selector: 'button' }));
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm', { selector: 'button' }),
+        ).toBeInTheDocument();
+
+        userEvent.click(screen.getByText('Confirm', { selector: 'button' }));
+      });
+
+      await waitFor(() => {
+        expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
+          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+        );
+      });
+    });
+  });
+
   describe('Amending a methodology', () => {
     test('the amend methodology button is shown if user has permission', () => {
       render(
@@ -431,7 +518,6 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
-            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -448,7 +534,6 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodology}
             topicId={testTopicId}
-            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -459,13 +544,12 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('shows the confirm modal when click the amend button', async () => {
+    test('shows the confirm modal when clicking the amend button', async () => {
       render(
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
-            allowAmendments
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -509,7 +593,6 @@ describe('MethodologySummary', () => {
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
             topicId={testTopicId}
-            allowAmendments
             onChangePublication={noop}
           />
         </Router>,
@@ -539,7 +622,6 @@ describe('MethodologySummary', () => {
     });
   });
 
-  // TODO SOW4 EES-2156 - add tests for deleting the first draft version of a Methodology
   describe('Cancelling an amendment', () => {
     test('the cancel amendment button is shown if user has permission', () => {
       render(
@@ -553,11 +635,15 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByText('Cancel amendment', { selector: 'button' }),
+        screen.queryByText('Cancel amendment', { selector: 'button' }),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByText('Remove', { selector: 'button' }),
+      ).not.toBeInTheDocument();
     });
 
-    test('shows the confirm modal when click the cancel amendment  button', async () => {
+    test('shows the confirm modal when clicking the cancel amendment  button', async () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -575,6 +661,12 @@ describe('MethodologySummary', () => {
         expect(
           screen.queryByText(
             'Confirm you want to cancel this amended methodology',
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByText(
+            'By cancelling the amendments you will lose any changes made, and the original methodology will remain unchanged.',
           ),
         ).toBeInTheDocument();
 
