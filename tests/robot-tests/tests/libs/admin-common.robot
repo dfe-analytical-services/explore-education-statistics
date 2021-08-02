@@ -12,13 +12,7 @@ user signs in as bau1
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible    Sign in
     user signs in as    ADMIN
-
-    user waits until h1 is visible    Dashboard
-    user waits until page contains title caption    Welcome Bau1
-    user waits until page contains element
-    ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
-    ...    %{WAIT_LONG}
-
+    user navigates to admin dashboard    Bau1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
@@ -32,14 +26,7 @@ user signs in as analyst1
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible    Sign in
     user signs in as    ANALYST
-    user waits until h1 is visible    Dashboard
-    user waits until page contains title caption    Welcome Analyst1
-    user waits until page contains element    css:[id="publicationsReleases-themeTopic-themeId"]    60
-
-    # @TODO: Luke - See if this test id is being stripped out of the DOM by React
-    # no selector with this data-test id is present
-    # user waits until page contains element    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']    %{WAIT_LONG}
-
+    user navigates to admin dashboard    Analyst1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
@@ -59,18 +46,16 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]    ${theme}    ${topic}
-    ${current_url}=    Get Location
-    IF    "${current_url}" != "%{ADMIN_URL}"
-        user navigates to admin dashboard
+    user navigates to admin dashboard
+    ${correct_theme_and_topic_selected}=    user is on admin dashboard with theme and topic selected    %{ADMIN_URL}
+    ...    ${theme}    ${topic}
+    IF    ${correct_theme_and_topic_selected} is ${FALSE}
+        user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
+        user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
+        user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
+        user waits until h2 is visible    ${theme}    60
+        user waits until h3 is visible    ${topic}    60
     END
-    user waits until page contains link    Manage publications and releases    90
-    user clicks link    Manage publications and releases
-    user waits until page contains element    id:publicationsReleases-themeTopic-themeId    60
-    user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
-    user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
-    user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
-    user waits until h2 is visible    ${theme}    60
-    user waits until h3 is visible    ${topic}    60
 
 user navigates to editable release summary from admin dashboard
     [Arguments]
@@ -148,7 +133,7 @@ user opens publication on the admin dashboard
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    user navigates to admin dashboard
+    user waits until page does not contain loading spinner
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
@@ -172,11 +157,82 @@ user views methodology for publication
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user views methodology for open publication accordion    ${accordion}    ${methodology_title}
 
+user views methodology amendment for publication
+    [Arguments]    ${publication}    ${methodology_title}=${publication}
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user views methodology for open publication accordion    ${accordion}    ${methodology_title}
+    ...    Edit this amendment
+
 user views methodology for open publication accordion
-    [Arguments]    ${accordion}    ${methodology_title}
+    [Arguments]
+    ...    ${accordion}
+    ...    ${methodology_title}
+    ...    ${edit_button_text}=Edit this methodology
     user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    Edit this methodology
+    user clicks link    ${edit_button_text}    ${accordion}
     user waits until h2 is visible    Methodology summary
+
+user approves methodology for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ...    ${methodology_title}=${publication}
+
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks link    Edit this methodology    ${accordion}
+    approve methodology from methodology view
+
+user approves methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks link    Edit this amendment    ${accordion}
+    approve methodology from methodology view
+
+approve methodology from methodology view
+    user clicks link    Sign off
+    user changes methodology status to Approved
+
+user creates approved methodology for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+
+    user creates methodology for publication    ${publication}    ${theme}    ${topic}
+    user approves methodology for publication    ${publication}    ${theme}    ${topic}
+
+user creates methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks button    Amend methodology    ${accordion}
+    user waits until modal is visible    Confirm you want to amend this live methodology
+    user clicks button    Confirm
+    user waits until h2 is visible    Methodology summary
+
+user cancels methodology amendment for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    user opens details dropdown    ${methodology_title}    ${accordion}
+    user clicks button    Cancel amendment    ${accordion}
+    user waits until modal is visible    Confirm you want to cancel this amended methodology
+    user clicks button    Confirm
 
 user links publication to external methodology
     [Arguments]
@@ -219,7 +275,8 @@ user adds basic release content
     user waits until element contains    id:releaseSummary    This section is empty    60
     user clicks button    Edit block    id:releaseSummary
     user presses keys    Test summary text for ${publication}
-    user clicks element    css:body    # To ensure Save button gets clicked
+    # To ensure Save button gets clicked
+    user sets focus to element    xpath://button[.="Save"]    id:releaseSummary
     user clicks button    Save    id:releaseSummary
     user waits until element contains    id:releaseSummary    Test summary text for ${publication}    60
 
@@ -237,50 +294,6 @@ user adds basic release content
     user adds text block to editable accordion section    Test section one    css:#releaseMainContent
     user adds content to accordion section text block    Test section one    1    Test content block for ${publication}
     ...    css:#releaseMainContent
-
-user creates approved methodology
-    [Arguments]    ${title}
-    user waits until h1 is visible    Manage methodologies
-    user waits until page contains element    id:approved-methodologies-tab
-    user clicks element    id:approved-methodologies-tab
-    ${is_approved}=    run keyword and return status    user waits until page contains element
-    ...    xpath://section[@id="approved-methodologies"]//a[text()="${title}"]    1
-    user clicks element    id:draft-methodologies-tab
-    ${is_draft}=    run keyword and return status    user waits until page contains element
-    ...    xpath://section[@id="draft-methodologies"]//a[text()="${title}"]    1
-    IF    ${is_approved} == False and ${is_draft} == False
-        user creates methodology    ${title}
-        user approves methodology    ${title}
-    END
-    IF    ${is_draft} == True
-        user clicks element    id:draft-methodologies-tab
-        user clicks link    ${title}
-        user approves methodology    ${title}
-    END
-
-user creates methodology
-    [Arguments]    ${title}
-    user waits until h1 is visible    Manage methodologies
-    user clicks link    Create new methodology
-    user waits until h1 is visible    Create new methodology
-    user enters text into element    id:createMethodologyForm-title    ${title}
-    user clicks button    Create methodology
-    user waits until page contains title caption    Edit methodology
-    user waits until h1 is visible    ${title}
-
-user approves methodology
-    [Arguments]    ${title}
-    user waits until page contains title caption    Edit methodology
-    user waits until h1 is visible    ${title}
-    user clicks link    Sign off
-    user clicks button    Edit status
-    user waits until h2 is visible    Edit methodology status
-    user clicks radio    Approved for publication
-    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Test release note
-    user clicks button    Update status
-
-    user waits until h2 is visible    Methodology status
-    user checks page contains tag    Approved
 
 user creates public prerelease access list
     [Arguments]    ${content}
@@ -351,77 +364,6 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
-user opens nth editable accordion section
-    [Arguments]    ${section_num}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    ${section}=    get child element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    ${header_button}=    get child element    ${section}    css:h2 > button[aria-expanded]
-    ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
-    IF    '${is_expanded}' != 'true'
-        user clicks element    ${header_button}
-    END
-    user checks element attribute value should be    ${header_button}    aria-expanded    true
-
-user changes accordion section title
-    [Arguments]    ${section_num}    ${title}    ${parent}=id:releaseMainContent
-    user opens nth editable accordion section    ${section_num}    ${parent}
-    ${section}=    get child element    ${parent}
-    ...    xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
-    user clicks button    Edit section title    ${section}
-    user waits until parent contains element    ${section}    css:input[name="heading"]
-    ${input}=    get child element    ${section}    css:input[name="heading"]
-    user enters text into element    ${input}    ${title}
-    user clicks button    Save section title    ${section}
-    user waits until parent contains element    ${section}    xpath:.//h2/button[@aria-expanded and text()="${title}"]
-
-user checks accordion section contains x blocks
-    [Arguments]    ${section_name}    ${num_blocks}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${blocks}=    get child elements    ${section}    css:[data-testid="editableSectionBlock"]
-    length should be    ${blocks}    ${num_blocks}
-
-user adds text block to editable accordion section
-    [Arguments]    ${section_name}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    user clicks button    Add text block    ${section}
-    user waits until element contains    ${section}    This section is empty
-
-user adds data block to editable accordion section
-    [Arguments]    ${section_name}    ${block_name}    ${parent}=css:[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    user waits for page to finish loading
-    user clicks button    Add data block    ${section}
-    ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
-    user chooses select option    ${block_list}    Dates data block name
-    user waits until parent contains element    ${section}    css:table
-    user clicks button    Embed    ${section}
-
-user adds content to accordion section text block
-    [Arguments]    ${section_name}    ${block_num}    ${content}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user clicks button    Edit block    ${block}
-    user presses keys    CTRL+a
-    user presses keys    BACKSPACE
-    user presses keys    ${content}
-    user clicks button    Save    ${block}
-    user waits until element contains    ${block}    ${content}
-
-user checks accordion section text block contains
-    [Arguments]    ${section_name}    ${block_num}    ${content}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user waits until element contains    ${block}    ${content}
-
-user deletes editable accordion section content block
-    [Arguments]    ${section_name}    ${block_num}    ${parent}=[data-testid="accordion"]
-    ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user clicks button    Remove block    ${block}
-    user clicks button    Confirm
-
 user gets meta guidance data file content editor
     [Arguments]    ${accordion_heading}
     user waits until page contains element    id:metaGuidance-dataFiles
@@ -478,7 +420,7 @@ user approves release for immediate publication
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
-    user goes to url    %{ADMIN_URL}
+    user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""
         user waits until page contains title caption    Welcome ${USER}
@@ -543,12 +485,6 @@ user approves release for scheduled release
     user waits until h1 is visible    Confirm publish date
     user clicks button    Confirm
 
-user creates new content section
-    [Arguments]    ${SECTION_NUMBER}    ${CONTENT_SECTION_NAME}
-    user waits until button is enabled    Add new section
-    user clicks button    Add new section
-    user changes accordion section title    ${SECTION_NUMBER}    ${CONTENT_SECTION_NAME}
-
 user verifies release summary
     [Arguments]    ${PUBLICATION_NAME}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
     user waits until h2 is visible    Release summary
@@ -563,6 +499,15 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks button    Update status
+    user waits until h2 is visible    Methodology status
+    user checks page contains tag    Approved
+
+user changes methodology status to Draft
+    user clicks button    Edit status
+    user clicks element    id:methodologyStatusForm-status-Draft
+    user clicks button    Update status
+    user waits until h2 is visible    Methodology status
+    user checks page contains tag    In Draft
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
@@ -611,3 +556,13 @@ user goes to manage user
     # stale element exception if you don't wait until it's enabled
     user waits until element is enabled    css:[name="selectedPublicationId"]
     user waits until element is enabled    css:[name="selectedReleaseId"]
+
+user waits until modal is visible
+    [Arguments]
+    ...    ${MODAL_TITLE}
+    ...    ${MODAL_TEXT}=${EMPTY}
+
+    user waits until parent contains element    css:.ReactModal__Content    xpath://h1[.="${MODAL_TITLE}"]
+    IF    "${MODAL_TEXT}" != "${EMPTY}"
+        user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
+    END

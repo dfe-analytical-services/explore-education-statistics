@@ -1,4 +1,4 @@
-from logging import warn
+from logging import warning
 from robot.running.context import EXECUTION_CONTEXTS
 
 class KeywordListener:
@@ -20,10 +20,16 @@ class KeywordListener:
     def end_keyword(self, name, attributes):
         if attributes["status"] == "FAIL":
             args_and_value_string = self.get_args_and_values_string(attributes)
-            warn(f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{args_and_value_string}\t\tfile://{attributes["source"]} line {attributes["lineno"]}')
+            warning(f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{args_and_value_string}\t\tfile://{attributes["source"]} line {attributes["lineno"]}')
 
     def get_args_and_values_string(self, attributes):
+
         args = attributes["args"]
-        values = EXECUTION_CONTEXTS.current.namespace.variables.replace_list(args)
-        args_and_values = list(zip(args, values))
-        return ",\t".join(map(lambda kvp: f'{kvp[0]}={kvp[1]}', args_and_values))
+        
+        try:
+            values = EXECUTION_CONTEXTS.current.namespace.variables.replace_list(args)
+            args_and_values = list(zip(args, values))
+            return ",\t".join(map(lambda kvp: f'{kvp[0]}={kvp[1]}', args_and_values))
+        
+        except:
+            return ",\t".join(map(lambda arg: f'{arg}=Unknown', args))

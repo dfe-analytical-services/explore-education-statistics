@@ -167,13 +167,24 @@ user waits for page to finish loading
     sleep    0.2
 
 user waits until page does not contain loading spinner
-    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not disappear in 30 seconds.')
-    user waits until page does not contain element    css:[class^="LoadingSpinner"]    60
+    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not
+    # disappear in 30 seconds.')
+
+    # Also, we're only interested in loading spinners that aren't lazy loaders that are waiting for user interaction
+    # prior to loading their content.
+    user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
+    ...    60
 
 user sets focus to element
-    [Arguments]    ${selector}
-    wait until page contains element    ${selector}
-    set focus to element    ${selector}
+    [Arguments]    ${selector}    ${parent}=css:body
+    ${webelement}=    is webelement    ${selector}
+    IF    ${webelement} is ${TRUE}
+        ${element}=    set variable    ${selector}
+    ELSE
+        user waits until parent contains element    ${parent}    ${selector}
+        ${element}=    get child element    ${parent}    ${selector}
+    END
+    set focus to element    ${element}
 
 user waits until page contains
     [Arguments]    ${pageText}    ${wait}=${timeout}
@@ -323,13 +334,25 @@ user checks element contains button
     [Arguments]
     ...    ${element}
     ...    ${button_text}
-    user waits until parent contains element    ${element}    xpath:.//button[text()="${button_text}"]
+    user waits until parent contains element    ${element}    xpath://button[text()="${button_text}"]
 
 user checks element does not contain button
     [Arguments]
     ...    ${element}
     ...    ${button_text}
-    user waits until parent does not contain element    ${element}    xpath:.//button[text()="${button_text}"]
+    user waits until parent does not contain element    ${element}    xpath://button[text()="${button_text}"]
+
+user checks element contains link
+    [Arguments]
+    ...    ${element}
+    ...    ${link_text}
+    user waits until parent contains element    ${element}    xpath://a[text()="${link_text}"]
+
+user checks element does not contain link
+    [Arguments]
+    ...    ${element}
+    ...    ${link_text}
+    user waits until parent does not contain element    ${element}    xpath://a[text()="${link_text}"]
 
 user waits until element is visible
     [Arguments]    ${selector}    ${wait}=${timeout}
@@ -385,17 +408,17 @@ user checks page does not contain element
     page should not contain element    ${element}
 
 user clicks element
-    [Arguments]    ${element}
-    wait until page contains element    ${element}
+    [Arguments]
+    ...    ${selector}
+    ...    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
     click element    ${element}
 
 user clicks link
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    link:${text}
-    ${element}=    get child element    ${parent}    link:${text}
-    user clicks element    ${element}
+    user clicks element    link:${text}    ${parent}
 
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body
@@ -523,12 +546,14 @@ user clears element text
     sleep    0.1
 
 user presses keys
-    [Arguments]    ${keys}    ${selector}=${EMPTY}
+    [Arguments]
+    ...    ${keys}
+    ...    ${selector}=${EMPTY}
     IF    '${selector}' != '${EMPTY}'
-        user waits until page contains element    ${selector}
-        user waits until element is visible    ${selector}
-        user sets focus to element    ${selector}
-        user clicks element    ${selector}
+        ${element}=    lookup or return webelement    ${selector}
+        user waits until element is visible    ${element}
+        user sets focus to element    ${element}
+        user clicks element    ${element}
     END
     press keys    ${NONE}    ${keys}    # No selector as sometimes leads to text not being input
     sleep    0.1
@@ -559,6 +584,7 @@ user opens details dropdown
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains element    ${parent}
     ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]    60
+    ${details}=    get child element    ${parent}    xpath:.//details[summary[contains(., "${text}")]]
     ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
     user waits until element is visible    ${summary}    60
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
@@ -566,6 +592,7 @@ user opens details dropdown
         user clicks element    ${summary}
     END
     user checks element attribute value should be    ${summary}    aria-expanded    true
+    [Return]    ${details}
 
 user closes details dropdown
     [Arguments]    ${text}    ${parent}=css:body
@@ -718,3 +745,17 @@ check that variable is not empty
 user waits until table tool wizard step is available
     [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
+
+lookup or return webelement
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${parent}=css:body
+
+    ${is_webelement}=    is webelement    ${selector_or_webelement}
+    IF    ${is_webelement} is ${TRUE}
+        ${element}=    set variable    ${selector_or_webelement}
+    ELSE
+        user waits until parent contains element    ${parent}    ${selector_or_webelement}
+        ${element}=    get child element    ${parent}    ${selector_or_webelement}
+    END
+    [Return]    ${element}

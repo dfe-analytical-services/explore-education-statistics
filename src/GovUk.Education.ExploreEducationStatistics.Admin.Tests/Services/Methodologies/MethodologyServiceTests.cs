@@ -82,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                MethodologyParent = new MethodologyParent {
+                MethodologyParent = new MethodologyParent
+                {
                     Slug = "pupil-absence-statistics-methodology",
                     OwningPublicationTitle = "Owning publication"
                 },
@@ -149,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Published, viewModel.Published);
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
-                
+
                 Assert.Equal(owningPublication.Id, viewModel.Publication.Id);
                 Assert.Equal(owningPublication.Title, viewModel.Publication.Title);
 
@@ -169,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Title = "Test publication",
             };
-            
+
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
@@ -345,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -462,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 imageService.Verify(mock =>
                     mock.Delete(methodology.Id, new List<Guid>
@@ -541,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publishingService = new Mock<IPublishingService>(Strict);
 
             cacheService.Setup(mock =>
-                mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
+                    mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
                 .Returns(Task.CompletedTask);
 
             contentService.Setup(mock =>
@@ -567,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 methodologyRepository.Verify(mock =>
                     mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
@@ -665,7 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 methodologyRepository.Verify(mock =>
                     mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
@@ -696,15 +697,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        // TODO SOW4 EES-2166 EES-2200:
-        // Once amendments are available updating an approved methodology shouldn't be possible
-        // but un-approving should be provided the Methodology is not publicly accessible
-        public async Task UpdateMethodology_AlreadyPublished()
+        public async Task UpdateMethodology_UnapproveMethodology()
         {
             var methodology = new Methodology
             {
                 InternalReleaseNote = "Test approval",
-                Published = new DateTime(2020, 5, 25),
+                Published = null,
                 PublishingStrategy = Immediately,
                 Status = Approved,
                 MethodologyParent = new MethodologyParent
@@ -726,8 +724,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = null,
                 PublishingStrategy = Immediately,
-                Status = Approved,
-                Title = "Pupil absence statistics (updated): methodology"
+                Status = Draft,
+                Title = "Pupil absence statistics: methodology"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -744,20 +742,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
-            cacheService.Setup(mock =>
-                    mock.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance))
-                .Returns(Task.CompletedTask);
-
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyRepository.Setup(mock =>
                     mock.IsPubliclyAccessible(methodology.Id))
-                .ReturnsAsync(true);
-
-            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
-                .ReturnsAsync(Unit.Instance);
+                .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -768,12 +759,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).Right;
+                // Un-approving is allowed for users that can approve the methodology providing it's not publicly accessible
+                // Test that un-approving alters the status
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // Original release note is not cleared if the update is not altering it
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
-                Assert.Equal(methodology.Published, viewModel.Published);
+                Assert.Null(viewModel.Published);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -785,8 +778,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Include(m => m.MethodologyParent)
                     .SingleAsync(m => m.Id == methodology.Id);
 
-                Assert.Equal(methodology.Published, model.Published);
-                Assert.Equal(Approved, model.Status);
+                Assert.Null(model.Published);
+                Assert.Equal(Draft, model.Status);
                 Assert.Equal(Immediately, model.PublishingStrategy);
                 // Slug remains unchanged
                 Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
@@ -879,7 +872,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task DeleteMethodology()
         {
             var methodologyParentId = Guid.NewGuid();
-            
+
             var methodology = new Methodology
             {
                 Id = Guid.NewGuid(),
@@ -904,14 +897,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Sanity check that a Methodology, a MethodologyParent and a PublicationMethodology row were
                 // created.
                 Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodology.Id));
                 Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == methodologyParentId));
-                Assert.NotNull(await context.PublicationMethodologies.SingleAsync(m => m.MethodologyParentId == methodologyParentId));
+                Assert.NotNull(
+                    await context.PublicationMethodologies.SingleAsync(
+                        m => m.MethodologyParentId == methodologyParentId));
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -924,7 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var result = await service.DeleteMethodology(methodology.Id);
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Assert that the Methodology has successfully been deleted and as it was the only Methodology
@@ -938,7 +933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
             }
         }
-        
+
         [Fact]
         public async Task DeleteMethodology_MoreThanOneMethodologyVersion()
         {
@@ -962,7 +957,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Status = Draft
                 })
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -970,7 +965,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.MethodologyParents.AddAsync(methodologyParent);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Sanity check that 2 Methodologies and their MethodologyParent is created.
@@ -985,7 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Assert that the Methodology has successfully been deleted and as there was another Methodology
@@ -1020,7 +1015,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Status = Draft
                 })
             };
-            
+
             var file1 = new File();
             var file2 = new File();
 
@@ -1029,19 +1024,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 File = file1,
                 Methodology = methodologyParent.Versions[0]
             };
-            
+
             var methodologyVersion2File1Link = new MethodologyFile
             {
                 File = file1,
                 Methodology = methodologyParent.Versions[1]
             };
-            
+
             var methodologyVersion2File2Link = new MethodologyFile
             {
                 File = file2,
                 Methodology = methodologyParent.Versions[1]
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1052,7 +1047,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyVersion1File1Link, methodologyVersion2File1Link, methodologyVersion2File2Link);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var methodologyImageService = new Mock<IMethodologyImageService>();
@@ -1063,16 +1058,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Setup(s => s.Delete(methodologyParent.Versions[1].Id,
                         methodologyVersion2FileIds))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodology(methodologyParent.Versions[1].Id);
-                
+
                 // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
                 // the Methodology Version being deleted.
                 VerifyAllMocks(methodologyImageService);
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Assert that the Methodology has successfully been deleted.
@@ -1100,7 +1095,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Status = Draft
                 })
             };
-            
+
             var unrelatedMethodologyParent = new MethodologyParent
             {
                 Id = unrelatedMethodologyParentId,
@@ -1113,7 +1108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Status = Draft
                 })
             };
-            
+
             var relatedFile = new File();
             var unrelatedFile = new File();
 
@@ -1122,13 +1117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 File = relatedFile,
                 Methodology = methodologyParent.Versions[0]
             };
-            
+
             var unrelatedFileMethodologyLink = new MethodologyFile
             {
                 File = unrelatedFile,
                 Methodology = unrelatedMethodologyParent.Versions[0]
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1138,7 +1133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.MethodologyFiles.AddRangeAsync(relatedFileMethodologyLink, unrelatedFileMethodologyLink);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var methodologyImageService = new Mock<IMethodologyImageService>();
@@ -1147,24 +1142,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService
                     .Setup(s => s.Delete(methodologyParent.Versions[0].Id, relatedMethodologyFileLinks))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodology(methodologyParent.Versions[0].Id);
-                
+
                 // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
                 // the Methodology being deleted.
                 VerifyAllMocks(methodologyImageService);
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Assert that the Methodology and its Parent is deleted, but the unrelated Methodology is
                 // unaffected. 
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyParent.Versions[0].Id));
                 Assert.False(context.MethodologyParents.Any(m => m.Id == methodologyParentId));
-                
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
+
+                Assert.NotNull(
+                    await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyParent.Versions[0].Id));
                 Assert.NotNull(await context.MethodologyParents.SingleAsync(m => m.Id == unrelatedMethodologyParentId));
             }
         }

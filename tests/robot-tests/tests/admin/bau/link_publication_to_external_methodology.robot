@@ -38,7 +38,3 @@ Remove the External Methodology from Publication
     user checks element contains button    ${accordion}    Link to an externally hosted methodology
     user checks element does not contain button    ${accordion}    Edit externally hosted methodology
     user checks element does not contain button    ${accordion}    Remove
-
-*** Keywords ***
-teardown suite
-    user closes the browser
