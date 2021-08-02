@@ -170,7 +170,7 @@ Visit the approved Amendment and check that its readonly content is as expected
     [Tags]    HappyPath
     user clicks link    View this methodology
     user clicks link    Manage content
-    user verifies amended Methodololgy readonly content
+    user verifies amended Methodology readonly content
 
 Create and cancel an Amendment
     [Tags]    HappyPath
@@ -188,7 +188,7 @@ Revisit the live Amendment after the cancellation to double check it remains una
     [Tags]    HappyPath
     user clicks link    View this methodology
     user clicks link    Manage content
-    user verifies amended Methodololgy readonly content
+    user verifies amended Methodology readonly content
 
 *** Keywords ***
 user verifies original Methodology readonly content
@@ -212,7 +212,7 @@ user verifies original Methodology readonly content
     user waits until parent contains element    ${section}
     ...    xpath://img[@alt="Alt text for the uploaded annex image 3"]
 
-user verifies amended Methodololgy readonly content
+user verifies amended Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology content
@@ -224,6 +224,3 @@ user verifies amended Methodololgy readonly content
     ${section}=    user opens accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2
-
-teardown suite
-    user closes the browser

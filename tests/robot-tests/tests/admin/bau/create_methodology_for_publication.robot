@@ -124,7 +124,3 @@ Unapprove the Methodology
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${details}    Edit this methodology
     user checks element contains button    ${details}    Remove
-
-*** Keywords ***
-teardown suite
-    user closes the browser
