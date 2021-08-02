@@ -106,7 +106,7 @@ const MethodologyStatusPage = ({
                     <>
                       <SummaryListItem term="When to publish">
                         {model.summary.publishingStrategy === 'WithRelease'
-                          ? 'With specific release'
+                          ? 'With a specific release'
                           : model.summary.publishingStrategy}
                       </SummaryListItem>
                       {model.summary.publishingStrategy === 'WithRelease' && (
