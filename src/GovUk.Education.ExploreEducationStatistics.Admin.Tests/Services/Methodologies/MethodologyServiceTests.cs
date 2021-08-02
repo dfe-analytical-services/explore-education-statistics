@@ -20,7 +20,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -162,7 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        // TODO SOW4 EES-2159 - add test for updating AlternativeTitles explicitly
         [Fact]
         public async Task UpdateMethodology()
         {
@@ -553,11 +551,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
-            // Methodology is publicly accessible later after its publishing strategy and status are updated
-            methodologyRepository.SetupSequence(mock =>
+            methodologyRepository.Setup(mock =>
                     mock.IsPubliclyAccessible(methodology.Id))
-                .ReturnsAsync(false)
                 .ReturnsAsync(true);
 
             publishingService.Setup(mock => mock.PublishMethodologyFiles(methodology.Id))
@@ -574,8 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
-                methodologyRepository.Verify(mock =>
-                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
+                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -600,8 +594,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -653,12 +645,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            // Methodology is not publicly accessible to begin with when checking if the slug should be updated.
-            // Methodology is not publicly accessible later after its publishing strategy and status are updated
-            // due to the Release not being live
-            methodologyRepository.SetupSequence(mock =>
+            methodologyRepository.Setup(mock =>
                     mock.IsPubliclyAccessible(methodology.Id))
-                .ReturnsAsync(false)
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -672,8 +660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
-                methodologyRepository.Verify(mock =>
-                    mock.IsPubliclyAccessible(methodology.Id), Times.Exactly(2));
+                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -696,8 +683,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -794,30 +779,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
+        
         [Fact]
-        public async Task UpdateMethodology_SlugNotUnique()
+        public async Task UpdateMethodology_SettingAlternativeTitleCausesSlugClash()
         {
-            var methodology1 = new Methodology
+            var publication = new Publication
             {
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                MethodologyParent = new MethodologyParent
-                {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology"
-                }
+                Title = "Test publication",
+                Slug = "test-publication"
             };
 
-            var methodology2 = new Methodology
+            var methodology = new Methodology
             {
-                InternalReleaseNote = "Test approval",
-                Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "pupil-exclusion-statistics-methodology",
-                    OwningPublicationTitle = "Pupil exclusion statistics: methodology"
+                    Slug = "test-publication",
+                    OwningPublicationTitle = "Test publication",
+                    Publications = AsList(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = publication
+                    })
+                }
+            };
+            
+            // This pre-existing Methodology has a slug that the update will clash with.
+            var methodologyWithTargetSlug = new Methodology
+            {
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                MethodologyParent = new MethodologyParent
+                {
+                    Slug = "updated-methodology-title",
+                    OwningPublicationTitle = "Test publication 2"
                 }
             };
 
@@ -826,17 +822,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 LatestInternalReleaseNote = null,
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                Title = "Pupil exclusion statistics: methodology"
+                Title = "Updated Methodology Title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.AddRangeAsync(new List<Methodology>
-                {
-                    methodology1, methodology2
-                });
+                await context.Methodologies.AddRangeAsync(methodology, methodologyWithTargetSlug);
                 await context.SaveChangesAsync();
             }
 
@@ -847,12 +840,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(methodology1.Id))
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
-
-            methodologyRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodology1.Id))
-                .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -863,13 +852,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
-                var result = await service.UpdateMethodology(methodology1.Id, request);
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SlugNotUnique);
+                var result = await service.UpdateMethodology(methodology.Id, request);
+                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
+                result.AssertBadRequest(SlugNotUnique);
             }
 
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var notUpdatedMethodology = await context
+                    .Methodologies
+                    .Include(m => m.MethodologyParent)
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Null(notUpdatedMethodology.Published);
+                Assert.Equal(Draft, notUpdatedMethodology.Status);
+                Assert.Equal(Immediately, notUpdatedMethodology.PublishingStrategy);
+                Assert.Equal("Test publication", notUpdatedMethodology.Title);
+                Assert.Null(notUpdatedMethodology.AlternativeTitle);
+                Assert.Equal("test-publication", notUpdatedMethodology.Slug);
+                Assert.Equal("test-publication", notUpdatedMethodology.MethodologyParent.Slug);
+                Assert.False(notUpdatedMethodology.Updated.HasValue);
+            }
         }
 
         [Fact]
