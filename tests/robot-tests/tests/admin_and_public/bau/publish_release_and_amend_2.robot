@@ -297,6 +297,8 @@ Edit methodology amendment content
     [Tags]    HappyPath
     user views methodology amendment for publication    ${PUBLICATION_NAME}
     user clicks link    Manage content
+    user opens accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
@@ -307,7 +309,7 @@ Change methodology amendment status to Approved
     [Tags]    HappyPath
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
-Create amendment
+Create release amendment
     [Tags]    HappyPath
     user clicks link    Home
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
@@ -347,13 +349,13 @@ Delete second subject file
     user clicks link    Data and files
     user deletes subject file    ${SECOND_SUBJECT}
 
-Navigate to 'Content' page for amendment
+Navigate to 'Content' page for release amendment
     [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
 
-Add release note to amendment
+Add release note to release amendment
     [Tags]    HappyPath
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
@@ -362,7 +364,7 @@ Add release note to amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Go to "Sign off" page and approve amendment
+Go to "Sign off" page and approve release amendment
     [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
