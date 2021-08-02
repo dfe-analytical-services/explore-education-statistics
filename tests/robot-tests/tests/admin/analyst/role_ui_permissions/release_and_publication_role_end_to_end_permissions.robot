@@ -36,14 +36,7 @@ Check publication owner can create methodology for publication
 
 Check publication owner can approve methodology for publication
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
-    user clicks button    Edit status
-    user waits until page contains element    id:methodologyStatusForm-status-Approved
-    user clicks element    id:methodologyStatusForm-status-Approved
-    user waits until page contains element    id:methodologyStatusForm-latestInternalReleaseNote
-    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
-    user clicks button    Update status
-    user waits until h2 is visible    Methodology status
+    user changes methodology status to Approved
 
 Check publication owner can upload subject file
     [Tags]    HappyPath
@@ -109,10 +102,6 @@ Check publication owner can edit release status to "In draft"
     ...    Moving back to Draft state (publication owner)
     user clicks button    Update status
 
-User goes back to admin dashboard
-    [Tags]    HappyPath
-    user goes to url    %{ADMIN_URL}
-
 Check that a publication owner can make a new release
     [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -175,5 +164,22 @@ Check release approver can create a release note
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
+    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
+
+Navigate to administration as bau1 and swap release approver role for publication owner now that the publication is live
+    [Tags]    HappyPath
+    user changes to bau1
+    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+
+Check publication owner can create and cancel Methodology amendments on a live Publication
+    [Tags]    HappyPath
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user cancels methodology amendment for publication    ${PUBLICATION_NAME}
+
+Check publication owner can approve Methodology amendments on a live Publication
+    [Tags]    HappyPath
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user approves methodology amendment for publication    ${PUBLICATION_NAME}

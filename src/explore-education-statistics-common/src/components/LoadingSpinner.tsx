@@ -37,6 +37,7 @@ const LoadingSpinner = ({
             },
             className,
           )}
+          data-testid="loadingSpinner"
         >
           <div
             className={classNames(styles.spinner, styles[`spinner--${size}`])}

@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -17,7 +18,6 @@ ${THIRD_SUBJECT}        upload file test with filter subject
 *** Test Cases ***
 Create publication
     [Tags]    HappyPath
-    user navigates to admin dashboard
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
@@ -30,31 +30,15 @@ Create new methodology
 Add methodology content
     [Tags]    HappyPath
     user clicks link    Manage content
-    user clicks button    Add new section
-    user clicks button    New section
-    # NOTE: scroll to element is here to avoid selenium clicking the
-    # set page view text box on the methodology page
-    user scrolls to element    xpath://button[text()="Add text block"]
-    user clicks button    Add text block
-    user clicks button    Edit block
-    user presses keys    Adding Methodology content
-    user clicks button    Save
-    user clicks link    Go to top
-    user clicks button    Edit section title
-    user enters text into element    xpath=//*[@name="heading"]    ${PUBLICATION_NAME}
-    user clicks button    Save section title
+    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    1
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
 Approve methodology
     [Tags]    HappyPath
-    user clicks link    Sign off
-    user clicks button    Edit status
-    user clicks radio    Approved for publication
-    user enters text into element    xpath=//*[@name="latestInternalReleaseNote"]    Approved by UI tests
-    user clicks button    Update status
-
-Check methodology is approved
-    [Tags]    HappyPath
-    user waits until page contains element    xpath://strong[text()="Approved"]
+    user approves methodology for publication    ${PUBLICATION_NAME}
 
 Create new release
     [Tags]    HappyPath
@@ -305,33 +289,23 @@ Return to Admin
     [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
 
-Change methodology status to Draft
+Create a methodology amendment
     [Tags]    HappyPath
-    user views methodology for publication    ${PUBLICATION_NAME}
-    user clicks link    Sign off
-    user clicks button    Edit status
-    user clicks element    id:methodologyStatusForm-status-Draft
-    user clicks button    Update status
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
 
-Edit methodology content
+Edit methodology amendment content
     [Tags]    HappyPath
+    user views methodology amendment for publication    ${PUBLICATION_NAME}
     user clicks link    Manage content
-    user clicks button    ${PUBLICATION_NAME}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
-    user scrolls to element    xpath://button[text()="Add text block"]
-    user waits until button is enabled    Add text block
-    user clicks button    Add text block
-    user clicks button    Edit block
-    user presses keys    New & Updated content -
-    user clicks button    Save
-    user clicks button    Edit section title
-    user enters text into element    xpath=//*[@name="heading"]    ${PUBLICATION_NAME} New and Updated Title -
-    user clicks button    Save section title
-
-Change methodology status to Approved
+Change methodology amendment status to Approved
     [Tags]    HappyPath
-    user clicks link    Sign off
-    user changes methodology status to Approved
+    user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
 Create amendment
     [Tags]    HappyPath

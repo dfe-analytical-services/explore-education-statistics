@@ -1,6 +1,7 @@
 *** Settings ***
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/charts.robot
 Resource            ../../libs/public-common.robot
 
@@ -290,17 +291,20 @@ Verify public metadata guidance document
 
     user opens details dropdown    Variable names and descriptions
 
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
+    user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
+    user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    1    1    children_attending
+    user checks results table cell contains    1    1    children_attending    css:table[data-testid="Variables"]
     user checks results table cell contains    1    2    Number of children attending
+    ...    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    6    1    date
-    user checks results table cell contains    6    2    Date
+    user checks results table cell contains    6    1    date    css:table[data-testid="Variables"]
+    user checks results table cell contains    6    2    Date    css:table[data-testid="Variables"]
 
     user checks results table cell contains    10    1    otherwise_vulnerable_children_attending
+    ...    css:table[data-testid="Variables"]
     user checks results table cell contains    10    2    Number of otherwise vulnerable children attending
+    ...    css:table[data-testid="Variables"]
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
