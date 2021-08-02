@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 
@@ -8,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
     {
         Task<TItem?> GetItem<TItem>(TKey cacheKey)
             where TItem : class;
+
+        Task<object?> GetItem(TKey cacheKey, Type targetType);
 
         Task SetItem<TItem>(TKey cacheKey, TItem item);
 

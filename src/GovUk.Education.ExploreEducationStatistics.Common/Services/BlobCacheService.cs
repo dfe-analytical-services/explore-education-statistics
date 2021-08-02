@@ -93,13 +93,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<TItem?> GetItem<TItem>(IBlobCacheKey cacheKey)
             where TItem : class
         {
+            return (TItem?) await GetItem(cacheKey, typeof(TItem));
+        }
+
+        public async Task<object?> GetItem(IBlobCacheKey cacheKey, Type targetType)
+        {
             var blobContainer = cacheKey.Container;
             var key = cacheKey.Key;
 
             // Attempt to read blob from the storage container
             try
             {
-                return await _blobStorageService.GetDeserializedJson<TItem>(blobContainer, key);
+                return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
             }
             catch (JsonException)
             {
