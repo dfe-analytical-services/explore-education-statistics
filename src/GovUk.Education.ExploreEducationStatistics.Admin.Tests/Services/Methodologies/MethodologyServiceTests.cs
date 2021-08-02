@@ -151,8 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
 
-                Assert.Equal(owningPublication.Id, viewModel.Publication.Id);
-                Assert.Equal(owningPublication.Title, viewModel.Publication.Title);
+                Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(owningPublication.Title, viewModel.OwningPublication.Title);
 
                 Assert.Equal(2, viewModel.OtherPublications.Count);
                 Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
@@ -169,16 +169,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publication = new Publication
             {
                 Title = "Test publication",
+                Slug = "test-publication"
             };
 
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                AlternativeTitle = "Pupil absence statistics: methodology",
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "methodology-slug",
+                    Slug = "test-publication",
+                    OwningPublicationTitle = "Test publication",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
@@ -192,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 LatestInternalReleaseNote = null,
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                Title = "Pupil absence statistics (updated): methodology"
+                Title = "Updated Methodology Title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -233,24 +234,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.Published);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
-                Assert.Equal(publication.Id, viewModel.Publication.Id);
-                Assert.Equal(publication.Title, viewModel.Publication.Title);
+                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(publication.Title, viewModel.OwningPublication.Title);
                 Assert.Empty(viewModel.OtherPublications);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context
+                var updatedMethodology = await context
                     .Methodologies
                     .Include(m => m.MethodologyParent)
                     .SingleAsync(m => m.Id == methodology.Id);
 
-                Assert.Null(model.Published);
-                Assert.Equal(Draft, model.Status);
-                Assert.Equal(Immediately, model.PublishingStrategy);
-                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodology.Published);
+                Assert.Equal(Draft, updatedMethodology.Status);
+                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal("Updated Methodology Title", updatedMethodology.Title);
+                Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
+                Assert.Equal("updated-methodology-title", updatedMethodology.Slug);
+                Assert.Equal("updated-methodology-title", updatedMethodology.MethodologyParent.Slug);
+                Assert.True(updatedMethodology.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated.Value).Milliseconds, 0, 1500);
             }
 
             VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);

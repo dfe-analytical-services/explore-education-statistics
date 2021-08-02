@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToList();
 
                     var viewModel = _mapper.Map<MethodologySummaryViewModel>(methodology);
-                    viewModel.Publication = owningPublication;
+                    viewModel.OwningPublication = owningPublication;
                     viewModel.OtherPublications = otherPublications;
                     return viewModel;
                 });
@@ -103,25 +103,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
                 .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
-                .OnSuccess(async methodology =>
-                {
-                    // TODO SOW4 EES-2166 EES-2200:
-                    // In future it probably won't be necessary to do this,
-                    // since it won't be possible to change the title of a methodology that's already publicly accessible.
-                    // Prevent the slug from being changed on amendments instead.
-                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
-                    {
-                        // Leave slug
-                        return methodology;
-                    }
-
-                    var slug = SlugFromTitle(request.Title);
-                    return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).OnSuccess(_ =>
-                    {
-                        methodology.MethodologyParent.Slug = slug;
-                        return methodology;
-                    });
-                })
+                .OnSuccessDo(methodology => 
+                    // Check that the Methodology will have a unique slug.  This is possible in the case where another 
+                    // Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
+                    // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Unlikely
+                    // scenario but possible. 
+                    ValidateMethodologySlugUniqueForUpdate(methodology.Id, SlugFromTitle(request.Title)))
                 .OnSuccess(async methodology =>
                 {
                     _context.Methodologies.Update(methodology);
@@ -130,7 +117,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
-                    methodology.AlternativeTitle = request.Title;
+
+                    // TODO SOW4 EES-2159 - add a Migration to unset any AlternativeTitles that have been accidentally 
+                    // set in the interim between Amendments going out and this work
+                    if (request.Title != methodology.MethodologyParent.OwningPublicationTitle)
+                    {
+                        methodology.AlternativeTitle = request.Title;
+                        methodology.MethodologyParent.Slug = SlugFromTitle(request.Title);
+                    }
+                    
                     methodology.Updated = DateTime.UtcNow;
 
                     if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
@@ -245,11 +240,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new TitleAndIdViewModel(publication.Id, publication.Title);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
+            Guid methodologyId, string slug)
         {
             var methodologyParentId = await _context
                 .Methodologies
-                .Where(m => m.Id == id)
+                .Where(m => m.Id == methodologyId)
                 .Select(m => m.MethodologyParentId)
                 .SingleAsync();
 

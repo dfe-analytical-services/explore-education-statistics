@@ -1,3 +1,7 @@
+*** Comments ***
+# TODO SOW4 EES-2159 - include editing the Alternaiteve Title on an Amendment and see how it (doesn't) affect the
+# original
+
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot

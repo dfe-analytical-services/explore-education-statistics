@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string InternalReleaseNote { get; set; }
 
-        public TitleAndIdViewModel Publication { get; set; }
+        public TitleAndIdViewModel OwningPublication { get; set; }
 
         public List<TitleAndIdViewModel> OtherPublications { get; set; }
 

@@ -29,7 +29,10 @@ const MethodologySummaryEditPage = ({
             id="updateMethodologyForm"
             initialValues={{
               title: methodology.title,
-              titleType: 'publication', // EES-2159 - use real value
+              titleType:
+                methodology.title !== methodology.owningPublication.title
+                  ? 'alternative'
+                  : 'publication',
             }}
             submitText="Update methodology"
             onSubmit={async values => {
