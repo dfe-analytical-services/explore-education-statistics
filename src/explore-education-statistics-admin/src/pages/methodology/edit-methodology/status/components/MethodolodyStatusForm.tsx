@@ -3,7 +3,7 @@ import {
   MethodologyPublishingStrategy,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
-import { Release } from '@admin/services/releaseService';
+import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -23,23 +23,10 @@ export interface FormValues {
   withReleaseId?: string;
 }
 
-// EES-2163 Replace with real list when EES-2264 done.
-const fakeUnpublishedReleases: Release[] = [
-  {
-    id: 'rel-1',
-    title: 'Release 1',
-  } as Release,
-  {
-    id: 'rel-2',
-    title: 'Release 2',
-  } as Release,
-];
-
 interface Props {
   isPublished?: string;
   methodologySummary: BasicMethodology;
-  showWithRelease?: boolean; // EES-2163 - flag for showing publishing strategy sections for testing, remove when BE done.
-  unPublishedReleases?: Release[];
+  unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }
@@ -47,8 +34,7 @@ interface Props {
 const MethodologyStatusForm = ({
   isPublished,
   methodologySummary,
-  showWithRelease = false,
-  unPublishedReleases = fakeUnpublishedReleases, // EES-2163 use fake for now.
+  unpublishedReleases,
   onCancel,
   onSubmit,
 }: Props) => {
@@ -60,7 +46,7 @@ const MethodologyStatusForm = ({
           methodologySummary.latestInternalReleaseNote ?? '',
         publishingStrategy:
           methodologySummary.publishingStrategy ?? 'Immediately',
-        withReleaseId: methodologySummary.withReleaseId,
+        withReleaseId: methodologySummary.scheduledWithRelease?.id,
       }}
       onSubmit={useFormSubmit<FormValues>(onSubmit)}
       validationSchema={Yup.object<FormValues>({
@@ -112,7 +98,7 @@ const MethodologyStatusForm = ({
               ]}
               order={[]}
             />
-            {form.values.status === 'Approved' && showWithRelease && (
+            {form.values.status === 'Approved' && (
               <FormFieldRadioGroup<FormValues>
                 name="publishingStrategy"
                 legend="When to publish"
@@ -127,7 +113,7 @@ const MethodologyStatusForm = ({
                       <FormFieldSelect<FormValues>
                         label="Select release"
                         name="withReleaseId"
-                        options={unPublishedReleases.map(release => {
+                        options={unpublishedReleases.map(release => {
                           return {
                             label: release.title,
                             value: release.id,

@@ -13,6 +13,8 @@ import { Dictionary } from '@common/types';
 import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -38,14 +40,21 @@ const MethodologyStatusPage = ({
     setState: setModel,
     isLoading,
   } = useAsyncRetry(async () => {
-    const [summary, canApprove, canMarkAsDraft] = await Promise.all([
+    const [
+      summary,
+      unpublishedReleases,
+      canApprove,
+      canMarkAsDraft,
+    ] = await Promise.all([
       methodologyService.getMethodology(methodologyId),
+      methodologyService.getUnpublishedReleases(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
     ]);
 
     return {
       summary,
+      unpublishedReleases,
       canApprove,
       canMarkAsDraft,
     };
@@ -87,12 +96,27 @@ const MethodologyStatusPage = ({
           <>
             {!showForm ? (
               <>
-                <h2>Methodology status</h2>
+                <h2>Sign off</h2>
 
-                <div className="govuk-!-margin-bottom-6">
-                  The current methodology status is:{' '}
-                  <StatusBlock text={statusMap[model.summary.status]} />
-                </div>
+                <SummaryList>
+                  <SummaryListItem term="Status">
+                    <StatusBlock text={statusMap[model.summary.status]} />
+                  </SummaryListItem>
+                  {model.summary.status === 'Approved' && (
+                    <>
+                      <SummaryListItem term="When to publish">
+                        {model.summary.publishingStrategy === 'WithRelease'
+                          ? 'With specific release'
+                          : model.summary.publishingStrategy}
+                      </SummaryListItem>
+                      {model.summary.publishingStrategy === 'WithRelease' && (
+                        <SummaryListItem term="Publish with release">
+                          {model.summary.scheduledWithRelease?.title}
+                        </SummaryListItem>
+                      )}
+                    </>
+                  )}
+                </SummaryList>
 
                 {isEditable && (
                   <Button
@@ -107,6 +131,7 @@ const MethodologyStatusPage = ({
               <MethodologyStatusForm
                 isPublished={isPublished}
                 methodologySummary={model.summary}
+                unpublishedReleases={model.unpublishedReleases}
                 onCancel={toggleForm.off}
                 onSubmit={handleSubmit}
               />

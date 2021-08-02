@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -99,16 +100,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         await _context.Entry(methodology)
                             .Reference(m => m.ScheduledWithRelease)
                             .LoadAsync();
+                        
+                        await _context.Entry(methodology.ScheduledWithRelease)
+                            .Reference(r => r.Publication)
+                            .LoadAsync();
 
                         if (methodology.ScheduledWithRelease != null)
                         {
+                            var title =
+                                $"{methodology.ScheduledWithRelease.Publication.Title} - {methodology.ScheduledWithRelease.Title}"; 
                             viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
                                 methodology.ScheduledWithRelease.Id,
-                                methodology.ScheduledWithRelease.Title);
+                                title);
                         }
                     }
 
                     return viewModel;
+                });
+        }
+
+        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+            Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id, queryable =>
+                    queryable.Include(m => m.MethodologyParent)
+                        .ThenInclude(mp => mp.Publications))
+                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(async methodology =>
+                {
+                    // Get all Publications using the Methodology including adopting Publications
+                    var publicationIds =
+                        methodology.MethodologyParent.Publications.Select(pm => pm.PublicationId);
+
+                    // Get the Releases of those publications
+                    var releases = await _context.Releases
+                        .Include(r => r.Publication)
+                        .Where(r => publicationIds.Contains(r.PublicationId))
+                        .ToListAsync();
+
+                    // Return an ordered list of the Releases that are not published
+                    return releases.Where(r => !r.Live)
+                        .OrderBy(r => r.Publication.Title)
+                        .ThenBy(r => r.Year)
+                        .ThenBy(r => r.TimePeriodCoverage)
+                        .Select(r => new TitleAndIdViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
+                        .ToList();
                 });
         }
 
@@ -134,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     // TODO SOW4 EES-2164 Check that this Release exists and that it's not published before setting it
-                    methodology.ScheduledWithReleaseId = request.ScheduledWithReleaseId;
+                    methodology.ScheduledWithReleaseId = request.WithReleaseId;
                     methodology.Status = request.Status;
 
                     if (request.Title != methodology.Title)
@@ -180,27 +216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
                 .OnSuccessDo(DeleteMethodologyVersion)
                 .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
-        }
-
-        // TODO SOW4 EES-2264 WIP - Unit test this, and link it to Controller endpoint or add it to an existing view model
-        private async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
-            Guid id)
-        {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id, queryable =>
-                    queryable.Include(m => m.MethodologyParent)
-                        .ThenInclude(mp => mp.Publications))
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
-                .OnSuccess(async methodology =>
-                {
-                    // Get all Publications using the Methodology including adopting Publications
-                    var publicationIds =
-                        methodology.MethodologyParent.Publications.Select(pm => pm.PublicationId);
-
-                    // Get the Releases of those publications that are not published
-                    return await _context.Releases.Where(r => publicationIds.Contains(r.PublicationId) && !r.Live)
-                        .Select(release => new TitleAndIdViewModel(release.Id, release.Title))
-                        .ToListAsync();
-                });
         }
 
         private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(

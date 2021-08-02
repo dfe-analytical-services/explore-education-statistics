@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
     public class MethodologyServiceTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
-        
+
         [Fact]
         public async Task CreateMethodology()
         {
@@ -148,6 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
+                Assert.Equal(Immediately, methodology.PublishingStrategy);
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
 
@@ -159,6 +160,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(adoptingPublication1.Title, viewModel.OtherPublications[0].Title);
                 Assert.Equal(adoptingPublication2.Id, viewModel.OtherPublications[1].Id);
                 Assert.Equal(adoptingPublication2.Title, viewModel.OtherPublications[1].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetUnpublishedReleasesUsingMethodology_PublicationsHaveNoUnpublishedReleases()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent()
+            };
+
+            var owningPublication = new Publication
+            {
+                Title = "Owning publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = true
+                    }
+                ),
+                Releases = AsList(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2021"
+                    }
+                )
+            };
+
+            var adoptingPublication = new Publication
+            {
+                Title = "Adopting publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = false
+                    }
+                ),
+                Releases = AsList(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2021"
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+
+                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodology.Id)).AssertRight();
+
+                Assert.Empty(result);
             }
         }
 
@@ -329,6 +397,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
@@ -445,10 +515,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Draft, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal(publication.Title, updatedMethodology.Title);
-                
+
                 // Test explicitly that AlternativeTitle has been unset.
                 Assert.Null(updatedMethodology.AlternativeTitle);
-                
+
                 Assert.Equal("test-publication", updatedMethodology.Slug);
                 Assert.Equal("test-publication", updatedMethodology.MethodologyParent.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
@@ -547,10 +617,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Draft, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal(publication.Title, updatedMethodology.Title);
-                
+
                 // Test that the AlternativeTitle has explicitly be set to null.
                 Assert.Null(updatedMethodology.AlternativeTitle);
-                
+
                 Assert.Equal("alternative-methodology-title", updatedMethodology.Slug);
                 Assert.Equal("alternative-methodology-title", updatedMethodology.MethodologyParent.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
@@ -655,6 +725,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -779,6 +851,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -876,6 +950,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.True(viewModel.Published.HasValue);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published.Value).Milliseconds, 0, 1500);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
@@ -901,9 +977,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_ApprovingUsingWithReleaseStrategy()
         {
+            var publication = new Publication
+            {
+                Title = "Publication title"
+            };
+
             var scheduledWithRelease = new Release
             {
                 Id = Guid.NewGuid(),
+                Publication = publication,
                 TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2021"
             };
@@ -919,10 +1001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Title = "Publication title"
-                        }
+                        Publication = publication
                     })
                 }
             };
@@ -931,7 +1010,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = scheduledWithRelease.Id,
+                WithReleaseId = scheduledWithRelease.Id,
                 Status = Approved,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -940,6 +1019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await context.Publications.AddAsync(publication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.Releases.AddAsync(scheduledWithRelease);
                 await context.SaveChangesAsync();
@@ -975,12 +1055,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(WithRelease, viewModel.PublishingStrategy);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
                 Assert.Equal(scheduledWithRelease.Id, viewModel.ScheduledWithRelease.Id);
-                Assert.Equal(scheduledWithRelease.Title, viewModel.ScheduledWithRelease.Title);
+                Assert.Equal("Publication title - Calendar Year 2021", viewModel.ScheduledWithRelease.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1071,6 +1152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Original release note is not cleared if the update is not altering it
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -1094,7 +1177,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
-        
         [Fact]
         public async Task UpdateMethodology_SettingAlternativeTitleCausesSlugClash()
         {
@@ -1119,7 +1201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     })
                 }
             };
-            
+
             // This pre-existing Methodology has a slug that the update will clash with.
             var methodologyWithTargetSlug = new Methodology
             {
@@ -1267,17 +1349,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
                 Versions = AsList(new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                },
-                new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                })
+                    {
+                        Id = Guid.NewGuid(),
+                        PublishingStrategy = Immediately,
+                        Status = Draft
+                    },
+                    new Methodology
+                    {
+                        Id = Guid.NewGuid(),
+                        PublishingStrategy = Immediately,
+                        Status = Draft
+                    })
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1325,17 +1407,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
                 Versions = AsList(new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                },
-                new Methodology
-                {
-                    Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                })
+                    {
+                        Id = Guid.NewGuid(),
+                        PublishingStrategy = Immediately,
+                        Status = Draft
+                    },
+                    new Methodology
+                    {
+                        Id = Guid.NewGuid(),
+                        PublishingStrategy = Immediately,
+                        Status = Draft
+                    })
             };
 
             var file1 = new File();
@@ -1498,7 +1580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IPublishingService publishingService = null,
             IUserService userService = null)
         {
-            return new MethodologyService(
+            return new(
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),

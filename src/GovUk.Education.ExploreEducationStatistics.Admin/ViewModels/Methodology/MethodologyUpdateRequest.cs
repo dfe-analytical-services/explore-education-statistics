@@ -20,6 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
-        public Guid? ScheduledWithReleaseId { get; set; }
+        public Guid? WithReleaseId { get; set; }
     }
 }

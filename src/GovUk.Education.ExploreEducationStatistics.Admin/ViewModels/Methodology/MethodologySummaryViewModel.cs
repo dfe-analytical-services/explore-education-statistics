@@ -18,6 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public DateTime? Published { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyPublishingStrategy PublishingStrategy { get; set; }
+
         public TitleAndIdViewModel ScheduledWithRelease { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
