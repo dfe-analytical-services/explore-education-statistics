@@ -48,62 +48,6 @@ const MethodologySummaryForm = ({
     errorMappings,
   );
 
-  // EES-2159 - new version of the form. The form values will probably need to be changed when the BE is done.
-  if (canUpdateTitle) {
-    return (
-      <Formik<MethodologySummaryFormValues>
-        enableReinitialize
-        initialValues={
-          initialValues ??
-          ({
-            title: '',
-            titleType: 'publication',
-          } as MethodologySummaryFormValues)
-        }
-        validationSchema={Yup.object<MethodologySummaryFormValues>({
-          titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
-            .oneOf(['publication', 'alternative'])
-            .required('Choose a title type'),
-          title: Yup.string().when('titleType', {
-            is: 'alternative',
-            then: Yup.string().required('Enter a methodology title'),
-            otherwise: Yup.string(),
-          }),
-        })}
-        onSubmit={handleSubmit}
-      >
-        <Form id={id}>
-          <FormFieldRadioGroup<MethodologySummaryFormValues>
-            legend="Methodology title"
-            name="titleType"
-            order={[]}
-            options={[
-              {
-                label: 'Use publication title',
-                value: 'publication',
-              },
-              {
-                label: 'Set an  alternative title',
-                value: 'alternative',
-                conditional: (
-                  <FormFieldTextInput<MethodologySummaryFormValues>
-                    label="Enter methodology title"
-                    name="title"
-                  />
-                ),
-              },
-            ]}
-          />
-          <ButtonGroup>
-            <Button type="submit">{submitText}</Button>
-            <ButtonText onClick={onCancel}>Cancel</ButtonText>
-          </ButtonGroup>
-        </Form>
-      </Formik>
-    );
-  }
-
-  // EES-2159 - remove this version of the form
   return (
     <Formik<MethodologySummaryFormValues>
       enableReinitialize
@@ -111,21 +55,45 @@ const MethodologySummaryForm = ({
         initialValues ??
         ({
           title: '',
+          titleType: 'publication',
         } as MethodologySummaryFormValues)
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
-        title: Yup.string().required('Enter a methodology title'),
+        titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
+          .oneOf(['publication', 'alternative'])
+          .required('Choose a title type'),
+        title: Yup.string().when('titleType', {
+          is: 'alternative',
+          then: Yup.string().required('Enter a methodology title'),
+          otherwise: Yup.string(),
+        }),
       })}
       onSubmit={handleSubmit}
     >
       <Form id={id}>
-        <FormFieldTextInput<MethodologySummaryFormValues>
-          label="Enter methodology title"
-          name="title"
+        <FormFieldRadioGroup<MethodologySummaryFormValues>
+          legend="Methodology title"
+          name="titleType"
+          order={[]}
+          options={[
+            {
+              label: 'Use publication title',
+              value: 'publication',
+            },
+            {
+              label: 'Set an  alternative title',
+              value: 'alternative',
+              conditional: (
+                <FormFieldTextInput<MethodologySummaryFormValues>
+                  label="Enter methodology title"
+                  name="title"
+                />
+              ),
+            },
+          ]}
         />
         <ButtonGroup>
           <Button type="submit">{submitText}</Button>
-
           <ButtonText onClick={onCancel}>Cancel</ButtonText>
         </ButtonGroup>
       </Form>

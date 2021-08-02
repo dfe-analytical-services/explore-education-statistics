@@ -123,7 +123,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     if (request.Title != methodology.MethodologyParent.OwningPublicationTitle)
                     {
                         methodology.AlternativeTitle = request.Title;
-                        methodology.MethodologyParent.Slug = SlugFromTitle(request.Title);
+
+                        // If we're updating a Methodology that is not an Amendment, it's not yet publicly
+                        // visible and so its Slug can be updated.  At the point that a Methodology is publicly
+                        // visible and the only means of updating it is via Amendments, we will no longer allow its
+                        // Slug to change even though its AlternativeTitle can.
+                        if (!methodology.Amendment)
+                        {
+                            methodology.MethodologyParent.Slug = SlugFromTitle(request.Title);
+                        }
                     }
                     
                     methodology.Updated = DateTime.UtcNow;
