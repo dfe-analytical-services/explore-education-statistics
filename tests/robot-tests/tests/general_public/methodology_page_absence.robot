@@ -29,7 +29,7 @@ User navigates to absence methodology page
     ...    Pupil absence in schools in England
     ...    Pupil absence statistics: methodology
     user waits until h1 is visible    Pupil absence statistics: methodology
-    user waits until page contains title caption  Methodology
+    user waits until page contains title caption    Methodology
 
 Validate Published date, Last updated date
     [Tags]    HappyPath

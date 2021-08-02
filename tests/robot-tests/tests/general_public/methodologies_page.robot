@@ -30,7 +30,7 @@ Validate page contents
     ...    Pupil absence in schools in England
     ...    Pupil absence statistics: methodology
     ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
-    user waits until page contains title caption  Methodology
+    user waits until page contains title caption    Methodology
 
 Validate Related information section links exist
     [Tags]    HappyPath
