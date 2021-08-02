@@ -161,13 +161,14 @@ Revisit the Publication on the dashboard and check that the new Amendment is now
     [Tags]    HappyPath
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    Edit this methodology
+    user checks element contains link    ${accordion}    View this methodology
+    user checks element does not contain link    ${accordion}    Edit this methodology
     user checks element contains button    ${accordion}    Amend methodology
     user checks element does not contain link    ${accordion}    Edit this amendment
 
 Visit the approved Amendment and check that its readonly content is as expected
     [Tags]    HappyPath
-    user clicks link    Edit this methodology
+    user clicks link    View this methodology
     user clicks link    Manage content
     user verifies amended Methodololgy readonly content
 
@@ -178,13 +179,14 @@ Create and cancel an Amendment
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    Edit this methodology
+    user checks element contains link    ${accordion}    View this methodology
+    user checks element does not contain link    ${accordion}    Edit this methodology
     user checks element contains button    ${accordion}    Amend methodology
     user checks element does not contain link    ${accordion}    Edit this amendment
 
 Revisit the live Amendment after the cancellation to double check it remains unaffected
     [Tags]    HappyPath
-    user clicks link    Edit this methodology
+    user clicks link    View this methodology
     user clicks link    Manage content
     user verifies amended Methodololgy readonly content
 

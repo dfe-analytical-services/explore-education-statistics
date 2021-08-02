@@ -157,10 +157,19 @@ user views methodology for publication
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user views methodology for open publication accordion    ${accordion}    ${methodology_title}
 
+user views methodology amendment for publication
+    [Arguments]    ${publication}    ${methodology_title}=${publication}
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user views methodology for open publication accordion    ${accordion}    ${methodology_title}
+    ...    Edit this amendment
+
 user views methodology for open publication accordion
-    [Arguments]    ${accordion}    ${methodology_title}
+    [Arguments]
+    ...    ${accordion}
+    ...    ${methodology_title}
+    ...    ${edit_button_text}=Edit this methodology
     user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    Edit this methodology
+    user clicks link    ${edit_button_text}    ${accordion}
     user waits until h2 is visible    Methodology summary
 
 user approves methodology for publication
