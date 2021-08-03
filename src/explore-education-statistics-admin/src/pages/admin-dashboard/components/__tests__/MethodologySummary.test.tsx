@@ -186,7 +186,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', {
+        screen.getByRole('button', {
           name: 'Link to an externally hosted methodology',
         }),
       ).toBeInTheDocument();
@@ -210,11 +210,11 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Create methodology' }),
+        screen.getByRole('button', { name: 'Create methodology' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', {
+        screen.getByRole('button', {
           name: 'Link to an externally hosted methodology',
         }),
       ).toBeInTheDocument();
@@ -256,7 +256,7 @@ describe('MethodologySummary', () => {
         }),
       ).not.toBeInTheDocument();
 
-      expect(screen.queryByText('No methodologies added.')).toBeInTheDocument();
+      expect(screen.getByText('No methodologies added.')).toBeInTheDocument();
     });
 
     test('clicking the link external methodology button shows the form', async () => {
@@ -278,7 +278,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText('Link to an externally hosted methodology', {
+          screen.getByText('Link to an externally hosted methodology', {
             selector: 'legend',
           }),
         ).toBeInTheDocument();
@@ -302,16 +302,14 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
-      expect(screen.queryByText(testMethodology.title)).toBeInTheDocument();
+      expect(screen.getByText(testMethodology.title)).toBeInTheDocument();
 
-      expect(screen.queryByText('8 June 2021')).toBeInTheDocument();
+      expect(screen.getByText('8 June 2021')).toBeInTheDocument();
 
-      expect(
-        screen.queryByText('this is the release note'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('this is the release note')).toBeInTheDocument();
 
       expect(
-        screen.queryByText('View this methodology', { selector: 'a' }),
+        screen.getByText('View this methodology', { selector: 'a' }),
       ).toBeInTheDocument();
     });
 
@@ -327,7 +325,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Approved', { selector: 'span' }),
+        screen.getByText('Approved', { selector: 'span' }),
       ).toBeInTheDocument();
     });
 
@@ -343,7 +341,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Draft', { selector: 'span' }),
+        screen.getByText('Draft', { selector: 'span' }),
       ).toBeInTheDocument();
     });
 
@@ -359,7 +357,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Amendment', { selector: 'span' }),
+        screen.getByText('Amendment', { selector: 'span' }),
       ).toBeInTheDocument();
     });
   });
@@ -380,7 +378,7 @@ describe('MethodologySummary', () => {
         );
 
         expect(
-          screen.queryByText('Ext methodolology title (external methodology)', {
+          screen.getByText('Ext methodolology title (external methodology)', {
             selector: 'a',
           }),
         ).toBeInTheDocument();
@@ -418,7 +416,7 @@ describe('MethodologySummary', () => {
         );
 
         expect(
-          screen.queryByText('Ext methodolology title (external methodology)'),
+          screen.getByText('Ext methodolology title (external methodology)'),
         ).toBeInTheDocument();
 
         expect(
@@ -435,7 +433,7 @@ describe('MethodologySummary', () => {
   });
 
   describe('Removing a non-amendment methodology', () => {
-    test('the remove methodology button is shown if user has permission', () => {
+    test('the remove methodology button is shown if user has permission', async () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -446,13 +444,19 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
-      expect(
-        screen.queryByText('Remove', { selector: 'button' }),
-      ).toBeInTheDocument();
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
 
-      expect(
-        screen.queryByText('Amend methodology', { selector: 'button' }),
-      ).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          screen.getByRole('button', { name: 'Remove' }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByRole('button', { name: 'Amend methodology' }),
+        ).not.toBeInTheDocument();
+      });
     });
 
     test('shows the confirm modal when clicking the Remove button', async () => {
@@ -466,20 +470,25 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
-      userEvent.click(screen.getByText('Remove', { selector: 'button' }));
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
       await waitFor(() => {
         expect(
-          screen.queryByText('Confirm you want to remove this methodology'),
+          screen.getByText('Confirm you want to remove this methodology'),
         ).toBeInTheDocument();
 
         expect(
-          screen.queryByText(
+          screen.getByText(
             'By removing this methodology you will lose any changes made.',
           ),
         ).toBeInTheDocument();
 
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
       });
     });
@@ -494,13 +503,19 @@ describe('MethodologySummary', () => {
           />
         </MemoryRouter>,
       );
-      userEvent.click(screen.getByText('Remove', { selector: 'button' }));
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
       await waitFor(() => {
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
 
-        userEvent.click(screen.getByText('Confirm', { selector: 'button' }));
+        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
       });
 
       await waitFor(() => {
@@ -523,8 +538,12 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
       expect(
-        screen.getByText('Amend methodology', { selector: 'button' }),
+        screen.getByRole('button', { name: 'Amend methodology' }),
       ).toBeInTheDocument();
     });
 
@@ -540,7 +559,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByText('Amend methodology', { selector: 'button' }),
+        screen.queryByRole('button', { name: 'Amend methodology' }),
       ).not.toBeInTheDocument();
     });
 
@@ -556,15 +575,19 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByText('Amend methodology', { selector: 'button' }),
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Amend methodology' }),
       );
       await waitFor(() => {
         expect(
-          screen.queryByText('Confirm you want to amend this live methodology'),
+          screen.getByText('Confirm you want to amend this live methodology'),
         ).toBeInTheDocument();
 
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
       });
     });
@@ -599,7 +622,11 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByText('Amend methodology', { selector: 'button' }),
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Amend methodology' }),
       );
       await waitFor(() => {
         expect(
@@ -634,12 +661,16 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
       expect(
-        screen.queryByText('Cancel amendment', { selector: 'button' }),
+        screen.getByRole('button', { name: 'Cancel amendment' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByText('Remove', { selector: 'button' }),
+        screen.queryByRole('button', { name: 'Remove' }),
       ).not.toBeInTheDocument();
     });
 
@@ -655,23 +686,25 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByText('Cancel amendment', { selector: 'button' }),
+        screen.getByTestId('Expand Details Section I am a methodology'),
       );
+
+      userEvent.click(screen.getByRole('button', { name: 'Cancel amendment' }));
       await waitFor(() => {
         expect(
-          screen.queryByText(
+          screen.getByText(
             'Confirm you want to cancel this amended methodology',
           ),
         ).toBeInTheDocument();
 
         expect(
-          screen.queryByText(
+          screen.getByText(
             'By cancelling the amendments you will lose any changes made, and the original methodology will remain unchanged.',
           ),
         ).toBeInTheDocument();
 
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
       });
     });
@@ -686,15 +719,18 @@ describe('MethodologySummary', () => {
           />
         </MemoryRouter>,
       );
+
       userEvent.click(
-        screen.getByText('Cancel amendment', { selector: 'button' }),
+        screen.getByTestId('Expand Details Section I am a methodology'),
       );
+
+      userEvent.click(screen.getByRole('button', { name: 'Cancel amendment' }));
       await waitFor(() => {
         expect(
-          screen.getByText('Confirm', { selector: 'button' }),
+          screen.getByRole('button', { name: 'Confirm' }),
         ).toBeInTheDocument();
 
-        userEvent.click(screen.getByText('Confirm', { selector: 'button' }));
+        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
       });
 
       await waitFor(() => {
