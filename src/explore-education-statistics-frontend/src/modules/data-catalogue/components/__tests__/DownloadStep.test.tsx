@@ -3,6 +3,7 @@ import DownloadStep, {
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { getDescribedBy } from '@common-test/queries';
+import { Release } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -77,24 +78,29 @@ describe('DownloadStep', () => {
     },
   ];
 
+  const testNotLatestRelease = {
+    id: 'release-1',
+    latestRelease: false,
+  } as Release;
+
+  const testLatestRelease = {
+    id: 'release-2',
+    latestRelease: true,
+  } as Release;
+
   test('renders with downloads', () => {
     const { container } = render(
-      <DownloadStep
-        subjects={testSubjects}
-        isLatestRelease
-        onSubmit={noop}
-        {...wizardProps}
-      />,
+      <DownloadStep {...wizardProps} subjects={testSubjects} onSubmit={noop} />,
     );
 
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();
 
-    const DownloadsGroup = within(
+    const downloadsGroup = within(
       screen.getByRole('group', {
         name: /Choose files to download/,
       }),
     );
-    const downloads = DownloadsGroup.getAllByRole('checkbox');
+    const downloads = downloadsGroup.getAllByRole('checkbox');
 
     expect(downloads.length).toBe(3);
 
@@ -102,7 +108,7 @@ describe('DownloadStep', () => {
     expect(downloads[0]).toBeEnabled();
     expect(downloads[0]).not.toBeChecked();
     expect(downloads[0]).toEqual(
-      DownloadsGroup.getByLabelText('Another Subject (csv, 101mb)'),
+      downloadsGroup.getByLabelText('Another Subject (csv, 101mb)'),
     );
 
     const subject2Hint = within(getDescribedBy(container, downloads[0]));
@@ -122,7 +128,7 @@ describe('DownloadStep', () => {
     expect(downloads[1]).toBeEnabled();
     expect(downloads[1]).not.toBeChecked();
     expect(downloads[1]).toEqual(
-      DownloadsGroup.getByLabelText('Subject 1 (csv, 100mb)'),
+      downloadsGroup.getByLabelText('Subject 1 (csv, 100mb)'),
     );
     const subject1Hint = within(getDescribedBy(container, downloads[1]));
     expect(
@@ -141,7 +147,7 @@ describe('DownloadStep', () => {
     expect(downloads[2]).toBeEnabled();
     expect(downloads[2]).not.toBeChecked();
     expect(downloads[2]).toEqual(
-      DownloadsGroup.getByLabelText('Subject 3 (csv, 100mb)'),
+      downloadsGroup.getByLabelText('Subject 3 (csv, 100mb)'),
     );
 
     const subject3Hint = within(getDescribedBy(container, downloads[2]));
@@ -165,10 +171,10 @@ describe('DownloadStep', () => {
   test('shows latest data tag', () => {
     render(
       <DownloadStep
-        subjects={testSubjects}
-        isLatestRelease
-        onSubmit={noop}
         {...wizardProps}
+        subjects={testSubjects}
+        release={testLatestRelease}
+        onSubmit={noop}
       />,
     );
 
@@ -178,10 +184,10 @@ describe('DownloadStep', () => {
   test('shows not latest data tag', () => {
     render(
       <DownloadStep
-        subjects={testSubjects}
-        isLatestRelease={false}
-        onSubmit={noop}
         {...wizardProps}
+        subjects={testSubjects}
+        release={testNotLatestRelease}
+        onSubmit={noop}
       />,
     );
 
@@ -189,33 +195,31 @@ describe('DownloadStep', () => {
   });
 
   test('renders a message when there are no downloads', () => {
+    const handleSubmit = jest.fn();
     render(
-      <DownloadStep
-        subjects={[]}
-        isLatestRelease={false}
-        onSubmit={noop}
-        {...wizardProps}
-      />,
+      <DownloadStep {...wizardProps} subjects={[]} onSubmit={handleSubmit} />,
     );
 
     expect(
       screen.queryByRole('group', {
-        name: /Choose files to download/,
+        name: 'Choose files from the list below',
       }),
     ).not.toBeInTheDocument();
 
     expect(screen.getByText('No downloads available.')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Download selected files' }),
+    ).not.toBeInTheDocument();
   });
 
-  test('shows validation error if a release is not selected before click the download button', async () => {
+  test('shows validation error if a download is not selected before clicking the download button', async () => {
     const handleSubmit = jest.fn();
 
     render(
       <DownloadStep
-        subjects={testSubjects}
-        isLatestRelease
-        onSubmit={handleSubmit}
         {...wizardProps}
+        subjects={testSubjects}
+        onSubmit={handleSubmit}
       />,
     );
 
@@ -238,10 +242,9 @@ describe('DownloadStep', () => {
 
     render(
       <DownloadStep
-        subjects={testSubjects}
-        isLatestRelease
-        onSubmit={handleSubmit}
         {...wizardProps}
+        subjects={testSubjects}
+        onSubmit={handleSubmit}
       />,
     );
 
@@ -253,7 +256,10 @@ describe('DownloadStep', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({ files: ['file-1'] });
+      expect(handleSubmit).toHaveBeenCalledWith(
+        { files: ['file-1'] },
+        expect.anything(),
+      );
     });
   });
 });

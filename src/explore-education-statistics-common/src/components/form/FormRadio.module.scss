@@ -1,0 +1,10 @@
+.inlineHint {
+  display: flex;
+
+  :global(.govuk-radios__hint) {
+    align-items: center;
+    display: flex;
+    margin: 0 !important; // Needed to override a very specific govuk style
+    padding: 0;
+  }
+}

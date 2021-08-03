@@ -11,13 +11,13 @@ import React from 'react';
 
 interface Props {
   releases: Release[];
-  releaseId?: string;
+  selectedRelease?: Release;
   onSubmit: ReleaseFormSubmitHandler;
 }
 
 const ReleaseStep = ({
   releases,
-  releaseId = '',
+  selectedRelease,
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
@@ -31,29 +31,25 @@ const ReleaseStep = ({
   );
 
   if (isActive) {
-    const form = (
+    return (
       <ReleaseForm
         {...stepProps}
-        initialValues={{
-          releaseId,
-        }}
         options={releases}
         onSubmit={onSubmit}
         legendSize="l"
         legend={stepHeading}
       />
     );
-    return form;
   }
-
-  const releaseTitle = releases.find(({ id }) => releaseId === id)?.title ?? '';
 
   return (
     <div className="govuk-grid-row">
       <div className="govuk-grid-column-two-thirds">
         {stepHeading}
         <SummaryList noBorder>
-          <SummaryListItem term="Release">{releaseTitle}</SummaryListItem>
+          <SummaryListItem term="Release">
+            {selectedRelease?.title}
+          </SummaryListItem>
         </SummaryList>
       </div>
       <div className="govuk-grid-column-one-third dfe-align--right">

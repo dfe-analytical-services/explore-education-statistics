@@ -1,13 +1,19 @@
-import { Form, FormFieldCheckboxGroup } from '@common/components/form';
+import {
+  Form,
+  FormFieldCheckboxGroup,
+  FormFieldset,
+} from '@common/components/form';
 import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { FileInfo } from '@common/services/types/file';
+import { Release } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import Details from '@common/components/Details';
 import { Subject } from '@common/services/tableBuilderService';
 import ContentHtml from '@common/components/ContentHtml';
@@ -25,14 +31,14 @@ export interface SubjectWithDownloadFiles extends Subject {
 }
 
 interface Props {
-  isLatestRelease: boolean;
+  release?: Release;
   subjects: SubjectWithDownloadFiles[];
   initialValues?: { files: string[] };
   onSubmit: DownloadFormSubmitHandler;
 }
 
 const DownloadStep = ({
-  isLatestRelease,
+  release,
   subjects,
   initialValues = { files: [] },
   onSubmit,
@@ -45,12 +51,11 @@ const DownloadStep = ({
     <WizardStepHeading {...stepProps} fieldsetHeading stepEnabled={stepEnabled}>
       <span className="dfe-flex dfe-align-items--center">
         Choose files to download{' '}
-        {isLatestRelease && (
+        {release && release.latestRelease ? (
           <Tag strong className="govuk-!-margin-left-4">
             This is the latest data
           </Tag>
-        )}
-        {!isLatestRelease && (
+        ) : (
           <Tag strong colour="orange" className="govuk-!-margin-left-4">
             This is not the latest data
           </Tag>
@@ -111,6 +116,8 @@ const DownloadStep = ({
     [subjects],
   );
 
+  const handleSubmit = useFormSubmit<DownloadFormValues>(onSubmit);
+
   return (
     <Formik<DownloadFormValues>
       enableReinitialize
@@ -119,28 +126,29 @@ const DownloadStep = ({
       validationSchema={Yup.object<DownloadFormValues>({
         files: Yup.array().of(Yup.string()).required('Choose a file'),
       })}
-      onSubmit={async ({ files }) => {
-        await onSubmit({ files });
-      }}
+      onSubmit={handleSubmit}
     >
       {form => {
         return isActive ? (
-          <Form {...form} id="downloadForm" showSubmitError>
-            {checkboxOptions.length > 0 ? (
-              <>
+          <Form id="downloadForm" showSubmitError>
+            <FormFieldset id="downloadFiles" legend={stepHeading}>
+              {checkboxOptions.length > 0 && (
                 <FormFieldCheckboxGroup<DownloadFormValues>
                   name="files"
-                  legend={stepHeading}
+                  legend="Choose files from the list below"
+                  legendHidden
                   disabled={form.isSubmitting}
                   options={checkboxOptions}
                 />
+              )}
+            </FormFieldset>
 
-                <WizardStepFormActions
-                  submitText="Download selected files"
-                  submittingText="Downloading"
-                  {...stepProps}
-                />
-              </>
+            {checkboxOptions.length > 0 ? (
+              <WizardStepFormActions
+                {...stepProps}
+                submitText="Download selected files"
+                submittingText="Downloading"
+              />
             ) : (
               <p>No downloads available.</p>
             )}

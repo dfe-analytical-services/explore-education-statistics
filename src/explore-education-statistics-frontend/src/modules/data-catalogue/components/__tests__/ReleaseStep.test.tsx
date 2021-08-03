@@ -42,7 +42,7 @@ describe('ReleaseStep', () => {
 
   test('renders with releases', () => {
     render(
-      <ReleaseStep releases={testReleases} onSubmit={noop} {...wizardProps} />,
+      <ReleaseStep {...wizardProps} releases={testReleases} onSubmit={noop} />,
     );
 
     expect(screen.getByText('Choose a release')).toBeInTheDocument();
@@ -61,10 +61,11 @@ describe('ReleaseStep', () => {
     expect(releases[0]).toBeEnabled();
     expect(releases[0]).not.toBeChecked();
     expect(releases[0]).toEqual(
-      releasesGroup.getByLabelText(
-        'Release 1 (30 June 2021) This is the latest data',
-      ),
+      releasesGroup.getByLabelText('Release 1 (30 June 2021)'),
     );
+    expect(
+      screen.getByTestId('Radio item for Release 1 (30 June 2021)'),
+    ).toHaveTextContent('This is the latest data');
 
     expect(releases[1]).toHaveAttribute('value', 'test-rel-2');
     expect(releases[1]).toBeEnabled();
@@ -87,7 +88,7 @@ describe('ReleaseStep', () => {
 
   test('filters the list of releases when searching', async () => {
     render(
-      <ReleaseStep releases={testReleases} onSubmit={noop} {...wizardProps} />,
+      <ReleaseStep {...wizardProps} releases={testReleases} onSubmit={noop} />,
     );
 
     expect(screen.getAllByRole('radio')).toHaveLength(3);
@@ -106,9 +107,9 @@ describe('ReleaseStep', () => {
   test('when there is only one release it is pre-selected and no search is shown', () => {
     render(
       <ReleaseStep
+        {...wizardProps}
         releases={[testReleases[0]]}
         onSubmit={noop}
-        {...wizardProps}
       />,
     );
     expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
@@ -127,7 +128,7 @@ describe('ReleaseStep', () => {
   });
 
   test('renders a message when there are no releases', () => {
-    render(<ReleaseStep releases={[]} onSubmit={noop} {...wizardProps} />);
+    render(<ReleaseStep {...wizardProps} releases={[]} onSubmit={noop} />);
     expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
 
     expect(
@@ -137,16 +138,19 @@ describe('ReleaseStep', () => {
     ).not.toBeInTheDocument();
 
     expect(screen.getByText('No releases available.')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Download selected files' }),
+    ).not.toBeInTheDocument();
   });
 
-  test('shows validation error if a release is not selected before click `Next step`', async () => {
+  test('shows validation error if a release is not selected before clicking `Next step`', async () => {
     const handleSubmit = jest.fn();
 
     render(
       <ReleaseStep
+        {...wizardProps}
         releases={testReleases}
         onSubmit={handleSubmit}
-        {...wizardProps}
       />,
     );
 
@@ -167,9 +171,9 @@ describe('ReleaseStep', () => {
 
     render(
       <ReleaseStep
+        {...wizardProps}
         releases={testReleases}
         onSubmit={handleSubmit}
-        {...wizardProps}
       />,
     );
 
@@ -186,16 +190,16 @@ describe('ReleaseStep', () => {
   test('renders with the selected release title when not active', () => {
     render(
       <ReleaseStep
-        releases={testReleases}
-        releaseId="test-rel-2"
-        onSubmit={noop}
         {...wizardProps}
         isActive={false}
+        releases={testReleases}
+        selectedRelease={testReleases[1]}
+        onSubmit={noop}
       />,
     );
 
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
 
-    expect(screen.getByTestId('Release')).toHaveTextContent('Release 2');
+    expect(screen.getByTestId('Release')).toHaveTextContent('Release 1');
   });
 });

@@ -14,6 +14,7 @@ import WizardStepFormActions from '@common/modules/table-tool/components/WizardS
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { Release } from '@common/services/publicationService';
 import Tag from '@common/components/Tag';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { format } from 'date-fns';
 import { Formik } from 'formik';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -51,15 +52,6 @@ const ReleaseForm = ({
   const [searchTerm, setSearchTerm] = useState('');
   const { isActive, currentStep, stepNumber } = stepProps;
 
-  const getLabel = (option: Release): ReactNode => {
-    return (
-      <>
-        {option.title} ({format(new Date(option.published), 'd MMMM yyyy')}){' '}
-        {option.latestRelease && <Tag strong>This is the latest data</Tag>}
-      </>
-    );
-  };
-
   const radioOptions = useMemo<RadioOption[]>(
     () =>
       orderBy(options, 'published', 'desc')
@@ -74,13 +66,24 @@ const ReleaseForm = ({
         })
         .map(option => {
           return {
-            label: option.title,
-            displayLabel: getLabel(option),
+            label: `${option.title} (${format(
+              new Date(option.published),
+              'd MMMM yyyy',
+            )})`,
+            hint: option.latestRelease ? (
+              <Tag strong>This is the latest data</Tag>
+            ) : undefined,
+            inlineHint: true,
             value: option.id,
           };
         }),
     [options, searchTerm],
   );
+
+  const handleSubmit = useFormSubmit(async (values: ReleaseFormValues) => {
+    await onSubmit(values);
+    goToNextStep();
+  });
 
   return (
     <Formik<ReleaseFormValues>
@@ -93,20 +96,15 @@ const ReleaseForm = ({
       validationSchema={Yup.object<ReleaseFormValues>({
         releaseId: Yup.string().required('Choose a release'),
       })}
-      onSubmit={async ({ releaseId }) => {
-        await onSubmit({
-          releaseId,
-        });
-        goToNextStep();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => {
         const { getError } = createErrorHelper(form);
         return isActive ? (
-          <Form {...form} id={formId} showSubmitError>
+          <Form id={formId} showSubmitError>
             <FormFieldset
-              error={getError('releaseId')}
-              id="releaseId"
+              error={getError('release')}
+              id="release"
               legend={legend}
               legendSize={legendSize}
               hint={legendHint}

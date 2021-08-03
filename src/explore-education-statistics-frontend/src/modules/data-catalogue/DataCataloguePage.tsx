@@ -1,6 +1,4 @@
-import tableBuilderService, {
-  Theme,
-} from '@common/services/tableBuilderService';
+import themeService, { DownloadTheme } from '@common/services/themeService';
 import Page from '@frontend/components/Page';
 import PublicationForm, {
   PublicationFormSubmitHandler,
@@ -14,6 +12,7 @@ import DownloadStep, {
   DownloadFormSubmitHandler,
   SubjectWithDownloadFiles,
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
+import ErrorPage from '@frontend/modules/ErrorPage';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import { useRouter } from 'next/router';
@@ -98,15 +97,14 @@ const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
 ];
 
 interface Props {
-  themes: Theme[];
+  themes: DownloadTheme[];
 }
 
 interface DataCatalogueState {
   initialStep: number;
   releases: Release[];
   query: {
-    isLatestRelease: boolean;
-    releaseId: string;
+    release?: Release;
     subjects: SubjectWithDownloadFiles[];
   };
 }
@@ -118,8 +116,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
     initialStep: 1,
     releases: [],
     query: {
-      isLatestRelease: false,
-      releaseId: '',
+      release: undefined,
       subjects: [],
     },
   });
@@ -138,17 +135,21 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
     releaseId: selectedReleaseId,
   }) => {
     updateState(draft => {
-      draft.query.isLatestRelease =
-        state.releases.find(release => release.id === selectedReleaseId)
-          ?.latestRelease ?? false;
-      draft.query.releaseId = selectedReleaseId;
+      draft.query.release = draft.releases.find(
+        rel => rel.id === selectedReleaseId,
+      );
       draft.query.subjects = fakeSubjectsWithDownloadFiles;
     });
   };
 
   const handleDownloadFormSubmit: DownloadFormSubmitHandler = ({ files }) => {
-    // DO STUFF!
+    // EES-2007  DO STUFF!
   };
+
+  // EES-2007 temp until page is complete
+  if (process.env.NODE_ENV === 'production') {
+    return <ErrorPage statusCode={404} />;
+  }
 
   return (
     <Page
@@ -165,7 +166,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
           {stepProps => (
             <PublicationForm
               {...stepProps}
-              options={themes}
+              options={themes as []}
               onSubmit={handlePublicationFormSubmit}
             />
           )}
@@ -175,7 +176,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
             <ReleaseStep
               {...stepProps}
               releases={state.releases}
-              releaseId={state.query.releaseId}
+              selectedRelease={state.query.release}
               onSubmit={handleReleaseFormSubmit}
             />
           )}
@@ -184,7 +185,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
           {stepProps => (
             <DownloadStep
               {...stepProps}
-              isLatestRelease={state.query.isLatestRelease}
+              release={state.query.release}
               subjects={state.query.subjects}
               onSubmit={handleDownloadFormSubmit}
             />
@@ -196,8 +197,10 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await tableBuilderService.getThemes();
-
+  const themes =
+    process.env.NODE_ENV !== 'production'
+      ? await themeService.getDownloadThemes()
+      : []; // EES-2007 temp until page is complete
   return {
     props: {
       themes,
