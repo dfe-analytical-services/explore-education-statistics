@@ -24,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
@@ -155,6 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
                 .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
                 .OnSuccessDo(methodology => 
                     // Check that the Methodology will have a unique slug.  This is possible in the case where another 
@@ -169,7 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.InternalReleaseNote =
                         request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishingStrategy = request.PublishingStrategy;
-                    // TODO SOW4 EES-2164 Check that this Release exists and that it's not published before setting it
                     methodology.ScheduledWithReleaseId = request.WithReleaseId;
                     methodology.Status = request.Status;
 
@@ -253,6 +254,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 _context.MethodologyParents.Remove(methodologyParent);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
+            Methodology methodology,
+            MethodologyUpdateRequest request)
+        {
+            if (request.PublishingStrategy != WithRelease)
+            {
+                return Unit.Instance;
+            }
+
+            if (!request.WithReleaseId.HasValue)
+            {
+                return new NotFoundResult();
+            }
+
+            // Check that this release exists, that it's not already published, and that it's using the methodology
+            return await _persistenceHelper.CheckEntityExists<Release>(request.WithReleaseId.Value)
+                .OnSuccess(async release =>
+                {
+                    if (release.Live)
+                    {
+                        throw new ArgumentException("Methodology cannot depend on a published Release");
+                    }
+
+                    await _context.Entry(methodology)
+                        .Reference(m => m.MethodologyParent)
+                        .LoadAsync();
+
+                    await _context.Entry(methodology.MethodologyParent)
+                        .Collection(mp => mp.Publications)
+                        .LoadAsync();
+
+                    var publicationIds = methodology.MethodologyParent.Publications
+                        .Select(pm => pm.PublicationId)
+                        .ToList();
+
+                    if (!publicationIds.Contains(release.PublicationId))
+                    {
+                        throw new ArgumentException("Methodology cannot depend on a Release that it's not used by");
+                    }
+
+                    return Unit.Instance;
+                });
         }
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,

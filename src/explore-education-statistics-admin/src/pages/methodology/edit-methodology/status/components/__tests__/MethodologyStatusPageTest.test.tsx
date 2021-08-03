@@ -6,7 +6,6 @@ import _methodologyService, {
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
-import { IdTitlePair } from '@admin/services/types/common';
 import {
   MethodologyRouteParams,
   methodologyStatusRoute,
