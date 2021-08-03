@@ -71,6 +71,7 @@ const withESLint = createPlugin((config, options) => {
 
 const nextConfig = {
   publicRuntimeConfig: {
+    APP_ENV: process.env.APP_ENV,
     CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
     DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
     NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,

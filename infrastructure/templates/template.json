@@ -1829,6 +1829,7 @@
         "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
       ],
       "properties": {
+        "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2015-05-01').InstrumentationKey]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",

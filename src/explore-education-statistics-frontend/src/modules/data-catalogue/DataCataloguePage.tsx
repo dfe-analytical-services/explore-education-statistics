@@ -149,7 +149,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
   };
 
   // EES-2007 temp until page is complete
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.APP_ENV === 'Production') {
     return <ErrorPage statusCode={404} />;
   }
 
@@ -203,11 +203,17 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes =
-    process.env.NODE_ENV !== 'production'
-      ? await themeService.getDownloadThemes()
-      : []; // EES-2007 temp until page is complete
+export const getServerSideProps: GetServerSideProps<Props> = async context => {
+  let themes: DownloadTheme[] = [];
+
+  if (process.env.APP_ENV === 'Production') {
+    // EES-2007 temp until page is complete
+    // eslint-disable-next-line no-param-reassign
+    context.res.statusCode = 404;
+  } else {
+    themes = await themeService.getDownloadThemes();
+  }
+
   return {
     props: {
       themes,
