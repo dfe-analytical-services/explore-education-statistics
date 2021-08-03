@@ -4,13 +4,8 @@ import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseCon
 import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
 import { Comment } from '@admin/services/types/content';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 import Comments from '../Comments';
@@ -76,7 +71,7 @@ describe('Comments', () => {
       </ReleaseContextProvider>,
     );
 
-    fireEvent.click(
+    userEvent.click(
       screen.getByRole('button', {
         name: 'Add / View comments (2 unresolved)',
       }),
@@ -133,34 +128,27 @@ describe('Comments', () => {
       </ReleaseContextProvider>,
     );
 
-    fireEvent.change(
+    await userEvent.type(
       screen.getByRole('textbox', {
         name: 'Comment',
         hidden: true,
       }),
-      {
-        target: {
-          value: 'New test comment',
-        },
+      'New test comment',
+    );
+
+    releaseContentCommentService.addContentSectionComment.mockResolvedValue({
+      id: 'comment-2',
+      content: 'New test comment',
+      createdBy: {
+        id: 'user-2',
+        email: 'test2@test.com',
+        firstName: 'Bethany',
+        lastName: 'Parker',
       },
-    );
+      created: '2020-06-06T14:00:00',
+    });
 
-    releaseContentCommentService.addContentSectionComment.mockImplementation(
-      () =>
-        Promise.resolve<Comment>({
-          id: 'comment-2',
-          content: 'New test comment',
-          createdBy: {
-            id: 'user-2',
-            email: 'test2@test.com',
-            firstName: 'Bethany',
-            lastName: 'Parker',
-          },
-          created: '2020-06-06T14:00:00',
-        }),
-    );
-
-    fireEvent.click(
+    userEvent.click(
       screen.getByRole('button', {
         name: 'Add comment',
         hidden: true,
@@ -288,7 +276,7 @@ describe('Comments', () => {
         })[1],
       );
 
-      fireEvent.click(
+      userEvent.click(
         comment.getByRole('button', {
           name: 'Edit',
           hidden: true,
@@ -334,14 +322,14 @@ describe('Comments', () => {
         })[1],
       );
 
-      fireEvent.click(
+      userEvent.click(
         comment.getByRole('button', {
           name: 'Edit',
           hidden: true,
         }),
       );
 
-      fireEvent.click(
+      userEvent.click(
         comment.getByRole('button', {
           name: 'Cancel',
           hidden: true,
@@ -389,42 +377,37 @@ describe('Comments', () => {
         })[1],
       );
 
-      fireEvent.click(
+      userEvent.click(
         comment.getByRole('button', {
           name: 'Edit',
           hidden: true,
         }),
       );
 
-      fireEvent.change(
+      await userEvent.type(
         comment.getByRole('textbox', {
           name: 'Comment',
           hidden: true,
         }),
+        'Updated test comment',
+      );
+
+      releaseContentCommentService.updateContentSectionComment.mockResolvedValue(
         {
-          target: {
-            value: 'Updated test comment',
+          id: 'comment-2',
+          content: 'Updated test comment',
+          createdBy: {
+            id: 'user-2',
+            email: 'test2@test.com',
+            firstName: 'Jane',
+            lastName: 'Roberts',
           },
+          created: '2020-06-06T11:00:00',
+          updated: '2020-06-06T15:00:00',
         },
       );
 
-      releaseContentCommentService.updateContentSectionComment.mockImplementation(
-        () =>
-          Promise.resolve<Comment>({
-            id: 'comment-2',
-            content: 'Updated test comment',
-            createdBy: {
-              id: 'user-2',
-              email: 'test2@test.com',
-              firstName: 'Jane',
-              lastName: 'Roberts',
-            },
-            created: '2020-06-06T11:00:00',
-            updated: '2020-06-06T15:00:00',
-          }),
-      );
-
-      fireEvent.click(
+      userEvent.click(
         comment.getByRole('button', {
           name: 'Update',
           hidden: true,
@@ -468,8 +451,8 @@ describe('Comments', () => {
       permissions: {} as GlobalPermissions,
     };
 
-    test('resolve comment', async () => {
-      const testComments = [
+    test('clicking resolve button calls the `onChange` handler with updated comments', async () => {
+      const testComments: Comment[] = [
         {
           id: 'comment-1',
           content: 'Test comment 1',
@@ -511,7 +494,7 @@ describe('Comments', () => {
           name: 'Unresolve',
           hidden: true,
         }),
-      ).toBeNull();
+      ).not.toBeInTheDocument();
 
       expect(
         within(comments[0]).getByRole('button', {
@@ -520,21 +503,23 @@ describe('Comments', () => {
         }),
       ).toBeInTheDocument();
 
-      const newComments: Comment[] = [...testComments];
-      newComments[0].resolved = '2020-06-20T12:00:00';
-      newComments[0].resolvedBy = {
-        id: 'user-2',
-        email: 'test@test.com',
-        firstName: 'Jane',
-        lastName: 'Roberts',
+      const updateComment: Comment = {
+        ...testComments[0],
+        resolved: '2020-06-20T12:00:00',
+        resolvedBy: {
+          id: 'user-2',
+          email: 'test@test.com',
+          firstName: 'Jane',
+          lastName: 'Roberts',
+        },
+        setResolved: true,
       };
-      newComments[0].setResolved = true;
 
-      releaseContentCommentService.updateContentSectionComment.mockImplementation(
-        () => Promise.resolve<Comment>(newComments[0]),
+      releaseContentCommentService.updateContentSectionComment.mockResolvedValue(
+        updateComment,
       );
 
-      fireEvent.click(
+      userEvent.click(
         screen.getByRole('button', {
           name: 'Resolve',
           hidden: true,
@@ -543,13 +528,13 @@ describe('Comments', () => {
 
       await waitFor(() => {
         expect(handleChange).toHaveBeenCalledWith('test-block', [
-          ...newComments,
+          updateComment,
         ]);
       });
     });
 
-    test('unresolve comment', async () => {
-      const testComments = [
+    test('clicking unresolve button calls the `onChange` handler with the updated comments', async () => {
+      const testComments: Comment[] = [
         {
           id: 'comment-2',
           content: 'Test comment 2',
@@ -599,7 +584,7 @@ describe('Comments', () => {
           name: 'Resolve',
           hidden: true,
         }),
-      ).toBeNull();
+      ).not.toBeInTheDocument();
 
       expect(
         within(comments[0]).getByRole('button', {
@@ -608,16 +593,18 @@ describe('Comments', () => {
         }),
       ).toBeInTheDocument();
 
-      const newComments: Comment[] = [...testComments];
-      newComments[0].resolved = undefined;
-      newComments[0].resolvedBy = undefined;
-      newComments[0].setResolved = false;
+      const updatedComment: Comment = {
+        ...testComments[0],
+        resolved: undefined,
+        resolvedBy: undefined,
+        setResolved: false,
+      };
 
-      releaseContentCommentService.updateContentSectionComment.mockImplementation(
-        () => Promise.resolve<Comment>(newComments[0]),
+      releaseContentCommentService.updateContentSectionComment.mockResolvedValue(
+        updatedComment,
       );
 
-      fireEvent.click(
+      userEvent.click(
         screen.getByRole('button', {
           name: 'Unresolve',
           hidden: true,
@@ -626,7 +613,7 @@ describe('Comments', () => {
 
       await waitFor(() => {
         expect(handleChange).toHaveBeenCalledWith('test-block', [
-          ...newComments,
+          updatedComment,
         ]);
       });
     });
@@ -721,11 +708,9 @@ describe('Comments', () => {
         </AuthContext.Provider>,
       );
 
-      releaseContentCommentService.deleteContentSectionComment.mockImplementation(
-        () => Promise.resolve(),
-      );
+      releaseContentCommentService.deleteContentSectionComment.mockResolvedValue();
 
-      fireEvent.click(
+      userEvent.click(
         screen.getByRole('button', {
           name: 'Delete',
           hidden: true,
@@ -784,11 +769,9 @@ describe('Comments', () => {
         </AuthContext.Provider>,
       );
 
-      releaseContentCommentService.deleteContentSectionComment.mockImplementation(
-        () => Promise.resolve(),
-      );
+      releaseContentCommentService.deleteContentSectionComment.mockResolvedValue();
 
-      fireEvent.click(
+      userEvent.click(
         screen.getAllByRole('button', {
           name: 'Delete',
           hidden: true,

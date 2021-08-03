@@ -119,8 +119,8 @@ const Comments = ({
             validationSchema={Yup.object({
               content: Yup.string().required('Enter a comment'),
             })}
-            onSubmit={(values, { resetForm }) => {
-              addComment(values.content);
+            onSubmit={async (values, { resetForm }) => {
+              await addComment(values.content);
               resetForm();
             }}
           >
@@ -140,89 +140,84 @@ const Comments = ({
           {orderBy(comments, ['created'], ['desc']).map(comment => {
             const { createdBy, resolvedBy } = comment;
 
-            return comment.resolved ? (
-              <li key={comment.id}>
-                <p className="govuk-!-margin-0">
-                  <strong>
-                    Comment resolved <span aria-hidden>✓</span>
-                  </strong>
+            const commentDetail = (
+              <>
+                <p className="govuk-!-font-weight-bold govuk-!-margin-0">
+                  {`${createdBy.firstName} ${createdBy.lastName}`}
                 </p>
+
                 <dl>
-                  <dt>{'On: '}</dt>
-                  <dd>
-                    <FormattedDate format="dd/MM/yy HH:mm">
-                      {comment.resolved}
-                    </FormattedDate>
-                  </dd>
-                  <br />
-                  <dt>{'By: '}</dt>
-                  <dd>{`${resolvedBy?.firstName} ${resolvedBy?.lastName}`}</dd>
-                </dl>
-                <Details
-                  summary="See comment"
-                  className="govuk-!-margin-bottom-0"
-                >
-                  <p className="govuk-!-margin-0">
-                    <strong>
-                      {`${createdBy.firstName} ${createdBy.lastName}`}
-                    </strong>
-                  </p>
-                  <dl>
+                  <div>
                     <dt>{'Created: '}</dt>
                     <dd>
                       <FormattedDate format="dd/MM/yy HH:mm">
                         {comment.created}
                       </FormattedDate>
                     </dd>
-                    {comment.updated && (
-                      <>
-                        <dt>{'Updated: '}</dt>
-                        <dd>
-                          <FormattedDate format="dd/MM/yy HH:mm">
-                            {comment.updated}
-                          </FormattedDate>
-                        </dd>
-                      </>
-                    )}
-                  </dl>
-                  <p className="govuk-!-margin-top-3">{comment.content}</p>
-                </Details>
-                {canComment && (
-                  <ButtonText
-                    onClick={() => {
-                      setResolved(comment.id, false);
-                    }}
-                  >
-                    Unresolve
-                  </ButtonText>
-                )}
-                <hr />
-              </li>
-            ) : (
-              <li key={comment.id}>
-                <p className="govuk-!-margin-0">
-                  <strong>
-                    {`${createdBy.firstName} ${createdBy.lastName}`}
-                  </strong>
-                </p>
-                <dl>
-                  <dt>{'Created: '}</dt>
-                  <dd>
-                    <FormattedDate format="dd/MM/yy HH:mm">
-                      {comment.created}
-                    </FormattedDate>
-                  </dd>
+                  </div>
                   {comment.updated && (
-                    <>
+                    <div>
                       <dt>{'Updated: '}</dt>
                       <dd>
                         <FormattedDate format="dd/MM/yy HH:mm">
                           {comment.updated}
                         </FormattedDate>
                       </dd>
-                    </>
+                    </div>
                   )}
                 </dl>
+              </>
+            );
+
+            if (comment.resolved) {
+              return (
+                <li key={comment.id}>
+                  <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-2">
+                    Comment resolved <span aria-hidden>✓</span>
+                  </p>
+
+                  <dl>
+                    <div>
+                      <dt>{'On: '}</dt>
+                      <dd>
+                        <FormattedDate format="dd/MM/yy HH:mm">
+                          {comment.resolved}
+                        </FormattedDate>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>{'By: '}</dt>
+                      <dd>{`${resolvedBy?.firstName} ${resolvedBy?.lastName}`}</dd>
+                    </div>
+                  </dl>
+
+                  <Details
+                    summary="See comment"
+                    className="govuk-!-margin-bottom-2"
+                  >
+                    {commentDetail}
+
+                    <p>{comment.content}</p>
+                  </Details>
+
+                  {canComment && (
+                    <ButtonText
+                      onClick={async () => {
+                        await setResolved(comment.id, false);
+                      }}
+                    >
+                      Unresolve
+                    </ButtonText>
+                  )}
+                </li>
+              );
+            }
+
+            return (
+              <li key={comment.id}>
+                {commentDetail}
+
+                <p>{comment.content}</p>
 
                 {editingComment?.id === comment.id ? (
                   <Formik<FormValues>
@@ -232,8 +227,8 @@ const Comments = ({
                     validationSchema={Yup.object({
                       content: Yup.string().required('Enter a comment'),
                     })}
-                    onSubmit={values => {
-                      updateComment(comment.id, values.content);
+                    onSubmit={async values => {
+                      await updateComment(comment.id, values.content);
                     }}
                   >
                     <Form
@@ -261,7 +256,6 @@ const Comments = ({
                   </Formik>
                 ) : (
                   <>
-                    <p className="govuk-!-margin-top-3">{comment.content}</p>
                     {canComment && (
                       <ButtonGroup>
                         {user?.id === createdBy.id && (
@@ -274,8 +268,8 @@ const Comments = ({
                               Edit
                             </ButtonText>
                             <ButtonText
-                              onClick={() => {
-                                removeComment(comment.id);
+                              onClick={async () => {
+                                await removeComment(comment.id);
                               }}
                             >
                               Delete
@@ -284,8 +278,8 @@ const Comments = ({
                         )}
 
                         <ButtonText
-                          onClick={() => {
-                            setResolved(comment.id, true);
+                          onClick={async () => {
+                            await setResolved(comment.id, true);
                           }}
                         >
                           Resolve
@@ -294,8 +288,6 @@ const Comments = ({
                     )}
                   </>
                 )}
-
-                <hr />
               </li>
             );
           })}
