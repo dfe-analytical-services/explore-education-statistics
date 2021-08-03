@@ -118,8 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.Status = request.Status;
 
-                    // TODO SOW4 EES-2159 - add a Migration to unset any AlternativeTitles that have been accidentally 
-                    // set in the interim between Amendments going out and this work
                     if (request.Title != methodology.Title)
                     {
                         methodology.AlternativeTitle = 
