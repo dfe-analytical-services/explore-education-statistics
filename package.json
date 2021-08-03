@@ -50,6 +50,7 @@
     "start:processor": "cd src/GovUk.Education.ExploreEducationStatistics.Data.Processor && func start --build",
     "test": "lerna run test",
     "test:ci": "lerna run test:ci",
+    "test:coverage": "lerna run test:coverage",
     "tsc": "lerna run tsc",
     "install:azure-emulator": "curl --output installer.msi -L \"https://go.microsoft.com/fwlink/?linkid=717179&clcid=0x409\" && installer.msi && rm installer.msi",
     "install:azure-tools": "npm install -g azure-functions-core-tools@3 --unsafe-perm true"
