@@ -5,7 +5,9 @@ import PublicationForm, {
 } from '@common/modules/table-tool/components/PublicationForm';
 import { Release } from '@common/services/publicationService';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import Wizard from '@common/modules/table-tool/components/Wizard';
+import Wizard, {
+  InjectedWizardProps,
+} from '@common/modules/table-tool/components/Wizard';
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import DownloadStep, {
@@ -151,6 +153,17 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
     return <ErrorPage statusCode={404} />;
   }
 
+  const PublicationStep = (props: InjectedWizardProps) => {
+    const options: DownloadTheme[] = themes;
+    return (
+      <PublicationForm
+        {...props}
+        onSubmit={handlePublicationFormSubmit}
+        options={options}
+      />
+    );
+  };
+
   return (
     <Page
       caption="Data catalogue"
@@ -163,13 +176,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
 
       <Wizard initialStep={state.initialStep} id="dataCatalogueWizard">
         <WizardStep onBack={handlePublicationStepBack}>
-          {stepProps => (
-            <PublicationForm
-              {...stepProps}
-              options={themes as []}
-              onSubmit={handlePublicationFormSubmit}
-            />
-          )}
+          {stepProps => <PublicationStep {...stepProps} />}
         </WizardStep>
         <WizardStep>
           {stepProps => (
