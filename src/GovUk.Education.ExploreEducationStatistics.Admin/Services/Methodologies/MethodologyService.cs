@@ -120,9 +120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     // TODO SOW4 EES-2159 - add a Migration to unset any AlternativeTitles that have been accidentally 
                     // set in the interim between Amendments going out and this work
-                    if (request.Title != methodology.MethodologyParent.OwningPublicationTitle)
+                    if (request.Title != methodology.Title)
                     {
-                        methodology.AlternativeTitle = request.Title;
+                        methodology.AlternativeTitle = 
+                            request.Title != methodology.MethodologyParent.OwningPublicationTitle 
+                                ? request.Title : null;
 
                         // If we're updating a Methodology that is not an Amendment, it's not yet publicly
                         // visible and so its Slug can be updated.  At the point that a Methodology is publicly

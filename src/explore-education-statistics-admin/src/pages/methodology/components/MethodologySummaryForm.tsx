@@ -12,7 +12,7 @@ import React from 'react';
 
 export interface MethodologySummaryFormValues {
   title: string;
-  titleType?: 'publication' | 'alternative';
+  titleType?: 'default' | 'specific';
 }
 
 const errorMappings = [
@@ -25,25 +25,28 @@ const errorMappings = [
 ];
 
 interface Props {
-  canUpdateTitle?: boolean;
   id: string;
   initialValues?: MethodologySummaryFormValues;
+  defaultTitle: string;
   submitText: string;
   onCancel: () => void;
   onSubmit: (values: MethodologySummaryFormValues) => void;
 }
 
 const MethodologySummaryForm = ({
-  canUpdateTitle = false, // EES-2159 - flip to true to test. Replace with actual permission or remove.
   id,
   initialValues,
+  defaultTitle,
   submitText,
   onCancel,
   onSubmit,
 }: Props) => {
   const handleSubmit = useFormSubmit<MethodologySummaryFormValues>(
     async values => {
-      onSubmit(values as MethodologySummaryFormValues);
+      onSubmit({
+        ...values,
+        title: values.titleType === 'default' ? defaultTitle : values.title,
+      });
     },
     errorMappings,
   );
@@ -55,15 +58,15 @@ const MethodologySummaryForm = ({
         initialValues ??
         ({
           title: '',
-          titleType: 'publication',
+          titleType: 'default',
         } as MethodologySummaryFormValues)
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
         titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
-          .oneOf(['publication', 'alternative'])
+          .oneOf(['default', 'specific'])
           .required('Choose a title type'),
         title: Yup.string().when('titleType', {
-          is: 'alternative',
+          is: 'specific',
           then: Yup.string().required('Enter a methodology title'),
           otherwise: Yup.string(),
         }),
@@ -78,11 +81,11 @@ const MethodologySummaryForm = ({
           options={[
             {
               label: 'Use publication title',
-              value: 'publication',
+              value: 'default',
             },
             {
-              label: 'Set an  alternative title',
-              value: 'alternative',
+              label: 'Set an alternative title',
+              value: 'specific',
               conditional: (
                 <FormFieldTextInput<MethodologySummaryFormValues>
                   label="Enter methodology title"

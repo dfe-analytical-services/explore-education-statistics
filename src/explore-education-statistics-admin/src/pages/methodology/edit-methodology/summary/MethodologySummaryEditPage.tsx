@@ -31,9 +31,10 @@ const MethodologySummaryEditPage = ({
               title: methodology.title,
               titleType:
                 methodology.title !== methodology.owningPublication.title
-                  ? 'alternative'
-                  : 'publication',
+                  ? 'specific'
+                  : 'default',
             }}
+            defaultTitle={methodology.owningPublication.title}
             submitText="Update methodology"
             onSubmit={async values => {
               await methodologyService.updateMethodology(methodologyId, {

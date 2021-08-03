@@ -1,7 +1,3 @@
-*** Comments ***
-# TODO SOW4 EES-2159 - include editing the Alternaiteve Title on an Amendment and see how it (doesn't) affect the
-# original
-
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -28,6 +24,10 @@ Create Methodology with some content and images
     [Tags]    HappyPath
 
     user creates methodology for publication    ${PUBLICATION_NAME}
+    user edits methodology summary for publication
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - first methodology version
 
     user clicks link    Manage content
     user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
@@ -94,7 +94,20 @@ Verify the editable content is as expected
 
 Approve the Methodology
     [Tags]    HappyPath
-    user approves methodology for publication    ${PUBLICATION_NAME}
+    user approves methodology for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - first methodology version
+
+Verify the summary for the original Methodology is as expected
+    [Tags]    HappyPath
+    ${expected_published_date}=    get current datetime    %-d %B %Y
+    user views methodology for publication
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - first methodology version
+    ...    View this methodology
+    user verifies methodology summary details
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - first methodology version
+    ...    Approved
+    ...    ${expected_published_date}
 
 Verify the readonly content for the original Methodology is as expected
     [Tags]    HappyPath
@@ -106,6 +119,24 @@ Create a Methodology Amendment
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user checks page contains tag    Draft
     user checks page contains tag    Amendment
+
+Edit the Amendment's summary to return the Methodology's title to the same as its owning Publication's title
+    [Tags]    HappyPath
+    user edits methodology summary for publication
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - first methodology version
+    ...    ${PUBLICATION_NAME}
+    ...    Edit this amendment
+    user verifies methodology summary details
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME}
+    ...    Draft Amendment
+    ...    Not yet published
+    user clicks link    Edit summary
+    user waits until h2 is visible    Edit methodology summary
+    # Double check that the front end is now showing the Methodology's title as being "Use publication title" when
+    # visiting the "Edit methodology summary" page again.
+    user checks radio is checked    Use publication title
 
 Remove a Content Section from the Amendment
     [Tags]    HappyPath
@@ -170,9 +201,18 @@ Revisit the Publication on the dashboard and check that the new Amendment is now
     user checks element contains button    ${accordion}    Amend methodology
     user checks element does not contain link    ${accordion}    Edit this amendment
 
-Visit the approved Amendment and check that its readonly content is as expected
+Visit the approved Amendment and check that its summary is as expected
     [Tags]    HappyPath
     user clicks link    View this methodology
+    ${date}=    get current datetime    %-d %B %Y
+    user verifies methodology summary details
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME}
+    ...    Approved
+    ...    ${date}
+
+Check the approved Amendment's readonly content is as expected
+    [Tags]    HappyPath
     user clicks link    Manage content
     user verifies amended Methodology readonly content
 

@@ -147,15 +147,18 @@ user creates methodology for publication
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user clicks button    Create methodology    ${accordion}
-    user waits until h2 is visible    Methodology summary
-    user checks summary list contains    Title    ${publication}
-    user checks summary list contains    Status    Draft
-    user checks summary list contains    Published on    Not yet published
+    user verifies methodology summary details    ${publication}
 
 user views methodology for publication
-    [Arguments]    ${publication}    ${methodology_title}=${publication}
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${view_button_text}=Edit this methodology
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user views methodology for open publication accordion    ${accordion}    ${methodology_title}
+    user views methodology for open publication accordion
+    ...    ${accordion}
+    ...    ${methodology_title}
+    ...    ${view_button_text}
 
 user views methodology amendment for publication
     [Arguments]    ${publication}    ${methodology_title}=${publication}
@@ -172,12 +175,55 @@ user views methodology for open publication accordion
     user clicks link    ${edit_button_text}    ${accordion}
     user waits until h2 is visible    Methodology summary
 
+user edits methodology summary for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${existing_methodology_title}
+    ...    ${new_methodology_title}
+    ...    ${edit_button_text}=Edit this methodology
+    user views methodology for publication    ${publication}    ${existing_methodology_title}    ${edit_button_text}
+    user clicks link    Edit summary
+    user waits until h2 is visible    Edit methodology summary
+
+    IF    "${existing_methodology_title}" == "${publication}"
+        user checks radio is checked    Use publication title
+        user waits until element is not visible    label:Enter methodology title
+    ELSE
+        user checks radio is checked    Set an alternative title
+        user waits until element is visible    label:Enter methodology title
+        user checks input field contains    label:Enter methodology title    ${existing_methodology_title}
+    END
+
+    IF    "${new_methodology_title}" == "${publication}"
+        user clicks radio    Use publication title
+        user waits until element is not visible    label:Enter methodology title
+    ELSE
+        user clicks radio    Set an alternative title
+        user waits until element is visible    label:Enter methodology title
+        user enters text into element    label:Enter methodology title    ${new_methodology_title}
+    END
+
+    user clicks button    Update methodology
+    user verifies methodology summary details    ${publication}    ${new_methodology_title}
+
+user verifies methodology summary details
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}=${publication}
+    ...    ${status}=Draft
+    ...    ${published_on}=Not yet published
+    user waits until h2 is visible    Methodology summary
+    user checks summary list contains    Title    ${methodology_title}
+    user checks summary list contains    Status    ${status}
+    user checks summary list contains    Published on    ${published_on}
+    user checks summary list contains    Owning publication    ${publication}
+
 user approves methodology for publication
     [Arguments]
     ...    ${publication}
+    ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ...    ${methodology_title}=${publication}
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
@@ -207,7 +253,7 @@ user creates approved methodology for publication
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
     user creates methodology for publication    ${publication}    ${theme}    ${topic}
-    user approves methodology for publication    ${publication}    ${theme}    ${topic}
+    user approves methodology for publication    ${publication}    ${publication}    ${theme}    ${topic}
 
 user creates methodology amendment for publication
     [Arguments]
@@ -420,6 +466,7 @@ user approves release for immediate publication
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
+    user waits until page does not contain loading spinner
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""

@@ -1,3 +1,6 @@
+*** Comments ***
+# TODO SOW4 EES-2159 - add in tests to check the content of Methodologies and Amendments in the public site
+
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
