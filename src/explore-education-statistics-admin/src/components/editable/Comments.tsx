@@ -48,53 +48,58 @@ const Comments = ({
   const { user } = useAuthContext();
   const { releaseId } = useReleaseContext();
 
-  const addComment = (content: string) => {
+  const addComment = async (content: string) => {
     const additionalComment: AddComment = {
       content,
     };
 
     if (releaseId && sectionId) {
-      releaseContentCommentService
-        .addContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          additionalComment,
-        )
-        .then(newComment => {
-          onChange(blockId, [newComment, ...comments]);
-        });
+      const newComment = await releaseContentCommentService.addContentSectionComment(
+        releaseId,
+        sectionId,
+        blockId,
+        additionalComment,
+      );
+      onChange(blockId, [newComment, ...comments]);
     }
   };
 
-  const removeComment = (commentId: string) => {
+  const removeComment = async (commentId: string) => {
     const index = comments.findIndex(comment => comment.id === commentId);
-    releaseContentCommentService
-      .deleteContentSectionComment(commentId)
-      .then(() => {
-        const newComments = [...comments];
-        newComments.splice(index, 1);
-        onChange(blockId, newComments);
-      });
+    await releaseContentCommentService.deleteContentSectionComment(commentId);
+
+    const newComments = [...comments];
+    newComments.splice(index, 1);
+    onChange(blockId, newComments);
   };
 
-  const updateComment = (commentId: string, content: string) => {
+  const updateComment = async (commentId: string, content: string) => {
     const index = comments.findIndex(comment => comment.id === commentId);
     const editedComment: UpdateComment = {
       ...comments[index],
       content,
     };
 
-    releaseContentCommentService
-      .updateContentSectionComment(editedComment)
-      .then(savedComment => {
-        const newComments = [...comments];
-        newComments[index] = savedComment;
+    const savedComment = await releaseContentCommentService.updateContentSectionComment(
+      editedComment,
+    );
 
-        onChange(blockId, newComments);
+    const newComments = [...comments];
+    newComments[index] = savedComment;
+    onChange(blockId, newComments);
+    setEditingComment(undefined);
+  };
 
-        setEditingComment(undefined);
-      });
+  const setResolved = async (commentId: string, resolved: boolean) => {
+    const index = comments.findIndex(comment => comment.id === commentId);
+    const newComment = { ...comments[index], setResolved: resolved };
+    const savedComment = await releaseContentCommentService.updateContentSectionComment(
+      newComment,
+    );
+
+    const newComments = [...comments];
+    newComments[index] = savedComment;
+    onChange(blockId, newComments);
   };
 
   return (
@@ -103,8 +108,8 @@ const Comments = ({
         onToggle={isOpen => onToggle && onToggle(isOpen)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
-          comments.length
-        })`}
+          comments.filter(comment => !comment.resolved).length
+        } unresolved)`}
       >
         {canComment && (
           <Formik<FormValues>
@@ -114,8 +119,8 @@ const Comments = ({
             validationSchema={Yup.object({
               content: Yup.string().required('Enter a comment'),
             })}
-            onSubmit={(values, { resetForm }) => {
-              addComment(values.content);
+            onSubmit={async (values, { resetForm }) => {
+              await addComment(values.content);
               resetForm();
             }}
           >
@@ -133,21 +138,86 @@ const Comments = ({
 
         <ul className={styles.commentsContainer}>
           {orderBy(comments, ['created'], ['desc']).map(comment => {
-            const { createdBy } = comment;
+            const { createdBy, resolvedBy } = comment;
+
+            const commentDetail = (
+              <>
+                <p className="govuk-!-font-weight-bold govuk-!-margin-0">
+                  {`${createdBy.firstName} ${createdBy.lastName}`}
+                </p>
+
+                <dl>
+                  <div>
+                    <dt>{'Created: '}</dt>
+                    <dd>
+                      <FormattedDate format="dd/MM/yy HH:mm">
+                        {comment.created}
+                      </FormattedDate>
+                    </dd>
+                  </div>
+                  {comment.updated && (
+                    <div>
+                      <dt>{'Updated: '}</dt>
+                      <dd>
+                        <FormattedDate format="dd/MM/yy HH:mm">
+                          {comment.updated}
+                        </FormattedDate>
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </>
+            );
+
+            if (comment.resolved) {
+              return (
+                <li key={comment.id}>
+                  <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-2">
+                    Comment resolved <span aria-hidden>✓</span>
+                  </p>
+
+                  <dl>
+                    <div>
+                      <dt>{'On: '}</dt>
+                      <dd>
+                        <FormattedDate format="dd/MM/yy HH:mm">
+                          {comment.resolved}
+                        </FormattedDate>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>{'By: '}</dt>
+                      <dd>{`${resolvedBy?.firstName} ${resolvedBy?.lastName}`}</dd>
+                    </div>
+                  </dl>
+
+                  <Details
+                    summary="See comment"
+                    className="govuk-!-margin-bottom-2"
+                  >
+                    {commentDetail}
+
+                    <p>{comment.content}</p>
+                  </Details>
+
+                  {canComment && (
+                    <ButtonText
+                      onClick={async () => {
+                        await setResolved(comment.id, false);
+                      }}
+                    >
+                      Unresolve
+                    </ButtonText>
+                  )}
+                </li>
+              );
+            }
 
             return (
-              <li key={comment.id} className="govuk-body-s">
-                <p className="govuk-!-margin-0">
-                  <strong>
-                    {`${createdBy.firstName} ${createdBy.lastName}`}
-                  </strong>
-                </p>
-                <p>
-                  {comment.updated ? 'Updated: ' : ''}
-                  <FormattedDate format="d MMMM yyyy HH:mm">
-                    {comment.updated || comment.created}
-                  </FormattedDate>
-                </p>
+              <li key={comment.id}>
+                {commentDetail}
+
+                <p>{comment.content}</p>
 
                 {editingComment?.id === comment.id ? (
                   <Formik<FormValues>
@@ -157,8 +227,8 @@ const Comments = ({
                     validationSchema={Yup.object({
                       content: Yup.string().required('Enter a comment'),
                     })}
-                    onSubmit={values => {
-                      updateComment(comment.id, values.content);
+                    onSubmit={async values => {
+                      await updateComment(comment.id, values.content);
                     }}
                   >
                     <Form
@@ -186,31 +256,38 @@ const Comments = ({
                   </Formik>
                 ) : (
                   <>
-                    <p>{comment.content}</p>
-
-                    {canComment && user?.id === createdBy.id && (
+                    {canComment && (
                       <ButtonGroup>
-                        <ButtonText
-                          onClick={() => {
-                            setEditingComment(comment);
-                          }}
-                        >
-                          Edit
-                        </ButtonText>
+                        {user?.id === createdBy.id && (
+                          <>
+                            <ButtonText
+                              onClick={() => {
+                                setEditingComment(comment);
+                              }}
+                            >
+                              Edit
+                            </ButtonText>
+                            <ButtonText
+                              onClick={async () => {
+                                await removeComment(comment.id);
+                              }}
+                            >
+                              Delete
+                            </ButtonText>
+                          </>
+                        )}
 
                         <ButtonText
-                          onClick={() => {
-                            removeComment(comment.id);
+                          onClick={async () => {
+                            await setResolved(comment.id, true);
                           }}
                         >
-                          Delete
+                          Resolve
                         </ButtonText>
                       </ButtonGroup>
                     )}
                   </>
                 )}
-
-                <hr />
               </li>
             );
           })}

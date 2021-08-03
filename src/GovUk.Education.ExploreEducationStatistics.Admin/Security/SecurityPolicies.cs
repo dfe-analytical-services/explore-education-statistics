@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
     public enum SecurityPolicies
@@ -32,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanPublishSpecificRelease,
         CanDeleteSpecificRelease,
         CanViewSpecificPreReleaseSummary,
+        CanResolveSpecificComment,
         CanUpdateSpecificComment,
         CanCancelOngoingImports,
         CanViewReleaseStatusHistory,

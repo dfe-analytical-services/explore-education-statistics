@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetUnattachedContentBlocksAsync<DataBlock>(release.Id))
+                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
             methodologyRepository.Setup(mock => mock.GetLatestByPublication(publication.Id))
@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 contentService.Verify(mock =>
-                    mock.GetUnattachedContentBlocksAsync<DataBlock>(release.Id), Times.Once);
+                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);

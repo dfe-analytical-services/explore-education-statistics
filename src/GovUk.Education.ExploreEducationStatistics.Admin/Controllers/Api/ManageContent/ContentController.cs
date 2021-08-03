@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid releaseId)
         {
             return await _contentService
-                .GetContentSectionsAsync(releaseId)
+                .GetContentSections(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
         {
             return await _contentService
-                .ReorderContentSectionsAsync(releaseId, newSectionOrder)
+                .ReorderContentSections(releaseId, newSectionOrder)
                 .HandleFailuresOrOk();
         }
 
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
-                .UpdateContentSectionHeadingAsync(releaseId, contentSectionId, request.Heading)
+                .UpdateContentSectionHeading(releaseId, contentSectionId, request.Heading)
                 .HandleFailuresOrOk();
         }
 
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId)
         {
             return await _contentService
-                .RemoveContentSectionAsync(releaseId, contentSectionId)
+                .RemoveContentSection(releaseId, contentSectionId)
                 .HandleFailuresOrOk();
         }
 
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
         {
             return await _contentService
-                .GetContentSectionAsync(releaseId, contentSectionId)
+                .GetContentSection(releaseId, contentSectionId)
                 .HandleFailuresOrOk();
         }
 
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return await _contentService
-                .ReorderContentBlocksAsync(releaseId, contentSectionId, newBlocksOrder)
+                .ReorderContentBlocks(releaseId, contentSectionId, newBlocksOrder)
                 .HandleFailuresOrOk();
         }
 
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
-                .AddContentBlockAsync(releaseId, contentSectionId, request)
+                .AddContentBlock(releaseId, contentSectionId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
             return await _contentService
-                .RemoveContentBlockAsync(releaseId, contentSectionId, contentBlockId)
+                .RemoveContentBlock(releaseId, contentSectionId, contentBlockId)
                 .HandleFailuresOrOk();
         }
 
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
         {
             return await _contentService
-                .UpdateDataBlockAsync(releaseId, contentSectionId, contentBlockId, request)
+                .UpdateDataBlock(releaseId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
-                .UpdateTextBasedContentBlockAsync(releaseId, contentSectionId, contentBlockId, request)
+                .UpdateTextBasedContentBlock(releaseId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return await _contentService
-                .GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
+                .GetUnattachedContentBlocks<DataBlock>(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -135,40 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             return await _contentService
                 .AttachDataBlock(releaseId, contentSectionId, request)
                 .HandleFailuresOrOk();
-        }
-
-        [HttpGet("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments")]
-        public async Task<ActionResult<List<CommentViewModel>>> GetComments(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
-        {
-            return await _contentService
-                .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
-        public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest)
-        {
-            return await _contentService
-                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, saveRequest)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, CommentSaveRequest saveRequest)
-        {
-            return await _contentService
-                .UpdateCommentAsync(commentId, saveRequest)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpDelete("comment/{commentId}")]
-        public async Task<ActionResult> DeleteComment(Guid commentId)
-        {
-            return await _contentService
-                .DeleteCommentAsync(commentId)
-                .HandleFailuresOrNoContent();
         }
     }
 }

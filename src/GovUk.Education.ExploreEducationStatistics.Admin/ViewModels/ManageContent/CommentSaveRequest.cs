@@ -3,5 +3,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     public class CommentSaveRequest
     {
         public string Content { get; set; }
+        public bool? SetResolved { get; set; }
     }
 }

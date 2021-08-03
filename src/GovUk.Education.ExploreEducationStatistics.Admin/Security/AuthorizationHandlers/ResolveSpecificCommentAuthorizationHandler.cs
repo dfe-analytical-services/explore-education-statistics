@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -11,19 +9,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class UpdateSpecificCommentRequirement : IAuthorizationRequirement
+    public class ResolveSpecificCommentRequirement : IAuthorizationRequirement
     {
     }
 
-    public class UpdateSpecificCommentAuthorizationHandler
-        : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
+    public class ResolveSpecificCommentAuthorizationHandler
+        : AuthorizationHandler<ResolveSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseStatusRepository _releaseStatusRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-        public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
+        public ResolveSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
             IReleaseStatusRepository releaseStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
@@ -35,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            UpdateSpecificCommentRequirement requirement,
+            ResolveSpecificCommentRequirement requirement,
             Comment resource)
         {
             var release = GetRelease(_contentDbContext, resource);
@@ -46,16 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 _userReleaseRoleRepository)
                 .HandleAsync(updateSpecificReleaseContext);
 
-            if (!updateSpecificReleaseContext.HasSucceeded)
-            {
-                return;
-            }
-
-            var canUpdateOwnCommentContext =
-                new AuthorizationHandlerContext(new[] {requirement}, context.User, resource);
-            await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(canUpdateOwnCommentContext);
-
-            if (canUpdateOwnCommentContext.HasSucceeded)
+            if (updateSpecificReleaseContext.HasSucceeded)
             {
                 context.Succeed(requirement);
             }
@@ -70,14 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .First(block => block.Id == comment.ContentBlockId);
 
             return contentBlock.ContentSection?.Release.Release;
-        }
-    }
-
-    public class CanUpdateOwnCommentAuthorizationHandler :
-        EntityAuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
-    {
-        public CanUpdateOwnCommentAuthorizationHandler() : base(ctx => ctx.User.GetUserId() == ctx.Entity.CreatedById)
-        {
         }
     }
 }

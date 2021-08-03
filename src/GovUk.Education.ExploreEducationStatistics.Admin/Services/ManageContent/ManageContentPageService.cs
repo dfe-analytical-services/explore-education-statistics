@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 )
                 .OnSuccess(HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId))
+                .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,
@@ -117,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     cb.Comments = await _contentDbContext.Comment
                         .Where(c => c.ContentBlockId == cb.Id)
                         .Include(c => c.CreatedBy)
+                        .Include(c => c.ResolvedBy)
                         .ToListAsync();
                 });
             });
