@@ -12,7 +12,7 @@ import React from 'react';
 
 export interface MethodologySummaryFormValues {
   title: string;
-  titleType?: 'default' | 'specific';
+  titleType?: 'default' | 'alternative';
 }
 
 const errorMappings = [
@@ -63,10 +63,10 @@ const MethodologySummaryForm = ({
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
         titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
-          .oneOf(['default', 'specific'])
+          .oneOf(['default', 'alternative'])
           .required('Choose a title type'),
         title: Yup.string().when('titleType', {
-          is: 'specific',
+          is: 'alternative',
           then: Yup.string().required('Enter a methodology title'),
           otherwise: Yup.string(),
         }),
@@ -85,7 +85,7 @@ const MethodologySummaryForm = ({
             },
             {
               label: 'Set an alternative title',
-              value: 'specific',
+              value: 'alternative',
               conditional: (
                 <FormFieldTextInput<MethodologySummaryFormValues>
                   label="Enter methodology title"

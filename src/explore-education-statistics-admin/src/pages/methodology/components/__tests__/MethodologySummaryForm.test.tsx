@@ -84,7 +84,7 @@ describe('MethodologySummaryForm', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
         title: 'an alternative title',
-        titleType: 'specific',
+        titleType: 'alternative',
       });
     });
   });

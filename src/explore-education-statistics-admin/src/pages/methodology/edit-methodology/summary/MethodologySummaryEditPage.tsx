@@ -31,7 +31,7 @@ const MethodologySummaryEditPage = ({
               title: methodology.title,
               titleType:
                 methodology.title !== methodology.owningPublication.title
-                  ? 'specific'
+                  ? 'alternative'
                   : 'default',
             }}
             defaultTitle={methodology.owningPublication.title}
