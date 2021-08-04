@@ -1,7 +1,8 @@
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces
 {
     public interface IBlobCacheKey : ICacheKey
     {
-        public IBlobContainer Container { get; }
+        IBlobContainer Container { get; }
     }
 }

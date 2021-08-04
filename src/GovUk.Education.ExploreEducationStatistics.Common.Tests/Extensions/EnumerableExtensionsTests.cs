@@ -25,43 +25,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Equal(1, distinct[0].Value);
             Assert.Equal(2, distinct[1].Value);
         }
-        
+
         [Fact]
         public async Task ForEachAsync()
         {
             List<int> results = new List<int>();
-            
+
             await new List<int> {1, 2}.ForEachAsync(async value =>
             {
                 var result = await GetIntTask(value);
                 results.Add(result);
             });
-            
+
             Assert.Equal(2, results.Count);
             Assert.Contains(1, results);
             Assert.Contains(2, results);
         }
-        
+
         [Fact]
         public async Task ForEachAsync_SuccessfulEitherList()
         {
-            Either<Unit, List<int>> results = 
+            Either<Unit, List<int>> results =
                 await new List<int> {1, 2}
-                    .ForEachAsync(async value => 
+                    .ForEachAsync(async value =>
                         await GetSuccessfulEither(value));
-            
+
             Assert.True(results.IsRight);
-            
+
             var resultsList = results.Right;
             Assert.Equal(2, resultsList.Count);
             Assert.Contains(1, resultsList);
             Assert.Contains(2, resultsList);
         }
-        
+
         [Fact]
         public async Task ForEachAsync_FailingEither()
         {
-            Either<Unit, List<int>> results = 
+            Either<Unit, List<int>> results =
                 await new List<int> {1, -1, 2}
                     .ForEachAsync(async value =>
                     {
@@ -69,10 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                         {
                             return await GetFailingEither();
                         }
-                        
+
                         return await GetSuccessfulEither(value);
                     });
-            
+
             Assert.True(results.IsLeft);
         }
 
@@ -81,14 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             var list = new List<int> {1, 2, 3};
             var results = list.SelectNullSafe(value => value * 2).ToList();
-            Assert.Equal(new List<int> {2, 4, 6}, results);            
+            Assert.Equal(new List<int> {2, 4, 6}, results);
         }
 
         [Fact]
         public void SelectNullSafe_Null()
         {
             var results = ((List<int>) null).SelectNullSafe(value => value * 2).ToList();
-            Assert.Equal(new List<int>(), results);            
+            Assert.Equal(new List<int>(), results);
         }
 
         [Fact]
@@ -110,6 +110,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.False(list.IsNullOrEmpty());
         }
 
+        [Fact]
+        public void JoinToString()
+        {
+            var list = new List<string>() { "foo", "bar", "baz" };
+
+            Assert.Equal("foo-bar-baz", list.JoinToString('-'));
+            Assert.Equal("foo - bar - baz", list.JoinToString(" - "));
+            Assert.Equal("foo, bar, baz", list.JoinToString(", "));
+        }
+
         private static async Task<int> GetIntTask(int value)
         {
             await Task.Delay(5);
@@ -121,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             await Task.Delay(5);
             return value;
         }
-        
+
         private static async Task<Either<Unit, int>> GetFailingEither()
         {
             await Task.Delay(5);
