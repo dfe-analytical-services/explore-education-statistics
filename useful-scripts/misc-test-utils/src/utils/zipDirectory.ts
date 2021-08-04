@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import archiver from 'archiver';
 import fs from 'fs';
 
