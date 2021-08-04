@@ -21,7 +21,7 @@ const TableToolInfo = ({
           {releaseLink && <li>Publication: {releaseLink}</li>}
           {methodologyLinks?.map((methodologyLink, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <li key={index}>{methodologyLink}</li>
+            <li key={index}>Methodology: {methodologyLink}</li>
           ))}
         </ul>
       </AccordionSection>
