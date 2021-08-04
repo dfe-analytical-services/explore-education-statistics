@@ -9,6 +9,7 @@ import subjectService from '../../services/subjectService';
 import releaseService from '../../services/releaseService';
 
 const cwd = projectRoot;
+export type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
 
 const uploadSingleSubject = async (releaseId: string) => {
   if (releaseId === '') {
@@ -17,7 +18,6 @@ const uploadSingleSubject = async (releaseId: string) => {
   await commonService.validateArchives();
   await commonService.prepareDirectories();
 
-  type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
   let importStatus: importStages = '';
 
   await commonService.extractZip();
