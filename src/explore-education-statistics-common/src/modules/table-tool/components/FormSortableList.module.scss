@@ -61,6 +61,12 @@
   opacity: 0.5;
 }
 
+.optionDraggedOutside {
+  border: 0;
+  opacity: 0.2;
+  outline: none;
+}
+
 .selectedCount {
   align-items: center;
   background: govuk-colour('yellow');
