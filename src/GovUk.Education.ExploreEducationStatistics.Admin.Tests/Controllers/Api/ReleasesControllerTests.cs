@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -96,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
-            AssertValidationProblem(result, CannotOverwriteFile);
+            result.Result.AssertBadRequest(CannotOverwriteFile);
         }
 
         [Fact]
@@ -159,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
-            AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
+            result.AssertBadRequest(UnableToFindMetadataFileToDelete);
         }
 
         [Fact]

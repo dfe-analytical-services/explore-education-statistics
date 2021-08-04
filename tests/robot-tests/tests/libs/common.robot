@@ -362,6 +362,10 @@ user checks element is visible
     [Arguments]    ${element}
     element should be visible    ${element}
 
+user waits until element is not visible
+    [Arguments]    ${selector}    ${wait}=${timeout}
+    wait until element is not visible    ${selector}    timeout=${wait}
+
 user checks element is not visible
     [Arguments]    ${element}    ${wait}=${timeout}
     element should not be visible    ${element}    ${wait}
@@ -490,9 +494,6 @@ user checks element value should be
 user checks textarea contains
     [Arguments]    ${selector}    ${text}
     textarea should contain    ${selector}    ${text}
-
-user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
-    user checks page contains element    css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list contains
     [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}

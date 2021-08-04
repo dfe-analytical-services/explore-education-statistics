@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -252,9 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new ContentSectionAddRequest(),
                     MethodologyContentService.ContentListType.Content);
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, MethodologyMustBeDraft);
+                result.AssertBadRequest(MethodologyMustBeDraft);
             }
         }
 

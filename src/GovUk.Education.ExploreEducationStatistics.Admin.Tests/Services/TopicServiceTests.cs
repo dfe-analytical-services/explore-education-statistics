@@ -90,9 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             );
 
-            Assert.True(result.IsLeft);
-            ValidationTestUtil.AssertValidationProblem(
-                result.Left, ThemeDoesNotExist);
+            result.AssertBadRequest(ThemeDoesNotExist);
         }
 
         [Fact]
@@ -132,9 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 
@@ -227,9 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, ThemeDoesNotExist);
+                result.AssertBadRequest(ThemeDoesNotExist);
             }
         }
 
@@ -277,9 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 

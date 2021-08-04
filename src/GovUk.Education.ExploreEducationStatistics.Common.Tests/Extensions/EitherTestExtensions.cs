@@ -1,4 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
@@ -37,12 +39,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return either.Left;
         }
         
-        private static void AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
+        public static ActionResult AssertBadRequest<TRight>(this Either<ActionResult, TRight> either, 
+            params Enum[] expectedValidationErrors)
+        {
+            var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
+            badRequest.AssertBadRequest(expectedValidationErrors);
+            return either.Left;
+        }
+        
+        private static TActionResult AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
             where TActionResult : ActionResult
         {
             var actionResult = result.AssertLeft($"Expecting result to be Left when asserting result of " +
                                                  $"type {typeof(TActionResult)}");
             Assert.IsType<TActionResult>(actionResult);
+            return actionResult as TActionResult;
         }
     }
 }

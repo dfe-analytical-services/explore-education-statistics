@@ -38,7 +38,7 @@ const testMethodology: MyMethodology = {
   slug: 'meth-1',
   status: 'Approved',
   title: 'I am a methodology',
-  publication: {
+  owningPublication: {
     id: 'p1',
     title: 'Publication title',
   },
@@ -599,7 +599,7 @@ describe('MethodologySummary', () => {
         id: '12345',
         internalReleaseNote: 'this is the release note',
         previousVersionId: 'lfkjdlfj',
-        publication: {
+        owningPublication: {
           id: 'p1',
           title: 'Publication title',
         },

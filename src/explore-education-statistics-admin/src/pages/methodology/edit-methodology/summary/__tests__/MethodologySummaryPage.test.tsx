@@ -22,7 +22,7 @@ const testMethodology: BasicMethodology = {
   title: 'Test methodology',
   slug: 'test-methodology',
   status: 'Draft',
-  publication: {
+  owningPublication: {
     id: 'p1',
     title: 'Publication title',
   },

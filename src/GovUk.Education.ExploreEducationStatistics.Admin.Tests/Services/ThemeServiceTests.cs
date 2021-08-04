@@ -81,8 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 
@@ -169,9 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 

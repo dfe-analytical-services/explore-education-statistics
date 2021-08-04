@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -818,8 +819,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Validate(release.Id);
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
+                result.AssertBadRequest(PublicMetaGuidanceRequired);
             }
         }
 
@@ -862,12 +862,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
 
                 var result = await service.Validate(release.Id);
-
-                Assert.True(result.IsLeft);
-
                 metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
-
-                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
+                result.AssertBadRequest(PublicMetaGuidanceRequired);
             }
         }
 

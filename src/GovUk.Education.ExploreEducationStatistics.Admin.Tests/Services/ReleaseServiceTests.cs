@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,11 +22,8 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -439,8 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.GetStatus(file.Id),
                     Times.Once());
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, CannotRemoveDataFilesUntilImportComplete);
+                result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
             }
         }
 
@@ -619,8 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService.Verify(
                     mock => mock.GetStatus(It.IsIn(file.Id, replacementFile.Id)), Times.Exactly(2));
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, CannotRemoveDataFilesUntilImportComplete);
+                result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
             }
         }
 
@@ -765,8 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1000,9 +995,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, DataFileImportsMustBeCompleted);
-                AssertValidationProblem(result.Left, DataFileReplacementsMustBeCompleted);
+                result.AssertBadRequest(
+                    DataFileImportsMustBeCompleted, 
+                    DataFileReplacementsMustBeCompleted);
             }
 
             MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService);
@@ -1056,9 +1051,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsLeft);
-
-                AssertValidationProblem(result.Left, ApprovedReleaseMustHavePublishScheduledDate);
+                result.AssertBadRequest(ApprovedReleaseMustHavePublishScheduledDate);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);
@@ -1110,8 +1103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, PublishedReleaseCannotBeUnapproved);
+                result.AssertBadRequest(PublishedReleaseCannotBeUnapproved);
             }
 
             MockUtils.VerifyAllMocks(contentService, releaseFileService);

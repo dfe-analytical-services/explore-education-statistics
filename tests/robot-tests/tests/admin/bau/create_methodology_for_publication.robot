@@ -30,10 +30,7 @@ Create a Methodology
     user checks element contains button    ${details}    Remove
     user checks element does not contain button    ${details}    Amend methodology
     user views methodology for open publication accordion    ${accordion}    ${PUBLICATION_NAME}
-    user checks summary list contains    Title    ${PUBLICATION_NAME}
-    user checks summary list contains    Status    Draft
-    user checks summary list contains    Published on    Not yet published
-    user checks summary list contains    Owning publication    ${PUBLICATION_NAME}
+    user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Remove the Methodology
     [Tags]    HappyPath
@@ -52,16 +49,10 @@ Create a Methodology again
 
 Update Methodology Summary
     [Tags]    HappyPath
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user views methodology for open publication accordion    ${accordion}    ${PUBLICATION_NAME}
-    user clicks link    Edit summary
-    user enters text into element    label:Enter methodology title    ${PUBLICATION_NAME} - New methodology title
-    user clicks button    Update methodology
-    user waits until h2 is visible    Methodology summary
-    user checks summary list contains    Title    ${PUBLICATION_NAME} - New methodology title
-    user checks summary list contains    Status    Draft
-    user checks summary list contains    Published on    Not yet published
-    user checks summary list contains    Owning publication    ${PUBLICATION_NAME}
+    user edits methodology summary for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - New methodology title
+    user edits methodology summary for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - New methodology title    ${PUBLICATION_NAME} - another new methodology title
 
 Update the Methodology Content
     [Tags]    HappyPath
@@ -93,14 +84,17 @@ Update the Methodology Content
 
 Approve the Methodology
     [Tags]    HappyPath
+    user approves methodology for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - another new methodology title
     user clicks link    Sign off
     user changes methodology status to Approved
     user clicks link    Summary
     user waits until h2 is visible    Methodology summary
-    user checks summary list contains    Title    ${PUBLICATION_NAME} - New methodology title
-    user checks summary list contains    Status    Approved
-    user checks summary list contains    Published on    Not yet published
-    user checks summary list contains    Owning publication    ${PUBLICATION_NAME}
+    user verifies methodology summary details
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - another new methodology title
+    ...    Approved
+    ...    Not yet published
 
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
     [Tags]    HappyPath

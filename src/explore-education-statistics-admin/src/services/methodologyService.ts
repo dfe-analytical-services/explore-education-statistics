@@ -23,7 +23,7 @@ export interface BasicMethodology {
   slug: string;
   status: MethodologyStatus;
   published?: string;
-  publication: MethodologyPublication;
+  owningPublication: MethodologyPublication;
   otherPublications?: MethodologyPublication[];
   withReleaseId?: string;
 }

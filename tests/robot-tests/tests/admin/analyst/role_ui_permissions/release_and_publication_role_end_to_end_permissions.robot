@@ -30,9 +30,7 @@ Sign in as Analyst1 User1 (publication owner)
 
 Check publication owner can create methodology for publication
     user creates methodology for publication    ${PUBLICATION_NAME}
-    user checks summary list contains    Title    ${PUBLICATION_NAME}
-    user checks summary list contains    Status    Draft
-    user checks summary list contains    Published on    Not yet published
+    user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Check publication owner can approve methodology for publication
     user clicks link    Sign off
