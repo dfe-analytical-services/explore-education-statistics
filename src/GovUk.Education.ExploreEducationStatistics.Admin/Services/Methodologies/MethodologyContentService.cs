@@ -15,6 +15,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
@@ -53,9 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+                .CheckEntityExists<Methodology>(methodologyId, HydrateMethodologyForManageMethodologyContentViewModel)
                 .OnSuccess(CheckCanViewMethodology)
-                .OnSuccess(HydrateMethodologyForManageMethodologyContentViewModel)
                 .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
 
@@ -450,18 +451,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return tuple;
         }
 
-        private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForManageMethodologyContentViewModel(
-            Methodology methodology)
-        {
-            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
-            await _context
-                .Entry(methodology)
-                .Reference(m => m.MethodologyParent)
-                .LoadAsync();
-
-            return methodology;
-        }
-
         private Either<ActionResult, Tuple<Methodology, List<ContentSection>>> FindContentList(Methodology methodology,
             params Guid[] contentSectionIds)
         {
@@ -500,6 +489,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var sectionsListIds = sectionsList.Select(section => section.Id);
             return contentSectionIds.All(id => sectionsListIds.Contains(id));
+        }
+
+        private static IIncludableQueryable<Methodology, MethodologyParent> 
+            HydrateMethodologyForManageMethodologyContentViewModel(IQueryable<Methodology> query)
+        {
+            // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
+            return query.Include(m => m.MethodologyParent);
         }
     }
 }
