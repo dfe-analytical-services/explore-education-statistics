@@ -433,6 +433,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         },
                         new
                         {
+                            Id = -28,
+                            ClaimType = "ApproveAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
                             Id = -29,
                             ClaimType = "ApproveAllMethodologies",
                             ClaimValue = "",
