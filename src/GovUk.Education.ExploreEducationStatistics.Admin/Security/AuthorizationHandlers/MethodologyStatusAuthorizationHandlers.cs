@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        // TODO SOW4 EES-2160 - DW - this could do with tidying up and merging with the similar code in
+        // TODO SOW4 EES-2162 - DW - this could do with tidying up and merging with the similar code in
         // UpdateSpecificMethodologyAuthorizationHandler.  The number of services / repositories in use here suggests
         // that we could be putting a lot of this code into an existing Service or Repository and giving that to the
         // handler to reduce the amount of duplication we have.
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .PublicationId;
         }
 
-        // TODO SOW4 EES-2160 - DW - this could do with tidying up and merging with the similar code in
+        // TODO SOW4 EES-2162 - DW - this could do with tidying up and merging with the similar code in
         // UpdateSpecificMethodologyAuthorizationHandler.  The number of services / repositories in use here suggests
         // that we could be putting a lot of this code into an existing Service or Repository and giving that to the
         // handler to reduce the amount of duplication we have.
