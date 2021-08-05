@@ -24,7 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
@@ -155,27 +155,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(id, HydrateMethodologyForManageMethodologySummaryViewModel)
                 .OnSuccess(methodology => methodology.Status != request.Status
-                    ? UpdateMethodologyStatus(methodology, request.Status)
+                    ? UpdateMethodologyStatus(methodology, request)
                     : UpdateMethodologyDetails(methodology, request))
                 .OnSuccess(_ => GetSummary(id));
         }
 
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
-            MethodologyStatus newStatus)
+            MethodologyUpdateRequest request)
         {
             return 
-                CheckCanUpdateMethodologyStatus(methodologyToUpdate, newStatus)
-                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
+                CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
                 .OnSuccessDo(RemoveUnusedImages)
                 .OnSuccess(async methodology =>
                 {
-                    methodology.Status = newStatus;
+                    methodology.Status = request.Status;
+                    methodology.PublishingStrategy = request.PublishingStrategy;
+                    methodology.ScheduledWithReleaseId = request.WithReleaseId;
+                    methodology.InternalReleaseNote = Approved == request.Status 
+                        ? request.LatestInternalReleaseNote 
+                        : null;
+                    
+                    methodology.Updated = DateTime.UtcNow;
+
+                    _context.Methodologies.Update(methodology);
 
                     if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
-
                         methodology.Published = DateTime.UtcNow;
+                        
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
 
                         // Invalidate the 'All Methodologies' cache item
                         await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
@@ -193,21 +201,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             
             return _userService
                 .CheckCanUpdateMethodology(methodologyToUpdate)
-                .OnSuccessDo(RemoveUnusedImages)
-                // Check that the Methodology will have a unique slug.  This is possible in the case where another 
-                // Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
-                // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Unlikely
-                // scenario but possible. 
+                // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
+                // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
+                // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
+                // unlikely scenario, it's entirely possible. 
                 .OnSuccessDo(methodology => ValidateMethodologySlugUniqueForUpdate(methodology.Id, newSlug))
                 .OnSuccess(async methodology =>
                 {
-                    _context.Methodologies.Update(methodology);
-
-                    methodology.InternalReleaseNote =
-                        request.LatestInternalReleaseNote ?? methodology.InternalReleaseNote;
-                    methodology.PublishingStrategy = request.PublishingStrategy;
-                    methodology.ScheduledWithReleaseId = request.WithReleaseId;
-                    methodology.Status = request.Status;
                     methodology.Updated = DateTime.UtcNow;
 
                     if (request.Title != methodology.Title)
@@ -224,16 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         {
                             methodology.MethodologyParent.Slug = newSlug;
                         }
-                    }
-
-                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
-                    {
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
-
-                        methodology.Published = DateTime.UtcNow;
-
-                        // Invalidate the 'All Methodologies' cache item
-                        await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
                     }
 
                     await _context.SaveChangesAsync();
@@ -345,8 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             return status switch
             {
-                MethodologyStatus.Draft => _userService.CheckCanMarkMethodologyAsDraft(methodology),
-                MethodologyStatus.Approved => _userService.CheckCanApproveMethodology(methodology),
+                Draft => _userService.CheckCanMarkMethodologyAsDraft(methodology),
+                Approved => _userService.CheckCanApproveMethodology(methodology),
                 _ => throw new ArgumentOutOfRangeException(nameof(status), "Unexpected status")
             };
         }
