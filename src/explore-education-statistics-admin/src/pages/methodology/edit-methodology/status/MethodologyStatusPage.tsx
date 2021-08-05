@@ -10,11 +10,11 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
-import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import MethodologyStatusEditPage from './MethodologyStatusEditPage';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -33,28 +33,21 @@ const MethodologyStatusPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const [showForm, toggleForm] = useToggle(false);
+  const [isEditing, toggleForm] = useToggle(false);
 
   const {
     value: model,
     setState: setModel,
     isLoading,
   } = useAsyncRetry(async () => {
-    const [
-      summary,
-      unpublishedReleases,
-      canApprove,
-      canMarkAsDraft,
-    ] = await Promise.all([
+    const [summary, canApprove, canMarkAsDraft] = await Promise.all([
       methodologyService.getMethodology(methodologyId),
-      methodologyService.getUnpublishedReleases(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
     ]);
 
     return {
       summary,
-      unpublishedReleases,
       canApprove,
       canMarkAsDraft,
     };
@@ -87,14 +80,13 @@ const MethodologyStatusPage = ({
   };
 
   const isEditable = model?.canApprove || model?.canMarkAsDraft;
-  const isPublished = model?.summary.published;
 
   return (
     <>
       <LoadingSpinner loading={isLoading}>
         {model ? (
           <>
-            {!showForm ? (
+            {!isEditing ? (
               <>
                 <h2>Sign off</h2>
 
@@ -128,10 +120,8 @@ const MethodologyStatusPage = ({
                 )}
               </>
             ) : (
-              <MethodologyStatusForm
-                isPublished={isPublished}
+              <MethodologyStatusEditPage
                 methodologySummary={model.summary}
-                unpublishedReleases={model.unpublishedReleases}
                 onCancel={toggleForm.off}
                 onSubmit={handleSubmit}
               />
