@@ -33,6 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             Status = Draft
         };
 
+        private readonly Methodology _approvedMethodology = new Methodology
+        {
+            Id = Guid.NewGuid(),
+            Status = Approved
+        };
+
         [Fact]
         public async Task CreateMethodology()
         {
@@ -66,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
         
         [Fact]
-        public async Task UpdateMethodology()
+        public async Task UpdateMethodologyDetails()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
@@ -77,6 +83,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology).Object,
                             userService: userService.Object);
                         return service.UpdateMethodology(_methodology.Id, new MethodologyUpdateRequest
+                        {
+                            Status    = Draft
+                        });
+                    }
+                );
+        }
+        
+        [Fact]
+        public async Task UpdateMethodologyStatus_Approved()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanApproveSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology).Object,
+                            userService: userService.Object);
+                        return service.UpdateMethodology(_methodology.Id, new MethodologyUpdateRequest
+                        {
+                            Status    = Approved
+                        });
+                    }
+                );
+        }
+        
+        [Fact]
+        public async Task UpdateMethodologyStatus_MarkAsDraft()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_approvedMethodology, SecurityPolicies.CanMarkSpecificMethodologyAsDraft)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(_approvedMethodology.Id, _approvedMethodology).Object,
+                            userService: userService.Object);
+                        return service.UpdateMethodology(_approvedMethodology.Id, new MethodologyUpdateRequest
                         {
                             Status    = Draft
                         });

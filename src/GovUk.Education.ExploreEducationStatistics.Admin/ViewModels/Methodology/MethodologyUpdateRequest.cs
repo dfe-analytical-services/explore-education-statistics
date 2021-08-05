@@ -21,5 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
         public Guid? WithReleaseId { get; set; }
+
+        public string Slug => SlugFromTitle(Title);
     }
 }

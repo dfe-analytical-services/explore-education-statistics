@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
@@ -643,8 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Id = Guid.NewGuid(),
                             Title = "Publication",
                             TopicId = topicId,
-                            Releases = new List<Release>
-                            {
+                            Releases = AsList(
                                 new Release
                                 {
                                     Id = notLatestReleaseId,
@@ -659,7 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     TimePeriodCoverage = June,
                                     Published = DateTime.UtcNow
                                 }
-                            }
+                            )    
                         }
                     }
                 });
@@ -677,6 +677,146 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releases = publications.Single().Releases;
                 Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease));
                 Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestReleaseForPublication_LiveRelease()
+        {
+            var expectedLatestReleaseId = Guid.NewGuid();
+            var contextId = Guid.NewGuid().ToString();
+            var pastDate = DateTime.Now.AddDays(-1);
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = AsList(
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = Week1,
+                        Published = pastDate
+                    },
+                    // This is the latest, by year and by time period coverage
+                    new Release
+                    {
+                        Id = expectedLatestReleaseId,
+                        ReleaseName = "2002",
+                        TimePeriodCoverage = Week2,
+                        Published = pastDate
+                    },
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2001",
+                        TimePeriodCoverage = Week1,
+                        Published = pastDate
+                    },
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2002",
+                        TimePeriodCoverage = Week1,
+                        Published = pastDate
+                    }
+                )
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
+                Assert.NotNull(latestRelease);
+                Assert.Equal(expectedLatestReleaseId, latestRelease!.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestReleaseForPublication_NonLiveRelease()
+        {
+            var expectedLatestReleaseId = Guid.NewGuid();
+            var contextId = Guid.NewGuid().ToString();
+            var pastDate = DateTime.Now.AddDays(-1);
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = AsList(
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = Week1,
+                        Published = pastDate
+                    },
+                    // This is the latest, by year and by time period coverage, despite it not yet having a Published
+                    // date and therefore not being "Live".
+                    new Release
+                    {
+                        Id = expectedLatestReleaseId,
+                        ReleaseName = "2002",
+                        TimePeriodCoverage = Week2
+                    },
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2001",
+                        TimePeriodCoverage = Week1,
+                        Published = pastDate
+                    },
+                    new Release
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseName = "2002",
+                        TimePeriodCoverage = Week1
+                    }
+                )
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
+                Assert.NotNull(latestRelease);
+                Assert.Equal(expectedLatestReleaseId, latestRelease!.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestReleaseForPublication_NoReleases()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = new List<Release>()
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
+                Assert.Null(latestRelease);
             }
         }
 

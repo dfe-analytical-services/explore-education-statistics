@@ -197,15 +197,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
-            var newSlug = SlugFromTitle(request.Title);
-            
             return _userService
                 .CheckCanUpdateMethodology(methodologyToUpdate)
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
                 // unlikely scenario, it's entirely possible. 
-                .OnSuccessDo(methodology => ValidateMethodologySlugUniqueForUpdate(methodology.Id, newSlug))
+                .OnSuccessDo(methodology => ValidateMethodologySlugUniqueForUpdate(methodology.Id, request.Slug))
                 .OnSuccess(async methodology =>
                 {
                     methodology.Updated = DateTime.UtcNow;
@@ -222,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // Slug to change even though its AlternativeTitle can.
                         if (!methodology.Amendment)
                         {
-                            methodology.MethodologyParent.Slug = newSlug;
+                            methodology.MethodologyParent.Slug = request.Slug;
                         }
                     }
 

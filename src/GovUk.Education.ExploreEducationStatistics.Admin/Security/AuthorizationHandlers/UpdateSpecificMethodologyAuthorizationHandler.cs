@@ -93,8 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 context.Succeed(requirement);
             }
-
-            // TODO SOW4 EES-2166 DON'T IMPLEMENT YET - When Status is Approved, succeed for Approvers on the latest Release of the owning Publication
         }
 
         private async Task<bool> IsPublicationOwnerOfOwningPublication(
