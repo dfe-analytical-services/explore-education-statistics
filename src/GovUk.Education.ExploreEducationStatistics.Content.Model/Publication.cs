@@ -45,7 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release LatestPublishedRelease()
         {
-            return Releases?.Where(r => r.Live && IsLatestVersionOfRelease(r.Id))
+            return LatestRelease();
+        }
+
+        public Release LatestRelease(bool checkIfLive = true)
+        {
+            return Releases?
+                .Where(r => !checkIfLive || r.Live)
+                .Where(r => IsLatestVersionOfRelease(r.Id))
                 .OrderBy(r => r.Year)
                 .ThenBy(r => r.TimePeriodCoverage)
                 .LastOrDefault();

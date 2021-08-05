@@ -213,27 +213,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
-                    // TODO SOW4 EES-2168 Drop claim UpdateAllMethodologies from the Analyst role
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -26,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
                     new IdentityRoleClaim<string>
                     {
                         Id = -27,
                         RoleId = analystRoleId,
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
-                    // TODO SOW4 EES-2162 Drop claim ApproveAllMethodologies from the Analyst role
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -28,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.ApproveAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>

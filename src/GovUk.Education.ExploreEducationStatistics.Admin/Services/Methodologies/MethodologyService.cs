@@ -152,18 +152,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id,
-                    HydrateMethodologyForManageMethodologySummaryViewModel)
-                .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(id, HydrateMethodologyForManageMethodologySummaryViewModel)
+                .OnSuccess(methodology => methodology.Status != request.Status
+                    ? UpdateMethodologyStatus(methodology, request.Status)
+                    : UpdateMethodologyDetails(methodology, request))
+                .OnSuccess(_ => GetSummary(id));
+        }
+
+        private Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
+            MethodologyStatus newStatus)
+        {
+            return 
+                CheckCanUpdateMethodologyStatus(methodologyToUpdate, newStatus)
                 .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
-                .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
-                .OnSuccessDo(methodology => 
-                    // Check that the Methodology will have a unique slug.  This is possible in the case where another 
-                    // Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
-                    // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Unlikely
-                    // scenario but possible. 
-                    ValidateMethodologySlugUniqueForUpdate(methodology.Id, SlugFromTitle(request.Title)))
+                .OnSuccessDo(RemoveUnusedImages)
+                .OnSuccess(async methodology =>
+                {
+                    methodology.Status = newStatus;
+
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                    {
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
+
+                        methodology.Published = DateTime.UtcNow;
+
+                        // Invalidate the 'All Methodologies' cache item
+                        await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    return methodology;
+                });
+        }
+
+        private Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
+            MethodologyUpdateRequest request)
+        {
+            var newSlug = SlugFromTitle(request.Title);
+            
+            return _userService
+                .CheckCanUpdateMethodology(methodologyToUpdate)
+                .OnSuccessDo(RemoveUnusedImages)
+                // Check that the Methodology will have a unique slug.  This is possible in the case where another 
+                // Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
+                // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Unlikely
+                // scenario but possible. 
+                .OnSuccessDo(methodology => ValidateMethodologySlugUniqueForUpdate(methodology.Id, newSlug))
                 .OnSuccess(async methodology =>
                 {
                     _context.Methodologies.Update(methodology);
@@ -173,6 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.PublishingStrategy = request.PublishingStrategy;
                     methodology.ScheduledWithReleaseId = request.WithReleaseId;
                     methodology.Status = request.Status;
+                    methodology.Updated = DateTime.UtcNow;
 
                     if (request.Title != methodology.Title)
                     {
@@ -186,11 +222,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // Slug to change even though its AlternativeTitle can.
                         if (!methodology.Amendment)
                         {
-                            methodology.MethodologyParent.Slug = SlugFromTitle(request.Title);
+                            methodology.MethodologyParent.Slug = newSlug;
                         }
                     }
-                    
-                    methodology.Updated = DateTime.UtcNow;
 
                     if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
@@ -204,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     await _context.SaveChangesAsync();
 
-                    return await GetSummary(id);
+                    return methodology;
                 });
         }
 
@@ -317,16 +351,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             };
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid methodologyId)
+        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Methodology methodology)
         {
-            return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodologyId)
+            return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodology.Id)
                 .OnSuccess(async contentBlocks =>
                 {
                     var contentImageIds = contentBlocks.SelectMany(contentBlock =>
                             HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
                         .Distinct();
 
-                    var imageFiles = await _methodologyFileRepository.GetByFileType(methodologyId, Image);
+                    var imageFiles = await _methodologyFileRepository.GetByFileType(methodology.Id, Image);
 
                     var unusedImages = imageFiles
                         .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -335,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (unusedImages.Any())
                     {
-                        return await _methodologyImageService.Delete(methodologyId, unusedImages);
+                        return await _methodologyImageService.Delete(methodology.Id, unusedImages);
                     }
 
                     return Unit.Instance;
@@ -348,12 +382,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new TitleAndIdViewModel(publication.Id, publication.Title);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
-            Guid methodologyId, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
         {
             var methodologyParentId = await _context
                 .Methodologies
-                .Where(m => m.Id == methodologyId)
+                .Where(m => m.Id == id)
                 .Select(m => m.MethodologyParentId)
                 .SingleAsync();
 

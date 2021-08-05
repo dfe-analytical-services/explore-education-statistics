@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public void CreateReleaseAmendmentAsync()
+        public void CreateReleaseAmendment()
         {
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 // Method under test
-                var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
+                var amendmentViewModel = releaseService.CreateReleaseAmendment(releaseId).Result.Right;
 
                 footnoteService.Verify(
                     mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);

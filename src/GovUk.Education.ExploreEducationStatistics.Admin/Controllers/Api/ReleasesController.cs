@@ -44,13 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("publications/{publicationId}/releases")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel release,
+        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel release,
             Guid publicationId)
         {
             release.PublicationId = publicationId;
 
             return await _releaseService
-                .CreateReleaseAsync(release)
+                .CreateRelease(release)
                 .HandleFailuresOrOk();
         }
 
@@ -63,10 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId}/amendment")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
         {
             return await _releaseService
-                .CreateReleaseAmendmentAsync(releaseId)
+                .CreateReleaseAmendment(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -156,11 +156,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/publication-status")]
-        public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(
+        public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
             Guid releaseId)
         {
             return await _releaseService
-                .GetReleasePublicationStatusAsync(releaseId)
+                .GetReleasePublicationStatus(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -183,11 +183,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId}/releases/template")]
-        public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateReleaseAsync(
+        public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateRelease(
             [Required] Guid publicationId)
         {
             return await _releaseService
-                .GetLatestReleaseAsync(publicationId)
+                .GetLatestPublishedRelease(publicationId)
                 .HandleFailuresOrOk();
         }
 

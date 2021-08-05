@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
@@ -145,6 +146,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public static Task ForEachSecurityClaimAsync(Func<SecurityClaimTypes, Task> action)
         {
             return GetEnumValues<SecurityClaimTypes>().ForEachAsync(action.Invoke);
+        }
+
+        public static Task ForEachReleaseRoleAsync(Func<ReleaseRole, Task> action)
+        {
+            return GetEnumValues<ReleaseRole>().ForEachAsync(action.Invoke);
+        }
+        
+        public static Task ForEachPublicationRoleAsync(Func<PublicationRole, Task> action)
+        {
+            return GetEnumValues<PublicationRole>().ForEachAsync(action.Invoke);
         }
 
         public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<TRequirement, TEntity>(
