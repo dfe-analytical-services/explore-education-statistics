@@ -26,9 +26,10 @@ const permissionService = _permissionService as jest.Mocked<
 describe('MethodologyStatusPage', () => {
   const testMethodology: BasicMethodology = {
     id: 'm1',
+    amendment: false,
     title: 'Test methodology',
     slug: 'test-methodology',
-    publication: {
+    owningPublication: {
       id: 'p1',
       title: 'Publication title',
     },

@@ -300,6 +300,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
@@ -498,6 +500,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
@@ -600,6 +604,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
