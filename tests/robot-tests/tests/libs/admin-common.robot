@@ -557,14 +557,14 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks element    id:methodologyStatusForm-publishingStrategy-${publishing_strategy}
-    IF    '${publishing_strategy}' == 'WithRelease'
+    IF    ${is_publishing_strategy_with_release} is ${TRUE}
         user waits until element is enabled    css:[name="withReleaseId"]
         user chooses select option    css:[name="withReleaseId"]    ${with_release}
     END
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Status    Approved
-    IF    '${publishing_strategy}' == 'WithRelease'
+    IF    ${is_publishing_strategy_with_release} is ${TRUE}
         user checks summary list contains    When to publish    With a specific release
         user checks summary list contains    Publish with release    ${with_release}
     ELSE

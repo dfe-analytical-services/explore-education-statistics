@@ -165,6 +165,203 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task GetUnpublishedReleasesUsingMethodology()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent()
+            };
+
+            // Set up a randomly ordered mix of published and unpublished Releases on owning and adopting publications
+
+            var owningPublication = new Publication
+            {
+                Title = "Publication B",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = true
+                    }
+                ),
+                Releases = AsList(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2018"
+                    },
+                    new Release
+                    {
+                        Published = null,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2021"
+                    },
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2019"
+                    },
+                    new Release
+                    {
+                        Published = null,
+                        TimePeriodCoverage = CalendarYear,
+                        ReleaseName = "2020"
+                    }
+                )
+            };
+
+            var adoptingPublication = new Publication
+            {
+                Title = "Publication A",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = false
+                    }
+                ),
+                Releases = AsList(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                        TimePeriodCoverage = FinancialYearQ3,
+                        ReleaseName = "2020"
+                    },
+                    new Release
+                    {
+                        Published = null,
+                        TimePeriodCoverage = FinancialYearQ2,
+                        ReleaseName = "2021"
+                    },
+                    new Release
+                    {
+                        Published = null,
+                        TimePeriodCoverage = FinancialYearQ4,
+                        ReleaseName = "2020"
+                    },
+                    new Release
+                    {
+                        Published = null,
+                        TimePeriodCoverage = FinancialYearQ1,
+                        ReleaseName = "2021"
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+
+                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodology.Id)).AssertRight();
+
+                // Check that only unpublished Releases are included and that they are in the correct order
+
+                var expectedReleaseAtIndex0 = adoptingPublication.Releases.Single(r =>
+                    r.Year == 2020 && r.TimePeriodCoverage == FinancialYearQ4);
+
+                var expectedReleaseAtIndex1 = adoptingPublication.Releases.Single(r =>
+                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ1);
+
+                var expectedReleaseAtIndex2 = adoptingPublication.Releases.Single(r =>
+                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ2);
+
+                var expectedReleaseAtIndex3 = owningPublication.Releases.Single(r =>
+                    r.Year == 2020 && r.TimePeriodCoverage == CalendarYear);
+
+                var expectedReleaseAtIndex4 = owningPublication.Releases.Single(r =>
+                    r.Year == 2021 && r.TimePeriodCoverage == CalendarYear);
+
+                Assert.Equal(5, result.Count);
+
+                Assert.Equal(expectedReleaseAtIndex0.Id, result[0].Id);
+                Assert.Equal(expectedReleaseAtIndex1.Id, result[1].Id);
+                Assert.Equal(expectedReleaseAtIndex2.Id, result[2].Id);
+                Assert.Equal(expectedReleaseAtIndex3.Id, result[3].Id);
+                Assert.Equal(expectedReleaseAtIndex4.Id, result[4].Id);
+
+                Assert.Equal("Publication A - Financial Year Q4 2020-21", result[0].Title);
+                Assert.Equal("Publication A - Financial Year Q1 2021-22", result[1].Title);
+                Assert.Equal("Publication A - Financial Year Q2 2021-22", result[2].Title);
+                Assert.Equal("Publication B - Calendar Year 2020", result[3].Title);
+                Assert.Equal("Publication B - Calendar Year 2021", result[4].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetUnpublishedReleasesUsingMethodology_MethodologyNotFound()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = SetupMethodologyService(contentDbContext: contentDbContext);
+
+            var result = await service.GetUnpublishedReleasesUsingMethodology(Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetUnpublishedReleasesUsingMethodology_PublicationsHaveNoReleases()
+        {
+            var methodology = new Methodology
+            {
+                MethodologyParent = new MethodologyParent()
+            };
+
+            var owningPublication = new Publication
+            {
+                Title = "Owning publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = true
+                    }
+                )
+            };
+
+            var adoptingPublication = new Publication
+            {
+                Title = "Adopting publication",
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        MethodologyParent = methodology.MethodologyParent,
+                        Owner = false
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext);
+
+                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodology.Id)).AssertRight();
+
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology_PublicationsHaveNoUnpublishedReleases()
         {
             var methodology = new Methodology
@@ -272,11 +469,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -289,13 +483,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -326,8 +519,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -372,11 +563,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -389,13 +577,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -426,8 +613,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -472,11 +657,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -489,13 +671,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -529,8 +710,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -576,11 +755,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -593,13 +769,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -633,8 +808,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -696,11 +869,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -721,13 +891,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -752,8 +921,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -815,11 +982,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
             var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -840,11 +1005,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
                     methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
@@ -854,6 +1017,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         imageFile1.File.Id,
                         imageFile2.File.Id
                     }), Times.Once);
+
+                VerifyAllMocks(contentService, imageService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -878,8 +1043,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -922,7 +1085,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
 
@@ -946,13 +1108,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyService(contentDbContext: context,
                     cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
                     methodologyRepository: methodologyRepository.Object,
                     publishingService: publishingService.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
-                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
+                VerifyAllMocks(cacheService, contentService, methodologyRepository, publishingService);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -1032,11 +1193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -1049,15 +1207,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
-                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
@@ -1086,8 +1241,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1125,26 +1278,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
-            var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
-                    methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                var service = SetupMethodologyService(contentDbContext: context);
 
                 var result = await service.UpdateMethodology(methodology.Id, request);
                 result.AssertNotFound();
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1182,26 +1322,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
-            var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
-                    methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                var service = SetupMethodologyService(contentDbContext: context);
 
                 var result = await service.UpdateMethodology(methodology.Id, request);
                 result.AssertNotFound();
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1251,27 +1378,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
-            var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
-                    methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                var service = SetupMethodologyService(contentDbContext: context);
 
-                var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
-                    service.UpdateMethodology(methodology.Id, request));
-                Assert.Equal("Methodology cannot depend on a published Release", ex.Message);
+                var result = await service.UpdateMethodology(methodology.Id, request);
+                result.AssertBadRequest(MethodologyCannotDependOnPublishedRelease);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1318,24 +1431,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
-            var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
-                    methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                var service = SetupMethodologyService(contentDbContext: context);
 
-                var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
-                    service.UpdateMethodology(methodology.Id, request));
-                Assert.Equal("Methodology cannot depend on a Release that it's not used by", ex.Message);
+                var result = await service.UpdateMethodology(methodology.Id, request);
+                result.AssertBadRequest(MethodologyCannotDependOnRelease);
             }
         }
 
@@ -1379,11 +1480,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -1396,15 +1494,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
                     methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyRepository: methodologyRepository.Object);
 
                 // Un-approving is allowed for users that can approve the methodology providing it's not publicly accessible
                 // Test that un-approving alters the status
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // Original release note is not cleared if the update is not altering it
@@ -1431,8 +1528,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
             }
-
-            VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
         }
 
         [Fact]
@@ -1488,11 +1583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<ICacheService>(Strict);
             var contentService = new Mock<IMethodologyContentService>(Strict);
-            var imageService = new Mock<IMethodologyImageService>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var publishingService = new Mock<IPublishingService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodology.Id))
@@ -1501,14 +1592,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: context,
-                    cacheService: cacheService.Object,
-                    methodologyContentService: contentService.Object,
-                    methodologyImageService: imageService.Object,
-                    methodologyRepository: methodologyRepository.Object,
-                    publishingService: publishingService.Object);
+                    methodologyContentService: contentService.Object);
 
                 var result = await service.UpdateMethodology(methodology.Id, request);
-                VerifyAllMocks(cacheService, contentService, imageService, methodologyRepository, publishingService);
+                VerifyAllMocks(contentService);
                 result.AssertBadRequest(SlugNotUnique);
             }
 
@@ -1842,12 +1929,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),
-                cacheService ?? new Mock<ICacheService>().Object,
-                methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
+                cacheService ?? new Mock<ICacheService>(Strict).Object,
+                methodologyContentService ?? new Mock<IMethodologyContentService>(Strict).Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
-                methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
-                publishingService ?? new Mock<IPublishingService>().Object,
+                methodologyRepository ?? new Mock<IMethodologyRepository>(Strict).Object,
+                methodologyImageService ?? new Mock<IMethodologyImageService>(Strict).Object,
+                publishingService ?? new Mock<IPublishingService>(Strict).Object,
                 userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }

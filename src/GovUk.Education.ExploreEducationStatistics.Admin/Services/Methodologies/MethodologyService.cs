@@ -272,11 +272,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             // Check that this release exists, that it's not already published, and that it's using the methodology
             return await _persistenceHelper.CheckEntityExists<Release>(request.WithReleaseId.Value)
-                .OnSuccess(async release =>
+                .OnSuccess<ActionResult, Release, Unit>(async release =>
                 {
                     if (release.Live)
                     {
-                        throw new ArgumentException("Methodology cannot depend on a published Release");
+                        return ValidationActionResult(MethodologyCannotDependOnPublishedRelease);
                     }
 
                     await _context.Entry(methodology)
@@ -293,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (!publicationIds.Contains(release.PublicationId))
                     {
-                        throw new ArgumentException("Methodology cannot depend on a Release that it's not used by");
+                        return ValidationActionResult(MethodologyCannotDependOnRelease);
                     }
 
                     return Unit.Instance;

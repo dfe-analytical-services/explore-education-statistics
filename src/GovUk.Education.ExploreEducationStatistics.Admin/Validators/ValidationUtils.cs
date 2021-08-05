@@ -97,6 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Methodology
         MethodologyMustBeDraft,
         MethodologyMustBeApproved,
+        MethodologyCannotDependOnPublishedRelease,
+        MethodologyCannotDependOnRelease,
 
         // Theme
         ThemeDoesNotExist,
