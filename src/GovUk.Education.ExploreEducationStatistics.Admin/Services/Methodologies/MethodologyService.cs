@@ -24,8 +24,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             .LoadAsync();
                         
                         await _context.Entry(methodology.ScheduledWithRelease)
-                            .Reference(r => r.Publication)
+                            .Reference(r => r!.Publication)
                             .LoadAsync();
 
                         if (methodology.ScheduledWithRelease != null)
@@ -165,6 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return 
                 CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
+                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
                 .OnSuccessDo(RemoveUnusedImages)
                 .OnSuccess(async methodology =>
                 {

@@ -849,17 +849,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context
+                var updatedMethodology = await context
                     .Methodologies
                     .Include(m => m.MethodologyParent)
                     .SingleAsync(m => m.Id == methodology.Id);
 
-                Assert.Null(model.Published);
-                Assert.Equal(Approved, model.Status);
-                Assert.Equal(Immediately, model.PublishingStrategy);
-                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodology.Published);
+                Assert.Equal(Approved, updatedMethodology.Status);
+                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
+                Assert.True(updatedMethodology.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
         }
 
@@ -972,17 +972,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context
+                var updatedMethodology = await context
                     .Methodologies
                     .Include(m => m.MethodologyParent)
                     .SingleAsync(m => m.Id == methodology.Id);
 
-                Assert.Null(model.Published);
-                Assert.Equal(Approved, model.Status);
-                Assert.Equal(Immediately, model.PublishingStrategy);
-                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodology.Published);
+                Assert.Equal(Approved, updatedMethodology.Status);
+                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
+                Assert.True(updatedMethodology.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
         }
 
@@ -1074,12 +1074,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodology.Id);
 
                 Assert.True(updatedMethodology.Published.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Published.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Published!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal(request.LatestInternalReleaseNote, updatedMethodology.InternalReleaseNote);
                 Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
         }
 
@@ -1169,18 +1169,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var model = await context
+                var updatedMethodology = await context
                     .Methodologies
                     .Include(m => m.MethodologyParent)
                     .SingleAsync(m => m.Id == methodology.Id);
 
-                Assert.Null(model.Published);
-                Assert.Equal(Approved, model.Status);
-                Assert.Equal(WithRelease, model.PublishingStrategy);
-                Assert.Equal(scheduledWithRelease.Id, model.ScheduledWithReleaseId);
+                Assert.Null(updatedMethodology.Published);
+                Assert.Equal(Approved, updatedMethodology.Status);
+                Assert.Equal(WithRelease, updatedMethodology.PublishingStrategy);
+                Assert.Equal(scheduledWithRelease.Id, updatedMethodology.ScheduledWithReleaseId);
                 Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.True(updatedMethodology.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
         }
 
@@ -1469,7 +1469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Slug remains unchanged
                 Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
         }
 
