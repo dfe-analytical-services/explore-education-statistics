@@ -224,11 +224,13 @@ user approves methodology for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
+    ...    ${publishing_strategy}=Immediately
+    ...    ${with_release}=
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks link    Edit this methodology    ${accordion}
-    approve methodology from methodology view
+    approve methodology from methodology view    ${publishing_strategy}    ${with_release}
 
 user approves methodology amendment for publication
     [Arguments]
@@ -236,15 +238,20 @@ user approves methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
+    ...    ${publishing_strategy}=Immediately
+    ...    ${with_release}=
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks link    Edit this amendment    ${accordion}
-    approve methodology from methodology view
+    approve methodology from methodology view    ${publishing_strategy}    ${with_release}
 
 approve methodology from methodology view
+    [Arguments]
+    ...    ${publishing_strategy}
+    ...    ${with_release}
     user clicks link    Sign off
-    user changes methodology status to Approved
+    user changes methodology status to Approved    ${publishing_strategy}    ${with_release}
 
 user creates approved methodology for publication
     [Arguments]
@@ -542,18 +549,33 @@ user verifies release summary
     user checks summary list contains    Release type    ${RELEASE_TYPE}
 
 user changes methodology status to Approved
+    [Arguments]
+    ...    ${publishing_strategy}=Immediately
+    ...    ${with_release}=
+    ${is_publishing_strategy_with_release}=    Evaluate    '${publishing_strategy}' == 'WithRelease'
     user clicks button    Edit status
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
+    user clicks element    id:methodologyStatusForm-publishingStrategy-${publishing_strategy}
+    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+        user waits until element is enabled    css:[name="withReleaseId"]
+        user chooses select option    css:[name="withReleaseId"]    ${with_release}
+    END
     user clicks button    Update status
-    user waits until h2 is visible    Methodology status
-    user checks page contains tag    Approved
+    user waits until h2 is visible    Sign off
+    user checks summary list contains    Status    Approved
+    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+        user checks summary list contains    When to publish    With a specific release
+        user checks summary list contains    Publish with release    ${with_release}
+    ELSE
+        user checks summary list contains    When to publish    ${publishing_strategy}
+    END
 
 user changes methodology status to Draft
     user clicks button    Edit status
     user clicks element    id:methodologyStatusForm-status-Draft
     user clicks button    Update status
-    user waits until h2 is visible    Methodology status
+    user waits until h2 is visible    Sign off
     user checks page contains tag    In Draft
 
 user gives analyst publication owner access

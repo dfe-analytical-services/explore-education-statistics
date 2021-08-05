@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDirectoryCallbacks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -93,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
                         // Include methodologies scheduled to be published with this release
                         var methodologyScheduledWithThisRelease =
-                            methodology.PublishingStrategy == WithRelease
+                            methodology.ScheduledForPublishingWithRelease
                             && methodology.ScheduledWithReleaseId == releaseId;
 
                         if (firstReleaseAndMethodologyScheduledImmediately ||

@@ -1,4 +1,5 @@
 import client from '@admin/services/utils/service';
+import { IdTitlePair } from '@admin/services/types/common';
 
 export type UpdateMethodology = {
   title: string;
@@ -25,7 +26,7 @@ export interface BasicMethodology {
   published?: string;
   owningPublication: MethodologyPublication;
   otherPublications?: MethodologyPublication[];
-  withReleaseId?: string;
+  scheduledWithRelease?: IdTitlePair;
 }
 
 export interface MyMethodology extends BasicMethodology {
@@ -51,6 +52,12 @@ const methodologyService = {
   getMethodology(methodologyId: string): Promise<BasicMethodology> {
     return client.get<BasicMethodology>(
       `/methodology/${methodologyId}/summary`,
+    );
+  },
+
+  getUnpublishedReleases(methodologyId: string): Promise<IdTitlePair[]> {
+    return client.get<IdTitlePair[]>(
+      `/methodology/${methodologyId}/unpublished-releases`,
     );
   },
 

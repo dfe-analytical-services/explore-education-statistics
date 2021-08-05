@@ -9,11 +9,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    NotAgain
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
     [Tags]    HappyPath
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/methodology
-    user waits until h1 is visible    Methodologies
-    user waits for page to finish loading
-
+    user navigates to methodologies page
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
 

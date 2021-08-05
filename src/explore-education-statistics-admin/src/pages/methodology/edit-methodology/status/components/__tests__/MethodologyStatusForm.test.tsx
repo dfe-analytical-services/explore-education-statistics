@@ -1,7 +1,7 @@
 import MethodologyStatusForm, {
   FormValues,
 } from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
-import { Release } from '@admin/services/releaseService';
+import { IdTitlePair } from '@admin/services/types/common';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -9,15 +9,15 @@ import noop from 'lodash/noop';
 import { BasicMethodology } from 'src/services/methodologyService';
 
 describe('MethodologyStatusForm', () => {
-  const testUnpublishedReleases: Release[] = [
+  const testUnpublishedReleases: IdTitlePair[] = [
     {
       id: 'test-release-2',
       title: 'Test Release 2',
-    } as Release,
+    },
     {
       id: 'test-release-1',
       title: 'Test Release 1',
-    } as Release,
+    },
   ];
 
   test('renders the form with draft initial values', () => {
@@ -28,7 +28,7 @@ describe('MethodologyStatusForm', () => {
             status: 'Draft',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -66,7 +66,7 @@ describe('MethodologyStatusForm', () => {
             latestInternalReleaseNote: 'The latest note',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -91,11 +91,12 @@ describe('MethodologyStatusForm', () => {
             status: 'Approved',
             latestInternalReleaseNote: 'The latest note',
             publishingStrategy: 'WithRelease',
-            withReleaseId: 'test-release-2',
+            scheduledWithRelease: {
+              id: 'test-release-2',
+            },
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
-        unPublishedReleases={testUnpublishedReleases}
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -141,7 +142,7 @@ describe('MethodologyStatusForm', () => {
             status: 'Draft',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -169,8 +170,7 @@ describe('MethodologyStatusForm', () => {
             status: 'Approved',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
-        unPublishedReleases={testUnpublishedReleases}
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -198,8 +198,7 @@ describe('MethodologyStatusForm', () => {
             publishingStrategy: 'WithRelease',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
-        unPublishedReleases={testUnpublishedReleases}
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={handleSubmit}
       />,
@@ -231,8 +230,7 @@ describe('MethodologyStatusForm', () => {
             publishingStrategy: 'WithRelease',
           } as BasicMethodology
         }
-        showWithRelease // EES-2163 flag
-        unPublishedReleases={testUnpublishedReleases}
+        unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={handleSubmit}
       />,
