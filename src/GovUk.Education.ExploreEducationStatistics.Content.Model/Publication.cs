@@ -45,10 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release LatestPublishedRelease()
         {
-            return LatestRelease();
+            return LatestRelease(checkIfLive: true);
         }
 
-        public Release LatestRelease(bool checkIfLive = true)
+        public Release LatestRelease(bool checkIfLive)
         {
             return Releases?
                 .Where(r => !checkIfLive || r.Live)

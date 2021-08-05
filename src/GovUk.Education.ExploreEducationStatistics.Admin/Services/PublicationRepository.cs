@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .SingleAsync(p => p.Id == publicationId);
 
-            return publication.LatestRelease(false);
+            return publication.LatestRelease(checkIfLive: false);
         }
 
 
