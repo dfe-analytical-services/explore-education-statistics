@@ -63,6 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
+            // TODO SOW4 EES-2160 - DW - this could do with tidying up and merging with the similar code in
+            // MethodologyStatusAuthorizationHandlers.  See notes there.
             await _contentDbContext
                 .Entry(methodology)
                 .Reference(m => m.MethodologyParent)
@@ -73,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .Collection(mp => mp.Publications)
                 .LoadAsync();
 
-            // A Publication Owner for the owning Publication of this Methodology can 
             var owningPublicationId = methodology
                 .MethodologyParent
                 .Publications
@@ -87,14 +88,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            // If the user is an Editor (Contributor, Lead) or an Approver of the latest Release belonging to the
-            // latest (Live or non-Live) Release for the owning Publication of this Methodology, they can update it.
+            // If the user is an Editor (Contributor, Lead) or an Approver of the latest (Live or non-Live) Release
+            // for the owning Publication of this Methodology, they can update it.
             if (await IsEditorOrApproverOfOwningPublicationsLatestRelease(context, owningPublicationId))
             {
                 context.Succeed(requirement);
             }
         }
 
+        // TODO SOW4 EES-2160 - DW - this could do with tidying up and merging with the similar code in
+        // MethodologyStatusAuthorizationHandlers.  See notes there.
         private async Task<bool> IsPublicationOwnerOfOwningPublication(
             AuthorizationHandlerContext context, Guid owningPublicationId)
         {
@@ -104,6 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             return ContainPublicationOwnerRole(publicationRoles);
         }
         
+        // TODO SOW4 EES-2160 - DW - this could do with tidying up and merging with the similar code in
+        // MethodologyStatusAuthorizationHandlers.  See notes there.
         private async Task<bool> IsEditorOrApproverOfOwningPublicationsLatestRelease(
             AuthorizationHandlerContext context, Guid owningPublicationId)
         {

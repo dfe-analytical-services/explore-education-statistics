@@ -1,6 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
@@ -31,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var (handler, methodologyRepository) = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, _, _) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
                         .ReturnsAsync(true);
@@ -59,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var (handler, methodologyRepository) = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, _, _) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
                         .ReturnsAsync(false);
@@ -79,15 +82,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        private static (MarkSpecificMethodologyAsDraftAuthorizationHandler, Mock<IMethodologyRepository>)
-            CreateHandlerAndDependencies()
+        
+            
+        private static (
+            MarkSpecificMethodologyAsDraftAuthorizationHandler, 
+            Mock<IMethodologyRepository>,
+            Mock<IPublicationRepository>,
+            Mock<IUserReleaseRoleRepository>
+            )
+            CreateHandlerAndDependencies(ContentDbContext? contentDbContext = null)
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
 
             var handler = new MarkSpecificMethodologyAsDraftAuthorizationHandler(
-                methodologyRepository.Object);
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
+                methodologyRepository.Object,
+                publicationRepository.Object,
+                userReleaseRoleRepository.Object
+            );
 
-            return (handler, methodologyRepository);
+            return (
+                handler,
+                methodologyRepository,
+                publicationRepository, 
+                userReleaseRoleRepository
+            );
         }
     }
 }
