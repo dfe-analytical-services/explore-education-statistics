@@ -1,19 +1,16 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -70,13 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
-
-            cacheService
-                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
-                    Task<Either<ActionResult, TableBuilderResultViewModel>>>(
-                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -90,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                blobCacheService: cacheService.Object,
                 tableBuilderService: tableBuilderService.Object
             );
 
@@ -98,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             Assert.Single(result.Results);
 
-            VerifyAllMocks(cacheService, tableBuilderService);
+            VerifyAllMocks(tableBuilderService);
         }
 
         [Fact]
@@ -150,13 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
-
-            cacheService
-                .SetupGetItemForCacheMiss<TableBuilderResultViewModel,
-                    Task<Either<ActionResult, TableBuilderResultViewModel>>>(
-                    new DataBlockTableResultCacheKey(releaseContentBlock));
 
             tableBuilderService
                 .Setup(
@@ -173,7 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var service = BuildDataBlockService(
                 contentDbContext,
-                blobCacheService: cacheService.Object,
                 tableBuilderService: tableBuilderService.Object
             );
 
@@ -181,76 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             Assert.Single(result.Results);
 
-            VerifyAllMocks(cacheService, tableBuilderService);
-        }
-
-        [Fact]
-        public async Task GetDataBlockTableResult_CachedResultExists()
-        {
-            var subjectId = Guid.NewGuid();
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Slug = "release-slug",
-                    Publication = new Publication
-                    {
-                        Slug = "publication-slug"
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = new ObservationQueryContext
-                    {
-                        SubjectId = subjectId,
-                    },
-                    Charts = new List<IChart>
-                    {
-                        new LineChart()
-                    }
-                }
-            };
-
-            await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
-
-            await contentDbContext.AddAsync(releaseContentBlock);
-            await contentDbContext.SaveChangesAsync();
-
-            var cacheKey = $"publications/publication-slug/releases/release-slug/data-blocks/{_dataBlockId}.json";
-
-            var tableResult = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new ObservationViewModel()
-                }
-            };
-
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
-            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
-
-            cacheService
-                .Setup(s => s.GetItem(
-                    It.Is<DataBlockTableResultCacheKey>(key => key.Key == cacheKey),
-                    It.IsAny<Func<Task<Either<ActionResult, TableBuilderResultViewModel>>>>()))
-                .ReturnsAsync(tableResult);
-
-            var service = BuildDataBlockService(
-                contentDbContext,
-                blobCacheService: cacheService.Object,
-                tableBuilderService: tableBuilderService.Object
-            );
-
-            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
-
-            Assert.Single(result.Results);
-
-            VerifyAllMocks(cacheService, tableBuilderService);
+            VerifyAllMocks(tableBuilderService);
         }
 
         [Fact]
@@ -286,13 +200,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         private static DataBlockService BuildDataBlockService(
             ContentDbContext contentDbContext,
-            IBlobCacheService blobCacheService = null,
-            ITableBuilderService tableBuilderService = null,
-            IUserService userService = null)
+            ITableBuilderService? tableBuilderService = null,
+            IUserService? userService = null)
         {
-            return new DataBlockService(
+            return new (
                 contentDbContext,
-                blobCacheService ?? new Mock<IBlobCacheService>().Object,
                 tableBuilderService ?? new Mock<ITableBuilderService>().Object,
                 userService ?? AlwaysTrueUserService().Object
             );

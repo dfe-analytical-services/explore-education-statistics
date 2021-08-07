@@ -22,7 +22,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
@@ -199,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodology.Published = DateTime.UtcNow;
 
                         // Invalidate the 'All Methodologies' cache item
-                        await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey(PublicContent));
+                        await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                     }
 
                     await _context.SaveChangesAsync();

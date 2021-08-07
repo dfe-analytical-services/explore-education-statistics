@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
@@ -117,6 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             IWebHostEnvironment env,
             ILogger<Startup> logger)
         {
+            // Enable caching and register any caching services
+            CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

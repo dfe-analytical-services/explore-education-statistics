@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -167,6 +168,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Enable caching and register any caching services
+            CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+
             UpdateDatabase(app);
 
             if (env.IsDevelopment())

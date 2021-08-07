@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task UpdateTaxonomy(PublishContext context)
         {
             // Invalidate the 'All Methodologies' cache item in case any methodologies are affected by the changes
-            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey(PublicContent));
+            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
         }
 
         private async Task DeleteAllContent()

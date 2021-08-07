@@ -1,22 +1,18 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -103,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByMethodologyParent(methodologyParent.Id))
-                .ReturnsAsync((Methodology) null);
+                .ReturnsAsync((Methodology) null!);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -262,60 +258,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task GetTree_CachedResultExists()
-        {
-            var expectedResult = new List<AllMethodologiesThemeViewModel>
-            {
-                new AllMethodologiesThemeViewModel
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Theme title",
-                    Topics = AsList(
-                        new AllMethodologiesTopicViewModel
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Topic title",
-                            Publications = AsList(
-                                new AllMethodologiesPublicationViewModel
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Title = "Publication title",
-                                    Methodologies = AsList(
-                                        new MethodologySummaryViewModel
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Slug = "methodology-slug",
-                                            Title = "Methodology title"
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    )
-                }
-            };
-
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
-
-            cacheService.Setup(mock => mock.GetItem(
-                    new AllMethodologiesCacheKey(PublicContent),
-                    It.IsAny<Func<Task<List<AllMethodologiesThemeViewModel>>>>()))
-                .ReturnsAsync(expectedResult);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    blobCacheService: cacheService.Object);
-
-                var result = (await service.GetTree()).AssertRight();
-
-                Assert.Equal(expectedResult, result);
-            }
-
-            VerifyAllMocks(cacheService);
-        }
-
-        [Fact]
         public async Task GetTree()
         {
             var publication = new Publication
@@ -375,12 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
-            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
-                new AllMethodologiesCacheKey(PublicContent)
-            );
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
@@ -388,7 +325,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    blobCacheService: cacheService.Object,
                     methodologyRepository: methodologyRepository.Object);
 
                 var themes = (await service.GetTree()).AssertRight();
@@ -422,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Equal("Methodology 2 v0 title", methodologies[1].Title);
             }
 
-            VerifyAllMocks(cacheService, methodologyRepository);
+            VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
@@ -444,17 +380,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
-            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
-                new AllMethodologiesCacheKey(PublicContent)
-            );
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    blobCacheService: cacheService.Object,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = (await service.GetTree()).AssertRight();
@@ -462,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Empty(result);
             }
 
-            VerifyAllMocks(cacheService, methodologyRepository);
+            VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
@@ -491,17 +421,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
-            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
-                new AllMethodologiesCacheKey(PublicContent)
-            );
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    blobCacheService: cacheService.Object,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetTree();
@@ -511,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Empty(result.Right);
             }
 
-            VerifyAllMocks(cacheService, methodologyRepository);
+            VerifyAllMocks(methodologyRepository);
         }
 
         [Fact]
@@ -555,12 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-
-            cacheService.SetupGetItemForCacheMiss<List<AllMethodologiesThemeViewModel>>(
-                new AllMethodologiesCacheKey(PublicContent)
-            );
 
             methodologyRepository.Setup(mock => mock.GetLatestPublishedByPublication(publication.Id))
                 .ReturnsAsync(latestMethodologies);
@@ -568,7 +487,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    blobCacheService: cacheService.Object,
                     methodologyRepository: methodologyRepository.Object);
 
                 var result = await service.GetTree();
@@ -578,21 +496,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.Empty(result.Right);
             }
 
-            VerifyAllMocks(cacheService, methodologyRepository);
+            VerifyAllMocks(methodologyRepository);
         }
 
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobCacheService blobCacheService = null,
-            IMethodologyRepository methodologyRepository = null,
-            IMapper mapper = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IMethodologyRepository? methodologyRepository = null,
+            IMapper? mapper = null)
         {
-            return new MethodologyService(
+            return new (
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
-                blobCacheService ?? new Mock<IBlobCacheService>().Object,
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object
             );
         }

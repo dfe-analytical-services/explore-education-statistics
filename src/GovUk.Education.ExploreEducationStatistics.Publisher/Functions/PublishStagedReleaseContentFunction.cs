@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -95,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                     // Invalidate the 'All Methodologies' cache item in case any methodologies
                     // are now accessible for the first time after publishing these releases
-                    await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey(PublicContent));
+                    await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);

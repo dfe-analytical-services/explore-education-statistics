@@ -22,7 +22,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -1089,7 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publishingService = new Mock<IPublishingService>(Strict);
 
             cacheService.Setup(mock =>
-                    mock.DeleteItem(new AllMethodologiesCacheKey(PublicContent)))
+                    mock.DeleteItem(new AllMethodologiesCacheKey()))
                 .Returns(Task.CompletedTask);
 
             contentService.Setup(mock =>
