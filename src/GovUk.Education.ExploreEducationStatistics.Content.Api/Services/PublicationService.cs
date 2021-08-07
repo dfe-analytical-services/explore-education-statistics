@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _releaseFileFileService = releaseFileService;
         }
 
+        [BlobCache(typeof(PublicationTreeCacheKey))]
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree()
         {
             var themes = await _contentDbContext.Themes
@@ -89,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             };
         }
 
+        [BlobCache(typeof(PublicationDownloadsTreeCacheKey))]
         public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetPublicationDownloadsTree()
         {
             var themes = await _contentDbContext.Themes

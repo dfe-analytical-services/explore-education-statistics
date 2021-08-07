@@ -124,12 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await CachePublication(publication.Id, context);
             await _publicationService.SetPublishedDate(publication.Id, context.Published);
+
+            // Invalidate the various cached trees in case any
+            // publications/methodologies are affected by the changes
+            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         public async Task UpdateTaxonomy(PublishContext context)
         {
-            // Invalidate the 'All Methodologies' cache item in case any methodologies are affected by the changes
+            // Invalidate the cached trees in case any
+            // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         private async Task DeleteAllContent()
