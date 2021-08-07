@@ -92,9 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
 
-                    // Invalidate the 'All Methodologies' cache item in case any methodologies
+                    // Invalidate the cached trees in case any methodologies/publications
                     // are now accessible for the first time after publishing these releases
                     await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                    await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+                    await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
