@@ -1,66 +1,17 @@
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import Button from '@common/components/Button';
-import {
-  FullTable,
-  FullTableMeta,
-} from '@common/modules/table-tool/types/fullTable';
-import {
-  appendColumnWidths,
-  appendTitle,
-  appendFootnotes,
-  getCsvData,
-} from '@common/modules/table-tool/components/utils/downloadTableUtils';
+import ButtonGroup from '@common/components/ButtonGroup';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { downloadCsvFile } from '@common/modules/table-tool/components/utils/downloadCsvUtils';
+import { downloadOdsFile } from '@common/modules/table-tool/components/utils/downloadOdsUtils';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
+import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Formik } from 'formik';
 import React, { createElement, RefObject } from 'react';
-import { utils, writeFile } from 'xlsx';
-
-const handleCsvDownload = (fileName: string, fullTable: FullTable) => {
-  const workBook = utils.book_new();
-  workBook.Sheets.Sheet1 = utils.aoa_to_sheet(getCsvData(fullTable));
-  workBook.SheetNames[0] = 'Sheet1';
-
-  writeFile(workBook, `${fileName}.csv`, {
-    type: 'binary',
-  });
-};
-
-const handleOdsDownload = (
-  fileName: string,
-  subjectMeta: FullTableMeta,
-  tableRef: RefObject<HTMLElement>,
-) => {
-  const { footnotes } = subjectMeta;
-
-  let tableEl: HTMLTableElement | null = null;
-
-  if (tableRef.current) {
-    if (tableRef.current.tagName.toLowerCase() === 'table') {
-      tableEl = tableRef.current as HTMLTableElement;
-    } else {
-      tableEl = tableRef.current.querySelector('table');
-    }
-  }
-
-  if (!tableEl) {
-    return;
-  }
-
-  const workBook = utils.table_to_book(tableEl, {
-    raw: true,
-  });
-  const sheet = workBook.Sheets[workBook.SheetNames[0]];
-
-  appendColumnWidths(sheet);
-  appendTitle(sheet, generateTableTitle(subjectMeta));
-  appendFootnotes(sheet, footnotes);
-
-  writeFile(workBook, `${fileName}.ods`, {
-    type: 'binary',
-    bookType: 'ods',
-  });
-};
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import DownloadTableWorker from 'worker-loader?name=static/[hash].worker.js!@common/modules/table-tool/components/workers/downloadTable.worker';
 
 export type FileFormat = 'ods' | 'csv' | undefined;
 
@@ -85,18 +36,37 @@ const DownloadTable = ({
   tableRef,
   onSubmit,
 }: Props) => {
+  const [processingData, toggleProcessingData] = useToggle(false);
+
+  const handleCsvDownload = () => {
+    const worker = new DownloadTableWorker();
+    worker.postMessage({ fileName, fullTable });
+    worker.onmessage = (event: MessageEvent) => {
+      downloadCsvFile(event.data.csvData, event.data.fileName);
+      toggleProcessingData();
+      worker.terminate();
+    };
+  };
+
+  const handleOdsDownload = () => {
+    const title = generateTableTitle(fullTable.subjectMeta);
+    downloadOdsFile(fileName, fullTable.subjectMeta, tableRef, title);
+    toggleProcessingData();
+  };
+
   return (
     <Formik<FormValues>
       initialValues={{
         fileFormat: undefined,
       }}
       onSubmit={values => {
+        toggleProcessingData();
         if (onSubmit) {
           onSubmit(values.fileFormat);
         }
         return values.fileFormat === 'csv'
-          ? handleCsvDownload(fileName, fullTable)
-          : handleOdsDownload(fileName, fullTable.subjectMeta, tableRef);
+          ? handleCsvDownload()
+          : handleOdsDownload();
       }}
       validationSchema={Yup.object<FormValues>({
         fileFormat: Yup.mixed().required('Choose a file format'),
@@ -133,7 +103,19 @@ const DownloadTable = ({
                   },
                 ]}
               />
-              <Button type="submit">Download table</Button>
+              <ButtonGroup>
+                <Button type="submit" disabled={processingData}>
+                  Download table
+                </Button>
+                <LoadingSpinner
+                  alert
+                  inline
+                  hideText
+                  loading={processingData}
+                  size="md"
+                  text="Preparing download"
+                />
+              </ButtonGroup>
             </>
           </Form>
         );
