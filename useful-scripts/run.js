@@ -39,6 +39,11 @@ const projects = {
     command: 'npm run start:local',
     colour: chalk.greenBright,
   },
+  frontendProd: {
+    path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
+    command: 'npm run build && npm run start:prod',
+    colour: chalk.greenBright,
+  },
   content: {
     path: path.join(
       projectRoot,
