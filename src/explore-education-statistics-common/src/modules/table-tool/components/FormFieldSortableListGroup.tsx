@@ -67,6 +67,9 @@ function FormFieldSortableListGroup<FormValues>({
                       {...draggableProvided.dragHandleProps}
                       className={classNames(styles.list, {
                         [styles.isDragging]: draggableSnapshot.isDragging,
+                        [styles.optionDraggedOutside]:
+                          draggableSnapshot.isDragging &&
+                          !draggableSnapshot.draggingOver,
                       })}
                       ref={draggableProvided.innerRef}
                       role="button"

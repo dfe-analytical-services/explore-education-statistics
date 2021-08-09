@@ -12,19 +12,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string InternalReleaseNote { get; set; }
 
-        public TitleAndIdViewModel Publication { get; set; }
+        public TitleAndIdViewModel OwningPublication { get; set; }
 
         public List<TitleAndIdViewModel> OtherPublications { get; set; }
 
         public DateTime? Published { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyPublishingStrategy PublishingStrategy { get; set; }
+
+        public TitleAndIdViewModel ScheduledWithRelease { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
 
         public string Title { get; set; }
-        
+
         public bool Amendment { get; set; }
-        
+
         public Guid PreviousVersionId { get; set; }
     }
 }

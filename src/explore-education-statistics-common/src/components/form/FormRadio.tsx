@@ -1,4 +1,5 @@
 import useMounted from '@common/hooks/useMounted';
+import styles from '@common/components/form/FormRadio.module.scss';
 import classNames from 'classnames';
 import React, { ChangeEvent, FocusEventHandler, memo, ReactNode } from 'react';
 
@@ -11,10 +12,11 @@ export type RadioChangeEventHandler = (
 
 export interface FormRadioProps {
   checked?: boolean;
-  defaultChecked?: boolean;
   conditional?: ReactNode;
+  defaultChecked?: boolean;
   hiddenConditional?: boolean;
   hint?: string | ReactNode;
+  inlineHint?: boolean;
   id: string;
   label: string;
   name: string;
@@ -26,11 +28,12 @@ export interface FormRadioProps {
 
 const FormRadio = ({
   checked,
-  defaultChecked,
   conditional,
+  defaultChecked,
   hiddenConditional,
   hint,
   id,
+  inlineHint,
   label,
   name,
   onBlur,
@@ -44,7 +47,9 @@ const FormRadio = ({
   return (
     <>
       <div
-        className="govuk-radios__item"
+        className={classNames('govuk-radios__item', {
+          [styles.inlineHint]: inlineHint,
+        })}
         data-testid={`Radio item for ${label}`}
       >
         <input

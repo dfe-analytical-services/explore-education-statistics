@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -260,8 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddPublicationRole(userId, publication.Id, Owner);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, UserAlreadyHasResourceRole);
+                result.AssertBadRequest(UserAlreadyHasResourceRole);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -468,8 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddReleaseRole(userId, release.Id, Contributor);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, UserAlreadyHasResourceRole);
+                result.AssertBadRequest(UserAlreadyHasResourceRole);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

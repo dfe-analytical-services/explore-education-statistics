@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,11 +19,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -138,8 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, ReplacementFileTypesMustBeData);
+                result.AssertBadRequest(ReplacementFileTypesMustBeData);
             }
         }
 
@@ -2505,8 +2503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, ReplacementMustBeValid);
+                result.AssertBadRequest(ReplacementMustBeValid);
             }
         }
 

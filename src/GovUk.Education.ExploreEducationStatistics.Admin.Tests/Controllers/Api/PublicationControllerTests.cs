@@ -1,15 +1,15 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var validationResponse =
                 new Either<ActionResult, PublicationViewModel>(
-                    ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
+                    ValidationUtils.ValidationActionResult(SlugNotUnique));
             
             publicationService
                 .Setup(s => s.CreatePublication(It.IsAny<PublicationSaveViewModel>()))
@@ -68,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 TopicId = topicId
             });
 
-            ValidationTestUtil.AssertValidationProblem(
-                result.Result, ValidationErrorMessages.SlugNotUnique);
+            result.Result.AssertBadRequest(SlugNotUnique);
         }
     }
 }

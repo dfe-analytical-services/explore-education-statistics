@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -13,55 +14,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     {
         public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock;
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
             Guid releaseId);
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder);
 
         Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
             Guid releaseId, ContentSectionAddRequest? request);
 
-        Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid releaseId, Guid contentSectionId, string newHeading);
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder);
 
-        Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
             Guid releaseId, Guid contentSectionId,
             ContentBlockAddRequest request);
 
-        Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
 
-        Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
 
-        Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlockAsync(
+        Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request);
 
-        Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
+        Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
             where T : ContentBlock;
 
         Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);
-
-        Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId);
-
-        Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest);
-
-        Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId, 
-            CommentSaveRequest saveRequest);
-
-        Task<Either<ActionResult, bool>> DeleteCommentAsync(Guid commentId);
     }
 }

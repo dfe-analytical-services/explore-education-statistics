@@ -17,17 +17,15 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
-const methodologyRoutes: MethodologyRouteProps[] = [
-  methodologySummaryRoute,
-  methodologySummaryEditRoute,
-  methodologyContentRoute,
-  methodologyStatusRoute,
-];
-
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
   methodologyContentRoute,
   methodologyStatusRoute,
+];
+
+const routes: MethodologyRouteProps[] = [
+  ...navRoutes,
+  methodologySummaryEditRoute,
 ];
 
 const MethodologyPage = ({
@@ -42,7 +40,7 @@ const MethodologyPage = ({
   );
 
   const currentRouteIndex =
-    methodologyRoutes.findIndex(
+    navRoutes.findIndex(
       route =>
         generatePath<MethodologyRouteParams>(route.path, {
           methodologyId,
@@ -50,13 +48,11 @@ const MethodologyPage = ({
     ) || 0;
 
   const previousRoute =
-    currentRouteIndex > 0
-      ? methodologyRoutes[currentRouteIndex - 1]
-      : undefined;
+    currentRouteIndex > 0 ? navRoutes[currentRouteIndex - 1] : undefined;
 
   const nextRoute =
-    currentRouteIndex < methodologyRoutes.length - 1
-      ? methodologyRoutes[currentRouteIndex + 1]
+    currentRouteIndex < navRoutes.length - 1
+      ? navRoutes[currentRouteIndex + 1]
       : undefined;
 
   const previousSection = previousRoute
@@ -111,7 +107,7 @@ const MethodologyPage = ({
             />
 
             <Switch>
-              {methodologyRoutes.map(route => (
+              {routes.map(route => (
                 <Route
                   exact
                   key={route.path}

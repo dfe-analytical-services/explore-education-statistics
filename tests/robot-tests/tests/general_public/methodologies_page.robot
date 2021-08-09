@@ -9,10 +9,7 @@ Suite Teardown      user closes the browser
 *** Test Cases ***
 Navigate to /methodology page
     [Tags]    HappyPath
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/methodology
-    user waits until h1 is visible    Methodologies
-    user waits for page to finish loading
+    user navigates to methodologies page
 
 Validate page contents
     [Tags]    HappyPath

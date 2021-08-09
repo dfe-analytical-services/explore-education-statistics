@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -47,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 2
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -93,16 +93,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = new List<ReleaseContentSection>
-                {
+                Content = AsList(
                     new ReleaseContentSection
                     {
                         ContentSection = new ContentSection
                         {
                             Heading = "New section",
                             Order = 1,
-                            Content = new List<ContentBlock>
-                            {
+                            Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
                                     Created = new DateTime(2001, 1, 1)
@@ -112,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Created = new DateTime(2002, 2, 2)
                                 },
                                 new DataBlock()
-                            }
+                            )
                         }
                     },
                     new ReleaseContentSection
@@ -121,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Heading = "New section",
                             Order = 2,
-                            Content = new List<ContentBlock>
-                            {
+                            Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
                                     Created = new DateTime(2003, 3, 3)
@@ -132,14 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Created = new DateTime(2004, 4, 4)
                                 },
                                 new DataBlock()
-                            }
+                            )
                         }
                     }
-                }
+                )
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
@@ -166,6 +162,132 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(new DateTime(2002, 2, 2), contentBlocks[1].Created);
                 Assert.Equal(new DateTime(2003, 3, 3), contentBlocks[2].Created);
                 Assert.Equal(new DateTime(2004, 4, 4), contentBlocks[3].Created);
+            }
+        }
+
+        [Fact]
+        public async Task GetContentSections()
+        {
+            var release = new Release
+            {
+                Content = AsList(
+                    new ReleaseContentSection
+                    {
+                        ContentSection = new ContentSection
+                        {
+                            Heading = "New section",
+                            Order = 1,
+                            Content = AsList<ContentBlock>(
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2001, 1, 1)
+                                },
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2002, 2, 2)
+                                },
+                                new DataBlock()
+                            )
+                        }
+                    },
+                    new ReleaseContentSection
+                    {
+                        ContentSection = new ContentSection
+                        {
+                            Heading = "New section",
+                            Order = 2,
+                            Content = AsList<ContentBlock>(
+                                new HtmlBlock
+                                {
+                                    Created = new DateTime(2003, 3, 3)
+                                }
+                            )
+                        }
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetContentSections(release.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(2, viewModel.Count);
+                Assert.Equal(release.Content[0].ContentSection.Id, viewModel[0].Id);
+                Assert.Equal(release.Content[1].ContentSection.Id, viewModel[1].Id);
+
+                Assert.Equal(3, viewModel[0].Content.Count);
+                Assert.Single(viewModel[1].Content);
+            }
+        }
+
+        [Fact]
+        public async Task GetContentSections_NoContentBlocks()
+        {
+            var release = new Release
+            {
+                Content = AsList(
+                    new ReleaseContentSection
+                    {
+                        ContentSection = new ContentSection
+                        {
+                            Heading = "New section",
+                            Order = 1,
+                            Content = AsList<ContentBlock>()
+                        }
+                    }
+                )
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetContentSections(release.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Single(viewModel);
+                Assert.Equal(release.Content[0].ContentSection.Id, viewModel[0].Id);
+                Assert.Empty(viewModel[0].Content);
+            }
+        }
+
+        [Fact]
+        public async Task GetContentSections_NoContentSections()
+        {
+            var release = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetContentSections(release.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
             }
         }
 

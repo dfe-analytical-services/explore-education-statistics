@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     await files.ForEachAsync(async file =>
                     {
-                        var methodologyLinks = await _methodologyFileRepository.GetMethodologyLinksToFile(file.Id);
+                        var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
 
                         await _methodologyFileRepository.Delete(methodologyId, file.Id);
 

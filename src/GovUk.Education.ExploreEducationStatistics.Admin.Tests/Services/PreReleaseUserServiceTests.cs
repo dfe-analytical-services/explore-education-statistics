@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -216,9 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.AddPreReleaseUser(release.Id, "not an email");
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, InvalidEmailAddress);
+                result.AssertBadRequest(InvalidEmailAddress);
             }
         }
 
@@ -270,9 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.AddPreReleaseUser(release.Id, "test@test.com");
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, UserAlreadyExists);
+                result.AssertBadRequest(UserAlreadyExists);
             }
         }
 
@@ -305,9 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.AddPreReleaseUser(release.Id, "test@test.com");
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, UserAlreadyExists);
+                result.AssertBadRequest(UserAlreadyExists);
             }
         }
 
@@ -531,9 +526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.RemovePreReleaseUser(release.Id, "not an email");
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(
-                    result.Left, InvalidEmailAddress);
+                result.AssertBadRequest(InvalidEmailAddress);
             }
         }
 

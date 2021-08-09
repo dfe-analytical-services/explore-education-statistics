@@ -25,6 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         public Task<List<MethodologyFile>> GetByFileType(Guid methodologyId, params FileType[] types);
         
-        public Task<List<MethodologyFile>> GetMethodologyLinksToFile(Guid fileId);
+        public Task<List<MethodologyFile>> GetByFile(Guid fileId);
     }
 }

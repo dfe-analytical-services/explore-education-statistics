@@ -35,6 +35,7 @@ export interface Topic<Publication = PublicationSummary> {
 export interface Theme<PublicationNode = PublicationSummary> {
   id: string;
   title: string;
+  slug: string;
   summary: string;
   topics: Topic<PublicationNode>[];
 }

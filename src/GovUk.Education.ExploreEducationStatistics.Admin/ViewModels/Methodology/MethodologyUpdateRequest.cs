@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -7,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 {
     public class MethodologyUpdateRequest
     {
-        public string LatestInternalReleaseNote { get; set; }
+        public string? LatestInternalReleaseNote { get; set; }
 
         // TODO SOW4 EES-2212 - update to AlternativeTitle
         [Required] public string Title { get; set; }
@@ -17,5 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
+
+        public Guid? WithReleaseId { get; set; }
     }
 }

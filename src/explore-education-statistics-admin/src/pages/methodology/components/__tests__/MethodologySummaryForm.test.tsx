@@ -8,12 +8,12 @@ describe('MethodologySummaryForm', () => {
   test('renders the form with initial values', () => {
     render(
       <MethodologySummaryForm
-        canUpdateTitle
         id="id"
         initialValues={{
           title: 'the publication title',
-          titleType: 'publication',
+          titleType: 'default',
         }}
+        defaultTitle="the publication title"
         submitText="Update methodology"
         onCancel={noop}
         onSubmit={noop}
@@ -32,12 +32,12 @@ describe('MethodologySummaryForm', () => {
   test('shows validation error when select alternative title type and no title given', async () => {
     render(
       <MethodologySummaryForm
-        canUpdateTitle
         id="id"
         initialValues={{
           title: '',
-          titleType: 'publication',
+          titleType: 'default',
         }}
+        defaultTitle="the publication title"
         submitText="Update methodology"
         onCancel={noop}
         onSubmit={noop}
@@ -61,12 +61,12 @@ describe('MethodologySummaryForm', () => {
     const handleSubmit = jest.fn();
     render(
       <MethodologySummaryForm
-        canUpdateTitle
         id="id"
         initialValues={{
           title: '',
-          titleType: 'publication',
+          titleType: 'default',
         }}
+        defaultTitle="the publication title"
         submitText="Update methodology"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -89,16 +89,16 @@ describe('MethodologySummaryForm', () => {
     });
   });
 
-  test('submits successfully with the publicatione title', async () => {
+  test('submits successfully with the publication title', async () => {
     const handleSubmit = jest.fn();
     render(
       <MethodologySummaryForm
-        canUpdateTitle
         id="id"
         initialValues={{
           title: '',
-          titleType: 'publication',
+          titleType: 'default',
         }}
+        defaultTitle="the publication title"
         submitText="Update methodology"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -109,8 +109,8 @@ describe('MethodologySummaryForm', () => {
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
-        title: '',
-        titleType: 'publication',
+        title: 'the publication title',
+        titleType: 'default',
       });
     });
   });

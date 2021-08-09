@@ -263,8 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var result = await service.Delete(methodology.Id, 
                     AsList(ancillaryFile.File.Id, imageFile.File.Id));
 
-                var actionResult = result.AssertLeft();
-                ValidationTestUtil.AssertValidationProblem(actionResult, FileTypeInvalid);
+                result.AssertBadRequest(FileTypeInvalid);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

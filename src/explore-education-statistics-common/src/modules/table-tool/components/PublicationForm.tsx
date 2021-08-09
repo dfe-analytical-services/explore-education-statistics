@@ -95,7 +95,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         const { values } = form;
         const { getError } = createErrorHelper(form);
 
-        const filteredOptions: Theme[] = options
+        const filteredOptions = options
           .filter(theme =>
             theme.topics.some(topic =>
               topic.publications.some(

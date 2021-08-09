@@ -33,6 +33,6 @@ const getUnresolvedComments = (release: EditableRelease) =>
         ],
         [],
       ),
-  ].filter(comment => comment !== undefined);
+  ].filter(comment => comment !== undefined && !comment.resolved);
 
 export default getUnresolvedComments;

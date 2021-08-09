@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -238,6 +239,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Release release)
         {
             return userService.CheckPolicy(release, SecurityPolicies.CanPublishSpecificRelease);
+        }
+
+        public static Task<Either<ActionResult, Comment>> CheckCanResolveComment(
+            this IUserService userService, Comment comment)
+        {
+            return userService.CheckPolicy(comment, SecurityPolicies.CanResolveSpecificComment);
         }
 
         public static Task<Either<ActionResult, Comment>> CheckCanUpdateComment(

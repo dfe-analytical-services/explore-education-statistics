@@ -40,6 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("LegacyCreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("Resolved")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ResolvedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
@@ -48,6 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("ContentBlockId");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("ResolvedById");
 
                     b.ToTable("Comment");
                 });
@@ -916,6 +924,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "ResolvedBy")
+                        .WithMany()
+                        .HasForeignKey("ResolvedById");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock", b =>

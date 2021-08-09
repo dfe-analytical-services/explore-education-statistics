@@ -1,3 +1,5 @@
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -20,6 +22,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static void AssertNoContentResult(this ActionResult result)
         {
             Assert.IsAssignableFrom<NoContentResult>(result);
+        }
+        
+        public static void AssertBadRequest(this ActionResult result, params Enum[] expectedValidationErrors)
+        {
+            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            var validationProblem = Assert.IsAssignableFrom<ValidationProblemDetails>(badRequest?.Value);
+            
+            Assert.True(validationProblem != null && validationProblem.Errors.ContainsKey(string.Empty));
+            
+            var globalErrors = validationProblem.Errors[string.Empty];
+
+            Assert.Equal(expectedValidationErrors.Length, globalErrors.Length);
+            
+            expectedValidationErrors.ForEach(message =>
+                Assert.Contains(message.ToString().ScreamingSnakeCase(), globalErrors));
         }
     }
 }

@@ -10,5 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public DateTime Created { get; set; }
         public User CreatedBy { get; set; }
         public DateTime? Updated { get; set; }
+        public DateTime? Resolved { get; set; }
+        public User ResolvedBy { get; set; }
     }
 }

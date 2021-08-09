@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using File = System.IO.File;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -34,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateFileForUpload(file, Ancillary);
 
-            Assert.True(result.IsLeft);
-            AssertValidationProblem(result.Left, FileCannotBeEmpty);
+            result.AssertBadRequest(FileCannotBeEmpty);
         }
 
         [Fact]
@@ -80,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(() => false);
             var result = await service.ValidateFileForUpload(file, Ancillary);
 
-            Assert.True(result.IsLeft);
-            AssertValidationProblem(result.Left, FileTypeInvalid);
+            result.AssertBadRequest(FileTypeInvalid);
         }
 
         [Fact]
@@ -95,20 +92,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateSubjectName(Guid.NewGuid(), "Subject & Title");
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SubjectTitleCannotContainSpecialCharacters);
+                result.AssertBadRequest(SubjectTitleCannotContainSpecialCharacters);
             }
         }
 
         [Fact]
         public async Task ValidateSubjectName_SubjectNameNotUnique()
         {
-            var release = new Content.Model.Release();
+            var release = new Release();
             var dataReleaseFile = new ReleaseFile
             {
                 Release = release,
                 Name = "Subject Title",
-                File = new Content.Model.File
+                File = new File
                 {
                     Type = FileType.Data,
                 }
@@ -128,8 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, contentDbContext);
                 var result = await service.ValidateSubjectName(release.Id,  "Subject Title");
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SubjectTitleMustBeUnique);
+                result.AssertBadRequest(SubjectTitleMustBeUnique);
             }
         }
 
@@ -178,8 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, DataFileCannotBeEmpty);
+                result.AssertBadRequest(DataFileCannotBeEmpty);
             }
         }
 
@@ -197,8 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MetadataFileCannotBeEmpty);
+                result.AssertBadRequest(MetadataFileCannotBeEmpty);
             }
         }
 
@@ -229,8 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, DataFileMustBeCsvFile);
+                result.AssertBadRequest(DataFileMustBeCsvFile);
             }
         }
 
@@ -261,8 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MetaFileMustBeCsvFile);
+                result.AssertBadRequest(MetaFileMustBeCsvFile);
             }
         }
 
@@ -308,8 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                     archiveFile);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, DataFileMustBeCsvFile);
+                result.AssertBadRequest(DataFileMustBeCsvFile);
             }
         }
 
@@ -370,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())
-                .Returns(() => File.OpenRead(filePath));
+                .Returns(() => System.IO.File.OpenRead(filePath));
             return formFile.Object;
         }
     }

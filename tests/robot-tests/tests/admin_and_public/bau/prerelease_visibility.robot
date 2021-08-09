@@ -39,7 +39,7 @@ Go to 'Sign Off' page
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Go to Public Release Link
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    HappyPath
     # To get around basic auth on public frontend
     user goes to url    %{PUBLIC_URL}
     user waits until h1 is visible    Explore our statistics and data
@@ -128,7 +128,7 @@ Go to public release URL and check release isn't visible
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check "Page not found" appears
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    HappyPath
     user waits until page contains    Page not found
 
 Go to admin release summary
@@ -152,6 +152,6 @@ Approve release for immediate publication but don't wait to finish
     user checks summary list contains    Current status    Approved
 
 Go to public release URL and check release isn't visible
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    HappyPath
     user goes to url    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found

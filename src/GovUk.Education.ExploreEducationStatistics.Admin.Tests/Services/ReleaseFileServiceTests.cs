@@ -219,8 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Delete(release.Id, dataFile.File.Id);
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, FileTypeInvalid);
+                result.AssertBadRequest(FileTypeInvalid);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -458,8 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFile.File.Id
                 });
 
-                Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, FileTypeInvalid);
+                result.AssertBadRequest(FileTypeInvalid);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

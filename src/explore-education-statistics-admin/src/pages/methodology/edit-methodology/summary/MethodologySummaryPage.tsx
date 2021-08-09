@@ -51,7 +51,7 @@ const MethodologySummaryPage = ({
                 )}
               </SummaryListItem>
               <SummaryListItem term="Owning publication">
-                {currentMethodology.publication.title}
+                {currentMethodology.owningPublication.title}
               </SummaryListItem>
               {currentMethodology.otherPublications &&
                 currentMethodology.otherPublications.length > 0 && (

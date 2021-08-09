@@ -14,7 +14,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -221,8 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TopicId = Guid.NewGuid()
                 });
 
-            Assert.True(result.IsLeft);
-            AssertValidationProblem(result.Left, TopicDoesNotExist);
+            result.AssertBadRequest(TopicDoesNotExist);
         }
 
         [Fact]
@@ -263,8 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 
@@ -668,8 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, TopicDoesNotExist);
+                result.AssertBadRequest(TopicDoesNotExist);
             }
         }
 
@@ -716,8 +712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SlugNotUnique);
+                result.AssertBadRequest(SlugNotUnique);
             }
         }
 
