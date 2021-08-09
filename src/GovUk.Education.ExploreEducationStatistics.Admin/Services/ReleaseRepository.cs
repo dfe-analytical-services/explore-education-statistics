@@ -49,12 +49,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
                 .Select(r => r.ReleaseId)
                 .ToListAsync();
-            
+
+            var userPublicationIds = await _contentDbContext
+                .UserPublicationRoles
+                .Where(r => r.UserId == userId && r.Role == PublicationRole.Owner)
+                .Select(r => r.PublicationId)
+                .ToListAsync();
+            var userPublicationRoleReleaseIds = await _contentDbContext
+                .Releases
+                .Where(r => userPublicationIds.Contains(r.PublicationId))
+                .Select(r => r.Id)
+                .ToListAsync();
+            userReleaseIds.AddRange(userPublicationRoleReleaseIds);
+
             var releases = await 
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
                 .Where(r => userReleaseIds.Contains(r.Id) && releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
-            
+
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
