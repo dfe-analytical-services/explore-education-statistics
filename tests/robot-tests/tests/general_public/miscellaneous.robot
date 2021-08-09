@@ -14,7 +14,7 @@ Verify public page loads
     user waits until element contains    css:body    Explore education statistics
 
 Verify can accept cookie banner
-    [Tags]    HappyPath    
+    [Tags]    HappyPath
     user checks page contains    We use some essential cookies to make this service work.
 
     cookie should not exist    ees_banner_seen
@@ -65,7 +65,7 @@ Validate Cookies page
     user checks nth breadcrumb contains    2    Cookies
 
 Disable google analytics
-    [Tags]    HappyPath    
+    [Tags]    HappyPath
     user clicks element    id:cookieSettingsForm-googleAnalytics-off
     user clicks element    xpath://button[text()="Save changes"]
     user waits until page contains    Your cookie settings were saved
@@ -74,7 +74,7 @@ Disable google analytics
     cookie should have value    ees_disable_google_analytics    true
 
 Enable google analytics
-    [Tags]    HappyPath    
+    [Tags]    HappyPath
     user reloads page
     user checks page does not contain    Your cookie settings were saved
     user waits until h1 is visible    Cookies on Explore education statistics
