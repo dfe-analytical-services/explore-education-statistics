@@ -52,3 +52,8 @@
   outline: $govuk-focus-width solid $govuk-focus-colour;
   outline-offset: 0;
 }
+
+.optionDraggedOutside {
+  opacity: 0.4;
+  outline: none;
+}

@@ -287,6 +287,9 @@ const FormSortableList = ({
                           selectedIndices.includes(index) &&
                           typeof draggingIndex === 'number' &&
                           draggingIndex !== index,
+                        [styles.optionDraggedOutside]:
+                          draggableSnapshot.isDragging &&
+                          !draggableSnapshot.draggingOver,
                       })}
                       ref={draggableProvided.innerRef}
                       role="button"
