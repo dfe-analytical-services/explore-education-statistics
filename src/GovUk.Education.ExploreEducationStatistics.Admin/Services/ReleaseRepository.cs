@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<List<MyReleaseViewModel>> GetAllReleasesForReleaseStatusesAsync(
+        public async Task<List<MyReleaseViewModel>> ListReleases(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var releases = await 
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
-        public async Task<List<MyReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUserAsync(Guid userId,
+        public async Task<List<MyReleaseViewModel>> ListReleasesForUser(Guid userId,
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var userReleaseIds = await _contentDbContext
@@ -61,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(r => r.Id)
                 .ToListAsync();
             userReleaseIds.AddRange(userPublicationRoleReleaseIds);
+            userReleaseIds = userReleaseIds.Distinct().ToList();
 
             var releases = await 
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
