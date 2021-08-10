@@ -1,6 +1,6 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -19,27 +19,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetThemes()
         {
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
-            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<IEnumerable<ThemeTree<PublicationTreeNode>>>(
-                        "publications/tree.json"
-                    )
-                )
+            publicationService
+                .Setup(s => s.GetPublicationTree())
                 .ReturnsAsync(
                     new List<ThemeTree<PublicationTreeNode>>
                     {
-                        new ThemeTree<PublicationTreeNode>
+                        new()
                         {
                             Topics = new List<TopicTree<PublicationTreeNode>>
                             {
-                                new TopicTree<PublicationTreeNode>
+                                new()
                                 {
                                     Publications = new List<PublicationTreeNode>
                                     {
-                                        new PublicationTreeNode()
+                                        new()
                                     }
                                 }
                             }
@@ -47,51 +42,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = BuildThemeController(fileStorageService.Object,
-                methodologyService.Object);
+            var controller = BuildThemeController(publicationService.Object);
 
             var result = await controller.GetThemes();
 
-            Assert.Single(result.Value);
+            var theme = Assert.Single(result);
 
-            var theme = result.Value.First();
             Assert.IsType<ThemeTree<PublicationTreeNode>>(theme);
-            Assert.Single(theme.Topics);
 
-            var topic = theme.Topics.First();
-            Assert.Single(topic.Publications);
+            var topic = Assert.Single(theme!.Topics);
 
-            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
+            Assert.Single(topic!.Publications);
+
+            MockUtils.VerifyAllMocks(publicationService);
         }
 
         [Fact]
         public async Task GetDownloadThemes()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            var methodologyService = new Mock<IMethodologyService>();
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(
-                    s => s.GetDeserialized<IEnumerable<ThemeTree<PublicationDownloadTreeNode>>>(
-                        "download/tree.json"
-                    )
-                )
+            publicationService
+                .Setup(s => s.GetPublicationDownloadsTree())
                 .ReturnsAsync(
-                    new List<ThemeTree<PublicationDownloadTreeNode>>
+                    new List<ThemeTree<PublicationDownloadsTreeNode>>
                     {
-                        new ThemeTree<PublicationDownloadTreeNode>
+                        new()
                         {
-                            Topics = new List<TopicTree<PublicationDownloadTreeNode>>
+                            Topics = new List<TopicTree<PublicationDownloadsTreeNode>>
                             {
-                                new TopicTree<PublicationDownloadTreeNode>
+                                new()
                                 {
-                                    Publications = new List<PublicationDownloadTreeNode>
+                                    Publications = new List<PublicationDownloadsTreeNode>
                                     {
-                                        new PublicationDownloadTreeNode
+                                        new()
                                         {
                                             DownloadFiles = new List<FileInfo>
                                             {
-                                                new FileInfo()
+                                                new()
                                             }
                                         }
                                     }
@@ -101,24 +89,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = BuildThemeController(fileStorageService.Object,
-                methodologyService.Object);
+            var controller = BuildThemeController(publicationService.Object);
 
             var result = await controller.GetDownloadThemes();
 
-            Assert.Single(result.Value);
+            var theme = Assert.Single(result);
+            Assert.IsType<ThemeTree<PublicationDownloadsTreeNode>>(theme);
 
-            var theme = result.Value.First();
-            Assert.IsType<ThemeTree<PublicationDownloadTreeNode>>(theme);
-            Assert.Single(theme.Topics);
+            var topic = Assert.Single(theme!.Topics);
+            var publication = Assert.Single(topic!.Publications);
 
-            var topic = theme.Topics.First();
-            Assert.Single(topic.Publications);
+            Assert.Single(publication!.DownloadFiles);
 
-            var publication = topic.Publications.First();
-            Assert.Single(publication.DownloadFiles);
-
-            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
+            MockUtils.VerifyAllMocks(publicationService);
         }
 
         [Fact]
@@ -154,30 +137,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
             );
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetTree())
                 .ReturnsAsync(themes);
 
-            var controller = BuildThemeController(fileStorageService.Object,
-                methodologyService.Object);
+            var controller = BuildThemeController(methodologyService: methodologyService.Object);
 
             var result = await controller.GetMethodologyThemes();
 
             Assert.Equal(themes, result.Value);
 
-            MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
+            MockUtils.VerifyAllMocks(methodologyService);
         }
 
         private static ThemeController BuildThemeController(
-            IFileStorageService fileStorageService = null,
-            IMethodologyService methodologyService = null
+            IPublicationService? publicationService = null,
+            IMethodologyService? methodologyService = null
         )
         {
-            return new ThemeController(
-                fileStorageService ?? new Mock<IFileStorageService>().Object,
-                methodologyService ?? new Mock<IMethodologyService>().Object
+            return new(
+                publicationService ?? Mock.Of<IPublicationService>(),
+                methodologyService ?? Mock.Of<IMethodologyService>()
             );
         }
     }

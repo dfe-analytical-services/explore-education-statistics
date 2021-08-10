@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -17,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _blobStorageService = blobStorageService;
         }
 
-        public async Task<Either<ActionResult, T>> GetDeserialized<T>(string path)
+        public async Task<Either<ActionResult, T?>> GetDeserialized<T>(string path)
+            where T : class
         {
             try
             {

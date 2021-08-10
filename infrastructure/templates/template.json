@@ -1151,6 +1151,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1231,6 +1232,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1372,6 +1374,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1451,6 +1454,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
