@@ -64,7 +64,7 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
         {contentItem}
       </SummaryList>
 
-      {variables.length && (
+      {variables.length > 0 && (
         <Details
           summary="Variable names and descriptions"
           className="govuk-!-margin-bottom-4"
