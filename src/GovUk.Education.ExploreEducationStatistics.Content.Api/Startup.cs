@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
@@ -56,6 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
+
+            services.AddControllers(
+                options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
+                }
+            );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
