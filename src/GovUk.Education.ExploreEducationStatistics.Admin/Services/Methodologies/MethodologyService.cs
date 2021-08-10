@@ -141,8 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     // Return an ordered list of the Releases that are not published
                     return releases.Where(r => !r.Live)
                         .OrderBy(r => r.Publication.Title)
-                        .ThenBy(r => r.Year)
-                        .ThenBy(r => r.TimePeriodCoverage)
+                        .ThenByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)
                         .Select(r => new TitleAndIdViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
                         .ToList();
                 });
