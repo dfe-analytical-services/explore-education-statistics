@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -9,10 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class MethodologyStatusAuthorizationHandlers
     {
         public class ApproveSpecificMethodologyRequirement : IAuthorizationRequirement
@@ -23,15 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             AuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
         {
             private readonly ContentDbContext _contentDbContext;
+            private readonly IMethodologyRepository _methodologyRepository;
             private readonly IPublicationRepository _publicationRepository;
             private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
             public ApproveSpecificMethodologyAuthorizationHandler(
-                ContentDbContext contentDbContext, 
-                IPublicationRepository publicationRepository, 
+                ContentDbContext contentDbContext,
+                IMethodologyRepository methodologyRepository,
+                IPublicationRepository publicationRepository,
                 IUserReleaseRoleRepository userReleaseRoleRepository)
             {
                 _contentDbContext = contentDbContext;
+                _methodologyRepository = methodologyRepository;
                 _publicationRepository = publicationRepository;
                 _userReleaseRoleRepository = userReleaseRoleRepository;
             }
@@ -40,7 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ApproveSpecificMethodologyRequirement requirement,
                 Methodology methodology)
             {
-                if (methodology.Status == Approved)
+                // If the Methodology is already public, it cannot be approved
+                // An approved Methodology that isn't public can be approved to change attributes associated with approval  
+                if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                 {
                     return;
                 }
@@ -50,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     context.Succeed(requirement);
                     return;
                 }
-                
+
                 var owningPublicationId = await GetOwningPublicationIdForMethodology(_contentDbContext, methodology);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
@@ -67,7 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
         }
 
-        public class MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<MarkSpecificMethodologyAsDraftRequirement, Methodology>
+        public class
+            MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
+                MarkSpecificMethodologyAsDraftRequirement, Methodology>
         {
             private readonly ContentDbContext _contentDbContext;
             private readonly IMethodologyRepository _methodologyRepository;
@@ -75,9 +83,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
             public MarkSpecificMethodologyAsDraftAuthorizationHandler(
-                ContentDbContext contentDbContext, 
-                IMethodologyRepository methodologyRepository, 
-                IPublicationRepository publicationRepository, 
+                ContentDbContext contentDbContext,
+                IMethodologyRepository methodologyRepository,
+                IPublicationRepository publicationRepository,
                 IUserReleaseRoleRepository userReleaseRoleRepository)
             {
                 _contentDbContext = contentDbContext;
@@ -101,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     context.Succeed(requirement);
                     return;
                 }
-                
+
                 var owningPublicationId = await GetOwningPublicationIdForMethodology(_contentDbContext, methodology);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
@@ -119,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         // that we could be putting a lot of this code into an existing Service or Repository and giving that to the
         // handler to reduce the amount of duplication we have.
         private static async Task<Guid> GetOwningPublicationIdForMethodology(
-            ContentDbContext contentDbContext, 
+            ContentDbContext contentDbContext,
             Methodology methodology)
         {
             await contentDbContext
@@ -146,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private static async Task<bool> IsApproverOfOwningPublicationsLatestRelease(
             IPublicationRepository publicationRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
-            AuthorizationHandlerContext context, 
+            AuthorizationHandlerContext context,
             Guid owningPublicationId)
         {
             var latestRelease = await publicationRepository.GetLatestReleaseForPublication(owningPublicationId);
@@ -155,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 return false;
             }
-            
+
             var rolesForLatestRelease = await userReleaseRoleRepository
                 .GetAllRolesByUser(context.User.GetUserId(), latestRelease.Id);
 

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
     }
 
-    public class UpdateSpecificMethodologyAuthorizationHandler : 
+    public class UpdateSpecificMethodologyAuthorizationHandler :
         AuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
         private readonly ContentDbContext _contentDbContext;
@@ -27,9 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         public UpdateSpecificMethodologyAuthorizationHandler(
             ContentDbContext contentDbContext,
-            IMethodologyRepository methodologyRepository, 
+            IMethodologyRepository methodologyRepository,
             IPublicationRepository publicationRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository, 
+            IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             _contentDbContext = contentDbContext;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 return;
             }
-            
+
             // If the Methodology is already public, it cannot be updated.
             if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
             {
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 .Entry(methodology)
                 .Reference(m => m.MethodologyParent)
                 .LoadAsync();
-            
+
             await _contentDbContext
                 .Entry(methodology.MethodologyParent)
                 .Collection(mp => mp.Publications)
@@ -87,9 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-            
+
             // If the user is an Editor (Contributor, Lead) or an Approver of the latest (Live or non-Live) Release
-            // for the owning Publication of this Methodology, they can update it.
+            // of the owning Publication of this Methodology, they can update it.
             if (await IsEditorOrApproverOfOwningPublicationsLatestRelease(context, owningPublicationId))
             {
                 context.Succeed(requirement);
@@ -106,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             return ContainPublicationOwnerRole(publicationRoles);
         }
-        
+
         // TODO SOW4 EES-2162 - DW - this could do with tidying up and merging with the similar code in
         // MethodologyStatusAuthorizationHandlers.  See notes there.
         private async Task<bool> IsEditorOrApproverOfOwningPublicationsLatestRelease(
@@ -118,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 return false;
             }
-            
+
             var rolesForLatestRelease = await _userReleaseRoleRepository
                 .GetAllRolesByUser(context.User.GetUserId(), latestRelease.Id);
 

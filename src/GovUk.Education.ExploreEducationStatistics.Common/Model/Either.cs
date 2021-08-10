@@ -354,6 +354,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return await func();
         }
 
+        public static async Task<Either<TFailure, TSuccess>> OrElse<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Func<Task<Either<TFailure, TSuccess>>> func)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            return await func();
+        }
+
         public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
             this Task<Either<TFailure, TSuccess>> task,
             Func<TSuccess> func)
