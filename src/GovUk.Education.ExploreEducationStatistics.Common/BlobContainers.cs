@@ -21,7 +21,7 @@
     /// <summary>
     /// Blob container with an immutable name that doesn't change when used with emulator storage
     /// </summary>
-    public class BlobContainer : IBlobContainer
+    public record BlobContainer : IBlobContainer
     {
         public string Name { get; }
 
@@ -38,7 +38,7 @@
     /// <summary>
     /// Blob container with a name prefixed by 'public-' when used with emulator storage
     /// </summary>
-    public class PublicBlobContainer : IBlobContainer
+    public record PublicBlobContainer : IBlobContainer
     {
         public string Name { get; }
 
@@ -55,7 +55,7 @@
     /// <summary>
     /// Blob container with a name prefixed by 'private-' when used with emulator storage
     /// </summary>
-    public class PrivateBlobContainer : IBlobContainer
+    public record PrivateBlobContainer : IBlobContainer
     {
         public string Name { get; }
 

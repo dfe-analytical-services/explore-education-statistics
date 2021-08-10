@@ -2,15 +2,10 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
-    public partial class EES2168_RemoveGlobalMethodologyClaimsFromAnalystRole : Migration
+    public partial class EES2168_RemoveUpdateAllMethodologiesClaimFromAnalystRole : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "AspNetRoleClaims",
-                keyColumn: "Id",
-                keyValue: -28);
-
             migrationBuilder.DeleteData(
                 table: "AspNetRoleClaims",
                 keyColumn: "Id",
@@ -23,11 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                 table: "AspNetRoleClaims",
                 columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
                 values: new object[] { -26, "UpdateAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoleClaims",
-                columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
-                values: new object[] { -28, "ApproveAllMethodologies", "", "f9ddb43e-aa9e-41ed-837d-3062e130c425" });
         }
     }
 }

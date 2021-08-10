@@ -45,10 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-                .AddScoped<ICacheService, BlobStorageCacheService>(provider =>
-                    new BlobStorageCacheService(
+                .AddScoped<IBlobCacheService, BlobCacheService>(provider =>
+                    new BlobCacheService(
                         blobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        logger: provider.GetRequiredService<ILogger<BlobStorageCacheService>>()))
+                        logger: provider.GetRequiredService<ILogger<BlobCacheService>>()))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
@@ -63,9 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        cacheService: provider.GetService<ICacheService>(),
+                        blobCacheService: provider.GetService<IBlobCacheService>(),
                         fastTrackService: provider.GetService<IFastTrackService>(),
-                        downloadService: provider.GetRequiredService<IDownloadService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>()
                     ))
@@ -82,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
-                .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IFastTrackService, FastTrackService>(provider =>
                     new FastTrackService(
                         contentDbContext: provider.GetService<ContentDbContext>(),

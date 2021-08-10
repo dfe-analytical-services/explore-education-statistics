@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            ICacheService cacheService = null,
+            IBlobCacheService blobCacheService = null,
             IMethodologyContentService methodologyContentService = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IMethodologyRepository methodologyRepository = null,
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 AdminMapper(),
-                cacheService ?? new Mock<ICacheService>().Object,
+                blobCacheService ?? new Mock<IBlobCacheService>().Object,
                 methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? new Mock<IMethodologyRepository>().Object,

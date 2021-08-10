@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20210804085100_EES2168_RemoveGlobalMethodologyClaimsFromAnalystRole")]
-    partial class EES2168_RemoveGlobalMethodologyClaimsFromAnalystRole
+    [Migration("20210804085100_EES2168_RemoveUpdateAllMethodologiesClaimFromAnalystRole")]
+    partial class EES2168_RemoveUpdateAllMethodologiesClaimFromAnalystRole
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

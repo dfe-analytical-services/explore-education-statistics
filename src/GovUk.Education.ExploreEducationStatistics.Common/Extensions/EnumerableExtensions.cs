@@ -1,22 +1,4 @@
-#region License and Terms
-
-// MoreLINQ - Extensions to LINQ to Objects
-// Copyright (c) 2009 Atif Aziz. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-#endregion
-
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             IEnumerable<TResult> _()
             {
-                TSource[] bucket = null;
+                TSource[]? bucket = null;
                 var count = 0;
 
                 foreach (var item in source)
@@ -169,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return rightResults;
         }
 
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> list)
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list)
         {
             if (list == null)
             {
@@ -179,8 +161,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return !list.Any();
         }
 
+        public static string JoinToString(this IEnumerable<string> source, char delimiter)
+        {
+            return string.Join(delimiter, source);
+        }
+
+        public static string JoinToString(this IEnumerable<string> source, string delimiter)
+        {
+            return string.Join(delimiter, source);
+        }
+
         public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
-            this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+            this IEnumerable<TSource>? source, Func<TSource, TResult> selector)
         {
             if (source == null)
             {
@@ -203,8 +195,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return result;
         }
 
-        public static async Task<TSource> FirstOrDefaultAsync<TSource>(
+        public static async Task<TSource?> FirstOrDefaultAsync<TSource>(
             this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+            where TSource : class
         {
             foreach (var item in source)
             {
@@ -239,6 +232,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return tasks.Result
                 .Where(tuple => tuple.isSuccess)
                 .Select(tuple => tuple.item);
+        }
+
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+            where T : class
+        {
+            return source.Where(item => item is not null)!;
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>

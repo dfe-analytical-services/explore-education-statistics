@@ -22,7 +22,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -34,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyRepository _methodologyRepository;
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
             IMapper mapper,
-            ICacheService cacheService,
+            IBlobCacheService blobCacheService,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyRepository methodologyRepository,
@@ -57,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _persistenceHelper = persistenceHelper;
             _context = context;
             _mapper = mapper;
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyRepository = methodologyRepository;
@@ -95,13 +94,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     viewModel.OwningPublication = owningPublication;
                     viewModel.OtherPublications = otherPublications;
-                    
+
                     if (methodology.ScheduledForPublishingWithRelease)
                     {
                         await _context.Entry(methodology)
                             .Reference(m => m.ScheduledWithRelease)
                             .LoadAsync();
-                        
+
                         await _context.Entry(methodology.ScheduledWithRelease)
                             .Reference(r => r!.Publication)
                             .LoadAsync();
@@ -109,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         if (methodology.ScheduledWithRelease != null)
                         {
                             var title =
-                                $"{methodology.ScheduledWithRelease.Publication.Title} - {methodology.ScheduledWithRelease.Title}"; 
+                                $"{methodology.ScheduledWithRelease.Publication.Title} - {methodology.ScheduledWithRelease.Title}";
                             viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
                                 methodology.ScheduledWithRelease.Id,
                                 title);
@@ -163,36 +162,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
-            return 
+            return
                 CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
-                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
-                .OnSuccessDo(RemoveUnusedImages)
-                .OnSuccess(async methodology =>
-                {
-                    methodology.Status = request.Status;
-                    methodology.PublishingStrategy = request.PublishingStrategy;
-                    methodology.ScheduledWithReleaseId = request.WithReleaseId;
-                    methodology.InternalReleaseNote = Approved == request.Status 
-                        ? request.LatestInternalReleaseNote 
-                        : null;
-                    
-                    methodology.Updated = DateTime.UtcNow;
-
-                    _context.Methodologies.Update(methodology);
-
-                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                    .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
+                    .OnSuccessDo(RemoveUnusedImages)
+                    .OnSuccess(async methodology =>
                     {
-                        methodology.Published = DateTime.UtcNow;
-                        
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
+                        methodology.Status = request.Status;
+                        methodology.PublishingStrategy = request.PublishingStrategy;
+                        methodology.ScheduledWithReleaseId = request.WithReleaseId;
+                        methodology.InternalReleaseNote = Approved == request.Status
+                            ? request.LatestInternalReleaseNote
+                            : null;
 
-                        // Invalidate the 'All Methodologies' cache item
-                        await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
-                    }
+                        methodology.Updated = DateTime.UtcNow;
 
-                    await _context.SaveChangesAsync();
-                    return methodology;
-                });
+                        _context.Methodologies.Update(methodology);
+
+                        if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                        {
+                            methodology.Published = DateTime.UtcNow;
+
+                            await _publishingService.PublishMethodologyFiles(methodology.Id);
+
+                            // Invalidate the 'All Methodologies' cache item
+                            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                        }
+
+                        await _context.SaveChangesAsync();
+                        return methodology;
+                    });
         }
 
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
@@ -211,9 +210,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (request.Title != methodology.Title)
                     {
-                        methodology.AlternativeTitle = 
-                            request.Title != methodology.MethodologyParent.OwningPublicationTitle 
-                                ? request.Title : null;
+                        methodology.AlternativeTitle =
+                            request.Title != methodology.MethodologyParent.OwningPublicationTitle
+                                ? request.Title
+                                : null;
 
                         // If we're updating a Methodology that is not an Amendment, it's not yet publicly
                         // visible and so its Slug can be updated.  At the point that a Methodology is publicly
