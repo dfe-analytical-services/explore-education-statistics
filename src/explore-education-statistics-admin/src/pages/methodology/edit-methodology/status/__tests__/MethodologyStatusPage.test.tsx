@@ -31,9 +31,23 @@ describe('MethodologyStatusPage', () => {
     slug: 'test-methodology',
     owningPublication: {
       id: 'p1',
-      title: 'Publication title',
+      title: 'Owning publication title',
     },
   } as BasicMethodology;
+
+  const testMethodologyWithOtherPublications = {
+    ...testMethodology,
+    otherPublications: [
+      {
+        id: 'p2',
+        title: 'Other publication 1',
+      },
+      {
+        id: 'p3',
+        title: 'Other publication 2',
+      },
+    ],
+  };
 
   test('renders Draft status details', async () => {
     methodologyService.getMethodology.mockResolvedValue({
@@ -187,6 +201,71 @@ describe('MethodologyStatusPage', () => {
       expect(
         screen.getByRole('button', { name: 'Update status' }),
       ).toBeInTheDocument();
+    });
+  });
+
+  test('renders the owning publication', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    methodologyService.getUnpublishedReleases.mockResolvedValue([]);
+    permissionService.canApproveMethodology.mockResolvedValue(true);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+
+      expect(screen.getByTestId('Owning publication-key')).toHaveTextContent(
+        'Owning publication',
+      );
+      expect(screen.getByTestId('Owning publication-value')).toHaveTextContent(
+        'Owning publication title',
+      );
+    });
+  });
+
+  test('renders the other publications', async () => {
+    methodologyService.getMethodology.mockResolvedValue(
+      testMethodologyWithOtherPublications,
+    );
+    methodologyService.getUnpublishedReleases.mockResolvedValue([]);
+    permissionService.canApproveMethodology.mockResolvedValue(true);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+
+      expect(screen.getByTestId('Other publications-key')).toHaveTextContent(
+        'Other publications',
+      );
+      const otherPublications = screen.queryAllByTestId(
+        'other-publication-item',
+      );
+      expect(otherPublications.length).toBe(2);
+      expect(otherPublications[0]).toHaveTextContent('Other publication 1');
+      expect(otherPublications[1]).toHaveTextContent('Other publication 2');
+    });
+  });
+
+  test('does not render the other publications section if there are none', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    methodologyService.getUnpublishedReleases.mockResolvedValue([]);
+    permissionService.canApproveMethodology.mockResolvedValue(true);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId('Other publications-key'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('Other publications-value'),
+      ).not.toBeInTheDocument();
     });
   });
 
