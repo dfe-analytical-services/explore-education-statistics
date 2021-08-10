@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -16,20 +15,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseContentFunction
     {
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseService _releaseService;
         private readonly IReleaseStatusService _releaseStatusService;
 
         public PublishReleaseContentFunction(
-            ICacheService cacheService,
+            IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseService releaseService,
             IReleaseStatusService releaseStatusService)
         {
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseService = releaseService;
@@ -73,9 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
 
-                // Invalidate the 'All Methodologies' cache item in case any methodologies
-                // are now accessible for the first time after publishing this release
-                await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
+                // Invalidate the cached trees in case any methodologies/publications
+                // are now accessible for the first time after publishing these releases
+                await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+                await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
