@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,13 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface IBlobStorageService
     {
-        public Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string path = null);
+        public Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
 
         public Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
         public Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
 
-        public Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string excludePattern = null);
+        public Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null);
 
         public Task DeleteBlob(IBlobContainer containerName, string path);
 
@@ -26,27 +28,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             IBlobContainer containerName,
             string path,
             IFormFile file,
-            IDictionary<string, string> metadata = null);
+            IDictionary<string, string>? metadata = null);
 
         public Task UploadStream(
             IBlobContainer containerName,
             string path,
             Stream stream,
             string contentType,
-            IDictionary<string, string> metadata = null);
+            IDictionary<string, string>? metadata = null);
 
         public Task UploadText(
             IBlobContainer containerName,
             string path,
             string content,
             string contentType,
-            IDictionary<string, string> metadata = null);
+            IDictionary<string, string>? metadata = null);
 
         public Task UploadAsJson<T>(
             IBlobContainer containerName,
             string path,
             T content,
-            JsonSerializerSettings settings = null);
+            JsonSerializerSettings? settings = null);
 
         public Task<bool> IsAppendSupported(IBlobContainer containerName, string path);
 
@@ -81,14 +83,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<string> DownloadBlobText(IBlobContainer containerName, string path);
 
-        Task<T> GetDeserializedJson<T>(IBlobContainer containerName, string path);
+        Task<object?> GetDeserializedJson(IBlobContainer containerName, string path, Type target);
+
+        Task<T?> GetDeserializedJson<T>(IBlobContainer containerName, string path)
+            where T : class;
 
         public class CopyDirectoryOptions
         {
-            public string DestinationConnectionString { get; set; }
-            public SetAttributesCallbackAsync SetAttributesCallbackAsync { get; set; }
-            public ShouldTransferCallbackAsync ShouldTransferCallbackAsync { get; set; }
-            public ShouldOverwriteCallbackAsync ShouldOverwriteCallbackAsync { get; set; }
+            public string? DestinationConnectionString { get; set; }
+            public SetAttributesCallbackAsync? SetAttributesCallbackAsync { get; set; }
+            public ShouldTransferCallbackAsync? ShouldTransferCallbackAsync { get; set; }
+            public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
         }
 
         public Task<List<BlobInfo>> CopyDirectory(
@@ -96,14 +101,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string sourceDirectoryPath,
             IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
-            CopyDirectoryOptions options = null);
+            CopyDirectoryOptions? options = null);
 
         public class MoveDirectoryOptions
         {
-            public string DestinationConnectionString { get; set; }
-            public SetAttributesCallbackAsync SetAttributesCallbackAsync { get; set; }
-            public ShouldTransferCallbackAsync ShouldTransferCallbackAsync { get; set; }
-            public ShouldOverwriteCallbackAsync ShouldOverwriteCallbackAsync { get; set; }
+            public string? DestinationConnectionString { get; set; }
+            public SetAttributesCallbackAsync? SetAttributesCallbackAsync { get; set; }
+            public ShouldTransferCallbackAsync? ShouldTransferCallbackAsync { get; set; }
+            public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
         }
 
         public Task MoveDirectory(
@@ -111,6 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string sourceDirectoryPath,
             IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
-            MoveDirectoryOptions options = null);
+            MoveDirectoryOptions? options = null);
     }
 }

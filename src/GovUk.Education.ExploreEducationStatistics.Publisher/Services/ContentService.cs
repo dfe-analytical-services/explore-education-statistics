@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentService : IContentService
     {
-        private readonly ICacheService _cacheService;
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IFastTrackService _fastTrackService;
         private readonly IReleaseService _releaseService;
@@ -26,13 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
 
         public ContentService(IBlobStorageService publicBlobStorageService,
-            ICacheService cacheService,
+            IBlobCacheService blobCacheService,
             IFastTrackService fastTrackService,
             IReleaseService releaseService,
             IPublicationService publicationService)
         {
             _publicBlobStorageService = publicBlobStorageService;
-            _cacheService = cacheService;
+            _blobCacheService = blobCacheService;
             _fastTrackService = fastTrackService;
             _releaseService = releaseService;
             _publicationService = publicationService;
@@ -124,12 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await CachePublication(publication.Id, context);
             await _publicationService.SetPublishedDate(publication.Id, context.Published);
+
+            // Invalidate the various cached trees in case any
+            // publications/methodologies are affected by the changes
+            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         public async Task UpdateTaxonomy(PublishContext context)
         {
-            // Invalidate the 'All Methodologies' cache item in case any methodologies are affected by the changes
-            await _cacheService.DeleteItem(PublicContent, AllMethodologiesCacheKey.Instance);
+            // Invalidate the cached trees in case any
+            // publications/methodologies are affected by the changes
+            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         private async Task DeleteAllContent()

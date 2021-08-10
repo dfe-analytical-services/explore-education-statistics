@@ -162,13 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Null("".NullIfWhiteSpace());
                 Assert.Null(" ".NullIfWhiteSpace());
             }
-
-            [Fact]
-            public void NullStringCanAppendTrailingSlash()
-            {
-                string? input = null;
-                Assert.Null(input.AppendTrailingSlash());
-            }
         }
 
         public class IsNullOrEmptyTests

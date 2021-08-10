@@ -36,18 +36,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return value.ToLines().ToList();
         }
 
+        public static Stream ToStream(this string value)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.Write(value);
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
         public static string StripLines(this string value)
         {
             return value.StripLineBreaks();
         }
 
-        public static string? AppendTrailingSlash(this string? input)
+        public static string AppendTrailingSlash(this string input)
         {
-            if (input == null)
-            {
-                return null;
-            }
-
             return input.EndsWith("/") ? input : input + "/";
         }
 
