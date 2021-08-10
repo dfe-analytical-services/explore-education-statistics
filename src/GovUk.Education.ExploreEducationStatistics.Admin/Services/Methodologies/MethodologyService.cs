@@ -125,7 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper.CheckEntityExists<Methodology>(id, queryable =>
                     queryable.Include(m => m.MethodologyParent)
                         .ThenInclude(mp => mp.Publications))
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(methodology => _userService.CheckCanApproveMethodology(methodology)
+                    .OrElse(() => _userService.CheckCanMarkMethodologyAsDraft(methodology)))
                 .OnSuccess(async methodology =>
                 {
                     // Get all Publications using the Methodology including adopting Publications
@@ -153,15 +154,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(id, HydrateMethodologyForManageMethodologySummaryViewModel)
-                .OnSuccess(methodology => methodology.Status != request.Status
-                    ? UpdateMethodologyStatus(methodology, request)
-                    : UpdateMethodologyDetails(methodology, request))
+                .OnSuccess(methodology => UpdateMethodologyStatus(methodology, request))
+                .OnSuccess(methodology => UpdateMethodologyDetails(methodology, request))
                 .OnSuccess(_ => GetSummary(id));
         }
 
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
+            if (!request.IsStatusUpdateForMethodology(methodologyToUpdate))
+            {
+                // Status unchanged
+                return Task.FromResult(new Either<ActionResult, Methodology>(methodologyToUpdate));
+            }
+
             return
                 CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
                     .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
@@ -197,6 +203,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
+            if (!request.IsDetailUpdateForMethodology(methodologyToUpdate))
+            {
+                // Details unchanged
+                return Task.FromResult(new Either<ActionResult, Methodology>(methodologyToUpdate));
+            }
+
             return _userService
                 .CheckCanUpdateMethodology(methodologyToUpdate)
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
@@ -324,19 +336,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,
-            MethodologyStatus status)
+            MethodologyStatus requestedStatus)
         {
-            if (methodology.Status == status)
-            {
-                // Status unchanged
-                return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
-            }
-
-            return status switch
+            return requestedStatus switch
             {
                 Draft => _userService.CheckCanMarkMethodologyAsDraft(methodology),
                 Approved => _userService.CheckCanApproveMethodology(methodology),
-                _ => throw new ArgumentOutOfRangeException(nameof(status), "Unexpected status")
+                _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
             };
         }
 

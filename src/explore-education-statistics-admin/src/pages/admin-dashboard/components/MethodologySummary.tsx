@@ -96,118 +96,127 @@ const MethodologySummary = ({
     onChangePublication();
   };
 
-  const hasMethodologyPermissions =
+  const canCreateOrManageExternal =
     publication.permissions.canCreateMethodologies ||
     publication.permissions.canManageExternalMethodology;
 
   return (
     <>
       {methodologies.length > 0 &&
-        methodologies.map(methodology => (
-          <Details
-            key={methodology.id}
-            open={false}
-            className="govuk-!-margin-bottom-0"
-            summary={methodology.title}
-            summaryAfter={
-              <TagGroup className="govuk-!-margin-left-2">
-                <Tag>{methodology.status}</Tag>
-                {methodology.amendment && <Tag>Amendment</Tag>}
-              </TagGroup>
-            }
-          >
-            <SummaryList className="govuk-!-margin-bottom-3">
-              <SummaryListItem term="Publish date">
-                {methodology.published ? (
-                  <FormattedDate>{methodology.published}</FormattedDate>
-                ) : (
-                  'Not yet published'
-                )}
-              </SummaryListItem>
-              {methodology.internalReleaseNote && (
-                <SummaryListItem term="Internal release note">
-                  {methodology.internalReleaseNote}
+        methodologies.map(methodology => {
+          const canEdit =
+            methodology.permissions.canApproveMethodology ||
+            methodology.permissions.canMarkMethodologyAsDraft ||
+            methodology.permissions.canUpdateMethodology;
+
+          return (
+            <Details
+              key={methodology.id}
+              open={false}
+              className="govuk-!-margin-bottom-0"
+              summary={methodology.title}
+              summaryAfter={
+                <TagGroup className="govuk-!-margin-left-2">
+                  <Tag>{methodology.status}</Tag>
+                  {methodology.amendment && <Tag>Amendment</Tag>}
+                </TagGroup>
+              }
+            >
+              <SummaryList className="govuk-!-margin-bottom-3">
+                <SummaryListItem term="Publish date">
+                  {methodology.published ? (
+                    <FormattedDate>{methodology.published}</FormattedDate>
+                  ) : (
+                    'Not yet published'
+                  )}
                 </SummaryListItem>
-              )}
-            </SummaryList>
+                {methodology.internalReleaseNote && (
+                  <SummaryListItem term="Internal release note">
+                    {methodology.internalReleaseNote}
+                  </SummaryListItem>
+                )}
+              </SummaryList>
 
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
-                {methodology.amendment ? (
-                  <>
-                    <ButtonGroup>
-                      <ButtonLink
-                        to={generatePath(methodologySummaryRoute.path, {
-                          publicationId,
-                          methodologyId: methodology.id,
-                        })}
-                      >
-                        {methodology.permissions.canUpdateMethodology
-                          ? 'Edit this amendment'
-                          : 'View this amendment'}
-                      </ButtonLink>
-                      <ButtonLink
-                        to={generatePath(methodologySummaryRoute.path, {
-                          publicationId,
-                          methodologyId: methodology.previousVersionId,
-                        })}
-                        className="govuk-button--secondary govuk-!-margin-left-4"
-                      >
-                        View original methodology
-                      </ButtonLink>
-                    </ButtonGroup>
-                  </>
-                ) : (
-                  <>
-                    <ButtonGroup>
-                      <ButtonLink
-                        to={generatePath(methodologySummaryRoute.path, {
-                          publicationId,
-                          methodologyId: methodology.id,
-                        })}
-                      >
-                        {methodology.permissions.canUpdateMethodology
-                          ? 'Edit this methodology'
-                          : 'View this methodology'}
-                      </ButtonLink>
-                      {methodology.permissions
-                        .canMakeAmendmentOfMethodology && (
-                        <Button
-                          type="button"
-                          onClick={() => setAmendMethodologyId(methodology.id)}
-                          variant="secondary"
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-two-thirds">
+                  {methodology.amendment ? (
+                    <>
+                      <ButtonGroup>
+                        <ButtonLink
+                          to={generatePath(methodologySummaryRoute.path, {
+                            publicationId,
+                            methodologyId: methodology.id,
+                          })}
                         >
-                          Amend methodology
-                        </Button>
-                      )}
-                    </ButtonGroup>
-                  </>
-                )}
+                          {canEdit
+                            ? 'Edit this amendment'
+                            : 'View this amendment'}
+                        </ButtonLink>
+                        <ButtonLink
+                          to={generatePath(methodologySummaryRoute.path, {
+                            publicationId,
+                            methodologyId: methodology.previousVersionId,
+                          })}
+                          className="govuk-button--secondary govuk-!-margin-left-4"
+                        >
+                          View original methodology
+                        </ButtonLink>
+                      </ButtonGroup>
+                    </>
+                  ) : (
+                    <>
+                      <ButtonGroup>
+                        <ButtonLink
+                          to={generatePath(methodologySummaryRoute.path, {
+                            publicationId,
+                            methodologyId: methodology.id,
+                          })}
+                        >
+                          {canEdit
+                            ? 'Edit this methodology'
+                            : 'View this methodology'}
+                        </ButtonLink>
+                        {methodology.permissions
+                          .canMakeAmendmentOfMethodology && (
+                          <Button
+                            type="button"
+                            onClick={() =>
+                              setAmendMethodologyId(methodology.id)
+                            }
+                            variant="secondary"
+                          >
+                            Amend methodology
+                          </Button>
+                        )}
+                      </ButtonGroup>
+                    </>
+                  )}
+                </div>
+                <div className="govuk-grid-column-one-third dfe-align--right">
+                  {methodology.permissions.canDeleteMethodology && (
+                    <Button
+                      onClick={() =>
+                        setDeleteMethodologyDetails({
+                          methodologyId: methodology.id,
+                          amendment: methodology.amendment,
+                        })
+                      }
+                      className="govuk-button--warning"
+                    >
+                      {methodology.amendment ? 'Cancel amendment' : 'Remove'}
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="govuk-grid-column-one-third dfe-align--right">
-                {methodology.permissions.canDeleteMethodology && (
-                  <Button
-                    onClick={() =>
-                      setDeleteMethodologyDetails({
-                        methodologyId: methodology.id,
-                        amendment: methodology.amendment,
-                      })
-                    }
-                    className="govuk-button--warning"
-                  >
-                    {methodology.amendment ? 'Cancel amendment' : 'Remove'}
-                  </Button>
-                )}
-              </div>
-            </div>
-          </Details>
-        ))}
+            </Details>
+          );
+        })}
 
-      {methodologies.length === 0 && !hasMethodologyPermissions && (
+      {methodologies.length === 0 && !canCreateOrManageExternal && (
         <>No methodologies added.</>
       )}
 
-      {hasMethodologyPermissions && (
+      {canCreateOrManageExternal && (
         <ButtonGroup className="govuk-!-margin-bottom-2">
           {publication.permissions.canCreateMethodologies && (
             <Button

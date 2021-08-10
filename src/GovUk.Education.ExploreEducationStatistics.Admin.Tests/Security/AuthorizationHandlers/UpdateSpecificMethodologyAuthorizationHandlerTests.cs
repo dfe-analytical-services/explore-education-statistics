@@ -297,8 +297,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         userPublicationRoleRepository,
                         userReleaseRoleRepository);
 
-                    // As the user has Publication Owner role on the owning Publication of this Methodology, they are
-                    // allowed to update it.
+                    // As the user has a role on the latest Release of the owning Publication of this Methodology
+                    // they are allowed to update it.
                     Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
                 });
             }

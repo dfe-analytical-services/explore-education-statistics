@@ -756,15 +756,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyParent = new MethodologyParent
                 {
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Slug = "pupil-absence-statistics-methodology",
+                    OwningPublicationTitle = "Publication title",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Title = "Publication title"
-                        }
+                        Publication = new Publication()
                     })
                 }
             };
@@ -793,10 +789,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                LatestInternalReleaseNote = null,
+                LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = Immediately,
                 Status = Approved,
-                Title = "Pupil absence statistics (updated): methodology"
+                Title = "Publication title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -838,12 +834,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal("Pupil absence statistics: methodology", viewModel.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -856,7 +851,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
@@ -870,15 +864,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    OwningPublicationTitle = "Publication title",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Title = "Publication title"
-                        }
+                        Publication = new Publication()
                     })
                 }
             };
@@ -907,10 +897,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                LatestInternalReleaseNote = null,
+                LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = Immediately,
                 Status = Approved,
-                Title = "Pupil absence statistics (updated): methodology"
+                Title = "Publication title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -961,12 +951,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, imageService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal("Pupil absence statistics: methodology", viewModel.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -979,7 +968,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
@@ -994,15 +982,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    OwningPublicationTitle = "Publication title",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Title = "Publication title"
-                        }
+                        Publication = new Publication()
                     })
                 }
             };
@@ -1011,7 +995,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = Immediately,
-                Status = Approved
+                Status = Approved,
+                Title = "Publication title",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1061,7 +1046,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal("Pupil absence statistics: methodology", viewModel.Title);
                 Assert.Equal(request.LatestInternalReleaseNote, viewModel.InternalReleaseNote);
             }
 
@@ -1104,8 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    OwningPublicationTitle = publication.Title,
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
@@ -1120,7 +1103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = WithRelease,
                 WithReleaseId = scheduledWithRelease.Id,
                 Status = Approved,
-                Title = "Pupil absence statistics (updated): methodology"
+                Title = publication.Title
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1159,7 +1142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.Published);
                 Assert.Equal(WithRelease, viewModel.PublishingStrategy);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal("Pupil absence statistics: methodology", viewModel.Title);
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
                 Assert.Equal(scheduledWithRelease.Id, viewModel.ScheduledWithRelease.Id);
@@ -1177,7 +1159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(WithRelease, updatedMethodology.PublishingStrategy);
                 Assert.Equal(scheduledWithRelease.Id, updatedMethodology.ScheduledWithReleaseId);
-                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
@@ -1186,16 +1167,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodologyStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdMissing()
         {
+            var publication = new Publication
+            {
+                Title = "Publication title"
+            };
+
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
+                    OwningPublicationTitle = publication.Title,
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -1207,13 +1194,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = WithRelease,
                 WithReleaseId = null,
                 Status = Approved,
-                Title = "Title"
+                Title = publication.Title
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await context.Publications.AddAsync(publication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -1230,12 +1218,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodologyStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdNotFound()
         {
+            var publication = new Publication
+            {
+                Title = "Publication title"
+            };
+
             var methodology = new Methodology
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
+                    OwningPublicationTitle = publication.Title,
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
@@ -1251,13 +1245,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = WithRelease,
                 WithReleaseId = Guid.NewGuid(),
                 Status = Approved,
-                Title = "Title"
+                Title = publication.Title
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await context.Publications.AddAsync(publication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -1275,7 +1270,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodologyStatus_ApprovingUsingWithReleaseStrategy_ReleaseAlreadyPublished()
         {
-            var publication = new Publication();
+            var publication = new Publication
+            {
+                Title = "Publication title" 
+            };
 
             // Create a release that is already published which the methodology cannot be made dependant on
             var scheduledWithRelease = new Release
@@ -1293,6 +1291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
+                    OwningPublicationTitle = publication.Title,
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
@@ -1307,13 +1306,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = WithRelease,
                 WithReleaseId = scheduledWithRelease.Id,
                 Status = Approved,
-                Title = "Title"
+                Title = publication.Title
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await context.Publications.AddAsync(publication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.Releases.AddAsync(scheduledWithRelease);
                 await context.SaveChangesAsync();
@@ -1346,6 +1346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft,
                 MethodologyParent = new MethodologyParent
                 {
+                    OwningPublicationTitle = "Publication title",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
@@ -1360,7 +1361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = WithRelease,
                 WithReleaseId = scheduledWithRelease.Id,
                 Status = Approved,
-                Title = "Title"
+                Title = "Publication title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1392,15 +1393,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Approved,
                 MethodologyParent = new MethodologyParent
                 {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Pupil absence statistics: methodology",
+                    OwningPublicationTitle = "Publication title",
                     Publications = AsList(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Title = "Publication title"
-                        }
+                        Publication = new Publication()
                     })
                 }
             };
@@ -1410,7 +1407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 LatestInternalReleaseNote = "A release note to be ignored",
                 PublishingStrategy = Immediately,
                 Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Title = "Publication title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1466,8 +1463,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Draft, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Null(updatedMethodology.InternalReleaseNote);
-                // Slug remains unchanged
-                Assert.Equal("pupil-absence-statistics-methodology", updatedMethodology.Slug);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
