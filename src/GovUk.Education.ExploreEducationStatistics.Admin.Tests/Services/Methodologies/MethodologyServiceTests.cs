@@ -1067,6 +1067,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task UpdateMethodologyStatus_ApprovingUsingImmediateStrategy_ScheduledWithReleaseIsCleared()
+        {
+            var scheduledWithRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var methodology = new Methodology
+            {
+                PublishingStrategy = WithRelease,
+                Status = Approved,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication()
+                    })
+                },
+                // Existing ScheduledWithRelease should be cleared
+                ScheduledWithRelease = scheduledWithRelease
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = "Test approval",
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Title = "Publication title",
+                // Requested id should be ignored
+                WithReleaseId = scheduledWithRelease.Id
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedMethodology = await context
+                    .Methodologies
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Equal(Approved, updatedMethodology.Status);
+                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                // Existing ScheduledWithReleaseId is cleared as requested publishing strategy is not WithRelease
+                Assert.Null(updatedMethodology.ScheduledWithReleaseId);
+            }
+        }
+
+        [Fact]
         public async Task UpdateMethodologyStatus_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
         {
             var publication = new Publication

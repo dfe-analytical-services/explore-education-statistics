@@ -1,12 +1,16 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from '@admin/services/types/common';
 
-export type UpdateMethodology = {
-  title: string;
-};
-
 export type MethodologyStatus = 'Draft' | 'Approved';
 export type MethodologyPublishingStrategy = 'WithRelease' | 'Immediately';
+
+export type UpdateMethodology = {
+  internalReleaseNote?: string;
+  title: string;
+  status: MethodologyStatus;
+  publishingStrategy?: MethodologyPublishingStrategy;
+  withReleaseId?: string;
+};
 
 interface MethodologyPublication {
   id: string;

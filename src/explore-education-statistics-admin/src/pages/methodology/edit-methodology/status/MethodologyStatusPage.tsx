@@ -61,8 +61,14 @@ const MethodologyStatusPage = ({
     const nextSummary = await methodologyService.updateMethodology(
       methodologyId,
       {
-        ...model.summary,
-        ...values,
+        internalReleaseNote: values.latestInternalReleaseNote,
+        publishingStrategy: values.publishingStrategy,
+        status: values.status,
+        title: model.summary.title,
+        withReleaseId:
+          values.publishingStrategy === 'WithRelease'
+            ? values.withReleaseId
+            : undefined,
       },
     );
 
