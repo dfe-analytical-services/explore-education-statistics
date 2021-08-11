@@ -43,9 +43,11 @@ const testMethodology: MyMethodology = {
     title: 'Publication title',
   },
   permissions: {
+    canApproveMethodology: false,
     canUpdateMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
+    canMarkMethodologyAsDraft: false,
   },
 };
 const testDraftMethodology: MyMethodology = {
@@ -302,6 +304,10 @@ describe('MethodologySummary', () => {
         </MemoryRouter>,
       );
 
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
       expect(screen.getByText(testMethodology.title)).toBeInTheDocument();
 
       expect(screen.getByText('8 June 2021')).toBeInTheDocument();
@@ -309,8 +315,12 @@ describe('MethodologySummary', () => {
       expect(screen.getByText('this is the release note')).toBeInTheDocument();
 
       expect(
-        screen.getByText('View this methodology', { selector: 'a' }),
+        screen.getByRole('link', { name: 'View this methodology' }),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'Edit this methodology' }),
+      ).not.toBeInTheDocument();
     });
 
     test('the approved tag is shown', () => {
@@ -345,6 +355,143 @@ describe('MethodologySummary', () => {
       ).toBeInTheDocument();
     });
 
+    test('the edit link is shown when a user can approve the methodology', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canApproveMethodology: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this methodology' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this methodology' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('the edit link is shown when a user can mark the methodology as draft', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canMarkMethodologyAsDraft: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this methodology' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this methodology' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('the edit link is shown when a user can update the methodology', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canUpdateMethodology: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this methodology' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this methodology' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('renders correctly with an amended Methodology', () => {
+    test('the methodology is shown', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithAmendmentMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(screen.getByText(testMethodology.title)).toBeInTheDocument();
+
+      expect(screen.getByText('8 June 2021')).toBeInTheDocument();
+
+      expect(screen.getByText('this is the release note')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('link', { name: 'View this amendment' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'Edit this amendment' }),
+      ).not.toBeInTheDocument();
+    });
+
     test('the amendment tag is shown', () => {
       render(
         <MemoryRouter>
@@ -359,6 +506,114 @@ describe('MethodologySummary', () => {
       expect(
         screen.getByText('Amendment', { selector: 'span' }),
       ).toBeInTheDocument();
+    });
+
+    test('the edit link is shown when a user can approve the amendment', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  amendment: true,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canApproveMethodology: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this amendment' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this amendment' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('the edit link is shown when a user can mark the amendment as draft', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  amendment: true,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canMarkMethodologyAsDraft: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this amendment' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this amendment' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('the edit link is shown when a user can update the amendment', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={{
+              ...testPublicationNoMethodology,
+              methodologies: [
+                {
+                  ...testMethodology,
+                  amendment: true,
+                  permissions: {
+                    ...testMethodology.permissions,
+                    canUpdateMethodology: true,
+                  },
+                },
+              ],
+            }}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId('Expand Details Section I am a methodology'),
+      );
+
+      expect(
+        screen.getByRole('link', { name: 'Edit this amendment' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', { name: 'View this amendment' }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -378,8 +633,8 @@ describe('MethodologySummary', () => {
         );
 
         expect(
-          screen.getByText('Ext methodolology title (external methodology)', {
-            selector: 'a',
+          screen.getByRole('link', {
+            name: 'Ext methodolology title (external methodology)',
           }),
         ).toBeInTheDocument();
 

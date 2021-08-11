@@ -24,5 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public Guid? WithReleaseId { get; set; }
 
         public string Slug => SlugFromTitle(Title);
+
+        public bool IsStatusUpdateForMethodology(Content.Model.Methodology methodology)
+        {
+            return methodology.Status != Status
+                   || methodology.PublishingStrategy != PublishingStrategy
+                   || methodology.ScheduledWithReleaseId != WithReleaseId
+                   || methodology.InternalReleaseNote != LatestInternalReleaseNote;
+        }
+
+        public bool IsDetailUpdateForMethodology(Content.Model.Methodology methodology)
+        {
+            return methodology.Title != Title;
+        }
     }
 }
