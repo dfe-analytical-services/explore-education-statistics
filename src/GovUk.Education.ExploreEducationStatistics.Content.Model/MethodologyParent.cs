@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -21,6 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Slug { get; set; }
 
         public List<Methodology> Versions { get; set; }
+
+        public PublicationMethodology OwningPublication()
+        {
+            if (Publications == null)
+            {
+                throw new ArgumentException("MethodologyParent must be hydrated with Publications to get the owning publication");
+            }
+
+            return Publications
+                .Single(pm => pm.Owner);
+        }
 
         public Methodology LatestVersion()
         {

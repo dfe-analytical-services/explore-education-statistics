@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,12 +42,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        public async Task<UserReleaseRole> GetByUserAndRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<bool> UserHasRoleOnRelease(Guid userId, Guid releaseId, ReleaseRole role)
         {
-            return await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
+            return await _contentDbContext.UserReleaseRoles.AnyAsync(r =>
                 r.UserId == userId &&
                 r.ReleaseId == releaseId &&
                 r.Role == role);
+        }
+
+        public async Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,
+            Guid publicationId,
+            IEnumerable<ReleaseRole> roles)
+        {
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == publicationId);
+
+            var latestRelease = publication.LatestRelease(checkIfLive: false);
+
+            // Publication may have no releases
+            if (latestRelease == null)
+            {
+                return false;
+            }
+
+            return await _contentDbContext.UserReleaseRoles
+                .AnyAsync(r =>
+                    r.UserId == userId &&
+                    r.ReleaseId == latestRelease.Id &&
+                    roles.Contains(r.Role));
         }
     }
 }

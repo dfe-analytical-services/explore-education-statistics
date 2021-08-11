@@ -1,5 +1,7 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -7,6 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -61,13 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRoles = new List<UserReleaseRole>
             {
-                new UserReleaseRole
+                new()
                 {
                     User = user,
                     Release = release,
                     Role = Contributor
                 },
-                new UserReleaseRole
+                new()
                 {
                     User = user,
                     Release = release,
@@ -78,14 +83,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var otherUserReleaseRoles = new List<UserReleaseRole>
             {
                 // Role for different release
-                new UserReleaseRole
+                new()
                 {
                     User = user,
                     Release = new Release(),
                     Role = Approver
                 },
                 // Role for different user
-                new UserReleaseRole
+                new()
                 {
                     User = new User(),
                     Release = release,
@@ -117,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetByUserAndRole()
+        public async Task UserHasRoleOnPublication_TrueIfRoleExists()
         {
             var userReleaseRole = new UserReleaseRole
             {
@@ -130,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -138,21 +143,250 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.GetByUserAndRole(userReleaseRole.UserId, userReleaseRole.ReleaseId, Contributor);
+                Assert.True(await service.UserHasRoleOnRelease(
+                    userReleaseRole.UserId,
+                    userReleaseRole.ReleaseId,
+                    Contributor));
+            }
+        }
 
-                Assert.Equal(userReleaseRole.Id, result.Id);
-                Assert.Equal(userReleaseRole.UserId, result.UserId);
-                Assert.Equal(userReleaseRole.ReleaseId, result.ReleaseId);
-                Assert.Equal(Contributor, result.Role);
+        [Fact]
+        public async Task UserHasRoleOnPublication_FalseIfRoleDoesNotExist()
+        {
+            var user = new User();
+            var release = new Release();
+
+            // Setup a role but for a different release to make sure it has no influence
+            var userReleaseRoleOtherRelease = new UserReleaseRole
+            {
+                User = user,
+                Release = new Release(),
+                Role = Contributor
+            };
+
+            // Setup a role but for a different release to make sure it has no influence
+            var userReleaseRoleDifferentRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(
+                    userReleaseRoleOtherRelease,
+                    userReleaseRoleDifferentRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.UserHasRoleOnRelease(
+                    user.Id,
+                    release.Id,
+                    Contributor));
+            }
+        }
+
+        [Fact]
+        public async Task UserHasAnyOfRolesOnLatestRelease_TrueIfUserHasRoleOnLatestRelease()
+        {
+            var publication = new Publication();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            // Assign one of the user roles being tested on the latest release
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = new User(),
+                Release = latestRelease,
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.True(await service.UserHasAnyOfRolesOnLatestRelease(
+                    userReleaseRole.UserId,
+                    publication.Id,
+                    ListOf(Contributor, Approver)));
+            }
+        }
+
+        [Fact]
+        public async Task UserHasAnyOfRolesOnLatestRelease_PublicationHasNoReleases()
+        {
+            var publication = new Publication();
+
+            // Assign a user role but to a release not connected with the publication
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = new User(),
+                Release = new Release(),
+                Role = Contributor
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.UserHasAnyOfRolesOnLatestRelease(
+                    userReleaseRole.UserId,
+                    publication.Id,
+                    ListOf(Contributor)));
+            }
+        }
+
+        [Fact]
+        public async Task UserHasAnyOfRolesOnLatestRelease_FalseIfUserHasNoRoleOnLatestRelease()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            // Assign the user role being tested to all releases except the latest release
+            var userReleaseRoles = ListOf(
+                    olderRelease, latestPublishedRelease, latestReleaseOtherPublication)
+                .Select(release => new UserReleaseRole
+                {
+                    User = user,
+                    Release = release,
+                    Role = Contributor
+                })
+                .ToList();
+
+            // Also assign a different role to the latest release to check it has no influence
+            userReleaseRoles.Add(new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = Approver
+            });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.UserHasAnyOfRolesOnLatestRelease(
+                    user.Id,
+                    publication.Id,
+                    ListOf(Contributor)));
             }
         }
 
         private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(
             ContentDbContext contentDbContext)
         {
-            return new UserReleaseRoleRepository(
-                contentDbContext
-            );
+            return new(contentDbContext);
         }
     }
 }

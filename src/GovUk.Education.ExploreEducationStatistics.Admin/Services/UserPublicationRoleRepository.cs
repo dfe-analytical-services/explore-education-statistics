@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,9 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        public async Task<UserPublicationRole> GetByUserAndRole(Guid userId, Guid publicationId, PublicationRole role)
+        public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
         {
-            return await _contentDbContext.UserPublicationRoles.FirstOrDefaultAsync(r =>
+            return await _contentDbContext.UserPublicationRoles.AnyAsync(r =>
                 r.UserId == userId &&
                 r.PublicationId == publicationId &&
                 r.Role == role);
