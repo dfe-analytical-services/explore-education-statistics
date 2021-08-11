@@ -10,23 +10,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel release);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel release);
 
         Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id);
 
         Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(Guid releaseId);
 
-        Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
+        Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(Guid releaseId);
 
         Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateViewModel request);
 
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseStatus(Guid releaseId, ReleaseStatusCreateViewModel request);
 
-        Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId);
+        Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestPublishedRelease(Guid publicationId);
 
         Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseApprovalStatus[] releaseApprovalStatues);

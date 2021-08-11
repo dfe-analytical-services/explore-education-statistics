@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210804085100_EES2168_RemoveUpdateAllMethodologiesClaimFromAnalystRole")]
+    partial class EES2168_RemoveUpdateAllMethodologiesClaimFromAnalystRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -428,13 +430,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         {
                             Id = -27,
                             ClaimType = "AccessAllMethodologies",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -28,
-                            ClaimType = "ApproveAllMethodologies",
                             ClaimValue = "",
                             RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },

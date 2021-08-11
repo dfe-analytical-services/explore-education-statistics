@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -108,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccess_WithRight()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccess(str => new Either<int, string>("another success"));
+                .OnSuccess(_ => new Either<int, string>("another success"));
 
             Assert.True(either.IsRight);
             Assert.Equal("another success", either.Right);
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>("a success"))
-                .OnSuccess(str => new Either<Exception, string>(exception));
+                .OnSuccess(_ => new Either<Exception, string>(exception));
 
             Assert.True(either.IsLeft);
             Assert.Equal(exception, either.Left);
@@ -131,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccess_WithTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccess(str => Task.FromResult("another success"));
+                .OnSuccess(_ => Task.FromResult("another success"));
 
             Assert.True(either.IsRight);
             Assert.Equal("another success", either.Right);
@@ -143,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccessVoid(
-                    async str =>
+                    async _ =>
                     {
                         await Task.FromResult(true);
                     });
@@ -157,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccess_WithRightTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccess(str => Task.FromResult(new Either<int, string>("another success")));
+                .OnSuccess(_ => Task.FromResult(new Either<int, string>("another success")));
 
             Assert.True(either.IsRight);
             Assert.Equal("another success", either.Right);
@@ -169,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var exception = new Exception("Something went wrong");
             var either = await Task.FromResult(new Either<Exception, string>("a success"))
-                .OnSuccess(str => Task.FromResult(new Either<Exception, string>(exception)));
+                .OnSuccess(_ => Task.FromResult(new Either<Exception, string>(exception)));
 
             Assert.True(either.IsLeft);
             Assert.Equal(exception, either.Left);
@@ -283,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccessCombineWith_FirstFails()
         {
             var either = await Task.FromResult(new Either<int, string>(500))
-                .OnSuccessCombineWith(firstSuccess =>
+                .OnSuccessCombineWith(_ =>
                 {
                     AssertFail("Second call should not be called if the first failed");
                     return Task.FromResult(new Either<int, string>("this should not be called"));
@@ -301,6 +302,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.True(either.IsLeft);
             Assert.Equal(500, either.Left);
+        }
+
+        [Fact]
+        public async Task OrElse_FirstSucceeds()
+        {
+            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+                .OrElse(() =>
+                {
+                    AssertFail("Second call should not be called if the first succeeds");
+                    return Task.FromResult(new Either<int, string>("this should not be called"));
+                });
+
+            Assert.True(either.IsRight);
+            Assert.Equal("Success number one!", either.Right);
+            Assert.Throws<ArgumentException>(() => either.Left);
+        }
+
+        [Fact]
+        public async Task OrElse_FirstFails()
+        {
+            var either = await Task.FromResult(new Either<int, string>(500))
+                .OrElse(() => Task.FromResult(new Either<int, string>("Success number two!")));
+
+            Assert.True(either.IsRight);
+            Assert.Equal("Success number two!", either.Right);
+            Assert.Throws<ArgumentException>(() => either.Left);
+        }
+
+        [Fact]
+        public async Task OrElse_BothFail()
+        {
+            var either = await Task.FromResult(new Either<int, string>(500))
+                .OrElse(() => Task.FromResult(new Either<int, string>(600)));
+
+            Assert.True(either.IsLeft);
+            Assert.Equal(600, either.Left);
         }
     }
 }
