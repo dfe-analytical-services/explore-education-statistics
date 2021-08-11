@@ -10,7 +10,7 @@ trigger:
   paths:
     exclude:
     - infrastructure/
-pr: [ 'master', 'dev', 'EES-1263-SOW4' ]
+pr: [ 'master', 'dev' ]
 
 jobs:
   - job: 'Backend'
