@@ -53,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicBlobStorageService.Setup(mock => mock.DownloadToStream(
                         PublicReleaseFiles,
                         file.PublicPath(release.Id),
-                        It.IsAny<ZipOutputStream>()))
+                        It.IsAny<ZipOutputStream>(),
+                        null))
                     .ReturnsAsync(new ZipOutputStream(new MemoryStream()));
             }
 

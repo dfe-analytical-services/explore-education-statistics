@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
@@ -370,17 +371,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await blob.AppendBlockAsync(stream);
         }
 
-        public async Task<Stream> DownloadToStream(IBlobContainer containerName, string path, Stream targetStream)
+        public async Task<Stream> DownloadToStream(
+            IBlobContainer containerName,
+            string path,
+            Stream targetStream,
+            CancellationToken? cancellationToken = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetAppendBlobClient(path);
+            var blob = blobContainer.GetBlobClient(path);
 
             if (!await blob.ExistsAsync())
             {
                 throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
             }
 
-            await blob.DownloadToAsync(targetStream);
+            await blob.DownloadToAsync(targetStream, cancellationToken ?? CancellationToken.None);
 
             if (targetStream.CanSeek)
             {

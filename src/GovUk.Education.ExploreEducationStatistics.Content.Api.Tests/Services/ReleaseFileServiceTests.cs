@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -99,8 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(
+                            PublicReleaseFiles, releaseFile.PublicPath(),
+                        It.IsAny<MemoryStream>(), null), Times.Once());
 
                 Assert.Equal("application/pdf", result.Right.ContentType);
                 Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
@@ -328,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PublicReleaseFiles, path,
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryContentDbContext())
@@ -350,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 blobStorageService.Verify(
                     mock => mock.DownloadToStream(PublicReleaseFiles, path,
-                        It.IsAny<MemoryStream>()), Times.Once());
+                        It.IsAny<MemoryStream>(), null), Times.Once());
 
                 Assert.Equal("application/zip", result.Right.ContentType);
                 Assert.Equal("all-files.zip", result.Right.FileDownloadName);

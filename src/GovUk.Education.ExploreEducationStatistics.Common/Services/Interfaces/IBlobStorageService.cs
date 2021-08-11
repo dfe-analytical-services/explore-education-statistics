@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
@@ -60,8 +61,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="containerName">name of the blob container</param>
         /// <param name="path">path to the blob within the container</param>
         /// <param name="stream">stream to output blob to</param>
+        /// <param name="cancellationToken">used to cancel the download</param>
         /// <returns>the blob stream</returns>
-        public Task<Stream> DownloadToStream(IBlobContainer containerName, string path, Stream stream);
+        public Task<Stream> DownloadToStream(
+            IBlobContainer containerName,
+            string path,
+            Stream stream,
+            CancellationToken? cancellationToken = null);
 
         public Task SetMetadata(IBlobContainer containerName, string path, IDictionary<string, string> metadata);
 
