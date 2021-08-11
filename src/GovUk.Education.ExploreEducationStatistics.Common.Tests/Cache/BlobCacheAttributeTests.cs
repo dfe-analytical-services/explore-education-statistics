@@ -5,25 +5,25 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 {
-    public class BlobCacheAttributeTests : IDisposable
+    [Collection(CacheTestFixture.CollectionName)]
+    public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
     {
         private readonly Mock<IBlobCacheService> _blobCacheService = new(MockBehavior.Strict);
 
         public BlobCacheAttributeTests()
         {
-            CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", _blobCacheService.Object);
         }
 
         public void Dispose()
         {
-            CacheAspect.Enabled = false;
             BlobCacheAttribute.ClearServices();
 
             _blobCacheService.Reset();
