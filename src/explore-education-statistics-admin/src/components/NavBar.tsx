@@ -13,7 +13,10 @@ interface Props {
 
 const NavBar = ({ className, routes }: Props) => {
   return (
-    <nav className={classNames(styles.navigation, className)}>
+    <nav
+      className={classNames(styles.navigation, className)}
+      aria-label="tab-navigation"
+    >
       <ul className={styles.list}>
         {routes.map(route => (
           <li key={route.to}>

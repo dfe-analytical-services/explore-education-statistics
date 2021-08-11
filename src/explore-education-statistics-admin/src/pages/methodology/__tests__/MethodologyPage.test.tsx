@@ -1,0 +1,184 @@
+import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
+import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
+import _methodologyService, {
+  BasicMethodology,
+} from '@admin/services/methodologyService';
+import _methodologyContentService, {
+  MethodologyContent,
+} from '@admin/services/methodologyContentService';
+import _permissionService from '@admin/services/permissionService';
+import { Router } from 'react-router';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
+import React from 'react';
+
+jest.mock('@admin/services/methodologyService');
+jest.mock('@admin/services/methodologyContentService');
+jest.mock('@admin/services/permissionService');
+
+const methodologyService = _methodologyService as jest.Mocked<
+  typeof _methodologyService
+>;
+const methodologyContentService = _methodologyContentService as jest.Mocked<
+  typeof _methodologyContentService
+>;
+const permissionService = _permissionService as jest.Mocked<
+  typeof _permissionService
+>;
+
+describe('MethodologyPage', () => {
+  const testMethodology: BasicMethodology = {
+    id: 'm1',
+    amendment: false,
+    title: 'Test methodology',
+    slug: 'test-methodology',
+    owningPublication: {
+      id: 'p1',
+      title: 'Publication title',
+    },
+    status: 'Draft',
+  };
+  const testMethodologyAmendment = {
+    ...testMethodology,
+    amendment: true,
+  };
+
+  const testMethodologyContent: MethodologyContent = {
+    id: 'mc-1',
+    title: 'The content',
+    slug: 'content-1',
+    status: 'Draft',
+    content: [],
+    annexes: [],
+  };
+
+  test('renders the page with the summary tab', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
+      );
+      expect(screen.getByText('Test methodology')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('navigation', { name: 'tab-navigation' }),
+      ).toBeInTheDocument();
+
+      const primaryNav = screen.getByRole('navigation', {
+        name: 'tab-navigation',
+      });
+      const navLinks = within(primaryNav).getAllByRole('link');
+
+      expect(navLinks).toHaveLength(3);
+      expect(navLinks[0]).toHaveTextContent('Summary');
+      expect(navLinks[0].getAttribute('aria-current')).toBe('page');
+      expect(navLinks[1]).not.toHaveAttribute('aria-current');
+      expect(navLinks[2]).toHaveTextContent('Sign off');
+      expect(navLinks[2]).not.toHaveAttribute('aria-current');
+
+      expect(screen.getByText('Methodology summary')).toBeInTheDocument();
+    });
+  });
+
+  test('showing the status tag', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
+      );
+      expect(screen.getByText('Draft')).toBeInTheDocument();
+      expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
+    });
+  });
+
+  test('showing the amendment page caption and tag', async () => {
+    methodologyService.getMethodology.mockResolvedValue(
+      testMethodologyAmendment,
+    );
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Amend methodology',
+      );
+      expect(screen.getByText('Draft')).toBeInTheDocument();
+      expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
+
+      expect(screen.getByText('Amendment')).toBeInTheDocument();
+      expect(screen.getByText('Amendment')).toHaveClass('govuk-tag');
+    });
+  });
+
+  test('using the tab navigation', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    methodologyContentService.getMethodologyContent.mockResolvedValue(
+      testMethodologyContent,
+    );
+    permissionService.canUpdateMethodology.mockResolvedValue(true);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
+      );
+    });
+
+    const primaryNav = screen.getByRole('navigation', {
+      name: 'tab-navigation',
+    });
+    const navLinks = within(primaryNav).getAllByRole('link');
+
+    userEvent.click(navLinks[1]);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Content' }),
+      ).toBeInTheDocument();
+      expect(navLinks[1].getAttribute('aria-current')).toBe('page');
+      expect(navLinks[0]).not.toHaveAttribute('aria-current');
+      expect(navLinks[2]).not.toHaveAttribute('aria-current');
+    });
+
+    userEvent.click(navLinks[2]);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Sign off' }),
+      ).toBeInTheDocument();
+      expect(navLinks[2].getAttribute('aria-current')).toBe('page');
+      expect(navLinks[0]).not.toHaveAttribute('aria-current');
+      expect(navLinks[1]).not.toHaveAttribute('aria-current');
+    });
+  });
+
+  function renderPage() {
+    const routeParams = {
+      params: {
+        methodologyId: 'm1',
+      } as MethodologyRouteParams,
+      isExact: true,
+      path: '',
+      url: '',
+    };
+    const history = createMemoryHistory();
+
+    const { location } = history;
+    location.pathname = '/methodology/m1/summary';
+
+    render(
+      <Router history={history}>
+        <MethodologyPage
+          match={routeParams}
+          history={history}
+          location={location}
+        />
+      </Router>,
+    );
+  }
+});

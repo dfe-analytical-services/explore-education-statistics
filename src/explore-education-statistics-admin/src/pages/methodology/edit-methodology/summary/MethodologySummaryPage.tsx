@@ -8,7 +8,6 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -33,15 +32,6 @@ const MethodologySummaryPage = ({
             <SummaryList>
               <SummaryListItem term="Title">
                 {currentMethodology.title}
-              </SummaryListItem>
-              <SummaryListItem term="Status">
-                <Tag>{currentMethodology.status}</Tag>
-                {currentMethodology.amendment && (
-                  <>
-                    {' '}
-                    <Tag>Amendment</Tag>
-                  </>
-                )}
               </SummaryListItem>
               <SummaryListItem term="Published on">
                 {currentMethodology.published ? (
