@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved))
+                .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved));
+            repository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved))
+                .Setup(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved));
+            repository.Verify(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 
