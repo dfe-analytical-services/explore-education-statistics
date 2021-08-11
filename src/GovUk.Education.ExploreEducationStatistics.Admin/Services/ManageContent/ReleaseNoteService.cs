@@ -48,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         On = saveRequest.On ?? DateTime.Now,
                         Reason = saveRequest.Reason,
-                        ReleaseId = release.Id
+                        ReleaseId = release.Id,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId(),
                     });
 
                     await _context.SaveChangesAsync();

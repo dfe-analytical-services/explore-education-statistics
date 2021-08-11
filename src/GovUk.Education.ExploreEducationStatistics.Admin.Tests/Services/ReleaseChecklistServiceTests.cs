@@ -40,13 +40,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalRelease = new Release
             {
                 Publication = publication,
-                Version = 0
+                Version = 0,
+                Created = DateTime.UtcNow.AddMonths(-2),
+                Updates = new List<Update>
+                {
+                    new()
+                    {
+                        Reason = "Original release note",
+                        Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
+                    }
+                },
             };
             var release = new Release
             {
                 Publication = publication,
                 PreviousVersion = originalRelease,
                 Version = 1,
+                Created = DateTime.UtcNow.AddMonths(-1),
+                Updates = new List<Update>
+                {
+                    new()
+                    {
+                        Reason = "Original release note",
+                        Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
+                    }
+                },
             };
 
             var releaseContentSection1 = new ReleaseContentSection
@@ -357,13 +375,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalRelease = new Release
             {
                 Publication = publication,
-                Version = 0
+                Version = 0,
+                Created = DateTime.UtcNow.AddDays(-14),
             };
+            var releaseId = Guid.NewGuid();
             var release = new Release
             {
+                Id = releaseId,
                 Publication = publication,
                 PreviousVersion = originalRelease,
                 Version = 1,
+                Created = DateTime.UtcNow.AddDays(-7),
                 MetaGuidance = "Test meta guidance",
                 PreReleaseAccessList = "Test access list",
                 NextReleaseDate = new PartialDate
@@ -376,11 +398,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Update
                     {
                         Reason = "Test reason 1",
-                        Release = originalRelease
+                        ReleaseId = releaseId,
+                        Created = DateTime.UtcNow.AddDays(-13),
                     },
                     new Update
                     {
-                        Reason = "Test reason 2"
+                        Reason = "Test reason 2",
+                        ReleaseId = releaseId,
+                        Created = DateTime.UtcNow,
                     }
                 },
             };

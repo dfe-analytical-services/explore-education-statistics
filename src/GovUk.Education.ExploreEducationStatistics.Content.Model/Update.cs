@@ -11,6 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release Release { get; set; }
 
+        public DateTime? Created { get; set; }
+
+        public User? CreatedBy { get; set; }
+        public Guid? CreatedById { get; set; }
+
         [Required] public DateTime On { get; set; }
 
         [Required] public string Reason { get; set; }

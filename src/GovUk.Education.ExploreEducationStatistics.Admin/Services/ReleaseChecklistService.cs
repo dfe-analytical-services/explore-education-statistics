@@ -107,7 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicMetaGuidanceRequired));
             }
 
-            if (release.Amendment && release.Updates.All(update => update.ReleaseId != release.Id))
+            if (release.Amendment
+                && !release.Updates.Any(update =>
+                   update.ReleaseId == release.Id
+                   && update.Created > release.Created))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
