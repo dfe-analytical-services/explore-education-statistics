@@ -10,7 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Assert.False(authContext.HasSucceeded);
                 });
             }
-            
+
             [Fact]
             public async Task NoClaimsAllowUpdatingPubliclyAccessibleMethodology()
             {
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var (handler, methodologyRepository, _, _, _)  = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, _, _, _) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
                         .ReturnsAsync(true);
@@ -86,22 +87,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserWithCorrectClaimCanUpdateNonPubliclyAccessibleMethodology()
             {
                 var owningPublicationId = Guid.NewGuid();
-                
+
                 var methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
-                        Publications = AsList( new PublicationMethodology {
+                        Publications = ListOf(new PublicationMethodology
+                        {
                             PublicationId = owningPublicationId,
                             Owner = true
                         })
                     }
                 };
-                
+
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Attach(methodology);
-                
+
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     var (
@@ -129,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .Setup(s => s.GetLatestReleaseForPublication(owningPublicationId))
                             .ReturnsAsync((Release?) null);
                     }
-                    
+
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
                         CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, Methodology>
@@ -149,29 +151,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task PublicationOwnerCanUpdateMethodology()
             {
                 var owningPublicationId = Guid.NewGuid();
-                
+
                 var methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
-                        Publications = AsList( 
-                            new PublicationMethodology {
+                        Publications = ListOf(
+                            new PublicationMethodology
+                            {
                                 PublicationId = Guid.NewGuid(),
                                 Owner = false
-                            }, 
-                            new PublicationMethodology {
+                            },
+                            new PublicationMethodology
+                            {
                                 PublicationId = owningPublicationId,
                                 Owner = true
-                            }, 
-                            new PublicationMethodology {
+                            },
+                            new PublicationMethodology
+                            {
                                 PublicationId = Guid.NewGuid(),
                                 Owner = false
                             }
                         )
                     }
                 };
-                
+
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Attach(methodology);
 
@@ -189,10 +194,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .ReturnsAsync(false);
 
                     var expectedToPassByRole = publicationRole == Owner;
-                    
+
                     userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUser(UserId, owningPublicationId))
-                        .ReturnsAsync(AsList(publicationRole));
+                        .ReturnsAsync(ListOf(publicationRole));
 
                     if (!expectedToPassByRole)
                     {
@@ -200,9 +205,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .Setup(s => s.GetLatestReleaseForPublication(owningPublicationId))
                             .ReturnsAsync((Release?) null);
                     }
-                    
+
                     var user = CreateClaimsPrincipal(UserId);
-                
+
                     var authContext =
                         CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, Methodology>
                             (user, methodology);
@@ -222,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task EditorsOrApproversOnOwningPublicationsLatestReleaseCanUpdateMethodology()
             {
-                var expectedReleaseRolesToPass = AsList(Approver, Contributor, Lead);
+                var expectedReleaseRolesToPass = ListOf(Approver, Contributor, Lead);
 
                 var owningPublicationId = Guid.NewGuid();
 
@@ -231,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
-                        Publications = AsList(
+                        Publications = ListOf(
                             new PublicationMethodology
                             {
                                 PublicationId = Guid.NewGuid(),
@@ -282,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUser(UserId, latestRelease.Id))
-                        .ReturnsAsync(AsList(releaseRole));
+                        .ReturnsAsync(ListOf(releaseRole));
 
                     var user = CreateClaimsPrincipal(UserId);
 
@@ -313,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
-                        Publications = AsList(
+                        Publications = ListOf(
                             new PublicationMethodology
                             {
                                 PublicationId = Guid.NewGuid(),
@@ -377,14 +382,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleRepository,
                     userReleaseRoleRepository);
 
-                // As the user has Publication Owner role on the owning Publication of this Methodology, they are
-                // allowed to update it.
+                // A user with no roles on the owning Publication of this Methodology is not allowed to update it.
                 Assert.False(authContext.HasSucceeded);
             }
         }
 
         private static (
-            UpdateSpecificMethodologyAuthorizationHandler, 
+            UpdateSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IPublicationRepository>,
             Mock<IUserPublicationRoleRepository>,
@@ -403,15 +407,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 publicationRepository.Object,
                 userPublicationRoleRepository.Object,
                 userReleaseRoleRepository.Object
-                );
+            );
 
             return (
-                handler, 
-                methodologyRepository, 
-                publicationRepository, 
-                userPublicationRoleRepository, 
+                handler,
+                methodologyRepository,
+                publicationRepository,
+                userPublicationRoleRepository,
                 userReleaseRoleRepository
-                );
+            );
         }
     }
 }

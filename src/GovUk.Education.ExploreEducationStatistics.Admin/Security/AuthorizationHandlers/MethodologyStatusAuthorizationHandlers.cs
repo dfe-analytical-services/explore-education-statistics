@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 var owningPublicationId = await GetOwningPublicationIdForMethodology(_contentDbContext, methodology);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
-                // this Methodology, they can update it.
+                // this Methodology, they can approve it.
                 if (await IsApproverOfOwningPublicationsLatestRelease(
                     _publicationRepository, _userReleaseRoleRepository, context, owningPublicationId))
                 {
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 var owningPublicationId = await GetOwningPublicationIdForMethodology(_contentDbContext, methodology);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
-                // this Methodology, they can update it.
+                // this Methodology, they can mark it as draft.
                 if (await IsApproverOfOwningPublicationsLatestRelease(
                     _publicationRepository, _userReleaseRoleRepository, context, owningPublicationId))
                 {
