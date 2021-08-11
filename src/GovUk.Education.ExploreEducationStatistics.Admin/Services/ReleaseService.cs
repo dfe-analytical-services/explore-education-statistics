@@ -415,9 +415,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(releaseApprovalStatuses))
+                        .OnSuccess(() => _repository.ListReleases(releaseApprovalStatuses))
                         .OrElse(() =>
-                            _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
+                            _repository.ListReleasesForUser(_userService.GetUserId(),
                                 releaseApprovalStatuses));
                 });
         }
@@ -430,9 +430,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved))
+                        .OnSuccess(() => _repository.ListReleases(ReleaseApprovalStatus.Approved))
                         .OrElse(() =>
-                            _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
+                            _repository.ListReleasesForUser(_userService.GetUserId(),
                                 ReleaseApprovalStatus.Approved));
                 })
                 .OnSuccess(approvedReleases =>

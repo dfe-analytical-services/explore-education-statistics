@@ -1,18 +1,237 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseRepositoryTests
     {
+        [Fact]
+        public async Task ListReleasesForUser_ReleaseRole_Approved()
+        {
+            var userId = Guid.NewGuid();
+            var userReleaseRole1 = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = new Release
+                {
+                    ApprovalStatus = ReleaseApprovalStatus.Approved,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    ReleaseName = "2001",
+                    Publication = new Publication
+                    {
+                        Title = "Test publication 1",
+                        Slug = "test-publication-1",
+                        Contact = new Contact(),
+                    },
+                },
+                Role = ReleaseRole.Lead,
+            };
+            var userReleaseRole2 = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = new Release
+                {
+                    ApprovalStatus = ReleaseApprovalStatus.Approved,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    ReleaseName = "2001",
+                    Publication = new Publication
+                    {
+                        Title = "Test publication 2",
+                        Slug = "test-publication-2",
+                        Contact = new Contact(),
+                    },
+                },
+                Role = ReleaseRole.PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var result =
+                    await releaseRepository.ListReleasesForUser(userId,
+                        ReleaseApprovalStatus.Approved);
+                Assert.Single(result);
+                Assert.Equal(userReleaseRole1.ReleaseId, result[0].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleasesForUser_ReleaseRole_Draft()
+        {
+            var userId = Guid.NewGuid();
+            var userReleaseRole1 = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = new Release
+                {
+                    ApprovalStatus = ReleaseApprovalStatus.Draft,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    ReleaseName = "2001",
+                    Publication = new Publication
+                    {
+                        Title = "Test publication 1",
+                        Slug = "test-publication-1",
+                        Contact = new Contact(),
+                    },
+                },
+                Role = ReleaseRole.Lead,
+            };
+            var userReleaseRole2 = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = new Release
+                {
+                    ApprovalStatus = ReleaseApprovalStatus.Draft,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    ReleaseName = "2001",
+                    Publication = new Publication
+                    {
+                        Title = "Test publication 2",
+                        Slug = "test-publication-2",
+                        Contact = new Contact(),
+                    },
+                },
+                Role = ReleaseRole.PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var result =
+                    await releaseRepository.ListReleasesForUser(userId,
+                        ReleaseApprovalStatus.Approved);
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleasesForUser_PublicationRole_Approved()
+        {
+            var userId = Guid.NewGuid();
+            var userPublicationRole1 = new UserPublicationRole()
+            {
+                UserId = userId,
+                Publication = new Publication
+                {
+                    Title = "Test publication 1",
+                    Slug = "test-publication-1",
+                    Contact = new Contact(),
+                    Releases = new List<Release>
+                    {
+                        new Release
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            ReleaseName = "2001",
+                        },
+                    }
+                },
+                Role = PublicationRole.Owner,
+            };
+
+            var otherPublication = new Publication
+            {
+                Title = "Test publication 2",
+                Slug = "test-publication-2",
+                Contact = new Contact(),
+                Releases = new List<Release>
+                {
+                    new Release
+                    {
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        ReleaseName = "2001",
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRole1, otherPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var result =
+                    await releaseRepository.ListReleasesForUser(userId,
+                        ReleaseApprovalStatus.Approved);
+                Assert.Single(result);
+                Assert.Equal(userPublicationRole1.Publication.Releases[0].Id, result[0].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleasesForUser_PublicationRole_Draft()
+        {
+            var userId = Guid.NewGuid();
+            var userPublicationRole1 = new UserPublicationRole()
+            {
+                UserId = userId,
+                Publication = new Publication
+                {
+                    Title = "Test publication 1",
+                    Slug = "test-publication-1",
+                    Contact = new Contact(),
+                    Releases = new List<Release>
+                    {
+                        new Release
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            ReleaseName = "2001",
+                        },
+                    }
+                },
+                Role = PublicationRole.Owner,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRole1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var result =
+                    await releaseRepository.ListReleasesForUser(userId,
+                        ReleaseApprovalStatus.Approved);
+                Assert.Empty(result);
+            }
+        }
+
         [Fact]
         public async Task ReleaseHierarchyCreated()
         {
@@ -47,9 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
-                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
-
+                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id);
             }
@@ -112,9 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
-                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
-
+                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id);
             }
@@ -161,9 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
-                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
-
+                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id);
             }
@@ -178,6 +391,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjects[0].Id, releaseSubjects[0].SubjectId);
                 Assert.Equal(release.Id, releaseSubjects[0].ReleaseId);
             }
+        }
+
+        private ReleaseRepository BuildReleaseRepository(
+            ContentDbContext? contentDbContext = null,
+            StatisticsDbContext? statisticsDbContext = null
+        )
+        {
+            return new ReleaseRepository(
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+                AdminMapper());
         }
     }
 }

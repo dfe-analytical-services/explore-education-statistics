@@ -125,10 +125,10 @@ describe('MethodologyStatusForm', () => {
     expect(releaseSelect.children.length).toBe(3);
     expect(releaseSelect.children[0]).toHaveTextContent('Choose a release');
     expect(releaseSelect.children[0]).toHaveValue('');
-    expect(releaseSelect.children[1]).toHaveTextContent('Test Release 1');
-    expect(releaseSelect.children[1]).toHaveValue('test-release-1');
-    expect(releaseSelect.children[2]).toHaveTextContent('Test Release 2');
-    expect(releaseSelect.children[2]).toHaveValue('test-release-2');
+    expect(releaseSelect.children[1]).toHaveTextContent('Test Release 2');
+    expect(releaseSelect.children[1]).toHaveValue('test-release-2');
+    expect(releaseSelect.children[2]).toHaveTextContent('Test Release 1');
+    expect(releaseSelect.children[2]).toHaveValue('test-release-1');
 
     expect(releaseSelect).toHaveDisplayValue('Test Release 2');
     expect(releaseSelect).toHaveValue('test-release-2');

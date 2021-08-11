@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,18 +17,13 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 {
-    public class CacheAspectTests : IDisposable
+    [Collection(CacheTestFixture.CollectionName)]
+    public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
-        private static Mock<ICacheService<ICacheKey>> CacheService { get; } = new(MockBehavior.Strict);
+        private static readonly Mock<ICacheService<ICacheKey>> CacheService = new(MockBehavior.Strict);
 
         public CacheAspectTests()
         {
-            CacheAspect.Enabled = true;
-        }
-
-        public void Dispose()
-        {
-            CacheAspect.Enabled = false;
             CacheService.Reset();
         }
 

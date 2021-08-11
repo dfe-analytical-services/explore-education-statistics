@@ -114,6 +114,24 @@ const MethodologyStatusPage = ({
                       )}
                     </>
                   )}
+                  <SummaryListItem term="Owning publication">
+                    {model.summary.owningPublication.title}
+                  </SummaryListItem>
+                  {model.summary.otherPublications &&
+                    model.summary.otherPublications.length > 0 && (
+                      <SummaryListItem term="Other publications">
+                        <ul className="govuk-!-margin-top-0">
+                          {model.summary.otherPublications?.map(publication => (
+                            <li
+                              key={publication.id}
+                              data-testid="other-publication-item"
+                            >
+                              {publication.title}
+                            </li>
+                          ))}
+                        </ul>
+                      </SummaryListItem>
+                    )}
                 </SummaryList>
 
                 {isEditable && (

@@ -142,8 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     // Return an ordered list of the Releases that are not published
                     return releases.Where(r => !r.Live)
                         .OrderBy(r => r.Publication.Title)
-                        .ThenBy(r => r.Year)
-                        .ThenBy(r => r.TimePeriodCoverage)
+                        .ThenByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)
                         .Select(r => new TitleAndIdViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
                         .ToList();
                 });
@@ -159,60 +159,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => GetSummary(id));
         }
 
-        private Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
+        private async Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
             if (!request.IsStatusUpdateForMethodology(methodologyToUpdate))
             {
                 // Status unchanged
-                return Task.FromResult(new Either<ActionResult, Methodology>(methodologyToUpdate));
+                return methodologyToUpdate;
             }
 
-            return
-                CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
-                    .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
-                    .OnSuccessDo(RemoveUnusedImages)
-                    .OnSuccess(async methodology =>
+            return await CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
+                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
+                .OnSuccessDo(RemoveUnusedImages)
+                .OnSuccess(async methodology =>
+                {
+                    methodology.Status = request.Status;
+                    methodology.PublishingStrategy = request.PublishingStrategy;
+                    methodology.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
+                        ? request.WithReleaseId
+                        : null;
+                    methodology.InternalReleaseNote = Approved == request.Status
+                        ? request.LatestInternalReleaseNote
+                        : null;
+
+                    methodology.Updated = DateTime.UtcNow;
+
+                    _context.Methodologies.Update(methodology);
+
+                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                     {
-                        methodology.Status = request.Status;
-                        methodology.PublishingStrategy = request.PublishingStrategy;
-                        methodology.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
-                            ? request.WithReleaseId
-                            : null;
-                        methodology.InternalReleaseNote = Approved == request.Status
-                            ? request.LatestInternalReleaseNote
-                            : null;
+                        methodology.Published = DateTime.UtcNow;
 
-                        methodology.Updated = DateTime.UtcNow;
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
 
-                        _context.Methodologies.Update(methodology);
+                        // Invalidate the 'All Methodologies' cache item
+                        await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                    }
 
-                        if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
-                        {
-                            methodology.Published = DateTime.UtcNow;
-
-                            await _publishingService.PublishMethodologyFiles(methodology.Id);
-
-                            // Invalidate the 'All Methodologies' cache item
-                            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-                        }
-
-                        await _context.SaveChangesAsync();
-                        return methodology;
-                    });
+                    await _context.SaveChangesAsync();
+                    return methodology;
+                });
         }
 
-        private Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
+        private async Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
             MethodologyUpdateRequest request)
         {
             if (!request.IsDetailUpdateForMethodology(methodologyToUpdate))
             {
                 // Details unchanged
-                return Task.FromResult(new Either<ActionResult, Methodology>(methodologyToUpdate));
+                return methodologyToUpdate;
             }
 
-            return _userService
-                .CheckCanUpdateMethodology(methodologyToUpdate)
+            return await _userService.CheckCanUpdateMethodology(methodologyToUpdate)
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
