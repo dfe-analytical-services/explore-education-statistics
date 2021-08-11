@@ -267,19 +267,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Check that only unpublished Releases are included and that they are in the correct order
 
                 var expectedReleaseAtIndex0 = adoptingPublication.Releases.Single(r =>
-                    r.Year == 2020 && r.TimePeriodCoverage == FinancialYearQ4);
+                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ2);
 
                 var expectedReleaseAtIndex1 = adoptingPublication.Releases.Single(r =>
                     r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ1);
 
                 var expectedReleaseAtIndex2 = adoptingPublication.Releases.Single(r =>
-                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ2);
+                    r.Year == 2020 && r.TimePeriodCoverage == FinancialYearQ4);
 
                 var expectedReleaseAtIndex3 = owningPublication.Releases.Single(r =>
-                    r.Year == 2020 && r.TimePeriodCoverage == CalendarYear);
+                    r.Year == 2021 && r.TimePeriodCoverage == CalendarYear);
 
                 var expectedReleaseAtIndex4 = owningPublication.Releases.Single(r =>
-                    r.Year == 2021 && r.TimePeriodCoverage == CalendarYear);
+                    r.Year == 2020 && r.TimePeriodCoverage == CalendarYear);
 
                 Assert.Equal(5, result.Count);
 
@@ -289,11 +289,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(expectedReleaseAtIndex3.Id, result[3].Id);
                 Assert.Equal(expectedReleaseAtIndex4.Id, result[4].Id);
 
-                Assert.Equal("Publication A - Financial Year Q4 2020-21", result[0].Title);
+                Assert.Equal("Publication A - Financial Year Q2 2021-22", result[0].Title);
                 Assert.Equal("Publication A - Financial Year Q1 2021-22", result[1].Title);
-                Assert.Equal("Publication A - Financial Year Q2 2021-22", result[2].Title);
-                Assert.Equal("Publication B - Calendar Year 2020", result[3].Title);
-                Assert.Equal("Publication B - Calendar Year 2021", result[4].Title);
+                Assert.Equal("Publication A - Financial Year Q4 2020-21", result[2].Title);
+                Assert.Equal("Publication B - Calendar Year 2021", result[3].Title);
+                Assert.Equal("Publication B - Calendar Year 2020", result[4].Title);
+
             }
         }
 
