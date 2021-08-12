@@ -3,12 +3,12 @@ import {
   getCsvData,
 } from '@common/modules/table-tool/components/utils/downloadCsv';
 import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+  WorkerCategoryFilter,
+  WorkerIndicator,
+  WorkerLocationFilter,
+  WorkerTimePeriodFilter,
+  WorkerFullTableMeta,
+} from '@common/modules/table-tool/types/workerFullTable';
 import { waitFor } from '@testing-library/react';
 import { writeFile, WorkBook } from 'xlsx';
 
@@ -22,7 +22,7 @@ jest.mock('xlsx', () => {
 });
 
 describe('Download CSV utils', () => {
-  const basicSubjectMeta: FullTableMeta = {
+  const basicSubjectMeta: WorkerFullTableMeta = {
     geoJsonAvailable: false,
     publicationName: '',
     subjectName: '',
@@ -32,43 +32,44 @@ describe('Download CSV utils', () => {
       Characteristic: {
         name: 'characteristic',
         options: [
-          new CategoryFilter({
+          {
             value: 'gender_female',
             label: 'Female',
             group: 'Gender',
             category: 'Characteristic',
-          }),
+          } as WorkerCategoryFilter,
         ],
       },
     },
     indicators: [
-      new Indicator({
+      {
         label: 'Authorised absence rate',
         value: 'authAbsRate',
         unit: '%',
         name: 'sess_authorised_percent',
-      }),
-      new Indicator({
+      } as WorkerIndicator,
+      {
         label: 'Number of authorised absence sessions',
         value: 'authAbsSess',
         unit: '',
         name: 'sess_authorised',
-      }),
+      } as WorkerIndicator,
     ],
     locations: [
-      new LocationFilter({
+      {
         value: 'england',
         label: 'England',
         level: 'country',
-      }),
+      } as WorkerLocationFilter,
     ],
     timePeriodRange: [
-      new TimePeriodFilter({
+      {
         code: 'AY',
         year: 2015,
         label: '2015/16',
         order: 0,
-      }),
+        value: '2015_AY',
+      } as WorkerTimePeriodFilter,
     ],
   };
 
@@ -82,26 +83,26 @@ describe('Download CSV utils', () => {
             'School Type': {
               name: 'school_type',
               options: [
-                new CategoryFilter({
+                {
                   value: 'school_primary',
                   label: 'State-funded primary',
                   category: 'School Type',
-                }),
-                new CategoryFilter({
+                } as WorkerCategoryFilter,
+                {
                   value: 'school_secondary',
                   label: 'State-funded secondary',
                   category: 'School Type',
-                }),
+                } as WorkerCategoryFilter,
               ],
             },
           },
           locations: [
             ...basicSubjectMeta.locations,
-            new LocationFilter({
+            {
               value: 'barnsley',
               label: 'Barnsley',
               level: 'localAuthority',
-            }),
+            } as WorkerLocationFilter,
           ],
         },
         results: [
@@ -200,16 +201,16 @@ describe('Download CSV utils', () => {
             'School Type': {
               name: 'school_type',
               options: [
-                new CategoryFilter({
+                {
                   value: 'school_primary',
                   label: 'State-funded primary',
                   category: 'School Type',
-                }),
-                new CategoryFilter({
+                } as WorkerCategoryFilter,
+                {
                   value: 'school_secondary',
                   label: 'State-funded secondary',
                   category: 'School Type',
-                }),
+                } as WorkerCategoryFilter,
               ],
             },
           },
@@ -270,16 +271,16 @@ describe('Download CSV utils', () => {
             'School Type': {
               name: 'school_type',
               options: [
-                new CategoryFilter({
+                {
                   value: 'school_primary',
                   label: 'State-funded primary',
                   category: 'School Type',
-                }),
-                new CategoryFilter({
+                } as WorkerCategoryFilter,
+                {
                   value: 'school_secondary',
                   label: 'State-funded secondary',
                   category: 'School Type',
-                }),
+                } as WorkerCategoryFilter,
               ],
             },
           },

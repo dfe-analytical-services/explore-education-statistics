@@ -1,16 +1,16 @@
 import {
-  CategoryFilter,
-  Filter,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
-import { WorkerFullTable } from '@common/modules/table-tool/types/workerFullTable';
+  WorkerCategoryFilter,
+  WorkerFilter,
+  WorkerLocationFilter,
+  WorkerTimePeriodFilter,
+  WorkerFullTable,
+} from '@common/modules/table-tool/types/workerFullTable';
 import cartesian from '@common/utils/cartesian';
 import { utils, writeFile } from 'xlsx';
 
 /**
  * Gets the CSV data for download.
- * This is used in the Web Worker so uses a raw version of the FullTable type (WorkerFullTable). When mapFullTable is refactored to not use classes (EES-2613) we can change this to use the standard FullTable type.
+ * This is used in the Web Worker so uses a Worker version of the FullTable type (WorkerFullTable). When mapFullTable is refactored to not use classes (EES-2613) we can change this to use the standard FullTable type.
  * IMPORTANT: the filters ids are getters which aren't serialised when passed to the worker so cannot be used here.
  */
 export const getCsvData = (fullTable: WorkerFullTable): string[][] => {
@@ -32,16 +32,16 @@ export const getCsvData = (fullTable: WorkerFullTable): string[][] => {
     ...indicatorColumns,
   ];
 
-  const rows = cartesian<Filter>(
+  const rows = cartesian<WorkerFilter>(
     locations,
     timePeriodRange,
     ...Object.values(filters).map(filterGroup => filterGroup.options),
   )
     .map(filterCombination => {
       const [location, timePeriod, ...filterOptions] = filterCombination as [
-        LocationFilter,
-        TimePeriodFilter,
-        ...CategoryFilter[]
+        WorkerLocationFilter,
+        WorkerTimePeriodFilter,
+        ...WorkerCategoryFilter[]
       ];
 
       const indicatorCells = indicators.map(indicator => {

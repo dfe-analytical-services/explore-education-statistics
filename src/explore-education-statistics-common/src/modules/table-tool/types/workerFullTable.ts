@@ -6,49 +6,49 @@ import {
 } from '@common/services/tableBuilderService';
 
 /**
- * Raw version of the FullTable type for use only in web workers.
+ * Worker version of the FullTable type for use only in web workers.
  * When mapFullTable is refactored to not use classes (EES-2613) we can remove this.
  */
-interface RawFilter {
+export interface WorkerFilter {
   value: string;
   label: string;
   group?: string;
   id: string; // ids don't get serialised into the worker as they're getters so can't be used.
 }
 
-interface RawCategoryFilter extends RawFilter {
+export interface WorkerCategoryFilter extends WorkerFilter {
   isTotal: boolean;
   category: string;
 }
 
-interface RawLocationFilter extends RawFilter {
+export interface WorkerLocationFilter extends WorkerFilter {
   level: string;
   geoJson: GeoJsonFeature;
 }
 
-interface RawTimePeriodFilter extends RawFilter {
+export interface WorkerTimePeriodFilter extends WorkerFilter {
   code: string;
   order: number;
   year: number;
 }
 
-interface RawIndicator extends RawFilter {
+export interface WorkerIndicator extends WorkerFilter {
   decimalPlaces: number;
   name: string;
   unit: string;
 }
 
-export interface RawFullTableMeta {
+export interface WorkerFullTableMeta {
   publicationName: string;
   subjectName: string;
-  locations: RawLocationFilter[];
-  timePeriodRange: RawTimePeriodFilter[];
+  locations: WorkerLocationFilter[];
+  timePeriodRange: WorkerTimePeriodFilter[];
 
   filters: Dictionary<{
     name: string;
-    options: RawCategoryFilter[];
+    options: WorkerCategoryFilter[];
   }>;
-  indicators: RawIndicator[];
+  indicators: WorkerIndicator[];
   boundaryLevels: BoundaryLevel[];
   footnotes: {
     id: string;
@@ -59,6 +59,6 @@ export interface RawFullTableMeta {
 
 export interface WorkerFullTable {
   title?: string;
-  subjectMeta: RawFullTableMeta;
+  subjectMeta: WorkerFullTableMeta;
   results: TableDataResult[];
 }
