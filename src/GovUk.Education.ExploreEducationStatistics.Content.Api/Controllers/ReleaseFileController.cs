@@ -29,33 +29,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _releaseFileService = releaseFileService;
         }
 
+        [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseId}/files/{fileId}")]
         public async Task<ActionResult> Stream(string releaseId, string fileId)
         {
-            if (Guid.TryParse(releaseId, out var releaseIdAsGuid) &&
-                Guid.TryParse(fileId, out var fileIdAsGuid))
+            if (Guid.TryParse(releaseId, out var releaseGuid) &&
+                Guid.TryParse(fileId, out var fileGuid))
             {
-                return await _releaseFileService
-                    .StreamFile(releaseIdAsGuid, fileIdAsGuid)
+                return await _persistenceHelper.CheckEntityExists<Release>(releaseGuid)
+                    .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
+                    .OnSuccess(release =>  _releaseFileService.StreamFile(release.Id, fileGuid))
+                    .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
                     .HandleFailures();
             }
 
             return NotFound();
         }
 
+        [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseId}/files/all")]
         public async Task<ActionResult> StreamAll(string releaseId)
         {
-            if (Guid.TryParse(releaseId, out var releaseIdAsGuid))
+            if (Guid.TryParse(releaseId, out var releaseGuid))
             {
-                return await _releaseFileService
-                    .StreamAllFilesZip(releaseIdAsGuid)
+                return await _persistenceHelper.CheckEntityExists<Release>(releaseGuid)
+                    .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
+                    .OnSuccess(release => _releaseFileService.StreamAllFilesZip(release.Id))
+                    .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
                     .HandleFailures();
             }
 
             return NotFound();
         }
 
+        [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseId}/files")]
         [Produces(MediaTypeNames.Application.Zip)]
         public async Task Stream(
@@ -66,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     releaseId,
                     q => q.Include(r => r.Publication)
                 )
+                .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
                 .OnSuccess(
                     async release =>
                     {

@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -16,6 +18,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             using var reader = new StreamReader(stream, leaveOpen: true);
             return reader.ReadToEnd();
+        }
+
+        public static string ComputeMd5Hash(this Stream stream)
+        {
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(stream);
+
+            if (stream.CanSeek)
+            {
+                stream.Position = 0;
+            }
+
+            return BitConverter.ToString(hash)
+                .Replace("-", string.Empty)
+                .ToLowerInvariant();
         }
     }
 }
