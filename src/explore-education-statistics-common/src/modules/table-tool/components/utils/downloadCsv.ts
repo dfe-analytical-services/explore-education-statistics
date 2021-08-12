@@ -4,11 +4,16 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { WorkerFullTable } from '@common/modules/table-tool/types/workerFullTable';
 import cartesian from '@common/utils/cartesian';
 import { utils, writeFile } from 'xlsx';
 
-export const getCsvData = (fullTable: FullTable): string[][] => {
+/**
+ * Gets the CSV data for download.
+ * This is used in the Web Worker so uses a raw version of the FullTable type (WorkerFullTable). When mapFullTable is refactored to not use classes (EES-2613) we can change this to use the standard FullTable type.
+ * IMPORTANT: the filters ids are getters which aren't serialised when passed to the worker so cannot be used here.
+ */
+export const getCsvData = (fullTable: WorkerFullTable): string[][] => {
   const { subjectMeta, results } = fullTable;
   const { indicators, filters, timePeriodRange, locations } = subjectMeta;
 
