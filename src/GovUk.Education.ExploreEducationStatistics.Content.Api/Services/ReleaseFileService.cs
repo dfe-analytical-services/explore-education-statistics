@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseFile>(q => q
@@ -66,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     .ThenInclude(release => release.Publication)
                     .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId)
                 )
+                .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.Release))
                 .OnSuccess(async rf =>
                 {
                     return await GetBlob(rf.PublicPath())
@@ -132,18 +133,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> StreamByPath(string path)
+        public async Task<Either<ActionResult, FileStreamResult>> StreamAllFilesZip(Guid releaseId)
         {
-            return await GetBlob(path)
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    q => q.Include(release => release.Publication))
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(release => GetBlob(release.AllFilesZipPath()))
                 .OnSuccess(DownloadToStreamResult);
         }
 
         private async Task<FileStreamResult> DownloadToStreamResult(BlobInfo blob, string filename)
         {
             var stream = new MemoryStream();
-            await _blobStorageService.DownloadToStream(PublicReleaseFiles, blob.Path, stream);
+            var next = await _blobStorageService.DownloadToStream(PublicReleaseFiles, blob.Path, stream);
 
-            return new FileStreamResult(stream, blob.ContentType)
+            return new FileStreamResult(next, blob.ContentType)
             {
                 FileDownloadName = filename
             };
@@ -162,14 +167,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         private async Task<Either<ActionResult, BlobInfo>> GetBlob(string path)
         {
-            if (!await _blobStorageService.CheckBlobExists(PublicReleaseFiles, path))
-            {
-                return new NotFoundResult();
-            }
+            var blob = await _blobStorageService.FindBlob(PublicReleaseFiles, path);
 
-            var blob = await _blobStorageService.GetBlob(PublicReleaseFiles, path);
-
-            if (!blob.IsReleased())
+            if (blob is null)
             {
                 return new NotFoundResult();
             }

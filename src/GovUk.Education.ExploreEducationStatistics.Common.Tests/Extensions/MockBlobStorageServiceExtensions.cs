@@ -43,7 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                         s.DownloadToStream(container, path, It.IsAny<Stream>(), cancellationToken)
                 )
                 .Callback<IBlobContainer, string, Stream, CancellationToken?>(
-                    (_, _, stream, _) => stream.WriteText(blobText)
+                    (_, _, stream, _) =>
+                    {
+                        stream.WriteText(blobText);
+
+                        if (stream.CanSeek)
+                        {
+                            stream.Position = 0;
+                        }
+                    }
                 )
                 .ReturnsAsync(blobText.ToStream());
         }

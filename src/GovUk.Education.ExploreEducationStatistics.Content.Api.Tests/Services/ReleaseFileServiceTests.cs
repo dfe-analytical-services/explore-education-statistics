@@ -23,7 +23,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using File = System.IO.File;
 
@@ -41,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Stream()
+        public async Task StreamFile()
         {
             var release = new Release
             {
@@ -76,59 +75,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var blob = new BlobInfo(
                 path: releaseFile.PublicPath(),
-                size: null,
+                size: "100 KB",
                 contentType: "application/pdf",
-                contentLength: 0L,
-                meta: GetMetaValuesReleaseDateTime(
-                    releaseDateTime: DateTime.UtcNow.AddDays(-1)),
-                created: null);
+                contentLength: 0L);
 
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath()))
-                .ReturnsAsync(true);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PublicReleaseFiles, releaseFile.PublicPath()))
-                .ReturnsAsync(blob);
-
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupFindBlob(PublicReleaseFiles, releaseFile.PublicPath(), blob);
+            blobStorageService
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.File.Id);
+                var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
                 Assert.True(result.IsRight);
 
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath()),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PublicReleaseFiles, releaseFile.PublicPath()),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(
-                            PublicReleaseFiles, releaseFile.PublicPath(),
-                        It.IsAny<MemoryStream>(), null), Times.Once());
-
                 Assert.Equal("application/pdf", result.Right.ContentType);
                 Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("Test blob", result.Right.FileStream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task Stream_ReleaseNotFound()
+        public async Task StreamFile_ReleaseNotFound()
         {
             var releaseFile = new ReleaseFile
             {
@@ -156,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
+                var result = await service.StreamFile(Guid.NewGuid(), releaseFile.File.Id);
 
                 result.AssertNotFound();
             }
@@ -165,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Stream_ReleaseFileNotFound()
+        public async Task StreamFile_ReleaseFileNotFound()
         {
             var release = new Release();
 
@@ -184,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(release.Id, Guid.NewGuid());
+                var result = await service.StreamFile(release.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -193,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Stream_BlobDoesNotExist()
+        public async Task StreamFile_BlobDoesNotExist()
         {
             var release = new Release
             {
@@ -226,29 +200,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, It.IsAny<string>()))
-                .ReturnsAsync(false);
+            blobStorageService.SetupFindBlob(PublicReleaseFiles, releaseFile.PublicPath(), null);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.File.Id);
+                var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
                 result.AssertNotFound();
-
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath()),
-                    Times.Once());
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task Stream_BlobIsNotPublished()
+        public async Task StreamAllFilesZip()
         {
             var release = new Release
             {
@@ -259,192 +227,91 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Slug = "release-slug"
             };
 
-            var releaseFile = new ReleaseFile
-            {
-                Release = release,
-                File = new Model.File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
-                }
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var path = release.AllFilesZipPath();
 
             var blob = new BlobInfo(
-                path: releaseFile.PublicPath(),
-                size: null,
-                contentType: "application/pdf",
-                contentLength: 0L,
-                meta: GetMetaValuesReleaseDateTime(
-                    releaseDateTime: DateTime.UtcNow.AddDays(1)),
-                created: null);
-
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath()))
-                .ReturnsAsync(true);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PublicReleaseFiles, releaseFile.PublicPath()))
-                .ReturnsAsync(blob);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
-
-                var result = await service.Stream(release.Id, releaseFile.File.Id);
-
-                result.AssertNotFound();
-
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath()),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PublicReleaseFiles, releaseFile.PublicPath()),
-                    Times.Once());
-            }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
-        }
-
-        [Fact]
-        public async Task StreamByPath()
-        {
-            const string path = "path/all-files.zip";
-
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            var blob = new BlobInfo(
-                path: path,
-                size: null,
+                path: release.AllFilesZipPath(),
+                size: "100 KB",
                 contentType: "application/zip",
-                contentLength: 0L,
-                meta: GetMetaValuesReleaseDateTime(
-                    releaseDateTime: DateTime.UtcNow.AddDays(-1)),
-                created: null);
+                contentLength: 0L);
 
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, path))
-                .ReturnsAsync(true);
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PublicReleaseFiles, path))
-                .ReturnsAsync(blob);
+            blobStorageService.SetupFindBlob(PublicReleaseFiles, path, blob);
+            blobStorageService.SetupDownloadToStream(PublicReleaseFiles, path, "Test blob");
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PublicReleaseFiles, path,
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
-
-            await using (var contentDbContext = InMemoryContentDbContext())
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.StreamByPath(path);
+                var result = await service.StreamAllFilesZip(release.Id);
 
-                Assert.True(result.IsRight);
-
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, path),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PublicReleaseFiles, path),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PublicReleaseFiles, path,
-                        It.IsAny<MemoryStream>(), null), Times.Once());
+                result.AssertRight();
 
                 Assert.Equal("application/zip", result.Right.ContentType);
-                Assert.Equal("all-files.zip", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("publication-slug_release-slug.zip", result.Right.FileDownloadName);
+                Assert.Equal("Test blob", result.Right.FileStream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task StreamByPath_BlobDoesNotExist()
+        public async Task StreamAllFilesZip_ReleaseNotFound()
         {
-            const string path = "path/all-files.zip";
-
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, It.IsAny<string>()))
-                .ReturnsAsync(false);
-
             await using (var contentDbContext = InMemoryContentDbContext())
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.StreamByPath(path);
+                var result = await service.StreamAllFilesZip(Guid.NewGuid());
 
                 result.AssertNotFound();
-
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, path),
-                    Times.Once());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task StreamByPath_BlobIsNotPublished()
+        public async Task StreamAllFilesZip_BlobDoesNotExist()
         {
-            const string path = "path/all-files.zip";
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Slug = "publication-slug"
+                },
+                Slug = "release-slug"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var path = release.AllFilesZipPath();
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            var blob = new BlobInfo(
-                path: path,
-                size: null,
-                contentType: "application/pdf",
-                contentLength: 0L,
-                meta: GetMetaValuesReleaseDateTime(
-                    releaseDateTime: DateTime.UtcNow.AddDays(1)),
-                created: null);
+            blobStorageService.SetupFindBlob(PublicReleaseFiles, path, null);
 
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PublicReleaseFiles, path))
-                .ReturnsAsync(true);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PublicReleaseFiles, path))
-                .ReturnsAsync(blob);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.StreamByPath(path);
+                var result = await service.StreamAllFilesZip(release.Id);
 
                 result.AssertNotFound();
-
-                blobStorageService.Verify(
-                    mock => mock.CheckBlobExists(PublicReleaseFiles, path),
-                    Times.Once());
-
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PublicReleaseFiles, path),
-                    Times.Once());
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);

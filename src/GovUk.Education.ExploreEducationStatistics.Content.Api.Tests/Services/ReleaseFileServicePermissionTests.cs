@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,28 +13,70 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
     public class ReleaseFileServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private static readonly Release Release = new()
         {
             Id = Guid.NewGuid()
         };
+
+        private static readonly ReleaseFile ReleaseFile = new()
+        {
+            Release = Release,
+            File = new File(),
+        };
+
+        [Fact]
+        public async Task StreamFile()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(ReleaseFile.Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var persistenceHelper =
+                            MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
+
+                        var service = BuildReleaseFileService(
+                            userService: userService.Object,
+                            persistenceHelper: persistenceHelper.Object
+                        );
+                        return service.StreamFile(ReleaseFile.ReleaseId, ReleaseFile.FileId);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task StreamAllFilesZip()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseFileService(userService: userService.Object);
+                        return service.StreamAllFilesZip(Release.Id);
+                    }
+                );
+        }
 
         [Fact]
         public async Task ZipFilesToStream()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseFileService(userService: userService.Object);
                         return service.ZipFilesToStream(
-                            releaseId: _release.Id,
+                            releaseId: Release.Id,
                             fileIds: ListOf(Guid.NewGuid()),
                             outputStream: Stream.Null
                         );
@@ -43,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 );
         }
 
-        public ReleaseFileService BuildReleaseFileService(
+        private ReleaseFileService BuildReleaseFileService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IBlobStorageService? blobStorageService = null,
@@ -60,9 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
-            return mock;
+            return MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release);
         }
     }
 }

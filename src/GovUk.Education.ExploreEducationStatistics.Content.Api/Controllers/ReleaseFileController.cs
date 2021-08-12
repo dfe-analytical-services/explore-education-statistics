@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 Guid.TryParse(fileId, out var fileIdAsGuid))
             {
                 return await _releaseFileService
-                    .Stream(releaseIdAsGuid, fileIdAsGuid)
+                    .StreamFile(releaseIdAsGuid, fileIdAsGuid)
                     .HandleFailures();
             }
 
@@ -49,10 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         {
             if (Guid.TryParse(releaseId, out var releaseIdAsGuid))
             {
-                return await _persistenceHelper
-                    .CheckEntityExists<Release>(releaseIdAsGuid,
-                        q => q.Include(release => release.Publication))
-                    .OnSuccess(release => _releaseFileService.StreamByPath(release.AllFilesZipPath()))
+                return await _releaseFileService
+                    .StreamAllFilesZip(releaseIdAsGuid)
                     .HandleFailures();
             }
 

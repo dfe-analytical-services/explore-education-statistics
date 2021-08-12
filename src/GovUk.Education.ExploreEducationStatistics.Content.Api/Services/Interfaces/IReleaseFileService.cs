@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IReleaseFileService
     {
-        Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid fileId);
 
         /// <summary>
         /// Pipe a zip file containing some release files to a stream.
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
             Stream outputStream,
             CancellationToken? cancellationToken = null);
 
-        Task<Either<ActionResult, FileStreamResult>> StreamByPath(string path);
+        Task<Either<ActionResult, FileStreamResult>> StreamAllFilesZip(Guid releaseId);
 
         Task<List<FileInfo>> ListDownloadFiles(Release release);
     }
