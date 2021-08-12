@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class MethodologyStatusAuthorizationHandlers
     {
         public class ApproveSpecificMethodologyRequirement : IAuthorizationRequirement
@@ -16,11 +17,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public class ApproveSpecificMethodologyAuthorizationHandler :
             AuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
         {
+            private readonly IMethodologyRepository _methodologyRepository;
+
+            public ApproveSpecificMethodologyAuthorizationHandler(IMethodologyRepository methodologyRepository)
+            {
+                _methodologyRepository = methodologyRepository;
+            }
+
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
                 ApproveSpecificMethodologyRequirement requirement,
                 Methodology methodology)
             {
-                if (methodology.Status == Approved)
+                // If the Methodology is already public, it cannot be approved
+                // An approved Methodology that isn't public can be approved to change attributes associated with approval  
+                if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
                 {
                     return;
                 }

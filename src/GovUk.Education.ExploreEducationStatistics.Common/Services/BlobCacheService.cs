@@ -11,30 +11,30 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
-    public class BlobStorageCacheService : ICacheService
+    public class BlobCacheService : IBlobCacheService
     {
         private readonly IBlobStorageService _blobStorageService;
-        private readonly ILogger<BlobStorageCacheService> _logger;
+        private readonly ILogger<BlobCacheService> _logger;
 
-        public BlobStorageCacheService(IBlobStorageService blobStorageService,
-            ILogger<BlobStorageCacheService> logger)
+        public BlobCacheService(IBlobStorageService blobStorageService,
+            ILogger<BlobCacheService> logger)
         {
             _blobStorageService = blobStorageService;
             _logger = logger;
         }
 
-        public async Task DeleteItem(IBlobContainer blobContainer, ICacheKey cacheKey)
+        public async Task DeleteItem(IBlobCacheKey cacheKey)
         {
-            await _blobStorageService.DeleteBlob(blobContainer, cacheKey.Key);
+            await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
         }
 
-        public async Task<TEntity> GetItem<TEntity>(
-            IBlobContainer blobContainer,
-            ICacheKey cacheKey,
-            Func<TEntity> entityProvider) where TEntity : class
+        public async Task<TItem> GetItem<TItem>(
+            IBlobCacheKey cacheKey,
+            Func<TItem> itemSupplier)
+            where TItem : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
+            var cachedEntity = await GetItem<TItem>(cacheKey);
 
             if (cachedEntity != null)
             {
@@ -42,66 +42,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             // Cache miss - invoke provider instead
-            var entity = entityProvider();
+            var entity = itemSupplier();
 
             // Write result to cache as a json blob before returning
-            await WriteToCache(blobContainer, cacheKey, entity);
+            await SetItem(cacheKey, entity);
             return entity;
         }
 
-        public async Task<TEntity> GetItem<TEntity>(
-            IBlobContainer blobContainer,
-            ICacheKey cacheKey,
-            Func<Task<TEntity>> entityProvider)
-            where TEntity : class
+        public async Task<TItem> GetItem<TItem>(
+            IBlobCacheKey cacheKey,
+            Func<Task<TItem>> itemSupplier)
+            where TItem : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
+            var cachedEntity = await GetItem<TItem>(cacheKey);
             if (cachedEntity != null)
             {
                 return cachedEntity;
             }
 
             // Cache miss - invoke provider instead
-            var entity = await entityProvider();
+            var entity = await itemSupplier();
 
             // Write result to cache as a json blob before returning
-            await WriteToCache(blobContainer, cacheKey, entity);
+            await SetItem(cacheKey, entity);
             return entity;
         }
 
-        public async Task<Either<ActionResult, TEntity>> GetItem<TEntity>(
-            IBlobContainer blobContainer,
-            ICacheKey cacheKey,
-            Func<Task<Either<ActionResult, TEntity>>> entityProvider)
-            where TEntity : class
+        public async Task<Either<ActionResult, TItem>> GetItem<TItem>(
+            IBlobCacheKey cacheKey,
+            Func<Task<Either<ActionResult, TItem>>> itemSupplier)
+            where TItem : class
         {
             // Attempt to read blob from the cache container
-            var cachedEntity = await ReadFromCache<TEntity>(blobContainer, cacheKey);
+            var cachedEntity = await GetItem<TItem>(cacheKey);
+
             if (cachedEntity != null)
             {
                 return cachedEntity;
             }
 
             // Cache miss - invoke provider instead
-            return await entityProvider().OnSuccessDo(async entity =>
+            return await itemSupplier().OnSuccessDo(async entity =>
             {
                 // Write result to cache as a json blob before returning
-                await WriteToCache(blobContainer, cacheKey, entity);
+                await SetItem(cacheKey, entity);
             });
         }
 
-        private async Task<TEntity?> ReadFromCache<TEntity>(
-            IBlobContainer blobContainer,
-            ICacheKey cacheKey)
-            where TEntity : class
+        public async Task<TItem?> GetItem<TItem>(IBlobCacheKey cacheKey)
+            where TItem : class
         {
+            return (TItem?) await GetItem(cacheKey, typeof(TItem));
+        }
+
+        public async Task<object?> GetItem(IBlobCacheKey cacheKey, Type targetType)
+        {
+            var blobContainer = cacheKey.Container;
             var key = cacheKey.Key;
 
             // Attempt to read blob from the storage container
             try
             {
-                return await _blobStorageService.GetDeserializedJson<TEntity>(blobContainer, key);
+                return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
             }
             catch (JsonException)
             {
@@ -118,16 +121,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 _logger.LogError(e, $"Caught error fetching cache entry from: {blobContainer}/{key}");
             }
 
-            return null;
+            return default;
         }
 
-        private async Task WriteToCache<TEntity>(
-            IBlobContainer blobContainer,
-            ICacheKey cacheKey,
-            TEntity entity)
+        public async Task SetItem<TItem>(
+            IBlobCacheKey cacheKey,
+            TItem item)
         {
             // Write result to cache as a json blob before returning
-            await _blobStorageService.UploadAsJson(blobContainer, cacheKey.Key, entity);
+            await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);
         }
     }
 }

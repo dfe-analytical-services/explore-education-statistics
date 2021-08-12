@@ -10,7 +10,7 @@ trigger:
   paths:
     exclude:
     - infrastructure/
-pr: [ 'master', 'dev', 'EES-1263-SOW4' ]
+pr: [ 'master', 'dev' ]
 
 jobs:
   - job: 'Backend'
@@ -42,7 +42,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Content API'
@@ -50,7 +50,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'

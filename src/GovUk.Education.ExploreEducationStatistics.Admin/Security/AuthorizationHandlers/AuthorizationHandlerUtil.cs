@@ -23,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private static readonly List<ReleaseRole> EditorRoles = new List<ReleaseRole>
         {
             ReleaseRole.Contributor,
-            ReleaseRole.Approver,
             ReleaseRole.Lead
         };
 
@@ -42,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             return ContainsAtLeastOneCommonRole(UnrestrictedViewerRoles, roles);
         }
 
-        public static bool ContainsEditorRole(IEnumerable<ReleaseRole> roles)
+        public static bool ContainsEditorOrApproverRole(IEnumerable<ReleaseRole> roles)
         {
-            return ContainsAtLeastOneCommonRole(EditorRoles, roles);
+            return ContainsAtLeastOneCommonRole(EditorRoles.Concat(ApproverRoles), roles);
         }
 
         public static bool ContainsApproverRole(IEnumerable<ReleaseRole> roles)

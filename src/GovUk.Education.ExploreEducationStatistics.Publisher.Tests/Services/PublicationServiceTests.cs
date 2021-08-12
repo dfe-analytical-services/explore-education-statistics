@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
@@ -19,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class PublicationServiceTests
     {
-        private static readonly Theme Theme = new Theme
+        private static readonly Theme Theme = new()
         {
             Id = Guid.NewGuid(),
             Title = "Theme A",
@@ -27,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Summary = "The first theme"
         };
 
-        private static readonly Topic Topic = new Topic
+        private static readonly Topic Topic = new()
         {
             Id = Guid.NewGuid(),
             Title = "Topic A",
@@ -35,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "topic-a"
         };
 
-        private static readonly Contact Contact1 = new Contact
+        private static readonly Contact Contact1 = new()
         {
             Id = Guid.NewGuid(),
             ContactName = "first contact name",
@@ -44,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "first contact team name"
         };
 
-        private static readonly Contact Contact2 = new Contact
+        private static readonly Contact Contact2 = new()
         {
             Id = Guid.NewGuid(),
             ContactName = "second contact name",
@@ -53,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "second contact team name"
         };
 
-        private static readonly Contact Contact3 = new Contact
+        private static readonly Contact Contact3 = new()
         {
             Id = Guid.NewGuid(),
             ContactName = "third contact name",
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TeamName = "third contact team name"
         };
 
-        private static readonly Publication PublicationA = new Publication
+        private static readonly Publication PublicationA = new()
         {
             Id = Guid.NewGuid(),
             Contact = Contact1,
@@ -103,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
-        private static readonly Publication PublicationB = new Publication
+        private static readonly Publication PublicationB = new()
         {
             Id = Guid.NewGuid(),
             Contact = Contact2,
@@ -115,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Summary = "second publication summary"
         };
 
-        private static readonly Publication PublicationC = new Publication
+        private static readonly Publication PublicationC = new()
         {
             Id = Guid.NewGuid(),
             Contact = Contact3,
@@ -128,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
-        private static readonly Release PublicationARelease1V0 = new Release
+        private static readonly Release PublicationARelease1V0 = new()
         {
             Id = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
             PublicationId = PublicationA.Id,
@@ -141,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = null
         };
 
-        private static readonly Release PublicationARelease1V1Deleted = new Release
+        private static readonly Release PublicationARelease1V1Deleted = new()
         {
             Id = new Guid("cf02f125-91da-4606-bf80-c2058092a653"),
             PublicationId = PublicationA.Id,
@@ -155,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             SoftDeleted = true
         };
 
-        private static readonly Release PublicationARelease1V1 = new Release
+        private static readonly Release PublicationARelease1V1 = new()
         {
             Id = new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"),
             PublicationId = PublicationA.Id,
@@ -168,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
         };
 
-        private static readonly Release PublicationARelease2 = new Release
+        private static readonly Release PublicationARelease2 = new()
         {
             Id = new Guid("874d4e4f-5568-482f-a5a4-d41e5bf6632a"),
             PublicationId = PublicationA.Id,
@@ -181,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = null
         };
 
-        private static readonly Release PublicationARelease3 = new Release
+        private static readonly Release PublicationARelease3 = new()
         {
             Id = new Guid("676ff979-9b1d-4bd2-a3f1-f126c4e2e8d4"),
             PublicationId = PublicationA.Id,
@@ -194,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = null
         };
 
-        private static readonly Release PublicationBRelease1 = new Release
+        private static readonly Release PublicationBRelease1 = new()
         {
             Id = new Guid("e66247d7-b350-4d81-a223-3080edc55623"),
             PublicationId = PublicationB.Id,
@@ -227,49 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             },
             PublicationBRelease1
         );
-
-        [Fact]
-        public void GetTree()
-        {
-            var contextId = Guid.NewGuid().ToString();
-
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
-            {
-                context.Add(Theme);
-                context.Add(Topic);
-                context.AddRange(PublicationA, PublicationB, PublicationC);
-                context.AddRange(Releases);
-
-                context.SaveChanges();
-            }
-
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
-            {
-                var service = BuildPublicationService(context);
-
-                var result = service.GetTree(Enumerable.Empty<Guid>());
-
-                Assert.Single(result);
-                var theme = result.First();
-                Assert.Equal("Theme A", theme.Title);
-
-                Assert.Single(theme.Topics);
-                var topic = theme.Topics.First();
-                Assert.Equal("Topic A", topic.Title);
-
-                var publications = topic.Publications;
-                Assert.Equal(2, publications.Count);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("first publication summary", publications[0].Summary);
-                Assert.Equal("Publication A", publications[0].Title);
-                // The Publication has a legacy url but it's not set because Releases exist
-                Assert.Null(publications[0].LegacyPublicationUrl);
-                Assert.Equal("publication-c", publications[1].Slug);
-                Assert.Equal("third publication summary", publications[1].Summary);
-                Assert.Equal("Publication C", publications[1].Title);
-                Assert.Equal("http://legacy.url/", publications[1].LegacyPublicationUrl);
-            }
-        }
 
         [Fact]
         public async Task GetViewModel()
@@ -534,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IMapper mapper = null,
             IReleaseService releaseService = null
         ) {
-            return new PublicationService(
+            return new(
                 contentDbContext: contentDbContext,
                 mapper: mapper ?? MapperForProfile<MappingProfiles>(),
                 releaseService: releaseService ?? new Mock<IReleaseService>().Object

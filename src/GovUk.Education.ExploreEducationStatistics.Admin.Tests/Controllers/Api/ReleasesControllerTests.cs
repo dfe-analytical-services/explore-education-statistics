@@ -30,12 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
 
-            mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<ReleaseCreateViewModel>()))
+            mocks.ReleaseService.Setup(s => s.CreateRelease(It.IsAny<ReleaseCreateViewModel>()))
                 .ReturnsAsync(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.CreateReleaseAsync(new ReleaseCreateViewModel(), _publicationId);
+            var result = await controller.CreateRelease(new ReleaseCreateViewModel(), _publicationId);
             result.AssertOkResult();
         }
 
@@ -181,18 +181,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task Get_Releases_For_Publication_Returns_Ok()
+        public async Task GetTemplateRelease_Returns_Ok()
         {
             var mocks = Mocks();
             var templateReleaseResult =
                 new Either<ActionResult, TitleAndIdViewModel>(new TitleAndIdViewModel());
             mocks.ReleaseService
-                .Setup(s => s.GetLatestReleaseAsync(It.Is<Guid>(id => id == _releaseId)))
+                .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseId)))
                 .Returns<Guid>(x => Task.FromResult(templateReleaseResult));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.GetTemplateReleaseAsync(_releaseId);
+            var result = await controller.GetTemplateRelease(_releaseId);
             result.AssertOkResult();
         }
 

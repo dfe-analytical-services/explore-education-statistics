@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
@@ -27,8 +28,8 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces.IReleaseService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -92,20 +93,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
-            services.AddTransient<ICacheService, BlobStorageCacheService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IPublicationService, Services.PublicationService>();
             services.AddTransient<IReleaseService, Content.Api.Services.ReleaseService>();
+            services.AddTransient<IReleaseFileService, ReleaseFileService>();
+            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -116,6 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             IWebHostEnvironment env,
             ILogger<Startup> logger)
         {
+            // Enable caching and register any caching services
+            CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

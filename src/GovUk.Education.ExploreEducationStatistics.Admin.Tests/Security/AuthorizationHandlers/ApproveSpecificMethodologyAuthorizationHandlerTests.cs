@@ -1,11 +1,16 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.MethodologyStatusAuthorizationHandlers;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -17,31 +22,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ApproveSpecificMethodologyAuthorizationHandlerClaimsTests
         {
             [Fact]
-            public async Task NoClaimsAllowApprovingMethodologyWhichIsApproved()
+            public async Task NoClaimsAllowApprovingPubliclyAccessibleMethodology()
             {
                 var methodology = new Methodology
                 {
-                    Id = Guid.NewGuid(),
-                    Status = Approved
+                    Id = Guid.NewGuid()
                 };
 
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var handler = new ApproveSpecificMethodologyAuthorizationHandler();
+                    var (handler, methodologyRepository) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
+                        .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, Methodology>
+                    var authContext =
+                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, Methodology>
                             (user, methodology);
 
                     await handler.HandleAsync(authContext);
+                    VerifyAllMocks(methodologyRepository);
 
-                    // No claims should allow approving a Methodology which is already approved
+                    // No claims should allow a publicly accessible Methodology to be approved
                     Assert.False(authContext.HasSucceeded);
                 });
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanApproveDraftMethodology()
+            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleDraftMethodology()
             {
                 var methodology = new Methodology
                 {
@@ -51,7 +60,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var handler = new ApproveSpecificMethodologyAuthorizationHandler();
+                    var (handler, methodologyRepository) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
+                        .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
@@ -60,11 +72,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
 
-                    // Only the ApproveAllMethodologies claim should allow approving a draft Methodology
+                    // Only the ApproveAllMethodologies claim should allow approving a Methodology
                     var expectedToPass = claim == SecurityClaimTypes.ApproveAllMethodologies;
                     Assert.Equal(expectedToPass, authContext.HasSucceeded);
                 });
             }
+
+            [Fact]
+            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleApprovedMethodology()
+            {
+                var methodology = new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    Status = Approved
+                };
+
+                await ForEachSecurityClaimAsync(async claim =>
+                {
+                    var (handler, methodologyRepository) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(mock => mock.IsPubliclyAccessible(methodology.Id))
+                        .ReturnsAsync(false);
+
+                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var authContext =
+                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, Methodology>
+                            (user, methodology);
+
+                    await handler.HandleAsync(authContext);
+
+                    // Only the ApproveAllMethodologies claim should allow approving a Methodology
+                    var expectedToPass = claim == SecurityClaimTypes.ApproveAllMethodologies;
+                    Assert.Equal(expectedToPass, authContext.HasSucceeded);
+                });
+            }
+        }
+
+        private static (ApproveSpecificMethodologyAuthorizationHandler, Mock<IMethodologyRepository>)
+            CreateHandlerAndDependencies()
+        {
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            var handler = new ApproveSpecificMethodologyAuthorizationHandler(
+                methodologyRepository.Object);
+
+            return (handler, methodologyRepository);
         }
     }
 }

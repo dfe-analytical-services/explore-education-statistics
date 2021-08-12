@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)
-                : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorRole(releaseRoles))
+                : ContainPublicationOwnerRole(publicationRoles) || ContainsEditorOrApproverRole(releaseRoles))
             {
                 context.Succeed(requirement);
             }

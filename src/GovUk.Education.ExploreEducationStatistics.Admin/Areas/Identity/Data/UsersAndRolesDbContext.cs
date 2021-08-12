@@ -213,14 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
-                    // TODO SOW4 EES-2168 Drop claim UpdateAllMethodologies from the Analyst role
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -26,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
+                    // TODO SOW4 EES-2603 Drop claim AccessAllMethodologies from the Analyst role
                     new IdentityRoleClaim<string>
                     {
                         Id = -27,

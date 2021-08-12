@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -20,15 +21,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string? InternalReleaseNote { get; set; }
 
-        public PermissionsSet Permissions { get; set; }
+        public PermissionsSet Permissions { get; set; } = new PermissionsSet();
 
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public class PermissionsSet
         {
+            public bool CanApproveMethodology { get; set; }
             public bool CanUpdateMethodology { get; set; }
             public bool CanDeleteMethodology { get; set; }
             public bool CanMakeAmendmentOfMethodology { get; set; }
+            public bool CanMarkMethodologyAsDraft { get; set; }
         }
     }
 }

@@ -7,7 +7,7 @@ import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup } from '@common/components/form';
+import { Form, FormFieldRadioGroup, FormSelect } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import Yup from '@common/validation/yup';
@@ -104,7 +104,7 @@ const MethodologyStatusForm = ({
                 legend="When to publish"
                 legendSize="m"
                 hint="Do you want to publish this methodology with a specific release or immediately?"
-                order={[]}
+                order={FormSelect.unordered}
                 options={[
                   {
                     label: 'With a specific release',
@@ -113,6 +113,7 @@ const MethodologyStatusForm = ({
                       <FormFieldSelect<FormValues>
                         label="Select release"
                         name="withReleaseId"
+                        order={FormSelect.unordered}
                         options={unpublishedReleases.map(release => {
                           return {
                             label: release.title,

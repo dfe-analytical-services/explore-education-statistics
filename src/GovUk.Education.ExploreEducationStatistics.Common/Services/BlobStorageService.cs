@@ -1,7 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -48,12 +48,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string path)
+        public async Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blobInfos = new List<BlobInfo>();
 
-            string continuationToken = null;
+            string? continuationToken = null;
 
             do
             {
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string excludePattern = null)
+        public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null)
         {
             if (!directoryPath.IsNullOrEmpty())
             {
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             _logger.LogInformation($"Deleting blobs from {blobContainer.Name}/{directoryPath}");
 
-            string continuationToken = null;
+            string? continuationToken = null;
 
             do
             {
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer containerName,
             string path,
             IFormFile file,
-            IDictionary<string, string> metadata = null)
+            IDictionary<string, string>? metadata = null)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string path,
             Stream stream,
             string contentType,
-            IDictionary<string, string> metadata = null)
+            IDictionary<string, string>? metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string path,
             string content,
             string contentType,
-            IDictionary<string, string> metadata = null)
+            IDictionary<string, string>? metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer containerName,
             string path,
             T content,
-            JsonSerializerSettings settings)
+            JsonSerializerSettings? settings)
         {
             var json = JsonConvert.SerializeObject(content, null, settings);
 
@@ -441,7 +441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await streamReader.ReadToEndAsync();
         }
 
-        public async Task<T> GetDeserializedJson<T>(IBlobContainer containerName, string path)
+        public async Task<object?> GetDeserializedJson(IBlobContainer containerName, string path, Type type)
         {
             var text = await DownloadBlobText(containerName, path);
 
@@ -451,8 +451,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     $"Found empty file when trying to deserialize JSON for path: {path}");
             }
 
-            return JsonConvert.DeserializeObject<T>(
+            return JsonConvert.DeserializeObject(
                 text,
+                type,
                 new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto
@@ -460,12 +461,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
+        public async Task<T?> GetDeserializedJson<T>(IBlobContainer containerName, string path)
+            where T : class
+        {
+            return (T?) await GetDeserializedJson(containerName, path, typeof(T));
+        }
+
         public async Task<List<BlobInfo>> CopyDirectory(
             IBlobContainer sourceContainerName,
             string sourceDirectoryPath,
             IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
-            IBlobStorageService.CopyDirectoryOptions options = null)
+            IBlobStorageService.CopyDirectoryOptions? options = null)
         {
             _logger.LogInformation(
                 "Copying directory from {0}/{1} to {2}/{3}",
@@ -515,7 +522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string sourceDirectoryPath,
             IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
-            IBlobStorageService.MoveDirectoryOptions options = null)
+            IBlobStorageService.MoveDirectoryOptions? options = null)
         {
             await CopyDirectory(
                 sourceContainerName: sourceContainerName,
@@ -561,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        private void FileFailedCallback(object sender, TransferEventArgs e)
+        private void FileFailedCallback(object? sender, TransferEventArgs e)
         {
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
@@ -576,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        private void FileSkippedCallback(object sender, TransferEventArgs e)
+        private void FileSkippedCallback(object? sender, TransferEventArgs e)
         {
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
@@ -603,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         private async Task<CloudBlobContainer> GetCloudBlobContainer(
             IBlobContainer containerName,
-            string connectionString = null)
+            string? connectionString = null)
         {
             var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();

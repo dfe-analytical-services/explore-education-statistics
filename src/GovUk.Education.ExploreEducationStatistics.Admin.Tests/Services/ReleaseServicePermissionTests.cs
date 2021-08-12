@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseAsync()
+        public async Task CreateRelease()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(Publication, CanCreateReleaseForSpecificPublication)
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseAsync(
+                        return service.CreateRelease(
                             new ReleaseCreateViewModel
                             {
                                 PublicationId = Publication.Id,
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestReleaseAsync()
+        public async Task GetLatestPublishedRelease()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(Publication, CanViewSpecificPublication)
@@ -181,13 +181,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.GetLatestReleaseAsync(Publication.Id);
+                        return service.GetLatestPublishedRelease(Publication.Id);
                     }
                 );
         }
 
         [Fact]
-        public async Task CreateReleaseAmendmentAsync()
+        public async Task CreateReleaseAmendment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_release, CanMakeAmendmentOfSpecificRelease)
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentDbContext.Attach(_release);
                             var service = BuildReleaseService(contentDbContext,
                                 userService: userService.Object);
-                            return service.CreateReleaseAmendmentAsync(_release.Id);
+                            return service.CreateReleaseAmendment(_release.Id);
                         }
                     }
                 );
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved))
+                .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved));
+            repository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             repository
-                .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved))
+                .Setup(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            repository.Verify(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseApprovalStatus.Approved));
+            repository.Verify(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved));
             repository.VerifyNoOtherCalls();
         }
 

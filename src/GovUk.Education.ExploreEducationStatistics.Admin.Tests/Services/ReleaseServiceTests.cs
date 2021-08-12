@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = releaseService.CreateReleaseAsync(
+                var result = releaseService.CreateRelease(
                     new ReleaseCreateViewModel
                     {
                         PublicationId = publication.Id,
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = releaseService.CreateReleaseAsync(
+                var result = releaseService.CreateRelease(
                     new ReleaseCreateViewModel
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -1619,7 +1619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestReleaseAsync()
+        public async Task GetLatestPublishedRelease()
         {
             var publication = new Publication
             {
@@ -1697,7 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var latest = releaseService.GetLatestReleaseAsync(publication.Id).Result.Right;
+                var latest = releaseService.GetLatestPublishedRelease(publication.Id).Result.Right;
 
                 Assert.NotNull(latest);
                 Assert.Equal(latestReleaseV1.Id, latest.Id);

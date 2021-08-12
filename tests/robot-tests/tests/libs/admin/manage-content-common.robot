@@ -131,7 +131,8 @@ user adds image to accordion section text block
     user clicks element    xpath://div[@title="Insert paragraph after block"]
 
     # wait for the API to save the image and for the src attribute to be updated before continuing
-    user waits until parent contains element    ${block}    xpath://img[starts-with(@src, "/api/") and @alt="${alt_text}"]
+    user waits until parent contains element    ${block}
+    ...    xpath://img[starts-with(@src, "/api/") and @alt="${alt_text}"]
 
     # Workaround to remove the eager "All images must have alternative (alt) text" validation error that persists
     # even after setting the alt text

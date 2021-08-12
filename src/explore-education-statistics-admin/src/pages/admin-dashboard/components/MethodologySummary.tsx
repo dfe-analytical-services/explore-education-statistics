@@ -96,14 +96,19 @@ const MethodologySummary = ({
     onChangePublication();
   };
 
-  const hasMethodologyPermissions =
+  const canCreateOrManageExternal =
     publication.permissions.canCreateMethodologies ||
     publication.permissions.canManageExternalMethodology;
 
   return (
     <>
-      {methodologies.length > 0 &&
-        methodologies.map(methodology => (
+      {methodologies.map(methodology => {
+        const canEdit =
+          methodology.permissions.canApproveMethodology ||
+          methodology.permissions.canMarkMethodologyAsDraft ||
+          methodology.permissions.canUpdateMethodology;
+
+        return (
           <Details
             key={methodology.id}
             open={false}
@@ -142,7 +147,7 @@ const MethodologySummary = ({
                           methodologyId: methodology.id,
                         })}
                       >
-                        {methodology.permissions.canUpdateMethodology
+                        {canEdit
                           ? 'Edit this amendment'
                           : 'View this amendment'}
                       </ButtonLink>
@@ -151,7 +156,8 @@ const MethodologySummary = ({
                           publicationId,
                           methodologyId: methodology.previousVersionId,
                         })}
-                        className="govuk-button--secondary govuk-!-margin-left-4"
+                        className="govuk-!-margin-left-4"
+                        variant="secondary"
                       >
                         View original methodology
                       </ButtonLink>
@@ -166,7 +172,7 @@ const MethodologySummary = ({
                           methodologyId: methodology.id,
                         })}
                       >
-                        {methodology.permissions.canUpdateMethodology
+                        {canEdit
                           ? 'Edit this methodology'
                           : 'View this methodology'}
                       </ButtonLink>
@@ -193,7 +199,7 @@ const MethodologySummary = ({
                         amendment: methodology.amendment,
                       })
                     }
-                    className="govuk-button--warning"
+                    variant="warning"
                   >
                     {methodology.amendment ? 'Cancel amendment' : 'Remove'}
                   </Button>
@@ -201,13 +207,14 @@ const MethodologySummary = ({
               </div>
             </div>
           </Details>
-        ))}
+        );
+      })}
 
-      {methodologies.length === 0 && !hasMethodologyPermissions && (
+      {methodologies.length === 0 && !canCreateOrManageExternal && (
         <>No methodologies added.</>
       )}
 
-      {hasMethodologyPermissions && (
+      {canCreateOrManageExternal && (
         <ButtonGroup className="govuk-!-margin-bottom-2">
           {publication.permissions.canCreateMethodologies && (
             <Button
