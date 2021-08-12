@@ -45,13 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release LatestPublishedRelease()
         {
-            return LatestRelease(checkIfLive: true);
+            return Releases?
+                .Where(IsLatestPublishedVersionOfRelease)
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .LastOrDefault();
         }
 
-        public Release LatestRelease(bool checkIfLive)
+        public Release LatestRelease()
         {
             return Releases?
-                .Where(r => !checkIfLive || r.Live)
                 .Where(r => IsLatestVersionOfRelease(r.Id))
                 .OrderBy(r => r.Year)
                 .ThenBy(r => r.TimePeriodCoverage)
@@ -61,6 +64,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool IsLatestVersionOfRelease(Guid releaseId)
         {
             return !Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+        }
+
+        private bool IsLatestPublishedVersionOfRelease(Release release)
+        {
+            return
+                // Release itself must be live
+                release.Live
+                // It must also be the latest version unless the later version is a draft
+                && !Releases.Any(r =>
+                    r.Live
+                    && r.PreviousVersionId == release.Id
+                    && r.Id != release.Id);
         }
     }
 }
