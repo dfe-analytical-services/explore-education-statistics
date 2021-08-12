@@ -8,7 +8,6 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Navigate to glossary page
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
     user waits until h1 is visible    Explore our statistics and data
@@ -18,7 +17,6 @@ Navigate to glossary page
     user checks url contains    %{PUBLIC_URL}/glossary
 
 Validate glossary accordion sections
-    [Tags]    HappyPath
     user checks accordion is in position    A    1
     user checks accordion is in position    B    2
     user checks accordion is in position    C    3
@@ -26,7 +24,6 @@ Validate glossary accordion sections
     user checks accordion is in position    Z    26
 
 Search for Pupil referral unit
-    [Tags]    HappyPath
     user verifies accordion is closed    P
 
     user enters text into element    id:pageSearchForm-input    Pupil referral unit

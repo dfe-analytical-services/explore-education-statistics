@@ -13,30 +13,25 @@ ${PUBLICATION_NAME}     UI tests - delete subject %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create test publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    TY    2020
 
 Verify Release summary
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Tax Year 2020-21 (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Tax Year    2020-21    UI test contact name
     ...    National Statistics
 
 Upload subject
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
 Navigate to 'Footnotes' page
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Create subject footnote for new subject
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -48,7 +43,6 @@ Create subject footnote for new subject
     user waits until h2 is visible    Footnotes
 
 Create indicator footnote for new subject
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -62,7 +56,6 @@ Create indicator footnote for new subject
     user waits until h2 is visible    Footnotes
 
 Create Random Filter Total footnote for new subject
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -76,7 +69,6 @@ Create Random Filter Total footnote for new subject
     user waits until h2 is visible    Footnotes
 
 Create Random Filter Select all footnote for new subject
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -90,18 +82,15 @@ Create Random Filter Select all footnote for new subject
     user waits until h2 is visible    Footnotes
 
 Navigate to 'Data blocks' page
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
 Create new data block
-    [Tags]    HappyPath
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
     user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
-    [Tags]    HappyPath
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
@@ -109,7 +98,6 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    [Tags]    HappyPath
     user opens details dropdown    Opportunity Area
     user clicks checkbox    Bolton 001 (E02000984)
     user opens details dropdown    Ward
@@ -119,19 +107,16 @@ Select locations
     user waits until table tool wizard step is available    Choose time period
 
 Select time period
-    [Tags]    HappyPath
     user chooses select option    id:timePeriodForm-start    2019
     user chooses select option    id:timePeriodForm-end    2019
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    Choose your filters
 
 Select indicators
-    [Tags]    HappyPath
     user clicks indicator checkbox    Admission Numbers
 
 Create table
     [Documentation]    EES-615
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
@@ -144,7 +129,6 @@ Create table
     user waits until page contains    Delete this data block
 
 Navigate to Create chart tab
-    [Tags]    HappyPath
     user waits until page contains link    Chart
     user waits until page does not contain loading spinner
     user clicks link    Chart
@@ -156,12 +140,10 @@ Navigate to Create chart tab
     user waits until page contains    Chart preview
 
 Navigate back to 'Data and files' page
-    [Tags]    HappyPath
     user clicks link    Data and files
     user waits until page contains link    Data uploads
 
 Delete UI test subject
-    [Tags]    HappyPath
     user clicks link    Data uploads
     user waits until h2 is visible    Add data file to release    60
     user waits until page contains accordion section    UI test subject    60

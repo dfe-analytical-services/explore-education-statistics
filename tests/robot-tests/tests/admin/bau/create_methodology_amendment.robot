@@ -21,8 +21,6 @@ Create publicly accessible Publication
     user approves release for immediate publication
 
 Create Methodology with some content and images
-    [Tags]    HappyPath
-
     user creates methodology for publication    ${PUBLICATION_NAME}
     user edits methodology summary for publication
     ...    ${PUBLICATION_NAME}
@@ -62,7 +60,6 @@ Create Methodology with some content and images
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Verify the editable content is as expected
-    [Tags]    HappyPath
     user checks accordion section contains x blocks    Methodology content section 1    1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
@@ -93,11 +90,9 @@ Verify the editable content is as expected
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Approve the Methodology
-    [Tags]    HappyPath
     user approves methodology for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - first methodology version
 
 Verify the summary for the original Methodology is as expected
-    [Tags]    HappyPath
     ${expected_published_date}=    get current datetime    %-d %B %Y
     user views methodology for publication
     ...    ${PUBLICATION_NAME}
@@ -110,18 +105,15 @@ Verify the summary for the original Methodology is as expected
     ...    ${expected_published_date}
 
 Verify the readonly content for the original Methodology is as expected
-    [Tags]    HappyPath
     user clicks link    Manage content
     user verifies original Methodology readonly content
 
 Create a Methodology Amendment
-    [Tags]    HappyPath
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user checks page contains tag    Draft
     user checks page contains tag    Amendment
 
 Edit the Amendment's summary to return the Methodology's title to the same as its owning Publication's title
-    [Tags]    HappyPath
     user edits methodology summary for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
@@ -139,13 +131,11 @@ Edit the Amendment's summary to return the Methodology's title to the same as it
     user checks radio is checked    Use publication title
 
 Remove a Content Section from the Amendment
-    [Tags]    HappyPath
     user clicks link    Manage content
     user opens accordion section    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user deletes editable accordion section    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Remove an image from a Content Block
-    [Tags]    HappyPath
     user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user removes image from accordion section text block    Methodology annex section 2    2
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
@@ -153,14 +143,12 @@ Remove an image from a Content Block
     ...    Alt text for the uploaded content image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Remove a Content Block from a Content Section
-    [Tags]    HappyPath
     user deletes editable accordion section content block    Methodology annex section 2    1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user checks accordion section contains x blocks    Methodology annex section 2    1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Add a new Content Block to an existing Content Section and include a new image
-    [Tags]    HappyPath
     user opens accordion section    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
@@ -170,7 +158,6 @@ Add a new Content Block to an existing Content Section and include a new image
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
 Verify all is as expected on the Amendment after the Amendment content changes
-    [Tags]    HappyPath
     user checks accordion section contains x blocks    Methodology content section 1    2
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user checks accordion section text block contains image with alt text    Methodology content section 1    1
@@ -181,7 +168,6 @@ Verify all is as expected on the Amendment after the Amendment content changes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Revisit the original Methodology and check that its content remains unaffected by the changes to the Amendment
-    [Tags]    HappyPath
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user clicks link    View original methodology    ${accordion}
@@ -189,11 +175,9 @@ Revisit the original Methodology and check that its content remains unaffected b
     user verifies original Methodology readonly content
 
 Approve the Methodology Amendment
-    [Tags]    HappyPath
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
 Revisit the Publication on the dashboard and check that the new Amendment is now the live Methodology
-    [Tags]    HappyPath
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${accordion}    View this methodology
@@ -202,7 +186,6 @@ Revisit the Publication on the dashboard and check that the new Amendment is now
     user checks element does not contain link    ${accordion}    Edit this amendment
 
 Visit the approved Amendment and check that its summary is as expected
-    [Tags]    HappyPath
     user clicks link    View this methodology
     ${date}=    get current datetime    %-d %B %Y
     user verifies methodology summary details
@@ -212,12 +195,10 @@ Visit the approved Amendment and check that its summary is as expected
     ...    ${date}
 
 Check the approved Amendment's readonly content is as expected
-    [Tags]    HappyPath
     user clicks link    Manage content
     user verifies amended Methodology readonly content
 
 Create and cancel an Amendment
-    [Tags]    HappyPath
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
 
@@ -229,7 +210,6 @@ Create and cancel an Amendment
     user checks element does not contain link    ${accordion}    Edit this amendment
 
 Revisit the live Amendment after the cancellation to double check it remains unaffected
-    [Tags]    HappyPath
     user clicks link    View this methodology
     user clicks link    Manage content
     user verifies amended Methodology readonly content

@@ -8,11 +8,9 @@ Suite Teardown      user closes the browser
 
 *** Test Cases ***
 Navigate to /methodology page
-    [Tags]    HappyPath
     user navigates to public methodologies page
 
 Validate page contents
-    [Tags]    HappyPath
     user waits until page contains accordion section    Pupils and schools
     user opens accordion section    Pupils and schools
     user opens details dropdown    Exclusions
@@ -29,6 +27,5 @@ Validate page contents
     ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
 
 Validate Related information section links exist
-    [Tags]    HappyPath
     user checks page contains element    xpath://a[text()="Find statistics and data"]
     user checks page contains element    xpath://a[text()="Education statistics: glossary"]

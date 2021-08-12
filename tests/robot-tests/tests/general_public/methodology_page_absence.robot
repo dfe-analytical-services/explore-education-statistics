@@ -8,13 +8,11 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    NotAgain
 
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
-    [Tags]    HappyPath
     user navigates to public methodologies page
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
 
 User navigates to absence methodology page
-    [Tags]    HappyPath
     user checks page contains methodology link
     ...    Pupil absence
     ...    Pupil absence in schools in England
@@ -28,11 +26,9 @@ User navigates to absence methodology page
     user waits until page contains title caption    Methodology
 
 Validate Published date, Last updated date
-    [Tags]    HappyPath
     user checks testid element contains    published-date    22 March 2018
 
 Validate accordion sections order
-    [Tags]    HappyPath
     user checks accordion is in position    1. Overview of absence statistics    1    id:content
     user checks accordion is in position    2. National Statistics badging    2    id:content
     user checks accordion is in position    3. Methodology    3    id:content
@@ -50,12 +46,10 @@ Validate accordion sections order
     user checks accordion is in position    Annex F - Absence rates over time    6    id:annexes
 
 Validate page has Print this page link
-    [Tags]    HappyPath
     user waits until page contains button    Print this page
 
 Search for "pupil"
     [Documentation]    EES-807
-    [Tags]    HappyPath
     user verifies accordion is closed    1. Overview of absence statistics
 
     user clicks element    id:pageSearchForm-input
@@ -69,7 +63,6 @@ Search for "pupil"
 
 Search for "specific enquiry"
     [Documentation]    EES-807
-    [Tags]    HappyPath
     user verifies accordion is closed    7. Contacts
 
     user clears element text    id:pageSearchForm-input

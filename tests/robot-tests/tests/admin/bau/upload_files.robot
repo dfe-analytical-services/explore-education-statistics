@@ -14,12 +14,10 @@ ${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create test publication and release via api
-    [Tags]    HappyPath
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2025
 
 Navigate to 'Data and files' page
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
 
@@ -28,7 +26,6 @@ Navigate to 'Data and files' page
 
 Upload a ZIP file subject
     [Documentation]    EES-1397
-    [Tags]    HappyPath
     user enters text into element    label:Subject title    Absence in PRUs
     user clicks radio    ZIP file
     user waits until page contains element    label:Upload ZIP file
@@ -52,7 +49,6 @@ Upload a ZIP file subject
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
 
 Change subject title
-    [Tags]    HappyPath
     user waits until page contains accordion section    Absence in PRUs
     user clicks link    Edit title
 
@@ -63,7 +59,6 @@ Change subject title
     user clicks button    Save changes
 
 Validate subject title has been updated
-    [Tags]    HappyPath
     user waits until h2 is visible    Uploaded data files
     user waits until page contains accordion section    Updated Absence in PRUs
     user opens accordion section    Absence in PRUs
@@ -72,7 +67,6 @@ Validate subject title has been updated
     user checks headed table body row contains    Subject title    Updated Absence in PRUs    ${section}
 
 Check subject appears in 'Data blocks' page
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -83,7 +77,6 @@ Check subject appears in 'Data blocks' page
     user waits until page contains    Updated Absence in PRUs
 
 Navigate to 'Data and files' page - 'Ancillary file uploads' tab
-    [Tags]    HappyPath
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
     user clicks link    Ancillary file uploads
@@ -91,14 +84,12 @@ Navigate to 'Data and files' page - 'Ancillary file uploads' tab
     user waits until page contains    No files have been uploaded
 
 Validate cannot upload empty ancillary file
-    [Tags]    HappyPath
     user enters text into element    label:Title    Empty test
     user chooses file    label:Upload file    ${FILES_DIR}empty-file.txt
     user clicks button    Upload file
     user waits until page contains    Choose a file that is not empty
 
 Upload multiple ancillary files
-    [Tags]    HappyPath
     user enters text into element    label:Title    Test 1
     user enters text into element    label:Summary    Test 1 summary
     user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
@@ -130,7 +121,6 @@ Upload multiple ancillary files
     user checks there are x accordion sections    2    id:file-uploads
 
 Validate ancillary files on release page
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
@@ -150,7 +140,6 @@ Validate ancillary files on release page
     user checks element should contain    ${other_files_1_details}    Test 1 summary
 
 Navigate back to 'Ancillary file uploads' tab
-    [Tags]    HappyPath
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
@@ -158,7 +147,6 @@ Navigate back to 'Ancillary file uploads' tab
     user waits until h2 is visible    Add file to release
 
 Change ancillary file details
-    [Tags]    HappyPath
     user waits until page contains accordion section    Test 2
     user opens accordion section    Test 2    id:file-uploads
 
@@ -172,7 +160,6 @@ Change ancillary file details
     user clicks button    Save changes
 
 Validate ancillary file details were changed
-    [Tags]    HappyPath
     user waits until h2 is visible    Add file to release
     user waits until h2 is visible    Uploaded files
 
@@ -184,7 +171,6 @@ Validate ancillary file details were changed
     user checks summary list contains    Summary    Test 2 summary updated    ${section}
 
 Delete ancillary file
-    [Tags]    HappyPath
     ${file_2_section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
     user clicks button    Delete file    ${file_2_section}
     user waits until h1 is visible    Confirm deletion of file
