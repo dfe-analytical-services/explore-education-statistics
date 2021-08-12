@@ -3,6 +3,7 @@ import {
   MethodologyRouteParams,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
+import { methodologyRoute } from '@admin/routes/routes';
 import _methodologyService, {
   BasicMethodology,
 } from '@admin/services/methodologyService';
@@ -13,8 +14,8 @@ import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import React from 'react';
+import { Route } from 'react-router-dom';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -171,24 +172,9 @@ describe('MethodologyPage', () => {
       },
     );
 
-    const routeParams = {
-      params: {
-        methodologyId: 'm1',
-      } as MethodologyRouteParams,
-      isExact: true,
-      path: '',
-      url: '',
-    };
-    const history = createMemoryHistory();
-    const { location } = history;
-
     render(
       <MemoryRouter initialEntries={[path]}>
-        <MethodologyPage
-          match={routeParams}
-          history={history}
-          location={location}
-        />
+        <Route component={MethodologyPage} path={methodologyRoute.path} />
       </MemoryRouter>,
     );
   }
