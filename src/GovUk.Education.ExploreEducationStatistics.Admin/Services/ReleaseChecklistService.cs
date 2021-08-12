@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var allowedSubjectIds = dataFiles
                 .Where(dataFile => dataFile.SubjectId.HasValue)
-                .Select(dataFile => dataFile.SubjectId.Value);
+                .Select(dataFile => dataFile.SubjectId!.Value);
 
             return (await _footnoteRepository.GetSubjectsWithNoFootnotes(release.Id))
                 .Where(subject => allowedSubjectIds.Contains(subject.Id))

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ReleaseId { get; set; }
 
-        public Release Release { get; set; }
+        public Release Release { get; set; } = null!;
 
         public DateTime? Created { get; set; }
 
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public DateTime On { get; set; }
 
-        [Required] public string Reason { get; set; }
+        [Required] public string Reason { get; set; } = null!;
 
         public Update Clone(Release newRelease)
         {
