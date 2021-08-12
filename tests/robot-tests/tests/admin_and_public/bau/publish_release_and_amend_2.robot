@@ -1,6 +1,3 @@
-*** Comments ***
-# TODO SOW4 EES-2591 - add in tests to check the content of Methodologies and Amendments in the public site
-
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -25,23 +22,6 @@ Create publication
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
-
-Create new methodology
-    [Tags]    HappyPath
-    user creates methodology for publication    ${PUBLICATION_NAME}
-
-Add methodology content
-    [Tags]    HappyPath
-    user clicks link    Manage content
-    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds text block to editable accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-
-Approve methodology
-    [Tags]    HappyPath
-    user approves methodology for publication    ${PUBLICATION_NAME}
 
 Create new release
     [Tags]    HappyPath
@@ -291,26 +271,6 @@ Go to permalink
 Return to Admin
     [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
-
-Create a methodology amendment
-    [Tags]    HappyPath
-    user creates methodology amendment for publication    ${PUBLICATION_NAME}
-
-Edit methodology amendment content
-    [Tags]    HappyPath
-    user views methodology amendment for publication    ${PUBLICATION_NAME}
-    user clicks link    Manage content
-    user opens accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds text block to editable accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-
-Change methodology amendment status to Approved
-    [Tags]    HappyPath
-    user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
 Create release amendment
     [Tags]    HappyPath

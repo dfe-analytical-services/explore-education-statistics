@@ -9,7 +9,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    NotAgain
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
     [Tags]    HappyPath
-    user navigates to methodologies page
+    user navigates to public methodologies page
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
 

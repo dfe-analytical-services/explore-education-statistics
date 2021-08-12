@@ -9,7 +9,7 @@ Suite Teardown      user closes the browser
 *** Test Cases ***
 Navigate to /methodology page
     [Tags]    HappyPath
-    user navigates to methodologies page
+    user navigates to public methodologies page
 
 Validate page contents
     [Tags]    HappyPath
