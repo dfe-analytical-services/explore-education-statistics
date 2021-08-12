@@ -118,6 +118,7 @@ const MethodologyPage = ({
                   methodologyId,
                 }),
               }))}
+              label="Methodology"
             />
 
             <Switch>

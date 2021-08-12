@@ -64,11 +64,11 @@ describe('MethodologyPage', () => {
       expect(screen.getByText('Test methodology')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('navigation', { name: 'tab-navigation' }),
+        screen.getByRole('navigation', { name: 'Methodology' }),
       ).toBeInTheDocument();
 
       const primaryNav = screen.getByRole('navigation', {
-        name: 'tab-navigation',
+        name: 'Methodology',
       });
       const navLinks = within(primaryNav).getAllByRole('link');
 
@@ -91,7 +91,9 @@ describe('MethodologyPage', () => {
       expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
         'Edit methodology',
       );
-      expect(screen.getByText('Draft')).toBeInTheDocument();
+      expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
+        'Amend methodology',
+      );
       expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
     });
   });
@@ -106,10 +108,11 @@ describe('MethodologyPage', () => {
       expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
         'Amend methodology',
       );
-      expect(screen.getByText('Draft')).toBeInTheDocument();
+      expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
+        'Edit methodology',
+      );
       expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
 
-      expect(screen.getByText('Amendment')).toBeInTheDocument();
       expect(screen.getByText('Amendment')).toHaveClass('govuk-tag');
     });
   });
@@ -130,7 +133,7 @@ describe('MethodologyPage', () => {
     });
 
     const primaryNav = screen.getByRole('navigation', {
-      name: 'tab-navigation',
+      name: 'Methodology',
     });
     const navLinks = within(primaryNav).getAllByRole('link');
 
