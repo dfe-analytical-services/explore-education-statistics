@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="path">path to the blob within the container</param>
         /// <param name="stream">stream to output blob to</param>
         /// <param name="cancellationToken">used to cancel the download</param>
-        /// <returns>the blob stream</returns>
+        /// <returns>the stream that the blob has been output to</returns>
         public Task<Stream> DownloadToStream(
             IBlobContainer containerName,
             string path,

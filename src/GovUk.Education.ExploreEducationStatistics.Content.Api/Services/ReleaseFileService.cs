@@ -2,16 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,20 +26,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class ReleaseFileService : IReleaseFileService
     {
+        private static readonly FileType[] DownloadableFileTypes = {
+            FileType.Ancillary,
+            FileType.Data,
+        };
+
+        private static readonly FileType[] ZipFileTypes = {
+            FileType.Ancillary,
+            FileType.Data,
+            FileType.DataGuidance,
+        };
+
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IUserService _userService;
         private readonly ILogger<ReleaseFileService> _logger;
 
         public ReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
+            IUserService userService,
             ILogger<ReleaseFileService> logger)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -51,17 +69,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 .OnSuccess(async rf =>
                 {
                     return await GetBlob(rf.PublicPath())
-                        .OnSuccess(blob => DownloadToStream(blob, rf.File.Filename));
+                        .OnSuccess(blob => DownloadToStreamResult(blob, rf.File.Filename));
                 });
+        }
+
+        public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
+            Guid releaseId,
+            IList<Guid> fileIds,
+            Stream outputStream,
+            CancellationToken? cancellationToken = null)
+        {
+            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccessVoid(
+                    async () =>
+                    {
+                        var releaseFiles = (await QueryByFileType(releaseId, ZipFileTypes)
+                            .Where(rf => fileIds.Contains(rf.FileId))
+                            .ToListAsync())
+                            .OrderBy(rf => rf.File.ZipFileEntryName())
+                            .ToList();
+
+                        await DoZipFilesToStream(releaseFiles, outputStream, cancellationToken);
+                    }
+                );
+        }
+
+        private async Task DoZipFilesToStream(
+            List<ReleaseFile> releaseFiles,
+            Stream outputStream,
+            CancellationToken? cancellationToken = null)
+        {
+            using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
+
+            foreach (var releaseFile in releaseFiles)
+            {
+                // Stop immediately if we receive a cancellation request
+                if (cancellationToken?.IsCancellationRequested == true)
+                {
+                    return;
+                }
+
+                var blobExists = await _blobStorageService.CheckBlobExists(
+                    PublicReleaseFiles,
+                    releaseFile.PublicPath()
+                );
+
+                if (!blobExists)
+                {
+                    continue;
+                }
+
+                var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
+                await using var entryStream = entry.Open();
+
+                await _blobStorageService.DownloadToStream(
+                    containerName: PublicReleaseFiles,
+                    path: releaseFile.PublicPath(),
+                    stream: entryStream,
+                    cancellationToken: cancellationToken
+                );
+            }
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamByPath(string path)
         {
             return await GetBlob(path)
-                .OnSuccess(DownloadToStream);
+                .OnSuccess(DownloadToStreamResult);
         }
 
-        private async Task<FileStreamResult> DownloadToStream(BlobInfo blob, string filename)
+        private async Task<FileStreamResult> DownloadToStreamResult(BlobInfo blob, string filename)
         {
             var stream = new MemoryStream();
             await _blobStorageService.DownloadToStream(PublicReleaseFiles, blob.Path, stream);
@@ -72,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             };
         }
 
-        private async Task<FileStreamResult> DownloadToStream(BlobInfo blob)
+        private async Task<FileStreamResult> DownloadToStreamResult(BlobInfo blob)
         {
             var stream = new MemoryStream();
             await _blobStorageService.DownloadToStream(PublicReleaseFiles, blob.Path, stream);
@@ -102,11 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<List<FileInfo>> ListDownloadFiles(Release release)
         {
-            var releaseFiles = await ListByFileType(
-                release.Id,
-                FileType.Ancillary,
-                FileType.Data
-            );
+            var releaseFiles = await ListDownloadableFiles(release.Id);
 
             // There are no files for this release
             if (releaseFiles.Count == 0)
@@ -184,15 +257,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             };
         }
 
+        private IQueryable<ReleaseFile> QueryByFileType(Guid releaseId, params FileType[] types)
+        {
+            return _contentDbContext.ReleaseFiles
+                .Include(f => f.Release)
+                .ThenInclude(r => r.Publication)
+                .Include(f => f.File)
+                .Where(releaseFile => releaseFile.ReleaseId == releaseId
+                                      && types.Contains(releaseFile.File.Type));
+        }
+
+        private Task<List<ReleaseFile>> ListDownloadableFiles(Guid releaseId)
+        {
+            return ListByFileType(releaseId, DownloadableFileTypes);
+        }
+
         private async Task<List<ReleaseFile>> ListByFileType(Guid releaseId, params FileType[] types)
         {
-            return await _contentDbContext.ReleaseFiles
-                .Include(f => f.Release)
-                .Include(f => f.File)
-                .Where(releaseFile =>
-                    releaseFile.ReleaseId == releaseId
-                    && types.Contains(releaseFile.File.Type))
-                .ToListAsync();
+            return await QueryByFileType(releaseId, types).ToListAsync();
         }
     }
 }

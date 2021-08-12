@@ -1,7 +1,9 @@
 #nullable enable
 using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 
@@ -338,6 +340,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.True(either.IsLeft);
             Assert.Equal(600, either.Left);
+        }
+
+        [Fact]
+        public async Task OnFailureVoid()
+        {
+            var failures = new List<int>();
+
+            var either = await Task.FromResult(new Either<int, string>(500))
+                .OnFailureVoid(
+                    failure =>
+                    {
+                        failures.Add(failure);
+                    }
+                );
+
+            either.AssertLeft();
+
+            var failure = Assert.Single(failures);
+            Assert.Equal(500, failure);
         }
     }
 }
