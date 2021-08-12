@@ -760,3 +760,7 @@ lookup or return webelement
         ${element}=    get child element    ${parent}    ${selector_or_webelement}
     END
     [Return]    ${element}
+
+user closes Set Page View box
+    user clicks element    id:pageViewToggleButton
+    user waits until element is not visible    id:editingMode
