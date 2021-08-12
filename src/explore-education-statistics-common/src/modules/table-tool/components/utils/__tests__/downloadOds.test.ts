@@ -2,7 +2,7 @@ import {
   appendColumnWidths,
   appendFootnotes,
   appendTitle,
-} from '@common/modules/table-tool/components/utils/downloadOdsUtils';
+} from '@common/modules/table-tool/components/utils/downloadOds';
 import { utils } from 'xlsx';
 
 describe('Download ODS utils', () => {

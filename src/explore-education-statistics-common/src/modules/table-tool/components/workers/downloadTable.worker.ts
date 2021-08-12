@@ -1,6 +1,6 @@
 import 'core-js/stable'; // required for IE 11 support
 import 'regenerator-runtime/runtime'; // required for IE 11 support
-import { getCsvData } from '@common/modules/table-tool/components/utils/downloadCsvUtils';
+import { getCsvData } from '@common/modules/table-tool/components/utils/downloadCsv';
 
 /* eslint-disable no-restricted-globals */
 const ctx: Worker = self as never;

@@ -1,7 +1,7 @@
 import {
   downloadCsvFile,
   getCsvData,
-} from '@common/modules/table-tool/components/utils/downloadCsvUtils';
+} from '@common/modules/table-tool/components/utils/downloadCsv';
 import {
   CategoryFilter,
   Indicator,
