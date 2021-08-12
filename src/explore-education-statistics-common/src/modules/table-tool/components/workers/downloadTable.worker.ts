@@ -10,6 +10,6 @@ const ctx: Worker = self as never;
  */
 ctx.addEventListener('message', event => {
   const result = getCsvData(event.data.fullTable);
-  ctx.postMessage({ csvData: result, fileName: event.data.fileName }); // need filenmae?
+  ctx.postMessage({ csvData: result, fileName: event.data.fileName });
 });
 export {};
