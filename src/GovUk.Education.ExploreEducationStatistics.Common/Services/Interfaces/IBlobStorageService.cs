@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
 
+        public Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
+
         public Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null);
 
         public Task DeleteBlob(IBlobContainer containerName, string path);

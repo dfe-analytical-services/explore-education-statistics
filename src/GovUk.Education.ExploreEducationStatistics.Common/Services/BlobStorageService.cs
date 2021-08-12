@@ -110,6 +110,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
+        public async Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path)
+        {
+            var exists = await CheckBlobExists(containerName, path);
+
+            if (!exists)
+            {
+                return null;
+            }
+
+            return await GetBlob(containerName, path);
+        }
+
         public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null)
         {
             if (!directoryPath.IsNullOrEmpty())
