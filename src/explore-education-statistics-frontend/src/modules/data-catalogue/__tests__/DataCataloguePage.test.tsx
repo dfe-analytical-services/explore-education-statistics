@@ -1,5 +1,9 @@
-import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
+import DataCataloguePage, {
+  SelectedPublication,
+} from '@frontend/modules/data-catalogue/DataCataloguePage';
 import { DownloadTheme } from '@common/services/themeService';
+import { Release } from '@common/services/publicationService';
+import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
@@ -25,6 +29,98 @@ describe('DataCataloguePage', () => {
         },
       ],
     } as DownloadTheme,
+  ];
+
+  const testPublication: SelectedPublication = {
+    id: 'publication-1',
+    title: 'Test publication',
+    slug: 'test-publication',
+  };
+
+  const testReleases: Release[] = [
+    {
+      id: 'rel-1',
+      latestRelease: true,
+      published: '2021-06-30T11:21:17.7585345',
+      slug: 'rel-1-slug',
+      title: 'Release 1',
+    } as Release,
+    {
+      id: 'rel-3',
+      latestRelease: false,
+      published: '2021-01-01T11:21:17.7585345',
+      slug: 'rel-3-slug',
+      title: 'Another Release',
+    } as Release,
+    {
+      id: 'rel-2',
+      latestRelease: false,
+      published: '2021-05-30T11:21:17.7585345',
+      slug: 'rel-2-slug',
+      title: 'Release 2',
+    } as Release,
+  ];
+
+  const testPublicationWithReleases = {
+    ...testPublication,
+    selectedRelease: testReleases[0],
+  };
+
+  const testSubjects: SubjectWithDownloadFiles[] = [
+    {
+      id: 'subject-1',
+      name: 'Subject 1',
+      content: 'Some content here',
+      geographicLevels: ['SoYo'],
+      timePeriods: {
+        from: '2016',
+        to: '2019',
+      },
+      downloadFile: {
+        id: 'file-1',
+        extension: 'csv',
+        fileName: 'file-1.csv',
+        name: 'File 1',
+        size: '100mb',
+        type: 'Data',
+      },
+    },
+    {
+      id: 'subject-2',
+      name: 'Another Subject',
+      content: 'Some content here',
+      geographicLevels: ['SoYo'],
+      timePeriods: {
+        from: '2016',
+        to: '2019',
+      },
+      downloadFile: {
+        id: 'file-2',
+        extension: 'csv',
+        fileName: 'file-2.csv',
+        name: 'File 2',
+        size: '100mb',
+        type: 'Data',
+      },
+    },
+    {
+      id: 'subject-3',
+      name: 'Subject 3',
+      content: 'Some content here',
+      geographicLevels: ['SoYo'],
+      timePeriods: {
+        from: '2016',
+        to: '2019',
+      },
+      downloadFile: {
+        id: 'file-3',
+        extension: 'csv',
+        fileName: 'file-3.csv',
+        name: 'File 3',
+        size: '100mb',
+        type: 'Data',
+      },
+    },
   ];
 
   beforeAll(preloadAll);
@@ -96,5 +192,64 @@ describe('DataCataloguePage', () => {
     expect(
       screen.getByRole('button', { name: 'Download selected files' }),
     ).toBeInTheDocument();
+  });
+
+  test('direct link to step 2', async () => {
+    render(
+      <DataCataloguePage
+        themes={testThemes}
+        selectedPublication={testPublication}
+        releases={testReleases}
+      />,
+    );
+    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByText('Choose a release')).toBeInTheDocument();
+    expect(screen.getAllByRole('radio')).toHaveLength(3);
+    expect(
+      screen.getByLabelText('Release 1 (30 June 2021)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Release 2 (30 May 2021)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Another Release (1 January 2021)'),
+    ).toBeInTheDocument();
+  });
+
+  test('direct link to step 3', async () => {
+    render(
+      <DataCataloguePage
+        themes={testThemes}
+        selectedPublication={testPublicationWithReleases}
+        releases={testReleases}
+        subjects={testSubjects}
+      />,
+    );
+    expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByTestId('wizardStep-3')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+    expect(screen.getByText('Choose files to download')).toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+    expect(
+      screen.getByLabelText('Another Subject (csv, 100mb)'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Subject 1 (csv, 100mb)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Subject 3 (csv, 100mb)')).toBeInTheDocument();
   });
 });

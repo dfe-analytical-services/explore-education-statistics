@@ -14,9 +14,10 @@ import DownloadStep, {
   DownloadFormSubmitHandler,
   SubjectWithDownloadFiles,
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
+import { Dictionary } from '@common/types';
 import ErrorPage from '@frontend/modules/ErrorPage';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useImmer } from 'use-immer';
 
@@ -30,12 +31,14 @@ const fakeReleases: Release[] = [
   } as Release,
   {
     id: 'rel-3',
+    latestRelease: false,
     published: '2021-01-01T11:21:17.7585345',
     slug: 'rel-3-slug',
     title: 'Another Release',
   } as Release,
   {
     id: 'rel-2',
+    latestRelease: false,
     published: '2021-05-30T11:21:17.7585345',
     slug: 'rel-2-slug',
     title: 'Release 2',
@@ -98,38 +101,74 @@ const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
   },
 ];
 
+export interface SelectedPublication {
+  id: string;
+  title: string;
+  slug: string;
+  selectedRelease?: Release;
+}
+
 interface Props {
+  releases?: Release[];
+  selectedPublication?: SelectedPublication;
+  subjects?: SubjectWithDownloadFiles[];
   themes: DownloadTheme[];
 }
 
 interface DataCatalogueState {
   initialStep: number;
   releases: Release[];
+  subjects: SubjectWithDownloadFiles[];
   query: {
+    publicationId?: string;
     release?: Release;
-    subjects: SubjectWithDownloadFiles[];
   };
 }
 
-const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
+const DataCataloguePage: NextPage<Props> = ({
+  releases = [],
+  selectedPublication,
+  subjects = [],
+  themes,
+}: Props) => {
   const router = useRouter();
 
-  const [state, updateState] = useImmer<DataCatalogueState>({
-    initialStep: 1,
-    releases: [],
-    query: {
-      release: undefined,
-      subjects: [],
-    },
-  });
+  const initialState = useMemo<DataCatalogueState>(() => {
+    const getInitialStep = () => {
+      if (selectedPublication && selectedPublication.selectedRelease) {
+        return 3;
+      }
+      if (selectedPublication) {
+        return 2;
+      }
+      return 1;
+    };
+
+    return {
+      initialStep: getInitialStep(),
+      releases,
+      subjects,
+      query: {
+        publicationId: (selectedPublication && selectedPublication.id) || '',
+        release:
+          (selectedPublication && selectedPublication.selectedRelease) ||
+          undefined,
+      },
+    };
+  }, [releases, selectedPublication, subjects]);
+
+  const [state, updateState] = useImmer<DataCatalogueState>(initialState);
 
   const handlePublicationStepBack = () => {
     router.push('/data-catalogue', undefined, { shallow: true });
   };
 
-  const handlePublicationFormSubmit: PublicationFormSubmitHandler = async () => {
+  const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
+    publicationId,
+  }) => {
     updateState(draft => {
       draft.releases = fakeReleases;
+      draft.query.publicationId = publicationId;
     });
   };
 
@@ -140,7 +179,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
       draft.query.release = draft.releases.find(
         rel => rel.id === selectedReleaseId,
       );
-      draft.query.subjects = fakeSubjectsWithDownloadFiles;
+      draft.subjects = fakeSubjectsWithDownloadFiles;
     });
   };
 
@@ -158,6 +197,9 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
     return (
       <PublicationForm
         {...props}
+        initialValues={{
+          publicationId: state.query.publicationId ?? '',
+        }}
         onSubmit={handlePublicationFormSubmit}
         options={options}
       />
@@ -193,7 +235,7 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
             <DownloadStep
               {...stepProps}
               release={state.query.release}
-              subjects={state.query.subjects}
+              subjects={state.subjects}
               onSubmit={handleDownloadFormSubmit}
             />
           )}
@@ -204,20 +246,61 @@ const DataCataloguePage: NextPage<Props> = ({ themes }: Props) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
-  let themes: DownloadTheme[] = [];
-
+  // EES-2007 temp until page is complete
   if (process.env.APP_ENV === 'Production') {
-    // EES-2007 temp until page is complete
     // eslint-disable-next-line no-param-reassign
     context.res.statusCode = 404;
-  } else {
-    themes = await themeService.getDownloadThemes();
+    return {
+      props: {
+        themes: [],
+      },
+    };
+  }
+
+  const {
+    publicationSlug = '',
+    releaseSlug = '',
+  } = context.query as Dictionary<string>;
+
+  const themes = await themeService.getDownloadThemes();
+
+  const selectedPublication = themes
+    .flatMap(option => option.topics)
+    .flatMap(option => option.publications)
+    .find(option => option.slug === publicationSlug) as SelectedPublication;
+
+  // EES-2007 Get real releases here
+  const releases = fakeReleases;
+
+  let selectedRelease: Release | undefined;
+  if (releaseSlug) {
+    selectedRelease = releases.find(rel => rel.slug === releaseSlug);
+    if (selectedPublication && selectedRelease) {
+      selectedPublication.selectedRelease = selectedRelease;
+    }
+  }
+
+  let subjects;
+  if (selectedPublication && selectedRelease) {
+    // EES-2007 Get real subjects here
+    subjects = fakeSubjectsWithDownloadFiles;
+  }
+
+  const props: Props = {
+    releases: releases ?? [],
+    subjects: subjects ?? [],
+    themes,
+  };
+  if (selectedPublication) {
+    props.selectedPublication = selectedPublication;
+
+    if (selectedRelease) {
+      props.selectedPublication.selectedRelease = selectedRelease;
+    }
   }
 
   return {
-    props: {
-      themes,
-    },
+    props,
   };
 };
 

@@ -89,8 +89,10 @@ const ReleaseForm = ({
     <Formik<ReleaseFormValues>
       enableReinitialize
       initialValues={{
-        ...initialValues,
-        releaseId: radioOptions.length === 1 ? radioOptions[0].value : '',
+        releaseId:
+          radioOptions.length === 1
+            ? radioOptions[0].value
+            : initialValues.releaseId,
       }}
       validateOnBlur={false}
       validationSchema={Yup.object<ReleaseFormValues>({

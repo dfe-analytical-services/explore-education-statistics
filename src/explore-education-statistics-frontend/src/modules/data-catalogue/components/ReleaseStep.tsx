@@ -7,6 +7,7 @@ import { Release } from '@common/services/publicationService';
 import ReleaseForm, {
   ReleaseFormSubmitHandler,
 } from '@frontend/modules/data-catalogue/components/ReleaseForm';
+import useMounted from '@common/hooks/useMounted';
 import React from 'react';
 
 interface Props {
@@ -22,6 +23,7 @@ const ReleaseStep = ({
   ...stepProps
 }: Props & InjectedWizardProps) => {
   const { isActive, currentStep, stepNumber } = stepProps;
+  const { isMounted } = useMounted();
 
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
@@ -29,11 +31,14 @@ const ReleaseStep = ({
       Choose a release
     </WizardStepHeading>
   );
-
-  if (isActive) {
+  // isMounted check required as Formik context can be undefined if the step is active on page load.
+  if (isActive && isMounted) {
     return (
       <ReleaseForm
         {...stepProps}
+        initialValues={{
+          releaseId: selectedRelease?.id || '',
+        }}
         options={releases}
         onSubmit={onSubmit}
         legendSize="l"
