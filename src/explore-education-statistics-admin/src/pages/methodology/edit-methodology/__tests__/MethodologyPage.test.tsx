@@ -1,5 +1,8 @@
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
-import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
+import {
+  MethodologyRouteParams,
+  methodologySummaryRoute,
+} from '@admin/routes/methodologyRoutes';
 import _methodologyService, {
   BasicMethodology,
 } from '@admin/services/methodologyService';
@@ -7,7 +10,7 @@ import _methodologyContentService, {
   MethodologyContent,
 } from '@admin/services/methodologyContentService';
 import _permissionService from '@admin/services/permissionService';
-import { Router } from 'react-router';
+import { generatePath, MemoryRouter } from 'react-router';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
@@ -161,6 +164,13 @@ describe('MethodologyPage', () => {
   });
 
   function renderPage() {
+    const path = generatePath<MethodologyRouteParams>(
+      methodologySummaryRoute.path,
+      {
+        methodologyId: 'm1',
+      },
+    );
+
     const routeParams = {
       params: {
         methodologyId: 'm1',
@@ -170,18 +180,16 @@ describe('MethodologyPage', () => {
       url: '',
     };
     const history = createMemoryHistory();
-
     const { location } = history;
-    location.pathname = '/methodology/m1/summary';
 
     render(
-      <Router history={history}>
+      <MemoryRouter initialEntries={[path]}>
         <MethodologyPage
           match={routeParams}
           history={history}
           location={location}
         />
-      </Router>,
+      </MemoryRouter>,
     );
   }
 });
