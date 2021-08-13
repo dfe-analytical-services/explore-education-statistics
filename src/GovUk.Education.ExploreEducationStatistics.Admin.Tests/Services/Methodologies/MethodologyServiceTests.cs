@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.GetSummary(methodology.Id)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.LatestInternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
                 Assert.Equal(Immediately, methodology.PublishingStrategy);
                 Assert.Equal(methodology.Status, viewModel.Status);
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -555,7 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -634,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -717,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -835,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -952,7 +952,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, imageService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -1041,13 +1041,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(cacheService, contentService, methodologyRepository, publishingService);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.True(viewModel.Published.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal(request.LatestInternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(request.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1221,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(WithRelease, viewModel.PublishingStrategy);
                 Assert.Equal(request.Status, viewModel.Status);
@@ -1527,7 +1527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 
                 // Original release note is cleared if unapproving
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);

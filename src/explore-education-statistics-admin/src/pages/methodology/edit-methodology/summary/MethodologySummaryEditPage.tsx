@@ -38,8 +38,12 @@ const MethodologySummaryEditPage = ({
             submitText="Update methodology"
             onSubmit={async values => {
               await methodologyService.updateMethodology(methodologyId, {
-                ...methodology,
+                latestInternalReleaseNote:
+                  methodology.latestInternalReleaseNote,
+                publishingStrategy: methodology.publishingStrategy,
+                status: methodology.status,
                 title: values.title,
+                withReleaseId: methodology.scheduledWithRelease?.id,
               });
 
               history.push(

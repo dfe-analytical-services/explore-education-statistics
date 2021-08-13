@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public DateTime? Published { get; set; }
 
-        public string? InternalReleaseNote { get; set; }
+        public string? LatestInternalReleaseNote { get; set; }
 
         public PermissionsSet Permissions { get; set; } = new PermissionsSet();
 

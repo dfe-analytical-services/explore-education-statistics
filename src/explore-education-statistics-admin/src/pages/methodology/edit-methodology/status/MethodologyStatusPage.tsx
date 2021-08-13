@@ -61,7 +61,7 @@ const MethodologyStatusPage = ({
     const nextSummary = await methodologyService.updateMethodology(
       methodologyId,
       {
-        internalReleaseNote: values.latestInternalReleaseNote,
+        latestInternalReleaseNote: values.latestInternalReleaseNote,
         publishingStrategy: values.publishingStrategy,
         status: values.status,
         title: model.summary.title,

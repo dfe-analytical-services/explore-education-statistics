@@ -5,7 +5,7 @@ export type MethodologyStatus = 'Draft' | 'Approved';
 export type MethodologyPublishingStrategy = 'WithRelease' | 'Immediately';
 
 export type UpdateMethodology = {
-  internalReleaseNote?: string;
+  latestInternalReleaseNote?: string;
   title: string;
   status: MethodologyStatus;
   publishingStrategy?: MethodologyPublishingStrategy;
@@ -20,7 +20,6 @@ interface MethodologyPublication {
 export interface BasicMethodology {
   amendment: boolean;
   id: string;
-  internalReleaseNote?: string;
   latestInternalReleaseNote?: string;
   previousVersionId?: string;
   publishingStrategy?: MethodologyPublishingStrategy;

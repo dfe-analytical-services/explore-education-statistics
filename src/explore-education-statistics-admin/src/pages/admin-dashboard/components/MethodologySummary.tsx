@@ -129,9 +129,9 @@ const MethodologySummary = ({
                   'Not yet published'
                 )}
               </SummaryListItem>
-              {methodology.internalReleaseNote && (
+              {methodology.latestInternalReleaseNote && (
                 <SummaryListItem term="Internal release note">
-                  {methodology.internalReleaseNote}
+                  {methodology.latestInternalReleaseNote}
                 </SummaryListItem>
               )}
             </SummaryList>
