@@ -109,9 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             if (release.Amendment
-                && !release.Updates.Any(update =>
-                   update.ReleaseId == release.Id
-                   && update.Created > release.Created))
+                && !release.Updates.Any(update => update.Created > release.Created))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }

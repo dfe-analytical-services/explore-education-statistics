@@ -376,16 +376,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Publication = publication,
                 Version = 0,
-                Created = DateTime.UtcNow.AddDays(-14),
+                Created = DateTime.UtcNow.AddMonths(-2),
             };
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
-                Id = releaseId,
                 Publication = publication,
                 PreviousVersion = originalRelease,
                 Version = 1,
-                Created = DateTime.UtcNow.AddDays(-7),
+                Created = DateTime.UtcNow.AddMonths(-1),
                 MetaGuidance = "Test meta guidance",
                 PreReleaseAccessList = "Test access list",
                 NextReleaseDate = new PartialDate
@@ -395,16 +393,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 Updates = new List<Update>
                 {
-                    new Update
-                    {
-                        Reason = "Test reason 1",
-                        ReleaseId = releaseId,
-                        Created = DateTime.UtcNow.AddDays(-13),
-                    },
-                    new Update
+                    new()
                     {
                         Reason = "Test reason 2",
-                        ReleaseId = releaseId,
+                        // To avoid checklist error, this amendment requires an Update
+                        // created after release.Created
                         Created = DateTime.UtcNow,
                     }
                 },
