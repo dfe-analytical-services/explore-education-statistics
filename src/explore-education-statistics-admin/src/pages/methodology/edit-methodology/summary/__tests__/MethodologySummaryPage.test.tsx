@@ -43,9 +43,6 @@ describe('MethodologySummaryPage', () => {
         'Test methodology',
       );
 
-      expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
-
       expect(screen.getByTestId('Published on-key')).toHaveTextContent(
         'Published on',
       );

@@ -159,6 +159,7 @@ const ReleasePageContainer = ({
                 releaseId,
               }),
             }))}
+            label="Release"
           />
 
           <ReleaseContextProvider
