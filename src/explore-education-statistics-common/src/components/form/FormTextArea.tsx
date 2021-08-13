@@ -16,6 +16,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  testId?: string;
   maxLength?: number;
   name: string;
   rows?: number;
@@ -56,6 +57,7 @@ const FormTextArea = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       <textarea
+        data-testid="comment-textarea"
         aria-describedby={
           classNames({
             [`${id}-error`]: !!error,

@@ -28,17 +28,14 @@ ${FOOTNOTE_SUBJECT_1_MIXTURE}=          Footnote for subject 1 - mixture of all
 
 *** Test Cases ***
 Create new publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Navigate to release
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_1_NAME} (not Live)
 
 Add public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
 
@@ -52,12 +49,10 @@ Add public prerelease access list
     ...    Test public access list
 
 Go to "Sign off" page and approve release
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 Create another release for the same publication
-    [Tags]    HappyPath
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section    ${PUBLICATION_NAME}
@@ -65,24 +60,20 @@ Create another release for the same publication
     user creates release for publication    ${PUBLICATION_NAME}    Financial Year    3001
 
 Verify new release summary
-    [Tags]    HappyPath
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subjects to release
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
     user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
 Navigate to Footnotes page
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Create footnote for both subjects
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -93,7 +84,6 @@ Create footnote for both subjects
     user waits until h2 is visible    Footnotes
 
 Create footnote for both subject indicators
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -111,7 +101,6 @@ Create footnote for both subject indicators
     user waits until h2 is visible    Footnotes
 
 Create footnote for both subject filters
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -128,7 +117,6 @@ Create footnote for both subject filters
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -139,7 +127,6 @@ Create footnote for subject 1
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1 indicators
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -153,7 +140,6 @@ Create footnote for subject 1 indicators
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1 filters
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -170,7 +156,6 @@ Create footnote for subject 1 filters
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1 filter groups
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -185,7 +170,6 @@ Create footnote for subject 1 filter groups
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1 filter items
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -205,7 +189,6 @@ Create footnote for subject 1 filter items
     user waits until h2 is visible    Footnotes
 
 Create footnote for subject 1 with mixture of indicators and filters
-    [Tags]    HappyPath
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
 
@@ -230,7 +213,6 @@ Create footnote for subject 1 with mixture of indicators and filters
     user waits until h2 is visible    Footnotes
 
 Confirm created footnotes
-    [Tags]    HappyPath
     user waits until h2 is visible    Footnotes
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL}
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
@@ -243,7 +225,6 @@ Confirm created footnotes
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_MIXTURE}
 
 Add meta guidance to subjects
-    [Tags]    HappyPath
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
@@ -260,7 +241,6 @@ Add meta guidance to subjects
     ...    ${SUBJECT_2_NAME} meta guidance content
 
 Validate meta guidance variables and descriptions
-    [Tags]    HappyPath
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     ...    id:metaGuidance-dataFiles
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
@@ -303,7 +283,6 @@ Validate meta guidance variables and descriptions
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate meta guidance footnotes
-    [Tags]    HappyPath
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     ...    id:metaGuidance-dataFiles
     user opens details dropdown    Footnotes    ${subject_1_content}
@@ -331,28 +310,23 @@ Validate meta guidance footnotes
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
 
 Save meta guidance
-    [Tags]    HappyPath
     user clicks button    Save guidance
 
 Navigate to Data blocks page
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
 Create new data block
-    [Tags]    HappyPath
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
     user waits until table tool wizard step is available    Choose a subject
 
 Select subject "${SUBJECT_2_NAME}"
-    [Tags]    HappyPath
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
     user clicks element    id:publicationSubjectForm-submit
 
 Select locations
-    [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose locations
     user opens details dropdown    Opportunity Area
     user clicks checkbox    Bolton 001 (E02000984)
@@ -365,14 +339,12 @@ Select locations
     user clicks element    id:locationFiltersForm-submit
 
 Select time period
-    [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose time period
     user chooses select option    id:timePeriodForm-start    2005
     user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
 
 Select indicators and filters
-    [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
 
@@ -380,19 +352,16 @@ Select indicators and filters
     user clicks category checkbox    Random Filter    Not specified
 
 Create table
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
 
 Check created table has footnotes
-    [Tags]    HappyPath
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a highlight
-    [Tags]    HappyPath
     user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test table title
     user enters text into element    id:dataBlockDetailsForm-source    UI Test source
@@ -406,7 +375,6 @@ Save data block as a highlight
     user waits until page contains    Delete this data block
 
 Edit footnote
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
@@ -418,7 +386,6 @@ Edit footnote
     user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
 
 Check footnote was updated on data block
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -431,21 +398,17 @@ Check footnote was updated on data block
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Add public prerelease access list for release
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 
 Approve release
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 User goes to public Find Statistics page
-    [Tags]    HappyPath
     user navigates to find statistics page on public frontend
 
 Verify newly published release is on Find Statistics page
-    [Tags]    HappyPath
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user waits until accordion section contains text    %{TEST_THEME_NAME}    ${TOPIC_NAME}
@@ -457,12 +420,10 @@ Verify newly published release is on Find Statistics page
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 Navigate to published release page
-    [Tags]    HappyPath
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}    90
 
 Check latest release is correct
-    [Tags]    HappyPath
     user waits until page contains title caption    ${RELEASE_2_NAME}    90
     user checks page contains    This is the latest data
     user checks page contains    See other releases (1)
@@ -474,7 +435,6 @@ Check latest release is correct
     user clicks link    ${RELEASE_1_NAME}
 
 Check other release is correct
-    [Tags]    HappyPath
     user waits until page contains title caption    ${RELEASE_1_NAME}
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
@@ -483,11 +443,9 @@ Check other release is correct
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
 Go to Table Tool page
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend
 
 Select publication in table tool
-    [Tags]    HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
@@ -496,7 +454,6 @@ Select publication in table tool
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_2_NAME}" in table tool
-    [Tags]    HappyPath
     user clicks link    Create your own table
     user waits until table tool wizard step is available    Choose a subject
     user waits until page contains    ${SUBJECT_2_NAME}
@@ -506,7 +463,6 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    [Tags]    HappyPath
     user opens details dropdown    Local Authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
@@ -516,13 +472,11 @@ Select locations in table tool
     user checks previous table tool step contains    3    Local Authority    Birmingham
 
 Select time period in table tool
-    [Tags]    HappyPath
     user chooses select option    id:timePeriodForm-start    2014
     user chooses select option    id:timePeriodForm-end    2018
     user clicks element    id:timePeriodForm-submit
 
 Select indicators and filters in table tool
-    [Tags]    HappyPath
     user waits until table tool wizard step is available    Choose your filters
     user clicks indicator checkbox    Admission Numbers
 
@@ -531,7 +485,6 @@ Select indicators and filters in table tool
     user clicks element    id:filtersForm-submit
 
 Validate table
-    [Tags]    HappyPath
     user waits until results table appears    %{WAIT_LONG}
     user checks table column heading contains    1    1    2014
     user checks table column heading contains    1    2    2015
@@ -554,14 +507,12 @@ Validate table
     user checks table cell in offset row contains    ${row}    0    5    3,962
 
 Validate table has footnotes
-    [Tags]    HappyPath
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Select table highlight from subjects step
-    [Tags]    HappyPath
     user clicks element    testid:wizardStep-2-goToButton
     user waits until h1 is visible    Go back to previous step
     user clicks button    Confirm
@@ -582,11 +533,9 @@ Select table highlight from subjects step
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    Admission Numbers
 
 Validate table rows for table highlight
-    [Tags]    HappyPath
     ${row}=    user gets row number with heading    Bolton 001 (E02000984)
     user checks table heading in offset row contains    ${row}    0    2    2019
 
@@ -642,14 +591,12 @@ Validate table rows for table highlight
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
 Validate table highlight has footnotes
-    [Tags]    HappyPath
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Go to release page
-    [Tags]    HappyPath
     user opens accordion section    Related information
     user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
 
@@ -657,7 +604,6 @@ Go to release page
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
 Go to meta guidance document
-    [Tags]    HappyPath
     user clicks link    Metadata guidance document
 
     user waits until page contains title caption    ${RELEASE_2_NAME}
@@ -665,7 +611,6 @@ Go to meta guidance document
     user waits until h2 is visible    Metadata guidance document
 
 Validate meta guidance document file details
-    [Tags]    HappyPath
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
     user waits until page contains accordion section    ${SUBJECT_2_NAME}
     user checks there are x accordion sections    2
@@ -689,7 +634,6 @@ Validate meta guidance document file details
     user checks summary list contains    Content    UI test subject 2 meta guidance content    ${subject_2_content}
 
 Validate meta guidance document variables
-    [Tags]    HappyPath
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
 
@@ -730,7 +674,6 @@ Validate meta guidance document variables
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate meta guidance document footnotes
-    [Tags]    HappyPath
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Footnotes    ${subject_1_content}
 

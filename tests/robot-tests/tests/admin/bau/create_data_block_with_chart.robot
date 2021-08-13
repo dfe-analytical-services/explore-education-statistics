@@ -18,19 +18,16 @@ ${CONTENT_SECTION_NAME}=    Test data block section
 
 *** Test Cases ***
 Create test publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2025
 
 Upload subject
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
     user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Start creating a data block
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
     user waits until page contains    No data blocks have been created.
@@ -39,7 +36,6 @@ Start creating a data block
     user waits until table tool wizard step is available    Choose a subject
 
 Select subject "UI test subject"
-    [Tags]    HappyPath
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
@@ -47,7 +43,6 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    [Tags]    HappyPath
     user opens details dropdown    Opportunity Area
     user clicks checkbox    Bolton 001 (E02000984)
     user clicks checkbox    Bolton 001 (E05000364)
@@ -60,7 +55,6 @@ Select locations
     user waits until table tool wizard step is available    Choose time period    90
 
 Select time period
-    [Tags]    HappyPath
     user waits until page contains element    id:timePeriodForm-start
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start
     ${timePeriodEndList}=    get list items    id:timePeriodForm-end
@@ -76,19 +70,16 @@ Select time period
     user checks previous table tool step contains    3    Time period    2005 to 2020
 
 Select indicators
-    [Tags]    HappyPath
     user clicks indicator checkbox    Admission Numbers
 
 Create table
     [Documentation]    EES-615
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
     ...    Table showing Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    Admission Numbers
 
     ${row}=    user gets row number with heading    Bolton 001 (E02000984)
@@ -146,7 +137,6 @@ Validate table rows
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
 Save data block
-    [Tags]    HappyPath
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
     user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
     user enters text into element    id:dataBlockDetailsForm-source    UI test source
@@ -160,7 +150,6 @@ Save data block
     user waits until page contains    Delete this data block
 
 Validate data block is in list
-    [Tags]    HappyPath
     user clicks link    Back
     user waits until h2 is visible    Data blocks
 
@@ -179,7 +168,6 @@ Validate data block is in list
     user checks results table cell contains    1    4    UI test highlight name
 
 Embed data block into release content
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
@@ -192,7 +180,6 @@ Embed data block into release content
     sleep    0.3s
 
 Validate embedded table rows
-    [Tags]    HappyPath
     ${table}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
     user scrolls to element    xpath://button[text()="${CONTENT_SECTION_NAME}"]
     # The below is to avoid React lazy-loading the table which causes the test to fail here
@@ -256,7 +243,6 @@ Validate embedded table rows
     user checks table cell in offset row contains    ${row}    4    1    1,959    ${table}
 
 Validate marked as 'In content' on data block list
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -269,7 +255,6 @@ Validate marked as 'In content' on data block list
     user checks results table cell contains    1    3    Yes
 
 Navigate to Chart tab
-    [Tags]    HappyPath
     user clicks link    Edit block
 
     user waits until h2 is visible    Edit data block
@@ -286,7 +271,6 @@ Navigate to Chart tab
     user waits until table tool wizard step is available    Choose chart type
 
 Configure basic line chart
-    [Tags]    HappyPath
     user clicks button    Line
     user enters text into element    id:chartConfigurationForm-title    Test chart title
     user enters text into element    id:chartConfigurationForm-alt    Test chart alt
@@ -299,7 +283,6 @@ Configure basic line chart
     user clicks button    Add data set
 
 Validate basic line chart preview
-    [Tags]    HappyPath
     ${preview}=    set variable    id:chartBuilderPreview
     user waits until element contains line chart    ${preview}
 
@@ -333,7 +316,6 @@ Validate basic line chart preview
     user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 4,198
 
 Save chart and validate marked as 'Has chart' in data blocks list
-    [Tags]    HappyPath
     user clicks link    Chart configuration
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
@@ -350,7 +332,6 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user checks results table cell contains    1    2    Yes
 
 Validate line chart embeds correctly
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
@@ -389,7 +370,7 @@ Validate line chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood): 4,198
 
 Configure basic vertical bar chart
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user goes to url    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
@@ -399,7 +380,7 @@ Configure basic vertical bar chart
     user configures basic chart    Vertical bar    500    800
 
 Change vertical bar chart legend
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user clicks link    Legend
     user waits until h3 is visible    Legend    60
 
@@ -412,7 +393,7 @@ Change vertical bar chart legend
     user waits for chart preview to update
 
 Validate basic vertical bar chart preview
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     ${preview}=    set variable    id:chartBuilderPreview
     user waits until element does not contain line chart    ${preview}
     user waits until element contains bar chart    ${preview}
@@ -447,7 +428,7 @@ Validate basic vertical bar chart preview
     user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     # Transient React error that happens locally & on dev sometimes: TypeError: Cannot read property '_leaflet_pos' of undefined
     user clicks link    Chart configuration
     user clicks button    Save chart options
@@ -493,7 +474,7 @@ Save and validate vertical bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic horizontal bar chart
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user goes to url    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    60
     user waits until page does not contain loading spinner
@@ -502,7 +483,7 @@ Configure basic horizontal bar chart
     user configures basic chart    Horizontal bar    600    700
 
 Validate basic horizontal bar chart preview
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     ${preview}=    set variable    id:chartBuilderPreview
     user waits until element contains bar chart    ${preview}
 
@@ -536,7 +517,7 @@ Validate basic horizontal bar chart preview
     user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user clicks link    Chart configuration
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
@@ -578,7 +559,7 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic geographic chart
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user goes to url    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    60
     user waits until page does not contain loading spinner
@@ -587,7 +568,7 @@ Configure basic geographic chart
     user configures basic chart    Geographic    700    600
 
 Change geographic chart legend
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     user clicks link    Legend
     user waits until h3 is visible    Legend    90
 
@@ -607,7 +588,7 @@ Change geographic chart legend
     user waits for chart preview to update
 
 Validate basic geographic chart preview
-    [Tags]    HappyPath    Failing
+    [Tags]    Failing
     ${preview}=    set variable    id:chartBuilderPreview
     user waits until element does not contain bar chart    ${preview}
     user waits until element contains map chart    ${preview}
@@ -632,7 +613,7 @@ Validate basic geographic chart preview
     user checks map chart indicator tile contains    ${preview}    5    Admissions in 2016    4,198
 
 Save and validate geographic chart embeds correctly
-    [Tags]    HappyPath    Failing    NotAgainstDev    NotAgainstLocal
+    [Tags]    Failing    NotAgainstDev    NotAgainstLocal
     # transient React error    TypeError: Cannot read property '_leaflet_pos' of undefined
 
     user clicks button    Save chart options
@@ -666,7 +647,6 @@ Save and validate geographic chart embeds correctly
     user checks map chart indicator tile contains    ${datablock}    5    Admissions in 2016    4,198
 
 Configure basic infographic chart
-    [Tags]    HappyPath
     user goes to url    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
@@ -678,13 +658,11 @@ Configure basic infographic chart
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
 
 Validate basic infographic chart preview
-    [Tags]    HappyPath
     user checks chart title contains    id:chartBuilderPreview    Test chart title
     user waits until element contains infographic chart    id:chartBuilderPreview
     user checks infographic chart contains alt    id:chartBuilderPreview    Test chart alt
 
 Save and validate infographic chart embeds correctly
-    [Tags]    HappyPath
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
 
@@ -697,12 +675,10 @@ Save and validate infographic chart embeds correctly
     user checks infographic chart contains alt    ${datablock}    Test chart alt
 
 Delete embedded data block
-    [Tags]    HappyPath
     user clicks button    Remove block
     user clicks button    Confirm
 
 Delete chart from data block
-    [Tags]    HappyPath
     user goes to url    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
@@ -714,7 +690,6 @@ Delete chart from data block
     user waits until element does not contain infographic chart    id:chartBuilderPreview
 
 Delete data block
-    [Tags]    HappyPath
     user clicks button    Delete this data block
     user waits until page does not contain loading spinner
     user clicks button    Confirm

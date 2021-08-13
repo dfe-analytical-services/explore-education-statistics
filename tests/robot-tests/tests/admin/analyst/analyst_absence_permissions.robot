@@ -8,7 +8,6 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
-    [Tags]    HappyPath
     user selects theme and topic from admin dashboard    Pupils and schools    Pupil absence
     user waits until page contains accordion section    Pupil absence in schools in England    60
 
@@ -18,25 +17,21 @@ Validate Analyst1 can see correct themes and topics
     user checks select contains option    id:publicationsReleases-themeTopic-topicId    Pupil absence
 
 Validate Analyst1 can see correct draft and scheduled releases tabs
-    [Tags]    HappyPath
     user checks element should contain    id:draft-releases-tab    View draft releases
     user checks element should contain    id:scheduled-releases-tab    View scheduled releases
 
 Validate Analyst1 cannot create a publication for Pupils absence topic
-    [Tags]    HappyPath
     user clicks element    id:publicationsReleases
     user waits until page contains element    id:publicationsReleases-themeTopic-themeId
     user waits until h3 is visible    Pupil absence
     user checks page does not contain element    link:Create new publication
 
 Validate Analyst1 cannot create a release for Pupil absence topic
-    [Tags]    HappyPath
     user waits until page contains accordion section    Pupil absence in schools in England
     user opens accordion section    Pupil absence in schools in England
     user checks page does not contain element    testid:Create new release link for Pupil absence in schools in England
 
 Navigate to Absence release
-    [Tags]    HappyPath
     user opens details dropdown    Academic Year 2016/17 (Live - Latest release)
     user clicks element
     ...    testid:Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)
@@ -44,18 +39,15 @@ Navigate to Absence release
     user waits until h2 is visible    Release summary
 
 Validate Analyst1 can see Absence release summary
-    [Tags]    HappyPath
     user verifies release summary    Pupil absence in schools in England    Academic Year    2016/17    Data Analyst
     ...    Official Statistics
 
 Validate Analyst1 can see 'Content' page
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
 Validate Analyst1 can see 'Content' page key stats
-    [Tags]    HappyPath
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}
     user waits until page does not contain loading spinner
     user scrolls to element    id:releaseHeadlines
@@ -74,7 +66,6 @@ Validate Analyst1 can see 'Content' page key stats
     user checks element count is x    css:[data-testid="keyStat"]    3
 
 Validate Analyst1 can see 'Content' page accordion sections
-    [Tags]    HappyPath
     user checks accordion is in position    About these statistics    1    id:releaseMainContent
     user checks accordion is in position    Pupil absence rates    2    id:releaseMainContent
     user checks accordion is in position    Persistent absence    3    id:releaseMainContent

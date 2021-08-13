@@ -16,7 +16,6 @@ ${CREATED_TOPIC_NAME}       UI test topic - create publication %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Go to Create publication page for "UI tests topic" topic
-    [Tags]    HappyPath
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user waits until page contains link    Create new publication
     user checks page does not contain button    ${PUBLICATION_NAME}
@@ -25,30 +24,25 @@ Go to Create publication page for "UI tests topic" topic
     user waits until h1 is visible    Create new publication
 
 Enters contact details
-    [Tags]    HappyPath
     user enters text into element    id:publicationForm-teamName    Post-16 statistics team
     user enters text into element    id:publicationForm-teamEmail    post16.statistics@education.gov.uk
     user enters text into element    id:publicationForm-contactName    Suzanne Wallace
     user enters text into element    id:publicationForm-contactTelNo    0123456789
 
 Error message appears when submitting and title is empty
-    [Tags]    HappyPath
     user checks element is not visible    id:publicationForm-title-error    30
     user clicks button    Save publication
     user waits until element is visible    id:publicationForm-title-error    30
 
 Enter new publication title
-    [Tags]    HappyPath
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
     user checks element is not visible    id:publicationForm-title-error    60
 
 User redirects to the dashboard after saving publication
-    [Tags]    HappyPath
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard    60
 
 Verify that new publication has been created
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)
     user checks testid element contains    Team name for ${PUBLICATION_NAME} (created)    Post-16 statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME} (created)
@@ -58,19 +52,16 @@ Verify that new publication has been created
     user checks testid element contains    Releases for ${PUBLICATION_NAME} (created)    No releases created
 
 Create new test theme and topic
-    [Tags]    HappyPath
     ${theme_id}    user creates theme via api    ${CREATED_THEME_NAME}
     ${topic_id}    user creates topic via api    ${CREATED_TOPIC_NAME}    ${theme_id}
     set suite variable    ${CREATED_THEME_ID}    ${theme_id}
 
 Go to edit publication
-    [Tags]    HappyPath
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME} (created)
     user waits until page contains title caption    ${PUBLICATION_NAME} (created)    60
     user waits until h1 is visible    Manage publication
 
 Update publication
-    [Tags]    HappyPath
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME}
     user chooses select option    id:publicationForm-themeId    ${CREATED_THEME_NAME}
     user chooses select option    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
@@ -86,7 +77,6 @@ Add a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}    ${CREATED_TOPIC_NAME}
 
 Verify publication has been updated
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
     ...    ${CREATED_TOPIC_NAME}
     user checks testid element contains    Team name for ${PUBLICATION_NAME}
@@ -98,7 +88,6 @@ Verify publication has been updated
     user checks testid element contains    Releases for ${PUBLICATION_NAME}    No releases created
 
 Create new release
-    [Tags]    HappyPath
     user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
@@ -110,14 +99,12 @@ Create new release
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify created release summary
-    [Tags]    HappyPath
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    Sean Gibson
     ...    National Statistics
 
 Edit release summary
-    [Tags]    HappyPath
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
     user waits until h2 is visible    Edit release summary
@@ -128,7 +115,6 @@ Edit release summary
     user clicks button    Update release summary
 
 Verify updated release summary
-    [Tags]    HappyPath
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    Sean Gibson
     ...    Official Statistics

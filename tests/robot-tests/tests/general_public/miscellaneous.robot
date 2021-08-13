@@ -8,13 +8,11 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Verify public page loads
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
     user waits until element contains    css:body    Explore education statistics
 
 Verify can accept cookie banner
-    [Tags]    HappyPath
     user checks page contains    We use some essential cookies to make this service work.
 
     cookie should not exist    ees_banner_seen
@@ -28,7 +26,6 @@ Verify can accept cookie banner
     user checks page does not contain button    Hide this message
 
 Validate homepage
-    [Tags]    HappyPath
     user checks page contains element    link:Explore
     user checks page contains element    link:Create
 
@@ -54,7 +51,6 @@ Validate homepage
     ...    https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/
 
 Validate Cookies page
-    [Tags]    HappyPath
     user clicks link    Cookies
 
     user waits until h1 is visible    Cookies on Explore education statistics
@@ -65,7 +61,6 @@ Validate Cookies page
     user checks nth breadcrumb contains    2    Cookies
 
 Disable google analytics
-    [Tags]    HappyPath
     user clicks element    id:cookieSettingsForm-googleAnalytics-off
     user clicks element    xpath://button[text()="Save changes"]
     user waits until page contains    Your cookie settings were saved
@@ -74,7 +69,6 @@ Disable google analytics
     cookie should have value    ees_disable_google_analytics    true
 
 Enable google analytics
-    [Tags]    HappyPath
     user reloads page
     user checks page does not contain    Your cookie settings were saved
     user waits until h1 is visible    Cookies on Explore education statistics
@@ -87,7 +81,6 @@ Enable google analytics
     cookie should have value    ees_disable_google_analytics    false
 
 Validate Cookies Details page
-    [Tags]    HappyPath
     user clicks link    Find out more about cookies on Explore education statistics
     user waits until h1 is visible    Details about cookies
     user checks url contains    %{PUBLIC_URL}/cookies/details
@@ -100,7 +93,6 @@ Validate Cookies Details page
     cookie names should be on page
 
 Validate Privacy notice page
-    [Tags]    HappyPath
     user clicks link    Privacy notice
     user waits until h1 is visible    Privacy notice
     user waits until page contains
@@ -113,7 +105,6 @@ Validate Privacy notice page
     user checks nth breadcrumb contains    2    Privacy notice
 
 Validate Contact page
-    [Tags]    HappyPath
     user clicks link    Contact us
     user waits until page contains    Contact Explore education statistics
     user waits until page contains    General enquiries
@@ -128,7 +119,6 @@ Validate Contact page
     user checks nth breadcrumb contains    2    Contact
 
 Validate Accessibility statement page
-    [Tags]    HappyPath
     user clicks link    Accessibility statement
     user waits until h1 is visible    Accessibility statement for Explore education statistics
     user waits until h2 is visible    What we’re doing to improve accessibility
@@ -140,7 +130,6 @@ Validate Accessibility statement page
     user checks nth breadcrumb contains    2    Accessibility statement
 
 Validate Help and support page
-    [Tags]    HappyPath
     user clicks link    Help and support
     user waits until h1 is visible    Help and support
 
@@ -152,7 +141,6 @@ Validate Help and support page
 
 Validate Feedback page
     [Documentation]    EES-942
-    [Tags]    HappyPath
     user clicks link    feedback
     user selects newly opened window
     user waits until page contains element    xpath://span[text()="Explore Education Statistics"]    %{WAIT_MEDIUM}

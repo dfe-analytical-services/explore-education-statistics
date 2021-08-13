@@ -8,12 +8,10 @@ Suite Teardown      user closes the browser
 
 *** Test Cases ***
 Navigate to publication release page
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Click fast track link for 'Pupil absence rates' data block
-    [Tags]    HappyPath
     user waits until h1 is visible    Pupil absence in schools in England
     user opens accordion section    Pupil absence rates    id:content
     user scrolls to accordion section content    Pupil absence rates    id:content
@@ -21,17 +19,15 @@ Click fast track link for 'Pupil absence rates' data block
     user clicks link    Explore data
 
 Validate Publication selected step option
-    [Tags]    HappyPath
     user waits until h1 is visible    Create your own tables
     user waits until page contains element    css:table
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
 
 Validate Subject selected step option
-    [Tags]    HappyPath    NotAgainstDev    NotAgainstTest
+    [Tags]    NotAgainstDev    NotAgainstTest
     user checks previous table tool step contains    2    Subject    Absence by characteristic
 
 Validate other selected step options
-    [Tags]    HappyPath
     user checks previous table tool step contains    3    National    England
     user checks previous table tool step contains    4    Time period    2012/13 to 2016/17
     user checks previous table tool step contains    5    Indicators    Authorised absence rate
@@ -41,7 +37,6 @@ Validate other selected step options
     user checks previous table tool step contains    5    Characteristic    Total
 
 Validate table data
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    2012/13
     user checks table column heading contains    1    2    2013/14
     user checks table column heading contains    1    3    2014/15

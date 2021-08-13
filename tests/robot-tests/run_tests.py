@@ -119,6 +119,10 @@ parser.add_argument("--fail-fast",
                     dest="fail_fast",
                     action='store_true',
                     help="stop test execution on failure")
+parser.add_argument("--custom-env",
+                    dest="custom_env",
+                    default=None,
+                    help="load a custom .env file (must be in ~/robot-tests directory)")
 
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
@@ -187,12 +191,16 @@ if args.ci:
     robotArgs += ['--removekeywords',
                   'name:common.user goes to url']  # To hide basic auth credentials
 else:
-    load_dotenv('.env.' + args.env)
-    assert os.getenv('PUBLIC_URL') is not None
-    assert os.getenv('ADMIN_URL') is not None
-    assert os.getenv('ADMIN_EMAIL') is not None
-    assert os.getenv('ADMIN_PASSWORD') is not None
+    if args.custom_env: 
+        load_dotenv(args.custom_env)
 
+    else:
+        load_dotenv('.env.' + args.env)
+
+assert os.getenv('PUBLIC_URL') is not None
+assert os.getenv('ADMIN_URL') is not None
+assert os.getenv('ADMIN_EMAIL') is not None
+assert os.getenv('ADMIN_PASSWORD') is not None
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint

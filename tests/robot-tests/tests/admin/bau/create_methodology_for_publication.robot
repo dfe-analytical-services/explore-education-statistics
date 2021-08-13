@@ -13,14 +13,12 @@ ${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFI
 
 *** Test Cases ***
 Create Publication and check available Methodology controls
-    [Tags]    HappyPath
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
     user checks element contains button    ${accordion}    Link to an externally hosted methodology
 
 Create a Methodology
-    [Tags]    HappyPath
     user creates methodology for publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
@@ -33,7 +31,6 @@ Create a Methodology
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Remove the Methodology
-    [Tags]    HappyPath
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user clicks button    Remove    ${details}
@@ -44,18 +41,15 @@ Remove the Methodology
     user checks element contains button    ${accordion}    Create methodology
 
 Create a Methodology again
-    [Tags]    HappyPath
     user creates methodology for publication    ${PUBLICATION_NAME}
 
 Update Methodology Summary
-    [Tags]    HappyPath
     user edits methodology summary for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - New methodology title
     user edits methodology summary for publication    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - New methodology title    ${PUBLICATION_NAME} - another new methodology title
 
 Update the Methodology Content
-    [Tags]    HappyPath
     user clicks link    Manage content
     user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
@@ -83,7 +77,6 @@ Update the Methodology Content
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Approve the Methodology
-    [Tags]    HappyPath
     user approves methodology for publication    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - another new methodology title
     user clicks link    Sign off
@@ -97,7 +90,6 @@ Approve the Methodology
     ...    Not yet published
 
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
-    [Tags]    HappyPath
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${details}    Edit this methodology
@@ -109,7 +101,6 @@ Check the controls available are as expected for an approved Methodology that is
     user checks element does not contain button    ${details}    Amend methodology
 
 Unapprove the Methodology
-    [Tags]    HappyPath
     user views methodology for publication    ${PUBLICATION_NAME}
     user clicks link    Sign off
     user changes methodology status to Draft

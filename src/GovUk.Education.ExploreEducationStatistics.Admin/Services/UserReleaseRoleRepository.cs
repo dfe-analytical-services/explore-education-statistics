@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .SingleAsync(p => p.Id == publicationId);
 
-            var latestRelease = publication.LatestRelease(checkIfLive: false);
+            var latestRelease = publication.LatestRelease();
 
             // Publication may have no releases
             if (latestRelease == null)

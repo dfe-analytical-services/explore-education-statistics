@@ -13,24 +13,20 @@ ${PUBLICATION_NAME}=    UI tests - public release visibility %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create test publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    CY    2000
 
 Verify release summary
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Calendar Year    2000    UI test contact name
     ...    National Statistics
 
 Upload subject
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Go to 'Sign Off' page
-    [Tags]    HappyPath
     user clicks link    Sign off
     user waits for page to finish loading
     user waits until page contains element    testid:public-release-url
@@ -39,7 +35,6 @@ Go to 'Sign Off' page
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Go to Public Release Link
-    [Tags]    HappyPath
     # To get around basic auth on public frontend
     user goes to url    %{PUBLIC_URL}
     user waits until h1 is visible    Explore our statistics and data
@@ -48,11 +43,9 @@ Go to Public Release Link
     user checks page does not contain    ${RELEASE_NAME}
 
 Return to admin
-    [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
 
 Select release from admin dashboard
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} (not Live)    ${accordion}
@@ -61,16 +54,13 @@ Select release from admin dashboard
     user clicks link    Edit this release
 
 Add public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user creates public prerelease access list    Initial test public access list
 
 Update public prerelease access list
-    [Tags]    HappyPath
     user updates public prerelease access list    Updated test public access list
 
 Add meta guidance to subject
-    [Tags]    HappyPath
     user clicks link    Data and files
     user clicks link    Metadata guidance
     user waits until h2 is visible    Public metadata guidance document
@@ -82,13 +72,12 @@ Add meta guidance to subject
     user clicks button    Save guidance
 
 Go to "Sign off" page
-    [Tags]    HappyPath
     user clicks link    Sign off
     user waits until h2 is visible    Sign off    90
     user waits until page contains button    Edit release status    60
 
 Approve release and wait for it to be Scheduled
-    [Tags]    HappyPath    NotAgainstDev
+    [Tags]    NotAgainstDev
     ${day}=    get current datetime    %-d    2
     ${month}=    get current datetime    %-m    2
     ${month_word}=    get current datetime    %B    2
@@ -118,27 +107,22 @@ Approve release and wait for it to be Scheduled
     user waits for release process status to be    Scheduled    60
 
 Check scheduled release isn't visible on public Table Tool
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Go to public release URL and check release isn't visible
-    [Tags]    HappyPath
     user goes to url    ${PUBLIC_RELEASE_LINK}
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check "Page not found" appears
-    [Tags]    HappyPath
     user waits until page contains    Page not found
 
 Go to admin release summary
-    [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
 
 Approve release for immediate publication but don't wait to finish
-    [Tags]    HappyPath
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user waits until page contains button    Edit release status
@@ -152,6 +136,5 @@ Approve release for immediate publication but don't wait to finish
     user checks summary list contains    Current status    Approved
 
 Go to public release URL and check release isn't visible
-    [Tags]    HappyPath
     user goes to url    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found

@@ -8,7 +8,7 @@ Suite Teardown      user closes the browser
 
 *** Test Cases ***
 Navigate to Absence publication
-    [Tags]    HappyPath    Local
+    [Tags]    Local
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
     user waits until page contains    Explore our statistics and data
@@ -24,7 +24,7 @@ Navigate to Absence publication
     user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Go to Notify me page for Absence publication
-    [Tags]    HappyPath    Local
+    [Tags]    Local
     user clicks link    Sign up for email alerts
 
     user waits until page contains title caption    Notify me    %{WAIT_LONG}
@@ -38,7 +38,7 @@ Go to Notify me page for Absence publication
 
 Sign up for email alerts
     [Documentation]    EES-716    EES-1265
-    [Tags]    HappyPath    NotAgainstPreProd
+    [Tags]    NotAgainstPreProd
     user clicks element    id:subscriptionForm-email
     press keys    id:subscriptionForm-email    mark@hiveit.co.uk
     user clicks button    Subscribe
