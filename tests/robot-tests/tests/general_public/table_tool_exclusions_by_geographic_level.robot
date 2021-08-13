@@ -8,11 +8,9 @@ Force Tags          GeneralPublic    Local    Dev
 
 *** Test Cases ***
 Go to Table Tool page
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend
 
 Select Exclusions publication
-    [Tags]    HappyPath
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Exclusions
     user clicks radio    Permanent and fixed-period exclusions in England
@@ -22,7 +20,6 @@ Select Exclusions publication
     ...    Permanent and fixed-period exclusions in England
 
 Validate "Exclusions by geographic level" subject details
-    [Tags]    HappyPath
     user opens details dropdown    More details    css:[data-testid="Radio item for Exclusions by geographic level"]
     ${details}=    user gets details content element    More details
     ...    css:[data-testid="Radio item for Exclusions by geographic level"]
@@ -30,14 +27,12 @@ Validate "Exclusions by geographic level" subject details
     user checks summary list contains    Time period    2006/07 to 2016/17    ${details}
 
 Select subject "Exclusions by geographic level"
-    [Tags]    HappyPath
     user clicks radio    Exclusions by geographic level
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains    2    Subject    Exclusions by geographic level
 
 Select Locations LA, Bury, Sheffield, York
-    [Tags]    HappyPath
     user opens details dropdown    Local Authority
     user clicks checkbox    Bury
     user clicks checkbox    Sheffield
@@ -49,7 +44,6 @@ Select Locations LA, Bury, Sheffield, York
     user checks previous table tool step contains    3    Local Authority    York
 
 Select Start date and End date
-    [Tags]    HappyPath
     user chooses select option    id:timePeriodForm-start    2006/07
     user chooses select option    id:timePeriodForm-end    2008/09
     user clicks element    id:timePeriodForm-submit
@@ -58,44 +52,36 @@ Select Start date and End date
     user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
 
 Select Indicator - Number of pupils
-    [Tags]    HappyPath
     user clicks indicator checkbox    Number of pupils
     user checks indicator checkbox is checked    Number of pupils
 
 Select Indicator - Number of permanent exclusions
-    [Tags]    HappyPath
     user clicks indicator checkbox    Number of permanent exclusions
     user checks indicator checkbox is checked    Number of permanent exclusions
 
 Select Indicator - Number of fixed period exclusions
-    [Tags]    HappyPath
     user clicks indicator checkbox    Number of fixed period exclusions
     user checks indicator checkbox is checked    Number of fixed period exclusions
 
 Select Characteristics
-    [Tags]    HappyPath
     user opens details dropdown    School type
     user clicks category checkbox    School type    State-funded secondary
 
 User clicks Create table button
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
 
 User waits for table to appear
-    [Tags]    HappyPath
     # Extra timeout until EES-234
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing 'Exclusions by geographic level' for State-funded secondary in Bury, Sheffield and York between 2006/07 and 2008/09"]
 
 Validate results table column headings
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    2006/07
     user checks table column heading contains    1    2    2007/08
     user checks table column heading contains    1    3    2008/09
 
 Validate Bury Number of fixed period exclusions row
-    [Tags]    HappyPath
     ${row}=    user gets row with group and indicator    Bury    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
     user checks row cell contains text    ${row}    1    1,539
@@ -103,31 +89,26 @@ Validate Bury Number of fixed period exclusions row
     user checks row cell contains text    ${row}    3    1,298
 
 User generates a permanent link
-    [Tags]    HappyPath
     user waits until page contains button    Generate shareable link    60
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
     user checks generated permalink is valid
 
 User validates permanent link works correctly
-    [Tags]    HappyPath
     user clicks link    View share link
     user waits until h1 is visible
     ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'    60
 
 User validates permalink contains correct date
-    [Tags]    HappyPath
     ${date}=    get current datetime    %-d %B %Y
     user checks page contains element    xpath://*[@data-testid="created-date"]//strong//time[text()="${date}"]
 
 User validates permalink table headers
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    2006/07
     user checks table column heading contains    1    2    2007/08
     user checks table column heading contains    1    3    2008/09
 
 User validates permalink table rows for Bury
-    [Tags]    HappyPath
     ${row}=    user gets row with group and indicator    Bury    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
     user checks row cell contains text    ${row}    1    1,539
@@ -147,7 +128,6 @@ User validates permalink table rows for Bury
     user checks row cell contains text    ${row}    3    11,217
 
 User validates permalink table rows for Sheffield
-    [Tags]    HappyPath
     ${row}=    user gets row with group and indicator    Sheffield    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
     user checks row cell contains text    ${row}    1    5,351
@@ -167,7 +147,6 @@ User validates permalink table rows for Sheffield
     user checks row cell contains text    ${row}    3    30,948
 
 User validates permalink table rows for York
-    [Tags]    HappyPath
     ${row}=    user gets row with group and indicator    York    Number of fixed period exclusions
     user checks row contains heading    ${row}    Number of fixed period exclusions
     user checks row cell contains text    ${row}    1    1,073

@@ -8,7 +8,6 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Failing
 
 *** Test Cases ***
 Navigate to /download-data page
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
     user waits until h1 is visible    Choose how to explore our statistics and data
@@ -18,7 +17,6 @@ Navigate to /download-data page
 
 Validate Pupils and schools contains Pupil absence files
     [Documentation]    EES-562
-    [Tags]    HappyPath
     user waits until page contains accordion section    Pupils and schools
     user waits for page to finish loading
     user opens accordion section    Pupils and schools
@@ -27,7 +25,7 @@ Validate Pupils and schools contains Pupil absence files
 
 Validate Pupil absence data downloads are available
     [Documentation]    EES-562
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     environment variable should be set    CONTENT_API_URL
 
     user opens details dropdown    Pupil absence
@@ -57,14 +55,14 @@ Validate Pupil absence data downloads are available
     ...    %{CONTENT_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
 
 Download Absence in prus CSV
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     download file    xpath://ul[@data-testid="Pupil absence in schools in England"]//a[text()="Absence in prus"]
     ...    absence_in_prus.csv
     downloaded file should have first line    absence_in_prus.csv
     ...    time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,num_schools,enrolments,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa_10_exact,enrolments_pa_10_exact_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons
 
 Download All files ZIP
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     download file
     ...    xpath://ul[@data-testid="Pupil absence in schools in England"]//a[text()="Download all data and files for this release"]
     ...    pupil-absence-in-schools-in-england_2016-17.zip
@@ -81,12 +79,12 @@ Download All files ZIP
     user closes details dropdown    Pupil absence
 
 Validate Pupil and schools contains Exclusions files
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     user waits until accordion section contains text    Pupils and schools    Exclusions
 
 Validate Exclusions data downloads are available
     [Documentation]    EES-562
-    [Tags]    HappyPath    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     user opens details dropdown    Exclusions
     user waits until details contains link    Exclusions    Duration of fixed exclusions
     user checks page contains link with text and url    Duration of fixed exclusions

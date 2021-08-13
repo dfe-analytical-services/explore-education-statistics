@@ -11,7 +11,6 @@ Suite Teardown      user closes the browser
 
 *** Test Cases ***
 Navigate to manage users page as bau1
-    [Tags]    HappyPath
     user goes to url    %{ADMIN_URL}/administration/users
     user checks table column heading contains    1    1    Name
     user checks table column heading contains    1    2    Email
@@ -19,7 +18,6 @@ Navigate to manage users page as bau1
     user checks table column heading contains    1    4    Actions
 
 Assert that test users are present in table
-    [Tags]    HappyPath
     user checks results table row heading contains    1    1    Analyst1 User1
     user checks results table row heading contains    2    1    Analyst2 User2
     user checks results table row heading contains    3    1    Analyst3 User3

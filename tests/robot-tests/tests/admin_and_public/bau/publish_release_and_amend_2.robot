@@ -1,6 +1,3 @@
-*** Comments ***
-# TODO SOW4 EES-2591 - add in tests to check the content of Methodologies and Amendments in the public site
-
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -20,31 +17,12 @@ ${THIRD_SUBJECT}        upload file test with filter subject
 
 *** Test Cases ***
 Create publication
-    [Tags]    HappyPath
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
-Create new methodology
-    [Tags]    HappyPath
-    user creates methodology for publication    ${PUBLICATION_NAME}
-
-Add methodology content
-    [Tags]    HappyPath
-    user clicks link    Manage content
-    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds text block to editable accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-
-Approve methodology
-    [Tags]    HappyPath
-    user approves methodology for publication    ${PUBLICATION_NAME}
-
 Create new release
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
@@ -52,12 +30,10 @@ Create new release
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
-    [Tags]    HappyPath
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
     user uploads subject    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
 
 Add meta guidance to subject
-    [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until h2 is visible    Public metadata guidance document    90
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
@@ -66,7 +42,6 @@ Add meta guidance to subject
     ...    meta guidance content
 
 Add meta guidance to second Subject
-    [Tags]    HappyPath
     user waits until h2 is visible    Public metadata guidance document
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
@@ -75,12 +50,10 @@ Add meta guidance to second Subject
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Add footnote to second Subject
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
@@ -101,7 +74,6 @@ Add second footnote to second Subject
     user waits until h2 is visible    Footnotes
 
 Add footnote to subject
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
@@ -111,7 +83,6 @@ Add footnote to subject
     user waits until h2 is visible    Footnotes
 
 Add second footnote to subject
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
@@ -124,21 +95,17 @@ Add second footnote to subject
     user waits until h2 is visible    Footnotes
 
 Add public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 
 Approve release
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 Go to public Table Tool page
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend
 
 Select "Test Topic" publication
-    [Tags]    HappyPath
     environment variable should be set    TEST_THEME_NAME
     environment variable should be set    TEST_TOPIC_NAME
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -149,24 +116,20 @@ Select "Test Topic" publication
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject
-    [Tags]    HappyPath
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location
-    [Tags]    HappyPath
     user opens details dropdown    National
     user clicks checkbox    England
 
 Click next step button
-    [Tags]    HappyPath
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    Choose time period
 
 Select start date and end date
-    [Tags]    HappyPath
     user chooses select option    id:timePeriodForm-start    2012/13
     user chooses select option    id:timePeriodForm-end    2012/13
     user clicks element    id:timePeriodForm-submit
@@ -175,44 +138,35 @@ Select start date and end date
     user checks previous table tool step contains    4    Time period    2012/13
 
 Select Indicators
-    [Tags]    HappyPath
     user clicks indicator checkbox    Lower quartile annualised earnings
     user checks indicator checkbox is checked    Lower quartile annualised earnings
 
 Select cheese filter
-    [Tags]    HappyPath
     user opens details dropdown    Cheese
     user clicks select all for category    Cheese
 
 Select Number of years after achievement of learning aim filter
-    [Tags]    HappyPath
     user opens details dropdown    Number of years after achievement of learning aim
     user clicks select all for category    Number of years after achievement of learning aim
 
 Select ethnicity group filter
-    [Tags]    HappyPath
     user opens details dropdown    Ethnicity group
     user clicks select all for category    Ethnicity group
 
 Select Provision filter
-    [Tags]    HappyPath
     user opens details dropdown    Provision
     user clicks select all for category    Provision
 
 Click submit button
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
 
 Wait until table is generated
-    [Tags]    HappyPath
     user waits until page contains button    Generate shareable link
 
 Wait until new footnote is visible
-    [Tags]    HappyPath
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Validate results table column headings
-    [Tags]    HappyPath
     user checks results table row heading contains    1    1    Asian/Asian British
     user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
     user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
@@ -223,7 +177,6 @@ Validate results table column headings
     user checks results table row heading contains    7    1    White
 
 Validate row headings
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    1 year after study
     user checks table column heading contains    1    2    2 years after study
     user checks table column heading contains    1    3    3 years after study
@@ -231,7 +184,6 @@ Validate row headings
     user checks table column heading contains    1    5    5 years after study
 
 Validate table cells
-    [Tags]    HappyPath
     user checks results table cell contains    1    1    8
     user checks results table cell contains    2    1    2
     user checks results table cell contains    3    1    5
@@ -274,7 +226,6 @@ Validate table cells
 
 Generate the permalink
     [Documentation]    EES-214
-    [Tags]    HappyPath
     user waits until page contains button    Generate shareable link    60
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
@@ -282,43 +233,19 @@ Generate the permalink
     Set Suite Variable    ${PERMA_LOCATION_URL}
 
 Go to permalink
-    [Tags]    HappyPath
     user goes to url    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Return to Admin
-    [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
 
-Create a methodology amendment
-    [Tags]    HappyPath
-    user creates methodology amendment for publication    ${PUBLICATION_NAME}
-
-Edit methodology amendment content
-    [Tags]    HappyPath
-    user views methodology amendment for publication    ${PUBLICATION_NAME}
-    user clicks link    Manage content
-    user opens accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds text block to editable accordion section    Methodology content section 1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-
-Change methodology amendment status to Approved
-    [Tags]    HappyPath
-    user approves methodology amendment for publication    ${PUBLICATION_NAME}
-
 Create release amendment
-    [Tags]    HappyPath
     user clicks link    Home
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
 
 Replace subject data
-    [Tags]    HappyPath
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
     user waits until h2 is visible    Uploaded data files
@@ -343,23 +270,19 @@ Replace subject data
     user waits until button is enabled    Confirm data replacement
 
 Confirm data replacement
-    [Tags]    HappyPath
     user clicks button    Confirm data replacement
 
 Delete second subject file
-    [Tags]    HappyPath
     user clicks link    Footnotes    # to avoid focus issues
     user clicks link    Data and files
     user deletes subject file    ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for release amendment
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
 
 Add release note to release amendment
-    [Tags]    HappyPath
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
     user clicks button    Save note
@@ -368,17 +291,14 @@ Add release note to release amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
 Go to "Sign off" page and approve release amendment
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 Go to permalink page & check for error element to be present
-    [Tags]    HappyPath
     user goes to url    ${PERMA_LOCATION_URL}
     user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
 
 Check the table has the same results as original table
-    [Tags]    HappyPath
     user checks results table row heading contains    1    1    Asian/Asian British
     user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
     user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
@@ -435,7 +355,6 @@ Check the table has the same results as original table
     user checks results table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject
-    [Tags]    HappyPath
     user goes to url    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -447,29 +366,24 @@ Check amended release doesn't contain deleted subject
     user checks page does not contain    ${SECOND_SUBJECT}
 
 Create amendment to modify release
-    [Tags]    HappyPath
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
 
 Add subject to release
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
 Add meta guidance to third subject
-    [Tags]    HappyPath
     user clicks link    Metadata guidance
     user enters text into meta guidance data file content editor    ${THIRD_SUBJECT}    meta content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' Tab
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Add footnote to "upload file test filter" subject file
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
@@ -481,7 +395,6 @@ Add footnote to "upload file test filter" subject file
     user waits until h2 is visible    Footnotes
 
 Update Seven filters footnote
-    [Tags]    HappyPath
     user clicks link    Edit footnote    testid:Footnote - Footnote 1 ${SUBJECT_NAME}
     user clicks element    label:Footnote
     user enters text into element    label:Footnote    Updating ${SUBJECT_NAME} footnote
@@ -489,17 +402,14 @@ Update Seven filters footnote
     user waits until page contains element    testid:Footnote - Updating ${SUBJECT_NAME} footnote
 
 Go to "Sign off" to approve release for immedate publication
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 Go to public Table Tool page for amendment
-    [Tags]    HappyPath
     user goes to url    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 Select publication
-    [Tags]    HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
@@ -509,24 +419,20 @@ Select publication
     #user checks page does not contain    ${SECOND_SUBJECT}    # EES-1360
 
 Select subject again
-    [Tags]    HappyPath
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location filter
-    [Tags]    HappyPath
     user opens details dropdown    National
     user clicks checkbox    England
 
 Click the next step button
-    [Tags]    HappyPath
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    Choose time period
 
 Select start date + end date
-    [Tags]    HappyPath
     user chooses select option    id:timePeriodForm-start    2020 Week 13
     user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
@@ -534,7 +440,6 @@ Select start date + end date
     user waits until page contains element    id:filtersForm-indicators
 
 Select four indicators
-    [Tags]    HappyPath
     user clicks indicator checkbox    Number of open settings
     user checks indicator checkbox is checked    Number of open settings
     user clicks indicator checkbox    Number of children attending
@@ -545,29 +450,24 @@ Select four indicators
     user checks indicator checkbox is checked    Response rate
 
 Select the date cateogory
-    [Tags]    HappyPath
     user opens details dropdown    Date
     user clicks select all for category    Date
 
 Generate table
-    [Tags]    HappyPath
     user clicks element    id:filtersForm-submit
     user waits until page contains    Generate shareable link    60
 
 Validate generated table
-    [Tags]    HappyPath
     user checks page contains    Updating ${SUBJECT_NAME} footnote
 
 Generate the new permalink
     [Documentation]    EES-214
-    [Tags]    HappyPath
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
     ${PERMA_LOCATION_URL_TWO}    Get Value    testid:permalink-generated-url
     Set Suite Variable    ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink
-    [Tags]    HappyPath
     user goes to url    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.

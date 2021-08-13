@@ -330,6 +330,10 @@ user checks element does not contain child element
     ...    ${child_element}
     user waits until parent does not contain element    ${element}    ${child_element}
 
+user checks element contains
+    [Arguments]    ${element}    ${text}
+    user waits until parent contains element    ${element}    xpath://*[contains(text(),"${text}")]
+
 user checks element contains button
     [Arguments]
     ...    ${element}

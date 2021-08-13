@@ -19,10 +19,19 @@ Create a draft release
     user create test release via api    ${PUBLICATION_ID}    AY    2021
 
 Approve a methodology for publishing immediately
-    user creates approved methodology for publication    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}
+
+    user clicks link    Manage content
+    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    1
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+    user approves methodology for publication    ${PUBLICATION_NAME}
 
 Verify that the publication is not visible on the public methodologies page without a published release
-    user navigates to methodologies page
+    user navigates to public methodologies page
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is not publicly accessible by URL without a published release
@@ -36,7 +45,7 @@ Alter the approval to publish the methodology with the release
     ...    with_release=${PUBLICATION_NAME} - Academic Year 2021/22
 
 Verify that the publication is still not visible on the public methodologies page without publishing the release
-    user navigates to methodologies page
+    user navigates to public methodologies page
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is still not publicly accessible by URL without publishing the release
@@ -49,7 +58,7 @@ Approve the release
     user approves release for immediate publication
 
 Verify that the methodology is visible on the public methodologies page with the expected URL
-    user navigates to methodologies page
+    user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -67,6 +76,12 @@ Verify that the methodology is publicly accessible
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology
 
+Verify that the methodology content is correct
+    user waits until page contains accordion section    Methodology content section 1
+    user opens accordion section    Methodology content section 1
+    ${content}=    user gets accordion section content element    Methodology content section 1
+    user checks element contains    ${content}    Adding Methodology content
+
 Amend the methodology in preparation to test publishing immediately
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user edits methodology summary for publication
@@ -75,13 +90,23 @@ Amend the methodology in preparation to test publishing immediately
     ...    ${PUBLICATION_NAME} - Amended methodology
     ...    Edit this amendment
 
+Update the methodology amendment's content
+    user clicks link    Manage content
+    user opens accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
 Approve the amendment for publishing immediately
     user approves methodology amendment for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
 
 Verify that the amended methodology is visible on the public methodologies page immediately
-    user navigates to methodologies page
+    user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -98,3 +123,10 @@ Verify that the amended methodology is publicly accessible immediately
     ...    ${PUBLICATION_NAME} - Amended methodology
     user waits until h1 is visible    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
+
+Verify that the amended methodology content is correct
+    user waits until page contains accordion section    New and Updated Title
+    user opens accordion section    New and Updated Title
+    ${content}=    user gets accordion section content element    New and Updated Title
+    user checks element contains    ${content}    Adding Methodology content
+    user checks element contains    ${content}    New & Updated content

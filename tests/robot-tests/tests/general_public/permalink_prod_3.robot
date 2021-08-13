@@ -8,17 +8,14 @@ Force Tags          GeneralPublic    Prod
 
 *** Test Cases ***
 Go to Table Tool page
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend
 
 Go to permalink
-    [Tags]    HappyPath
     user goes to url    %{PUBLIC_URL}/data-tables/permalink/c5688b39-2630-4de0-a143-725df9e48690
     user waits until h1 is visible
     ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 Validate breadcrumbs
-    [Tags]    HappyPath
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Data tables
@@ -27,14 +24,12 @@ Validate breadcrumbs
     ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 Validate miscellaneous
-    [Tags]    HappyPath
     user checks summary list contains    Created    7 April 2020
     user waits until element contains    testid:dataTableCaption
     ...    Table showing 'Exclusions by geographic level' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
     user waits until page contains button    Print this page
 
 Validate table
-    [Tags]    HappyPath
     user checks table column heading contains    1    1    2014/15
     user checks table column heading contains    1    2    2015/16
     user checks table column heading contains    1    3    2016/17
@@ -64,18 +59,15 @@ Validate table
     user checks row cell contains text    ${row}    3    798
 
 Validate footnotes
-    [Tags]    HappyPath
     user checks page contains element
     ...    xpath://h3[text()="Footnotes"]/../ol/li[text()="The number of fixed period exclusions expressed as a percentage of the number of pupils in January each year."]
     user checks page contains element
     ...    xpath://h3[text()="Footnotes"]/../ol/li[text()="x - 1 or 2 pupils, or a percentage based on 1 or 2."]
 
 Validate download files
-    [Tags]    HappyPath
     user checks page contains element    xpath://button[text()="Download the data of this table (CSV)"]
     user checks page contains element    xpath://button[text()="Download table as Excel spreadsheet (XLSX)"]
     # TODO: More / Check CSV?
 
 Use Create tables button
-    [Tags]    HappyPath
     user navigates to data tables page on public frontend

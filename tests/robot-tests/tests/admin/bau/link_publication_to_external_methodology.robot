@@ -12,7 +12,6 @@ ${PUBLICATION_NAME}=    UI tests - link external methodology publication %{RUN_I
 
 *** Test Cases ***
 Link Publication to External Methodology
-    [Tags]    HappyPath
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology

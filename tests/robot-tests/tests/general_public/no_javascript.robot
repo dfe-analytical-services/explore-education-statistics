@@ -7,12 +7,10 @@ Force Tags      GeneralPublic    Local    Dev    Test    Preprod    Prod
 *** Test Cases ***
 Parse Find Statistics page HTML
     [Documentation]    EES-1186
-    [Tags]    HappyPath
     ${parsed_page}=    user gets parsed html from page    %{PUBLIC_URL}/find-statistics
     set suite variable    ${parsed_page}
 
 Validate Pupils and schools accordion section on page
-    [Tags]    HappyPath
     ${accordion}=    user gets page accordion section    ${parsed_page}    Pupils and schools
     ${accordion_heading}=    user gets accordion heading    ${accordion}
     user checks accordion heading is not tag type    ${accordion_heading}    button

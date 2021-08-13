@@ -13,22 +13,18 @@ ${PUBLICATION_NAME}=    UI tests - methodology alternative title %{RUN_IDENTIFIE
 
 *** Test Cases ***
 Create Publication as bau1
-    [Tags]    HappyPath
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
     user checks element contains button    ${accordion}    Link to an externally hosted methodology
 
 Assign publication owner permissions to analyst1
-    [Tags]    HappyPath
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Switch to analyst1
-    [Tags]    HappyPath
     user changes to analyst1
 
 Create a Methodology as publication owner
-    [Tags]    HappyPath
     user creates methodology for publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
@@ -41,14 +37,12 @@ Create a Methodology as publication owner
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Update Methodology Title
-    [Tags]    HappyPath
     user edits methodology summary for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - New methodology title
     user edits methodology summary for publication    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - New methodology title    ${PUBLICATION_NAME} - another new methodology title
 
 Approve the Methodology
-    [Tags]    HappyPath
     user approves methodology for publication    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - another new methodology title
     user clicks link    Sign off
