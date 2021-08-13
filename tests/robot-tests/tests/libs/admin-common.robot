@@ -635,3 +635,8 @@ user waits until modal is visible
     IF    "${MODAL_TEXT}" != "${EMPTY}"
         user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
     END
+
+user gets comment
+    [Arguments]    ${comment_text}
+    ${result}=    get webelement    xpath://*[li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]]
+    [Return]    ${result}
