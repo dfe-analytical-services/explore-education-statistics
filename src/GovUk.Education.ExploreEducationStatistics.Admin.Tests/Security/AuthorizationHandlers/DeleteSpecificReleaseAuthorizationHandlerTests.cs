@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DeleteSpecificReleaseAuthorizationHandlerTests
     {
-        public class DeleteSpecificReleaseAuthorizationHandlerClaimsTests
+        public class ClaimsTests
         {
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class DeleteSpecificReleaseAuthorizationHandlerPublicationRoleTests
+        public class PublicationRoleTests
         {
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     Version = 0
                 };
-                
+
                 // Assert that no User Publication roles will allow a Release to be deleted that is not an Amendment
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     contentDbContext =>
@@ -146,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class DeleteSpecificReleaseAuthorizationHandlerReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()

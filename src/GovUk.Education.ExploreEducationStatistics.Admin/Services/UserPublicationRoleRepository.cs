@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -45,6 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.PublicationId == publicationId)
                 .Select(role => role.Role)
                 .ToListAsync();
+        }
+
+        public async Task<bool> IsUserPublicationOwner(Guid userId, Guid publicationId)
+        {
+            return await UserHasRoleOnPublication(userId, publicationId, Owner);
         }
 
         public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)

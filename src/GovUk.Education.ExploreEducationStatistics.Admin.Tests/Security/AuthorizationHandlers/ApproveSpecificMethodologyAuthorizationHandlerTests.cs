@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid()
         };
 
-        public class ApproveSpecificMethodologyAuthorizationHandlerClaimsTests
+        public class ClaimsTests
         {
             [Fact]
             public async Task NoClaimsAllowApprovingPubliclyAccessibleMethodology()
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userReleaseRoleRepository
-                            .Setup(s => s.UserHasAnyOfRolesOnLatestRelease(UserId, OwningPublication.Id, ApproverRoles))
+                            .Setup(s => s.IsUserApproverOnLatestRelease(UserId, OwningPublication.Id))
                             .ReturnsAsync(false);
                     }
 
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         userReleaseRoleRepository
-                            .Setup(s => s.UserHasAnyOfRolesOnLatestRelease(UserId, OwningPublication.Id, ApproverRoles))
+                            .Setup(s => s.IsUserApproverOnLatestRelease(UserId, OwningPublication.Id))
                             .ReturnsAsync(false);
                     }
 
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class ApproveSpecificMethodologyAuthorizationHandlerReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task ApproversOnOwningPublicationsLatestReleaseCanApprove()
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .ReturnsAsync(OwningPublication);
 
                     userReleaseRoleRepository
-                        .Setup(s => s.UserHasAnyOfRolesOnLatestRelease(UserId, OwningPublication.Id, ApproverRoles))
+                        .Setup(s => s.IsUserApproverOnLatestRelease(UserId, OwningPublication.Id))
                         .ReturnsAsync(ApproverRoles.Contains(releaseRole));
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(OwningPublication);
 
                 userReleaseRoleRepository
-                    .Setup(s => s.UserHasAnyOfRolesOnLatestRelease(UserId, OwningPublication.Id, ApproverRoles))
+                    .Setup(s => s.IsUserApproverOnLatestRelease(UserId, OwningPublication.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);

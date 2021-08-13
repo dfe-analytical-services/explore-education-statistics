@@ -1,7 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
                 // this Methodology, they can approve it.
-                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(context, owningPublication.Id))
+                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
+                    context.User.GetUserId(),
+                    owningPublication.Id))
                 {
                     context.Succeed(requirement);
                 }
@@ -101,7 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
                 // this Methodology, they can mark it as draft.
-                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(context, owningPublication.Id))
+                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
+                    context.User.GetUserId(),
+                    owningPublication.Id))
                 {
                     context.Succeed(requirement);
                 }

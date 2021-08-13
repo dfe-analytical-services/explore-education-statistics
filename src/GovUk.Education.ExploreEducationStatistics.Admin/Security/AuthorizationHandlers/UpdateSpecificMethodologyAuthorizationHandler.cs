@@ -1,7 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 await _methodologyRepository.GetOwningPublicationByMethodologyParent(methodology.MethodologyParentId);
 
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can update it.
-            if (await _userPublicationRoleRepository.IsUserPublicationOwner(context, owningPublication.Id))
+            if (await _userPublicationRoleRepository.IsUserPublicationOwner(context.User.GetUserId(),
+                owningPublication.Id))
             {
                 context.Succeed(requirement);
                 return;
@@ -66,7 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             // If the user is an Editor (Contributor, Lead) or an Approver of the latest (Live or non-Live) Release
             // of the owning Publication of this Methodology, they can update it.
-            if (await _userReleaseRoleRepository.IsUserEditorOrApproverOnLatestRelease(context, owningPublication.Id))
+            if (await _userReleaseRoleRepository.IsUserEditorOrApproverOnLatestRelease(
+                context.User.GetUserId(),
+                owningPublication.Id))
             {
                 context.Succeed(requirement);
             }

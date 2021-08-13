@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -122,7 +123,316 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UserHasRoleOnPublication_TrueIfRoleExists()
+        public async Task IsUserApproverOnLatestRelease_TrueIfUserHasRole()
+        {
+            var publication = new Publication();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            // Assign the Approver role to the latest release
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = new User(),
+                Release = latestRelease,
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.True(await service.IsUserApproverOnLatestRelease(
+                    userReleaseRole.UserId,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserApproverOnLatestRelease_FalseWithoutRole()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            // Assign the Approver role to all releases except the latest release
+            var userReleaseRoles = ListOf(
+                    olderRelease, latestPublishedRelease, latestReleaseOtherPublication)
+                .Select(release => new UserReleaseRole
+                {
+                    User = user,
+                    Release = release,
+                    Role = Approver
+                })
+                .ToList();
+
+            // Also assign a different role to the latest release to check it has no influence
+            userReleaseRoles.Add(new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = Lead
+            });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserApproverOnLatestRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserEditorOrApproverOnLatestRelease_TrueIfUserHasRole()
+        {
+            var publication = new Publication();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            await ListOf(Approver, Contributor, Lead).ForEachAsync(async role =>
+            {
+                // Assign the role to the latest release
+                var userReleaseRole = new UserReleaseRole
+                {
+                    User = new User(),
+                    Release = latestRelease,
+                    Role = role
+                };
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.Releases.AddRangeAsync(
+                        olderRelease,
+                        latestPublishedRelease,
+                        latestRelease);
+                    await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                    Assert.True(await service.IsUserEditorOrApproverOnLatestRelease(
+                        userReleaseRole.UserId,
+                        publication.Id));
+                }
+            });
+        }
+
+        [Fact]
+        public async Task IsUserEditorOrApproverOnLatestRelease_FalseWithoutRole()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            // Assign the Contributor role to all releases except the latest release
+            var userReleaseRoles = ListOf(
+                    olderRelease, latestPublishedRelease, latestReleaseOtherPublication)
+                .Select(release => new UserReleaseRole
+                {
+                    User = user,
+                    Release = release,
+                    Role = Contributor
+                })
+                .ToList();
+
+            // Also assign a different role to the latest release to check it has no influence
+            userReleaseRoles.Add(new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = Viewer
+            });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserEditorOrApproverOnLatestRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task UserHasRoleOnRelease_TrueIfRoleExists()
         {
             var userReleaseRole = new UserReleaseRole
             {
@@ -151,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UserHasRoleOnPublication_FalseIfRoleDoesNotExist()
+        public async Task UserHasRoleOnRelease_FalseIfRoleDoesNotExist()
         {
             var user = new User();
             var release = new Release();
@@ -164,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Contributor
             };
 
-            // Setup a role but for a different release to make sure it has no influence
+            // Setup a different role on the release to make sure it has no influence
             var userReleaseRoleDifferentRole = new UserReleaseRole
             {
                 User = user,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -15,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
     {
-        public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerClaimsTests
+        public class ClaimsTests
         {
             [Fact]
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
             {
-                var release  = new Release
+                var release = new Release
                 {
                     Publication = new Publication
                     {
@@ -64,9 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     },
                     ApprovalStatus = ReleaseApprovalStatus.Draft
                 };
-                
+
                 // Assert that no User Publication roles will allow assigning pre release contacts to a release that's not approved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                    AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(release);
@@ -92,7 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that users with the Publication Owner role can assign pre release contacts to a release that's approved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                    AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(release);
@@ -107,13 +110,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
             {
                 // Assert that no User Release roles will allow assigning pre release contacts to a release that's not approved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                    AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                         new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
                             new UserPublicationRoleRepository(contentDbContext),
@@ -128,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_Approved()
             {
                 // Assert that users with an editor User Release role can assign pre release contacts to a release that's approved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                    AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                         new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
                             new UserPublicationRoleRepository(contentDbContext),

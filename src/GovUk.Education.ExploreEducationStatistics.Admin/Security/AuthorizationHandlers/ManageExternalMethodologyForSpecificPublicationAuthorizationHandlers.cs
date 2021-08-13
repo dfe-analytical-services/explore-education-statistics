@@ -1,7 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -33,7 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (await _userPublicationRoleRepository.IsUserPublicationOwner(context, publication.Id))
+            if (await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                publication.Id))
             {
                 context.Succeed(requirement);
             }

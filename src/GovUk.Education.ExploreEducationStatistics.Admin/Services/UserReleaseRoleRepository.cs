@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -40,6 +41,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.ReleaseId == releaseId)
                 .Select(r => r.Role)
                 .ToListAsync();
+        }
+
+        public async Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId)
+        {
+            return await UserHasAnyOfRolesOnLatestRelease(
+                userId,
+                publicationId,
+                ApproverRoles);
+        }
+
+        public async Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId)
+        {
+            return await UserHasAnyOfRolesOnLatestRelease(
+                userId,
+                publicationId,
+                EditorAndApproverRoles);
         }
 
         public async Task<bool> UserHasRoleOnRelease(Guid userId, Guid releaseId, ReleaseRole role)

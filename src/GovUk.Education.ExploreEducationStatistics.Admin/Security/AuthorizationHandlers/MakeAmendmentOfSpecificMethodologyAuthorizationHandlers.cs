@@ -1,7 +1,7 @@
 #nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -51,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can create 
             // an Amendment of this Methodology.
-            if (await _userPublicationRoleRepository.IsUserPublicationOwner(context, owningPublication.Id))
+            if (await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                owningPublication.Id))
             {
                 context.Succeed(requirement);
             }

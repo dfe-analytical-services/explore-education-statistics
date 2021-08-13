@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             })
         };
 
-        public class CreateMethodologyForSpecificPublicationAuthorizationHandlerClaimTests
+        public class ClaimTests
         {
             [Fact]
             public async Task UserWithCorrectClaimCanCreateMethodologyForAnyPublication()
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByClaimAlone)
                     {
                         publicationRoleRepository
-                            .Setup(s => s.UserHasRoleOnPublication(UserId, publication.Id, Owner))
+                            .Setup(s => s.IsUserPublicationOwner(UserId, publication.Id))
                             .ReturnsAsync(false);
                     }
 
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class CreateMethodologyForSpecificPublicationAuthorizationHandlerPublicationRoleTests
+        public class PublicationRoleTests
         {
             [Fact]
             public async Task UserCanCreateMethodologyForPublicationWithPublicationOwnerRole()
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, Publication);
 
                 publicationRoleRepository
-                    .Setup(s => s.UserHasRoleOnPublication(UserId, Publication.Id, Owner))
+                    .Setup(s => s.IsUserPublicationOwner(UserId, Publication.Id))
                     .ReturnsAsync(false);
 
                 await handler.HandleAsync(authContext);
@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, publication);
 
                 publicationRoleRepository
-                    .Setup(s => s.UserHasRoleOnPublication(UserId, publication.Id, Owner))
+                    .Setup(s => s.IsUserPublicationOwner(UserId, publication.Id))
                     .ReturnsAsync(true);
 
                 await handler.HandleAsync(authContext);

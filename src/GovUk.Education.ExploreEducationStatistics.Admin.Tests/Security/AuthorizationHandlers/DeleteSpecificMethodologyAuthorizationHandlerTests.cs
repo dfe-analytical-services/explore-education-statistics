@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid()
         };
 
-        public class DeleteSpecificMethodologyAuthorizationHandlerClaimTests
+        public class ClaimTests
         {
             [Fact]
             public async Task UserWithCorrectClaimCanDeleteDraftMethodology()
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(OwningPublication);
 
                         publicationRoleRepository
-                            .Setup(s => s.UserHasRoleOnPublication(UserId, OwningPublication.Id, Owner))
+                            .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
                             .ReturnsAsync(false);
                     }
 
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class DeleteSpecificMethodologyAuthorizationHandlerPublicationRoleTests
+        public class PublicationRoleTests
         {
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .ReturnsAsync(OwningPublication);
 
                     publicationRoleRepository
-                        .Setup(s => s.UserHasRoleOnPublication(UserId, OwningPublication.Id, Owner))
+                        .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
                         .ReturnsAsync(role == Owner);
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(OwningPublication);
 
                 publicationRoleRepository
-                    .Setup(s => s.UserHasRoleOnPublication(UserId, OwningPublication.Id, Owner))
+                    .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);
