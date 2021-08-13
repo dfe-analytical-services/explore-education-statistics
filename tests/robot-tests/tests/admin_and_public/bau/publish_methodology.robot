@@ -35,7 +35,6 @@ Verify that the publication is not visible on the public methodologies page with
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is not publicly accessible by URL without a published release
-    [Tags]    NotAgainstLocal
     user goes to url    ${PUBLIC_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
@@ -50,7 +49,6 @@ Verify that the publication is still not visible on the public methodologies pag
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is still not publicly accessible by URL without publishing the release
-    [Tags]    NotAgainstLocal
     user goes to url    ${PUBLIC_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
