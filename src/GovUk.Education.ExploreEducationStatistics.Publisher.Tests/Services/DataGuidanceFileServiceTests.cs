@@ -57,24 +57,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(
+                    .Setup(s => s.WriteToStream(
+                        It.IsAny<FileStream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.IsAny<string>())
-                    )
+                        null
+                    ))
                     .ReturnsAsync(mockFile);
 
-                var blobStorageService = new Mock<IBlobStorageService>();
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
                 blobStorageService
                     .Setup(
                         s => s.UploadStream(
                             PrivateReleaseFiles,
                             It.Is<string>(path => path.StartsWith($"{release.Id}/data-guidance")),
-                            mockFile,
+                            It.IsAny<FileStream>(),
                             "text/plain",
                             null
                         )
-                    );
+                    )
+                    .Returns(Task.CompletedTask);
 
                 var service = BuildDataGuidanceFileService(
                     contentDbContext: contentDbContext,
@@ -163,13 +165,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>();
+                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(
+                    .Setup(s => s.WriteToStream(
+                        It.IsAny<FileStream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.IsAny<string>())
-                    )
+                        null
+                    ))
                     .ThrowsAsync(new Exception("Write to file failed"));
 
                 var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -216,23 +219,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var mockFile = CreateMockFile();
 
-                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>();
+                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(
+                    .Setup(s => s.WriteToStream(
+                        It.IsAny<FileStream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.IsAny<string>())
-                    )
+                        null
+                    ))
                     .ReturnsAsync(mockFile);
 
-                var blobStorageService = new Mock<IBlobStorageService>();
+                var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
                 blobStorageService
                     .Setup(
                         s => s.UploadStream(
                             PrivateReleaseFiles,
                             It.Is<string>(path => path.StartsWith($"{release.Id}/data-guidance")),
-                            mockFile,
+                            It.IsAny<FileStream>(),
                             "text/plain",
                             null
                         )

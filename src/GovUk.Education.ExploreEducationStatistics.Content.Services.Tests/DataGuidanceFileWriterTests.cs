@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task WriteFile_NoSubjects()
+        public async Task WriteToStream_NoSubjects()
         {
             var release = new Release
             {
@@ -97,21 +97,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 var path = GenerateFilePath();
+                await using var stream = File.OpenWrite(path);
 
                 var exception = await Assert.ThrowsAsync<ArgumentException>(
-                    async () => { await writer.WriteFile(release, path); }
+                    async () => { await writer.WriteToStream(stream, release); }
                 );
 
                 Assert.Equal($"Could not find subjects for release: {release.Id}", exception.Message);
-
-                Assert.False(File.Exists(path));
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_MultipleDataFiles()
+        public async Task WriteToStream_MultipleDataFiles()
         {
             var release = new Release
             {
@@ -210,21 +209,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                await using var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_SingleDataFile()
+        public async Task WriteToStream_SingleDataFile()
         {
             var release = new Release
             {
@@ -294,21 +289,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_NoDataGuidance()
+        public async Task WriteToStream_NoDataGuidance()
         {
             // Release has no data guidance (aka meta guidance)
             var release = new Release
@@ -373,21 +364,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                await using var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_NoDataFiles()
+        public async Task WriteToStream_NoDataFiles()
         {
             var release = new Release
             {
@@ -425,21 +412,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                await using var file = await writer.WriteFile(release, path);
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithSingleProperties()
+        public async Task WriteToStream_FileWithSingleProperties()
         {
             var release = new Release
             {
@@ -499,21 +482,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithEmptyProperties()
+        public async Task WriteToStream_FileWithEmptyProperties()
         {
             var release = new Release
             {
@@ -559,21 +538,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithEmptyTimePeriodStart()
+        public async Task WriteToStream_FileWithEmptyTimePeriodStart()
         {
             var release = new Release
             {
@@ -623,21 +598,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithEmptyTimePeriodEnd()
+        public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
         {
             var release = new Release
             {
@@ -684,21 +655,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithEmptyVariable()
+        public async Task WriteToStream_FileWithEmptyVariable()
         {
             var release = new Release
             {
@@ -749,21 +716,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithOverTenFootnotesAndMultiline()
+        public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
         {
             var release = new Release
             {
@@ -836,21 +799,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
-                var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
 
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Snapshot.Match(stream.ReadToEnd());
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
         }
 
         [Fact]
-        public async Task WriteFile_FileWithEmptyFootnote()
+        public async Task WriteToStream_FileWithEmptyFootnote()
         {
             var release = new Release
             {
@@ -907,14 +866,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
+
+                Snapshot.Match(stream.ReadToEnd());
+            }
+
+            MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteToStream_FileStream()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                MetaGuidance = TestBasicMetaGuidance
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+            metaGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(new List<MetaGuidanceSubjectViewModel>());
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Entry(release).ReloadAsync();
+
+                var writer = BuildDataGuidanceFileWriter(
+                    contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+                );
+
                 var path = GenerateFilePath();
-                var file = await writer.WriteFile(release, path);
+                await using var stream = File.OpenWrite(path);
+
+                await writer.WriteToStream(stream, release);
 
                 var text = await File.ReadAllTextAsync(path);
 
-                Assert.Equal(text, file.ReadToEnd());
-
-                Snapshot.Match(text);
+                Assert.Contains("Test publication", text);
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceSubjectService);

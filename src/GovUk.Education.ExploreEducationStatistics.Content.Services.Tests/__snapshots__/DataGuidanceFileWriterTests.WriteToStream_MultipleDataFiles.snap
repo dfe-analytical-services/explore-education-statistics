@@ -1,0 +1,62 @@
+﻿Test publication
+2020 Reporting Year
+
+Description
+
+This document describes the data included in the ‘Children looked after in England including adoptions: 2019 to 2020’ National Statistics release’s underlying data files. This data is released under the terms of the Open Government License and is intended to meet at least three stars for Open Data.
+
+Coverage
+
+This data is based upon information collected in the SSDA903 (CLA) data collection. It is a child level dataset collected from local authorities in England annually. The data includes information on:
+
+- children looked after at 31 March in each year, including unaccompanied asylum seeking children
+- children looked after at any time
+- children who started to be looked after
+- children who ceased to be looked after
+
+Data files
+
+Test data 1
+
+Filename: test-1.csv
+Geographic levels: Local Authority; National; Regional
+Time period: 2018 to 2020
+Content summary: Local authority level data on care leavers aged 17 to 21, by accommodation type (as measured on or around their birthday).
+
+Variable names and descriptions for this file are provided below:
+
+Variable name          |  Variable description
+---------------------  |  -------------------------------------------
+accommodation_type     |  Accommodation type
+age_end                |  Age at end
+number_of_leavers      |  Number of leavers
+percentage_of_leavers  |  Percentage of leavers by accommodation type
+
+Footnotes:
+
+1. Subject 1 Footnote 1
+2. Subject 1 Footnote 2
+
+
+Test data 2
+
+Filename: test-2.csv
+Geographic levels: National
+Time period: 2018
+Content summary: Number and proportion of population participating in education, training and employment by age, gender and labour market status.
+
+Variable names and descriptions for this file are provided below:
+
+Variable name         |  Variable description
+--------------------  |  --------------------
+age                   |  Academic age
+category              |  Activity
+gender                |  Gender
+labour_market_status  |  Labour market status
+
+Footnotes:
+
+1. Subject 2 Footnote 1
+2. Subject 2 Footnote 2
+3. Subject 2 Footnote 3
+4. Subject 2 Footnote 4

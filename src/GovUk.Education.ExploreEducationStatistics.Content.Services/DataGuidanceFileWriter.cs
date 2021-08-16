@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -32,30 +31,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
 
-        public async Task<FileStream> WriteFile(Release release, string destinationPath)
+        public async Task<Stream> WriteToStream(Stream stream, Release release, IEnumerable<Guid>? subjectIds = null)
         {
             // Make sure publication has been hydrated
             await _contentDbContext.Entry(release)
                 .Reference(r => r.Publication)
                 .LoadAsync();
 
-            var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id);
+            var subjects = await ListSubjects(release, subjectIds);
+
+            await using var file = new StreamWriter(stream, leaveOpen: stream.CanRead);
+
+            await DoWrite(file, release, subjects);
+
+            await file.FlushAsync();
+
+            if (stream.CanSeek)
+            {
+                stream.Position = 0;
+            }
+
+            return stream;
+        }
+
+        private async Task<List<MetaGuidanceSubjectViewModel>> ListSubjects(
+            Release release,
+            IEnumerable<Guid>? subjectIds = null)
+        {
+            var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id, subjectIds);
 
             if (subjects.IsLeft)
             {
                 throw new ArgumentException($"Could not find subjects for release: {release.Id}");
             }
 
-            return await DoWrite(destinationPath, release, subjects.Right);
+            return subjects.Right;
         }
 
-        private static async Task<FileStream> DoWrite(
-            string path,
+        private static async Task DoWrite(
+            TextWriter file,
             Release release,
             IList<MetaGuidanceSubjectViewModel> subjects)
         {
-            await using var file = new StreamWriter(path);
-
             // Add header information including publication/release title
             await file.WriteLineAsync(release.Publication.Title);
             await file.WriteLineAsync(
@@ -76,14 +93,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 await file.WriteLineAsync();
             }
 
-            await WriteDataFiles(subjects, file);
-
-            await file.DisposeAsync();
-
-            return File.OpenRead(path);
+            await WriteDataFiles(file, subjects);
         }
 
-        private static async Task WriteDataFiles(IList<MetaGuidanceSubjectViewModel> subjects, TextWriter file)
+        private static async Task WriteDataFiles(TextWriter file, IList<MetaGuidanceSubjectViewModel> subjects)
         {
             if (subjects.Count == 0)
             {

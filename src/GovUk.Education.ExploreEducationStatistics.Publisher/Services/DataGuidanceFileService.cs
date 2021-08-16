@@ -42,12 +42,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 throw new ArgumentException($"Could not find release with id: {releaseId}");
             }
 
+
             if (release.MetaGuidance.IsNullOrWhitespace())
             {
                 throw new InvalidOperationException($"Release {releaseId} must have non-empty data guidance");
             }
 
-            await using var stream = await _dataGuidanceFileWriter.WriteFile(release, path);
+            await using var file = System.IO.File.OpenWrite(path);
+            await _dataGuidanceFileWriter.WriteToStream(file, release);
+
+            await file.DisposeAsync();
 
             var releaseFile = new ReleaseFile
             {
@@ -67,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _blobStorageService.UploadStream(
                 containerName: BlobContainers.PrivateReleaseFiles,
                 path: created.Path(),
-                stream: stream,
+                stream: System.IO.File.OpenRead(path),
                 "text/plain"
             );
 
