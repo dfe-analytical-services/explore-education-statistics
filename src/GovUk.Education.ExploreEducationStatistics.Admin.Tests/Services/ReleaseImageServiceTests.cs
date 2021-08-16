@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -91,8 +91,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
+                        It.IsAny<MemoryStream>(), null),
+                    Times.Once());
 
                 Assert.Equal("image/png", result.Right.ContentType);
                 Assert.Equal("image.png", result.Right.FileDownloadName);
@@ -287,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
-            IReleaseFileRepository releaseFileRepository = null, 
+            IReleaseFileRepository releaseFileRepository = null,
             IUserService userService = null)
         {
             contentDbContext.Users.Add(_user);

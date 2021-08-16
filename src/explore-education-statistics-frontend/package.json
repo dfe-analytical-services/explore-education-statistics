@@ -151,7 +151,8 @@
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
       "^react$": "<rootDir>/node_modules/react",
-      "^formik$": "<rootDir>/node_modules/formik"
+      "^formik$": "<rootDir>/node_modules/formik",
+      "\\.worker.js":"<rootDir>/../explore-education-statistics-common/__mocks__/mock.worker.ts"
     },
     "moduleFileExtensions": [
       "web.js",

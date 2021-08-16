@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         On = saveRequest.On ?? DateTime.Now,
                         Reason = saveRequest.Reason,
-                        ReleaseId = release.Id
+                        ReleaseId = release.Id,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId(),
                     });
 
                     await _context.SaveChangesAsync();
@@ -113,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return _mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
         }
         
-        public static IQueryable<Release> HydrateReleaseForUpdates(IQueryable<Release> values)
+        private static IQueryable<Release> HydrateReleaseForUpdates(IQueryable<Release> values)
         {
             return values.Include(r => r.Updates);
         }

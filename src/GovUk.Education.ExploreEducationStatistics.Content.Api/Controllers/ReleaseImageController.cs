@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 Guid.TryParse(fileId, out var fileIdAsGuid))
             {
                 return await _releaseFileService
-                    .Stream(releaseId: releaseIdAsGuid, fileId: fileIdAsGuid)
+                    .StreamFile(releaseId: releaseIdAsGuid, fileId: fileIdAsGuid)
                     .HandleFailures();
             }
 

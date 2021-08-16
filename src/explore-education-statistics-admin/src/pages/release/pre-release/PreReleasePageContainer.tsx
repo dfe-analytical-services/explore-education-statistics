@@ -141,6 +141,7 @@ const PreReleasePageContainer = ({
                 releaseId,
               }),
             }))}
+            label="Pre-release"
           />
 
           <Switch>

@@ -18,6 +18,7 @@ import Details from '@common/components/Details';
 import { Subject } from '@common/services/tableBuilderService';
 import ContentHtml from '@common/components/ContentHtml';
 import Tag from '@common/components/Tag';
+import useMounted from '@common/hooks/useMounted';
 import React, { useMemo } from 'react';
 import { Formik } from 'formik';
 
@@ -45,6 +46,7 @@ const DownloadStep = ({
   ...stepProps
 }: Props & InjectedWizardProps) => {
   const { isActive, currentStep, stepNumber } = stepProps;
+  const { isMounted } = useMounted();
 
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
@@ -129,7 +131,8 @@ const DownloadStep = ({
       onSubmit={handleSubmit}
     >
       {form => {
-        return isActive ? (
+        // isMounted check required as Formik context can be undefined if the step is active on page load.
+        return isActive && isMounted ? (
           <Form id="downloadForm" showSubmitError>
             <FormFieldset id="downloadFiles" legend={stepHeading}>
               {checkboxOptions.length > 0 && (

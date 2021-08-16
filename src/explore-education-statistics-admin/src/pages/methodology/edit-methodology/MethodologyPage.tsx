@@ -14,6 +14,7 @@ import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
@@ -34,7 +35,7 @@ const MethodologyPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value, isLoading } = useAsyncHandledRetry(
+  const { value: methodology, isLoading } = useAsyncHandledRetry(
     () => methodologyService.getMethodology(methodologyId),
     [methodologyId],
   );
@@ -76,11 +77,18 @@ const MethodologyPage = ({
   return (
     <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
       <LoadingSpinner loading={isLoading}>
-        {value ? (
+        {methodology ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
-                <PageTitle title={value.title} caption="Edit methodology" />
+                <PageTitle
+                  title={methodology.title}
+                  caption={
+                    methodology.amendment
+                      ? 'Amend methodology'
+                      : 'Edit methodology'
+                  }
+                />
               </div>
 
               {/* EES-2464
@@ -97,6 +105,12 @@ const MethodologyPage = ({
               </div> */}
             </div>
 
+            <Tag>{methodology.status}</Tag>
+
+            {methodology.amendment && (
+              <Tag className="govuk-!-margin-left-2">Amendment</Tag>
+            )}
+
             <NavBar
               routes={navRoutes.map(route => ({
                 title: route.title,
@@ -104,6 +118,7 @@ const MethodologyPage = ({
                   methodologyId,
                 }),
               }))}
+              label="Methodology"
             />
 
             <Switch>

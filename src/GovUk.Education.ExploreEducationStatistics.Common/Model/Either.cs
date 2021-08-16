@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
          * the results.  If either OnSuccess(...) fails, the entire result fails and additionally, if the first result
          * fails, the second OnSuccess(...) will not be called.
          *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better. 
+         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
          */
         public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
             OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
          * the results.  If any OnSuccess(...) fails, the entire result fails and additionally, if the first result
          * fails, the subsequent OnSuccess(...) will not be called.
          *
-         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better. 
+         * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
          */
         public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>>
             OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2, TSuccess3>(
@@ -281,8 +281,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return await func(firstResult.Right);
         }
 
-        public static async Task<Either<TFailure1, TFaillure2>> OnFailureDo<TFailure1, TFaillure2>(
-            this Task<Either<TFailure1, TFaillure2>> task,
+        public static async Task<Either<Unit, TSuccess>> OnFailureVoid<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Action<TFailure> failureTask)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            failureTask(firstResult.Left);
+            return Unit.Instance;
+        }
+
+        public static async Task<Either<TFailure1, TFailure2>> OnFailureDo<TFailure1, TFailure2>(
+            this Task<Either<TFailure1, TFailure2>> task,
             Func<TFailure1, Task> failureTask)
         {
             var firstResult = await task;

@@ -1,89 +1,9 @@
-import {
-  CategoryFilter,
-  Filter,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
-import {
-  FullTable,
-  FullTableMeta,
-} from '@common/modules/table-tool/types/fullTable';
-import cartesian from '@common/utils/cartesian';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import last from 'lodash/last';
 import sum from 'lodash/sum';
-import { CellObject, utils, WorkSheet } from 'xlsx';
-
-export const getCsvData = (fullTable: FullTable): string[][] => {
-  const { subjectMeta, results } = fullTable;
-  const { indicators, filters, timePeriodRange, locations } = subjectMeta;
-
-  const filterColumns = Object.values(filters).map(
-    filterGroup => filterGroup.name,
-  );
-
-  const indicatorColumns = indicators.map(indicator => indicator.name);
-
-  const columns = [
-    'location',
-    'location_code',
-    'geographic_level',
-    'time_period',
-    ...filterColumns,
-    ...indicatorColumns,
-  ];
-
-  const rows = cartesian<Filter>(
-    locations,
-    timePeriodRange,
-    ...Object.values(filters).map(filterGroup => filterGroup.options),
-  )
-    .map(filterCombination => {
-      const [location, timePeriod, ...filterOptions] = filterCombination as [
-        LocationFilter,
-        TimePeriodFilter,
-        ...CategoryFilter[]
-      ];
-
-      const indicatorCells = indicators.map(indicator => {
-        const matchingResult = results.find(result => {
-          const { geographicLevel } = result;
-
-          return (
-            filterOptions.every(filter =>
-              result.filters.includes(filter.value),
-            ) &&
-            result.location[geographicLevel] &&
-            result.location[geographicLevel].code === location.value &&
-            location.level === geographicLevel &&
-            result.timePeriod === timePeriod.value
-          );
-        });
-
-        if (!matchingResult) {
-          return 'n/a';
-        }
-
-        return matchingResult.measures[indicator.value] ?? 'n/a';
-      });
-
-      if (indicatorCells.every(cell => cell === 'n/a')) {
-        return [];
-      }
-
-      return [
-        location.label,
-        location.value,
-        location.level,
-        timePeriod.label.replace(/\//g, ''),
-        ...filterOptions.map(column => column.label),
-        ...indicatorCells,
-      ];
-    })
-    .filter(row => row.length > 0);
-
-  return [columns, ...rows];
-};
+import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
+import { RefObject } from 'react';
 
 /**
  * Append a {@param title} to the beginning of the {@param sheet}.
@@ -211,3 +131,40 @@ export function appendFootnotes(
 
   return sheet;
 }
+
+export const downloadOdsFile = (
+  fileName: string,
+  subjectMeta: FullTableMeta,
+  tableRef: RefObject<HTMLElement>,
+  title: string,
+) => {
+  const { footnotes } = subjectMeta;
+
+  let tableEl: HTMLTableElement | null = null;
+
+  if (tableRef.current) {
+    if (tableRef.current.tagName.toLowerCase() === 'table') {
+      tableEl = tableRef.current as HTMLTableElement;
+    } else {
+      tableEl = tableRef.current.querySelector('table');
+    }
+  }
+
+  if (!tableEl) {
+    return;
+  }
+
+  const workBook = utils.table_to_book(tableEl, {
+    raw: true,
+  });
+  const sheet = workBook.Sheets[workBook.SheetNames[0]];
+
+  appendColumnWidths(sheet);
+  appendTitle(sheet, title);
+  appendFootnotes(sheet, footnotes);
+
+  writeFile(workBook, `${fileName}.ods`, {
+    type: 'binary',
+    bookType: 'ods',
+  });
+};

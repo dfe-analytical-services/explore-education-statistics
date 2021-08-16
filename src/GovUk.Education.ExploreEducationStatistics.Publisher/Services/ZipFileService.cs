@@ -1,9 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var file in files)
             {
-                var zipEntry = new ZipEntry(file.Type.GetEnumLabel() + "/" + file.Filename);
+                var zipEntry = new ZipEntry(file.ZipFileEntryName());
                 zipOutputStream.PutNextEntry(zipEntry);
 
                 await _publicBlobStorageService.DownloadToStream(

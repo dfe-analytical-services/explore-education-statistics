@@ -54,6 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
         }
 
+        public static string ZipFileEntryName(this File file)
+        {
+            return file.Type.GetEnumLabel() + "/" + file.Filename;
+        }
+
         // TODO: Remove after completion of EES-2343
         public static FileInfo ToFileInfoNotFound(this File file)
         {

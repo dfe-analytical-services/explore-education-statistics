@@ -1,4 +1,5 @@
 #nullable enable
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
@@ -324,6 +325,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Equal("FOO_BAR", "FooBar".ScreamingSnakeCase());
                 Assert.Equal("FOO_BAR", "FooBAr".ScreamingSnakeCase());
             }
+        }
+
+        public class ToMd5HashTests
+        {
+            [Fact]
+            public void Utf8Encoding()
+            {
+                var input = "hey";
+                Assert.Equal("6057f13c496ecf7fd777ceb9e79ae285", input.ToMd5Hash());
+            }
+
+            [Fact]
+            public void Utf8Encoding_Utf8Chars()
+            {
+                var input = "héy";
+                Assert.Equal("55adad7d576b41782831a8815778a74a", input.ToMd5Hash());
+            }
+
+            [Fact]
+            public void AsciiEncoding()
+            {
+                var input = "hey";
+                Assert.Equal("6057f13c496ecf7fd777ceb9e79ae285", input.ToMd5Hash(Encoding.ASCII));
+            }
+
+            [Fact]
+            public void AsciiEncoding_Utf8Chars()
+            {
+                var input = "héy";
+                Assert.Equal("f7d6171b6bcfd8923a50b65721064b27", input.ToMd5Hash(Encoding.ASCII));
+            }
+
         }
     }
 }
