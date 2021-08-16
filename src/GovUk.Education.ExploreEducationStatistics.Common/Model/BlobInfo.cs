@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -24,14 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             string size,
             string contentType,
             long contentLength,
-            IDictionary<string, string> meta,
+            IDictionary<string, string>? meta = null,
             DateTimeOffset? created = null)
         {
             Path = path;
             Size = size;
             ContentType = contentType;
             ContentLength = contentLength;
-            Meta = meta;
+            Meta = meta ?? new Dictionary<string, string>();
             Created = created;
         }
 

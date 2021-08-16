@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -91,6 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.Secure = CookieSecurePolicy.Always;
             });
+
+            services.AddControllers(
+                options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
+                }
+            );
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options

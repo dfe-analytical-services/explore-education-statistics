@@ -4,6 +4,7 @@ using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -13,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -62,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
-                options.Conventions.Add(new CommaSeparatedQueryStringConvention());
                 options.EnableEndpointRouting = false;
 
             })
@@ -70,6 +69,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
+
+            services.AddControllers(
+                options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
+                }
+            );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
