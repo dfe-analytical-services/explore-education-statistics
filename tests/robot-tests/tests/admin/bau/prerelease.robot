@@ -219,7 +219,9 @@ Validate prerelease has started
     ...    60
 
 Validate metadata guidance page
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
@@ -314,7 +316,9 @@ Validate prerelease has started for Analyst user
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60

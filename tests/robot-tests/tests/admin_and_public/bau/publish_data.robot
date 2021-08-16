@@ -604,7 +604,9 @@ Go to release page
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
 Go to meta guidance document
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user waits until page contains title caption    ${RELEASE_2_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
