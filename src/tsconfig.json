@@ -14,7 +14,8 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "webworker"
     ],
     "skipLibCheck": true,
     "esModuleInterop": true,

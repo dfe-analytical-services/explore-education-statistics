@@ -17,7 +17,7 @@ export default function useClickAway<
   events: (keyof DocumentEventMap)[] = ['click'],
 ) {
   useEffect(() => {
-    const handler: EventListenerOrEventListenerObject = event => {
+    const handler: EventListenerOrEventListenerObject = (event: Event) => {
       const { current: element } = ref;
 
       if (element && event.target && !element.contains(event.target as Node)) {
