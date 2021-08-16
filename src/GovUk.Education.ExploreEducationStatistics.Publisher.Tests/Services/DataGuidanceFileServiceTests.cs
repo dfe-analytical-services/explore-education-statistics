@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class DataGuidanceFileServiceTests : IDisposable
     {
-        private readonly List<FileStream> _files = new List<FileStream>();
+        private readonly List<FileStream> _files = new();
 
         public void Dispose()
         {
@@ -37,7 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CreateDataGuidanceFile()
         {
-            var release = new Release();
+            var release = new Release
+            {
+                MetaGuidance = "Test guidance"
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -51,10 +54,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var mockFile = CreateMockFile();
 
-                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>();
+                var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(release.Id, It.IsAny<string>()))
+                    .Setup(s => s.WriteFile(
+                        It.Is<Release>(r => r.Id == release.Id),
+                        It.IsAny<string>())
+                    )
                     .ReturnsAsync(mockFile);
 
                 var blobStorageService = new Mock<IBlobStorageService>();
@@ -78,11 +84,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var file = await service.CreateDataGuidanceFile(release.Id);
 
+                MockUtils.VerifyAllMocks(dataGuidanceFileWriter, blobStorageService);
+
                 Assert.Equal(FileType.DataGuidance, file.Type);
                 Assert.Equal(release.Id, file.RootPath);
                 Assert.Equal("data-guidance.txt", file.Filename);
-
-                MockUtils.VerifyAllMocks(dataGuidanceFileWriter, blobStorageService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -96,17 +102,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task CreateDataGuidanceFile_WriteThrows()
+        public async Task CreateDataGuidanceFile_NoRelease()
         {
             var releaseId = Guid.NewGuid();
+            await using var contentDbContext = InMemoryContentDbContext();
+
+            var service = BuildDataGuidanceFileService(
+                contentDbContext: contentDbContext
+            );
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                async () => { await service.CreateDataGuidanceFile(releaseId); }
+            );
+
+            Assert.Equal($"Could not find release with id: {releaseId}", exception.Message);
+        }
+
+        [Fact]
+        public async Task CreateDataGuidanceFile_NoReleaseDataGuidance()
+        {
+            var release = new Release();
+
             var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataGuidanceFileService(
+                    contentDbContext: contentDbContext
+                );
+
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                    async () => { await service.CreateDataGuidanceFile(release.Id); }
+                );
+
+                Assert.Equal($"Release {release.Id} must have non-empty data guidance", exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task CreateDataGuidanceFile_WriteThrows()
+        {
+            var release = new Release
+            {
+                MetaGuidance = "Test guidance"
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>();
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(releaseId, It.IsAny<string>()))
+                    .Setup(s => s.WriteFile(
+                        It.Is<Release>(r => r.Id == release.Id),
+                        It.IsAny<string>())
+                    )
                     .ThrowsAsync(new Exception("Write to file failed"));
 
                 var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -118,12 +181,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 );
 
                 var exception = await Assert.ThrowsAsync<Exception>(
-                    async () => { await service.CreateDataGuidanceFile(releaseId); }
+                    async () => { await service.CreateDataGuidanceFile(release.Id); }
                 );
 
-                Assert.Equal("Write to file failed", exception.Message);
-
                 MockUtils.VerifyAllMocks(dataGuidanceFileWriter, blobStorageService);
+
+                Assert.Equal("Write to file failed", exception.Message);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -136,7 +199,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CreateDataGuidanceFile_UploadThrows()
         {
-            var release = new Release();
+            var release = new Release
+            {
+                MetaGuidance = "Test guidance"
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -153,7 +219,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>();
 
                 dataGuidanceFileWriter
-                    .Setup(s => s.WriteFile(release.Id, It.IsAny<string>()))
+                    .Setup(s => s.WriteFile(
+                        It.Is<Release>(r => r.Id == release.Id),
+                        It.IsAny<string>())
+                    )
                     .ReturnsAsync(mockFile);
 
                 var blobStorageService = new Mock<IBlobStorageService>();
@@ -180,9 +249,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     async () => { await service.CreateDataGuidanceFile(release.Id); }
                 );
 
-                Assert.Equal("Something went wrong with the upload", exception.Message);
-
                 MockUtils.VerifyAllMocks(dataGuidanceFileWriter, blobStorageService);
+
+                Assert.Equal("Something went wrong with the upload", exception.Message);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -209,8 +278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             return new DataGuidanceFileService(
                 contentDbContext,
-                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                blobStorageService ?? Mock.Of<IBlobStorageService>()
+                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(MockBehavior.Strict),
+                blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict)
             );
         }
     }

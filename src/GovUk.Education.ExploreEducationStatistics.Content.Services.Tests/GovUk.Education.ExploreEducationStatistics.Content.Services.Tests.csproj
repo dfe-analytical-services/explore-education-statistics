@@ -17,5 +17,9 @@
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="__snapshots__\__mismatch__" />
+    </ItemGroup>
 
 </Project>

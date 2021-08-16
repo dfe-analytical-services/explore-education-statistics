@@ -9,39 +9,35 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using File = System.IO.File;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class DataGuidanceFileWriter : IDataGuidanceFileWriter
     {
         private const string VariableSeparator = "  |  ";
 
-        private readonly IReleaseService _releaseService;
+        private readonly ContentDbContext _contentDbContext;
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
 
         public DataGuidanceFileWriter(
-            IReleaseService releaseService,
+            ContentDbContext contentDbContext,
             IMetaGuidanceSubjectService metaGuidanceSubjectService)
         {
-            _releaseService = releaseService;
+            _contentDbContext = contentDbContext;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
 
-        public async Task<FileStream> WriteFile(Guid releaseId, string path)
+        public async Task<FileStream> WriteFile(Release release, string destinationPath)
         {
-            var release = await _releaseService.Get(releaseId);
-
-            if (release.MetaGuidance.IsNullOrWhitespace())
-            {
-                throw new InvalidOperationException(
-                    $"Cannot create data guidance file for release {release.Id} with no data guidance"
-                );
-            }
+            // Make sure publication has been hydrated
+            await _contentDbContext.Entry(release)
+                .Reference(r => r.Publication)
+                .LoadAsync();
 
             var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id);
 
@@ -50,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 throw new ArgumentException($"Could not find subjects for release: {release.Id}");
             }
 
-            return await DoWrite(path, release, subjects.Right);
+            return await DoWrite(destinationPath, release, subjects.Right);
         }
 
         private static async Task<FileStream> DoWrite(
@@ -69,12 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     TimePeriodLabelFormat.FullLabel
                 )
             );
-            await file.WriteLineAsync();
 
-            // Add the release's guidance content
-            var guidance = await HtmlToTextUtils.HtmlToText(release.MetaGuidance);
-            await file.WriteAsync(guidance);
-            await file.WriteLineAsync();
+            if (!release.MetaGuidance.IsNullOrWhitespace())
+            {
+                await file.WriteLineAsync();
+
+                // Add the release's guidance content
+                var guidance = await HtmlToTextUtils.HtmlToText(release.MetaGuidance);
+                await file.WriteAsync(guidance);
+                await file.WriteLineAsync();
+            }
 
             await WriteDataFiles(subjects, file);
 
