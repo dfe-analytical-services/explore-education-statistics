@@ -1,4 +1,7 @@
-import themeService, { DownloadTheme } from '@common/services/themeService';
+import themeService, {
+  DownloadTheme,
+  PublicationDownloadSummary,
+} from '@common/services/themeService';
 import Page from '@frontend/components/Page';
 import PublicationForm, {
   PublicationFormSubmitHandler,
@@ -101,16 +104,10 @@ const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
   },
 ];
 
-export interface SelectedPublication {
-  id: string;
-  title: string;
-  slug: string;
-  selectedRelease?: Release;
-}
-
 interface Props {
   releases?: Release[];
-  selectedPublication?: SelectedPublication;
+  selectedPublication?: PublicationDownloadSummary;
+  selectedRelease?: Release;
   subjects?: SubjectWithDownloadFiles[];
   themes: DownloadTheme[];
 }
@@ -128,6 +125,7 @@ interface DataCatalogueState {
 const DataCataloguePage: NextPage<Props> = ({
   releases = [],
   selectedPublication,
+  selectedRelease,
   subjects = [],
   themes,
 }: Props) => {
@@ -135,7 +133,7 @@ const DataCataloguePage: NextPage<Props> = ({
 
   const initialState = useMemo<DataCatalogueState>(() => {
     const getInitialStep = () => {
-      if (selectedPublication && selectedPublication.selectedRelease) {
+      if (selectedPublication && selectedRelease) {
         return 3;
       }
       if (selectedPublication) {
@@ -149,13 +147,11 @@ const DataCataloguePage: NextPage<Props> = ({
       releases,
       subjects,
       query: {
-        publicationId: (selectedPublication && selectedPublication.id) || '',
-        release:
-          (selectedPublication && selectedPublication.selectedRelease) ||
-          undefined,
+        publicationId: selectedPublication?.id || '',
+        release: (selectedPublication && selectedRelease) || undefined,
       },
     };
-  }, [releases, selectedPublication, subjects]);
+  }, [releases, selectedPublication, selectedRelease, subjects]);
 
   const [state, updateState] = useImmer<DataCatalogueState>(initialState);
 
@@ -267,7 +263,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   const selectedPublication = themes
     .flatMap(option => option.topics)
     .flatMap(option => option.publications)
-    .find(option => option.slug === publicationSlug) as SelectedPublication;
+    .find(option => option.slug === publicationSlug);
 
   // EES-2007 Get real releases here
   const releases = fakeReleases;
@@ -275,9 +271,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   let selectedRelease: Release | undefined;
   if (releaseSlug) {
     selectedRelease = releases.find(rel => rel.slug === releaseSlug);
-    if (selectedPublication && selectedRelease) {
-      selectedPublication.selectedRelease = selectedRelease;
-    }
   }
 
   let subjects;
@@ -295,7 +288,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     props.selectedPublication = selectedPublication;
 
     if (selectedRelease) {
-      props.selectedPublication.selectedRelease = selectedRelease;
+      props.selectedRelease = selectedRelease;
     }
   }
 

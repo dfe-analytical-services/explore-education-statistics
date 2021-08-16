@@ -1,7 +1,8 @@
-import DataCataloguePage, {
-  SelectedPublication,
-} from '@frontend/modules/data-catalogue/DataCataloguePage';
-import { DownloadTheme } from '@common/services/themeService';
+import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
+import {
+  DownloadTheme,
+  PublicationDownloadSummary,
+} from '@common/services/themeService';
 import { Release } from '@common/services/publicationService';
 import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -31,11 +32,11 @@ describe('DataCataloguePage', () => {
     } as DownloadTheme,
   ];
 
-  const testPublication: SelectedPublication = {
+  const testPublication = {
     id: 'publication-1',
     title: 'Test publication',
     slug: 'test-publication',
-  };
+  } as PublicationDownloadSummary;
 
   const testReleases: Release[] = [
     {
@@ -60,11 +61,6 @@ describe('DataCataloguePage', () => {
       title: 'Release 2',
     } as Release,
   ];
-
-  const testPublicationWithReleases = {
-    ...testPublication,
-    selectedRelease: testReleases[0],
-  };
 
   const testSubjects: SubjectWithDownloadFiles[] = [
     {
@@ -227,7 +223,8 @@ describe('DataCataloguePage', () => {
     render(
       <DataCataloguePage
         themes={testThemes}
-        selectedPublication={testPublicationWithReleases}
+        selectedPublication={testPublication}
+        selectedRelease={testReleases[2]}
         releases={testReleases}
         subjects={testSubjects}
       />,
