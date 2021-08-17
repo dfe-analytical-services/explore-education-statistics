@@ -190,26 +190,6 @@ const ReleaseContent = () => {
                   View data and files
                 </a>
               </li>
-              {release.hasMetaGuidance && (
-                <li>
-                  <Link
-                    to={{
-                      pathname: generatePath<ReleaseRouteParams>(
-                        releaseMetaGuidanceRoute.path,
-                        {
-                          publicationId: release.publication.id,
-                          releaseId: release.id,
-                        },
-                      ),
-                      state: {
-                        backLink: location.pathname,
-                      },
-                    }}
-                  >
-                    Metadata guidance document
-                  </Link>
-                </li>
-              )}
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link

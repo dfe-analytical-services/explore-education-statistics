@@ -241,7 +241,9 @@ Verify release associated files
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
 Verify public metadata guidance document
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
@@ -581,7 +583,9 @@ Verify amendment files
     downloaded file should have first line    test_ancillary_file_2.txt    Test file 2
 
 Verify amendment public metadata guidance document
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
