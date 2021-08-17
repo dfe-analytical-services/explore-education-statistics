@@ -214,9 +214,9 @@ user verifies methodology summary details
     ...    ${published_on}=Not yet published
     user waits until h2 is visible    Methodology summary
     user checks summary list contains    Title    ${methodology_title}
-    user checks summary list contains    Status    ${status}
     user checks summary list contains    Published on    ${published_on}
     user checks summary list contains    Owning publication    ${publication}
+    user checks page contains tag    ${status}
 
 user approves methodology for publication
     [Arguments]
