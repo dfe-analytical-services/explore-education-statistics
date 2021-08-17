@@ -16,7 +16,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -107,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(publication);
+                    await context.Publications.AddAsync(publication);
+                    await context.SaveChangesAsync();
 
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
@@ -141,7 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UserCannotCreateMethodologyForPublicationWithoutPublicationOwnerRole()
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(Publication);
+                await context.Publications.AddAsync(Publication);
+                await context.SaveChangesAsync();
 
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 
@@ -191,7 +192,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             private static async Task AssertPublicationOwnerCannotCreateMethodology(Publication publication)
             {
                 await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                context.Attach(publication);
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
 
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
 

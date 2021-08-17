@@ -97,15 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Distinct()
                 .ToListAsync();
 
-            var hydratedPublication =
-                HydratePublicationForPublicationViewModel(_context.Publications)
-                    .First(p => p.Id == publicationId);
-            
-            hydratedPublication.Releases = hydratedPublication
-                .Releases
-                .FindAll(r => userReleaseIdsForPublication.Contains(r.Id));
-            
-            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+            return await GetPublicationWithFilteredReleases(publicationId, userReleaseIdsForPublication);
         }
 
         public async Task<MyPublicationViewModel> GetPublicationWithAllReleases(Guid publicationId)
@@ -130,8 +122,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<MyPublicationViewModel> GetPublicationWithFilteredReleases(Guid publicationId,
             IEnumerable<Guid> releaseIds)
         {
+            // Use AsNoTracking:
+            // - There should be no need to track changes as this method is only used to create a view model.
+            // - We also mutate Publication to filter only Releases visible to the user and this mutation shouldn't
+            //   be tracked otherwise it will affect any other code retrieving Publication from the context that's
+            //   expecting an unfiltered list of Releases. Entities tracked by the context can be returned immediately
+            //   without making a request to the database, e.g. when using DbContext.Find/FindAsync.
             var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
-                    .FirstAsync(p => p.Id == publicationId);
+                .AsNoTracking()
+                .FirstAsync(p => p.Id == publicationId);
 
             hydratedPublication.Releases = hydratedPublication.Releases
                 .FindAll(r => releaseIds.Contains(r.Id));

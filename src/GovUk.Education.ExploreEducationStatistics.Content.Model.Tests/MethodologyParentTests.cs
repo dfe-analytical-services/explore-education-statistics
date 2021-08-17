@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -9,17 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
     public class MethodologyParentTests
     {
-        [Fact]
-        public void IsLatestVersionOfMethodology_ArgumentExceptionWithNullVersions()
-        {
-            var methodology = new MethodologyParent
-            {
-                Versions = null
-            };
-
-            Assert.Throws<ArgumentException>(() => methodology.IsLatestVersionOfMethodology(Guid.NewGuid()));
-        }
-
         [Fact]
         public void IsLatestVersionOfMethodology_FalseWithEmptyVersions()
         {
@@ -110,25 +100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         }
 
         [Fact]
-        public void LatestVersion_ArgumentExceptionWithNullVersions()
-        {
-            var methodology = new MethodologyParent
-            {
-                Versions = null
-            };
-
-            Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
-        }
-
-        [Fact]
-        public void LatestVersion_NullWithEmptyVersions()
+        public void LatestVersion_ArgumentExceptionWithEmptyVersions()
         {
             var methodology = new MethodologyParent
             {
                 Versions = new List<Methodology>()
             };
 
-            Assert.Null(methodology.LatestVersion());
+            Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
         }
 
         [Fact]

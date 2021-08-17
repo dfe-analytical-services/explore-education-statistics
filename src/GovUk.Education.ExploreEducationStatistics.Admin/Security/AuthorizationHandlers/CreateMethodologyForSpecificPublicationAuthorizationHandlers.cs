@@ -1,10 +1,10 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -31,13 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CreateMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            await _context
-                .Entry(publication)
-                .Collection(p => p.Methodologies)
-                .LoadAsync();
-
             // If a Publication owns a Methodology already, they cannot own another.
-            if (publication.Methodologies.Any(m => m.Owner))
+            if (await _context.PublicationMethodologies
+                .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
             {
                 return;
             }
