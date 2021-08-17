@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(savedPublication.Title, methodology.Title);
                 Assert.Equal(savedPublication.Slug, methodology.Slug);
                 Assert.NotNull(methodology.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract((DateTime) methodology.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodology.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(userId, methodology.CreatedById);
             }
         }
@@ -165,14 +165,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestByPublication_MethodologyHasNoVersions()
+        public async Task GetLatestByPublication_MethodologyHasNoVersionsThrowsException()
         {
             var publication = new Publication();
 
-            var methodologyParent = new MethodologyParent
-            {
-                Versions = new List<Methodology>()
-            };
+            var methodologyParent = new MethodologyParent();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -202,8 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 methodologyParentRepository.Setup(mock => mock.GetByPublication(publication.Id))
                     .ReturnsAsync(ListOf(methodologyParent));
 
-                var result = await service.GetLatestByPublication(publication.Id);
-                Assert.Empty(result);
+                await Assert.ThrowsAsync<ArgumentException>(
+                    () => service.GetLatestByPublication(publication.Id));
             }
 
             MockUtils.VerifyAllMocks(methodologyParentRepository);
@@ -318,6 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
+                Assert.NotNull(result);
                 Assert.Equal(latestPublishedVersion.Id, result.Id);
             }
 

@@ -77,12 +77,8 @@ Update the Methodology Content
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Approve the Methodology
-    user approves methodology for publication    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - another new methodology title
-    user clicks link    Sign off
-    user changes methodology status to Approved
+    approve methodology from methodology view
     user clicks link    Summary
-    user waits until h2 is visible    Methodology summary
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - another new methodology title

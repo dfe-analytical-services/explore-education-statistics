@@ -132,6 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AsNoTracking()
                 .FirstAsync(p => p.Id == publicationId);
 
+            // TODO EES-2624 Don't mutate Publication
             hydratedPublication.Releases = hydratedPublication.Releases
                 .FindAll(r => releaseIds.Contains(r.Id));
 

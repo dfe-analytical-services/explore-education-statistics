@@ -52,3 +52,8 @@ user can see the create amendment controls for release
     [Arguments]    ${RELEASE_DETAILS_SECTION}
     user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View this release    30
     user checks element contains button    ${RELEASE_DETAILS_SECTION}    Amend this release
+
+user cannot see the edit status controls for methodology
+    user clicks link    Sign off
+    user waits until page does not contain loading spinner
+    user checks page does not contain    Edit status

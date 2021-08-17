@@ -248,8 +248,8 @@ user approves methodology amendment for publication
 
 approve methodology from methodology view
     [Arguments]
-    ...    ${publishing_strategy}
-    ...    ${with_release}
+    ...    ${publishing_strategy}=Immediately
+    ...    ${with_release}=
     user clicks link    Sign off
     user changes methodology status to Approved    ${publishing_strategy}    ${with_release}
 
