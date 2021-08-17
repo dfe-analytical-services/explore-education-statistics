@@ -1315,4 +1315,84 @@ describe('createDataSetCategories', () => {
       timePeriod: '2015_AY',
     });
   });
+
+  test('group by specific filter category', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'filters',
+      groupByFilter: 'school_type',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      ...testTable,
+      subjectMeta: {
+        ...testTable.subjectMeta,
+        filters: {
+          Characteristic: {
+            ...testTable.subjectMeta.filters.Characteristic,
+            options: {
+              EthnicGroupMajor: {
+                ...testTable.subjectMeta.filters.Characteristic.options
+                  .EthnicGroupMajor,
+                options: [
+                  {
+                    label: 'Ethnicity Major Chinese',
+                    value: 'ethnicity-major-chinese',
+                  },
+                  {
+                    label: 'Ethnicity another',
+                    value: 'ethnicity-another',
+                  },
+                ],
+              },
+            },
+          },
+          SchoolType: {
+            ...testTable.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                ...testTable.subjectMeta.filters.SchoolType.options.Default,
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(2);
+    expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
+    expect(dataSetCategories[1].filter.label).toBe('State-funded secondary');
+  });
 });
