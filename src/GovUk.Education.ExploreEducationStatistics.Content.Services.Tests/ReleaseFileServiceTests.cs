@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -336,6 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
+                    SubjectId = Guid.NewGuid()
                 }
             };
             var releaseFile2 = new ReleaseFile
@@ -356,11 +358,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
-                    await contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             }
-
-            var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
@@ -373,11 +372,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             blobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
+            var subjectIds = releaseFiles
+                .Where(rf => rf.File.SubjectId.HasValue)
+                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
+                .ToList();
+
+            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
+
+            dataGuidanceFileWriter
+                .Setup(
+                    s => s.WriteToStream(
+                        It.IsAny<Stream>(),
+                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<IEnumerable<Guid>>(
+                            ids => ids.All(id => subjectIds.Contains(id))
+                        )
+                    )
+                )
+                .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+                .Callback<Stream, Release, IEnumerable<Guid>?>(
+                    (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                );
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                var path = GenerateZipFilePath();
+                var stream = File.OpenWrite(path);
+
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    blobStorageService: blobStorageService.Object,
+                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -391,15 +416,134 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 using var zip = ZipFile.OpenRead(path);
 
                 // Entries are sorted alphabetically
-                Assert.Equal(2, zip.Entries.Count);
+                Assert.Equal(3, zip.Entries.Count);
                 Assert.Equal("ancillary/ancillary.pdf", zip.Entries[0].FullName);
                 Assert.Equal("Test ancillary blob", zip.Entries[0].Open().ReadToEnd());
 
                 Assert.Equal("data/data.csv", zip.Entries[1].FullName);
                 Assert.Equal("Test data blob", zip.Entries[1].Open().ReadToEnd());
+
+                // Data guidance is generated if there is at least one data file
+                Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
+                Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+        }
+
+        [Fact]
+        public async Task ZipFilesToStream_DataGuidanceForMultipleDataFiles()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Slug = "publication-slug"
+                },
+                Slug = "release-slug"
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = release,
+                File = new Model.File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data-1.csv",
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new Model.File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data-2.csv",
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+            var releaseFiles = ListOf(releaseFile1, releaseFile2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService
+                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
+            blobStorageService
+                .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
+            blobStorageService
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data 1 blob");
+            blobStorageService
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test data 2 blob");
+
+            var subjectIds = releaseFiles
+                .Where(rf => rf.File.SubjectId.HasValue)
+                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
+                .ToList();
+
+            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
+
+            dataGuidanceFileWriter
+                .Setup(
+                    s => s.WriteToStream(
+                        It.IsAny<Stream>(),
+                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<IEnumerable<Guid>>(
+                            ids => ids.All(id => subjectIds.Contains(id))
+                        )
+                    )
+                )
+                .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+                .Callback<Stream, Release, IEnumerable<Guid>?>(
+                    (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                );
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var path = GenerateZipFilePath();
+                var stream = File.OpenWrite(path);
+
+                var service = SetupReleaseFileService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+
+                var fileIds = releaseFiles.Select(file => file.FileId).ToList();
+
+                var result = await service.ZipFilesToStream(
+                    releaseId: release.Id,
+                    fileIds: fileIds,
+                    outputStream: stream);
+
+                result.AssertRight();
+
+                using var zip = ZipFile.OpenRead(path);
+
+                // Entries are sorted alphabetically
+                Assert.Equal(3, zip.Entries.Count);
+                Assert.Equal("data/data-1.csv", zip.Entries[0].FullName);
+                Assert.Equal("Test data 1 blob", zip.Entries[0].Open().ReadToEnd());
+
+                Assert.Equal("data/data-2.csv", zip.Entries[1].FullName);
+                Assert.Equal("Test data 2 blob", zip.Entries[1].Open().ReadToEnd());
+
+                // Data guidance is generated if there is at least one data file
+                Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
+                Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
+            }
+
+            MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
         }
 
         [Fact]
@@ -1414,12 +1558,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IBlobStorageService? blobStorageService = null,
+            IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
         {
             return new (
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
             Mock.Of<ILogger<ReleaseFileService>>()
             );

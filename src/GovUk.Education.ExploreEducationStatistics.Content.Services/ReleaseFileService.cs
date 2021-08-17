@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
         private readonly IUserService _userService;
         private readonly ILogger<ReleaseFileService> _logger;
 
@@ -47,12 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
+            IDataGuidanceFileWriter dataGuidanceFileWriter,
             IUserService userService,
             ILogger<ReleaseFileService> logger)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
+            _dataGuidanceFileWriter = dataGuidanceFileWriter;
             _userService = userService;
             _logger = logger;
         }
@@ -83,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccessVoid(
-                    async () =>
+                    async release =>
                     {
                         var releaseFiles = (await QueryByFileType(releaseId, ZipFileTypes)
                             .Where(rf => fileIds.Contains(rf.FileId))
@@ -91,13 +94,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             .OrderBy(rf => rf.File.ZipFileEntryName())
                             .ToList();
 
-                        await DoZipFilesToStream(releaseFiles, outputStream, cancellationToken);
+                        await DoZipFilesToStream(releaseFiles, release, outputStream, cancellationToken);
                     }
                 );
         }
 
         private async Task DoZipFilesToStream(
             List<ReleaseFile> releaseFiles,
+            Release release,
             Stream outputStream,
             CancellationToken? cancellationToken = null)
         {
@@ -130,6 +134,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     stream: entryStream,
                     cancellationToken: cancellationToken
                 );
+            }
+
+            // Add data guidance file if there are any data files in this zip.
+            var subjectIds = releaseFiles
+                .Where(rf => rf.File.SubjectId.HasValue)
+                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
+                .ToList();
+
+            if (subjectIds.Any())
+            {
+                var entry = archive.CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt");
+                await using var entryStream = entry.Open();
+
+                await _dataGuidanceFileWriter.WriteToStream(entryStream, release, subjectIds);
             }
         }
 

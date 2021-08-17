@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -87,12 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IBlobStorageService? blobStorageService = null,
+            IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
         {
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
                 userService ?? Mock.Of<IUserService>(),
                 Mock.Of<ILogger<ReleaseFileService>>()
             );
