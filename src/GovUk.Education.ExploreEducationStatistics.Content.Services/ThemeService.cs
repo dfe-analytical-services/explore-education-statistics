@@ -14,12 +14,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
-    public class PublicationService : IPublicationService
+    public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseFileService _releaseFileFileService;
 
-        public PublicationService(ContentDbContext contentDbContext, IReleaseFileService releaseFileService)
+        public ThemeService(ContentDbContext contentDbContext, IReleaseFileService releaseFileService)
         {
             _contentDbContext = contentDbContext;
             _releaseFileFileService = releaseFileService;

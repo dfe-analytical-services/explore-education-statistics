@@ -19,9 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetThemes()
         {
-            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var themeService = new Mock<IThemeService>(MockBehavior.Strict);
 
-            publicationService
+            themeService
                 .Setup(s => s.GetPublicationTree())
                 .ReturnsAsync(
                     new List<ThemeTree<PublicationTreeNode>>
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = BuildThemeController(publicationService.Object);
+            var controller = BuildThemeController(themeService.Object);
 
             var result = await controller.GetThemes();
 
@@ -54,15 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             Assert.Single(topic!.Publications);
 
-            MockUtils.VerifyAllMocks(publicationService);
+            MockUtils.VerifyAllMocks(themeService);
         }
 
         [Fact]
         public async Task GetDownloadThemes()
         {
-            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var themeService = new Mock<IThemeService>(MockBehavior.Strict);
 
-            publicationService
+            themeService
                 .Setup(s => s.GetPublicationDownloadsTree())
                 .ReturnsAsync(
                     new List<ThemeTree<PublicationDownloadsTreeNode>>
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
-            var controller = BuildThemeController(publicationService.Object);
+            var controller = BuildThemeController(themeService.Object);
 
             var result = await controller.GetDownloadThemes();
 
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             Assert.Single(publication!.DownloadFiles);
 
-            MockUtils.VerifyAllMocks(publicationService);
+            MockUtils.VerifyAllMocks(themeService);
         }
 
         [Fact]
@@ -152,12 +152,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         private static ThemeController BuildThemeController(
-            IPublicationService? publicationService = null,
+            IThemeService? themeService = null,
             IMethodologyService? methodologyService = null
         )
         {
             return new(
-                publicationService ?? Mock.Of<IPublicationService>(),
+                themeService ?? Mock.Of<IThemeService>(),
                 methodologyService ?? Mock.Of<IMethodologyService>()
             );
         }

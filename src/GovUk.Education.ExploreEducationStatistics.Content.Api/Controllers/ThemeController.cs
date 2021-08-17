@@ -13,27 +13,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ThemeController : ControllerBase
     {
-        private readonly IPublicationService _publicationService;
+        private readonly IThemeService _themeService;
         private readonly IMethodologyService _methodologyService;
 
         public ThemeController(
-            IPublicationService publicationService,
+            IThemeService themeService,
             IMethodologyService methodologyService)
         {
-            _publicationService = publicationService;
+            _themeService = themeService;
             _methodologyService = methodologyService;
         }
 
         [HttpGet("themes")]
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes()
         {
-            return await _publicationService.GetPublicationTree();
+            return await _themeService.GetPublicationTree();
         }
 
         [HttpGet("download-themes")]
         public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetDownloadThemes()
         {
-            return await _publicationService.GetPublicationDownloadsTree();
+            return await _themeService.GetPublicationDownloadsTree();
         }
 
         [HttpGet("methodology-themes")]

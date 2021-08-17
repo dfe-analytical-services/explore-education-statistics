@@ -34,9 +34,9 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
-using PublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
+using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
-            services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();

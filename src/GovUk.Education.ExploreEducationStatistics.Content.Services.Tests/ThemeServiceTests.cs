@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.C
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    public class PublicationServiceTests
+    public class ThemeServiceTests
     {
         [Fact]
         public async Task GetPublicationTree_Empty()
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -315,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -539,7 +539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -636,7 +636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree();
 
@@ -733,7 +733,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildPublicationService(context);
+                var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -881,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == publicationCLatestRelease.Id)))
                     .ReturnsAsync(publicationCFiles);
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1043,7 +1043,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == releases[2].Id)))
                     .ReturnsAsync(ListOf(testFile));
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1171,7 +1171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == releases[0].Id)))
                     .ReturnsAsync(ListOf(testFile));
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1316,7 +1316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == releases[2].Id)))
                     .ReturnsAsync(new List<FileInfo>());
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1440,7 +1440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == releases[2].Id)))
                     .ReturnsAsync(new List<FileInfo>());
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1551,7 +1551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         It.Is<Release>(r => r.Id == releases[2].Id)))
                     .ReturnsAsync(new List<FileInfo>());
 
-                var service = BuildPublicationService(context, releaseFileService: releaseFileService.Object);
+                var service = BuildThemeService(context, releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetPublicationDownloadsTree();
 
@@ -1570,7 +1570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         }
 
-        private static PublicationService BuildPublicationService(
+        private static ThemeService BuildThemeService(
             ContentDbContext contentDbContext,
             IReleaseFileService? releaseFileService = null)
         {
