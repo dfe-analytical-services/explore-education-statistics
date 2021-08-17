@@ -23,13 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         /// </summary>
         public static bool TryBoxToResult(this object value, Type targetType, out object? boxedValue)
         {
+            boxedValue = value;
+
             var path = targetType.GetUnboxedResultTypePath();
             path.Reverse();
 
-            boxedValue = value;
-
             // Would not be able to reach the target type.
-            if (path.First() != value.GetType())
+            if (!path.First().IsInstanceOfType(value))
             {
                 return false;
             }
@@ -71,6 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
                         boxedValue = either;
                         break;
+
+                    default:
+                        // Not a type that we handle so we
+                        // can't box this any further.
+                        return false;
                 }
             }
 
