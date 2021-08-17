@@ -125,7 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     continue;
                 }
 
-                var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
+                var entry = archive
+                    .CreateEntry(releaseFile.File.ZipFileEntryName())
+                    .SetUnixPermissions("664");
+
                 await using var entryStream = entry.Open();
 
                 await _blobStorageService.DownloadToStream(
@@ -144,7 +147,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             if (subjectIds.Any())
             {
-                var entry = archive.CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt");
+                var entry = archive
+                    .CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt")
+                    .SetUnixPermissions("664");
+
                 await using var entryStream = entry.Open();
 
                 await _dataGuidanceFileWriter.WriteToStream(entryStream, release, subjectIds);
