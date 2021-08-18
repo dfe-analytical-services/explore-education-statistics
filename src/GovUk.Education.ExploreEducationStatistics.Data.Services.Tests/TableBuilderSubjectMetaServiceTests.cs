@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 filterRepository.Setup(s => s.GetFiltersIncludingItems(subject.Id)).Returns(Enumerable.Empty<Filter>());
                 indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(subject.Id)).Returns(Enumerable.Empty<IndicatorGroup>());
-                locationRepository.Setup(s => s.GetObservationalUnits(subject.Id)).Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
+                locationRepository.Setup(s => s.GetLocationsLabelValue(subject.Id)).Returns(new Dictionary<GeographicLevel, IEnumerable<LabelValue>>());
                 timePeriodService.Setup(s => s.GetTimePeriods(subject.Id)).Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
                 var service = new SubjectMetaService(boundaryLevelRepository.Object,

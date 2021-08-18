@@ -179,15 +179,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(Guid subjectId)
         {
-            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
-            return BuildObservationalUnitsViewModels(observationalUnits);
+            var locationLabelValues = _locationRepository.GetLocationsLabelValue(subjectId);
+            return BuildObservationalUnitsViewModels(locationLabelValues);
         }
 
         private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
-            var observationalUnits = _locationRepository.GetObservationalUnits(observations);
-            return BuildObservationalUnitsViewModels(observationalUnits);
+            var locationLabelValues = _locationRepository.GetLocationsLabelValue(observations);
+            return BuildObservationalUnitsViewModels(locationLabelValues);
         }
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
-            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+            Dictionary<GeographicLevel, IEnumerable<LabelValue>> observationalUnits)
         {
             var viewModels = observationalUnits
                 .OrderBy(pair => pair.Key.GetEnumLabel())
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         Hint = "",
                         Legend = pair.Key.GetEnumLabel(),
-                        Options = pair.Value.Select(MapObservationalUnitToLabelValue)
+                        Options = pair.Value,
                     });
 
             foreach (var (_, viewModel) in viewModels)
@@ -242,16 +242,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private string GetTotalValue(Filter filter)
         {
             return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
-        }
-
-        private static LabelValue MapObservationalUnitToLabelValue(IObservationalUnit unit)
-        {
-            var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
-            return new LabelValue
-            {
-                Label = unit.Name,
-                Value = value
-            };
         }
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)

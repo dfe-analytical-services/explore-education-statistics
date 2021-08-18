@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -14,6 +15,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
         }
 
+        public Dictionary<GeographicLevel, IEnumerable<LabelValue>> GetLocationsLabelValue(Guid subjectId)
+        {
+            var observations = _context.Observation
+                .Where(o => o.SubjectId == subjectId);
+            return GetLocationsLabelValue(observations);
+        }
+
+        public Dictionary<GeographicLevel, IEnumerable<LabelValue>> GetLocationsLabelValue(
+            IQueryable<Observation> observations)
+        {
+            var tuple = observations
+                .Select(o => new {o.GeographicLevel, o.LocationId})
+                .AsNoTracking()
+                .ToList();
+
+            var geographicLevels = tuple
+                .Select(t => t.GeographicLevel)
+                .Distinct()
+                .ToList();
+
+            var locationIds = tuple
+                .Select(t => t.LocationId)
+                .ToArray();
+            var locationsDict = Find(locationIds)
+                .AsNoTracking()
+                .ToList()
+                .ToDictionary(l => l.Id);
+
+            return geographicLevels
+                .ToDictionary(
+                    geographicLevel => geographicLevel,
+                    geographicLevel =>
+                    {
+                        var locations = tuple
+                            .Where(t => t.GeographicLevel == geographicLevel)
+                            .Select(t => locationsDict[t.LocationId])
+                            .Distinct()
+                            .ToList();
+                        return locations
+                            .Select(location =>
+                            {
+                                var observationalUnit = GetObservationalUnit(geographicLevel, location);
+                                return new LabelValue(observationalUnit.Name, location.Id.ToString());
+                            })
+                            .Distinct();
+                    });
+        }
+
+        // Can be removed after EES-2629 replace data work is complete
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(Guid subjectId)
         {
             var observations = _context.Observation
@@ -21,23 +71,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return GetObservationalUnits(observations);
         }
 
+        // Can be removed after EES-2629 replace data work is complete
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
-            var geographicLevels = observations
-                .Select(o => o.GeographicLevel)
+            var tuple = observations
+                .Select(o => new {o.GeographicLevel, o.LocationId})
+                .AsNoTracking()
+                .ToList();
+
+            var geographicLevels = tuple
+                .Select(t => t.GeographicLevel)
                 .Distinct()
                 .ToList();
+
+            var locationIds = tuple
+                .Select(t => t.LocationId)
+                .ToArray();
+            var locationsDict = Find(locationIds)
+                .AsNoTracking()
+                .ToList()
+                .ToDictionary(l => l.Id);
 
             return geographicLevels
                 .ToDictionary(
                     geographicLevel => geographicLevel,
                     geographicLevel =>
                     {
-                        var locations = observations
-                            .Include(observation => observation.Location)
-                            .Where(observation => observation.GeographicLevel == geographicLevel)
-                            .Select(observation => observation.Location)
+                        var locations = tuple
+                            .Where(t => t.GeographicLevel == geographicLevel)
+                            .Select(t => locationsDict[t.LocationId])
                             .Distinct()
                             .ToList();
                         return locations
