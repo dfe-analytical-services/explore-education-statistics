@@ -3,8 +3,8 @@ import {
   SelectedPublication,
   SubjectMeta,
   SubjectsAndHighlights,
-  Theme,
 } from '@common/services/tableBuilderService';
+import { Theme } from '@common/services/themeService';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
@@ -278,17 +278,18 @@ describe('TableToolPage', () => {
     {
       id: 'ee1855ca-d1e1-4f04-a795-cbd61d326a1f',
       title: 'Pupils and schools',
-      slug: 'pupils-and-schools',
+      summary: '',
       topics: [
         {
           id: 'c9f0b897-d58a-42b0-9d12-ca874cc7c810',
           title: 'Admission appeals',
-          slug: 'admission-appeals',
+          summary: '',
           publications: [
             {
               id: testPublicationId,
               title: 'Test publication',
               slug: 'test-publication',
+              summary: '',
             },
           ],
         },

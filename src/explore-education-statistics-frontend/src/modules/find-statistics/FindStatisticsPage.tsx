@@ -98,7 +98,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await themeService.getThemes();
+  const themes = await themeService.listThemes();
 
   return {
     props: {

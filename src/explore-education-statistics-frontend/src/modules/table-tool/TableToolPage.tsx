@@ -11,8 +11,8 @@ import tableBuilderService, {
   SelectedPublication,
   SubjectMeta,
   SubjectsAndHighlights,
-  Theme,
 } from '@common/services/tableBuilderService';
+import themeService, { Theme } from '@common/services/themeService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -183,7 +183,9 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     string
   >;
 
-  const themeMeta = await tableBuilderService.getThemes();
+  const themeMeta = await themeService.listThemes({
+    publicationFilter: 'LatestData',
+  });
 
   const selectedPublication = themeMeta
     .flatMap(option => option.topics)

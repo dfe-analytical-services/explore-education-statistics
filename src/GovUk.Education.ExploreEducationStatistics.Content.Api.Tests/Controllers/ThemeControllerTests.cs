@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var themeService = new Mock<IThemeService>(MockBehavior.Strict);
 
             themeService
-                .Setup(s => s.GetPublicationTree())
+                .Setup(s => s.GetPublicationTree(null))
                 .ReturnsAsync(
                     new List<ThemeTree<PublicationTreeNode>>
                     {

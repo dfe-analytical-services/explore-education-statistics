@@ -4,6 +4,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,11 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("themes")]
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes()
+        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes(
+            [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
         {
-            return await _themeService.GetPublicationTree();
+            return await _themeService.GetPublicationTree(filter);
         }
 
+        // TODO: EES-2365 Remove once 'Download latest data' page no longer exists
         [HttpGet("download-themes")]
         public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetDownloadThemes()
         {
