@@ -122,8 +122,9 @@ Edit the Amendment's summary to return the Methodology's title to the same as it
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
-    ...    Draft Amendment
+    ...    Draft
     ...    Not yet published
+    user checks page contains tag    Amendment
     user clicks link    Edit summary
     user waits until h2 is visible    Edit methodology summary
     # Double check that the front end is now showing the Methodology's title as being "Use publication title" when
