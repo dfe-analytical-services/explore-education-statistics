@@ -16,15 +16,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(Guid subjectId)
         {
-            var locations = GetLocationsGroupedByGeographicLevel(subjectId);
-            return GetObservationalUnits(locations);
+            var observations = _context.Observation
+                .Where(o => o.SubjectId == subjectId);
+            return GetObservationalUnits(observations);
         }
 
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
-            var locations = GetLocationsGroupedByGeographicLevel(observations);
-            return GetObservationalUnits(locations);
+            var geographicLevels = observations
+                .Select(o => o.GeographicLevel)
+                .Distinct()
+                .ToList();
+
+            return geographicLevels
+                .ToDictionary(
+                    geographicLevel => geographicLevel,
+                    geographicLevel =>
+                    {
+                        var locations = observations
+                            .Include(observation => observation.Location)
+                            .Where(observation => observation.GeographicLevel == geographicLevel)
+                            .Select(observation => observation.Location)
+                            .Distinct()
+                            .ToList();
+                        return locations
+                            .Select(location => GetObservationalUnit(geographicLevel, location))
+                            .Distinct();
+                    });
         }
 
         public IEnumerable<IObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes)
@@ -122,15 +141,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return query.ToList();
         }
 
-        private static Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
-            Dictionary<GeographicLevel, IEnumerable<Location>> locations)
-        {
-            return locations.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.Select(location => GetObservationalUnit(pair.Key, location))
-            );
-        }
-
         private static IObservationalUnit GetObservationalUnit(GeographicLevel geographicLevel, Location location)
         {
             switch (geographicLevel)
@@ -172,53 +182,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(Guid subjectId)
-        {
-            var locationIdsWithGeographicLevel = _context.Observation
-                .Where(observation => observation.SubjectId == subjectId)
-                .Select(observation => new {observation.GeographicLevel, observation.LocationId})
-                .Distinct()
-                .AsNoTracking()
-                .ToList()
-                .Select(arg => (arg.GeographicLevel, arg.LocationId));
-
-            return GetLocationsGroupedByGeographicLevel(locationIdsWithGeographicLevel);
-        }
-
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(
-            IQueryable<Observation> observations)
-        {
-            var locationIdsWithGeographicLevel = observations
-                .Select(observation => new {observation.GeographicLevel, observation.LocationId})
-                .Distinct()
-                .AsNoTracking()
-                .ToList()
-                .Select(arg => (arg.GeographicLevel, arg.LocationId));
-
-            return GetLocationsGroupedByGeographicLevel(locationIdsWithGeographicLevel);
-        }
-
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(
-            IEnumerable<(GeographicLevel GeographicLevel, Guid LocationId)> locationIdsWithGeographicLevel)
-        {
-            var locationIdsGroupedByGeographicLevel = locationIdsWithGeographicLevel.GroupBy(
-                tuple => tuple.GeographicLevel,
-                tuple => tuple.LocationId);
-
-            var locations = GetLocations(locationIdsWithGeographicLevel.Select(arg => arg.LocationId).ToArray());
-
-            return locationIdsGroupedByGeographicLevel
-                .ToDictionary(
-                    grouping => grouping.Key,
-                    grouping => grouping.ToList().Select(id => locations[id]));
-        }
-
-        private Dictionary<Guid, Location> GetLocations(Guid[] locationIds)
-        {
-            var locations = Find(locationIds).ToList();
-            return locations.ToDictionary(location => location.Id);
         }
     }
 }
