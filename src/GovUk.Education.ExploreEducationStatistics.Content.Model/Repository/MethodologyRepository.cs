@@ -1,9 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     OwningPublicationTitle = publication.Title,
                     Publications = new List<PublicationMethodology>
                     {
-                        new PublicationMethodology
+                        new()
                         {
                             Owner = true,
                             PublicationId = publicationId
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToList();
         }
 
-        public async Task<Methodology> GetLatestPublishedByMethodologyParent(Guid methodologyParentId)
+        public async Task<Methodology?> GetLatestPublishedByMethodologyParent(Guid methodologyParentId)
         {
             var methodologyParent = await _contentDbContext.MethodologyParents
                 .SingleAsync(mp => mp.Id == methodologyParentId);
@@ -83,13 +83,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId)
         {
             var methodologyParents = await _methodologyParentRepository.GetByPublication(publicationId);
-            return (await methodologyParents.SelectAsync(async methodologyParent =>
-                    await GetLatestPublishedByMethodologyParent(methodologyParent)))
-                .Where(version => version != null)
+            return (await methodologyParents
+                    .SelectAsync(async methodologyParent =>
+                        await GetLatestPublishedByMethodologyParent(methodologyParent)))
+                .WhereNotNull()
                 .ToList();
         }
 
-        private async Task<Methodology> GetLatestPublishedByMethodologyParent(MethodologyParent methodologyParent)
+        public async Task<Publication> GetOwningPublicationByMethodologyParent(Guid methodologyParentId)
+        {
+            var methodologyParent = await _contentDbContext.MethodologyParents
+                .Include(mp => mp.Publications)
+                .SingleAsync(mp => mp.Id == methodologyParentId);
+
+            var owningPublicationLink = methodologyParent.OwningPublication();
+
+            await _contentDbContext.Entry(owningPublicationLink)
+                .Reference(pm => pm.Publication)
+                .LoadAsync();
+
+            return owningPublicationLink.Publication;
+        }
+
+        private async Task<Methodology?> GetLatestPublishedByMethodologyParent(MethodologyParent methodologyParent)
         {
             await _contentDbContext.Entry(methodologyParent)
                 .Collection(m => m.Versions)
@@ -111,10 +127,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         // optimisation purposes, but MethodologyParent.Slug is used for the actual Slug for all of its Methodology
         // Versions.  It's therefore important to keep it up-to-date with changes to its owning Publication's Slug too, 
         // but only if none of its Versions are yet publicly accessible.
-        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug)
+        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle,
+            string updatedSlug)
         {
             var slugChanged = originalSlug != updatedSlug;
-            
+
             // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
             // that are owned by this Publication
             var ownedMethodologyParents = await _contentDbContext
@@ -128,16 +145,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             {
                 methodologyParent.OwningPublicationTitle = updatedTitle;
 
-                if (slugChanged && methodologyParent.Slug == originalSlug && !await IsPubliclyAccessible(methodologyParent))
+                if (slugChanged && methodologyParent.Slug == originalSlug &&
+                    !await IsPubliclyAccessible(methodologyParent))
                 {
                     methodologyParent.Slug = updatedSlug;
                 }
             });
-                        
+
             _contentDbContext.MethodologyParents.UpdateRange(ownedMethodologyParents);
             await _contentDbContext.SaveChangesAsync();
         }
-        
+
         private async Task<bool> IsPubliclyAccessible(MethodologyParent methodologyParent)
         {
             await _contentDbContext

@@ -1,14 +1,10 @@
 #nullable enable
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -20,24 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificMethodologyAuthorizationHandler :
         AuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly IMethodologyRepository _methodologyRepository;
-        private readonly IPublicationRepository _publicationRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
         public UpdateSpecificMethodologyAuthorizationHandler(
-            ContentDbContext contentDbContext,
             IMethodologyRepository methodologyRepository,
-            IPublicationRepository publicationRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            _contentDbContext = contentDbContext;
             _methodologyRepository = methodologyRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
-            _publicationRepository = publicationRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -64,24 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            await _contentDbContext
-                .Entry(methodology)
-                .Reference(m => m.MethodologyParent)
-                .LoadAsync();
-
-            await _contentDbContext
-                .Entry(methodology.MethodologyParent)
-                .Collection(mp => mp.Publications)
-                .LoadAsync();
-
-            var owningPublicationId = methodology
-                .MethodologyParent
-                .Publications
-                .Single(p => p.Owner)
-                .PublicationId;
+            var owningPublication =
+                await _methodologyRepository.GetOwningPublicationByMethodologyParent(methodology.MethodologyParentId);
 
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can update it.
-            if (await IsPublicationOwnerOfOwningPublication(context, owningPublicationId))
+            if (await _userPublicationRoleRepository.IsUserPublicationOwner(context.User.GetUserId(),
+                owningPublication.Id))
             {
                 context.Succeed(requirement);
                 return;
@@ -89,35 +67,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             // If the user is an Editor (Contributor, Lead) or an Approver of the latest (Live or non-Live) Release
             // of the owning Publication of this Methodology, they can update it.
-            if (await IsEditorOrApproverOfOwningPublicationsLatestRelease(context, owningPublicationId))
+            if (await _userReleaseRoleRepository.IsUserEditorOrApproverOnLatestRelease(
+                context.User.GetUserId(),
+                owningPublication.Id))
             {
                 context.Succeed(requirement);
             }
-        }
-
-        private async Task<bool> IsPublicationOwnerOfOwningPublication(
-            AuthorizationHandlerContext context, Guid owningPublicationId)
-        {
-            var publicationRoles = await _userPublicationRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), owningPublicationId);
-
-            return ContainPublicationOwnerRole(publicationRoles);
-        }
-
-        private async Task<bool> IsEditorOrApproverOfOwningPublicationsLatestRelease(
-            AuthorizationHandlerContext context, Guid owningPublicationId)
-        {
-            var latestRelease = await _publicationRepository.GetLatestReleaseForPublication(owningPublicationId);
-
-            if (latestRelease == null)
-            {
-                return false;
-            }
-
-            var rolesForLatestRelease = await _userReleaseRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), latestRelease.Id);
-
-            return ContainsEditorOrApproverRole(rolesForLatestRelease);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -282,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid publicationId,
             PublicationRole role)
         {
-            if (await _userPublicationRoleRepository.GetByUserAndRole(userId, publicationId, role) != null)
+            if (await _userPublicationRoleRepository.UserHasRoleOnPublication(userId, publicationId, role))
             {
                 return ValidationActionResult(UserAlreadyHasResourceRole);
             }
@@ -294,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             ReleaseRole role)
         {
-            if (await _userReleaseRoleRepository.GetByUserAndRole(userId, releaseId, role) != null)
+            if (await _userReleaseRoleRepository.UserHasRoleOnRelease(userId, releaseId, role))
             {
                 return ValidationActionResult(UserAlreadyHasResourceRole);
             }

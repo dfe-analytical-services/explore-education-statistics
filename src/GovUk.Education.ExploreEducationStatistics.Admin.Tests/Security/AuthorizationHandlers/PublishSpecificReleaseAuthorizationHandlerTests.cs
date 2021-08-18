@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
@@ -13,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class PublishSpecificReleaseAuthorizationHandlerTests
     {
-        public class PublishSpecificReleaseAuthorizationHandlerClaimTests
+        public class ClaimTests
         {
             [Fact]
             public async Task PublishSpecificReleaseAuthorizationHandler_FailsWhenDraft()
@@ -45,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class PublishSpecificReleaseAuthorizationHandlerReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task PublishSpecificReleaseAuthorizationHandler_FailsWhenDraft()
@@ -66,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that only the Approver User Release role will allow an approved Release to be published
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
-                    contentDbContext => 
+                    contentDbContext =>
                         new PublishSpecificReleaseAuthorizationHandler(new UserReleaseRoleRepository(contentDbContext)),
                     new Release
                     {

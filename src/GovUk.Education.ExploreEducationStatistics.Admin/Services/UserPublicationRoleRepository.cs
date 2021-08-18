@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -46,9 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        public async Task<UserPublicationRole> GetByUserAndRole(Guid userId, Guid publicationId, PublicationRole role)
+        public async Task<bool> IsUserPublicationOwner(Guid userId, Guid publicationId)
         {
-            return await _contentDbContext.UserPublicationRoles.FirstOrDefaultAsync(r =>
+            return await UserHasRoleOnPublication(userId, publicationId, Owner);
+        }
+
+        public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
+        {
+            return await _contentDbContext.UserPublicationRoles.AnyAsync(r =>
                 r.UserId == userId &&
                 r.PublicationId == publicationId &&
                 r.Role == role);

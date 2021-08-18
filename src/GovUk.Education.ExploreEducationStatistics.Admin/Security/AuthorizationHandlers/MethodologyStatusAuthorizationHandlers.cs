@@ -1,5 +1,7 @@
-﻿#nullable enable
+#nullable enable
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -18,10 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             AuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
         {
             private readonly IMethodologyRepository _methodologyRepository;
+            private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-            public ApproveSpecificMethodologyAuthorizationHandler(IMethodologyRepository methodologyRepository)
+            public ApproveSpecificMethodologyAuthorizationHandler(
+                IMethodologyRepository methodologyRepository,
+                IUserReleaseRoleRepository userReleaseRoleRepository)
             {
                 _methodologyRepository = methodologyRepository;
+                _userReleaseRoleRepository = userReleaseRoleRepository;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -41,7 +47,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     return;
                 }
 
-                // TODO SOW4 EES-2162 Succeed for Approvers on the latest Release of the owning Publication
+                var owningPublication =
+                    await _methodologyRepository.GetOwningPublicationByMethodologyParent(
+                        methodology.MethodologyParentId);
+
+                // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
+                // this Methodology, they can approve it.
+                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
+                    context.User.GetUserId(),
+                    owningPublication.Id))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
 
@@ -49,13 +66,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
         }
 
-        public class MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<MarkSpecificMethodologyAsDraftRequirement, Methodology>
+        public class
+            MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
+                MarkSpecificMethodologyAsDraftRequirement, Methodology>
         {
             private readonly IMethodologyRepository _methodologyRepository;
+            private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-            public MarkSpecificMethodologyAsDraftAuthorizationHandler(IMethodologyRepository methodologyRepository)
+            public MarkSpecificMethodologyAsDraftAuthorizationHandler(
+                IMethodologyRepository methodologyRepository,
+                IUserReleaseRoleRepository userReleaseRoleRepository)
             {
                 _methodologyRepository = methodologyRepository;
+                _userReleaseRoleRepository = userReleaseRoleRepository;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -74,7 +97,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     return;
                 }
 
-                // TODO SOW4 EES-2166 Succeed for Approvers on the latest Release of the owning Publication
+                var owningPublication =
+                    await _methodologyRepository.GetOwningPublicationByMethodologyParent(
+                        methodology.MethodologyParentId);
+
+                // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
+                // this Methodology, they can mark it as draft.
+                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
+                    context.User.GetUserId(),
+                    owningPublication.Id))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
     {
-        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTests
+        public class ClaimTests
         {
             [Fact]
             public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()
@@ -168,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTestsPublicationRoleTests
+        public class PublicationRoleTests
         {
             [Fact]
             public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()
@@ -337,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerClaimTestsReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionDraft()

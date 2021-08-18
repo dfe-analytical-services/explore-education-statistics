@@ -2,6 +2,7 @@
 Library             ../../../libs/admin_api.py
 Resource            ../../../libs/admin-common.robot
 Resource            ../../../libs/common.robot
+Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -29,9 +30,14 @@ Check publication owner can create methodology for publication
     user creates methodology for publication    ${PUBLICATION_NAME}
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
-Check publication owner can approve methodology for publication
-    user clicks link    Sign off
-    user changes methodology status to Approved
+Check publication owner can update methodology summary
+    user edits methodology summary for publication
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
+
+Check publication owner cannot approve methodology for publication
+    user cannot see the edit status controls for methodology
 
 Check publication owner can upload subject file
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
@@ -113,8 +119,20 @@ Navigate to administration as bau1 and swap publication owner role for release a
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
     user gives release access to analyst    ${RELEASE_NAME}    Approver
 
-Check release approver can access release
+Check release approver can approve methodology for publication
     user changes to analyst1
+    user views methodology for publication    ${PUBLICATION_NAME}
+    approve methodology from methodology view
+
+Check release approver can unapprove methodology
+    user changes methodology status to Draft
+
+Check release approver can approve methodology for publishing with the release
+    approve methodology from methodology view
+    ...    publishing_strategy=WithRelease
+    ...    with_release=${RELEASE_NAME}
+
+Check release approver can access release
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
 
@@ -151,10 +169,16 @@ Navigate to administration as bau1 and swap release approver role for publicatio
     user removes release access from analyst    ${RELEASE_NAME}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
-Check publication owner can create and cancel Methodology amendments on a live Publication
+Check publication owner can create and cancel methodology amendments on a live publication
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
-
-Check publication owner can approve Methodology amendments on a live Publication
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+
+Navigate to administration as bau1 and swap publication owner role for release approver
+    user changes to bau1
+    user removes publication owner access from analyst    ${PUBLICATION_NAME}
+    user gives release access to analyst    ${RELEASE_NAME}    Approver
+
+Check release approver can approve methodology amendments on a live publication
+    user changes to analyst1
     user approves methodology amendment for publication    ${PUBLICATION_NAME}

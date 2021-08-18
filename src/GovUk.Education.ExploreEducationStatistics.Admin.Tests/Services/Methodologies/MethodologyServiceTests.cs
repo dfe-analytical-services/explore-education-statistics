@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var owningPublication = new Publication
             {
                 Title = "Owning publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var adoptingPublication1 = new Publication
             {
                 Title = "Test publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var adoptingPublication2 = new Publication
             {
                 Title = "Test publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.GetSummary(methodology.Id)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.LatestInternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
                 Assert.Equal(Immediately, methodology.PublishingStrategy);
                 Assert.Equal(methodology.Status, viewModel.Status);
@@ -176,14 +176,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var owningPublication = new Publication
             {
                 Title = "Publication B",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
                         Owner = true
                     }
                 ),
-                Releases = AsList(
+                Releases = ListOf(
                     new Release
                     {
                         Published = DateTime.UtcNow,
@@ -214,14 +214,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var adoptingPublication = new Publication
             {
                 Title = "Publication A",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
                         Owner = false
                     }
                 ),
-                Releases = AsList(
+                Releases = ListOf(
                     new Release
                     {
                         Published = DateTime.UtcNow,
@@ -321,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var owningPublication = new Publication
             {
                 Title = "Owning publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var adoptingPublication = new Publication
             {
                 Title = "Adopting publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
@@ -372,14 +372,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var owningPublication = new Publication
             {
                 Title = "Owning publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
                         Owner = true
                     }
                 ),
-                Releases = AsList(
+                Releases = ListOf(
                     new Release
                     {
                         Published = DateTime.UtcNow,
@@ -392,14 +392,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var adoptingPublication = new Publication
             {
                 Title = "Adopting publication",
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         MethodologyParent = methodology.MethodologyParent,
                         Owner = false
                     }
                 ),
-                Releases = AsList(
+                Releases = ListOf(
                     new Release
                     {
                         Published = DateTime.UtcNow,
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Slug = "test-publication",
                     OwningPublicationTitle = "Test publication",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -523,7 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Slug = "test-publication",
                     OwningPublicationTitle = "Test publication",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -555,7 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -603,7 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Slug = "test-publication",
                     OwningPublicationTitle = "Test publication",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -634,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -685,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Slug = "alternative-methodology-title",
                     OwningPublicationTitle = "Test publication",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -717,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -758,7 +758,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Publication title",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -835,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -866,7 +866,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Publication title",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -952,7 +952,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, imageService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -984,7 +984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Publication title",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -1041,13 +1041,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(cacheService, contentService, methodologyRepository, publishingService);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.True(viewModel.Published.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
-                Assert.Equal(request.LatestInternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(request.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1064,6 +1064,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(request.LatestInternalReleaseNote, updatedMethodology.InternalReleaseNote);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateMethodologyStatus_ApprovingUsingImmediateStrategy_ScheduledWithReleaseIsCleared()
+        {
+            var scheduledWithRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var methodology = new Methodology
+            {
+                PublishingStrategy = WithRelease,
+                Status = Approved,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication()
+                    })
+                },
+                // Existing ScheduledWithRelease should be cleared
+                ScheduledWithRelease = scheduledWithRelease
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                LatestInternalReleaseNote = "Test approval",
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Title = "Publication title",
+                // Requested id should be ignored
+                WithReleaseId = scheduledWithRelease.Id
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodology.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodology.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var viewModel = (await service.UpdateMethodology(methodology.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyRepository);
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Null(viewModel.ScheduledWithRelease);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedMethodology = await context
+                    .Methodologies
+                    .SingleAsync(m => m.Id == methodology.Id);
+
+                Assert.Equal(Approved, updatedMethodology.Status);
+                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                // Existing ScheduledWithReleaseId is cleared as requested publishing strategy is not WithRelease
+                Assert.Null(updatedMethodology.ScheduledWithReleaseId);
             }
         }
 
@@ -1090,7 +1172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = publication.Title,
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -1139,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(WithRelease, viewModel.PublishingStrategy);
                 Assert.Equal(request.Status, viewModel.Status);
@@ -1180,7 +1262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = publication.Title,
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -1231,7 +1313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = publication.Title,
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -1293,7 +1375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = publication.Title,
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -1348,7 +1430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Publication title",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -1395,7 +1477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 MethodologyParent = new MethodologyParent
                 {
                     OwningPublicationTitle = "Publication title",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = new Publication()
@@ -1445,7 +1527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 
                 // Original release note is cleared if unapproving
-                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
@@ -1486,7 +1568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Slug = "test-publication",
                     OwningPublicationTitle = "Test publication",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
                         Publication = publication
@@ -1563,7 +1645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Id = methodologyParentId,
                     Slug = "pupil-absence-statistics-methodology",
                     OwningPublicationTitle = "Pupil absence statistics: methodology",
-                    Publications = AsList(new PublicationMethodology
+                    Publications = ListOf(new PublicationMethodology
                     {
                         MethodologyParentId = methodologyParentId
                     })
@@ -1624,7 +1706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = methodologyParentId,
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
-                Versions = AsList(new Methodology
+                Versions = ListOf(new Methodology
                     {
                         Id = Guid.NewGuid(),
                         PublishingStrategy = Immediately,
@@ -1682,7 +1764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = methodologyParentId,
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
-                Versions = AsList(new Methodology
+                Versions = ListOf(new Methodology
                     {
                         Id = Guid.NewGuid(),
                         PublishingStrategy = Immediately,
@@ -1768,7 +1850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = methodologyParentId,
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
-                Versions = AsList(new Methodology
+                Versions = ListOf(new Methodology
                 {
                     Id = Guid.NewGuid(),
                     PublishingStrategy = Immediately,
@@ -1781,7 +1863,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = unrelatedMethodologyParentId,
                 Slug = "pupil-absence-statistics-methodology",
                 OwningPublicationTitle = "Pupil absence statistics: methodology",
-                Versions = AsList(new Methodology
+                Versions = ListOf(new Methodology
                 {
                     Id = Guid.NewGuid(),
                     PublishingStrategy = Immediately,
@@ -1860,12 +1942,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 AdminMapper(),
-                blobCacheService ?? new Mock<IBlobCacheService>().Object,
-                methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
+                blobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                methodologyContentService ?? Mock.Of<IMethodologyContentService>(Strict),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
-                methodologyRepository ?? new Mock<IMethodologyRepository>(Strict).Object,
-                methodologyImageService ?? new Mock<IMethodologyImageService>(Strict).Object,
-                publishingService ?? new Mock<IPublishingService>(Strict).Object,
+                methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict),
+                methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
+                publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }

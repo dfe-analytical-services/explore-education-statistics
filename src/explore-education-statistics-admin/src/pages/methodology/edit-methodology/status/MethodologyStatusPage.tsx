@@ -53,7 +53,12 @@ const MethodologyStatusPage = ({
     };
   }, [methodologyId]);
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async ({
+    latestInternalReleaseNote,
+    publishingStrategy,
+    status,
+    withReleaseId,
+  }: FormValues) => {
     if (!model) {
       return;
     }
@@ -61,8 +66,12 @@ const MethodologyStatusPage = ({
     const nextSummary = await methodologyService.updateMethodology(
       methodologyId,
       {
-        ...model.summary,
-        ...values,
+        latestInternalReleaseNote,
+        publishingStrategy,
+        status,
+        title: model.summary.title,
+        withReleaseId:
+          publishingStrategy === 'WithRelease' ? withReleaseId : undefined,
       },
     );
 

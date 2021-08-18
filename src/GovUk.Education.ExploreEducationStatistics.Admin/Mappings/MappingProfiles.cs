@@ -67,6 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
             CreateMap<Methodology, MethodologySummaryViewModel>()
+                .ForMember(dest => dest.LatestInternalReleaseNote,
+                    m => m.MapFrom(model => model.InternalReleaseNote))
                 .ForMember(dest => dest.ScheduledWithRelease,
                     m => m.Ignore());
 
@@ -89,6 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.ThemeId));
 
             CreateMap<Methodology, MyMethodologyViewModel>()
+                .ForMember(dest => dest.LatestInternalReleaseNote,
+                    m => m.MapFrom(model => model.InternalReleaseNote))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyMethodologyPermissionSetPropertyResolver>());
 
             CreateMap<Publication, MyPublicationViewModel>()

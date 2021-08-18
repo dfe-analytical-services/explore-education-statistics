@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class UpdateSpecificReleaseAuthorizationHandlerTests
     {
-        public class UpdateSpecificReleaseAuthorizationHandlerClaimTests
+        public class ClaimTests
         {
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             
         }
 
-        public class UpdateSpecificReleaseAuthorizationHandlerPublicationRoleTests
+        public class PublicationRoleTests
         {
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
@@ -189,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        public class UpdateSpecificReleaseAuthorizationHandlerReleaseRoleTests
+        public class ReleaseRoleTests
         {
             [Fact]
             public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
@@ -292,15 +293,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         { 
             var statusListWhenPublishing = new List<PublisherReleaseStatus>
             {
-                new PublisherReleaseStatus()
+                new()
             };
-            
+
             return HandlerSupplier(release, statusListWhenPublishing);
         }
 
         private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
             Release release,
-            List<PublisherReleaseStatus> publishingStatuses = null)
+            List<PublisherReleaseStatus>? publishingStatuses = null)
         {
             var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
 
