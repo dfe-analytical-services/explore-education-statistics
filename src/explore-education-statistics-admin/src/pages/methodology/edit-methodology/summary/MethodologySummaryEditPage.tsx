@@ -36,13 +36,13 @@ const MethodologySummaryEditPage = ({
             }}
             defaultTitle={methodology.owningPublication.title}
             submitText="Update methodology"
-            onSubmit={async values => {
+            onSubmit={async ({ title }) => {
               await methodologyService.updateMethodology(methodologyId, {
                 latestInternalReleaseNote:
                   methodology.latestInternalReleaseNote,
                 publishingStrategy: methodology.publishingStrategy,
                 status: methodology.status,
-                title: values.title,
+                title,
                 withReleaseId: methodology.scheduledWithRelease?.id,
               });
 
