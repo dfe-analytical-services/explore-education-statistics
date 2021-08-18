@@ -9,11 +9,15 @@ interface Props {
     to: string;
     title: string;
   }[];
+  label: string;
 }
 
-const NavBar = ({ className, routes }: Props) => {
+const NavBar = ({ className, routes, label }: Props) => {
   return (
-    <nav className={classNames(styles.navigation, className)}>
+    <nav
+      className={classNames(styles.navigation, className)}
+      aria-label={label}
+    >
       <ul className={styles.list}>
         {routes.map(route => (
           <li key={route.to}>

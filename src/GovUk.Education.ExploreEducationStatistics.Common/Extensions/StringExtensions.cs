@@ -1,8 +1,11 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using AngleSharp.Text;
 
@@ -119,6 +122,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
 
             return SnakeCase(input).ToUpper();
+        }
+
+        public static string ToMd5Hash(this string input, Encoding? encoding = null)
+        {
+            using var md5 = MD5.Create();
+
+            var inputBytes = (encoding ?? Encoding.UTF8).GetBytes(input);
+
+            return BitConverter.ToString(md5.ComputeHash(inputBytes))
+                .Replace("-", string.Empty)
+                .ToLowerInvariant();
         }
     }
 }

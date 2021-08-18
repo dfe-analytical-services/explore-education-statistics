@@ -20,12 +20,10 @@ ${RELEASE_URL}=
 
 *** Test Cases ***
 Create test publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    CY    2000
 
 Verify release summary
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Calendar Year 2000 (not Live)
     user waits until h2 is visible    Release summary
@@ -33,12 +31,10 @@ Verify release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subject
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Add metadata guidance
-    [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until h2 is visible    Public metadata guidance document
 
@@ -65,7 +61,6 @@ Add metadata guidance
     user waits until page contains button    Edit guidance
 
 Add table highlight
-    [Tags]    HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -92,29 +87,24 @@ Add table highlight
     user waits until page contains    Delete this data block
 
 Add basic release content
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user adds basic release content    ${PUBLICATION_NAME}
 
 Add public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user creates public prerelease access list    Initial test public access list
 
 Update public prerelease access list
-    [Tags]    HappyPath
     user updates public prerelease access list    Updated test public access list
 
 Go to "Sign off" page
-    [Tags]    HappyPath
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user waits until page contains button    Edit release status
 
 Approve release and wait for it to be Scheduled
-    [Tags]    HappyPath
     ${day}=    get current datetime    %-d    2
     ${month}=    get current datetime    %-m    2
     ${month_word}=    get current datetime    %B    2
@@ -141,14 +131,12 @@ Approve release and wait for it to be Scheduled
     user waits for release process status to be    Scheduled    90
 
 Navigate to prerelease page
-    [Tags]    HappyPath
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
     user goes to url    ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
-    [Tags]    HappyPath
     user waits until h1 is visible    Pre-release access is not yet available    60
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -162,12 +150,10 @@ Validate prerelease has not started
     user checks page contains    Pre-release access will be available from ${time_start} until ${time_end}.
 
 Go to prerelease access page
-    [Tags]    HappyPath
     user goes to url    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
 Invite users to prerelease for scheduled release
-    [Tags]    HappyPath
     # This is GOV.UK Notify's test email address
     user enters text into element    css:input[name="email"]    simulate-delivered@notifications.service.gov.uk
     user clicks button    Invite new user
@@ -181,7 +167,6 @@ Invite users to prerelease for scheduled release
     user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
 
 Validate prerelease has not started for Analyst user
-    [Tags]    HappyPath
     user changes to analyst1
     user goes to url    ${RELEASE_URL}/prerelease/content
 
@@ -198,7 +183,6 @@ Validate prerelease has not started for Analyst user
     user checks page contains    Pre-release access will be available from ${time_start} until ${time_end}.
 
 Start prerelease
-    [Tags]    HappyPath
     user changes to bau1
     ${day}=    get current datetime    %-d    1
     ${month}=    get current datetime    %-m    1
@@ -218,7 +202,6 @@ Start prerelease
     user waits for release process status to be    Scheduled    90
 
 Validate prerelease has started
-    [Tags]    HappyPath
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
@@ -236,8 +219,9 @@ Validate prerelease has started
     ...    60
 
 Validate metadata guidance page
-    [Tags]    HappyPath
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
@@ -264,7 +248,6 @@ Validate metadata guidance page
     user checks results table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page
-    [Tags]    HappyPath
     user clicks link    Back
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -274,7 +257,6 @@ Go back to prerelease content page
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
 Validate public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access list
     user waits until page contains title caption    Calendar Year 2000    30
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
@@ -282,7 +264,6 @@ Validate public prerelease access list
     user waits until page contains    Updated test public access list    60
 
 Go back to prerelease content page again
-    [Tags]    HappyPath
     user clicks link    Back
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
     user checks breadcrumb count should be    2
@@ -290,13 +271,11 @@ Go back to prerelease content page again
     user checks nth breadcrumb contains    2    Pre-release access
 
 Go to prerelease table tool page
-    [Tags]    HappyPath
     user clicks link    Table tool
     user waits until h1 is visible    Create your own tables    60
     user waits until table tool wizard step is available    Choose a subject    60
 
 Validate table highlights
-    [Tags]    HappyPath
     user waits until page contains element    id:featuredTables
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_HIGHLIGHT_NAME}
@@ -304,12 +283,10 @@ Validate table highlights
     ...    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
 Go to table highlight and validate table
-    [Tags]    HappyPath
     user clicks link    ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
 Create and validate custom table
-    [Tags]    HappyPath
     user clicks link    Table tool
 
     user waits until h1 is visible    Create your own tables    60
@@ -325,7 +302,6 @@ Create and validate custom table
     user validates table rows
 
 Validate prerelease has started for Analyst user
-    [Tags]    HappyPath
     user changes to analyst1
     user goes to url    ${RELEASE_URL}/prerelease/content
 
@@ -340,8 +316,9 @@ Validate prerelease has started for Analyst user
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
-    [Tags]    HappyPath
-    user clicks link    Metadata guidance document
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Open data
+    user clicks link    data files guide
 
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
@@ -368,7 +345,6 @@ Validate public metdata guidance for Analyst user
     user checks results table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page as Analyst user
-    [Tags]    HappyPath
     user clicks link    Back
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -378,7 +354,6 @@ Go back to prerelease content page as Analyst user
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
 Validate public prerelease access list as Analyst user
-    [Tags]    HappyPath
     user clicks link    Pre-release access list
 
     user waits until page contains title caption    Calendar Year 2000    60
@@ -388,7 +363,6 @@ Validate public prerelease access list as Analyst user
     user waits until page contains    Updated test public access list    60
 
 Go back to prerelease content page again as Analyst user
-    [Tags]    HappyPath
     user clicks link    Back
 
     user checks breadcrumb count should be    2
@@ -399,14 +373,12 @@ Go back to prerelease content page again as Analyst user
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
 Go to prerelease table tool page as Analyst user
-    [Tags]    HappyPath
     user clicks link    Table tool
 
     user waits until h1 is visible    Create your own tables    60
     user waits until table tool wizard step is available    Choose a subject    60
 
 Validate table highlights as Analyst user
-    [Tags]    HappyPath
     user waits until page contains element    id:featuredTables    60
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_HIGHLIGHT_NAME}
@@ -414,12 +386,10 @@ Validate table highlights as Analyst user
     ...    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
 Go to table highlight and validate table as Analyst user
-    [Tags]    HappyPath
     user clicks link    ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
 Create and validate custom table as Analyst user
-    [Tags]    HappyPath
     user clicks link    Table tool
 
     user waits until h1 is visible    Create your own tables    60

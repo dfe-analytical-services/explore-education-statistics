@@ -132,14 +132,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(4)),
                         Reason = "Reason 1",
-                        ReleaseId = releaseId
+                        ReleaseId = releaseId,
+                        Created = createdDate.AddDays(1),
+                        CreatedById = Guid.NewGuid(),
                     },
                     new Update
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(5)),
                         Reason = "Reason 2",
-                        ReleaseId = releaseId
+                        ReleaseId = releaseId,
+                        Created = createdDate.AddDays(2),
+                        CreatedById = Guid.NewGuid(),
                     }
                 },
                 Content = new List<ReleaseContentSection>
@@ -544,14 +548,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(previous.Url, amended.Url);
         }
 
-        private static void AssertAmendedUpdateCorrect(Update amended, Update previous, Release amendment)
+        private static void AssertAmendedUpdateCorrect(Update amendedUpdate, Update previousUpdate, Release amendment)
         {
-            Assert.True(amended.Id != Guid.Empty);
-            Assert.NotEqual(previous.Id, amended.Id);
-            Assert.Equal(previous.On, amended.On);
-            Assert.Equal(previous.Reason, amended.Reason);
-            Assert.Equal(amendment, amended.Release);
-            Assert.Equal(amendment.Id, amended.ReleaseId);
+            Assert.True(amendedUpdate.Id != Guid.Empty);
+            Assert.NotEqual(previousUpdate.Id, amendedUpdate.Id);
+            Assert.Equal(previousUpdate.On, amendedUpdate.On);
+            Assert.Equal(previousUpdate.Reason, amendedUpdate.Reason);
+            Assert.Equal(previousUpdate.Created, amendedUpdate.Created);
+            Assert.Equal(previousUpdate.CreatedById, amendedUpdate.CreatedById);
+            Assert.Equal(amendment.Id, amendedUpdate.ReleaseId);
         }
 
         private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,

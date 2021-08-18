@@ -128,6 +128,7 @@ const Comments = ({
               <FormFieldTextArea<FormValues>
                 label="Comment"
                 name="content"
+                data-testid="comment-textarea"
                 rows={3}
               />
 
@@ -197,7 +198,7 @@ const Comments = ({
                   >
                     {commentDetail}
 
-                    <p>{comment.content}</p>
+                    <p data-testid="comment-content">{comment.content}</p>
                   </Details>
 
                   {canComment && (
@@ -217,7 +218,7 @@ const Comments = ({
               <li key={comment.id}>
                 {commentDetail}
 
-                <p>{comment.content}</p>
+                <p data-testid="comment-content">{comment.content}</p>
 
                 {editingComment?.id === comment.id ? (
                   <Formik<FormValues>
@@ -278,6 +279,7 @@ const Comments = ({
                         )}
 
                         <ButtonText
+                          testId="resolve-button"
                           onClick={async () => {
                             await setResolved(comment.id, true);
                           }}

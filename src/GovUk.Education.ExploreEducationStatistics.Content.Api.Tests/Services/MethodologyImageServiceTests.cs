@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PublicMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -89,8 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PublicMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(
+                            PublicMethodologyFiles, methodologyFile.Path(),
+                        It.IsAny<MemoryStream>(), null),
+                    Times.Once());
 
                 Assert.Equal("image/png", result.Right.ContentType);
                 Assert.Equal("image.png", result.Right.FileDownloadName);
@@ -133,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 result.AssertNotFound();
             }
-            
+
             MockUtils.VerifyAllMocks(blobStorageService);
         }
 
@@ -169,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         public async Task Stream_BlobDoesNotExist()
         {
             var methodology = new Methodology();
-            
+
             var methodologyFile = new MethodologyFile
             {
                 Methodology = methodology,

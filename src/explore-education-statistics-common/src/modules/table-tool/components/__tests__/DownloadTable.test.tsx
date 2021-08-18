@@ -95,47 +95,6 @@ describe('DownloadTable', () => {
     ).toBeInTheDocument();
   });
 
-  test('downloads the csv file', async () => {
-    const ref = createRef<HTMLElement>();
-
-    render(
-      <DownloadTable
-        fileName="The file name"
-        fullTable={{
-          subjectMeta: basicSubjectMeta,
-          results: [],
-        }}
-        tableRef={ref}
-      />,
-    );
-    fireEvent.click(
-      screen.getByRole('radio', {
-        name: 'Table in CSV format (flat file, with location codes)',
-      }),
-    );
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Download table',
-      }),
-    );
-
-    const mockedWriteFile = writeFile as jest.Mock;
-    await waitFor(() => {
-      expect(mockedWriteFile).toHaveBeenCalledTimes(1);
-
-      const workbook = mockedWriteFile.mock.calls[0][0] as WorkBook;
-
-      expect(workbook.Sheets.Sheet1.A1.v).toBe('location');
-      expect(workbook.Sheets.Sheet1.B1.v).toBe('location_code');
-      expect(workbook.Sheets.Sheet1.C1.v).toBe('geographic_level');
-      expect(workbook.Sheets.Sheet1.D1.v).toBe('time_period');
-      expect(workbook.Sheets.Sheet1.E1.v).toBe('characteristic');
-      expect(workbook.Sheets.Sheet1.F1.v).toBe('sess_authorised_percent');
-
-      expect(mockedWriteFile.mock.calls[0][1]).toBe('The file name.csv');
-    });
-  });
-
   test('downloads the ods file', async () => {
     const ref = createRef<HTMLTableElement>();
     render(

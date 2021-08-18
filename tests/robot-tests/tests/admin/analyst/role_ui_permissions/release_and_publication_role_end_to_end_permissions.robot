@@ -16,16 +16,13 @@ ${SUBJECT_NAME}         UI test subject
 
 *** Test Cases ***
 Create new publication and release via API
-    [Tags]    HappyPath
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2025
 
 Give Analyst1 User1 publication owner access
-    [Tags]    HappyPath
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Sign in as Analyst1 User1 (publication owner)
-    [Tags]    HappyPath
     user changes to analyst1
 
 Check publication owner can create methodology for publication
@@ -37,7 +34,6 @@ Check publication owner can approve methodology for publication
     user changes methodology status to Approved
 
 Check publication owner can upload subject file
-    [Tags]    HappyPath
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
     user clicks link    Data and files
@@ -45,7 +41,6 @@ Check publication owner can upload subject file
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add meta guidance to ${SUBJECT_NAME}
-    [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until page does not contain loading spinner
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
@@ -55,13 +50,11 @@ Check publication owner can add meta guidance to ${SUBJECT_NAME}
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
-    [Tags]    HappyPath
     user waits for page to finish loading
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Check publication owner can add a footnote to ${SUBJECT_NAME}
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until page does not contain loading spinner
@@ -72,19 +65,16 @@ Check publication owner can add a footnote to ${SUBJECT_NAME}
     user waits until h2 is visible    Footnotes    60
 
 Add public prerelease access list
-    [Tags]    HappyPath
     user clicks link    Pre-release access
     user waits until page does not contain loading spinner
     user creates public prerelease access list    Test public access list
 
 Go to "Sign off" page
-    [Tags]    HappyPath
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user clicks button    Edit release status
 
 Check publication owner can edit release status to "Ready for higher review"
-    [Tags]    HappyPath
     user clicks radio    Ready for higher review
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    ready for higher review (publication owner)
@@ -92,7 +82,6 @@ Check publication owner can edit release status to "Ready for higher review"
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
 
 Check publication owner can edit release status to "In draft"
-    [Tags]    HappyPath
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    30
     user clicks radio    In draft
@@ -101,19 +90,16 @@ Check publication owner can edit release status to "In draft"
     user clicks button    Update status
 
 Check that a publication owner can make a new release
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Check publication owner can upload subject file on new release
-    [Tags]    HappyPath
     user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add meta guidance to ${SUBJECT_NAME} on new release
-    [Tags]    HappyPath
     user clicks link    Metadata guidance
     user waits until page does not contain loading spinner
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
@@ -123,24 +109,20 @@ Check publication owner can add meta guidance to ${SUBJECT_NAME} on new release
     user clicks button    Save guidance
 
 Navigate to administration as bau1 and swap publication owner role for release approver
-    [Tags]    HappyPath
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
     user gives release access to analyst    ${RELEASE_NAME}    Approver
 
 Check release approver can access release
-    [Tags]    HappyPath
     user changes to analyst1
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
 
 Navigate to 'Footnotes' section
-    [Tags]    HappyPath
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Add a Footnote as a release approver
-    [Tags]    HappyPath
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
@@ -152,7 +134,6 @@ Add a Footnote as a release approver
     user waits until h2 is visible    Footnotes
 
 Check release approver can create a release note
-    [Tags]    HappyPath
     user clicks link    Content
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
@@ -162,22 +143,18 @@ Check release approver can create a release note
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
-    [Tags]    HappyPath
     user clicks link    Sign off
     user approves release for immediate publication
 
 Navigate to administration as bau1 and swap release approver role for publication owner now that the publication is live
-    [Tags]    HappyPath
     user changes to bau1
     user removes release access from analyst    ${RELEASE_NAME}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner can create and cancel Methodology amendments on a live Publication
-    [Tags]    HappyPath
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
 
 Check publication owner can approve Methodology amendments on a live Publication
-    [Tags]    HappyPath
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user approves methodology amendment for publication    ${PUBLICATION_NAME}

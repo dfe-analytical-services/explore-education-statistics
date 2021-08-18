@@ -8,7 +8,6 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 *** Test Cases ***
 Navigate to Find Statistics page
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
@@ -17,7 +16,6 @@ Navigate to Find Statistics page
 # TODO: User uses search
 
 Validate accordion sections exist
-    [Tags]    HappyPath
     user waits until page contains accordion section    Children, early years and social care
     user waits until page contains accordion section    Destination of pupils and students
     user waits until page contains accordion section    Finance and funding
@@ -29,12 +27,10 @@ Validate accordion sections exist
     user waits until page contains accordion section    UK education and training statistics
 
 Open "Pupils and schools" accordion section
-    [Tags]    HappyPath
     user opens accordion section    Pupils and schools
 
 Validate "Pupils and schools" section
     [Documentation]    EES-1577
-    [Tags]    HappyPath
     user waits until accordion section contains text    Pupils and schools    Admission appeals
     user waits until accordion section contains text    Pupils and schools    Exclusions
     user waits until accordion section contains text    Pupils and schools    Parental responsibility measures
@@ -46,7 +42,6 @@ Validate "Pupils and schools" section
     user waits until accordion section contains text    Pupils and schools    Special educational needs (SEN)
 
 Validate "Pupil absence" details component
-    [Tags]    HappyPath
     user opens details dropdown    Pupil absence
 
     user waits until details dropdown contains publication    Pupil absence    Pupil absence in schools in England

@@ -9,7 +9,6 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    [Tags]    HappyPath
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
     user waits until page contains    Explore our statistics and data
@@ -23,29 +22,25 @@ Navigate to Absence publication
     user waits until h1 is visible    Pupil absence in schools in England    90
 
 Validate title
-    [Tags]    HappyPath
     user waits until h1 is visible    Pupil absence in schools in England    90
     user waits until page contains title caption    Academic Year 2016/17
 
 Validate URL
-    [Tags]    HappyPath
     user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Validate Published date
-    [Tags]    HappyPath    NotAgainstPreProd    Failing
+    [Tags]    NotAgainstPreProd    Failing
     user checks summary list contains    Published date    25 April 2018
 
 Validate Next update date
-    [Tags]    HappyPath    NotAgainstPreProd
+    [Tags]    NotAgainstPreProd
     user checks summary list contains    Next update    22 March 2019
 
 Validate Email alerts link
-    [Tags]    HappyPath
     user checks page contains link with text and url    Sign up for email alerts
     ...    /subscriptions?slug=pupil-absence-in-schools-in-england
 
 Validate "About these statistics" -- Number of other releases
-    [Tags]    HappyPath
     user checks number of other releases is correct    6
     user opens details dropdown    See other releases (6)
     user checks other release is shown in position    Academic Year 2014/15    1
@@ -57,7 +52,6 @@ Validate "About these statistics" -- Number of other releases
     user closes details dropdown    See other releases (6)
 
 Validate "About these statistics" -- "Last updated"
-    [Tags]    HappyPath
     user checks summary list contains    Last updated    19 April 2018
 
     user checks number of release updates    2
@@ -67,20 +61,19 @@ Validate "About these statistics" -- "Last updated"
     user closes details dropdown    See all updates (2)
 
 Validate "Useful information"
-    [Tags]    HappyPath
     user checks page contains link with text and url    Pupil absence statistics: methodology
     ...    /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
     [Documentation]    DFE-958    DFE-562
-    [Tags]    HappyPath    NotAgainstLocal    Failing
+    [Tags]    NotAgainstLocal    Failing
     user opens details dropdown    Download data files
     user checks page contains    Absence in PRUs (CSV, 141 Kb)
     user closes details dropdown    Download data files
 
 Validate absence_in_prus.csv file can be downloaded
     [Documentation]    DFE-958    DFE-562
-    [Tags]    HappyPath    NotAgainstLocal    Failing
+    [Tags]    NotAgainstLocal    Failing
     user opens details dropdown    Download data files
 
     download file    link:Absence in PRUs    absence_in_prus.csv
@@ -91,7 +84,6 @@ Validate absence_in_prus.csv file can be downloaded
 
 Validate headlines -- Summary tab key stats
     [Documentation]    DFE-915    EES-806    EES-1508
-    [Tags]    HappyPath
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
@@ -108,14 +100,13 @@ Validate headlines -- Summary tab key stats
 
 Validate headlines -- Summary tab content
     [Documentation]    EES-718
-    [Tags]    HappyPath    NotAgainstPreProd
+    [Tags]    NotAgainstPreProd
     user checks headline summary contains    pupils missed on average 8.2 school days
     user checks headline summary contains    overall and unauthorised absence rates up on 2015/16
     user checks headline summary contains    unauthorised absence rise due to higher rates of unauthorised holidays
     user checks headline summary contains    10% of pupils persistently absent during 2016/17
 
 Validate Key Statistics data block -- Charts tab
-    [Tags]    HappyPath
     user scrolls to element    css:#releaseHeadlines-charts-tab
     user clicks element    id:releaseHeadlines-charts-tab
     ${headline_chart}=    set variable    css:#releaseHeadlines-chart    # must be css selector
@@ -163,7 +154,6 @@ Validate Key Statistics data block -- Charts tab
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
 
 Validate Key Statistics data block -- Data tables tab
-    [Tags]    HappyPath
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
     ...    Table showing 'Absence by characteristic' in England between 2012/13 and 2016/17    30
@@ -202,7 +192,6 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    5    4.7
 
 Validate accordion sections order
-    [Tags]    HappyPath
     user checks accordion is in position    About these statistics    1    id:content
     user checks accordion is in position    Pupil absence rates    2    id:content
     user checks accordion is in position    Persistent absence    3    id:content
@@ -221,7 +210,7 @@ Validate accordion sections order
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
-    [Tags]    HappyPath    NotAgainstDev    NotAgainstLocal
+    [Tags]    NotAgainstDev    NotAgainstLocal
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
     ...    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in    90
@@ -268,7 +257,7 @@ Validate Regional and local authority (LA) breakdown table
     user checks row cell contains text    ${row}    1    1.7%
 
 Validate Regional and local authority (LA) breakdown chart
-    [Tags]    HappyPath    NotAgainstDev    NotAgainstLocal
+    [Tags]    NotAgainstDev    NotAgainstLocal
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section content    Regional and local authority (LA) breakdown    id:content
 
@@ -318,7 +307,6 @@ Validate Regional and local authority (LA) breakdown chart
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898
-    [Tags]    HappyPath
     user clicks link    Create tables
     user waits until h1 is visible    Create your own tables    60
     user waits for page to finish loading

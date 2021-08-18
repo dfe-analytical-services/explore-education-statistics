@@ -214,9 +214,9 @@ user verifies methodology summary details
     ...    ${published_on}=Not yet published
     user waits until h2 is visible    Methodology summary
     user checks summary list contains    Title    ${methodology_title}
-    user checks summary list contains    Status    ${status}
     user checks summary list contains    Published on    ${published_on}
     user checks summary list contains    Owning publication    ${publication}
+    user checks page contains tag    ${status}
 
 user approves methodology for publication
     [Arguments]
@@ -635,3 +635,8 @@ user waits until modal is visible
     IF    "${MODAL_TEXT}" != "${EMPTY}"
         user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
     END
+
+user gets comment
+    [Arguments]    ${comment_text}
+    ${result}=    get webelement    xpath://*[li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]]
+    [Return]    ${result}

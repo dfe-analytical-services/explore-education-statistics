@@ -1607,7 +1607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1624,8 +1624,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
+                        It.IsAny<MemoryStream>(), null),
+                    Times.Once());
 
                 Assert.Equal("application/pdf", result.Right.ContentType);
                 Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
@@ -1676,7 +1678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1693,8 +1695,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
+                        It.IsAny<MemoryStream>(), null),
+                    Times.Once());
 
                 Assert.Equal("application/pdf", result.Right.ContentType);
                 Assert.Equal("Ancillary 1.pdf", result.Right.FileDownloadName);

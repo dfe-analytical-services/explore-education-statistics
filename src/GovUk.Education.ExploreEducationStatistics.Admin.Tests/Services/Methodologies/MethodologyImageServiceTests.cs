@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, 
+                var result = await service.Delete(methodology.Id,
                     AsList(imageFile1.File.Id, imageFile2.File.Id));
 
                 result.AssertRight();
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Type = Image
                 }
             };
-            
+
             var imageFile2UsedByAnotherMethodology = new MethodologyFile
             {
                 Methodology = anotherMethodology,
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, 
+                var result = await service.Delete(methodology.Id,
                     AsList(imageFile1.File.Id, imageFile2.File.Id));
 
                 result.AssertRight();
@@ -196,19 +196,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(await contentDbContext.MethodologyFiles.FindAsync(imageFile1.Id));
                 Assert.Null(await contentDbContext.Files.FindAsync(imageFile1.File.Id));
                 Assert.Null(await contentDbContext.MethodologyFiles.FindAsync(imageFile2.Id));
-                
+
                 // However, the file that is still linked to anotherMethodology remains in the File table, as does
                 // its link to anotherMethodology.
                 Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile2UsedByAnotherMethodology.Id));
-                
-                var filesForFileLinkedToDeletingMethodology = 
+
+                var filesForFileLinkedToDeletingMethodology =
                     await contentDbContext.Files.FindAsync(imageFile2.File.Id);
-                
-                var filesForFileLinkedToAnotherMethodology = 
+
+                var filesForFileLinkedToAnotherMethodology =
                     await contentDbContext.Files.FindAsync(imageFile2UsedByAnotherMethodology.File.Id);
-                
+
                 Assert.NotNull(filesForFileLinkedToAnotherMethodology);
-                
+
                 // Sanity check that the File entry that remains is the same File as was referenced by the
                 // MethodologyFile link that was deleted.
                 Assert.Equal(filesForFileLinkedToDeletingMethodology, filesForFileLinkedToAnotherMethodology);
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Type = Ancillary
                 }
             };
-            
+
             var imageFile = new MethodologyFile
             {
                 Methodology = methodology,
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, 
+                var result = await service.Delete(methodology.Id,
                     AsList(ancillaryFile.File.Id, imageFile.File.Id));
 
                 result.AssertBadRequest(FileTypeInvalid);
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Check that all the files remain untouched
                 Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
-                
+
                 Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(imageFile.File.Id));
             }
@@ -311,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(Guid.NewGuid(), 
+                var result = await service.Delete(Guid.NewGuid(),
                     AsList(imageFile.File.Id));
 
                 result.AssertNotFound();
@@ -359,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(methodology.Id, 
+                var result = await service.Delete(methodology.Id,
                     AsList(imageFile.File.Id, Guid.NewGuid()));
 
                 result.AssertNotFound();
@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>()))
+                        It.IsAny<MemoryStream>(), null))
                 .ReturnsAsync(new MemoryStream());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -433,8 +433,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Times.Once());
 
                 blobStorageService.Verify(
-                    mock => mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>()), Times.Once());
+                    mock =>
+                        mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
+                        It.IsAny<MemoryStream>(), null),
+                    Times.Once());
 
                 Assert.Equal("image/png", image.ContentType);
                 Assert.Equal("image.png", image.FileDownloadName);

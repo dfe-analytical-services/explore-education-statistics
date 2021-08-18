@@ -193,24 +193,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     View data and files
                   </a>
                 </li>
-                {release.hasMetaGuidance && (
-                  <li>
-                    <Link
-                      to={
-                        release.latestRelease
-                          ? '/find-statistics/[publication]/meta-guidance'
-                          : '/find-statistics/[publication]/[release]/meta-guidance'
-                      }
-                      as={
-                        release.latestRelease
-                          ? `/find-statistics/${release.publication.slug}/meta-guidance`
-                          : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
-                      }
-                    >
-                      Metadata guidance document
-                    </Link>
-                  </li>
-                )}
                 {release.hasPreReleaseAccessList && (
                   <li>
                     <Link

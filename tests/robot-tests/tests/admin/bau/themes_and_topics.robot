@@ -17,12 +17,10 @@ ${CREATED_TOPIC_NAME}       UI test topic - suite created %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Go to 'Manage themes and topics'
-    [Tags]    HappyPath
     user clicks link    manage themes and topics
     user waits until h1 is visible    Manage themes and topics
 
 Verify existing theme and topics
-    [Tags]    HappyPath
     user waits until page contains accordion section    Children, early years and social care
     user opens accordion section    Children, early years and social care
     user checks summary list contains    Summary
@@ -38,7 +36,6 @@ Verify existing theme and topics
     user checks topic is in correct position    Children, early years and social care    6    Secure children's homes
 
 Create theme
-    [Tags]    HappyPath
     user clicks link    Create theme
     user waits until h1 is visible    Create theme
     user enters text into element    id:themeForm-title    ${CREATED_THEME_NAME}
@@ -46,7 +43,6 @@ Create theme
     user clicks button    Save theme
 
 Verify created theme
-    [Tags]    HappyPath
     user waits until h1 is visible    Manage themes and topics
     user waits until page contains accordion section    ${CREATED_THEME_NAME}
     user checks testid element contains    Summary for ${CREATED_THEME_NAME}    Created summary
@@ -54,7 +50,6 @@ Verify created theme
     ...    xpath://*[@data-testid="Topics for ${CREATED_THEME_NAME}"]//*[text()="No topics for this theme"]
 
 Edit theme
-    [Tags]    HappyPath
     user clicks element    testid:Edit link for ${CREATED_THEME_NAME}
     user waits until h1 is visible    Edit theme
 
@@ -71,14 +66,12 @@ Edit theme
     user waits until h1 is visible    Manage themes and topics
 
 Verify updated theme
-    [Tags]    HappyPath
     user waits until page contains accordion section    ${THEME_NAME}
     user checks testid element contains    Summary for ${THEME_NAME}    Updated summary
     user checks element is visible
     ...    xpath://*[@data-testid="Topics for ${THEME_NAME}"]//*[text()="No topics for this theme"]
 
 Create topic
-    [Tags]    HappyPath
     user clicks element    testid:Create topic link for ${THEME_NAME}
     user waits until page contains title caption    ${THEME_NAME}
     user waits until h1 is visible    Create topic
@@ -86,13 +79,11 @@ Create topic
     user clicks button    Save topic
 
 Verify created topic
-    [Tags]    HappyPath
     user waits until h1 is visible    Manage themes and topics
     user waits until page contains accordion section    ${THEME_NAME}
     user checks topic is in correct position    ${THEME_NAME}    1    ${CREATED_TOPIC_NAME}
 
 Edit topic
-    [Tags]    HappyPath
     user clicks element    testid:Edit ${CREATED_TOPIC_NAME} topic link for ${THEME_NAME}
     user waits until page contains title caption    ${THEME_NAME}
     user waits until h1 is visible    Edit topic
@@ -102,7 +93,6 @@ Edit topic
     user clicks button    Save topic
 
 Verify updated topic
-    [Tags]    HappyPath
     user waits until h1 is visible    Manage themes and topics
     user waits until page contains accordion section    ${THEME_NAME}
     user checks topic is in correct position    ${THEME_NAME}    1    ${TOPIC_NAME}
