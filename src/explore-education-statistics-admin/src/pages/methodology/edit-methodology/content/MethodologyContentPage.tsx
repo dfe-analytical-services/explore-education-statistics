@@ -10,17 +10,17 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import MethodologyAccordion from './components/MethodologyAccordion';
+import MethodologyAccordion from '@admin/pages/methodology/edit-methodology/content/components/MethodologyAccordion';
 import {
   MethodologyContextState,
-  MethodologyProvider,
-  useMethodologyState,
-} from './context/MethodologyContext';
+  MethodologyContentProvider,
+  useMethodologyContentState,
+} from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
 
 const MethodologyContentPageInternal = () => {
-  const { methodology, canUpdateMethodology } = useMethodologyState();
+  const { methodology, canUpdateMethodology } = useMethodologyContentState();
 
   const canUpdateContent =
     canUpdateMethodology && methodology.status === 'Draft';
@@ -126,9 +126,9 @@ const MethodologyContentPage = ({
   return (
     <LoadingSpinner loading={isLoading}>
       {value ? (
-        <MethodologyProvider value={value}>
+        <MethodologyContentProvider value={value}>
           <MethodologyContentPageInternal />
-        </MethodologyProvider>
+        </MethodologyContentProvider>
       ) : (
         <WarningMessage>Could not load methodology</WarningMessage>
       )}

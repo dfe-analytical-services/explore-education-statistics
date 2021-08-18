@@ -1,11 +1,11 @@
 import methodologyContentService from '@admin/services/methodologyContentService';
 import { ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
-import { useMethodologyDispatch } from './MethodologyContext';
-import { ContentSectionKeys } from './MethodologyContextActionTypes';
+import { useMethodologyContentDispatch } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
+import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 
-export default function useMethodologyActions() {
-  const dispatch = useMethodologyDispatch();
+export default function useMethodologyContentActions() {
+  const dispatch = useMethodologyContentDispatch();
 
   async function deleteContentSectionBlock({
     methodologyId,

@@ -2,10 +2,10 @@ import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { Dictionary } from '@common/types';
+import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
+import useMethodologyContentActions from '@admin/pages/methodology/edit-methodology/content/context/useMethodologyContentActions';
+import MethodologyAccordionSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyAccordionSection';
 import React, { useCallback } from 'react';
-import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
-import useMethodologyActions from '../context/useMethodologyActions';
-import MethodologyAccordionSection from './MethodologyAccordionSection';
 
 export interface MethodologyAccordionProps {
   id?: string;
@@ -24,7 +24,7 @@ const MethodologyAccordion = ({
   const {
     addContentSection,
     updateContentSectionsOrder,
-  } = useMethodologyActions();
+  } = useMethodologyContentActions();
 
   const onAddSection = useCallback(
     () =>

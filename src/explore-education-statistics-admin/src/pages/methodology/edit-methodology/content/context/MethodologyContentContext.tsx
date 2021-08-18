@@ -3,7 +3,7 @@ import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
-import { MethodologyDispatchAction } from './MethodologyContextActionTypes';
+import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 
 export type MethodologyContextDispatch = (
   action: MethodologyDispatchAction,
@@ -130,12 +130,15 @@ export const methodologyReducer: Reducer<
   }
 };
 
-interface MethodologyProviderProps {
+interface MethodologyContentProviderProps {
   children: ReactNode;
   value: MethodologyContextState;
 }
 
-function MethodologyProvider({ children, value }: MethodologyProviderProps) {
+function MethodologyContentProvider({
+  children,
+  value,
+}: MethodologyContentProviderProps) {
   const [state, dispatch] = useLoggedImmerReducer(
     'Methodology',
     methodologyReducer,
@@ -151,24 +154,28 @@ function MethodologyProvider({ children, value }: MethodologyProviderProps) {
   );
 }
 
-function useMethodologyState() {
+function useMethodologyContentState() {
   const context = useContext(MethodologyStateContext);
   if (context === undefined) {
     throw new Error(
-      'useMethodologyState must be used within a MethodologyProvider',
+      'useMethodologyContentState must be used within a MethodologyContentProvider',
     );
   }
   return context;
 }
 
-function useMethodologyDispatch() {
+function useMethodologyContentDispatch() {
   const context = useContext(MethodologyDispatchContext);
   if (context === undefined) {
     throw new Error(
-      'useMethodologyDispatch must be used within a MethodologyProvider',
+      'useMethodologyContentDispatch must be used within a MethodologyContentProvider',
     );
   }
   return context;
 }
 
-export { MethodologyProvider, useMethodologyState, useMethodologyDispatch };
+export {
+  MethodologyContentProvider,
+  useMethodologyContentState,
+  useMethodologyContentDispatch,
+};

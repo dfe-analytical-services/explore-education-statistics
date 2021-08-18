@@ -11,6 +11,7 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
+import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -35,10 +36,13 @@ const MethodologyPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value: methodology, isLoading } = useAsyncHandledRetry(
-    () => methodologyService.getMethodology(methodologyId),
-    [methodologyId],
-  );
+  const {
+    value: methodology,
+    setState: setMethodology,
+    isLoading,
+  } = useAsyncHandledRetry(() => {
+    return methodologyService.getMethodology(methodologyId);
+  }, [methodologyId]);
 
   const currentRouteIndex =
     navRoutes.findIndex(
@@ -121,16 +125,23 @@ const MethodologyPage = ({
               label="Methodology"
             />
 
-            <Switch>
-              {routes.map(route => (
-                <Route
-                  exact
-                  key={route.path}
-                  path={route.path}
-                  component={route.component}
-                />
-              ))}
-            </Switch>
+            <MethodologyContextProvider
+              methodology={methodology}
+              onMethodologyChange={nextMethodology => {
+                setMethodology({ value: nextMethodology });
+              }}
+            >
+              <Switch>
+                {routes.map(route => (
+                  <Route
+                    exact
+                    key={route.path}
+                    path={route.path}
+                    component={route.component}
+                  />
+                ))}
+              </Switch>
+            </MethodologyContextProvider>
 
             <PreviousNextLinks
               previousSection={previousSection}

@@ -1,20 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import _methodologyService, {
-  BasicMethodology,
-} from '@admin/services/methodologyService';
+import { BasicMethodology } from '@admin/services/methodologyService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
+import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import {
   MethodologyRouteParams,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import { Route } from 'react-router-dom';
-
-jest.mock('@admin/services/methodologyService');
-const methodologyService = _methodologyService as jest.Mocked<
-  typeof _methodologyService
->;
 
 const testMethodology: BasicMethodology = {
   id: 'm1',
@@ -22,6 +16,16 @@ const testMethodology: BasicMethodology = {
   title: 'Test methodology',
   slug: 'test-methodology',
   status: 'Draft',
+  otherPublications: [
+    {
+      id: 'op1',
+      title: 'Other publication title 1',
+    },
+    {
+      id: 'op2',
+      title: 'Other publication title 2',
+    },
+  ],
   owningPublication: {
     id: 'p1',
     title: 'Publication title',
@@ -31,8 +35,6 @@ const testMethodology: BasicMethodology = {
 
 describe('MethodologySummaryPage', () => {
   test('renders methodology summary page correctly', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
-
     renderPage();
 
     await waitFor(() => {
@@ -60,20 +62,6 @@ describe('MethodologySummaryPage', () => {
   });
 
   test('renders other publications list correctly', async () => {
-    methodologyService.getMethodology.mockResolvedValue({
-      ...testMethodology,
-      otherPublications: [
-        {
-          id: 'op1',
-          title: 'Other publication title 1',
-        },
-        {
-          id: 'op2',
-          title: 'Other publication title 2',
-        },
-      ],
-    });
-
     renderPage();
 
     await waitFor(() => {
@@ -104,10 +92,12 @@ describe('MethodologySummaryPage', () => {
           }),
         ]}
       >
-        <Route
-          path={methodologySummaryRoute.path}
-          component={MethodologySummaryPage}
-        />
+        <MethodologyContextProvider methodology={testMethodology}>
+          <Route
+            path={methodologySummaryRoute.path}
+            component={MethodologySummaryPage}
+          />
+        </MethodologyContextProvider>
       </MemoryRouter>,
     );
   }

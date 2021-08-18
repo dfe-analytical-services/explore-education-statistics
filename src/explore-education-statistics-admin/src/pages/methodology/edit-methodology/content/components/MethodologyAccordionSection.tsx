@@ -6,10 +6,10 @@ import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { memo, useCallback, useEffect, useState } from 'react';
 import MethodologyBlock from '@admin/pages/methodology/components/MethodologyBlock';
-import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
-import useMethodologyActions from '../context/useMethodologyActions';
+import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
+import useMethodologyContentActions from '@admin/pages/methodology/edit-methodology/content/context/useMethodologyContentActions';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 interface MethodologyAccordionSectionProps {
   id: string;
@@ -33,7 +33,7 @@ const MethodologyAccordionSection = ({
     updateSectionBlockOrder,
     updateContentSectionHeading,
     removeContentSection,
-  } = useMethodologyActions();
+  } = useMethodologyContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableContentBlock[]>(sectionContent);
