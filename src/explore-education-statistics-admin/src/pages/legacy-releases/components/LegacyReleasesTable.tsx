@@ -1,61 +1,47 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import Page from '@admin/components/Page';
-import usePublicationContext from '@admin/contexts/PublicationContext';
 import {
   legacyReleaseCreateRoute,
   legacyReleaseEditRoute,
 } from '@admin/routes/legacyReleaseRoutes';
-import { dashboardRoute, PublicationRouteParams } from '@admin/routes/routes';
+import { PublicationRouteParams } from '@admin/routes/routes';
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import publicationService from '@admin/services/publicationService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import reorder from '@common/utils/reorder';
+import styles from '@admin/pages/legacy-releases/components/LegacyReleasesTable.module.scss';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { generatePath } from 'react-router';
-import styles from './LegacyReleasesPage.module.scss';
 
-const LegacyReleasesPage = () => {
-  const {
-    value: publication,
-    setState: setPublication,
-    isLoading,
-    retry: reloadPublication,
-  } = usePublicationContext();
-
+interface Props {
+  publication: BasicPublicationDetails;
+}
+const LegacyReleasesTable = ({ publication }: Props) => {
   const [isReordering, toggleReordering] = useToggle(false);
   const [deleteLegacyRelease, setDeleteLegacyRelease] = useState<
     LegacyRelease
   >();
 
-  if (!publication) {
-    return <LoadingSpinner loading={isLoading} />;
-  }
+  const [legacyReleases, setLegacyReleases] = useState<LegacyRelease[]>(
+    publication.legacyReleases,
+  );
 
   return (
-    <Page
-      title="Legacy releases"
-      caption={publication.title}
-      breadcrumbs={[{ name: 'Legacy releases' }]}
-      backLink={appendQuery(dashboardRoute.path, {
-        themeId: publication.themeId,
-        topicId: publication.topicId,
-      })}
-    >
+    <>
       <p>
         Legacy releases will be displayed in descending order on the
         publication.
       </p>
 
-      {publication.legacyReleases.length > 0 ? (
+      {legacyReleases.length > 0 ? (
         <DragDropContext
           onDragEnd={result => {
             if (!result.destination) {
@@ -63,21 +49,14 @@ const LegacyReleasesPage = () => {
             }
 
             const nextLegacyReleases = reorder(
-              publication.legacyReleases,
+              legacyReleases,
               result.source.index,
               result.destination.index,
             ).map((release, index) => ({
               ...release,
-              order: publication.legacyReleases.length - index,
+              order: legacyReleases.length - index,
             }));
-
-            setPublication({
-              isLoading: false,
-              value: {
-                ...publication,
-                legacyReleases: nextLegacyReleases,
-              },
-            });
+            setLegacyReleases(nextLegacyReleases);
           }}
         >
           <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
@@ -100,7 +79,7 @@ const LegacyReleasesPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {publication.legacyReleases.map((release, index) => (
+                  {legacyReleases.map((release, index) => (
                     <Draggable
                       draggableId={release.id}
                       isDragDisabled={!isReordering}
@@ -145,7 +124,7 @@ const LegacyReleasesPage = () => {
 
                           {!isReordering && (
                             <td>
-                              <ButtonGroup>
+                              <ButtonGroup className="govuk-!-margin-bottom-0">
                                 <ButtonLink
                                   to={generatePath(
                                     legacyReleaseEditRoute.path,
@@ -191,7 +170,10 @@ const LegacyReleasesPage = () => {
               deleteLegacyRelease?.id,
             );
 
-            await reloadPublication();
+            const nextLegacyReleases = legacyReleases.filter(
+              release => release.id !== deleteLegacyRelease.id,
+            );
+            setLegacyReleases(nextLegacyReleases);
           }
 
           setDeleteLegacyRelease(undefined);
@@ -215,7 +197,7 @@ const LegacyReleasesPage = () => {
             Create legacy release
           </ButtonLink>
 
-          {publication.legacyReleases.length > 0 && (
+          {legacyReleases.length > 0 && (
             <Button variant="secondary" onClick={toggleReordering.on}>
               Reorder legacy releases
             </Button>
@@ -227,7 +209,7 @@ const LegacyReleasesPage = () => {
             onClick={async () => {
               await publicationService.partialUpdateLegacyReleases(
                 publication.id,
-                publication.legacyReleases.map(release => ({
+                legacyReleases.map(release => ({
                   id: release.id,
                   order: release.order,
                 })),
@@ -238,13 +220,19 @@ const LegacyReleasesPage = () => {
           >
             Confirm order
           </Button>
-          <Button variant="secondary" onClick={toggleReordering.off}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setLegacyReleases(publication.legacyReleases);
+              toggleReordering.off();
+            }}
+          >
             Cancel reordering
           </Button>
         </ButtonGroup>
       )}
-    </Page>
+    </>
   );
 };
 
-export default LegacyReleasesPage;
+export default LegacyReleasesTable;
