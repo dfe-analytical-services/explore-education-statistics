@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -32,11 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(
+            Guid releaseId,
             IFormFile dataFile,
-            IFormFile metaFile)
+            IFormFile metaFile,
+            File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName)
+            return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName, replacingFile)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
                 .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
@@ -45,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             IDataArchiveFile archiveFile)
         {
-            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName)
+            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName, null)
                 .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
@@ -120,7 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 && rf.File.Type == type);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(Guid releaseId, string dataFileName, string metaFileName)
+        private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(
+            Guid releaseId, 
+            string dataFileName, 
+            string metaFileName,
+            File? replacingFile)
         {
             if (string.Equals(dataFileName.ToLower(), metaFileName.ToLower(), OrdinalIgnoreCase))
             {
@@ -152,14 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, FileType.Data, dataFileName))
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName) && replacingFile?.Filename != dataFileName)
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
-            }
-
-            if (IsFileExisting(releaseId, Metadata, metaFileName))
-            {
-                return ValidationActionResult(CannotOverwriteMetadataFile);
             }
 
             return Unit.Instance;

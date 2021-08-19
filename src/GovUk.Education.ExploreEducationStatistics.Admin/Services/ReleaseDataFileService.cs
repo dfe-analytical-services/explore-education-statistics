@@ -203,73 +203,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccess(async replacingFile =>
+                    return await _persistenceHelper
+                        .CheckOptionalEntityExists<File>(replacingFileId)
+                        .OnSuccessDo(replacingFile => _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFormFile, metaFormFile, replacingFile))
+                        // First, create with status uploading to prevent other users uploading the same datafile
+                        .OnSuccessCombineWith(replacingFile => ValidateSubjectName(releaseId, subjectName, replacingFile))
+                        .OnSuccess(async replacingFileAndSubjectName =>
                         {
-                            return await ValidateSubjectName(releaseId, subjectName, replacingFile)
-                                .OnSuccess(validSubjectName => _fileUploadsValidatorService
-                                    .ValidateDataFilesForUpload(releaseId, dataFormFile, metaFormFile)
-                                    // First, create with status uploading to prevent other users uploading the same datafile
-                                    .OnSuccess(async () =>
-                                    {
-                                        var subjectId =
-                                            await _releaseRepository
-                                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
+                            var (replacingFile, validSubjectName) = replacingFileAndSubjectName;
+                            
+                            var subjectId =
+                                await _releaseRepository
+                                    .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
 
-                                        var dataFile = await _releaseDataFileRepository.Create(
-                                            releaseId: releaseId,
-                                            subjectId: subjectId,
-                                            filename: dataFormFile.FileName.ToLower(),
-                                            type: FileType.Data,
-                                            createdById: _userService.GetUserId(),
-                                            name: validSubjectName,
-                                            replacingFile: replacingFile);
+                            var dataFile = await _releaseDataFileRepository.Create(
+                                releaseId: releaseId,
+                                subjectId: subjectId,
+                                filename: dataFormFile.FileName.ToLower(),
+                                type: FileType.Data,
+                                createdById: _userService.GetUserId(),
+                                name: validSubjectName,
+                                replacingFile: replacingFile);
 
-                                        var metaFile = await _releaseDataFileRepository.Create(
-                                            releaseId: releaseId,
-                                            subjectId: subjectId,
-                                            filename: metaFormFile.FileName.ToLower(),
-                                            type: Metadata,
-                                            createdById: _userService.GetUserId());
+                            var metaFile = await _releaseDataFileRepository.Create(
+                                releaseId: releaseId,
+                                subjectId: subjectId,
+                                filename: metaFormFile.FileName.ToLower(),
+                                type: Metadata,
+                                createdById: _userService.GetUserId());
 
-                                        var dataInfo = GetDataFileMetaValues(
-                                            metaFileName: metaFile.Filename,
-                                            numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
-                                        );
+                            var dataInfo = GetDataFileMetaValues(
+                                metaFileName: metaFile.Filename,
+                                numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
+                            );
 
-                                        await UploadFileToStorage(dataFile, dataFormFile, dataInfo);
-                                        await UploadFileToStorage(metaFile, metaFormFile);
+                            await UploadFileToStorage(dataFile, dataFormFile, dataInfo);
+                            await UploadFileToStorage(metaFile, metaFormFile);
 
-                                        await _dataImportService.Import(
-                                            subjectId: subjectId,
-                                            dataFile: dataFile,
-                                            metaFile: metaFile,
-                                            formFile: dataFormFile);
+                            await _dataImportService.Import(
+                                subjectId: subjectId,
+                                dataFile: dataFile,
+                                metaFile: metaFile,
+                                formFile: dataFormFile);
 
-                                        var blob = await _blobStorageService.GetBlob(
-                                            PrivateReleaseFiles,
-                                            dataFile.Path()
-                                        );
+                            var blob = await _blobStorageService.GetBlob(
+                                PrivateReleaseFiles,
+                                dataFile.Path()
+                            );
 
-                                        await _contentDbContext.Entry(dataFile)
-                                            .Reference(f => f.CreatedBy)
-                                            .LoadAsync();
+                            await _contentDbContext.Entry(dataFile)
+                                .Reference(f => f.CreatedBy)
+                                .LoadAsync();
 
-                                        return new DataFileInfo
-                                        {
-                                            Id = dataFile.Id,
-                                            FileName = dataFile.Filename,
-                                            Name = validSubjectName,
-                                            Size = blob.Size,
-                                            MetaFileId = metaFile.Id,
-                                            MetaFileName = metaFile.Filename,
-                                            Rows = blob.GetNumberOfRows(),
-                                            UserName = dataFile.CreatedBy.Email,
-                                            Status = DataImportStatus.QUEUED,
-                                            Created = dataFile.Created,
-                                            Permissions = await _userService.GetDataFilePermissions(dataFile)
-                                        };
-                                    }));
+                            return new DataFileInfo
+                            {
+                                Id = dataFile.Id,
+                                FileName = dataFile.Filename,
+                                Name = validSubjectName,
+                                Size = blob.Size,
+                                MetaFileId = metaFile.Id,
+                                MetaFileName = metaFile.Filename,
+                                Rows = blob.GetNumberOfRows(),
+                                UserName = dataFile.CreatedBy.Email,
+                                Status = DataImportStatus.QUEUED,
+                                Created = dataFile.Created,
+                                Permissions = await _userService.GetDataFilePermissions(dataFile)
+                            };
                         });
                 });
         }
