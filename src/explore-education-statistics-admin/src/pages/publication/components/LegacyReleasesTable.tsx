@@ -15,7 +15,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import reorder from '@common/utils/reorder';
-import styles from '@admin/pages/legacy-releases/components/LegacyReleasesTable.module.scss';
+import styles from '@admin/pages/publication/components/LegacyReleasesTable.module.scss';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';

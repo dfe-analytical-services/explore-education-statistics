@@ -10,7 +10,7 @@ import publicationService from '@admin/services/publicationService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import LegacyReleasesTable from '@admin/pages/legacy-releases/components/LegacyReleasesTable';
+import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps, useHistory } from 'react-router';
