@@ -67,7 +67,6 @@ const MethodologyStatusPage = () => {
         title: currentMethodology.title,
         withReleaseId:
           publishingStrategy === 'WithRelease' ? withReleaseId : undefined,
-
       },
     );
 
