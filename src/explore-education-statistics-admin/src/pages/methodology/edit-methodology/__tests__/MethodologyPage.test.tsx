@@ -65,7 +65,9 @@ describe('MethodologyPage', () => {
       expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
         'Edit methodology',
       );
-      expect(screen.getByText('Test methodology')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Test methodology' }),
+      ).toBeInTheDocument();
 
       expect(
         screen.getByRole('navigation', { name: 'Methodology' }),

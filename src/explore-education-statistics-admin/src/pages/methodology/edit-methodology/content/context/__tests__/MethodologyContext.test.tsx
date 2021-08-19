@@ -4,8 +4,8 @@ import { produce } from 'immer';
 import {
   MethodologyContextState,
   methodologyReducer as originalMethodologyReducer,
-} from '../MethodologyContext';
-import { MethodologyDispatchAction } from '../MethodologyContextActionTypes';
+} from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
+import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 
 const basicMethodology: MethodologyContent = {
   id: 'methodology-0',

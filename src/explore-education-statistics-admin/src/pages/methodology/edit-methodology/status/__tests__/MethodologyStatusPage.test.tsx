@@ -6,6 +6,7 @@ import _methodologyService, {
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
+import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import {
   MethodologyRouteParams,
   methodologyStatusRoute,
@@ -50,15 +51,14 @@ describe('MethodologyStatusPage', () => {
   };
 
   test('renders Draft status details', async () => {
-    methodologyService.getMethodology.mockResolvedValue({
+    permissionService.canApproveMethodology.mockResolvedValue(false);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage({
       ...testMethodology,
       status: 'Draft',
       publishingStrategy: 'WithRelease',
     });
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
-
-    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -76,15 +76,14 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Approved details for publishing immediatately', async () => {
-    methodologyService.getMethodology.mockResolvedValue({
+    permissionService.canApproveMethodology.mockResolvedValue(false);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage({
       ...testMethodology,
       status: 'Approved',
       publishingStrategy: 'Immediately',
     });
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
-
-    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -108,7 +107,10 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Approved details for publishing with release', async () => {
-    methodologyService.getMethodology.mockResolvedValue({
+    permissionService.canApproveMethodology.mockResolvedValue(false);
+    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+
+    renderPage({
       ...testMethodology,
       status: 'Approved',
       publishingStrategy: 'WithRelease',
@@ -117,10 +119,6 @@ describe('MethodologyStatusPage', () => {
         title: 'Dependant Release',
       },
     });
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
-
-    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -147,11 +145,10 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can approve methodology', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
     permissionService.canApproveMethodology.mockResolvedValue(true);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
-    renderPage();
+    renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -163,11 +160,10 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can mark methodology as draft', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
     permissionService.canApproveMethodology.mockResolvedValue(false);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(true);
 
-    renderPage();
+    renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -179,12 +175,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders status form when Edit button is clicked', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
     permissionService.canApproveMethodology.mockResolvedValue(true);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
-    renderPage();
+    renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -205,12 +200,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders the owning publication', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
     permissionService.canApproveMethodology.mockResolvedValue(true);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
-    renderPage();
+    renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -225,14 +219,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders the other publications', async () => {
-    methodologyService.getMethodology.mockResolvedValue(
-      testMethodologyWithOtherPublications,
-    );
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
     permissionService.canApproveMethodology.mockResolvedValue(true);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
-    renderPage();
+    renderPage(testMethodologyWithOtherPublications);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -250,12 +241,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('does not render the other publications section if there are none', async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
     permissionService.canApproveMethodology.mockResolvedValue(true);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
-    renderPage();
+    renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -269,7 +259,7 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
-  function renderPage() {
+  function renderPage(methodology: BasicMethodology) {
     render(
       <MemoryRouter
         initialEntries={[
@@ -278,10 +268,12 @@ describe('MethodologyStatusPage', () => {
           }),
         ]}
       >
-        <Route
-          path={methodologyStatusRoute.path}
-          component={MethodologyStatusPage}
-        />
+        <MethodologyContextProvider methodology={methodology}>
+          <Route
+            path={methodologyStatusRoute.path}
+            component={MethodologyStatusPage}
+          />
+        </MethodologyContextProvider>
       </MemoryRouter>,
     );
   }

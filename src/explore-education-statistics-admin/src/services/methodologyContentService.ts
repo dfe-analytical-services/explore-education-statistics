@@ -1,4 +1,4 @@
-import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContextActionTypes';
+import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 import { MethodologyStatus } from '@admin/services/methodologyService';
 import {
   ContentBlockPostModel,
