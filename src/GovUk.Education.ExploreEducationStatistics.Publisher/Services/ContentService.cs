@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
@@ -129,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
             await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
@@ -138,6 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
             await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
