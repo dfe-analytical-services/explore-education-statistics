@@ -109,17 +109,16 @@ const ChartAxisConfiguration = ({
     if (canGroupByFilters) {
       // EES-2467 remove this check when BE done.
       if (showGroupByFilter) {
-        const categories: SelectOption[] = Object.keys(meta.filters)
-          .filter(filter => {
-            return meta.filters[filter].options.length > 1;
-          })
-          .map(filter => {
+        const categories: SelectOption[] = Object.entries(meta.filters)
+          .filter(([, value]) => value.options.length > 1)
+          .map(([key, value]) => {
             return {
-              label: filter,
-              value: meta.filters[filter].name,
+              label: key,
+              value: value.name,
             };
           });
-        categories.push({ label: 'All filters', value: '' });
+
+        categories.unshift({ label: 'All filters', value: '' });
 
         options.push({
           label: 'Filters',
@@ -129,6 +128,7 @@ const ChartAxisConfiguration = ({
               label="Select a filter"
               name="groupByFilter"
               options={categories}
+              order={[]}
             />
           ),
         });
@@ -388,14 +388,12 @@ const ChartAxisConfiguration = ({
                 )}
 
                 {validationSchema.fields.groupBy && (
-                  <>
-                    <FormFieldRadioGroup<AxisConfiguration>
-                      legend="Group data by"
-                      legendSize="s"
-                      name="groupBy"
-                      options={groupByOptions}
-                    />
-                  </>
+                  <FormFieldRadioGroup<AxisConfiguration>
+                    legend="Group data by"
+                    legendSize="s"
+                    name="groupBy"
+                    options={groupByOptions}
+                  />
                 )}
 
                 <FormFieldset id="labels" legend="Labels" legendSize="s">

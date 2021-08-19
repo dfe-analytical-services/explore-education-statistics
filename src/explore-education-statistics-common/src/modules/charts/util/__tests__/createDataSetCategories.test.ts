@@ -3,6 +3,7 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
+import produce from 'immer';
 
 describe('createDataSetCategories', () => {
   const testTable: TableDataResponse = {
@@ -1064,29 +1065,15 @@ describe('createDataSetCategories', () => {
       min: 0,
     };
 
-    const fullTable = mapFullTable({
-      ...testTable,
-      subjectMeta: {
-        ...testTable.subjectMeta,
-        filters: {
-          ...testTable.subjectMeta.filters,
-          SchoolType: {
-            ...testTable.subjectMeta.filters.SchoolType,
-            options: {
-              Default: {
-                ...testTable.subjectMeta.filters.SchoolType.options.Default,
-                options: [
-                  {
-                    label: 'State-funded primary',
-                    value: 'state-funded-primary',
-                  },
-                ],
-              },
-            },
-          },
+    const updatedTestTable = produce(testTable, draft => {
+      draft.subjectMeta.filters.SchoolType.options.Default.options = [
+        {
+          label: 'State-funded primary',
+          value: 'state-funded-primary',
         },
-      },
-    } as TableDataResponse);
+      ];
+    });
+    const fullTable = mapFullTable(updatedTestTable);
 
     const dataSetCategories = createDataSetCategories(
       axisConfiguration,
@@ -1117,43 +1104,21 @@ describe('createDataSetCategories', () => {
       min: 0,
     };
 
-    const fullTable = mapFullTable({
-      ...testTable,
-      subjectMeta: {
-        ...testTable.subjectMeta,
-        filters: {
-          Characteristic: {
-            ...testTable.subjectMeta.filters.Characteristic,
-            options: {
-              EthnicGroupMajor: {
-                ...testTable.subjectMeta.filters.Characteristic.options
-                  .EthnicGroupMajor,
-                options: [
-                  {
-                    label: 'Ethnicity Major Chinese',
-                    value: 'ethnicity-major-chinese',
-                  },
-                ],
-              },
-            },
-          },
-          SchoolType: {
-            ...testTable.subjectMeta.filters.SchoolType,
-            options: {
-              Default: {
-                ...testTable.subjectMeta.filters.SchoolType.options.Default,
-                options: [
-                  {
-                    label: 'State-funded primary',
-                    value: 'state-funded-primary',
-                  },
-                ],
-              },
-            },
-          },
+    const updatedTestTable = produce(testTable, draft => {
+      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options = [
+        {
+          label: 'Ethnicity Major Chinese',
+          value: 'ethnicity-major-chinese',
         },
-      },
-    } as TableDataResponse);
+      ];
+      draft.subjectMeta.filters.SchoolType.options.Default.options = [
+        {
+          label: 'State-funded primary',
+          value: 'state-funded-primary',
+        },
+      ];
+    });
+    const fullTable = mapFullTable(updatedTestTable);
 
     const dataSetCategories = createDataSetCategories(
       axisConfiguration,
@@ -1277,7 +1242,7 @@ describe('createDataSetCategories', () => {
           timePeriod: '2015_AY',
         },
       ],
-    } as TableDataResponse);
+    });
 
     const dataSetCategories = createDataSetCategories(
       axisConfiguration,
@@ -1339,51 +1304,29 @@ describe('createDataSetCategories', () => {
       min: 0,
     };
 
-    const fullTable = mapFullTable({
-      ...testTable,
-      subjectMeta: {
-        ...testTable.subjectMeta,
-        filters: {
-          Characteristic: {
-            ...testTable.subjectMeta.filters.Characteristic,
-            options: {
-              EthnicGroupMajor: {
-                ...testTable.subjectMeta.filters.Characteristic.options
-                  .EthnicGroupMajor,
-                options: [
-                  {
-                    label: 'Ethnicity Major Chinese',
-                    value: 'ethnicity-major-chinese',
-                  },
-                  {
-                    label: 'Ethnicity another',
-                    value: 'ethnicity-another',
-                  },
-                ],
-              },
-            },
-          },
-          SchoolType: {
-            ...testTable.subjectMeta.filters.SchoolType,
-            options: {
-              Default: {
-                ...testTable.subjectMeta.filters.SchoolType.options.Default,
-                options: [
-                  {
-                    label: 'State-funded primary',
-                    value: 'state-funded-primary',
-                  },
-                  {
-                    label: 'State-funded secondary',
-                    value: 'state-funded-secondary',
-                  },
-                ],
-              },
-            },
-          },
+    const updatedTestTable = produce(testTable, draft => {
+      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options = [
+        {
+          label: 'Ethnicity Major Chinese',
+          value: 'ethnicity-major-chinese',
         },
-      },
-    } as TableDataResponse);
+        {
+          label: 'Ethnicity another',
+          value: 'ethnicity-another',
+        },
+      ];
+      draft.subjectMeta.filters.SchoolType.options.Default.options = [
+        {
+          label: 'State-funded primary',
+          value: 'state-funded-primary',
+        },
+        {
+          label: 'State-funded secondary',
+          value: 'state-funded-secondary',
+        },
+      ];
+    });
+    const fullTable = mapFullTable(updatedTestTable);
 
     const dataSetCategories = createDataSetCategories(
       axisConfiguration,
