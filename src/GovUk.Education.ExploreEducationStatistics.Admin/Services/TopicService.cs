@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
      */
     public class TopicService : ITopicService
     {
-        private static readonly VersionedEntityDeletionOrderComparer VersionedEntityComparer = 
+        private static readonly VersionedEntityDeletionOrderComparer VersionedEntityComparer =
             new VersionedEntityDeletionOrderComparer();
 
         private readonly ContentDbContext _contentContext;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseSubjectRepository releaseSubjectRepository,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
-            IPublishingService publishingService, 
+            IPublishingService publishingService,
             IMethodologyService methodologyService)
         {
             _contentContext = contentContext;
@@ -171,6 +172,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var publicationIdsToDelete = topic.Publications.Select(p => p.Id);
 
+                    var methodologiesToDelete = _contentContext
+                        .PublicationMethodologies
+                        .Include(pm => pm.MethodologyParent)
+                        .ThenInclude(pm => pm.Versions)
+                        .Where(pm => publicationIdsToDelete.Contains(pm.PublicationId))
+                        .SelectMany(pm => pm.MethodologyParent.Versions)
+                        .ToList()
+                        .OrderBy(m => new IdAndPreviousVersionIdPair(m.Id, m.PreviousVersionId),
+                            VersionedEntityComparer);
+
+                    await methodologiesToDelete.ForEachAsync(methodology =>
+                        _methodologyService.DeleteMethodology(methodology.Id, forceDelete: true));
+
                     var releaseIdsToDelete = _statisticsContext
                         .Release
                         .Where(r => publicationIdsToDelete.Contains(r.PublicationId))
@@ -184,12 +198,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true);
                         await _releaseFileService.DeleteAll(releaseId, forceDelete: true);
                         await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseId);
-                        
+
                         var statsRelease = await _statisticsContext
                             .Release
                             .Where(r => r.Id == releaseId)
                             .SingleAsync();
-                        
+
                         var contentRelease = await _contentContext
                             .Releases
                             .Where(r => r.Id == releaseId)
@@ -201,20 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentContext.SaveChangesAsync();
                     await _statisticsContext.SaveChangesAsync();
-                    
-                    var methodologiesToDelete = _contentContext
-                        .PublicationMethodologies
-                        .Include(pm => pm.MethodologyParent)
-                        .ThenInclude(pm => pm.Versions)
-                        .Where(pm => publicationIdsToDelete.Contains(pm.PublicationId))
-                        .SelectMany(pm => pm.MethodologyParent.Versions)
-                        .ToList()
-                        .OrderBy(m => new IdAndPreviousVersionIdPair(m.Id, m.PreviousVersionId),
-                            VersionedEntityComparer);
 
-                    await methodologiesToDelete.ForEachAsync(methodology => 
-                        _methodologyService.DeleteMethodology(methodology.Id, forceDelete: true));
-                    
                     _contentContext.Topics.Remove(
                         await _contentContext
                             .Topics
@@ -223,7 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     );
 
                     await _contentContext.SaveChangesAsync();
-                    await _statisticsContext.SaveChangesAsync();
 
                     await _publishingService.TaxonomyChanged();
                 });
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return new ForbidResult();
             }
-                        
+
             // For now we only want to delete test topics as we
             // don't really have a mechanism to clean things up
             // properly across the entire application.
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return values.Include(p => p.Publications);
         }
-        
+
         /// <summary>
         /// An IComparer implementation that orders entities based upon having previous versions.  This IComparer will
         /// order the entities so that entities that have no previous versions will appear at the end of the list,
@@ -260,13 +260,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// </summary>
         public class VersionedEntityDeletionOrderComparer : IComparer<IdAndPreviousVersionIdPair>
         {
-            public int Compare(IdAndPreviousVersionIdPair entity1Ids, IdAndPreviousVersionIdPair entity2Ids)
+            public int Compare(IdAndPreviousVersionIdPair? entity1Ids, IdAndPreviousVersionIdPair? entity2Ids)
             {
                 if (entity1Ids == null)
                 {
                     return 1;
                 }
-                
+
                 if (entity2Ids == null)
                 {
                     return -1;
@@ -276,12 +276,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return 1;
                 }
-                
+
                 if (entity2Ids.PreviousVersionId == null)
                 {
                     return -1;
                 }
-                
+
                 if (entity1Ids.PreviousVersionId == entity2Ids.Id)
                 {
                     return -1;
