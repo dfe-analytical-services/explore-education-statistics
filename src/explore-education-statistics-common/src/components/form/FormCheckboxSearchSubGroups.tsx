@@ -20,19 +20,22 @@ import React, {
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormTextSearchInput from './FormTextSearchInput';
 
+interface OptionGroup {
+  id?: string;
+  legend: string;
+  options: CheckboxOption[];
+}
+
 export interface FormCheckboxSearchSubGroupsProps
   extends OmitStrict<
     FormCheckboxGroupProps,
     'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
   > {
-  options: {
-    id?: string;
-    legend: string;
-    options: CheckboxOption[];
-  }[];
+  options: OptionGroup[];
   onAllChange?: (
     event: MouseEvent<HTMLButtonElement>,
     checked: boolean,
+    options: OptionGroup[],
   ) => void;
   onSubGroupAllChange?: (
     event: CheckboxGroupAllChangeEvent,
@@ -78,28 +81,6 @@ const FormCheckboxSearchSubGroups = ({
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  const totalOptions = useMemo(
-    () => options.reduce((acc, group) => acc + group.options.length, 0),
-    [options],
-  );
-
-  const isAllChecked = useMemo(
-    () =>
-      options.every(group =>
-        group.options.every(option => value.includes(option.value)),
-      ),
-    [options, value],
-  );
-
-  const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> = useCallback(
-    event => {
-      if (onAllChange) {
-        onAllChange(event, isAllChecked);
-      }
-    },
-    [isAllChecked, onAllChange],
-  );
-
   let filteredOptions = options;
 
   if (searchTerm) {
@@ -123,6 +104,33 @@ const FormCheckboxSearchSubGroups = ({
       }));
   }
 
+  const totalOptions = useMemo(
+    () => options.reduce((acc, group) => acc + group.options.length, 0),
+    [options],
+  );
+
+  const totalFilteredOptions = useMemo(
+    () => filteredOptions.reduce((acc, group) => acc + group.options.length, 0),
+    [filteredOptions],
+  );
+
+  const isAllChecked = useMemo(
+    () =>
+      filteredOptions.every(group =>
+        group.options.every(option => value.includes(option.value)),
+      ),
+    [filteredOptions, value],
+  );
+
+  const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> = useCallback(
+    event => {
+      if (onAllChange) {
+        onAllChange(event, isAllChecked, filteredOptions);
+      }
+    },
+    [isAllChecked, onAllChange, filteredOptions],
+  );
+
   return (
     <FormFieldset {...fieldsetProps} useFormId={false}>
       {isMounted && (
@@ -136,7 +144,7 @@ const FormCheckboxSearchSubGroups = ({
             >
               {`${
                 isAllChecked ? 'Unselect' : 'Select'
-              } all ${totalOptions} options`}
+              } all ${totalFilteredOptions} options`}
             </ButtonText>
           )}
 
@@ -196,12 +204,16 @@ const FormCheckboxSearchSubGroups = ({
             {...groupProps}
             name={name}
             id={options[0].id ? options[0].id : `${id}-1`}
-            options={options[0].options}
+            options={
+              filteredOptions.length
+                ? filteredOptions[0].options
+                : options[0].options
+            }
             value={value}
             selectAll
             onAllChange={(event, checked) => {
               if (onSubGroupAllChange) {
-                onSubGroupAllChange(event, checked, options[0].options);
+                onSubGroupAllChange(event, checked, filteredOptions[0].options);
               }
             }}
           />

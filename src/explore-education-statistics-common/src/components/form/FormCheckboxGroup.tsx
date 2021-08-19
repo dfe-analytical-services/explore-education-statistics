@@ -32,6 +32,7 @@ export type CheckboxGroupAllChangeEvent = MouseEvent<HTMLButtonElement>;
 export type CheckboxGroupAllChangeEventHandler = (
   event: CheckboxGroupAllChangeEvent,
   checked: boolean,
+  filteredOptions: CheckboxOption[],
 ) => void;
 
 interface BaseFormCheckboxGroupProps {
@@ -94,10 +95,10 @@ export const BaseFormCheckboxGroup = ({
   const handleAllChange: MouseEventHandler<HTMLButtonElement> = useCallback(
     event => {
       if (onAllChange) {
-        onAllChange(event, isAllChecked);
+        onAllChange(event, isAllChecked, options);
       }
     },
-    [isAllChecked, onAllChange],
+    [isAllChecked, onAllChange, options],
   );
 
   return (
