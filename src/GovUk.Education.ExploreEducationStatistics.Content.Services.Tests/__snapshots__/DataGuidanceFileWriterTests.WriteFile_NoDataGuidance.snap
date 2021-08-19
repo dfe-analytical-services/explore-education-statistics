@@ -1,0 +1,20 @@
+﻿Test publication
+2020 Reporting Year
+
+Data files
+
+Test data 1
+
+Filename: test-1.csv
+Geographic levels: Local Authority; National; Regional
+Time period: 2018 to 2020
+Content summary: Local authority level data on care leavers aged 17 to 21, by accommodation type (as measured on or around their birthday).
+
+Variable names and descriptions for this file are provided below:
+
+Variable name          |  Variable description
+---------------------  |  -------------------------------------------
+accommodation_type     |  Accommodation type
+age_end                |  Age at end
+number_of_leavers      |  Number of leavers
+percentage_of_leavers  |  Percentage of leavers by accommodation type

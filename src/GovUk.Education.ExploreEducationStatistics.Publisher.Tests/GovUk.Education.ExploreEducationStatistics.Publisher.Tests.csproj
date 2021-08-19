@@ -22,8 +22,4 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher\GovUk.Education.ExploreEducationStatistics.Publisher.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\__snapshots__" />
-    </ItemGroup>
-
 </Project>

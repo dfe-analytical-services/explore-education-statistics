@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
     {
         Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
             Guid releaseId,
-            List<Guid>? subjectIds = null);
+            IEnumerable<Guid>? subjectIds = null);
 
         Task<TimePeriodLabels> GetTimePeriods(Guid subjectId);
 

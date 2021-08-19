@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
             Guid releaseId,
-            List<Guid>? subjectIds = null)
+            IEnumerable<Guid>? subjectIds = null)
         {
             return await _statisticsPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
