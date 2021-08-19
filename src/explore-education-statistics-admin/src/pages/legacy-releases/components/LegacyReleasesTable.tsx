@@ -30,7 +30,7 @@ const LegacyReleasesTable = ({ publication }: Props) => {
     LegacyRelease
   >();
 
-  const [legacyReleases, setLegacyReleases] = useState<LegacyRelease[]>(
+  const [legacyReleases, setLegacyReleases] = useState(
     publication.legacyReleases,
   );
 
