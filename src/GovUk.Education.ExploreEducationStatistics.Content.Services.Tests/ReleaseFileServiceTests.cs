@@ -91,14 +91,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.True(result.IsRight);
 
                 Assert.Equal("application/pdf", result.Right.ContentType);
                 Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
                 Assert.Equal("Test blob", result.Right.FileStream.ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -132,10 +132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamFile(Guid.NewGuid(), releaseFile.File.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -160,10 +160,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamFile(release.Id, Guid.NewGuid());
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -209,10 +209,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -255,14 +255,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamAllFilesZip(release.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 Assert.Equal("application/zip", result.Right.ContentType);
                 Assert.Equal("publication-slug_release-slug.zip", result.Right.FileDownloadName);
                 Assert.Equal("Test blob", result.Right.FileStream.ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -311,10 +311,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.StreamAllFilesZip(release.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -411,6 +411,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
@@ -427,8 +429,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
                 Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
         }
 
         [Fact]
@@ -526,6 +526,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
@@ -542,8 +544,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
                 Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
         }
 
         [Fact]
@@ -630,6 +630,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
@@ -645,8 +647,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("ancillary/test-3.pdf", zip.Entries[2].FullName);
                 Assert.Equal("Test 3 blob", zip.Entries[2].Open().ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -731,14 +731,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
 
                 Assert.Empty(zip.Entries);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -807,14 +807,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
 
                 Assert.Empty(zip.Entries);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -880,14 +880,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds,
                     outputStream: stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
 
                 Assert.Empty(zip.Entries);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -924,6 +924,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
                 var result = await service.ZipFilesToStream(release.Id, fileIds, stream);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.True(result.IsRight);
 
                 using var zip = ZipFile.OpenRead(path);
@@ -931,8 +933,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Entries are sorted alphabetically
                 Assert.Empty(zip.Entries);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1012,6 +1012,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     outputStream: stream,
                     cancellationToken: tokenSource.Token);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertRight();
 
                 using var zip = ZipFile.OpenRead(path);
@@ -1021,8 +1023,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("ancillary/ancillary-1.pdf", zip.Entries[0].FullName);
                 Assert.Equal("Test ancillary blob", zip.Entries[0].Open().ReadToEnd());
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1155,6 +1155,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ListDownloadFiles(release);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.Equal(3, result.Count);
                 Assert.Equal("All files", result[0].Name);
                 Assert.Equal("test-publication_2020.zip", result[0].FileName);
@@ -1178,8 +1180,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(FileType.Data, result[2].Type);
                 Assert.Null(result[2].Created);
                 Assert.Null(result[2].UserName);
-
-                MockUtils.VerifyAllMocks(blobStorageService);
             }
         }
 
@@ -1289,6 +1289,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ListDownloadFiles(release);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.Equal(2, result.Count);
                 Assert.Equal("All files", result[0].Name);
                 Assert.Equal("test-publication_2020.zip", result[0].FileName);
@@ -1387,6 +1389,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ListDownloadFiles(release);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.Equal(2, result.Count);
 
                 Assert.Equal("All files", result[0].Name);
@@ -1403,8 +1407,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(FileType.Data, result[1].Type);
                 Assert.Null(result[0].Created);
                 Assert.Null(result[0].UserName);
-
-                MockUtils.VerifyAllMocks(blobStorageService);
             }
         }
 
@@ -1487,6 +1489,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ListDownloadFiles(release);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.Equal(2, result.Count);
 
                 Assert.Equal("All files", result[0].Name);
@@ -1503,8 +1507,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(FileType.Data, result[1].Type);
                 Assert.Null(result[1].Created);
                 Assert.Null(result[1].UserName);
-
-                MockUtils.VerifyAllMocks(blobStorageService);
             }
         }
 
@@ -1540,9 +1542,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.ListDownloadFiles(release);
 
-                Assert.Empty(result);
-
                 MockUtils.VerifyAllMocks(blobStorageService);
+
+                Assert.Empty(result);
             }
         }
 
