@@ -3,7 +3,7 @@ import Page from '@admin/components/Page';
 import usePublicationContext from '@admin/contexts/PublicationContext';
 import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
 import {
-  legacyReleasesRoute,
+  publicationEditRoute,
   PublicationRouteParams,
 } from '@admin/routes/routes';
 import legacyReleaseService from '@admin/services/legacyReleaseService';
@@ -30,7 +30,7 @@ const LegacyReleaseEditPage = ({ match }: RouteComponentProps<Params>) => {
     legacyReleaseService.getLegacyRelease(legacyReleaseId),
   );
 
-  const legacyReleasesPath = generatePath(legacyReleasesRoute.path, {
+  const publicationEditPath = generatePath(publicationEditRoute.path, {
     publicationId,
   });
 
@@ -38,11 +38,11 @@ const LegacyReleaseEditPage = ({ match }: RouteComponentProps<Params>) => {
     <Page
       title="Edit legacy release"
       caption={publication?.title}
-      backLink={legacyReleasesPath}
+      backLink={publicationEditPath}
       breadcrumbs={[
         {
-          name: 'Legacy releases',
-          link: legacyReleasesPath,
+          name: 'Manage publication',
+          link: publicationEditPath,
         },
         { name: 'Edit legacy release' },
       ]}
@@ -56,7 +56,7 @@ const LegacyReleaseEditPage = ({ match }: RouteComponentProps<Params>) => {
               order: legacyRelease.order,
             }}
             cancelButton={
-              <Link unvisited to={legacyReleasesPath}>
+              <Link unvisited to={publicationEditPath}>
                 Cancel
               </Link>
             }
@@ -69,11 +69,7 @@ const LegacyReleaseEditPage = ({ match }: RouteComponentProps<Params>) => {
 
               await reloadPublication();
 
-              history.push(
-                generatePath<PublicationRouteParams>(legacyReleasesRoute.path, {
-                  publicationId,
-                }),
-              );
+              history.push(publicationEditPath);
             }}
           />
         )}

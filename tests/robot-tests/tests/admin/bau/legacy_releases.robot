@@ -19,15 +19,11 @@ Verify new publication
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user waits until page contains button    ${PUBLICATION_NAME}
 
-Go to legacy releases page
+Go to manage publication page
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
     user waits until h1 is visible    Manage publication
-    user clicks element    testid:Legacy releases link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    Legacy releases
-    user waits until page contains title caption    ${PUBLICATION_NAME}
-    user checks page does not contain element    css:table
 
 Create legacy release
     user clicks link    Create legacy release
@@ -37,7 +33,7 @@ Create legacy release
     user clicks button    Save legacy release
 
 Validate created legacy release
-    user waits until h1 is visible    Legacy releases
+    user waits until h1 is visible    Manage publication
     user checks element count is x    css:tbody tr    1
     user checks results table cell contains    1    1    1
     user checks results table cell contains    1    2    Test collection
@@ -52,7 +48,7 @@ Update legacy release
     user clicks button    Save legacy release
 
 Validate updated legacy release
-    user waits until h1 is visible    Legacy releases
+    user waits until h1 is visible    Manage publication
     user checks element count is x    css:tbody tr    1
     # Changing order to 2 should not actually change it to 2
     # as there isn't another release to swap the order with.
@@ -119,4 +115,4 @@ user creates legacy release
     user enters text into element    id:legacyReleaseForm-description    ${description}
     user enters text into element    id:legacyReleaseForm-url    ${url}
     user clicks button    Save legacy release
-    user waits until h1 is visible    Legacy releases
+    user waits until h1 is visible    Manage publication

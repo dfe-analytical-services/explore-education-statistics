@@ -3,22 +3,23 @@ import Page from '@admin/components/Page';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
 import {
   dashboardRoute,
-  legacyReleasesRoute,
   PublicationRouteParams,
   ThemeTopicParams,
 } from '@admin/routes/routes';
 import publicationService from '@admin/services/publicationService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps, useHistory } from 'react-router';
-import RelatedInformation from '@common/components/RelatedInformation';
+import { RouteComponentProps, useHistory } from 'react-router';
 
 const PublicationEditPage = ({
   match,
 }: RouteComponentProps<PublicationRouteParams>) => {
   const { publicationId } = match.params;
+  const { user } = useAuthContext();
 
   const history = useHistory();
 
@@ -94,22 +95,12 @@ const PublicationEditPage = ({
             }}
             confirmOnSubmit
           />
-        </div>
-        <div className="govuk-grid-column-one-quarter">
-          <RelatedInformation heading="Further actions">
-            <ul className="govuk-list">
-              <li>
-                <Link
-                  data-testid={`Legacy releases link for ${publication.title}`}
-                  to={generatePath(legacyReleasesRoute.path, {
-                    publicationId,
-                  })}
-                >
-                  Manage legacy releases
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
+          {user?.permissions.canAccessUserAdministrationPages && (
+            <>
+              <h2>Manage legacy releases</h2>
+              <LegacyReleasesTable publication={publication} />
+            </>
+          )}
         </div>
       </div>
     </Page>
