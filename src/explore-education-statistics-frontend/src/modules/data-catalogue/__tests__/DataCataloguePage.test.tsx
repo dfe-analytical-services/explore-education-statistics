@@ -1,7 +1,8 @@
 import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
 import {
   DownloadTheme,
-  PublicationDownloadSummary,
+  PublicationSummary,
+  Theme,
 } from '@common/services/themeService';
 import { Release } from '@common/services/publicationService';
 import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
@@ -11,7 +12,7 @@ import preloadAll from 'jest-next-dynamic';
 import React from 'react';
 
 describe('DataCataloguePage', () => {
-  const testThemes: DownloadTheme[] = [
+  const testThemes: Theme[] = [
     {
       id: 'theme-1',
       title: 'Pupils and schools',
@@ -35,7 +36,7 @@ describe('DataCataloguePage', () => {
     id: 'publication-1',
     title: 'Test publication',
     slug: 'test-publication',
-  } as PublicationDownloadSummary;
+  } as PublicationSummary;
 
   const testReleases: Release[] = [
     {

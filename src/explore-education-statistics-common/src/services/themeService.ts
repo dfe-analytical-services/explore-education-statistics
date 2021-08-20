@@ -13,6 +13,9 @@ export interface PublicationSummary extends BasePublicationSummary {
   legacyPublicationUrl?: string;
 }
 
+/**
+ * @deprecated
+ */
 export interface PublicationDownloadSummary extends BasePublicationSummary {
   downloadFiles: FileInfo[];
   earliestReleaseTime: string;
@@ -38,12 +41,15 @@ export interface Theme<PublicationNode = PublicationSummary> {
   topics: Topic<PublicationNode>[];
 }
 
+/**
+ * @deprecated
+ */
 export type DownloadTheme = Theme<PublicationDownloadSummary>;
 
 export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
 interface ListThemesOptions {
-  publicationFilter?: 'LatestData';
+  publicationFilter?: 'LatestData' | 'AnyData';
 }
 
 const themeService = {
@@ -52,6 +58,9 @@ const themeService = {
       params: { publicationFilter },
     });
   },
+  /**
+   * @deprecated
+   */
   getDownloadThemes(): Promise<DownloadTheme[]> {
     return contentApi.get('/download-themes');
   },

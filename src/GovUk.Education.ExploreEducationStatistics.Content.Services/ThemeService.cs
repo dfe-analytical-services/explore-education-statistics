@@ -86,10 +86,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             switch (filter)
             {
+                case PublicationTreeFilter.AnyData:
+                    return await publication.Releases
+                        .ToAsyncEnumerable()
+                        .AnyAwaitAsync(async release => release.IsLatestPublishedVersionOfRelease()
+                                                        && await HasAnyDataFiles(release));
+
                 case PublicationTreeFilter.LatestData:
                     var latestLiveRelease = publication.LatestPublishedRelease();
 
                     return latestLiveRelease != null && await HasAnyDataFiles(latestLiveRelease);
+
                 case null:
                     return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
                            publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
