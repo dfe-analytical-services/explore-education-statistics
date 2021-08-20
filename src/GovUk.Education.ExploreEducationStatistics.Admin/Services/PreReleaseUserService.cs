@@ -140,8 +140,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _context.SaveChangesAsync();
                         }
 
-                        await CreateNewUserReleaseInvite(releaseId, email, isExistingUser);
-                        SendPreReleaseInviteEmail(release, email, existingUser == null);
+                        var releaseIsApproved = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
+
+                        if (releaseIsApproved)
+                        {
+                            SendPreReleaseInviteEmail(release, email, !isExistingUser);
+                        }
+
+                        await CreateNewUserReleaseInvite(releaseId, email, isExistingUser, emailAlreadySent: releaseIsApproved);
 
                         return new PreReleaseUserViewModel
                         {
@@ -187,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email, bool isExistingUser)
+        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email, bool isExistingUser, bool emailAlreadySent)
         {
             var hasExistingInvite = await _context
                 .UserReleaseInvites
@@ -213,6 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Created = UtcNow,
                     CreatedById = _userService.GetUserId(),
                     Accepted = isExistingUser,
+                    EmailSent = emailAlreadySent,
                 }
             );
             await _context.SaveChangesAsync();
