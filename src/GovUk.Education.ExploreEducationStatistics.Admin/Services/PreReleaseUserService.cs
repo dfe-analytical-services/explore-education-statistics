@@ -124,8 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Users
                             .Where(u => u.Email.ToLower() == email.ToLower())
                             .FirstOrDefaultAsync();
+                        var isExistingUser = existingUser != null;
 
-                        if (existingUser != null)
+                        if (isExistingUser)
                         {
                             _context.Add(
                                 new UserReleaseRole
@@ -138,11 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             await _context.SaveChangesAsync();
                         }
-                        else
-                        {
-                            await CreateNewUserReleaseInvite(releaseId, email);
-                        }
 
+                        await CreateNewUserReleaseInvite(releaseId, email, isExistingUser);
                         SendPreReleaseInviteEmail(release, email, existingUser == null);
 
                         return new PreReleaseUserViewModel
@@ -189,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email)
+        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email, bool isExistingUser)
         {
             var hasExistingInvite = await _context
                 .UserReleaseInvites
@@ -213,7 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ReleaseId = releaseId,
                     Role = ReleaseRole.PrereleaseViewer,
                     Created = UtcNow,
-                    CreatedById = _userService.GetUserId()
+                    CreatedById = _userService.GetUserId(),
+                    Accepted = isExistingUser,
                 }
             );
             await _context.SaveChangesAsync();
@@ -236,7 +235,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Role = role,
                         Created = UtcNow,
                         // TODO
-                        CreatedBy = ""
+                        CreatedBy = "",
+                        Accepted = isExistingUser,
                     }
                 );
 

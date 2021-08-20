@@ -335,6 +335,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var identityRole = new IdentityRole
+            {
+                Name = "Prerelease User"
+            };
+
+            await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
+            {
+                userAndRolesDbContext.Add(identityRole);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
@@ -400,6 +411,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, savedUserReleaseRoles[0].ReleaseId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRoles[0].Role);
                 Assert.Equal(user.Id, savedUserReleaseRoles[0].UserId);
+
+                var releaseInvite = await context.UserReleaseInvites
+                    .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
+                    .SingleAsync();
+
+                Assert.Equal("test@test.com", releaseInvite.Email);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
+                Assert.True(releaseInvite.Accepted);
+            }
+
+            await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
+            {
+                var systemInvite = await userAndRolesDbContext.UserInvites
+                    .Where(userInvite => userInvite.Email == "test@test.com")
+                    .SingleAsync();
+
+                Assert.Equal("test@test.com", systemInvite.Email);
+                Assert.Equal(identityRole.Id, systemInvite.RoleId);
+                Assert.True(systemInvite.Accepted);
             }
         }
 
@@ -498,13 +528,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
+                Assert.False(releaseInvite.Accepted);
+            }
 
+            await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
+            {
                 var systemInvite = await userAndRolesDbContext.UserInvites
                     .Where(userInvite => userInvite.Email == "test@test.com")
                     .SingleAsync();
 
                 Assert.Equal("test@test.com", systemInvite.Email);
                 Assert.Equal(identityRole.Id, systemInvite.RoleId);
+                Assert.False(systemInvite.Accepted);
             }
         }
 
