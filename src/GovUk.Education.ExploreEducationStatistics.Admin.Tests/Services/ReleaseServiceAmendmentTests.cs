@@ -646,7 +646,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseSubjectRepository releaseSubjectRepository = null,
             IContentService contentService = null,
             IReleaseChecklistService releaseChecklistService = null,
-            IGuidGenerator guidGenerator = null)
+            IGuidGenerator guidGenerator = null,
+            IPreReleaseUserService preReleaseUserService = null)
         {
             return new ReleaseService(
                 contentDbContext,
@@ -666,7 +667,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                guidGenerator ?? new SequentialGuidGenerator()
+                guidGenerator ?? new SequentialGuidGenerator(),
+                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
             );
         }
     }

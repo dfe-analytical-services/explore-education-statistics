@@ -157,6 +157,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
+        public async Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseId, string email)
+        {
+            if (!new EmailAddressAttribute().IsValid(email))
+            {
+                return ValidationActionResult(InvalidEmailAddress);
+            }
+
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccessVoid(
+                    async () =>
+                    {
+                        _context.RemoveRange(
+                            _context
+                                .UserReleaseRoles
+                                .Include(r => r.User)
+                                .Where(
+                                    r =>
+                                        r.ReleaseId == releaseId
+                                        && r.User.Email.ToLower() == email.ToLower()
+                                        && r.Role == ReleaseRole.PrereleaseViewer
+                                )
+                        );
+                        _context.RemoveRange(
+                            _context
+                                .UserReleaseInvites
+                                .Where(
+                                    i =>
+                                        i.ReleaseId == releaseId
+                                        && i.Email.ToLower() == email.ToLower()
+                                        && i.Role == ReleaseRole.PrereleaseViewer
+                                )
+                        );
+                        await _context.SaveChangesAsync();
+
+                        var remainingReleaseInvites = await _context
+                            .UserReleaseInvites
+                            .Where(
+                                i =>
+                                    i.Email.ToLower() == email.ToLower()
+                                    && i.Role == ReleaseRole.PrereleaseViewer
+                            )
+                            .CountAsync();
+
+                        if (remainingReleaseInvites == 0)
+                        {
+                            var role = await GetPreReleaseUserRole();
+
+                            _usersAndRolesDbContext.UserInvites.RemoveRange(
+                                _usersAndRolesDbContext.UserInvites
+                                    .Where(
+                                        i =>
+                                            i.Email.ToLower() == email.ToLower()
+                                            && i.RoleId == role.Id
+                                            && !i.Accepted
+                                    )
+                            );
+
+                            await _usersAndRolesDbContext.SaveChangesAsync();
+                        }
+                    }
+                );
+        }
+
+        public async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(Release release)
+        {
+            var userReleaseInvites = await _context.UserReleaseInvites
+                .Where(i =>
+                    i.ReleaseId == release.Id
+                    && i.Role == ReleaseRole.PrereleaseViewer
+                    && i.EmailSent == false)
+                .ToListAsync();
+
+            await userReleaseInvites.ForEachAsync(async invite =>
+            {
+                var user = await _context.Users
+                    .SingleOrDefaultAsync(u => u.Email.ToLower() == invite.Email.ToLower());
+                SendPreReleaseInviteEmail(release, invite.Email.ToLower(), user == null);
+                invite.EmailSent = true;
+                _context.Update(invite);
+            });
+
+            await _context.SaveChangesAsync();
+            return Unit.Instance;
+        }
+
         private async Task<Either<ActionResult, Unit>> ValidateNewPreReleaseUser(Guid releaseId, string email)
         {
             var hasExistingReleaseRole = await _context
@@ -285,71 +372,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
 
             _emailService.SendEmail(email, template, emailValues);
-        }
-
-        public async Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseId, string email)
-        {
-            if (!new EmailAddressAttribute().IsValid(email))
-            {
-                return ValidationActionResult(InvalidEmailAddress);
-            }
-
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccessVoid(
-                    async () =>
-                    {
-                        _context.RemoveRange(
-                            _context
-                                .UserReleaseRoles
-                                .Include(r => r.User)
-                                .Where(
-                                    r =>
-                                        r.ReleaseId == releaseId
-                                        && r.User.Email.ToLower() == email.ToLower()
-                                        && r.Role == ReleaseRole.PrereleaseViewer
-                                )
-                        );
-                        _context.RemoveRange(
-                            _context
-                                .UserReleaseInvites
-                                .Where(
-                                    i =>
-                                        i.ReleaseId == releaseId
-                                        && i.Email.ToLower() == email.ToLower()
-                                        && i.Role == ReleaseRole.PrereleaseViewer
-                                )
-                        );
-                        await _context.SaveChangesAsync();
-
-                        var remainingReleaseInvites = await _context
-                            .UserReleaseInvites
-                            .Where(
-                                i =>
-                                    i.Email.ToLower() == email.ToLower()
-                                    && i.Role == ReleaseRole.PrereleaseViewer
-                            )
-                            .CountAsync();
-
-                        if (remainingReleaseInvites == 0)
-                        {
-                            var role = await GetPreReleaseUserRole();
-
-                            _usersAndRolesDbContext.UserInvites.RemoveRange(
-                                _usersAndRolesDbContext.UserInvites
-                                    .Where(
-                                        i =>
-                                            i.Email.ToLower() == email.ToLower()
-                                            && i.RoleId == role.Id
-                                            && !i.Accepted
-                                    )
-                            );
-
-                            await _usersAndRolesDbContext.SaveChangesAsync();
-                        }
-                    }
-                );
         }
 
         private async Task<IdentityRole> GetPreReleaseUserRole()

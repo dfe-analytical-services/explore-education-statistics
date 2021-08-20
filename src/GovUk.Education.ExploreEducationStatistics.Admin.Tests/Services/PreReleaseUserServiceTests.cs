@@ -1159,6 +1159,127 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task SendPreReleaseUserInviteEmails()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Publication = new Publication { Title = "Test publication" },
+                PublishScheduled = DateTime.Parse("2020-09-09T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+            };
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    release,
+                    new User
+                    {
+                        Email = "test@test.com",
+                    },
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        Email = "test@test.com",
+                        EmailSent = false,
+                    },
+
+                    new User
+                    {
+                        Email = "test2@test.com"
+                    },
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        Email = "test2@test.com",
+                        EmailSent = true,
+                    }
+                );
+
+            await context.SaveChangesAsync();
+            }
+
+            var identityRole = new IdentityRole
+            {
+                Name = "Prerelease User"
+            };
+
+            await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
+            {
+                userAndRolesDbContext.Add(identityRole);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+           var preReleaseService = new Mock<IPreReleaseService>();
+
+           preReleaseService
+               .Setup(s => s.GetPreReleaseWindow(It.IsAny<Release>()))
+               .Returns(
+                   new PreReleaseWindow
+                   {
+                       Start = DateTime.Parse("2020-09-08T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                       End = DateTime.Parse("2020-09-08T22:59:59.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                   }
+               );
+
+           var emailService = new Mock<IEmailService>();
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
+            await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
+            {
+
+                var service = SetupPreReleaseUserService(
+                    context,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    preReleaseService: preReleaseService.Object,
+                    emailService: emailService.Object
+                );
+
+                var result = await service.SendPreReleaseUserInviteEmails(release);
+
+                var sendMailResultDict = new Dictionary<string, dynamic>
+                {
+                    {"newUser", "no"},
+                    {"release name", "Academic Year 2020/21"},
+                    {"publication name", "Test publication"},
+                    {
+                        "prerelease link",
+                        $"http://localhost/publication/{release.PublicationId}/release/{release.Id}/prerelease/content"
+                    },
+                    {"prerelease day", "Tuesday 08 September 2020"},
+                    {"prerelease time", "09:30"},
+                    {"publish day", "Wednesday 09 September 2020"},
+                    {"publish time", "09:30"},
+                };
+
+                emailService.Verify(
+                    s => s.SendEmail(
+                        "test@test.com",
+                        "the-template-id",
+                        sendMailResultDict
+                    )
+                );
+                emailService.VerifyNoOtherCalls();
+
+                Assert.True(result.IsRight);
+                Assert.IsType<Unit>(result.Right);
+            }
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
+            {
+                var updatedInvite1 = context.UserReleaseInvites
+                    .SingleOrDefault(i => i.Email.ToLower() == "test@test.com");
+                Assert.NotNull(updatedInvite1);
+                Assert.Equal(release.Id, updatedInvite1.ReleaseId);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, updatedInvite1.Role);
+                Assert.True(updatedInvite1.EmailSent);
+            }
+        }
+
         private static Mock<IConfiguration> DefaultConfigurationMock()
         {
             var section = new Mock<IConfigurationSection>();

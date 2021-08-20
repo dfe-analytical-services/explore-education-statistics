@@ -1110,6 +1110,126 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task CreateReleaseStatus_Approved_SendPreReleaseEmails()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+            var preReleaseUserService = new Mock<IPreReleaseUserService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                releaseChecklistService
+                    .Setup(s =>
+                        s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(
+                        new List<ReleaseChecklistIssue>()
+                    );
+
+                contentService.Setup(mock =>
+                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+
+                preReleaseUserService.Setup(mock =>
+                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(Unit.Instance);
+
+            var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    preReleaseUserService: preReleaseUserService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                result.AssertRight();
+            }
+
+            MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService, preReleaseUserService);
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var preReleaseUserService = new Mock<IPreReleaseUserService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                contentService.Setup(mock =>
+                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+
+                preReleaseUserService.Setup(mock =>
+                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(Unit.Instance);
+
+            var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    preReleaseUserService: preReleaseUserService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            LatestInternalReleaseNote = "Test note",
+                        }
+                    );
+
+                result.AssertRight();
+            }
+
+            preReleaseUserService.VerifyNoOtherCalls();
+            MockUtils.VerifyAllMocks(contentService);
+        }
+
+        [Fact]
         public async Task CreateReleaseStatus_ReleaseHasImages()
         {
             var releaseId = Guid.NewGuid();
@@ -1875,7 +1995,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
             IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null)
+            IReleaseSubjectRepository releaseSubjectRepository = null,
+            IPreReleaseUserService preReleaseUserService = null)
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -1901,7 +2022,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                new SequentialGuidGenerator()
+                new SequentialGuidGenerator(),
+                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
             );
         }
     }

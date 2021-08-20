@@ -346,9 +346,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
             IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null)
+            IReleaseSubjectRepository releaseSubjectRepository = null,
+            IPreReleaseUserService preReleaseUserService = null)
         {
-            return new ReleaseService(
+            return new(
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
                 publishingService ?? new Mock<IPublishingService>().Object,
@@ -366,7 +367,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                new SequentialGuidGenerator()
+                new SequentialGuidGenerator(),
+                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
             );
         }
 
