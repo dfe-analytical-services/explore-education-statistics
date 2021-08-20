@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -397,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return ValidationActionResult(errors);
         }
 
-        public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestPublishedRelease(Guid publicationId)
+        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, queryable =>
@@ -667,8 +668,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         [JsonIgnore]
         public Guid SubjectId { get; set; }
 
-        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
+        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; } = null!;
 
-        public List<Guid> FootnoteIds { get; set; }
+        public List<Guid> FootnoteIds { get; set; } = null!;
     }
 }

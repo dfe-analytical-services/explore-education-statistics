@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -928,8 +929,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(saved.ReleaseStatuses);
                 var status = saved.ReleaseStatuses[0];
+                Assert.NotNull(status.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(status.Created.Value).Milliseconds, 0, 1500);
+                    .Subtract(status.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(release.Id, status.ReleaseId);
                 Assert.Equal(ReleaseApprovalStatus.Draft, status.ApprovalStatus);
                 Assert.Equal(_userId, status.CreatedById);
@@ -1352,7 +1354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
+                    .Subtract(savedStatus.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_userId, savedStatus.CreatedById);
             }
 
@@ -1983,20 +1985,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext = null,
-            IPublishingService publishingService = null,
-            IReleaseRepository releaseRepository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            ISubjectRepository subjectRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IDataImportService dataImportService = null,
-            IFootnoteService footnoteService = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseChecklistService releaseChecklistService = null,
-            IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null,
-            IPreReleaseUserService preReleaseUserService = null)
+            StatisticsDbContext? statisticsDbContext = null,
+            IPublishingService? publishingService = null,
+            IReleaseRepository? releaseRepository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            ISubjectRepository? subjectRepository = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IDataImportService? dataImportService = null,
+            IFootnoteService? footnoteService = null,
+            IDataBlockService? dataBlockService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IContentService? contentService = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IPreReleaseUserService? preReleaseUserService = null)
         {
             var userService = MockUtils.AlwaysTrueUserService();
 

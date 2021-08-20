@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -385,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext.SaveChanges();
             }
 
-            var newReleaseId = Guid.Empty;
+            Guid newReleaseId;
 
             var footnoteService = new Mock<IFootnoteService>();
 
@@ -491,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // and check that the Data Block that is not yet included in any content is copied across OK still
                 Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
-                Assert.Equal((amendmentContentBlock2 as DataBlock).Name, dataBlock2.Name);
+                Assert.Equal((amendmentContentBlock2 as DataBlock)?.Name, dataBlock2.Name);
 
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
@@ -559,6 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendedUpdate.ReleaseId);
         }
 
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
         private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
             ReleaseContentSection previous)
         {
@@ -584,14 +586,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
         }
 
-        private static void AssertAmendedContentBlockCorrect(ContentBlock previousBlock, ContentBlock amendedBlock,
+        private static void AssertAmendedContentBlockCorrect(ContentBlock? previousBlock, ContentBlock amendedBlock,
             ContentSection amendedSection)
         {
-            Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
-            Assert.Equal(previousBlock.Order, amendedBlock.Order);
+            Assert.NotEqual(previousBlock?.Id, amendedBlock.Id);
+            Assert.Equal(previousBlock?.Order, amendedBlock.Order);
             Assert.Equal(amendedSection, amendedBlock.ContentSection);
             Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
-            Assert.NotEmpty(previousBlock.Comments);
+            Assert.NotEmpty(previousBlock!.Comments);
             Assert.Empty(amendedBlock.Comments);
         }
 
@@ -632,24 +634,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IPublishingService publishingService = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            IReleaseRepository repository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            ISubjectRepository subjectRepository = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IReleaseFileService releaseFileService = null,
-            IDataImportService dataImportService = null,
-            IFootnoteService footnoteService = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null,
-            IContentService contentService = null,
-            IReleaseChecklistService releaseChecklistService = null,
-            IGuidGenerator guidGenerator = null,
-            IPreReleaseUserService preReleaseUserService = null)
+            IPublishingService? publishingService = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            IReleaseRepository? repository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            ISubjectRepository? subjectRepository = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IReleaseFileService? releaseFileService = null,
+            IDataImportService? dataImportService = null,
+            IFootnoteService? footnoteService = null,
+            IDataBlockService? dataBlockService = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IContentService? contentService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IGuidGenerator? guidGenerator = null,
+            IPreReleaseUserService? preReleaseUserService = null)
         {
-            return new ReleaseService(
+            return new(
                 contentDbContext,
                 AdminMapper(),
                 publishingService ?? new Mock<IPublishingService>().Object,
@@ -662,7 +664,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 footnoteService ?? new Mock<IFootnoteService>().Object,
-                statisticsDbContext ?? statisticsDbContext,
+                statisticsDbContext,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,

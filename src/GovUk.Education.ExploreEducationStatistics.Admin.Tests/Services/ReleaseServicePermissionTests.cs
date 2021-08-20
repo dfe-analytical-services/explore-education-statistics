@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -194,13 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync"))
-                        {
-                            contentDbContext.Attach(_release);
-                            var service = BuildReleaseService(contentDbContext,
-                                userService: userService.Object);
-                            return service.CreateReleaseAmendment(_release.Id);
-                        }
+                        using var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync");
+                        contentDbContext.Attach(_release);
+                        var service = BuildReleaseService(contentDbContext,
+                            userService: userService.Object);
+                        return service.CreateReleaseAmendment(_release.Id);
                     }
                 );
         }
@@ -330,24 +329,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseService BuildReleaseService(
-            ContentDbContext context = null,
-            IMapper mapper = null,
-            IPublishingService publishingService = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            IReleaseRepository releaseRepository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            ISubjectRepository subjectRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IDataImportService dataImportService = null,
-            IFootnoteService footnoteService = null,
-            StatisticsDbContext statisticsDbContext = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseChecklistService releaseChecklistService = null,
-            IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null,
-            IPreReleaseUserService preReleaseUserService = null)
+            ContentDbContext? context = null,
+            IMapper? mapper = null,
+            IPublishingService? publishingService = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            IReleaseRepository? releaseRepository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            ISubjectRepository? subjectRepository = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IDataImportService? dataImportService = null,
+            IFootnoteService? footnoteService = null,
+            StatisticsDbContext? statisticsDbContext = null,
+            IDataBlockService? dataBlockService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IContentService? contentService = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IPreReleaseUserService? preReleaseUserService = null)
         {
             return new(
                 context ?? new Mock<ContentDbContext>().Object,

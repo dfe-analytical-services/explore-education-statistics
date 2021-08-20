@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -133,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 {
                                     ReleaseId = releaseId,
                                     Role = ReleaseRole.PrereleaseViewer,
-                                    UserId = existingUser.Id
+                                    UserId = existingUser!.Id
                                 }
                             );
 
@@ -359,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publishDay = FormatDayForEmail(publishScheduled);
             var publishTime = FormatTimeForEmail(publishScheduledTime);
 
-            var emailValues = new Dictionary<string, dynamic>
+            var emailValues = new Dictionary<string, dynamic?>
             {
                 {"newUser", isNewUser ? "yes" : "no"},
                 {"release name", release.Title},
@@ -393,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return timeSpan.ToString(@"hh\:mm");
         }
 
-        private static string FormatDayForEmail(DateTime? dateTime)
+        private static string? FormatDayForEmail(DateTime? dateTime)
         {
             return dateTime?.ToString("dddd dd MMMM yyyy");
         }
@@ -401,6 +402,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class PreReleaseUserViewModel
     {
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }
