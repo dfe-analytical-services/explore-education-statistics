@@ -1,42 +1,54 @@
+#nullable enable
 using System;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using static System.Int32;
 using static System.String;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
-    public class PartialDate
+    public record PartialDate
     {
-        public static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
-        public static readonly Regex MonthRegex = new Regex(@"^([0-9]{1,2})?$");
-        public static readonly Regex DayRegex = new Regex(@"^([0-9]{1,2})?$");
-        private string _year;
-        private string _month;
-        private string _day;
+        public static readonly Regex YearRegex = new(@"^([0-9]{4})?$");
+        public static readonly Regex MonthRegex = new(@"^([0-9]{1,2})?$");
+        public static readonly Regex DayRegex = new(@"^([0-9]{1,2})?$");
 
-        public string Year
-        {
-            get => _year ?? "";
-            set => _year = value;
-        }
-        
+        private readonly string? _month;
+        private readonly string? _day;
+
+        public string Year { get; init; } = Empty;
+
         public string Month
         {
-            get => _month ?? "";
-            set => _month = value;
+            get => _month ?? Empty;
+            init => _month = value;
         }
-        
+
         public string Day
         {
-            get => _day ?? "";
-            set => _day = value;
+            get => _day ?? Empty;
+            init => _day = value;
         }
 
         public bool IsValid()
         {
+            var hasYear = !Year.IsNullOrWhitespace();
+            var hasMonth = !Month.IsNullOrWhitespace();
+            var hasDay = !Day.IsNullOrWhitespace();
+
+            if (!hasYear)
+            {
+                return false;
+            }
+
+            if (hasDay && !hasMonth)
+            {
+                return false;
+            }
+
             if (!YearRegex.Match(Year).Success || !MonthRegex.Match(Month).Success || !DayRegex.Match(Day).Success)
             {
-                return false; // Failed rudimentary number validation  
+                return false; // Failed rudimentary number validation
             }
 
             if (!EmptyOrBetween(Month, 1, 12) || !EmptyOrBetween(Day, 1, 31))
@@ -44,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
                 return false; // Failed more precise number validation
             }
 
-            if (!IsNullOrEmpty(Month) && !IsNullOrEmpty(Day))
+            if (hasMonth && hasDay)
             {
                 // We at least have a month and a day so at the very least we can check that they are acceptable
                 // together. If we have a year we can do even more if we do not then we use a leap year as this gives a
