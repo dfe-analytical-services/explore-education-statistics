@@ -1,4 +1,6 @@
+#nullable enable
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -26,17 +28,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Authorizat
             ViewReleaseRequirement requirement,
             Release release)
         {
-            var hydratedRelease = await _context.Releases
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Releases)
-                .FirstOrDefaultAsync(r => r.Id == release.Id);
-
-            if (hydratedRelease == null)
+            if (!_context.TryReloadEntity(release, out var loadedRelease))
             {
                 return;
             }
 
-            if (hydratedRelease.IsLatestPublishedVersionOfRelease())
+            await _context.Entry(loadedRelease)
+                .Reference(p => p.Publication)
+                .Query()
+                .Include(p => p.Releases)
+                .LoadAsync();
+
+            if (loadedRelease.IsLatestPublishedVersionOfRelease())
             {
                 authContext.Succeed(requirement);
             }
