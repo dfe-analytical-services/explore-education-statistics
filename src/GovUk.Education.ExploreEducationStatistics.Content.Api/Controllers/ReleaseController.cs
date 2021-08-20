@@ -1,3 +1,5 @@
+#nullable enable
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -17,6 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ReleaseController(IReleaseService releaseService)
         {
             _releaseService = releaseService;
+        }
+
+        [HttpGet("publications/{publicationSlug}/releases")]
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListReleases(string publicationSlug)
+        {
+            return await _releaseService.List(publicationSlug)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest")]

@@ -12,7 +12,7 @@ import Yup from '@common/validation/yup';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import createErrorHelper from '@common/validation/createErrorHelper';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import Tag from '@common/components/Tag';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { format } from 'date-fns';
@@ -34,7 +34,7 @@ interface Props {
   legendHint?: string;
   initialValues?: { releaseId: string };
   onSubmit: ReleaseFormSubmitHandler;
-  options: Release[];
+  options: ReleaseSummary[];
 }
 
 const ReleaseForm = ({
@@ -67,7 +67,7 @@ const ReleaseForm = ({
         .map(option => {
           return {
             label: `${option.title} (${format(
-              new Date(option.published),
+              new Date(option.published ?? ''),
               'd MMMM yyyy',
             )})`,
             hint: option.latestRelease ? (

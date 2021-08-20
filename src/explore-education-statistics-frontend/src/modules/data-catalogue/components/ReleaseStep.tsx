@@ -1,18 +1,18 @@
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useMounted from '@common/hooks/useMounted';
+import WizardStepEditButton from '@common/modules/table-tool/components//WizardStepEditButton';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import WizardStepEditButton from '@common/modules/table-tool/components//WizardStepEditButton';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import ReleaseForm, {
   ReleaseFormSubmitHandler,
 } from '@frontend/modules/data-catalogue/components/ReleaseForm';
-import useMounted from '@common/hooks/useMounted';
 import React from 'react';
 
 interface Props {
-  releases: Release[];
-  selectedRelease?: Release;
+  releases: ReleaseSummary[];
+  selectedRelease?: ReleaseSummary;
   onSubmit: ReleaseFormSubmitHandler;
 }
 

@@ -1,6 +1,4 @@
 import themeService, {
-  DownloadTheme,
-  PublicationDownloadSummary,
   PublicationSummary,
   Theme,
 } from '@common/services/themeService';
@@ -8,7 +6,9 @@ import Page from '@frontend/components/Page';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import { Release } from '@common/services/publicationService';
+import publicationService, {
+  ReleaseSummary,
+} from '@common/services/publicationService';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import Wizard, {
   InjectedWizardProps,
@@ -26,29 +26,6 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useImmer } from 'use-immer';
 
-const fakeReleases: Release[] = [
-  {
-    id: 'rel-1',
-    latestRelease: true,
-    published: '2021-06-30T11:21:17.7585345',
-    slug: 'rel-1-slug',
-    title: 'Release 1',
-  } as Release,
-  {
-    id: 'rel-3',
-    latestRelease: false,
-    published: '2021-01-01T11:21:17.7585345',
-    slug: 'rel-3-slug',
-    title: 'Another Release',
-  } as Release,
-  {
-    id: 'rel-2',
-    latestRelease: false,
-    published: '2021-05-30T11:21:17.7585345',
-    slug: 'rel-2-slug',
-    title: 'Release 2',
-  } as Release,
-];
 const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
   {
     id: 'subject-1',
@@ -107,20 +84,20 @@ const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
 ];
 
 interface Props {
-  releases?: Release[];
+  releases?: ReleaseSummary[];
   selectedPublication?: PublicationSummary;
-  selectedRelease?: Release;
+  selectedRelease?: ReleaseSummary;
   subjects?: SubjectWithDownloadFiles[];
   themes: Theme[];
 }
 
 interface DataCatalogueState {
   initialStep: number;
-  releases: Release[];
+  releases: ReleaseSummary[];
   subjects: SubjectWithDownloadFiles[];
   query: {
     publicationId?: string;
-    release?: Release;
+    release?: ReleaseSummary;
   };
 }
 
@@ -163,9 +140,12 @@ const DataCataloguePage: NextPage<Props> = ({
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId,
+    publicationSlug,
   }) => {
+    const nextReleases = await publicationService.listReleases(publicationSlug);
+
     updateState(draft => {
-      draft.releases = fakeReleases;
+      draft.releases = nextReleases;
       draft.query.publicationId = publicationId;
     });
   };
@@ -268,10 +248,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     .flatMap(option => option.publications)
     .find(option => option.slug === publicationSlug);
 
-  // EES-2007 Get real releases here
-  const releases = fakeReleases;
+  let releases: ReleaseSummary[] = [];
 
-  let selectedRelease: Release | undefined;
+  if (selectedPublication) {
+    releases = await publicationService.listReleases(publicationSlug);
+  }
+
+  let selectedRelease: ReleaseSummary | undefined;
+
   if (releaseSlug) {
     selectedRelease = releases.find(rel => rel.slug === releaseSlug);
   }
@@ -283,10 +267,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   }
 
   const props: Props = {
-    releases: releases ?? [],
+    releases,
     subjects: subjects ?? [],
     themes,
   };
+
   if (selectedPublication) {
     props.selectedPublication = selectedPublication;
 

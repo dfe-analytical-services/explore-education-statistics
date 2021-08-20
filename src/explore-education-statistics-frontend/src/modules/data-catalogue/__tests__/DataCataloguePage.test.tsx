@@ -4,12 +4,20 @@ import {
   PublicationSummary,
   Theme,
 } from '@common/services/themeService';
-import { Release } from '@common/services/publicationService';
+import _publicationService, {
+  ReleaseSummary,
+} from '@common/services/publicationService';
 import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import React from 'react';
+
+jest.mock('@common/services/publicationService');
+
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
 
 describe('DataCataloguePage', () => {
   const testThemes: Theme[] = [
@@ -38,28 +46,28 @@ describe('DataCataloguePage', () => {
     slug: 'test-publication',
   } as PublicationSummary;
 
-  const testReleases: Release[] = [
+  const testReleases: ReleaseSummary[] = [
     {
       id: 'rel-1',
       latestRelease: true,
-      published: '2021-06-30T11:21:17.7585345',
+      published: '2021-06-30T11:21:17',
       slug: 'rel-1-slug',
       title: 'Release 1',
-    } as Release,
+    } as ReleaseSummary,
     {
       id: 'rel-3',
       latestRelease: false,
-      published: '2021-01-01T11:21:17.7585345',
+      published: '2021-01-01T11:21:17',
       slug: 'rel-3-slug',
       title: 'Another Release',
-    } as Release,
+    } as ReleaseSummary,
     {
       id: 'rel-2',
       latestRelease: false,
-      published: '2021-05-30T11:21:17.7585345',
+      published: '2021-05-30T11:21:17',
       slug: 'rel-2-slug',
       title: 'Release 2',
-    } as Release,
+    } as ReleaseSummary,
   ];
 
   const testSubjects: SubjectWithDownloadFiles[] = [
@@ -140,8 +148,9 @@ describe('DataCataloguePage', () => {
     expect(screen.getByLabelText('Test publication')).toBeVisible();
   });
 
-  // EES-2207 this test will need to be updated to mock the api responses insted of using the fake data
   test('can go through all the steps to get to download files', async () => {
+    publicationService.listReleases.mockResolvedValue(testReleases);
+
     render(<DataCataloguePage themes={testThemes} />);
 
     expect(screen.getByText('Choose a publication')).toBeInTheDocument();

@@ -1,10 +1,13 @@
+#nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public class ReleaseSummaryViewModel
+    public record ReleaseSummaryViewModel
     {
         public Guid Id { get; }
 
@@ -28,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public DateTime? DataLastPublished { get; }
 
-        public PublicationSummaryViewModel Publication { get; }
+        public PublicationSummaryViewModel? Publication { get; }
 
         public ReleaseSummaryViewModel(CachedReleaseViewModel release, CachedPublicationViewModel publication)
         {
@@ -44,6 +47,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             LatestRelease = Id == publication.LatestReleaseId;
             DataLastPublished = release.DataLastPublished;
             Publication = new PublicationSummaryViewModel(publication);
+        }
+
+        public ReleaseSummaryViewModel(Release release)
+        {
+            Id = release.Id;
+            Title = release.Title;
+            Slug = release.Slug;
+            YearTitle = release.YearTitle;
+            CoverageTitle = release.TimePeriodCoverage.GetEnumLabel();
+            Published = release.Published;
+            ReleaseName = release.ReleaseName;
+            NextReleaseDate = release.NextReleaseDate;
+            Type = new ReleaseTypeViewModel {
+                Id = release.Type.Id,
+                Title = release.Type.Title
+            };
+            LatestRelease = Id == release.Publication.LatestPublishedRelease()?.Id;
+            DataLastPublished = release.DataLastPublished;
         }
     }
 }
