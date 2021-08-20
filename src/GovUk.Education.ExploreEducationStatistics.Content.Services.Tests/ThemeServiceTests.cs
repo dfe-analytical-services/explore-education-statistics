@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -293,6 +292,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new()
                 {
                     Title = "Theme C",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic B"
+                        }
+                    }
                 }
             };
 
@@ -481,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var publicationD = new Publication
             {
-                Title = "Publication C",
+                Title = "Publication D",
             };
 
             var themes = new List<Theme>
@@ -729,338 +735,793 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_LatestData()
+        public async Task GetPublicationTree_LatestData_SingleThemeTopic()
         {
-            var releaseFile1 = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    ReleaseName = "2000",
-                    Published = DateTime.UtcNow,
-                    Publication = new Publication
-                    {
-                        Title = "Theme 1 topic 1 publication 1",
-                        Slug = "theme-a-topic-a-publication-1",
-                        Topic = new Topic
-                        {
-                            Title = "Theme 1 topic 1",
-                            Slug = "theme-a-topic-a",
-                            Theme = new Theme
-                            {
-                                Title = "Theme 1",
-                                Slug = "theme-a",
-                            }
-                        }
-                    }
-                },
-                File = new File
-                {
-                    Type = FileType.Data
-                }
-            };
-
-            var releaseFile2 = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    ReleaseName = "2000",
-                    Published = DateTime.UtcNow,
-                    Publication = new Publication
-                    {
-                        Title = "Theme B topic B publication B",
-                        Slug = "theme-b-topic-b-publication-B",
-                        Topic = new Topic
-                        {
-                            Title = "Theme B topic B",
-                            Slug = "theme-b-topic-b",
-                            Theme = new Theme
-                            {
-                                Title = "Theme B",
-                                Slug = "theme-b",
-                            }
-                        }
-                    }
-                },
-                File = new File
-                {
-                    Type = FileType.Data
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                await context.AddRangeAsync(releaseFile1, releaseFile2);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildThemeService(context);
-
-                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
-
-                Assert.Equal(2, result.Count);
-                Assert.Equal(releaseFile1.Release.Publication.Topic.Theme.Id, result[0].Id);
-                Assert.Equal(releaseFile1.Release.Publication.Topic.Theme.Title, result[0].Title);
-
-                var themeATopics = result[0].Topics.ToList();
-                Assert.Single(themeATopics);
-                Assert.Equal(releaseFile1.Release.Publication.Topic.Id, themeATopics[0].Id);
-                Assert.Equal(releaseFile1.Release.Publication.Topic.Title, themeATopics[0].Title);
-
-                var themeATopicAPublications = themeATopics[0].Publications.ToList();
-                Assert.Single(themeATopicAPublications);
-                Assert.Equal(releaseFile1.Release.Publication.Id, themeATopicAPublications[0].Id);
-                Assert.Equal(releaseFile1.Release.Publication.Slug, themeATopicAPublications[0].Slug);
-                Assert.Equal(releaseFile1.Release.Publication.Title, themeATopicAPublications[0].Title);
-
-                Assert.Equal(releaseFile2.Release.Publication.Topic.Theme.Id, result[1].Id);
-                Assert.Equal(releaseFile2.Release.Publication.Topic.Theme.Title, result[1].Title);
-
-                var themeBTopics = result[1].Topics.ToList();
-                Assert.Single(themeBTopics);
-                Assert.Equal(releaseFile2.Release.Publication.Topic.Id, themeBTopics[0].Id);
-                Assert.Equal(releaseFile2.Release.Publication.Topic.Title, themeBTopics[0].Title);
-
-                var themeBTopicAPublications = themeBTopics[0].Publications.ToList();
-                Assert.Single(themeBTopicAPublications);
-                Assert.Equal(releaseFile2.Release.Publication.Id, themeBTopicAPublications[0].Id);
-                Assert.Equal(releaseFile2.Release.Publication.Slug, themeBTopicAPublications[0].Slug);
-                Assert.Equal(releaseFile2.Release.Publication.Title, themeBTopicAPublications[0].Title);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_LatestData_ThemeHasNoTopics()
-        {
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var theme = new Theme
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Theme",
-                    Slug = "theme"
-                };
-
-                await context.AddAsync(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildThemeService(context);
-                Assert.Empty(await service.GetPublicationTree(PublicationTreeFilter.LatestData));
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_LatestData_TopicHasNoPublications()
-        {
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var theme = new Theme
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Theme",
-                    Slug = "theme"
-                };
-
-                var topic = new Topic
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Topic",
-                    Slug = "topic",
-                    ThemeId = theme.Id
-                };
-
-                await context.AddAsync(theme);
-                await context.AddAsync(topic);
-
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildThemeService(context);
-                Assert.Empty(await service.GetPublicationTree(PublicationTreeFilter.LatestData));
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_LatestData_PublicationHasNoReleases()
-        {
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var theme = new Theme
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Theme",
-                    Slug = "theme"
-                };
-
-                var topic = new Topic
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Topic",
-                    Slug = "topic",
-                    ThemeId = theme.Id
-                };
-
-                var publication = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Publication",
-                    Slug = "publication",
-                    TopicId = topic.Id
-                };
-
-                await context.AddAsync(theme);
-                await context.AddAsync(topic);
-                await context.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildThemeService(context);
-                Assert.Empty(await service.GetPublicationTree(PublicationTreeFilter.LatestData));
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_LatestData_PublicationHasNoPublishedReleases()
-        {
-            var theme = new Theme
-            {
-                Title = "Theme",
-                Slug = "theme"
-            };
-
-            var topic = new Topic
-            {
-                Title = "Topic",
-                Slug = "topic",
-                Theme = theme
-            };
-
             var publicationA = new Publication
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Topic = topic
+                Summary = "Publication A summary",
             };
-
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Topic = topic
+                Summary = "Publication B summary"
             };
 
-            var publicationARelease = new Release
+            var theme = new Theme
             {
-                Publication = publicationA,
-                ReleaseName = "2000",
-                Published = DateTime.UtcNow
-            };
-
-            var publicationBRelease = new Release
-            {
-                Publication = publicationB,
-                ReleaseName = "2000",
-                Published = null
-            };
-
-            var publicationAReleaseFile = new ReleaseFile
-            {
-                Release = publicationARelease,
-                File = new File
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
                 {
-                    Type = FileType.Data
-                }
+                    new()
+                    {
+                        Title = "Topic A",
+                        // Publications are in random order
+                        // to check that ordering is done by title
+                        Publications = ListOf(publicationB, publicationA)
+                    },
+                },
             };
 
-            var publicationBReleaseFile = new ReleaseFile
+            var releaseFiles = new List<ReleaseFile>
             {
-                Release = publicationBRelease,
-                File = new File
-                {
-                    Type = FileType.Data
-                }
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationB,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 2, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(publicationAReleaseFile, publicationBReleaseFile);
+                await context.AddAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
 
                 Assert.Single(result);
-                Assert.Equal(theme.Id, result[0].Id);
-                Assert.Equal(theme.Title, result[0].Title);
-                var topics = result[0].Topics.ToList();
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
 
-                Assert.Single(topics);
-                Assert.Equal(topic.Id, topics[0].Id);
-                Assert.Equal(topic.Title, topics[0].Title);
-                var publications = topics[0].Publications.ToList();
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
 
-                Assert.Single(publications);
-                Assert.Equal(publicationA.Id, publications[0].Id);
-                Assert.Equal(publicationA.Slug, publications[0].Slug);
-                Assert.Equal(publicationA.Title, publications[0].Title);
+                var publications = result[0].Topics[0].Publications;
 
-                // Publication B is not included because it's Release is not published
+                Assert.Equal(2, publications.Count);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("Publication A summary", publications[0].Summary);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Null(publications[0].LegacyPublicationUrl);
+
+                Assert.Equal("publication-b", publications[1].Slug);
+                Assert.Equal("Publication B summary", publications[1].Summary);
+                Assert.Equal("Publication B", publications[1].Title);
+                Assert.Null(publications[1].LegacyPublicationUrl);
             }
         }
 
         [Fact]
-        public async Task GetPublicationTree_LatestData_PublicationLatestReleaseHasNoSubject()
+        public async Task GetPublicationTree_LatestData_MultipleThemesTopics()
         {
-            var theme = new Theme();
-            var topic = new Topic { Theme = theme };
-            var publication = new Publication { Topic = topic };
-            var previousRelease = new Release
+            var publicationA = new Publication
             {
-                Publication = publication,
-                ReleaseName = "2000",
-                Published = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
+                Title = "Publication A",
+                Slug = "publication-a",
+                Summary = "Publication A summary",
             };
-            var previousReleaseFile = new ReleaseFile
+            var publicationB = new Publication
             {
-                Release = previousRelease,
-                File = new File { Type = FileType.Data }
+                Title = "Publication B",
+                Slug = "publication-b",
+                Summary = "Publication B summary"
+            };
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                Slug = "publication-c",
+                Summary = "Publication C summary",
             };
 
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                    Summary = "Theme A summary",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications = ListOf(publicationA)
+                        },
+                        new()
+                        {
+                            Title = "Topic B",
+                            Publications = ListOf(publicationB)
+                        }
+                    },
+                },
+                new()
+                {
+                    Title = "Theme B",
+                    Summary = "Theme B summary",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic C",
+                            Slug = "topic-C",
+                            Publications = ListOf(publicationC)
+                        },
+                    },
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationB,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 2, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationC,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 2, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(themes);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
+
+                Assert.Equal("Theme B", result[1].Title);
+                Assert.Equal("Theme B summary", result[1].Summary);
+
+                Assert.Equal(2, result[0].Topics.Count);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Equal("Topic B", result[0].Topics[1].Title);
+
+                Assert.Single(result[1].Topics);
+                Assert.Equal("Topic C", result[1].Topics[0].Title);
+
+                var topicAPublications = result[0].Topics[0].Publications;
+
+                Assert.Single(topicAPublications);
+                Assert.Equal("publication-a", topicAPublications[0].Slug);
+                Assert.Equal("Publication A summary", topicAPublications[0].Summary);
+                Assert.Equal("Publication A", topicAPublications[0].Title);
+                Assert.Null(topicAPublications[0].LegacyPublicationUrl);
+
+                var topicBPublications = result[0].Topics[1].Publications;
+
+                Assert.Single(topicBPublications);
+                Assert.Equal("publication-b", topicBPublications[0].Slug);
+                Assert.Equal("Publication B summary", topicBPublications[0].Summary);
+                Assert.Equal("Publication B", topicBPublications[0].Title);
+                Assert.Null(topicBPublications[0].LegacyPublicationUrl);
+
+                var topicCPublications = result[1].Topics[0].Publications;
+
+                Assert.Single(topicCPublications);
+                Assert.Equal("publication-c", topicCPublications[0].Slug);
+                Assert.Equal("Publication C summary", topicCPublications[0].Summary);
+                Assert.Equal("Publication C", topicCPublications[0].Title);
+                Assert.Null(topicBPublications[0].LegacyPublicationUrl);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_FiltersThemesWithNoTopicsOrPublications()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                },
+                new()
+                {
+                    Title = "Theme B",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications = ListOf(publicationA),
+                        },
+                    },
+                },
+                new()
+                {
+                    Title = "Theme C",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic B"
+                        }
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(themes);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+
+                Assert.Single(result);
+                Assert.Equal("Theme B", result[0].Title);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("Publication A", publications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_FiltersThemesWithNoVisiblePublications()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+            };
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications =  ListOf(publicationA)
+                        },
+                    }
+                },
+                new()
+                {
+                    Title = "Theme B",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic B",
+                            Publications = ListOf(publicationB)
+                        },
+                    },
+                },
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Published with latest data
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                // Not published
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationB,
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(themes);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var topicAPublications = result[0].Topics[0].Publications;
+
+                Assert.Single(topicAPublications);
+                Assert.Equal("Publication A", topicAPublications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_FiltersTopicsWithNoVisiblePublications()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+            };
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications = ListOf(publicationA)
+                        },
+                        new()
+                        {
+                            Title = "Topic B",
+                            Publications = ListOf(publicationB),
+                        },
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Published with latest data
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                // Not published
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationB,
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(themes);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var topicAPublications = result[0].Topics[0].Publications;
+
+                // Publication has a published release, hence it is visible
+                Assert.Single(topicAPublications);
+                Assert.Equal("Publication A", topicAPublications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_FiltersPublicationsWithNoVisibleReleases()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+            };
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+            };
+            var publicationC = new Publication
+            {
+                Title = "Publication C"
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            publicationA,
+                            publicationB,
+                            publicationC
+                        }
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Published with latest data
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                // Published without latest data
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationB,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Ancillary
+                    }
+                },
+                // Not published
+                new() {
+                    Release = new()
+                    {
+                        Publication = publicationC,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                    },
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("Publication A", publications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_DoesNotFilterPublicationWithDataOnLatestRelease()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication A",
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            publication,
+                        }
+                    }
+                }
+            };
+
+            var olderRelease = new Release
+            {
+                Publication = publication,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Published = new DateTime(2020, 1, 1),
+            };
             var latestRelease = new Release
             {
                 Publication = publication,
-                ReleaseName = "2000",
-                Published = DateTime.UtcNow,
-                PreviousVersion = previousRelease
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2021",
+                Published = new DateTime(2021, 1, 1),
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Previous release has data, but
+                // not the latest release.
+                new()
+                {
+                    Release = olderRelease,
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new()
+                {
+                    Release = latestRelease,
+                    File = new()
+                    {
+                        Type = FileType.Ancillary
+                    }
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contentDbContextId))
             {
-                await context.AddRangeAsync(previousReleaseFile, latestRelease);
+                await context.AddRangeAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.LatestData);
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestData_FiltersPublicationWithNoDataOnLatestAmendedRelease()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication A",
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            publication,
+                        }
+                    }
+                }
+            };
+
+            var originalRelease = new Release
+            {
+                Publication = publication,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Published = new DateTime(2020, 1, 1),
+            };
+            var amendedRelease = new Release
+            {
+                Publication = publication,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Published = new DateTime(2020, 2, 1),
+                PreviousVersion = originalRelease
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Previous version has data, but
+                // not the amended release.
+                new()
+                {
+                    Release = originalRelease,
+                    File = new()
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new()
+                {
+                    Release = amendedRelease,
+                    File = new()
+                    {
+                        Type = FileType.Ancillary
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contentDbContextId))
+            {
+                await context.AddRangeAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+                await context.AddRangeAsync(amendedRelease);
                 await context.SaveChangesAsync();
             }
 
