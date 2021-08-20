@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public bool Accepted { get; set; }
 
+        public bool EmailSent { get; set; }
+
         public DateTime Created { get; set; }
         
         public User CreatedBy { get; set; }
