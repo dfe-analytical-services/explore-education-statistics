@@ -4,6 +4,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,27 +14,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ThemeController : ControllerBase
     {
-        private readonly IPublicationService _publicationService;
+        private readonly IThemeService _themeService;
         private readonly IMethodologyService _methodologyService;
 
         public ThemeController(
-            IPublicationService publicationService,
+            IThemeService themeService,
             IMethodologyService methodologyService)
         {
-            _publicationService = publicationService;
+            _themeService = themeService;
             _methodologyService = methodologyService;
         }
 
         [HttpGet("themes")]
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes()
+        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes(
+            [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
         {
-            return await _publicationService.GetPublicationTree();
+            return await _themeService.GetPublicationTree(filter);
         }
 
+        // TODO: EES-2365 Remove once 'Download latest data' page no longer exists
         [HttpGet("download-themes")]
         public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetDownloadThemes()
         {
-            return await _publicationService.GetPublicationDownloadsTree();
+            return await _themeService.GetPublicationDownloadsTree();
         }
 
         [HttpGet("methodology-themes")]

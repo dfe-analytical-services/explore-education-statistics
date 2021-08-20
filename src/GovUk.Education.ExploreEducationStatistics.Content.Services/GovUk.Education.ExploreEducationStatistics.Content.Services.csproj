@@ -4,11 +4,13 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <LangVersion>9.0</LangVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="10.1.1" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
         <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
+        <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+        <PackageReference Include="System.Linq.Async.Queryable" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>

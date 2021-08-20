@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
@@ -96,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     // are now accessible for the first time after publishing these releases
                     await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                     await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+                    await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
                     await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);

@@ -58,22 +58,6 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature[];
 }
 
-export interface Theme {
-  id: string;
-  title: string;
-  slug: string;
-  topics: {
-    id: string;
-    title: string;
-    slug: string;
-    publications: {
-      id: string;
-      title: string;
-      slug: string;
-    }[];
-  }[];
-}
-
 export interface Subject {
   id: string;
   name: string;
@@ -196,9 +180,6 @@ export interface SelectedPublication {
 }
 
 const tableBuilderService = {
-  getThemes(): Promise<Theme[]> {
-    return dataApi.get('/themes');
-  },
   getPublicationSubjectsAndHighlights(
     publicationId: string,
   ): Promise<SubjectsAndHighlights> {

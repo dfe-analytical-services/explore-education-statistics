@@ -28,8 +28,8 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
   TableHighlight,
-  Theme,
 } from '@common/services/tableBuilderService';
+import { Theme } from '@common/services/themeService';
 import React, { ReactElement, ReactNode } from 'react';
 import { useImmer } from 'use-immer';
 import { useRouter } from 'next/router';
