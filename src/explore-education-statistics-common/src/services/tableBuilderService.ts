@@ -1,6 +1,7 @@
 import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
+import { groupBy, mapValues, uniq } from 'lodash';
 
 export interface FilterOption {
   label: string;
@@ -179,6 +180,65 @@ export interface SelectedPublication {
   };
 }
 
+function mergeDuplicateLocationsInTableDataResponse(
+  tableData: TableDataResponse,
+): TableDataResponse {
+  const locationsGroupedByLevelAndCode = groupBy(
+    tableData.subjectMeta.locations,
+    location => `${location.level}_${location.value}`,
+  );
+
+  const mergedLocations = Object.values(locationsGroupedByLevelAndCode).flatMap(
+    locations => {
+      const distinctLocationNames = uniq(locations.map(l => l.label));
+      const mergedNames = distinctLocationNames.sort().join(' / ');
+      return [
+        {
+          ...locations[0],
+          label: mergedNames,
+        },
+      ];
+    },
+  );
+
+  return {
+    ...tableData,
+    subjectMeta: {
+      ...tableData.subjectMeta,
+      locations: mergedLocations,
+    },
+  };
+}
+
+function mergeDuplicateLocationsInSubjectMeta(
+  subjectMeta: SubjectMeta,
+): SubjectMeta {
+  const mergedLocations = mapValues(subjectMeta.locations, level => {
+    const optionsGroupedByCode = groupBy(level.options, option => option.value);
+    const mergedOptions = Object.values(optionsGroupedByCode).flatMap(
+      locations => {
+        const distinctLocationNames = uniq(locations.map(l => l.label));
+        const mergedNames = distinctLocationNames.sort().join(' / ');
+        return [
+          {
+            ...locations[0],
+            label: mergedNames,
+          },
+        ];
+      },
+    );
+    return {
+      ...level,
+      options: mergedOptions,
+    };
+  });
+
+  return {
+    ...subjectMeta,
+    locations: mergedLocations,
+  };
+}
+
 const tableBuilderService = {
   getPublicationSubjectsAndHighlights(
     publicationId: string,
@@ -190,34 +250,46 @@ const tableBuilderService = {
   ): Promise<SubjectsAndHighlights> {
     return dataApi.get(`/releases/${releaseId}`);
   },
-  getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
-    return dataApi.get(`/meta/subject/${subjectId}`);
+  async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
+    const response: SubjectMeta = await dataApi.get(
+      `/meta/subject/${subjectId}`,
+    );
+    return mergeDuplicateLocationsInSubjectMeta(response);
   },
-  filterSubjectMeta(query: {
+  async filterSubjectMeta(query: {
     subjectId: string;
     timePeriod?: TimePeriodQuery;
     geographicLevel?: string;
     locations?: Dictionary<string[]>;
   }): Promise<SubjectMeta> {
-    return dataApi.post('/meta/subject', query);
+    const response: SubjectMeta = await dataApi.post('/meta/subject', query);
+    return mergeDuplicateLocationsInSubjectMeta(response);
   },
-  getTableData({
+  async getTableData({
     releaseId,
     ...query
   }: ReleaseTableDataQuery): Promise<TableDataResponse> {
     if (releaseId) {
-      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
+      const response: TableDataResponse = await dataApi.post(
+        `/tablebuilder/release/${releaseId}`,
+        query,
+      );
+      return mergeDuplicateLocationsInTableDataResponse(response);
     }
-
-    return dataApi.post(`/tablebuilder`, query);
+    const response: TableDataResponse = await dataApi.post(
+      `/tablebuilder`,
+      query,
+    );
+    return mergeDuplicateLocationsInTableDataResponse(response);
   },
-  getDataBlockTableData(
+  async getDataBlockTableData(
     releaseId: string,
     dataBlockId: string,
   ): Promise<TableDataResponse> {
-    return dataApi.get(
+    const response: TableDataResponse = await dataApi.get(
       `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
     );
+    return mergeDuplicateLocationsInTableDataResponse(response);
   },
 };
 
