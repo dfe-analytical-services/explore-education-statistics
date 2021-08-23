@@ -16,6 +16,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import orderBy from 'lodash/orderBy';
+import useToggle from '@common/hooks/useToggle';
 import styles from './Comments.module.scss';
 
 interface FormValues {
@@ -45,6 +46,7 @@ const Comments = ({
   canComment = true,
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
+  const [isSubmitting, toggleSubmitting] = useToggle(false);
   const { user } = useAuthContext();
   const { releaseId } = useReleaseContext();
 
@@ -52,6 +54,7 @@ const Comments = ({
     const additionalComment: AddComment = {
       content,
     };
+    toggleSubmitting(true);
 
     if (releaseId && sectionId) {
       const newComment = await releaseContentCommentService.addContentSectionComment(
@@ -62,6 +65,7 @@ const Comments = ({
       );
       onChange(blockId, [newComment, ...comments]);
     }
+    toggleSubmitting(false);
   };
 
   const removeComment = async (commentId: string) => {
@@ -79,7 +83,7 @@ const Comments = ({
       ...comments[index],
       content,
     };
-
+    toggleSubmitting(true);
     const savedComment = await releaseContentCommentService.updateContentSectionComment(
       editedComment,
     );
@@ -88,6 +92,7 @@ const Comments = ({
     newComments[index] = savedComment;
     onChange(blockId, newComments);
     setEditingComment(undefined);
+    toggleSubmitting(false);
   };
 
   const setResolved = async (commentId: string, resolved: boolean) => {
@@ -132,7 +137,9 @@ const Comments = ({
                 rows={3}
               />
 
-              <Button type="submit">Add comment</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Add comment
+              </Button>
             </Form>
           </Formik>
         )}
@@ -244,7 +251,9 @@ const Comments = ({
                       />
 
                       <ButtonGroup>
-                        <Button type="submit">Update</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                          Update
+                        </Button>
                         <ButtonText
                           onClick={() => {
                             setEditingComment(undefined);
