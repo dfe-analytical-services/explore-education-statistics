@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -12,37 +14,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class CreateLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public async Task CanCreateAnyLegacyRelease()
+            public async Task CreateLegacyRelease()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<CreateLegacyReleaseRequirement>(
-                    new CreateLegacyReleaseAuthorizationHandler.CanCreateAnyLegacyRelease(), 
+                await AssertHandlerSucceedsWithCorrectClaims<Publication, CreateLegacyReleaseRequirement>(
+                    contentDbContext =>
+                        new CreateLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    new Publication(),
                     CreateAnyRelease
                 );
             }
+
+            // TODO Publication owner test @MarkFix
         }
 
         public class ViewLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public async Task CanViewAllLegacyReleases()
+            public async Task ViewLegacyRelease()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewLegacyReleaseRequirement>(
-                    new ViewLegacyReleaseAuthorizationHandler.CanViewAllLegacyReleases(), 
+                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, ViewLegacyReleaseRequirement>(
+                    contentDbContext =>
+                        new ViewLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    new LegacyRelease(),
                     AccessAllReleases
                 );
             }
+
+            // TODO Publication owner test @MarkFix
         }
 
         public class UpdateLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public async Task CanUpdateAllLegacyReleases()
+            public async Task UpdateLegacyRelease()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateLegacyReleaseRequirement>(
-                    new UpdateLegacyReleaseAuthorizationHandler.CanUpdateAllLegacyReleases(), 
+                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, UpdateLegacyReleaseRequirement>(
+                    contentDbContext =>
+                        new UpdateLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    new LegacyRelease(),
                     UpdateAllReleases
                 );
             }
+
+            // TODO Publication owner test @MarkFix
         }
 
         public class DeleteLegacyReleaseAuthorizationHandlerTests
@@ -50,11 +67,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task CanDeleteAllLegacyReleases()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteLegacyReleaseRequirement>(
-                    new DeleteLegacyReleaseAuthorizationHandler.CanDeleteAllLegacyReleases(), 
+                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, DeleteLegacyReleaseRequirement>(
+                    contentDbContext =>
+                        new DeleteLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    new LegacyRelease(),
                     UpdateAllReleases
                 );
             }
+
+            // TODO Publication owner test @MarkFix
         }
     }
 }
