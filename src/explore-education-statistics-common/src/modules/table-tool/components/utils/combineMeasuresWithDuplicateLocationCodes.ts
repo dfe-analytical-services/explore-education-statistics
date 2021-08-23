@@ -1,6 +1,6 @@
 import { TableDataResult } from '@common/services/tableBuilderService';
+import { groupBy, isEqual, mapValues, sum, uniq, uniqWith } from 'lodash';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
-import { groupBy, isEqual, mapValues, uniq, uniqWith } from 'lodash';
 
 type LocationGroupingKey = {
   level: string;
@@ -28,6 +28,7 @@ type MeasurementsMergeStrategy = (
 export default function combineMeasuresWithDuplicateLocationCodes(
   results: TableDataResult[],
   availableLocations: LocationFilter[],
+  measurementsMergeStrategy: MeasurementsMergeStrategy = sumNumericValuesMergeStrategy,
 ): TableDataResult[] {
   // iterate through results, looking at each rows' location[geographicLevel], and see if rows with the same
   // geographicLevel also have the same location[geographicLevel].code but different location[geographicLevel].name.
@@ -136,7 +137,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
         // Now for each measure, combine the values gathered from all of the Locations into a single value per measure.
         const mergedMeasurements = mapValues(
           measureValuesForEachLocation,
-          defaultMergeStrategy,
+          measurementsMergeStrategy,
         );
 
         return {
@@ -148,10 +149,30 @@ export default function combineMeasuresWithDuplicateLocationCodes(
   );
 }
 
-const defaultMergeStrategy: MeasurementsMergeStrategy = (
+export const slashSeparatedStringMergeStrategy: MeasurementsMergeStrategy = (
   measurementValues: (string | undefined)[],
 ) => {
   return measurementValues
-    .map(value => (typeof value === 'undefined' ? 'n/a' : value))
+    .map(value => (typeof value === 'undefined' ? '0' : value))
     .join(' / ');
+};
+
+const sumNumericValuesMergeStrategy: MeasurementsMergeStrategy = (
+  measurementValues: (string | undefined)[],
+) => {
+  const numericalValuesExist = measurementValues.some(
+    value => value && !Number.isNaN(parseFloat(value)),
+  );
+
+  if (!numericalValuesExist) {
+    return measurementValues.find(value => value) ?? '';
+  }
+
+  const total = sum(
+    measurementValues.map(value => {
+      const numeric = value ? parseFloat(value) : 0;
+      return !Number.isNaN(numeric) ? numeric : 0;
+    }),
+  );
+  return `${total}`;
 };

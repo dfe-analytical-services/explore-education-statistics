@@ -3,7 +3,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
 import { getIndicatorPath } from '@common/modules/charts/util/groupResultMeasuresByDataSet';
 import groupResultMeasuresByCombination from '@common/modules/table-tool/components/utils/groupResultMeasuresByCombination';
-import combineMeasuresWithDuplicateLocationCodes from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
 import Header from '@common/modules/table-tool/components/utils/Header';
 import {
   CategoryFilter,
@@ -138,19 +137,10 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
 
     const excludedFilters = getExcludedFilters(tableHeadersConfig, subjectMeta);
 
-    //
-    // Combine groups of rows with duplicate Location Code / unique Location Names that exist under a single Level
-    // into a single set of rows under a combined Location header.
-    //
-    const combinedDuplicateLocationCodeResults = combineMeasuresWithDuplicateLocationCodes(
-      results,
-      subjectMeta.locations,
-    );
-
     // Group measures by their respective combination of filters
     // allowing lookups later on to be MUCH faster.
     const measuresByFilterCombination = groupResultMeasuresByCombination(
-      combinedDuplicateLocationCodeResults,
+      results,
       excludedFilters,
     );
 

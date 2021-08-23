@@ -2,6 +2,7 @@ import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
 import { groupBy, mapValues, uniq } from 'lodash';
+import combineMeasuresWithDuplicateLocationCodes from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
 
 export interface FilterOption {
   label: string;
@@ -188,18 +189,18 @@ function mergeDuplicateLocationsInTableDataResponse(
     location => `${location.level}_${location.value}`,
   );
 
-  const mergedLocations = Object.values(locationsGroupedByLevelAndCode).flatMap(
-    locations => {
-      const distinctLocationNames = uniq(locations.map(l => l.label));
-      const mergedNames = distinctLocationNames.sort().join(' / ');
-      return [
-        {
-          ...locations[0],
-          label: mergedNames,
-        },
-      ];
-    },
-  );
+  const mergedLocations: LocationOption[] = Object.values(
+    locationsGroupedByLevelAndCode,
+  ).flatMap(locations => {
+    const distinctLocationNames = uniq(locations.map(l => l.label));
+    const mergedNames = distinctLocationNames.sort().join(' / ');
+    return [
+      {
+        ...locations[0],
+        label: mergedNames,
+      },
+    ];
+  });
 
   return {
     ...tableData,
@@ -207,6 +208,10 @@ function mergeDuplicateLocationsInTableDataResponse(
       ...tableData.subjectMeta,
       locations: mergedLocations,
     },
+    results: combineMeasuresWithDuplicateLocationCodes(
+      tableData.results,
+      mergedLocations,
+    ),
   };
 }
 
@@ -267,20 +272,27 @@ const tableBuilderService = {
   },
   async getTableData({
     releaseId,
+    combineDuplicateLocations = true,
     ...query
-  }: ReleaseTableDataQuery): Promise<TableDataResponse> {
+  }: ReleaseTableDataQuery & {
+    combineDuplicateLocations?: boolean;
+  }): Promise<TableDataResponse> {
     if (releaseId) {
       const response: TableDataResponse = await dataApi.post(
         `/tablebuilder/release/${releaseId}`,
         query,
       );
-      return mergeDuplicateLocationsInTableDataResponse(response);
+      return combineDuplicateLocations
+        ? mergeDuplicateLocationsInTableDataResponse(response)
+        : response;
     }
     const response: TableDataResponse = await dataApi.post(
       `/tablebuilder`,
       query,
     );
-    return mergeDuplicateLocationsInTableDataResponse(response);
+    return combineDuplicateLocations
+      ? mergeDuplicateLocationsInTableDataResponse(response)
+      : response;
   },
   async getDataBlockTableData(
     releaseId: string,

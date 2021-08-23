@@ -1,4 +1,6 @@
-import combineMeasuresWithDuplicateLocationCodes from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
+import combineMeasuresWithDuplicateLocationCodes, {
+  slashSeparatedStringMergeStrategy,
+} from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { TableDataResult } from '@common/services/tableBuilderService';
 
@@ -76,6 +78,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
       availableLocations,
+      slashSeparatedStringMergeStrategy,
     );
     expect(results).toEqual(tableDataResult);
   });
@@ -132,6 +135,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
       availableLocations,
+      slashSeparatedStringMergeStrategy,
     );
     expect(results).toEqual(tableDataResult);
   });
@@ -239,12 +243,13 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
       availableLocations,
+      slashSeparatedStringMergeStrategy,
     );
     expect(results).toEqual(expectedMergedResults);
   });
 
   test(
-    'results from locations with non-overlapping measures are combined with n/a values for ' +
+    'results from locations with non-overlapping measures are combined with "0" values for ' +
       'Locations that do not have data for particular measure',
     () => {
       const tableDataResult: TableDataResult[] = [
@@ -311,10 +316,10 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           geographicLevel: 'provider',
           timePeriod: '',
           measures: {
-            'indicator-1': '10 / 40 / n/a',
-            'indicator-2': '20 / 50 / n/a',
+            'indicator-1': '10 / 40 / 0',
+            'indicator-2': '20 / 50 / 0',
             'indicator-3': '30 / 60 / 70',
-            'indicator-4': 'n/a / n/a / 80',
+            'indicator-4': '0 / 0 / 80',
           },
           location: {
             provider: {
@@ -328,13 +333,14 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
         availableLocations,
+        slashSeparatedStringMergeStrategy,
       );
       expect(results).toEqual(expectedMergedResults);
     },
   );
 
   test(
-    'results from locations with non-overlapping time periods are combined with n/a values for ' +
+    'results from locations with non-overlapping time periods are combined with "0" values for ' +
       'Locations that do not have data for particular time periods',
     () => {
       const tableDataResult: TableDataResult[] = [
@@ -386,9 +392,9 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           geographicLevel: 'provider',
           timePeriod: 'time-period-1',
           measures: {
-            'indicator-1': '10 / n/a',
-            'indicator-2': '20 / n/a',
-            'indicator-3': '30 / n/a',
+            'indicator-1': '10 / 0',
+            'indicator-2': '20 / 0',
+            'indicator-3': '30 / 0',
           },
           location: {
             provider: {
@@ -402,9 +408,9 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           geographicLevel: 'provider',
           timePeriod: 'time-period-2',
           measures: {
-            'indicator-1': 'n/a / 40',
-            'indicator-2': 'n/a / 50',
-            'indicator-3': 'n/a / 60',
+            'indicator-1': '0 / 40',
+            'indicator-2': '0 / 50',
+            'indicator-3': '0 / 60',
           },
           location: {
             provider: {
@@ -418,13 +424,14 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
         availableLocations,
+        slashSeparatedStringMergeStrategy,
       );
       expect(results).toEqual(expectedMergedResults);
     },
   );
 
   test(
-    'results from locations with non-overlapping filters are combined with n/a text for the location that ' +
+    'results from locations with non-overlapping filters are combined with the text "0" for the location that ' +
       'does not have values for that filter combinations',
     () => {
       const tableDataResult: TableDataResult[] = [
@@ -476,9 +483,9 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           geographicLevel: 'provider',
           timePeriod: 'time-period-1',
           measures: {
-            'indicator-1': '10 / n/a',
-            'indicator-2': '20 / n/a',
-            'indicator-3': '30 / n/a',
+            'indicator-1': '10 / 0',
+            'indicator-2': '20 / 0',
+            'indicator-3': '30 / 0',
           },
           location: {
             provider: {
@@ -492,14 +499,107 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           geographicLevel: 'provider',
           timePeriod: 'time-period-2',
           measures: {
-            'indicator-1': 'n/a / 40',
-            'indicator-2': 'n/a / 50',
-            'indicator-3': 'n/a / 60',
+            'indicator-1': '0 / 40',
+            'indicator-2': '0 / 50',
+            'indicator-3': '0 / 60',
           },
           location: {
             provider: {
               code: 'duplicate-provider-code',
               name: 'Provider 1 / Provider 2',
+            },
+          },
+        },
+      ];
+
+      const results = combineMeasuresWithDuplicateLocationCodes(
+        tableDataResult,
+        availableLocations,
+        slashSeparatedStringMergeStrategy,
+      );
+      expect(results).toEqual(expectedMergedResults);
+    },
+  );
+
+  test(
+    'default sumNumericValuesMergeStrategy measurement-combining strategy combines numeric values rather than ' +
+      'separating with forward slashes.  If no numeric values exist, the first non-falsy value is displayed.',
+    () => {
+      const tableDataResult: TableDataResult[] = [
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '10',
+            'indicator-2': '20',
+            'indicator-3': 'Some text to be ignored',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code',
+              name: 'Provider 1',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-3': '70',
+            'indicator-4': '80',
+            'indicator-5': '~',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code',
+              name: 'Provider 3',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '40',
+            'indicator-3': '60',
+            'indicator-2': '50',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code',
+              name: 'Provider 2',
+            },
+          },
+        },
+      ];
+
+      const availableLocations: LocationFilter[] = [
+        new LocationFilter({
+          value: 'duplicate-provider-code',
+          label: 'Provider 1 / Provider 2 / Provider 3',
+          level: 'provider',
+        }),
+      ];
+
+      const expectedMergedResults = [
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '50',
+            'indicator-2': '70',
+            'indicator-3': '130',
+            'indicator-4': '80',
+            'indicator-5': '~',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code',
+              name: 'Provider 1 / Provider 2 / Provider 3',
             },
           },
         },
