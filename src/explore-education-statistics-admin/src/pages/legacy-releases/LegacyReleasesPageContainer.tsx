@@ -3,17 +3,12 @@ import { PublicationContextProvider } from '@admin/contexts/PublicationContext';
 import {
   legacyReleaseCreateRoute,
   legacyReleaseEditRoute,
-  legacyReleasesIndexRoute,
 } from '@admin/routes/legacyReleaseRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
 import React from 'react';
 import { RouteComponentProps, Switch } from 'react-router';
 
-const routes = [
-  legacyReleasesIndexRoute,
-  legacyReleaseCreateRoute,
-  legacyReleaseEditRoute,
-];
+const routes = [legacyReleaseCreateRoute, legacyReleaseEditRoute];
 
 const LegacyReleasesPageContainer = ({
   match,

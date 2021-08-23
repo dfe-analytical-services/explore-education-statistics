@@ -175,7 +175,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     methodology.Status = request.Status;
                     methodology.PublishingStrategy = request.PublishingStrategy;
-                    methodology.ScheduledWithReleaseId = request.WithReleaseId;
+                    methodology.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
+                        ? request.WithReleaseId
+                        : null;
                     methodology.InternalReleaseNote = Approved == request.Status
                         ? request.LatestInternalReleaseNote
                         : null;

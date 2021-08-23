@@ -1,5 +1,6 @@
 import fastTrackService from '@common/services/fastTrackService';
 import tableBuilderService from '@common/services/tableBuilderService';
+import themeService from '@common/services/themeService';
 import { Dictionary } from '@common/types';
 import TableToolPage, {
   TableToolPageProps,
@@ -15,7 +16,9 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
 
   const [fastTrack, themeMeta] = await Promise.all([
     fastTrackService.getFastTrackTableAndReleaseMeta(fastTrackId),
-    tableBuilderService.getThemes(),
+    themeService.listThemes({
+      publicationFilter: 'LatestData',
+    }),
   ]);
 
   if (!fastTrack) {

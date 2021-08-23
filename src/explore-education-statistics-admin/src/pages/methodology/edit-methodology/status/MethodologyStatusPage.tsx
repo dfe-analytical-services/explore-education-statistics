@@ -1,5 +1,4 @@
 import StatusBlock from '@admin/components/StatusBlock';
-import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyService, {
   MethodologyStatus,
 } from '@admin/services/methodologyService';
@@ -10,11 +9,11 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import MethodologyStatusEditPage from './MethodologyStatusEditPage';
+import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
+import React from 'react';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -28,63 +27,60 @@ const statusMap: Dictionary<string> = {
   Approved: 'Approved',
 };
 
-const MethodologyStatusPage = ({
-  match,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+const MethodologyStatusPage = () => {
+  const {
+    methodologyId,
+    methodology: currentMethodology,
+    onMethodologyChange,
+  } = useMethodologyContext();
 
   const [isEditing, toggleForm] = useToggle(false);
 
-  const {
-    value: model,
-    setState: setModel,
-    isLoading,
-  } = useAsyncRetry(async () => {
-    const [summary, canApprove, canMarkAsDraft] = await Promise.all([
-      methodologyService.getMethodology(methodologyId),
+  const { value: permissions, isLoading } = useAsyncRetry(async () => {
+    const [canApprove, canMarkAsDraft] = await Promise.all([
       permissionService.canApproveMethodology(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
     ]);
 
     return {
-      summary,
       canApprove,
       canMarkAsDraft,
     };
   }, [methodologyId]);
 
-  const handleSubmit = async (values: FormValues) => {
-    if (!model) {
+  const handleSubmit = async ({
+    latestInternalReleaseNote,
+    publishingStrategy,
+    status,
+    withReleaseId,
+  }: FormValues) => {
+    if (!currentMethodology) {
       return;
     }
 
     const nextSummary = await methodologyService.updateMethodology(
       methodologyId,
       {
-        ...model.summary,
-        ...values,
+        latestInternalReleaseNote,
+        publishingStrategy,
+        status,
+        title: currentMethodology.title,
+        withReleaseId:
+          publishingStrategy === 'WithRelease' ? withReleaseId : undefined,
       },
     );
 
-    setModel({
-      isLoading: false,
-      value: {
-        ...model,
-        summary: {
-          ...nextSummary,
-        },
-      },
-    });
+    onMethodologyChange(nextSummary);
 
     toggleForm.off();
   };
 
-  const isEditable = model?.canApprove || model?.canMarkAsDraft;
+  const isEditable = permissions?.canApprove || permissions?.canMarkAsDraft;
 
   return (
     <>
       <LoadingSpinner loading={isLoading}>
-        {model ? (
+        {currentMethodology ? (
           <>
             {!isEditing ? (
               <>
@@ -92,37 +88,40 @@ const MethodologyStatusPage = ({
 
                 <SummaryList>
                   <SummaryListItem term="Status">
-                    <StatusBlock text={statusMap[model.summary.status]} />
+                    <StatusBlock text={statusMap[currentMethodology.status]} />
                   </SummaryListItem>
-                  {model.summary.status === 'Approved' && (
+                  {currentMethodology.status === 'Approved' && (
                     <>
                       <SummaryListItem term="When to publish">
-                        {model.summary.publishingStrategy === 'WithRelease'
+                        {currentMethodology.publishingStrategy === 'WithRelease'
                           ? 'With a specific release'
-                          : model.summary.publishingStrategy}
+                          : currentMethodology.publishingStrategy}
                       </SummaryListItem>
-                      {model.summary.publishingStrategy === 'WithRelease' && (
+                      {currentMethodology.publishingStrategy ===
+                        'WithRelease' && (
                         <SummaryListItem term="Publish with release">
-                          {model.summary.scheduledWithRelease?.title}
+                          {currentMethodology.scheduledWithRelease?.title}
                         </SummaryListItem>
                       )}
                     </>
                   )}
                   <SummaryListItem term="Owning publication">
-                    {model.summary.owningPublication.title}
+                    {currentMethodology.owningPublication.title}
                   </SummaryListItem>
-                  {model.summary.otherPublications &&
-                    model.summary.otherPublications.length > 0 && (
+                  {currentMethodology.otherPublications &&
+                    currentMethodology.otherPublications.length > 0 && (
                       <SummaryListItem term="Other publications">
                         <ul className="govuk-!-margin-top-0">
-                          {model.summary.otherPublications?.map(publication => (
-                            <li
-                              key={publication.id}
-                              data-testid="other-publication-item"
-                            >
-                              {publication.title}
-                            </li>
-                          ))}
+                          {currentMethodology.otherPublications?.map(
+                            publication => (
+                              <li
+                                key={publication.id}
+                                data-testid="other-publication-item"
+                              >
+                                {publication.title}
+                              </li>
+                            ),
+                          )}
                         </ul>
                       </SummaryListItem>
                     )}
@@ -139,7 +138,7 @@ const MethodologyStatusPage = ({
               </>
             ) : (
               <MethodologyStatusEditPage
-                methodologySummary={model.summary}
+                methodologySummary={currentMethodology}
                 onCancel={toggleForm.off}
                 onSubmit={handleSubmit}
               />

@@ -1,6 +1,6 @@
 import MethodologyStatusForm, {
   FormValues,
-} from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
+} from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import { IdTitlePair } from '@admin/services/types/common';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

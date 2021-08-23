@@ -1,10 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -12,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public List<PublicationMethodology> Publications { get; set; }
+        public List<PublicationMethodology> Publications { get; set; } = new();
 
         [Required]
         public string OwningPublicationTitle { get; set; }
@@ -20,16 +19,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [Required]
         public string Slug { get; set; }
 
-        public List<Methodology> Versions { get; set; }
+        public List<Methodology> Versions { get; set; } = new();
+
+        public PublicationMethodology OwningPublication()
+        {
+            if (Publications.IsNullOrEmpty())
+            {
+                throw new ArgumentException("MethodologyParent must be hydrated with Publications to get the owning publication");
+            }
+
+            return Publications
+                .Single(pm => pm.Owner);
+        }
 
         public Methodology LatestVersion()
         {
-            if (Versions == null)
+            if (Versions.IsNullOrEmpty())
             {
                 throw new ArgumentException("Methodology must be hydrated with Versions to get the latest version");
             }
 
-            return Versions.SingleOrDefault(mv => IsLatestVersionOfMethodology(mv.Id));
+            return Versions.Single(mv => IsLatestVersionOfMethodology(mv.Id));
         }
 
         public bool IsLatestVersionOfMethodology(Guid methodologyVersionId)

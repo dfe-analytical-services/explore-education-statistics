@@ -73,9 +73,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
         {
             return await _contentDbContext.Releases
+                .AsQueryable()
                 .Where(release => ids.Contains(release.Id))
                 .Include(release => release.Publication)
                 .Include(release => release.PreviousVersion)
+                .ToAsyncEnumerable()
                 .ToListAsync();
         }
 
@@ -159,6 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             var statisticsRelease = await _publicStatisticsDbContext.Release
+                .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             if (contentRelease == null)
@@ -314,6 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)
         {
             var releases = await _publicStatisticsDbContext.Release
+                .AsQueryable()
                 .Where(r => releaseIds.Contains(r.Id))
                 .ToListAsync();
 

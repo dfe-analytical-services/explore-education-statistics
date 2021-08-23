@@ -185,15 +185,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             return new(
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 AdminMapper(),
-                blobCacheService ?? new Mock<IBlobCacheService>().Object,
-                methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
+                blobCacheService ?? Mock.Of<IBlobCacheService>(),
+                methodologyContentService ?? Mock.Of<IMethodologyContentService>(),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
-                methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
-                publishingService ?? new Mock<IPublishingService>().Object,
-                userService ?? new Mock<IUserService>().Object
+                methodologyRepository ?? Mock.Of<IMethodologyRepository>(),
+                methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
+                publishingService ?? Mock.Of<IPublishingService>(),
+                userService ?? Mock.Of<IUserService>()
             );
         }
 

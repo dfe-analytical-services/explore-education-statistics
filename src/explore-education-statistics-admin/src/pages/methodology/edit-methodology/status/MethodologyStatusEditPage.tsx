@@ -5,7 +5,7 @@ import methodologyService, {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodolodyStatusForm';
+import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import React from 'react';
 
 interface FormValues {

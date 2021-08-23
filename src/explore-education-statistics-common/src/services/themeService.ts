@@ -10,7 +10,7 @@ interface BasePublicationSummary {
 }
 
 export interface PublicationSummary extends BasePublicationSummary {
-  legacyPublicationUrl: string;
+  legacyPublicationUrl?: string;
 }
 
 export interface PublicationDownloadSummary extends BasePublicationSummary {
@@ -26,16 +26,14 @@ export interface PublicationMethodologySummary extends BasePublicationSummary {
 
 export interface Topic<Publication = PublicationSummary> {
   id: string;
-  slug: string;
   title: string;
-  summary?: string;
+  summary: string;
   publications: Publication[];
 }
 
 export interface Theme<PublicationNode = PublicationSummary> {
   id: string;
   title: string;
-  slug: string;
   summary: string;
   topics: Topic<PublicationNode>[];
 }
@@ -44,9 +42,15 @@ export type DownloadTheme = Theme<PublicationDownloadSummary>;
 
 export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
+interface ListThemesOptions {
+  publicationFilter?: 'LatestData';
+}
+
 const themeService = {
-  getThemes(): Promise<Theme[]> {
-    return contentApi.get('/themes');
+  listThemes({ publicationFilter }: ListThemesOptions = {}): Promise<Theme[]> {
+    return contentApi.get('/themes', {
+      params: { publicationFilter },
+    });
   },
   getDownloadThemes(): Promise<DownloadTheme[]> {
     return contentApi.get('/download-themes');

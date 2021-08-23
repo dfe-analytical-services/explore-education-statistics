@@ -36,13 +36,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public List<ContentSection> Content { get; set; } = new List<ContentSection>();
+        public List<ContentSection> Content { get; set; } = new();
 
-        public List<ContentSection> Annexes { get; set; } = new List<ContentSection>();
+        public List<ContentSection> Annexes { get; set; } = new();
 
         public string? InternalReleaseNote { get; set; }
 
-        public MethodologyParent MethodologyParent { get; set; }
+        public MethodologyParent MethodologyParent { get; set; } = null!;
 
         public Guid MethodologyParentId { get; set; }
 
@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.PublishingStrategy = Immediately;
             copy.ScheduledWithRelease = null;
             copy.ScheduledWithReleaseId = null;
-            copy.MethodologyParent = null;
+            copy.MethodologyParent = null!;
             copy.InternalReleaseNote = null;
 
             copy.Annexes = Annexes

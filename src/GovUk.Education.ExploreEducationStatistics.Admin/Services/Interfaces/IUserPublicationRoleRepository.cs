@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -7,15 +8,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserPublicationRoleRepository
     {
-        public Task<UserPublicationRole> Create(Guid userId,
+        Task<UserPublicationRole> Create(Guid userId,
             Guid publicationId,
             PublicationRole role,
             Guid createdById);
 
-        public Task<List<PublicationRole>> GetAllRolesByUser(Guid userId,
+        Task<List<PublicationRole>> GetAllRolesByUser(Guid userId,
             Guid publicationId);
 
-        public Task<UserPublicationRole> GetByUserAndRole(Guid userId,
+        Task<bool> IsUserPublicationOwner(Guid userId, Guid publicationId);
+
+        Task<bool> UserHasRoleOnPublication(Guid userId,
             Guid publicationId,
             PublicationRole role);
     }

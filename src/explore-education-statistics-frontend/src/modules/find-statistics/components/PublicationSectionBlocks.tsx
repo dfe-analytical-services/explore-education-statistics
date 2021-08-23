@@ -38,7 +38,7 @@ const PublicationSectionBlocks = ({
               onToggle={section => {
                 logEvent({
                   category: 'Publication Release Data Tabs',
-                  action: `${section.title} (${section.id}) tab opened`,
+                  action: `${section.title} (${block.name}) tab opened`,
                   label: window.location.pathname,
                 });
               }}

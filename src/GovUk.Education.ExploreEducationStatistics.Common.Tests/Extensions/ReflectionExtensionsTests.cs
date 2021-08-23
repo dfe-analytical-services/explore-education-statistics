@@ -5,35 +5,273 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using static System.Threading.Tasks.Task;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public static class ReflectionExtensionsTests
     {
+        private const string TestString = "test-value";
+
+        private abstract record BaseClass;
+
+        private record TestClass : BaseClass;
+
         public class TryBoxToResultTests
         {
-            private const string TestString = "test-value";
-
             [Fact]
-            public void VoidBoxTarget()
+            public void Void()
             {
                 Assert.False(TestString.TryBoxToResult(typeof(void), out var boxed));
                 Assert.Equal(TestString, boxed);
             }
 
             [Fact]
-            public void SameBoxTarget()
+            public void ValueType_Itself()
             {
                 Assert.True(TestString.TryBoxToResult(typeof(string), out var boxed));
                 Assert.Equal(TestString, boxed);
             }
 
             [Fact]
-            public void ListBoxTarget()
+            public void ValueType_Incompatible()
+            {
+                Assert.False(TestString.TryBoxToResult(typeof(int), out var boxed));
+                Assert.Equal(TestString, boxed);
+            }
+
+            [Fact]
+            public void ReferenceType_Itself()
+            {
+                var testClass = new TestClass();
+                Assert.True(testClass.TryBoxToResult(typeof(BaseClass), out var boxed));
+                Assert.Equal(testClass, boxed);
+            }
+
+            [Fact]
+            public void ReferenceType_SubType()
+            {
+                var testClass = new TestClass();
+                Assert.True(testClass.TryBoxToResult(typeof(BaseClass), out var boxed));
+                Assert.Equal(testClass, boxed);
+            }
+
+            [Fact]
+            public void ReferenceType_Incompatible()
+            {
+                var testClass = new TestClass();
+                Assert.False(testClass.TryBoxToResult(typeof(string), out var boxed));
+                Assert.Equal(testClass, boxed);
+            }
+
+            [Fact]
+            public void List_Itself()
+            {
+                var list = ListOf("test 1", "test 2");
+
+                Assert.True(list.TryBoxToResult(typeof(List<string>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Interface()
+            {
+                var list = ListOf("test 1", "test 2");
+
+                Assert.True(list.TryBoxToResult(typeof(IList<string>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Collection()
+            {
+                var list = ListOf("test 1", "test 2");
+
+                Assert.True(list.TryBoxToResult(typeof(ICollection<string>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Enumerable()
+            {
+                var list = ListOf("test 1", "test 2");
+
+                Assert.True(list.TryBoxToResult(typeof(IEnumerable<string>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Tasks()
+            {
+                var list = ListOf(FromResult("test1"), FromResult("test2"));
+
+                Assert.True(list.TryBoxToResult(typeof(List<Task<string>>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Tasks_Void()
+            {
+                var list = ListOf("test1", "test2");
+
+                Assert.False(list.TryBoxToResult(typeof(List<Task>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_ActionResults()
+            {
+                var list = ListOf(
+                    new ActionResult<string>("test1"), new ActionResult<string>("test2")
+                );
+
+                Assert.True(list.TryBoxToResult(typeof(List<ActionResult<string>>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_ActionResults_Void()
+            {
+                var list = ListOf(new OkResult(), new OkResult());
+
+                Assert.False(list.TryBoxToResult(typeof(List<ActionResult>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_Eithers()
+            {
+                var list = ListOf(
+                    new Either<int, string>("test1"), new Either<int, string>("test2")
+                );
+
+                Assert.True(list.TryBoxToResult(typeof(List<Either<int, string>>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void List_DoesNotBox()
             {
                 Assert.False(TestString.TryBoxToResult(typeof(List<string>), out var boxed));
                 Assert.Equal(TestString, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Itself()
+            {
+                var dictionary = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, string>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Interface()
+            {
+                var dictionary = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(IDictionary<string, string>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Collection()
+            {
+                var dictionary = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(ICollection<KeyValuePair<string, string>>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Enumerable()
+            {
+                var dictionary = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(IEnumerable<KeyValuePair<string, string>>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Tasks()
+            {
+                var dictionary = new Dictionary<string, Task<string>>
+                {
+                    {"key1", FromResult("test1")},
+                    {"key2", FromResult("test2")}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Task<string>>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Tasks_Void()
+            {
+                var dictionary = new Dictionary<string, Task>
+                {
+                    {"key1", CompletedTask},
+                    {"key2", CompletedTask}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Task>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_ActionResults()
+            {
+                var dictionary = new Dictionary<string, ActionResult<string>>
+                {
+                    {"key1", new ActionResult<string>("value1")},
+                    {"key2", new ActionResult<string>("value2")}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, ActionResult<string>>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_ActionResults_Void()
+            {
+                var dictionary = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.False(dictionary.TryBoxToResult(typeof(List<ActionResult>), out var boxed));
+                Assert.Equal(dictionary, boxed);
+            }
+
+            [Fact]
+            public void Dictionary_Eithers()
+            {
+                var dictionary = new Dictionary<string, Either<int, string>>
+                {
+                    {"key1", new Either<int, string>("value1")},
+                    {"key2", new Either<int, string>("value2")}
+                };
+
+                Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Either<int, string>>), out var boxed));
+                Assert.Equal(dictionary, boxed);
             }
 
             [Fact]
@@ -54,6 +292,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
                 var value = Assert.IsType<Either<Unit, List<string>>>(boxed);
                 Assert.Equal(list, value.Right);
+            }
+
+            [Fact]
+            public void Either_List_DoesNotBox()
+            {
+                Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, List<string>>), out var boxed));
+                Assert.Equal(TestString, boxed);
             }
 
             [Fact]
@@ -84,6 +329,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
 
             [Fact]
+            public void Task_List_Interface()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Task<IList<string>>), out var boxed));
+
+                var value = Assert.IsType<Task<IList<string>>>(boxed);
+                Assert.Equal(list, value.Result);
+            }
+
+            [Fact]
+            public void Task_List_Collection()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Task<ICollection<string>>), out var boxed));
+
+                var value = Assert.IsType<Task<ICollection<string>>>(boxed);
+                Assert.Equal(list, value.Result);
+            }
+
+            [Fact]
+            public void Task_List_Enumerable()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Task<IEnumerable<string>>), out var boxed));
+
+                var value = Assert.IsType<Task<IEnumerable<string>>>(boxed);
+                Assert.Equal(list, value.Result);
+            }
+
+            [Fact]
+            public void Task_List_Task()
+            {
+                var list = ListOf(FromResult("test"));
+
+                Assert.True(list.TryBoxToResult(typeof(Task<List<Task<string>>>), out var boxed));
+
+                var value = Assert.IsType<Task<List<Task<string>>>>(boxed);
+                Assert.Equal(list, value.Result);
+            }
+
+            [Fact]
+            public void Task_List_Task_Void()
+            {
+                var list = ListOf("test");
+
+                Assert.False(list.TryBoxToResult(typeof(Task<List<Task>>), out var boxed));
+                Assert.Equal(list, boxed);
+            }
+
+            [Fact]
+            public void Task_List_DoesNotBox()
+            {
+                Assert.False(TestString.TryBoxToResult(typeof(Task<List<string>>), out var boxed));
+                Assert.Equal(TestString, boxed);
+            }
+
+            [Fact]
             public void ActionResult()
             {
                 Assert.True(TestString.TryBoxToResult(typeof(ActionResult<string>), out var boxed));
@@ -108,6 +413,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
                 var value = Assert.IsType<ActionResult<List<string>>>(boxed);
                 Assert.Equal(list, value.Value);
+            }
+
+            [Fact]
+            public void ActionResult_List_Interface()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(ActionResult<IList<string>>), out var boxed));
+
+                var value = Assert.IsType<ActionResult<IList<string>>>(boxed);
+                Assert.Equal(list, value.Value);
+            }
+
+            [Fact]
+            public void ActionResult_List_Collection()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(ActionResult<ICollection<string>>), out var boxed));
+
+                var value = Assert.IsType<ActionResult<ICollection<string>>>(boxed);
+                Assert.Equal(list, value.Value);
+            }
+
+            [Fact]
+            public void ActionResult_List_Enumerable()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(ActionResult<IEnumerable<string>>), out var boxed));
+
+                var value = Assert.IsType<ActionResult<IEnumerable<string>>>(boxed);
+                Assert.Equal(list, value.Value);
+            }
+
+            [Fact]
+            public void ActionResult_List_DoesNotBox()
+            {
+                Assert.False(TestString.TryBoxToResult(typeof(ActionResult<List<string>>), out var boxed));
+                Assert.Equal(TestString, boxed);
             }
 
             [Fact]
@@ -179,6 +524,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
 
             [Fact]
+            public void Either_Task_ActionResult_List()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<List<string>>>>), out var boxed));
+
+                var value = Assert.IsType<Either<Unit, Task<ActionResult<List<string>>>>>(boxed);
+                Assert.Equal(list, value.Right.Result.Value);
+            }
+
+            [Fact]
+            public void Either_Task_ActionResult_List_Interface()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IList<string>>>>), out var boxed));
+
+                var value = Assert.IsType<Either<Unit, Task<ActionResult<IList<string>>>>>(boxed);
+                Assert.Equal(list, value.Right.Result.Value);
+            }
+
+            [Fact]
+            public void Either_Task_ActionResult_List_Collection()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<ICollection<string>>>>), out var boxed));
+
+                var value = Assert.IsType<Either<Unit, Task<ActionResult<ICollection<string>>>>>(boxed);
+                Assert.Equal(list, value.Right.Result.Value);
+            }
+
+            [Fact]
+            public void Either_Task_ActionResult_List_Enumerable()
+            {
+                var list = ListOf("test");
+
+                Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IEnumerable<string>>>>), out var boxed));
+
+                var value = Assert.IsType<Either<Unit, Task<ActionResult<IEnumerable<string>>>>>(boxed);
+                Assert.Equal(list, value.Right.Result.Value);
+            }
+
+            [Fact]
+            public void Either_Task_ActionResult_DoesNotBox()
+            {
+                Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<List<string>>>>), out var boxed));
+                Assert.Equal(TestString, boxed);
+            }
+
+            [Fact]
             public void Either_Task_ActionResult_Void_DoesNotBox()
             {
                 Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult>>), out var boxed));
@@ -200,10 +596,150 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             private const string TestString = "test-value";
 
             [Fact]
-            public void NotBoxedTarget()
+            public void ValueType()
             {
                 Assert.True(TestString.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
+            }
+
+            [Fact]
+            public void ReferenceType()
+            {
+                var testClass = new TestClass();
+                Assert.True(testClass.TryUnboxResult(out var unboxed));
+                Assert.Equal(testClass, unboxed);
+            }
+
+            [Fact]
+            public void List()
+            {
+                var list = ListOf("test1", "test2");
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void List_Tasks()
+            {
+                var list = ListOf(FromResult("test1"), FromResult("test2"));
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void List_Tasks_Void()
+            {
+                var list = ListOf(CompletedTask, CompletedTask);
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void List_ActionResults()
+            {
+                var list = ListOf(new ActionResult<string>("test1"), new ActionResult<string>("test2"));
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void List_ActionResults_Void()
+            {
+                var list = ListOf<ActionResult>(new OkResult(), new OkResult());
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void List_Eithers()
+            {
+                var list = ListOf(new Either<int, string>("test1"), new Either<int, string>("test2"));
+
+                Assert.True(list.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary()
+            {
+                var dict = new Dictionary<string, string>
+                {
+                    {"key1", "value1"},
+                    {"key2", "value2"}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary_Tasks()
+            {
+                var dict = new Dictionary<string, Task<string>>
+                {
+                    {"key1", FromResult("value1")},
+                    {"key2", FromResult("value2")}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary_Tasks_Void()
+            {
+                var dict = new Dictionary<string, Task>
+                {
+                    {"key1", CompletedTask},
+                    {"key2", CompletedTask}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary_ActionResults()
+            {
+                var dict = new Dictionary<string, ActionResult<string>>
+                {
+                    {"key1", new ActionResult<string>("value1")},
+                    {"key2", new ActionResult<string>("value2")}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary_ActionResults_Void()
+            {
+                var dict = new Dictionary<string, ActionResult>
+                {
+                    {"key1", new OkResult()},
+                    {"key2", new OkResult()}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
+            }
+
+            [Fact]
+            public void Dictionary_Eithers()
+            {
+                var dict = new Dictionary<string, Either<int, string>>
+                {
+                    {"key1", new Either<int, string>("value1")},
+                    {"key2", new Either<int, string>("value2")}
+                };
+
+                Assert.True(dict.TryUnboxResult(out var unboxed));
+                Assert.Equal(dict, unboxed);
             }
 
             [Fact]
@@ -228,7 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void FromTask()
             {
-                var boxed = Task.FromResult(TestString);
+                var boxed = FromResult(TestString);
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
@@ -237,7 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Task_Void()
             {
-                var boxed = Task.CompletedTask;
+                var boxed = CompletedTask;
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(boxed, unboxed);
@@ -247,7 +783,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             public void Task_List()
             {
                 var list = ListOf("test");
-                var boxed = Task.FromResult(list);
+                var boxed = FromResult(list);
+
+                Assert.True(boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void Task_List_Tasks()
+            {
+                var list = ListOf(FromResult("test1"), FromResult("test2"));
+                var boxed = FromResult(list);
+
+                Assert.True(boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal(list, unboxed);
+            }
+
+            [Fact]
+            public void Task_List_Tasks_Void()
+            {
+                var list = ListOf(CompletedTask, CompletedTask);
+                var boxed = FromResult(list);
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(list, unboxed);
@@ -284,7 +840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Task_Either()
             {
-                var boxed = Task.FromResult(new Either<Unit, string>(TestString));
+                var boxed = FromResult(new Either<Unit, string>(TestString));
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
@@ -293,7 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Task_Either_ActionResult()
             {
-                var boxed = Task.FromResult(new Either<Unit, ActionResult<string>>(TestString));
+                var boxed = FromResult(new Either<Unit, ActionResult<string>>(TestString));
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
@@ -302,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Task_Task()
             {
-                var boxed = Task.FromResult(Task.FromResult(TestString));
+                var boxed = FromResult(FromResult(TestString));
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
@@ -311,7 +867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Either_Task()
             {
-                var boxed = new Either<Unit, Task<string>>(Task.FromResult(TestString));
+                var boxed = new Either<Unit, Task<string>>(FromResult(TestString));
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
                 Assert.Equal(TestString, unboxed);
@@ -320,17 +876,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             [Fact]
             public void Either_Task_Void()
             {
-                var boxed = new Either<Unit, Task>(Task.CompletedTask);
+                var boxed = new Either<Unit, Task>(CompletedTask);
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(Task.CompletedTask, unboxed);
+                Assert.Equal(CompletedTask, unboxed);
             }
 
             [Fact]
             public void Either_Task_ActionResult()
             {
                 var boxed = new Either<Unit, Task<ActionResult<string>>>(
-                    Task.FromResult(new ActionResult<string>(TestString))
+                    FromResult(new ActionResult<string>(TestString))
                 );
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));
@@ -342,7 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var result = new OkResult();
                 var boxed = new Either<Unit, Task<ActionResult>>(
-                    Task.FromResult<ActionResult>(result)
+                    FromResult<ActionResult>(result)
                 );
 
                 Assert.True(boxed.TryUnboxResult(out var unboxed));

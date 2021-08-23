@@ -19,7 +19,6 @@ describe('DataCataloguePage', () => {
         {
           id: 'topic-1',
           title: 'Admission appeals',
-          slug: 'admission-appeals',
           publications: [
             {
               id: 'publication-1',

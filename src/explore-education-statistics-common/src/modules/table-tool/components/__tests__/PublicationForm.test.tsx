@@ -2,7 +2,7 @@ import PublicationForm, {
   PublicationFormValues,
 } from '@common/modules/table-tool/components/PublicationForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { Theme } from '@common/services/tableBuilderService';
+import { Theme } from '@common/services/themeService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,29 +14,31 @@ describe('PublicationForm', () => {
     {
       id: 'theme-1',
       title: 'Further education',
-      slug: 'further-education',
+      summary: '',
       topics: [
         {
           id: 'topic-1',
           title: 'Further education and skills',
-          slug: 'further-education-and-skills',
+          summary: '',
           publications: [
             {
               id: 'publication-1',
               title: 'Apprenticeships and traineeships',
               slug: 'apprenticeships-and-traineeships',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-2',
           title: 'National achievement rates tables',
-          slug: 'national-achievement-rates-tables',
+          summary: '',
           publications: [
             {
               id: 'publication-2',
               title: 'National achievement rates tables',
               slug: 'national-achievement-rates-tables',
+              summary: '',
             },
           ],
         },
@@ -45,17 +47,18 @@ describe('PublicationForm', () => {
     {
       id: 'theme-2',
       title: 'Children, early years and social care',
-      slug: 'children-and-early-years',
+      summary: '',
       topics: [
         {
           id: 'topic-3',
           title: 'Early years foundation stage profile',
-          slug: 'early-years-foundation-stage-profile',
+          summary: '',
           publications: [
             {
               id: 'publication-3',
               title: 'Early years foundation stage profile results',
               slug: 'early-years-foundation-stage-profile-results',
+              summary: '',
             },
           ],
         },
@@ -64,53 +67,57 @@ describe('PublicationForm', () => {
     {
       id: 'theme-3',
       title: 'Pupils and schools',
-      slug: 'pupils-and-schools',
+      summary: '',
       topics: [
         {
           id: 'topic-4',
           title: 'School applications',
-          slug: 'school-applications',
+          summary: '',
           publications: [
             {
               id: 'publication-4',
               title: 'Secondary and primary schools applications and offers',
               slug: 'secondary-and-primary-schools-applications-and-offers',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-5',
           title: 'Pupil absence',
-          slug: 'pupil-absence',
+          summary: '',
           publications: [
             {
               id: 'publication-5',
               title: 'Pupil absence in schools in England',
               slug: 'pupil-absence-in-schools-in-england',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-6',
           title: 'Special educational needs (SEN)',
-          slug: 'sen',
+          summary: '',
           publications: [
             {
               id: 'publication-6',
               title: 'Statements of SEN and EHC plans',
               slug: 'statements-of-sen-and-ehc-plans',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-7',
           title: 'Exclusions',
-          slug: 'exclusions',
+          summary: '',
           publications: [
             {
               id: 'publication-7',
               title: 'Permanent and fixed-period exclusions in England',
               slug: 'permanent-and-fixed-period-exclusions-in-england',
+              summary: '',
             },
           ],
         },
@@ -119,42 +126,45 @@ describe('PublicationForm', () => {
     {
       id: 'theme-4',
       title: 'School and college outcomes and performance',
-      slug: 'outcomes-and-performance',
+      summary: '',
       topics: [
         {
           id: 'topic-8',
           title: 'Key stage 2',
-          slug: 'key-stage-two',
+          summary: '',
           publications: [
             {
               id: 'publication-8',
               title: 'National curriculum assessments at key stage 2',
               slug: 'national-curriculum-assessments-key-stage2',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-9',
           title: 'GCSEs (key stage 4)',
-          slug: 'key-stage-four',
+          summary: '',
           publications: [
             {
               id: 'publication-9',
               title:
                 'GCSE and equivalent results, including pupil characteristics',
               slug: 'gcse-results-including-pupil-characteristics',
+              summary: '',
             },
           ],
         },
         {
           id: 'topic-10',
           title: '16 to 19 attainment',
-          slug: 'sixteen-to-nineteen-attainment',
+          summary: '',
           publications: [
             {
               id: 'publication-10',
               title: 'Level 2 and 3 attainment by young people aged 19',
               slug: 'Level 2 and 3 attainment by young people aged 19',
+              summary: '',
             },
           ],
         },

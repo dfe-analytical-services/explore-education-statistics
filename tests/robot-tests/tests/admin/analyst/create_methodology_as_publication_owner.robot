@@ -24,7 +24,7 @@ Assign publication owner permissions to analyst1
 Switch to analyst1
     user changes to analyst1
 
-Create a Methodology as publication owner
+Create a methodology as publication owner
     user creates methodology for publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
@@ -36,21 +36,18 @@ Create a Methodology as publication owner
     user views methodology for open publication accordion    ${accordion}    ${PUBLICATION_NAME}
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
-Update Methodology Title
-    user edits methodology summary for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
+Update methodology title
+    user edits methodology summary for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - New methodology title
     user edits methodology summary for publication    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - New methodology title    ${PUBLICATION_NAME} - another new methodology title
+    ...    ${PUBLICATION_NAME} - New methodology title
+    ...    ${PUBLICATION_NAME} - another new methodology title
 
-Approve the Methodology
-    user approves methodology for publication    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - another new methodology title
-    user clicks link    Sign off
-    user changes methodology status to Approved
-    user clicks link    Summary
-    user waits until h2 is visible    Methodology summary
-    user verifies methodology summary details
-    ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - another new methodology title
-    ...    Approved
-    ...    Not yet published
+Update methodology content
+    user clicks link    Manage content
+    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    1
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
