@@ -393,14 +393,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
-                var savedUserReleaseRoles = await context.UserReleaseRoles
+                var savedUserReleaseRole = await context.UserReleaseRoles
                     .Where(userReleaseRole => userReleaseRole.ReleaseId == release.Id)
-                    .ToListAsync();
+                    .SingleAsync();
 
-                Assert.Single(savedUserReleaseRoles);
-                Assert.Equal(release.Id, savedUserReleaseRoles[0].ReleaseId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRoles[0].Role);
-                Assert.Equal(user.Id, savedUserReleaseRoles[0].UserId);
+                Assert.Equal(release.Id, savedUserReleaseRole.ReleaseId);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
+                Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
                 var releaseInvite = await context.UserReleaseInvites
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
@@ -502,14 +501,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
-                var savedUserReleaseRoles = await context.UserReleaseRoles
+                var savedUserReleaseRole = await context.UserReleaseRoles
                     .Where(userReleaseRole => userReleaseRole.ReleaseId == release.Id)
-                    .ToListAsync();
+                    .SingleAsync();
 
-                Assert.Single(savedUserReleaseRoles);
-                Assert.Equal(release.Id, savedUserReleaseRoles[0].ReleaseId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRoles[0].Role);
-                Assert.Equal(user.Id, savedUserReleaseRoles[0].UserId);
+                Assert.Equal(release.Id, savedUserReleaseRole.ReleaseId);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
+                Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
                 var releaseInvite = await context.UserReleaseInvites
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
@@ -1068,11 +1066,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseRole.Lead, savedUserReleaseInvites[1].Role);
                 Assert.Equal("test@test.com", savedUserReleaseInvites[1].Email);
 
-                var savedUserInvites = await userAndRolesDbContext.UserInvites
-                    .ToListAsync();
+                var savedUserInvite = await userAndRolesDbContext.UserInvites
+                    .SingleAsync();
 
-                Assert.Single(savedUserInvites);
-                Assert.Equal("test@test.com", savedUserInvites[0].Email);
+                Assert.Equal("test@test.com", savedUserInvite.Email);
             }
         }
 
@@ -1137,11 +1134,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Empty(savedUserReleaseInvites);
 
-                var savedUserInvites = await userAndRolesDbContext.UserInvites
-                    .ToListAsync();
+                var savedUserInvite = await userAndRolesDbContext.UserInvites
+                    .SingleAsync();
 
-                Assert.Single(savedUserInvites);
-                Assert.Equal("test@test.com", savedUserInvites[0].Email);
+                Assert.Equal("test@test.com", savedUserInvite.Email);
             }
         }
 
