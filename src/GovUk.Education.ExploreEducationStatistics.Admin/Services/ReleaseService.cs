@@ -163,6 +163,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
 
+                    release.Updates = new List<Update>
+                    {
+                        new Update
+                        {
+                            Created = DateTime.UtcNow,
+                            On = DateTime.UtcNow,
+                            Reason = "First published",
+                            CreatedById = _userService.GetUserId()
+                        }
+                    };
+                
                     await _context.Releases.AddAsync(release);
                     await _context.SaveChangesAsync();
                     return await GetRelease(release.Id);
