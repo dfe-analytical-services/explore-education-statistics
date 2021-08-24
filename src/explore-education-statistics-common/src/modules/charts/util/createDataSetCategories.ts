@@ -140,7 +140,7 @@ function getCategoryFilters(
   axisConfiguration: AxisConfiguration,
   meta: FullTableMeta,
 ): Filter[] {
-  const { groupBy: axisGroupBy } = axisConfiguration;
+  const { groupBy: axisGroupBy, groupByFilter } = axisConfiguration;
 
   let filters: Filter[] = [];
 
@@ -151,8 +151,17 @@ function getCategoryFilters(
       // We want to try and remove any filter groups with only
       // one filter as these don't really make sense to display
       // on the chart (this is similar to what we do in table tool).
+      // Also take into account the specific filter category it's grouped by.
       const filteredFilters = filterGroups
-        .filter(filterGroup => filterGroup.options.length > 1)
+        .filter(filterGroup => {
+          if (groupByFilter) {
+            return (
+              filterGroup.options.length > 1 &&
+              filterGroup.name === groupByFilter
+            );
+          }
+          return filterGroup.options.length > 1;
+        })
         .flatMap(filterGroup => filterGroup.options);
 
       // If there are no filtered filters, we need to at least

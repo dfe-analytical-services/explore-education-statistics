@@ -14,7 +14,7 @@ import {
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormNumberInput from '@common/components/form/FormNumberInput';
-
+import { RadioOption } from '@common/components/form/FormRadioGroup';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   AxisConfiguration,
@@ -49,6 +49,7 @@ interface Props {
   definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
+  showGroupByFilter?: boolean;
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -60,6 +61,7 @@ const ChartAxisConfiguration = ({
   id,
   data,
   meta,
+  showGroupByFilter = false, // EES-2467 remove when BE done.
   type,
   onChange,
   onSubmit,
@@ -82,8 +84,8 @@ const ChartAxisConfiguration = ({
     return createDataSetCategories(config, data, meta);
   }, [configuration, data, meta, type]);
 
-  const groupByOptions = useMemo<SelectOption<AxisGroupBy>[]>(() => {
-    const options: SelectOption<AxisGroupBy>[] = [
+  const groupByOptions = useMemo<RadioOption<AxisGroupBy>[]>(() => {
+    const options: RadioOption<AxisGroupBy>[] = [
       {
         label: 'Time periods',
         value: 'timePeriod',
@@ -105,14 +107,41 @@ const ChartAxisConfiguration = ({
     );
 
     if (canGroupByFilters) {
-      options.push({
-        label: 'Filters',
-        value: 'filters',
-      });
+      // EES-2467 remove this check when BE done.
+      if (showGroupByFilter) {
+        const categories: SelectOption[] = Object.entries(meta.filters)
+          .filter(([, value]) => value.options.length > 1)
+          .map(([key, value]) => {
+            return {
+              label: key,
+              value: value.name,
+            };
+          });
+
+        categories.unshift({ label: 'All filters', value: '' });
+
+        options.push({
+          label: 'Filters',
+          value: 'filters',
+          conditional: (
+            <FormFieldSelect<AxisConfiguration>
+              label="Select a filter"
+              name="groupByFilter"
+              options={categories}
+              order={[]}
+            />
+          ),
+        });
+      } else {
+        options.push({
+          label: 'Filters',
+          value: 'filters',
+        });
+      }
     }
 
     return options;
-  }, [meta.filters]);
+  }, [meta.filters, showGroupByFilter]);
 
   // TODO EES-721: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
@@ -334,14 +363,6 @@ const ChartAxisConfiguration = ({
                   />
                 )}
 
-                {validationSchema.fields.groupBy && (
-                  <FormFieldSelect<AxisConfiguration>
-                    label="Group data by"
-                    name="groupBy"
-                    options={groupByOptions}
-                  />
-                )}
-
                 {validationSchema.fields.showGrid && (
                   <FormFieldCheckbox<AxisConfiguration>
                     name="showGrid"
@@ -363,6 +384,15 @@ const ChartAxisConfiguration = ({
                         />
                       </>
                     }
+                  />
+                )}
+
+                {validationSchema.fields.groupBy && (
+                  <FormFieldRadioGroup<AxisConfiguration>
+                    legend="Group data by"
+                    legendSize="s"
+                    name="groupBy"
+                    options={groupByOptions}
                   />
                 )}
 
