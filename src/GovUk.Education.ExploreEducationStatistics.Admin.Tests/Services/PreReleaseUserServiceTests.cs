@@ -84,9 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.GetPreReleaseUsers(release.Id);
 
-                Assert.True(result.IsRight);
-
-                var users = result.Right;
+                var users = result.AssertRight();
 
                 Assert.Equal(4, users.Count);
                 Assert.Equal("existing.1@test.com", users[0].Email);
@@ -139,10 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.GetPreReleaseUsers(release.Id);
 
-                Assert.True(result.IsRight);
-
-                var users = result.Right;
-
+                var users = result.AssertRight();
                 Assert.Empty(users);
             }
         }
@@ -192,10 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
                 var result = await service.GetPreReleaseUsers(release.Id);
 
-                Assert.True(result.IsRight);
-
-                var users = result.Right;
-
+                var users = result.AssertRight();
                 Assert.Empty(users);
             }
         }
@@ -395,9 +387,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )
                 );
 
-                Assert.True(result.IsRight);
-
-                Assert.Equal("test@test.com", result.Right.Email);
+                var preReleaseUser = result.AssertRight();
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -503,11 +494,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                emailService.VerifyNoOtherCalls();
+                MockUtils.VerifyAllMocks(emailService);
 
-                Assert.True(result.IsRight);
-
-                Assert.Equal("test@test.com", result.Right.Email);
+                var prereleaseUser = result.AssertRight();
+                Assert.Equal("test@test.com", prereleaseUser.Email);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -627,9 +617,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )
                 );
 
-                Assert.True(result.IsRight);
-
-                Assert.Equal("test@test.com", result.Right.Email);
+                var preReleaseUser = result.AssertRight();
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -719,9 +708,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 emailService.VerifyNoOtherCalls();
 
-                Assert.True(result.IsRight);
-
-                Assert.Equal("test@test.com", result.Right.Email);
+                var preReleaseUser = result.AssertRight();
+                Assert.Equal("test@test.com", preReleaseUser.Email);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -822,8 +810,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -909,8 +897,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -977,8 +965,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -1061,8 +1049,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -1137,8 +1125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -1263,8 +1251,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
                 emailService.VerifyNoOtherCalls();
 
-                Assert.True(result.IsRight);
-                Assert.IsType<Unit>(result.Right);
+                var unit = result.AssertRight();
+                Assert.IsType<Unit>(unit);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
