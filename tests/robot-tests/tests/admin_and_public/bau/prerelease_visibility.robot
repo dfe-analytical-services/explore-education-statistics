@@ -135,6 +135,6 @@ Approve release for immediate publication but don't wait to finish
     user waits until h2 is visible    Sign off
     user checks summary list contains    Current status    Approved
 
-Go to public release URL and check release isn't visible
+Go to public release URL again and check release isn't visible
     user goes to url    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
