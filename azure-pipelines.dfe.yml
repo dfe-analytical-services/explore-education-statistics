@@ -103,7 +103,7 @@ jobs:
 
   - job: 'Admin'
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
       demands:
         - npm
         - azureps
@@ -179,7 +179,7 @@ jobs:
 
   - job: 'Frontend'
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
       demands: 'npm'
     steps:
       - task: 'Npm@1'
@@ -277,7 +277,7 @@ jobs:
 
   - job: 'MiscellaneousArtifacts'
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
     steps:
       - task: CopyFiles@2
         displayName: 'Copy Pipfiles to tests'
