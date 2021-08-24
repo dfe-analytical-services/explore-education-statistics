@@ -98,10 +98,7 @@ const ChartBuilderTabSection = ({
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData({
-        ...nextQuery,
-        combineDuplicateLocations: false,
-      });
+      const tableData = await tableBuilderService.getTableData(nextQuery);
 
       onTableUpdate({
         table: mapFullTable(tableData),
