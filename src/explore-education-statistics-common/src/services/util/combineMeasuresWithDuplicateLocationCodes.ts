@@ -3,6 +3,7 @@ import {
   TableDataResult,
 } from '@common/services/tableBuilderService';
 import { groupBy, isEqual, mapValues, sum, uniq, uniqWith } from 'lodash';
+import produce from 'immer';
 
 type LocationGroupingKey = {
   level: string;
@@ -118,6 +119,9 @@ export default function combineMeasuresWithDuplicateLocationCodes(
         resultsGroupedByLocationName,
       ).sort();
 
+      // Now for each combination of Time Period and Filters, produce a single combined row of data that merges
+      // the duplicate rows from each Location into one, using a strategy to merge a set of data for each measurement
+      // into a single value.
       return timePeriodFilterCombinations.flatMap(combination => {
         // For each measure, collect the value for that measure from each Location's results for this Time Period and
         // Filter combination, or undefined if a Location does not have a value that matches this criteria.
@@ -146,15 +150,22 @@ export default function combineMeasuresWithDuplicateLocationCodes(
           measurementsMergeStrategy,
         );
 
-        return {
-          ...combination,
-          measures: mergedMeasurements,
-        };
+        // Return the Time Period / Filter combination, now with the merged measurement values from all of the
+        // Locations
+        return produce(combination, draft => {
+          draft.measures = mergedMeasurements;
+        });
       });
     },
   );
 }
 
+/**
+ * This is a strategy for merging measurement values from several duplicate Locations into a single value.
+ * This strategy produces a string with each Location's value for this measurement separated with forward slashes.
+ *
+ * ${@param measurementValues} represents the multiple values from each Location for this measurement.
+ */
 export const slashSeparatedStringMergeStrategy: MeasurementsMergeStrategy = (
   measurementValues: (string | undefined)[],
 ) => {
@@ -163,6 +174,15 @@ export const slashSeparatedStringMergeStrategy: MeasurementsMergeStrategy = (
     .join(' / ');
 };
 
+/**
+ * This is a strategy for merging measurement values from several duplicate Locations into a single value.
+ * This strategy produces a summation by adding up any numerical values from each Location for this measurement,
+ * and ignoring any non-numerical values.
+ *
+ * If no numerical values are found, this will return the first non-falsy non-numerical value found.
+ *
+ * ${@param measurementValues} represents the multiple values from each Location for this measurement.
+ */
 const sumNumericValuesMergeStrategy: MeasurementsMergeStrategy = (
   measurementValues: (string | undefined)[],
 ) => {
