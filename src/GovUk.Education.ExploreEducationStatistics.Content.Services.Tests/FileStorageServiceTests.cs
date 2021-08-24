@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -48,8 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var result = await fileStorageService.GetDeserialized<TestModel>("test-path");
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
     }
 }

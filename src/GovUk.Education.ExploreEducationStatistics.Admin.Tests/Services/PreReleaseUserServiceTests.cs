@@ -232,8 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
             var result = await service.AddPreReleaseUser(Guid.NewGuid(), "test@test.com");
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
 
         [Fact]

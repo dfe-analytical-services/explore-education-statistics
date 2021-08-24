@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -189,8 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var invalidReleaseId = Guid.NewGuid();
                 var result = await service.GetFootnote(invalidReleaseId, footnote.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -223,8 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetFootnote(release.Id, Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -269,8 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetFootnote(release.Id, footnote.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 

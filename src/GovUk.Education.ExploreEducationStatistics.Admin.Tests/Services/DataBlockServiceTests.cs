@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -118,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -144,8 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(dataBlock.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -467,8 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(release.Id, Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -521,8 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(Guid.NewGuid(), dataBlock.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -616,8 +613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Delete(release.Id, Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -645,8 +641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Delete(Guid.NewGuid(), dataBlock.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -769,8 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Create(Guid.NewGuid(), createRequest);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -908,8 +902,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var service = BuildDataBlockService(context);
             var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateViewModel());
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
 
         [Fact]

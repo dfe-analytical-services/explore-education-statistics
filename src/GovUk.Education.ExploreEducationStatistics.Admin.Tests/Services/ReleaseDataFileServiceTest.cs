@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -807,8 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.DeleteAll(Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
 
                 MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
             }
@@ -1095,8 +1095,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Guid.NewGuid()
                 );
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -1149,8 +1148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFile.Id
                 );
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
