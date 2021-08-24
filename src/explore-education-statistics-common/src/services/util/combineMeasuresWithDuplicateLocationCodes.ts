@@ -2,7 +2,15 @@ import {
   LocationOption,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import { groupBy, isEqual, mapValues, sum, uniq, uniqWith } from 'lodash';
+import {
+  groupBy,
+  isEqual,
+  mapValues,
+  partition,
+  sum,
+  uniq,
+  uniqWith,
+} from 'lodash';
 import produce from 'immer';
 
 type LocationGroupingKey = {
@@ -24,7 +32,7 @@ type MeasurementsMergeStrategy = (
  * duplicate Locations into a single selectable option in the Table Tool (with the label of the form
  * "Location A / Location B").
  *
- * {@param availableLocations} is an array of Locations available for the given Subject being queried, and from this
+ * {@param deduplicatedLocations} is an array of Locations available for the given Subject being queried, and from this
  * list, the single combined Location label can be determined for use as the Location label for the row header that
  * these combined result rows will fall under.
  *
@@ -34,16 +42,43 @@ type MeasurementsMergeStrategy = (
  */
 export default function combineMeasuresWithDuplicateLocationCodes(
   results: TableDataResult[],
-  availableLocations: LocationOption[],
+  deduplicatedLocations: LocationOption[],
   measurementsMergeStrategy: MeasurementsMergeStrategy = sumNumericValuesMergeStrategy,
 ): TableDataResult[] {
-  // iterate through results, looking at each rows' location[geographicLevel], and see if rows with the same
+  // If there is no potential data to merge because no Locations needed deduplicating, simply return the original
+  // results.
+  if (deduplicatedLocations.length === 0) {
+    return results;
+  }
+
+  // Otherwise, locate the potentially affected rows of data in order to merge them.  Find any rows belonging to a
+  // deduplicated Location.
+  const [deduplicatedLocationsResults, unaffectedResults] = partition(
+    results,
+    result => {
+      const { code } = result.location[result.geographicLevel];
+      return deduplicatedLocations.find(
+        dedupedLocations =>
+          dedupedLocations.level === result.geographicLevel &&
+          dedupedLocations.value === code,
+      );
+    },
+  );
+
+  // If there is no data that belongs to any of the Locations that were deduplicated, return the original results.
+  if (deduplicatedLocationsResults.length === 0) {
+    return results;
+  }
+
+  // Otherwise, iterate through the results that potentially need merging, looking at each row's location[geographicLevel], and see if rows with the same
   // geographicLevel also have the same location[geographicLevel].code but different location[geographicLevel].name.
-  const resultsGroupedByLocationCodeAndLevel = groupBy(results, result =>
-    JSON.stringify({
-      level: result.geographicLevel,
-      code: result.location[result.geographicLevel].code,
-    }),
+  const resultsGroupedByLocationCodeAndLevel = groupBy(
+    deduplicatedLocationsResults,
+    result =>
+      JSON.stringify({
+        level: result.geographicLevel,
+        code: result.location[result.geographicLevel].code,
+      }),
   );
 
   return Object.entries(resultsGroupedByLocationCodeAndLevel).flatMap(
@@ -61,7 +96,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       }
 
       // Get the label for the combined Location row.
-      const combinedLocation = availableLocations.find(
+      const combinedLocation = deduplicatedLocations.find(
         l => l.level === level && l.value === code,
       );
       if (!combinedLocation) {
@@ -122,40 +157,46 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       // Now for each combination of Time Period and Filters, produce a single combined row of data that merges
       // the duplicate rows from each Location into one, using a strategy to merge a set of data for each measurement
       // into a single value.
-      return timePeriodFilterCombinations.flatMap(combination => {
-        // For each measure, collect the value for that measure from each Location's results for this Time Period and
-        // Filter combination, or undefined if a Location does not have a value that matches this criteria.
-        const measureValuesForEachLocation = Object.keys(
-          combination.measures,
-        ).reduce((acc, measure) => {
-          const measureValues = allAvailableLocationNames.map(locationName => {
-            const resultForLocationName = resultsGroupedByLocationName[
-              locationName
-            ].find(
-              result =>
-                result.timePeriod === combination.timePeriod &&
-                isEqual(combination.filters, result.filters),
+      const deduplicatedResults = timePeriodFilterCombinations.flatMap(
+        combination => {
+          // For each measure, collect the value for that measure from each Location's results for this Time Period and
+          // Filter combination, or undefined if a Location does not have a value that matches this criteria.
+          const measureValuesForEachLocation = Object.keys(
+            combination.measures,
+          ).reduce((acc, measure) => {
+            const measureValues = allAvailableLocationNames.map(
+              locationName => {
+                const resultForLocationName = resultsGroupedByLocationName[
+                  locationName
+                ].find(
+                  result =>
+                    result.timePeriod === combination.timePeriod &&
+                    isEqual(combination.filters, result.filters),
+                );
+                return resultForLocationName?.measures[measure];
+              },
             );
-            return resultForLocationName?.measures[measure];
+            return {
+              ...acc,
+              [measure]: measureValues,
+            };
+          }, {});
+
+          // Now for each measure, combine the values gathered from all of the Locations into a single value per measure.
+          const mergedMeasurements = mapValues(
+            measureValuesForEachLocation,
+            measurementsMergeStrategy,
+          );
+
+          // Return the Time Period / Filter combination, now with the merged measurement values from all of the
+          // Locations
+          return produce(combination, draft => {
+            draft.measures = mergedMeasurements;
           });
-          return {
-            ...acc,
-            [measure]: measureValues,
-          };
-        }, {});
+        },
+      );
 
-        // Now for each measure, combine the values gathered from all of the Locations into a single value per measure.
-        const mergedMeasurements = mapValues(
-          measureValuesForEachLocation,
-          measurementsMergeStrategy,
-        );
-
-        // Return the Time Period / Filter combination, now with the merged measurement values from all of the
-        // Locations
-        return produce(combination, draft => {
-          draft.measures = mergedMeasurements;
-        });
-      });
+      return [...unaffectedResults, ...deduplicatedResults];
     },
   );
 }

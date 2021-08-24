@@ -57,27 +57,11 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       },
     ];
 
-    const availableLocations: LocationFilter[] = [
-      new LocationFilter({
-        value: 'provider-1',
-        label: 'Provider 1',
-        level: 'provider',
-      }),
-      new LocationFilter({
-        value: 'provider-2',
-        label: 'Provider 2',
-        level: 'provider',
-      }),
-      new LocationFilter({
-        value: 'localAuthority-1',
-        label: 'LocalAuthority 1',
-        level: 'localAuthority',
-      }),
-    ];
+    const deduplicatedLocations: LocationFilter[] = [];
 
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
-      availableLocations,
+      deduplicatedLocations,
       slashSeparatedStringMergeStrategy,
     );
     expect(results).toEqual(tableDataResult);
@@ -119,18 +103,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       },
     ];
 
-    const availableLocations: LocationFilter[] = [
-      new LocationFilter({
-        value: 'duplicate-location-code',
-        label: 'Provider 1',
-        level: 'provider',
-      }),
-      new LocationFilter({
-        value: 'duplicate-location-code',
-        label: 'LocalAuthority 1',
-        level: 'localAuthority',
-      }),
-    ];
+    const availableLocations: LocationFilter[] = [];
 
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
@@ -192,36 +165,15 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       },
     ];
 
-    const availableLocations: LocationFilter[] = [
+    const deduplicatedLocations: LocationFilter[] = [
       new LocationFilter({
         value: 'duplicate-provider-code',
         label: 'Provider 1 / Provider 2',
         level: 'provider',
       }),
-      new LocationFilter({
-        value: 'localAuthority-1',
-        label: 'LocalAuthority 1',
-        level: 'localAuthority',
-      }),
     ];
 
     const expectedMergedResults = [
-      {
-        filters: ['filter-1', 'filter-2'],
-        geographicLevel: 'provider',
-        timePeriod: '',
-        measures: {
-          'indicator-1': '10 / 40',
-          'indicator-2': '20 / 50',
-          'indicator-3': '30 / 60',
-        },
-        location: {
-          provider: {
-            code: 'duplicate-provider-code',
-            name: 'Provider 1 / Provider 2',
-          },
-        },
-      },
       {
         filters: ['filter-1', 'filter-2'],
         geographicLevel: 'localAuthority',
@@ -238,11 +190,27 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
         },
       },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '10 / 40',
+          'indicator-2': '20 / 50',
+          'indicator-3': '30 / 60',
+        },
+        location: {
+          provider: {
+            code: 'duplicate-provider-code',
+            name: 'Provider 1 / Provider 2',
+          },
+        },
+      },
     ];
 
     const results = combineMeasuresWithDuplicateLocationCodes(
       tableDataResult,
-      availableLocations,
+      deduplicatedLocations,
       slashSeparatedStringMergeStrategy,
     );
     expect(results).toEqual(expectedMergedResults);
@@ -302,7 +270,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
       ];
 
-      const availableLocations: LocationFilter[] = [
+      const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
           value: 'duplicate-provider-code',
           label: 'Provider 1 / Provider 2 / Provider 3',
@@ -332,7 +300,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
-        availableLocations,
+        deduplicatedLocations,
         slashSeparatedStringMergeStrategy,
       );
       expect(results).toEqual(expectedMergedResults);
@@ -378,7 +346,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
       ];
 
-      const availableLocations: LocationFilter[] = [
+      const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
           value: 'duplicate-provider-code',
           label: 'Provider 1 / Provider 2',
@@ -423,7 +391,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
-        availableLocations,
+        deduplicatedLocations,
         slashSeparatedStringMergeStrategy,
       );
       expect(results).toEqual(expectedMergedResults);
@@ -469,7 +437,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
       ];
 
-      const availableLocations: LocationFilter[] = [
+      const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
           value: 'duplicate-provider-code',
           label: 'Provider 1 / Provider 2',
@@ -514,7 +482,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
-        availableLocations,
+        deduplicatedLocations,
         slashSeparatedStringMergeStrategy,
       );
       expect(results).toEqual(expectedMergedResults);
@@ -576,7 +544,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
       ];
 
-      const availableLocations: LocationFilter[] = [
+      const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
           value: 'duplicate-provider-code',
           label: 'Provider 1 / Provider 2 / Provider 3',
@@ -607,7 +575,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const results = combineMeasuresWithDuplicateLocationCodes(
         tableDataResult,
-        availableLocations,
+        deduplicatedLocations,
       );
       expect(results).toEqual(expectedMergedResults);
     },

@@ -335,6 +335,20 @@ describe('tableBuilderService', () => {
         locations: {},
         indicators: [],
       });
+
+      const deduplicatedLocations = [
+        {
+          level: 'provider',
+          value: 'duplicate-provider',
+          label: 'Duplicate Provider 1 / Duplicate Provider 2',
+        },
+      ];
+
+      expect(combineMeasures.default).toHaveBeenCalledWith(
+        tableData.results,
+        deduplicatedLocations,
+      );
+
       expect(response).toEqual(expectedTableData);
     },
   );
@@ -445,6 +459,20 @@ describe('tableBuilderService', () => {
       dataApi.get.mockResolvedValue(tableData);
 
       const response = await tableBuilderService.getDataBlockTableData('', '');
+
+      const deduplicatedLocations = [
+        {
+          level: 'provider',
+          value: 'duplicate-provider',
+          label: 'Duplicate Provider 1 / Duplicate Provider 2',
+        },
+      ];
+
+      expect(combineMeasures.default).toHaveBeenCalledWith(
+        tableData.results,
+        deduplicatedLocations,
+      );
+
       expect(response).toEqual(expectedTableData);
     },
   );

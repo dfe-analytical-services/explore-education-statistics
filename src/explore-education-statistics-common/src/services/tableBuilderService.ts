@@ -188,6 +188,11 @@ export interface SelectedPublication {
 function generateMergedLocation<T extends LocationOption | FilterOption>(
   locations: T[],
 ): T {
+  // If there's only one Location provided, there's no need to do any merging.
+  if (locations.length === 1) {
+    return locations[0];
+  }
+  // Otherwise, produce a merged Location based upon the variations provided.
   const distinctLocationNames = uniq(locations.map(l => l.label));
   const mergedNames = distinctLocationNames.sort().join(' / ');
   return produce(locations[0], draft => {
@@ -216,9 +221,13 @@ function mergeDuplicateLocationsInTableDataResponse(
     locationsGroupedByLevelAndCode,
   ).flatMap(locations => [generateMergedLocation(locations)]);
 
+  const deduplicatedLocations = mergedLocations.filter(
+    location => !tableData.subjectMeta.locations.includes(location),
+  );
+
   const mergedResults = combineMeasuresWithDuplicateLocationCodes(
     tableData.results,
-    mergedLocations,
+    deduplicatedLocations,
   );
 
   return produce(tableData, draft => {
