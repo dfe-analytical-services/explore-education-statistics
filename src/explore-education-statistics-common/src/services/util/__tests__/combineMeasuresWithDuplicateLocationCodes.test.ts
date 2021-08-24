@@ -1,6 +1,6 @@
 import combineMeasuresWithDuplicateLocationCodes, {
   slashSeparatedStringMergeStrategy,
-} from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
+} from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { TableDataResult } from '@common/services/tableBuilderService';
 

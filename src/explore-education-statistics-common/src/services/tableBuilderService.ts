@@ -2,7 +2,7 @@ import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
 import { groupBy, mapValues, uniq } from 'lodash';
-import combineMeasuresWithDuplicateLocationCodes from '@common/modules/table-tool/components/utils/combineMeasuresWithDuplicateLocationCodes';
+import combineMeasuresWithDuplicateLocationCodes from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
 
 export interface FilterOption {
   label: string;

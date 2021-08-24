@@ -1,6 +1,8 @@
-import { TableDataResult } from '@common/services/tableBuilderService';
+import {
+  LocationOption,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import { groupBy, isEqual, mapValues, sum, uniq, uniqWith } from 'lodash';
-import { LocationFilter } from '@common/modules/table-tool/types/filters';
 
 type LocationGroupingKey = {
   level: string;
@@ -24,10 +26,14 @@ type MeasurementsMergeStrategy = (
  * {@param availableLocations} is an array of Locations available for the given Subject being queried, and from this
  * list, the single combined Location label can be determined for use as the Location label for the row header that
  * these combined result rows will fall under.
+ *
+ * ${@param measurementsMergeStrategy} is the strategy whereby multiple values from the various duplicate Locations
+ * are merged together so that the final value will reside within a single table cell.  By default this is by summing
+ * any numerical values together or, if no numeric values exist, to display the first non-numeric string.
  */
 export default function combineMeasuresWithDuplicateLocationCodes(
   results: TableDataResult[],
-  availableLocations: LocationFilter[],
+  availableLocations: LocationOption[],
   measurementsMergeStrategy: MeasurementsMergeStrategy = sumNumericValuesMergeStrategy,
 ): TableDataResult[] {
   // iterate through results, looking at each rows' location[geographicLevel], and see if rows with the same
