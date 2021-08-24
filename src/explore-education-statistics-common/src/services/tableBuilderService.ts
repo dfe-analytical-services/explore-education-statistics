@@ -199,7 +199,7 @@ function generateMergedLocation<T extends LocationOption | FilterOption>(
  * Given a set of ${@param tableData}, this function will merge any Locations that have duplicate codes and geographic
  * levels into combined Locations with a label derived from all of the distinct Location names.  E.g. if 2 Locations,
  * Provider 1 and Provider 2 share the same geographic level and code, this will merge those Locations into a single
- * Location with the label "Provider 1 / Provider 2), combining in alphabetical order.
+ * Location with the label "Provider 1 / Provider 2", combining in alphabetical order.
  *
  * This will merge not only the Locations in the TableDataSubjectMeta but also the TableDataResults for those duplicate
  * Locations, merging duplicate rows into single rows with combined values derived form each duplicate Location.
@@ -231,7 +231,7 @@ function mergeDuplicateLocationsInTableDataResponse(
  * Given ${@param subjectMeta}, this function will merge any Locations that have duplicate codes and geographic
  * levels into combined Locations with a label derived from all of the distinct Location names.  E.g. if 2 Locations,
  * Provider 1 and Provider 2 share the same geographic level and code, this will merge those Locations into a single
- * Location with the label "Provider 1 / Provider 2), combining in alphabetical order.
+ * Location with the label "Provider 1 / Provider 2", combining in alphabetical order.
  */
 function mergeDuplicateLocationsInSubjectMeta(
   subjectMeta: SubjectMeta,
@@ -264,10 +264,9 @@ const tableBuilderService = {
     return dataApi.get(`/releases/${releaseId}`);
   },
   async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
-    const response: SubjectMeta = await dataApi.get(
-      `/meta/subject/${subjectId}`,
+    return mergeDuplicateLocationsInSubjectMeta(
+      await dataApi.get(`/meta/subject/${subjectId}`),
     );
-    return mergeDuplicateLocationsInSubjectMeta(response);
   },
   async filterSubjectMeta(query: {
     subjectId: string;
@@ -275,8 +274,9 @@ const tableBuilderService = {
     geographicLevel?: string;
     locations?: Dictionary<string[]>;
   }): Promise<SubjectMeta> {
-    const response: SubjectMeta = await dataApi.post('/meta/subject', query);
-    return mergeDuplicateLocationsInSubjectMeta(response);
+    return mergeDuplicateLocationsInSubjectMeta(
+      await dataApi.post('/meta/subject', query),
+    );
   },
   async getTableData({
     releaseId,
@@ -287,7 +287,6 @@ const tableBuilderService = {
         await dataApi.post(`/tablebuilder/release/${releaseId}`, query),
       );
     }
-
     return mergeDuplicateLocationsInTableDataResponse(
       await dataApi.post(`/tablebuilder`, query),
     );
