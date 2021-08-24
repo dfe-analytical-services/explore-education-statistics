@@ -194,6 +194,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                         await _context.SaveChangesAsync();
 
+                        // NOTE: UserInvites only stores whether a user has a particular role - not which release
+                        // that role may be against. So we only wanted to remove the user's prerelease role from
+                        // UserInvites if they no longer have any PrereleaseView roles.
                         var remainingReleaseInvites = await _context
                             .UserReleaseInvites
                             .Where(
@@ -236,7 +239,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 var user = await _context.Users
                     .SingleOrDefaultAsync(u => u.Email.ToLower() == invite.Email.ToLower());
-                SendPreReleaseInviteEmail(release, invite.Email.ToLower(), user == null);
+                var isNewUser = user == null;
+                SendPreReleaseInviteEmail(release, invite.Email.ToLower(), isNewUser);
                 invite.EmailSent = true;
                 _context.Update(invite);
             });

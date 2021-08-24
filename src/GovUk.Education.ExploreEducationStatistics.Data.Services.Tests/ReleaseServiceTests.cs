@@ -152,6 +152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.GetRelease(contentRelease.Id);
 
+                MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
+
                 Assert.True(result.IsRight);
 
                 Assert.Equal(contentRelease.Id, result.Right.Id);
@@ -189,8 +191,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(dataBlock.Id, highlights[0].Id);
                 Assert.Equal(dataBlock.HighlightName, highlights[0].Name);
                 Assert.Equal(dataBlock.HighlightDescription, highlights[0].Description);
-
-                MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
             }
         }
 
@@ -669,12 +669,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IUserService userService = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
         {
-            return new ReleaseService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+            return new (
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
+                metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>()
             );
         }
     }

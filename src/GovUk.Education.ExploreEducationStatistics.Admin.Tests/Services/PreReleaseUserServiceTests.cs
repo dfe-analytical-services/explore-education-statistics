@@ -177,7 +177,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-
                 await context.SaveChangesAsync();
             }
 
@@ -384,8 +383,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {"publish day", "Wednesday 09 September 2020"},
                             {"publish time", "09:30"},
                         }
-                    )
+                    ),
+                    Times.Once
                 );
+
+                MockUtils.VerifyAllMocks(emailService, preReleaseService);
 
                 var preReleaseUser = result.AssertRight();
                 Assert.Equal("test@test.com", preReleaseUser.Email);
@@ -407,8 +409,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.True(releaseInvite.Accepted);
-                Assert.True(releaseInvite.EmailSent);
+                Assert.True(releaseInvite.Accepted); // User already exists, so permission has been applied immediately
+                Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved releases
             }
 
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
@@ -468,17 +470,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var preReleaseService = new Mock<IPreReleaseService>();
-
-                preReleaseService
-                    .Setup(s => s.GetPreReleaseWindow(It.IsAny<Release>()))
-                    .Returns(
-                        new PreReleaseWindow
-                        {
-                            Start = DateTime.Parse("2020-09-08T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                            End = DateTime.Parse("2020-09-08T22:59:59.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                        }
-                    );
-
                 var emailService = new Mock<IEmailService>();
 
                 var service = SetupPreReleaseUserService(
@@ -493,7 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                MockUtils.VerifyAllMocks(emailService);
+                MockUtils.VerifyAllMocks(emailService, preReleaseService);
 
                 var prereleaseUser = result.AssertRight();
                 Assert.Equal("test@test.com", prereleaseUser.Email);
@@ -515,8 +506,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.True(releaseInvite.Accepted);
-                Assert.False(releaseInvite.EmailSent);
+                Assert.True(releaseInvite.Accepted); // User already exists, so permission has been applied immediately
+                Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
             }
 
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
@@ -612,8 +603,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {"publish day", "Wednesday 09 September 2020"},
                             {"publish time", "09:30"},
                         }
-                    )
+                    ),
+                    Times.Once
                 );
+
+                MockUtils.VerifyAllMocks(emailService, preReleaseService);
 
                 var preReleaseUser = result.AssertRight();
                 Assert.Equal("test@test.com", preReleaseUser.Email);
@@ -627,8 +621,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.False(releaseInvite.Accepted);
-                Assert.True(releaseInvite.EmailSent);
+                Assert.False(releaseInvite.Accepted); // User not yet created
+                Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved release
             }
 
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
@@ -679,17 +673,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var preReleaseService = new Mock<IPreReleaseService>();
-
-                preReleaseService
-                    .Setup(s => s.GetPreReleaseWindow(It.IsAny<Release>()))
-                    .Returns(
-                        new PreReleaseWindow
-                        {
-                            Start = DateTime.Parse("2020-09-08T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                            End = DateTime.Parse("2020-09-08T22:59:59.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                        }
-                    );
-
                 var emailService = new Mock<IEmailService>();
 
                 var service = SetupPreReleaseUserService(
@@ -704,7 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     "test@test.com"
                 );
 
-                emailService.VerifyNoOtherCalls();
+                MockUtils.VerifyAllMocks(emailService, preReleaseService);
 
                 var preReleaseUser = result.AssertRight();
                 Assert.Equal("test@test.com", preReleaseUser.Email);
@@ -718,8 +701,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.False(releaseInvite.Accepted);
-                Assert.False(releaseInvite.EmailSent);
+                Assert.False(releaseInvite.Accepted); // User not yet created
+                Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
             }
 
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
@@ -1182,7 +1165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
 
             var identityRole = new IdentityRole
@@ -1243,9 +1226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "test@test.com",
                         "the-template-id",
                         sendMailResultDict
-                    )
+                    ), Times.Once
                 );
-                emailService.VerifyNoOtherCalls();
+
+                MockUtils.VerifyAllMocks(emailService, preReleaseService);
 
                 var unit = result.AssertRight();
                 Assert.IsType<Unit>(unit);
@@ -1293,20 +1277,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private PreReleaseUserService SetupPreReleaseUserService(
             ContentDbContext context,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IConfiguration configuration = null,
-            IEmailService emailService = null,
-            IPreReleaseService preReleaseService = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            IHttpContextAccessor httpContextAccessor = null)
+            UsersAndRolesDbContext usersAndRolesDbContext,
+            IConfiguration? configuration = null,
+            IEmailService? emailService = null,
+            IPreReleaseService? preReleaseService = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            IHttpContextAccessor? httpContextAccessor = null)
         {
-            return new PreReleaseUserService(
+            return new (
                 context,
                 usersAndRolesDbContext,
                 configuration ?? DefaultConfigurationMock().Object,
-                emailService ?? new Mock<IEmailService>().Object,
-                preReleaseService ?? new Mock<IPreReleaseService>().Object,
+                emailService ?? Mock.Of<IEmailService>(),
+                preReleaseService ?? Mock.Of<IPreReleaseService>(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 httpContextAccessor ?? DefaultHttpContextAccessorMock().Object

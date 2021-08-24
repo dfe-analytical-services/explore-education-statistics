@@ -654,23 +654,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new(
                 contentDbContext,
                 AdminMapper(),
-                publishingService ?? new Mock<IPublishingService>().Object,
+                publishingService ?? Mock.Of<IPublishingService>(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? UserServiceMock().Object,
-                repository ?? new Mock<IReleaseRepository>().Object,
-                releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
-                subjectRepository ?? new Mock<ISubjectRepository>().Object,
-                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                dataImportService ?? new Mock<IDataImportService>().Object,
-                footnoteService ?? new Mock<IFootnoteService>().Object,
+                repository ?? Mock.Of<IReleaseRepository>(),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(),
+                dataImportService ?? Mock.Of<IDataImportService>(),
+                footnoteService ?? Mock.Of<IFootnoteService>(),
                 statisticsDbContext,
-                dataBlockService ?? new Mock<IDataBlockService>().Object,
-                releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
-                contentService ?? new Mock<IContentService>().Object,
-                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
+                dataBlockService ?? Mock.Of<IDataBlockService>(),
+                releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(),
+                contentService ?? Mock.Of<IContentService>(),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
                 guidGenerator ?? new SequentialGuidGenerator(),
-                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
+                preReleaseUserService ?? Mock.Of<IPreReleaseUserService>()
             );
         }
     }
