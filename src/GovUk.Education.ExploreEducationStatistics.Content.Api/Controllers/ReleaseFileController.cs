@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseId}/files")]
         [Produces(MediaTypeNames.Application.Zip)]
-        public async Task Stream(
+        public async Task StreamFilesToZip(
             Guid releaseId,
             [FromQuery] IList<Guid> fileIds)
         {

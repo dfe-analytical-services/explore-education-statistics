@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
         /// <returns>An Either returning nothing if successful</returns>
         Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,
-            IList<Guid> fileIds,
+            IEnumerable<Guid> fileIds,
             Stream outputStream,
             CancellationToken? cancellationToken = null);
 
