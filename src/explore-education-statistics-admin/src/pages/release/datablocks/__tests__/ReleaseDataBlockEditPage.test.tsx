@@ -362,7 +362,7 @@ describe('ReleaseDataBlockEditPage', () => {
       });
     });
 
-    test('renders with correct data block details with highlight name and description', async () => {
+    test('renders with correct data block details with featured table name and description', async () => {
       renderPage();
 
       await waitFor(() => {
@@ -370,19 +370,19 @@ describe('ReleaseDataBlockEditPage', () => {
           screen.getByRole('heading', { name: 'Test name 1' }),
         ).toBeInTheDocument();
 
-        expect(screen.getByTestId('Highlight name')).toHaveTextContent(
+        expect(screen.getByTestId('Featured table name')).toHaveTextContent(
           'Test highlight name 1',
         );
-        expect(screen.getByTestId('Highlight description')).toHaveTextContent(
-          'Test highlight description 1',
-        );
+        expect(
+          screen.getByTestId('Featured table description'),
+        ).toHaveTextContent('Test highlight description 1');
         expect(screen.getByLabelText('Url')).toHaveValue(
           'http://localhost/data-tables/fast-track/block-1',
         );
       });
     });
 
-    test('renders with correct data block details without highlight name and description', async () => {
+    test('renders with correct data block details without Featured table name and description', async () => {
       dataBlockService.getDataBlock.mockResolvedValue({
         ...testDataBlock,
         highlightName: '',
@@ -396,9 +396,11 @@ describe('ReleaseDataBlockEditPage', () => {
           screen.getByRole('heading', { name: 'Test name 1' }),
         ).toBeInTheDocument();
 
-        expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
         expect(
-          screen.queryByTestId('Highlight description'),
+          screen.queryByTestId('Featured table name'),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId('Featured table description'),
         ).not.toBeInTheDocument();
 
         expect(screen.getByLabelText('Url')).toHaveValue(

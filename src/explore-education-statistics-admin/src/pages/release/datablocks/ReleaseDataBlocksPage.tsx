@@ -139,7 +139,7 @@ const ReleaseDataBlocksPage = ({
                     'govuk-!-width-one-quarter': hasHighlightNames,
                   })}
                 >
-                  Highlight name
+                  Featured table name
                 </th>
                 <th scope="col">Created date</th>
                 <th scope="col" className="govuk-table__header--actions">

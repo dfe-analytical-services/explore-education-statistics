@@ -65,11 +65,11 @@ const DataBlockDetailsForm = ({
         isHighlight: Yup.boolean(),
         highlightName: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string().required('Enter a highlight name'),
+          then: Yup.string().required('Enter a featured table name'),
         }),
         highlightDescription: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string().required('Enter a highlight description'),
+          then: Yup.string().required('Enter a featured table description'),
         }),
         heading: Yup.string().required('Enter a table title'),
         source: Yup.string(),
@@ -109,25 +109,25 @@ const DataBlockDetailsForm = ({
 
               <FormFieldset
                 id="highlight"
-                legend="Would you like to make this a table highlight?"
+                legend="Would you like to make this a featured table?"
                 legendSize="s"
                 hint="Checking this option will make this table available as a featured table when the publication is selected via the table builder"
               >
                 <FormFieldCheckbox<FormValues>
                   name="isHighlight"
-                  label="Set as a table highlight for this publication"
+                  label="Set as a featured table for this publication"
                   conditional={
                     <>
                       <FormFieldTextInput<FormValues>
                         name="highlightName"
-                        label="Highlight name"
+                        label="Featured table name"
                         hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
                       />
                       <FormFieldTextArea<FormValues>
                         name="highlightDescription"
-                        label="Highlight description"
-                        hint="Describe the contents of this highlight to table builder users"
+                        label="Featured table description"
+                        hint="Describe the contents of this featured table to table builder users"
                         className="govuk-!-width-two-thirds"
                       />
                     </>

@@ -123,13 +123,13 @@ const ReleaseDataBlockEditPage = ({
                 {!canUpdateRelease && (
                   <>
                     {dataBlock.highlightName && (
-                      <SummaryListItem term="Highlight name">
+                      <SummaryListItem term="Featured table name">
                         {dataBlock.highlightName || 'None'}
                       </SummaryListItem>
                     )}
 
                     {dataBlock.highlightDescription && (
-                      <SummaryListItem term="Highlight description">
+                      <SummaryListItem term="Featured table description">
                         {dataBlock.highlightDescription || 'None'}
                       </SummaryListItem>
                     )}
