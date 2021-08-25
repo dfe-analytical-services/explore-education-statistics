@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -18,152 +19,152 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ContentServiceTests
     {
-        [Fact]
-        public async Task GetContentBlocks_NoContentSections()
-        {
-            var release = new Release();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupContentService(contentDbContext: contentDbContext);
-
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
-
-                Assert.True(result.IsRight);
-
-                Assert.Empty(result.Right);
-            }
-        }
-
-        [Fact]
-        public async Task GetContentBlocks_NoContentBlocks()
-        {
-            var release = new Release
-            {
-                Content = AsList(
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 1
-                        }
-                    },
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 2
-                        }
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupContentService(contentDbContext: contentDbContext);
-
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
-
-                Assert.True(result.IsRight);
-
-                Assert.Empty(result.Right);
-            }
-        }
-
-        [Fact]
-        public async Task GetContentBlocks()
-        {
-            var release = new Release
-            {
-                Content = AsList(
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 1,
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Created = new DateTime(2001, 1, 1)
-                                },
-                                new HtmlBlock
-                                {
-                                    Created = new DateTime(2002, 2, 2)
-                                },
-                                new DataBlock()
-                            )
-                        }
-                    },
-                    new ReleaseContentSection
-                    {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 2,
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Created = new DateTime(2003, 3, 3)
-                                },
-                                new HtmlBlock
-                                {
-                                    Created = new DateTime(2004, 4, 4)
-                                },
-                                new DataBlock()
-                            )
-                        }
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupContentService(contentDbContext: contentDbContext);
-
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
-
-                Assert.True(result.IsRight);
-
-                var contentBlocks = result.Right;
-
-                Assert.Equal(4, contentBlocks.Count);
-                Assert.Equal(release.Content[0].ContentSection.Content[0].Id, contentBlocks[0].Id);
-                Assert.Equal(release.Content[0].ContentSection.Content[1].Id, contentBlocks[1].Id);
-                Assert.Equal(release.Content[1].ContentSection.Content[0].Id, contentBlocks[2].Id);
-                Assert.Equal(release.Content[1].ContentSection.Content[1].Id, contentBlocks[3].Id);
-
-                Assert.Equal(new DateTime(2001, 1, 1), contentBlocks[0].Created);
-                Assert.Equal(new DateTime(2002, 2, 2), contentBlocks[1].Created);
-                Assert.Equal(new DateTime(2003, 3, 3), contentBlocks[2].Created);
-                Assert.Equal(new DateTime(2004, 4, 4), contentBlocks[3].Created);
-            }
-        }
+        // [Fact]
+        // public async Task GetContentBlocks_NoContentSections()
+        // {
+        //     var release = new Release();
+        //
+        //     var contentDbContextId = Guid.NewGuid().ToString();
+        //
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         await contentDbContext.Releases.AddAsync(release);
+        //         await contentDbContext.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         var service = SetupContentService(contentDbContext: contentDbContext);
+        //
+        //         var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+        //
+        //         Assert.True(result.IsRight);
+        //
+        //         Assert.Empty(result.Right);
+        //     }
+        // }
+        //
+        // [Fact]
+        // public async Task GetContentBlocks_NoContentBlocks()
+        // {
+        //     var release = new Release
+        //     {
+        //         Content = AsList(
+        //             new ReleaseContentSection
+        //             {
+        //                 ContentSection = new ContentSection
+        //                 {
+        //                     Heading = "New section",
+        //                     Order = 1
+        //                 }
+        //             },
+        //             new ReleaseContentSection
+        //             {
+        //                 ContentSection = new ContentSection
+        //                 {
+        //                     Heading = "New section",
+        //                     Order = 2
+        //                 }
+        //             }
+        //         )
+        //     };
+        //
+        //     var contentDbContextId = Guid.NewGuid().ToString();
+        //
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         await contentDbContext.Releases.AddAsync(release);
+        //         await contentDbContext.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         var service = SetupContentService(contentDbContext: contentDbContext);
+        //
+        //         var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+        //
+        //         Assert.True(result.IsRight);
+        //
+        //         Assert.Empty(result.Right);
+        //     }
+        // }
+        //
+        // [Fact]
+        // public async Task GetContentBlocks()
+        // {
+        //     var release = new Release
+        //     {
+        //         Content = AsList(
+        //             new ReleaseContentSection
+        //             {
+        //                 ContentSection = new ContentSection
+        //                 {
+        //                     Heading = "New section",
+        //                     Order = 1,
+        //                     Content = AsList<ContentBlock>(
+        //                         new HtmlBlock
+        //                         {
+        //                             Created = new DateTime(2001, 1, 1)
+        //                         },
+        //                         new HtmlBlock
+        //                         {
+        //                             Created = new DateTime(2002, 2, 2)
+        //                         },
+        //                         new DataBlock()
+        //                     )
+        //                 }
+        //             },
+        //             new ReleaseContentSection
+        //             {
+        //                 ContentSection = new ContentSection
+        //                 {
+        //                     Heading = "New section",
+        //                     Order = 2,
+        //                     Content = AsList<ContentBlock>(
+        //                         new HtmlBlock
+        //                         {
+        //                             Created = new DateTime(2003, 3, 3)
+        //                         },
+        //                         new HtmlBlock
+        //                         {
+        //                             Created = new DateTime(2004, 4, 4)
+        //                         },
+        //                         new DataBlock()
+        //                     )
+        //                 }
+        //             }
+        //         )
+        //     };
+        //
+        //     var contentDbContextId = Guid.NewGuid().ToString();
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         await contentDbContext.Releases.AddAsync(release);
+        //         await contentDbContext.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //     {
+        //         var service = SetupContentService(contentDbContext: contentDbContext);
+        //
+        //         var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+        //
+        //         Assert.True(result.IsRight);
+        //
+        //         var contentBlocks = result.Right;
+        //
+        //         Assert.Equal(4, contentBlocks.Count);
+        //         Assert.Equal(release.Content[0].ContentSection.Content[0].Id, contentBlocks[0].Id);
+        //         Assert.Equal(release.Content[0].ContentSection.Content[1].Id, contentBlocks[1].Id);
+        //         Assert.Equal(release.Content[1].ContentSection.Content[0].Id, contentBlocks[2].Id);
+        //         Assert.Equal(release.Content[1].ContentSection.Content[1].Id, contentBlocks[3].Id);
+        //
+        //         Assert.Equal(new DateTime(2001, 1, 1), contentBlocks[0].Created);
+        //         Assert.Equal(new DateTime(2002, 2, 2), contentBlocks[1].Created);
+        //         Assert.Equal(new DateTime(2003, 3, 3), contentBlocks[2].Created);
+        //         Assert.Equal(new DateTime(2004, 4, 4), contentBlocks[3].Created);
+        //     }
+        // }
 
         [Fact]
         public async Task GetContentSections()
@@ -293,14 +294,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IReleaseContentSectionRepository releaseContentSectionRepository = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null)
         {
-            return new ContentService(
+            return new(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 AdminMapper()
             );

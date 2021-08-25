@@ -40,10 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<DataBlock> DataBlocks { get; set; }
         public DbSet<DataImport> DataImports { get; set; }
         public DbSet<DataImportError> DataImportErrors { get; set; }
-        public DbSet<HtmlBlock> HtmlBlocks { get; set; }
-        public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<MethodologyContentSection> MethodologyContentSections { get; set; }
+        public DbSet<MethodologyContentBlock> MethodologyContentBlocks { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }

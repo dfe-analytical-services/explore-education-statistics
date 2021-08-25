@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     {
         Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyId);
 
-        Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyId) where T : ContentBlock;
+        Task<Either<ActionResult, List<MethodologyContentBlock>>> GetContentBlocks(Guid methodologyId);
 
         Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
             Guid releaseId,

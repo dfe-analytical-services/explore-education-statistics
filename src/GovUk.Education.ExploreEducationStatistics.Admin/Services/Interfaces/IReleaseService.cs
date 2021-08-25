@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseStatus(Guid releaseId, ReleaseStatusCreateViewModel request);
 
-        Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestPublishedRelease(Guid publicationId);
+        Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId);
 
         Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseApprovalStatus[] releaseApprovalStatues);

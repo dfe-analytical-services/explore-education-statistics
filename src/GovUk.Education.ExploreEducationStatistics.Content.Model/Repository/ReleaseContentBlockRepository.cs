@@ -17,12 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<List<T>> GetAll<T>(Guid releaseId) where T : ContentBlock
+        public async Task<List<T>> GetByRelease<T>(Guid releaseId) where T : ContentBlock
         {
             return await _contentDbContext
-                .ReleaseContentBlocks
-                .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
-                .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+                .ContentBlocks
+                .Where(contentBlock => contentBlock.ReleaseId == releaseId)
                 .OfType<T>()
                 .ToListAsync();
         }

@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             Heading = "Release 1 summary section",
             Caption = "",
-            Type = ContentSectionType.ReleaseSummary
+            Type = ReleaseContentSectionType.ReleaseSummary
         };
 
         private static readonly ContentSection Release1Section1 = new ContentSection
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 1 section 1 order 2",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release1Section2 = new ContentSection
@@ -292,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 0,
             Heading = "Release 1 section 2 order 0",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release1Section3 = new ContentSection
@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             Heading = "Release 1 section 3 order 1",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release1KeyStatsSection = new ContentSection
@@ -310,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 1 key stats section",
             Caption = "",
-            Type = ContentSectionType.KeyStatistics
+            Type = ReleaseContentSectionType.KeyStatistics
         };
 
         private static readonly ContentSection Release2SummarySection = new ContentSection
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             Heading = "Release 2 summary section",
             Caption = "",
-            Type = ContentSectionType.ReleaseSummary
+            Type = ReleaseContentSectionType.ReleaseSummary
         };
 
         private static readonly ContentSection Release2Section1 = new ContentSection
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 2 section 1 order 2",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release2Section2 = new ContentSection
@@ -337,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 0,
             Heading = "Release 2 section 2 order 0",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release2Section3 = new ContentSection
@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             Heading = "Release 2 section 3 order 1",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ReleaseContentSectionType.Generic
         };
 
         private static readonly ContentSection Release2KeyStatsSection = new ContentSection
@@ -355,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 2 key stats section",
             Caption = "",
-            Type = ContentSectionType.KeyStatistics
+            Type = ReleaseContentSectionType.KeyStatistics
         };
 
         private static readonly List<ContentSection> ContentSections = new List<ContentSection>

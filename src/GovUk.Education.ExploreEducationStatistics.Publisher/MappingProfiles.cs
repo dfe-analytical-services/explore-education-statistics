@@ -63,8 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateDataBlockMap();
 
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-            CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 
         private void CreateDataBlockMap()

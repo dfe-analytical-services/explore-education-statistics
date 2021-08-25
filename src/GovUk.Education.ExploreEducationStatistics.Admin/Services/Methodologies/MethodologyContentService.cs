@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -30,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             Annexes
         }
 
-        private static readonly Dictionary<ContentListType, Func<Methodology, List<ContentSection>>> ContentListSelector
-            = new Dictionary<ContentListType, Func<Methodology, List<ContentSection>>>
+        private static readonly Dictionary<ContentListType, Func<Methodology, List<MethodologyContentSection>>> ContentListSelector
+            = new Dictionary<ContentListType, Func<Methodology, List<MethodologyContentSection>>>
             {
                 {ContentListType.Content, methodology => methodology.Content},
                 {ContentListType.Annexes, methodology => methodology.Annexes},
@@ -60,20 +59,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
 
-        public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyId) where T : ContentBlock
+        public Task<Either<ActionResult, List<MethodologyContentBlock>>> GetContentBlocks(Guid methodologyId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
                 .OnSuccess(CheckCanViewMethodology)
                 .OnSuccess(methodology =>
                 {
-                    var sections =
-                        (methodology.Annexes)
-                        .Concat(methodology.Content);
+                    var sections = methodology.Annexes.Concat(methodology.Content);
 
                     return sections
                         .SelectMany(section => section.Content)
-                        .OfType<T>()
                         .ToList();
                 });
         }
@@ -83,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
-                .OnSuccess(CheckCanViewMethodology)
+                .OnSuccess(_userService.CheckCanViewMethodology)
                 .OnSuccess(methodology =>
                 {
                     var content = ContentListSelector[contentType](methodology);
@@ -94,10 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid methodologyId,
             Guid contentSectionId)
         {
-            return
-                CheckContentSectionExists(methodologyId, contentSectionId)
-                    .OnSuccess(CheckCanViewMethodology)
-                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
+            // TODO EES-2168 hydrate methodology for permission check
+            return _persistenceHelper
+                .CheckEntityExists<MethodologyContentSection>(methodologyId)
+                .OnSuccess(CheckCanViewContentSection)
+                .OnSuccess(BuildContentSectionViewModel);
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
@@ -143,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                         .ForEach(contentSection => contentSection.Order++);
 
-                    var newContentSection = new ContentSection
+                    var newContentSection = new MethodologyContentSection
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -238,7 +235,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(async tuple =>
                 {
                     var (methodology, section) = tuple;
-                    var newContentBlock = CreateContentBlockForType(request.Type);
+
+                    var newContentBlock = new MethodologyContentBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        Created = DateTime.UtcNow
+                    };
+
                     return await AddContentBlockToContentSectionAndSave(
                         request.Order, section, newContentBlock, methodology);
                 });
@@ -355,15 +358,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _mapper.Map<T>(block);
         }
 
-        private static ContentBlock CreateContentBlockForType(ContentBlockType type)
-        {
-            var classType = GetContentBlockClassTypeFromEnumValue(type);
-            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
-            newContentBlock.Id = Guid.NewGuid();
-            newContentBlock.Created = DateTime.UtcNow;
-            return newContentBlock;
-        }
-
         private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
         {
             return _mapper.Map<List<IContentBlockViewModel>>(section
@@ -372,14 +366,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList());
         }
 
-        private List<ContentSectionViewModel> OrderedContentSections(List<ContentSection> sectionsList)
+        private List<ContentSectionViewModel> OrderedContentSections(List<MethodologyContentSection> sections)
         {
-            return _mapper.Map<List<ContentSectionViewModel>>(sectionsList)
+            return _mapper.Map<List<ContentSectionViewModel>>(sections)
                 .OrderBy(c => c.Order)
                 .ToList();
         }
 
-        private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckContentSectionExists(
+        private Task<Either<ActionResult, Tuple<Methodology, MethodologyContentSection>>> CheckContentSectionExists(Methodology methodology, Guid contentSectionId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(methodology => FindContentList(methodology, contentSectionId))
+                .OnSuccess(tuple =>
+                {
+                    var (methodology, content) = tuple;
+
+                    var section = content
+                        .Find(contentSection => contentSection.Id == contentSectionId);
+
+                    if (section == null)
+                    {
+                        return new NotFoundResult();
+                    }
+
+                    return new Either<ActionResult, Tuple<Methodology, ContentSection>>(
+                        new Tuple<Methodology, ContentSection>(methodology, section));
+                });
+        }
+
+        private Task<Either<ActionResult, Tuple<Methodology, MethodologyContentSection>>> CheckContentSectionExists(
             Guid methodologyId, Guid contentSectionId)
         {
             return _persistenceHelper
@@ -400,6 +416,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     return new Either<ActionResult, Tuple<Methodology, ContentSection>>(
                         new Tuple<Methodology, ContentSection>(methodology, section));
                 });
+        }
+
+        private ContentSectionViewModel BuildContentSectionViewModel(MethodologyContentSection contentSection)
+        {
+            return _mapper.Map<ContentSectionViewModel>(contentSection);
+        }
+
+        private Task<Either<ActionResult, MethodologyContentSection>> CheckCanViewContentSection(MethodologyContentSection contentSection)
+        {
+            return _userService
+                .CheckCanViewMethodology(contentSection.Methodology)
+                .OnSuccess(_ => contentSection);
         }
 
         private Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(Methodology methodology)
@@ -440,8 +468,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => tuple);
         }
 
-        private Either<ActionResult, Tuple<Methodology, ContentSection>> EnsureContentBlockListNotNull(
-            Tuple<Methodology, ContentSection> tuple)
+        private Either<ActionResult, Tuple<Methodology, MethodologyContentSection>> EnsureContentBlockListNotNull(
+            Tuple<Methodology, MethodologyContentSection> tuple)
         {
             if (tuple.Item2.Content == null)
             {
@@ -451,35 +479,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return tuple;
         }
 
-        private Either<ActionResult, Tuple<Methodology, List<ContentSection>>> FindContentList(Methodology methodology,
-            params Guid[] contentSectionIds)
+        private Either<ActionResult, Tuple<Methodology, List<MethodologyContentSection>>> FindContentList(Methodology methodology,
+            params Guid contentSectionId)
         {
-            return FindContentList(methodology, contentSectionIds.ToList());
+            return methodology.Content.SingleOrDefault(section => section.Id );
         }
 
         private List<ContentSection> FindContentList(Methodology methodology,
-            params ContentSection[] contentSections)
+            params MethodologyContentSection[] contentSections)
         {
             return FindContentList(methodology, contentSections.Select(section => section.Id).ToList()).Right.Item2;
         }
 
-        private Either<ActionResult, Tuple<Methodology, List<ContentSection>>> FindContentList(Methodology methodology,
+        private static Either<ActionResult, Tuple<Methodology, List<MethodologyContentSection>>> FindContentList(
+            Methodology methodology,
             List<Guid> contentSectionIds)
         {
             if (ContentListContainsAllSectionIds(methodology.Content, contentSectionIds))
             {
-                return new Tuple<Methodology, List<ContentSection>>(methodology, methodology.Content);
+                return new Tuple<Methodology, List<MethodologyContentSection>>(methodology, methodology.Content);
             }
 
             if (ContentListContainsAllSectionIds(methodology.Annexes, contentSectionIds))
             {
-                return new Tuple<Methodology, List<ContentSection>>(methodology, methodology.Annexes);
+                return new Tuple<Methodology, List<MethodologyContentSection>>(methodology, methodology.Annexes);
             }
 
             return new NotFoundResult();
         }
 
-        private static bool ContentListContainsAllSectionIds(List<ContentSection> sectionsList,
+        private static bool ContentListContainsAllSectionIds(List<MethodologyContentSection> sectionsList,
             List<Guid> contentSectionIds)
         {
             if (sectionsList == null)
@@ -496,6 +525,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             // Load the MethodologyParent so that Methodology Title and Slug can be provided by the MethodologyParent.
             return query.Include(m => m.MethodologyParent);
+        }
+        
+
+        private static IQueryable<MethodologyContentSection> HydrateContentSectionsAndBlocks(
+            IQueryable<MethodologyContentSection> values)
+        {
+            return values
+                .Include(r => r.Methodology)
+                .Include(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
+                .Include(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.ResolvedBy);
         }
     }
 }

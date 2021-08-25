@@ -76,12 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        [JsonIgnore]
-        public List<ReleaseContentSection> Content { get; set; }
+        public List<ReleaseContentSection> Content { get; set; } = new();
 
         // TODO: EES-1568 This should be DataBlocks
-        [JsonIgnore]
-        public List<ReleaseContentBlock> ContentBlocks { get; set; }
+        public List<DataBlock> ContentBlocks { get; set; }
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
@@ -92,107 +90,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool SoftDeleted { get; set; }
 
         [NotMapped]
-        [JsonProperty("Content")]
-        public IEnumerable<ContentSection> GenericContent
+        public IEnumerable<ReleaseContentSection> GenericContent
         {
             get
             {
-                if (Content == null)
-                {
-                    return new List<ContentSection>();
-                }
-
                 return Content
-                    .Select(join => join.ContentSection)
-                    .ToList()
-                    .FindAll(section => section.Type == ContentSectionType.Generic)
+                    .Where(section => section.Type == ReleaseContentSectionType.Generic)
                     .ToImmutableList();
             }
-            set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
-        }
-
-        public void AddGenericContentSection(ContentSection section)
-        {
-            Content.Add(new ReleaseContentSection
-            {
-                Release = this,
-                ContentSection = section
-            });
-        }
-
-        public void RemoveGenericContentSection(ContentSection section)
-        {
-            Content.Remove(Content.Find(join => join.ContentSection == section));
-        }
-
-        public void AddContentBlock(ContentBlock contentBlock)
-        {
-            if (ContentBlocks == null)
-            {
-                ContentBlocks = new List<ReleaseContentBlock>();
-            }
-
-            ContentBlocks.Add(new ReleaseContentBlock
-            {
-                Release = this,
-                ContentBlock = contentBlock
-            });
+            set => ReplaceContentSectionsOfType(ReleaseContentSectionType.Generic, value);
         }
 
         [NotMapped]
-        public ContentSection KeyStatisticsSection
+        public ReleaseContentSection KeyStatisticsSection
         {
-            get => FindSingleSectionByType(ContentSectionType.KeyStatistics);
-            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatistics, new List<ContentSection> { value });
+            get => FindSingleSectionByType(ReleaseContentSectionType.KeyStatistics);
+            set => ReplaceContentSectionsOfType(ReleaseContentSectionType.KeyStatistics, ListOf(value));
         }
 
         [NotMapped]
-        public ContentSection KeyStatisticsSecondarySection
+        public ReleaseContentSection KeyStatisticsSecondarySection
         {
-            get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
-            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
+            get => FindSingleSectionByType(ReleaseContentSectionType.KeyStatisticsSecondary);
+            set => ReplaceContentSectionsOfType(ReleaseContentSectionType.KeyStatisticsSecondary, ListOf(value));
         }
 
         [NotMapped]
-        public ContentSection HeadlinesSection
+        public ReleaseContentSection HeadlinesSection
         {
-            get => FindSingleSectionByType(ContentSectionType.Headlines);
-            set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, new List<ContentSection> { value });
+            get => FindSingleSectionByType(ReleaseContentSectionType.Headlines);
+            set => ReplaceContentSectionsOfType(ReleaseContentSectionType.Headlines, ListOf(value));
         }
 
         [NotMapped]
-        public ContentSection SummarySection
+        public ReleaseContentSection SummarySection
         {
-            get => FindSingleSectionByType(ContentSectionType.ReleaseSummary);
-            set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
+            get => FindSingleSectionByType(ReleaseContentSectionType.ReleaseSummary);
+            set => ReplaceContentSectionsOfType(ReleaseContentSectionType.ReleaseSummary, ListOf(value));
         }
 
-        private ContentSection FindSingleSectionByType(ContentSectionType type)
+        private ReleaseContentSection FindSingleSectionByType(ReleaseContentSectionType type)
         {
-            if (Content == null)
-            {
-                Content = new List<ReleaseContentSection>();
-            }
-
-            return Content
-                .Select(join => join.ContentSection)
-                .ToList()
-                .Find(section => section.Type == type);
+            return Content.Single(section => section.Type == type);
         }
 
-        private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
+        private void ReplaceContentSectionsOfType(ReleaseContentSectionType type, IEnumerable<ReleaseContentSection> replacementSections)
         {
-            if (Content == null)
-            {
-                Content = new List<ReleaseContentSection>();
-            }
-
-            Content.RemoveAll(join => join.ContentSection.Type == type);
-            Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
-            {
-               Release = this,
-               ContentSection = section,
-            }));
+            Content.RemoveAll(contentSection => contentSection.Type == type);
+            Content.AddRange(replacementSections);
         }
 
         public Guid? TypeId { get; set; }
@@ -232,38 +177,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             // Set new values for fields that should be altered in the amended
             // Release rather than copied from the original Release
-            amendment.Id = Guid.NewGuid();
-            amendment.Published = null;
-            amendment.PublishScheduled = null;
-            amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
-            amendment.Created = createdDate;
-            amendment.CreatedById = createdByUserId;
-            amendment.Version = Version + 1;
-            amendment.PreviousVersionId = Id;
-
-            var context = new CloneContext();
-
-            amendment.Content = amendment
-                .Content?
-                .Select(content => content.Clone(amendment, context))
-                .ToList();
-
-            amendment.ContentBlocks = amendment
-                .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(amendment, context))
-                .ToList();
-
-            amendment.RelatedInformation = amendment
-                .RelatedInformation?
-                .Select(link => link.Clone())
-                .ToList();
-
-            amendment.Updates = amendment
-                .Updates?
-                .Select(update => update.Clone(amendment))
-                .ToList();
-
-            UpdateAmendmentContent(context);
+            // amendment.Id = Guid.NewGuid();
+            // amendment.Published = null;
+            // amendment.PublishScheduled = null;
+            // amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
+            // amendment.Created = createdDate;
+            // amendment.CreatedById = createdByUserId;
+            // amendment.Version = Version + 1;
+            // amendment.PreviousVersionId = Id;
+            //
+            // var context = new CloneContext();
+            //
+            // amendment.Content = amendment
+            //     .Content?
+            //     .Select(content => content.Clone(amendment, context))
+            //     .ToList();
+            //
+            // amendment.ContentBlocks = amendment
+            //     .ContentBlocks?
+            //     .Select(releaseContentBlock => releaseContentBlock.Clone(amendment, context))
+            //     .ToList();
+            //
+            // amendment.RelatedInformation = amendment
+            //     .RelatedInformation?
+            //     .Select(link => link.Clone())
+            //     .ToList();
+            //
+            // amendment.Updates = amendment
+            //     .Updates?
+            //     .Select(update => update.Clone(amendment))
+            //     .ToList();
+            //
+            // UpdateAmendmentContent(context);
 
             return amendment;
         }
@@ -284,9 +229,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                     case HtmlBlock block:
                         block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
                         break;
-                    case MarkDownBlock block:
-                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
-                        break;
+                    
+                    // TODO EES-2168 throw exception here?
                 }
             }
         }
@@ -316,19 +260,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public void CreateGenericContentFromTemplate(Release newRelease)
         {
-            var context = new CloneContext();
-
-            newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
-
-            newRelease.Content = newRelease
-                .Content?
-                .Select(content => content.Clone(newRelease, context))
-                .ToList();
-
-            newRelease.ContentBlocks = newRelease
-                .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(newRelease, context))
-                .ToList();
+            // var context = new CloneContext();
+            //
+            // newRelease.Content = Content.Where(c => c.ContentSection.Type == ReleaseContentSectionType.Generic).ToList();
+            //
+            // newRelease.Content = newRelease
+            //     .Content?
+            //     .Select(content => content.Clone(newRelease, context))
+            //     .ToList();
+            //
+            // newRelease.ContentBlocks = newRelease
+            //     .ContentBlocks?
+            //     .Select(releaseContentBlock => releaseContentBlock.Clone(newRelease, context))
+            //     .ToList();
         }
 
         // Ideally we want to try and get rid of this completely as we

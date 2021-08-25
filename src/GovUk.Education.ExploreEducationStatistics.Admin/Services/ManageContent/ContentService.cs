@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,12 +13,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -25,29 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IReleaseContentSectionRepository releaseContentSectionRepository,
             IUserService userService,
             IMapper mapper)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
-            _releaseContentSectionRepository = releaseContentSectionRepository;
             _userService = userService;
             _mapper = mapper;
-        }
-
-        public async Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _releaseContentSectionRepository.GetAllContentBlocks<T>(release.Id));
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
@@ -64,17 +52,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    newSectionOrder.ToList().ForEach(kvp =>
+                    foreach (var (sectionId, newOrder) in newSectionOrder)
                     {
-                        var (sectionId, newOrder) = kvp;
-                        release
+                        var contentSection = release
                             .GenericContent
                             .ToList()
-                            .Find(section => section.Id == sectionId).Order = newOrder;
-                    });
+                            .SingleOrDefault(section => section.Id == sectionId);
+
+                        if (contentSection != null)
+                        {
+                            contentSection.Order = newOrder;
+                        }
+                    }
 
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
@@ -82,12 +74,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, ContentSectionAddRequest? request)
+        public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSection(
+            Guid releaseId,
+            ContentSectionAddRequest? request)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
                     var orderForNewSection = request?.Order ??
@@ -98,13 +91,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                         .ForEach(contentSection => contentSection.Order++);
 
-                    var newContentSection = new ContentSection
+                    var newContentSection = new ReleaseContentSection
                     {
                         Heading = "New section",
                         Order = orderForNewSection
                     };
 
-                    release.AddGenericContentSection(newContentSection);
+                    release.Content.Add(newContentSection);
 
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
@@ -113,261 +106,210 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid releaseId, Guid contentSectionId, string newHeading)
+            Guid contentSectionId,
+            string newHeading)
         {
-            return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (_, sectionToUpdate) = tuple;
-
-                        sectionToUpdate.Heading = newHeading;
-
-                        _context.ContentSections.Update(sectionToUpdate);
-                        await _context.SaveChangesAsync();
-                        return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
-                    });
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateContentSection)
+                .OnSuccess(async contentSection =>
+                {
+                    _context.ContentSections.Update(contentSection);
+                    contentSection.Heading = newHeading;
+                    await _context.SaveChangesAsync();
+                    return BuildContentSectionViewModel(contentSection);
+                });
         }
 
-        public  Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
+        public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
             Guid releaseId,
             Guid contentSectionId)
         {
-            return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess<ActionResult, Release, List<ContentSectionViewModel>>(async release =>
+                {
+                    var sectionToRemove = release
+                        .Content
+                        .SingleOrDefault(contentSection => contentSection.Id == contentSectionId);
+
+                    if (sectionToRemove == null)
                     {
-                        var (release, sectionToRemove) = tuple;
+                        return new NotFoundResult();
+                    }
 
-                        // detach DataBlocks before removing the ContentSection and its ContentBlocks
-                        var dataBlocks = sectionToRemove
-                            .Content
-                            .OfType<DataBlock>()
-                            .ToList();
+                    release.Content.Remove(sectionToRemove);
+                    _context.ContentSections.Remove(sectionToRemove);
 
-                        dataBlocks.ForEach(dataBlock =>
-                            RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
+                    var removedSectionOrder = sectionToRemove.Order;
 
-                        release.RemoveGenericContentSection(sectionToRemove);
-                        _context.ContentSections.Remove(sectionToRemove);
+                    release.GenericContent
+                        .ToList()
+                        .FindAll(contentSection => contentSection.Order > removedSectionOrder)
+                        .ForEach(contentSection => contentSection.Order--);
 
-                        var removedSectionOrder = sectionToRemove.Order;
-
-                        release.GenericContent
-                            .ToList()
-                            .FindAll(contentSection => contentSection.Order > removedSectionOrder)
-                            .ForEach(contentSection => contentSection.Order--);
-
-                        _context.Releases.Update(release);
-                        await _context.SaveChangesAsync();
-                        return OrderedContentSections(release);
-                    });
+                    _context.Releases.Update(release);
+                    await _context.SaveChangesAsync();
+                    return OrderedContentSections(release);
+                });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
+        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid contentSectionId)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(BuildContentSectionViewModel);
         }
 
-        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
+            Guid releaseId,
+            Guid contentSectionId,
+            Dictionary<Guid, int> newBlocksOrder)
         {
-            return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateContentSection)
+                .OnSuccess(async contentSection =>
+                {
+                    foreach (var (blockId, newOrder) in newBlocksOrder)
                     {
-                        var (_, section) = tuple;
-
-                        newBlocksOrder.ToList().ForEach(kvp =>
+                        var contentBlock = contentSection.Content.SingleOrDefault(block => block.Id == blockId);
+                        if (contentBlock != null)
                         {
-                            var (blockId, newOrder) = kvp;
-                            section.Content.Find(block => block.Id == blockId).Order = newOrder;
-                        });
+                            contentBlock.Order = newOrder;
+                        }
+                    }
 
-                        _context.ContentSections.Update(section);
-                        await _context.SaveChangesAsync();
-                        return OrderedContentBlocks(section);
-                    });
+                    _context.ContentSections.Update(contentSection);
+                    await _context.SaveChangesAsync();
+                    return OrderedContentBlocks(contentSection);
+                });
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(Guid releaseId,
+        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
             Guid contentSectionId,
             ContentBlockAddRequest request)
         {
-            if (request.Type != ContentBlockType.HtmlBlock)
-            {
-                throw new ArgumentOutOfRangeException(nameof(request), "Cannot create type");
-            }
-
-            return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId)
+                .OnSuccess(CheckCanUpdateContentSection)
+                .OnSuccess(async contentSection =>
+                {
+                    var newContentBlock = new ReleaseContentBlock
                     {
-                        var (_, section) = tuple;
-                        var newContentBlock = CreateContentBlockForType(request.Type);
-                        return await AddContentBlockToContentSectionAndSave(request.Order, section,
-                            newContentBlock);
-                    });
+                        Created = DateTime.UtcNow
+                    };
+                    return await AddContentBlockToContentSectionAndSave(request.Order, contentSection, newContentBlock);
+                });
         }
 
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+            Guid releaseId,
+            Guid contentSectionId,
+            Guid contentBlockId)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateContentSection)
+                .OnSuccess<ActionResult, ReleaseContentSection, List<IContentBlockViewModel>>(async contentSection =>
                 {
-                    var (_, section) = tuple;
-
-                    var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
+                    var blockToRemove = contentSection.Content.SingleOrDefault(block => block.Id == contentBlockId);
 
                     if (blockToRemove == null)
-                    {
-                        return NotFound<List<IContentBlockViewModel>>();
-                    }
-
-                    if (!blockToRemove.ContentSectionId.HasValue)
-                    {
-                        return ValidationActionResult(ContentBlockAlreadyDetached);
-                    }
-
-                    if (blockToRemove.ContentSectionId != contentSectionId)
                     {
                         return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
                     }
 
-                    // This is rubbish. Data blocks and content blocks are only the
-                    // same type in name as they actually do very different things.
-                    // Ideally we need to separate out data blocks from the content block model.
-                    // TODO: EES-1306 Refactor data blocks out of content block model
-                    var deleteContentBlock = !(blockToRemove is DataBlock);
+                    RemoveContentBlockFromContentSection(contentSection, blockToRemove);
 
-                    RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
-
-                    _context.ContentSections.Update(section);
+                    _context.ContentSections.Update(contentSection);
                     await _context.SaveChangesAsync();
-                    return OrderedContentBlocks(section);
+                    return OrderedContentBlocks(contentSection);
                 });
         }
 
         public Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
+            Guid releaseId, Guid contentSectionId, Guid dataBlockId, DataBlockUpdateRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<DataBlock>(dataBlockId)
+                // TODO EES-2168 check can update release
+                .OnSuccess(async blockToUpdate =>
                 {
-                    var (_, section) = tuple;
+                    blockToUpdate.Summary ??= new DataBlockSummary();
 
-                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (blockToUpdate == null)
+                    blockToUpdate.Summary.DataDefinitionTitle = new List<string>
                     {
-                        return NotFound<DataBlockViewModel>();
-                    }
+                        request.DataDefinitionTitle
+                    };
 
-                    if (!(blockToUpdate is DataBlock dataBlock))
+                    blockToUpdate.Summary.DataDefinition = new List<string>
                     {
-                        return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                    }
+                        request.DataDefinition
+                    };
 
-                    return await UpdateDataBlock(dataBlock, request);
+                    blockToUpdate.Summary.DataSummary = new List<string>
+                    {
+                        request.DataSummary
+                    };
+
+                    _context.DataBlocks.Update(blockToUpdate);
+                    await _context.SaveChangesAsync();
+                    return _mapper.Map<DataBlockViewModel>(blockToUpdate);
                 });
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
+        public Task<Either<ActionResult, IContentBlockViewModel>> UpdateContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentBlock>(contentBlockId)
+                // TODO EES-2168 check can update content block
+                .OnSuccess(async blockToUpdate =>
                 {
-                    var (_, section) = tuple;
-
-                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (blockToUpdate == null)
-                    {
-                        return NotFound<IContentBlockViewModel>();
-                    }
-
-                    return blockToUpdate switch
-                    {
-                        MarkDownBlock markDownBlock => await UpdateMarkDownBlock(markDownBlock, request.Body),
-                        HtmlBlock htmlBlock => await UpdateHtmlBlock(htmlBlock, request.Body),
-                        DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
+                    blockToUpdate.Body = request.Body;
+                    _context.ReleaseContentBlocks.Update(blockToUpdate);
+                    await _context.SaveChangesAsync();
+                    return _mapper.Map<IContentBlockViewModel>(blockToUpdate);
                 });
         }
 
-        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
-            where T : ContentBlock
+        public async Task<Either<ActionResult, List<DataBlock>>> GetUnattachedDataBlocks(Guid releaseId)
         {
-            var unattachedContentBlocks = await _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .Where(join => join.ReleaseId == releaseId)
-                .Select(join => join.ContentBlock)
-                .Where(contentBlock => contentBlock.ContentSectionId == null)
-                .OfType<T>()
+            return await _context.DataBlocks
+                .Where(dataBlock => dataBlock.ReleaseId == releaseId && dataBlock.ContentSectionId == null)
+                .OrderBy(dataBlock => dataBlock.Name)
                 .ToListAsync();
-
-            if (typeof(T) == typeof(DataBlock))
-            {
-                return unattachedContentBlocks
-                    .OfType<DataBlock>()
-                    .OrderBy(contentBlock => contentBlock.Name)
-                    .OfType<T>()
-                    .ToList();
-            }
-
-            return unattachedContentBlocks;
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
-            ContentBlockAttachRequest request)
+        public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid contentSectionId,
+            DataBlockAttachRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseContentSection>(contentSectionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateContentSection)
+                .OnSuccessCombineWith(contentSection => _persistenceHelper.CheckEntityExists<DataBlock>(
+                    q => q.Where(dataBlock =>
+                        contentSection.ReleaseId == dataBlock.ReleaseId &&
+                        dataBlock.Id == request.DataBlockId)))
+                .OnSuccess(async contentSectionAndDataBlock =>
                 {
-                    var (_, section) = tuple;
+                    var (contentSection, dataBlock) = contentSectionAndDataBlock;
 
-                    var blockToAttach =
-                        _context.ContentBlocks.FirstOrDefault(block => block.Id == request.ContentBlockId);
-
-                    if (blockToAttach == null)
+                    // Create a new ContentBlock for the DataBlock
+                    var contentBlock = new ReleaseContentBlock
                     {
-                        return NotFound<IContentBlockViewModel>();
-                    }
+                        DataBlockId = dataBlock.Id
+                    };
 
-                    if (!(blockToAttach is DataBlock dataBlock))
-                    {
-                        return ValidationActionResult(IncorrectContentBlockTypeForAttach);
-                    }
-
-                    if (dataBlock.ContentSectionId.HasValue)
-                    {
-                        return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
-                    }
-
-                    return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlock);
+                    return await AddContentBlockToContentSectionAndSave(request.Order, contentSection, contentBlock);
                 });
         }
 
         private async Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockToContentSectionAndSave(
-            int? order, ContentSection section, ContentBlock newContentBlock)
+            int? order, ReleaseContentSection section, ReleaseContentBlock newContentBlock)
         {
-            if (section.Content == null)
-            {
-                section.Content = new List<ContentBlock>();
-            }
-
             var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
 
             section.Content
@@ -379,28 +321,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
             _context.ContentSections.Update(section);
             await _context.SaveChangesAsync();
-            return new Either<ActionResult, IContentBlockViewModel>(_mapper.Map<IContentBlockViewModel>(newContentBlock));
+            return new Either<ActionResult, IContentBlockViewModel>(
+                _mapper.Map<IContentBlockViewModel>(newContentBlock));
         }
 
-        private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
+        private static int OrderValueForNewlyAddedContentBlock(int? order, ReleaseContentSection contentSection)
         {
             if (order.HasValue)
             {
                 return order.Value;
             }
 
-            if (!section.Content.Any())
+            // TODO EES-2168 is this right?
+            if (!contentSection.Content.Any())
             {
-                return section.Content.Max(contentBlock => contentBlock.Order) + 1;
+                return contentSection.Content.Max(contentBlock => contentBlock.Order) + 1;
             }
 
             return 1;
         }
 
         private void RemoveContentBlockFromContentSection(
-            ContentSection section,
-            ContentBlock blockToRemove,
-            bool deleteContentBlock)
+            ReleaseContentSection section,
+            ReleaseContentBlock blockToRemove)
         {
             section.Content.Remove(blockToRemove);
 
@@ -410,87 +353,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
                 .ForEach(contentBlock => contentBlock.Order--);
 
-            if (deleteContentBlock)
-            {
-                _context.ContentBlocks.Remove(blockToRemove);
-            }
-            else
-            {
-                blockToRemove.Order = 0;
-                blockToRemove.ContentSectionId = null;
-                _context.ContentBlocks.Update(blockToRemove);
-            }
+            _context.ContentBlocks.Remove(blockToRemove);
         }
 
-        private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateMarkDownBlock(MarkDownBlock markDownBlock,
-            string body)
+        private List<IContentBlockViewModel> OrderedContentBlocks(ReleaseContentSection contentSection)
         {
-            var htmlBlock = new HtmlBlock
-            {
-                Body = body,
-                Comments = markDownBlock.Comments,
-                Order = markDownBlock.Order,
-                ContentSectionId = markDownBlock.ContentSectionId
-            };
-
-            var added = (await _context.ContentBlocks.AddAsync(htmlBlock)).Entity;
-            _context.ContentBlocks.Remove(markDownBlock);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<HtmlBlockViewModel>(added);
-        }
-
-        private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
-            string body)
-        {
-            blockToUpdate.Body = body;
-            return await SaveContentBlock<HtmlBlockViewModel>(blockToUpdate);
-        }
-
-        private async Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(DataBlock blockToUpdate,
-            DataBlockUpdateRequest request)
-        {
-            if (blockToUpdate.Summary == null)
-            {
-                blockToUpdate.Summary = new DataBlockSummary();
-            }
-
-            blockToUpdate.Summary.DataDefinitionTitle = new List<string>
-            {
-                request.DataDefinitionTitle
-            };
-
-            blockToUpdate.Summary.DataDefinition = new List<string>
-            {
-                request.DataDefinition
-            };
-
-            blockToUpdate.Summary.DataSummary = new List<string>
-            {
-                request.DataSummary
-            };
-
-            return await SaveContentBlock<DataBlockViewModel>(blockToUpdate);
-        }
-
-        private async Task<T> SaveContentBlock<T>(ContentBlock blockToUpdate)
-            where T: IContentBlockViewModel
-        {
-            _context.ContentBlocks.Update(blockToUpdate);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<T>(blockToUpdate);
-        }
-
-        private static ContentBlock CreateContentBlockForType(ContentBlockType type)
-        {
-            var classType = GetContentBlockClassTypeFromEnumValue(type);
-            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
-            newContentBlock.Created = DateTime.UtcNow;
-            return newContentBlock;
-        }
-
-        private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
-        {
-            return _mapper.Map<List<IContentBlockViewModel>>(section
+            return _mapper.Map<List<IContentBlockViewModel>>(contentSection
                 .Content
                 .OrderBy(block => block.Order)
                 .ToList());
@@ -503,55 +371,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ToList();
         }
 
-        private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> releases)
+        private ContentSectionViewModel BuildContentSectionViewModel(ReleaseContentSection contentSection)
         {
-            return releases
+            return _mapper.Map<ContentSectionViewModel>(contentSection);
+        }
+
+        private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> values)
+        {
+            return values
                 .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.CreatedBy)
+                .ThenInclude(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
                 .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.ResolvedBy);
+                .ThenInclude(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.ResolvedBy);
         }
 
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
-            Guid releaseId, Guid contentSectionId)
+        private static IQueryable<ReleaseContentSection> HydrateContentSectionsAndBlocks(
+            IQueryable<ReleaseContentSection> values)
         {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release =>
-                {
-                    var section = release
-                        .Content
-                        .Select(join => join.ContentSection)
-                        .ToList()
-                        .Find(contentSection => contentSection.Id == contentSectionId);
-
-                    if (section == null)
-                    {
-                        return new NotFoundResult();
-                    }
-
-                    return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        new Tuple<Release, ContentSection>(release, section));
-                });
+            return values
+                .Include(r => r.Release)
+                .Include(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
+                .Include(r => r.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.ResolvedBy);
         }
 
-        private Task<Either<ActionResult, Release>> CheckCanUpdateRelease(Release release)
-        {
-            return _userService.CheckCanUpdateRelease(release);
-        }
-
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckCanUpdateRelease(
-            Tuple<Release, ContentSection> tuple)
+        private Task<Either<ActionResult, ReleaseContentSection>> CheckCanUpdateContentSection(
+            ReleaseContentSection contentSection)
         {
             return _userService
-                .CheckCanUpdateRelease(tuple.Item1)
-                .OnSuccess(_ => tuple);
+                .CheckCanUpdateRelease(contentSection.Release)
+                .OnSuccess(_ => contentSection);
         }
     }
 }

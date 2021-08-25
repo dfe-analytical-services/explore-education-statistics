@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,15 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Security.ContentSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -26,12 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         private static readonly Guid ContentSectionId = Guid.NewGuid();
         private static readonly Guid ContentBlockId = Guid.NewGuid();
 
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
             Content = new List<ReleaseContentSection>
             {
-                new ReleaseContentSection
+                new()
                 {
                     ContentSection = new ContentSection
                     {
@@ -93,21 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         return service.AttachDataBlock(
                             _release.Id,
                             ContentSectionId,
-                            new ContentBlockAttachRequest());
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task GetContentBlocks()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.GetContentBlocks<HtmlBlock>(_release.Id);
+                            new DataBlockAttachRequest());
                     }
                 );
         }
@@ -204,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateTextBasedContentBlock(
+                        return service.UpdateContentBlock(
                             _release.Id,
                             ContentSectionId,
                             ContentBlockId,
@@ -232,16 +215,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         private ContentService SetupContentService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IReleaseContentSectionRepository releaseContentSectionRepository = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IContentBlockRepository? contentBlockRepository = null,
+            IUserService? userService = null)
         {
-            return new ContentService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+            return new(
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
-                userService ?? new Mock<IUserService>().Object,
+                contentBlockRepository ?? Mock.Of<IContentBlockRepository>(),
+                userService ?? Mock.Of<IUserService>(),
                 AdminMapper()
             );
         }

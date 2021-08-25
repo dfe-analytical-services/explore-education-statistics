@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 {
     public interface IReleaseContentBlockRepository
     {
-        public Task<List<T>> GetAll<T>(Guid releaseId) where T : ContentBlock;
+        Task<List<T>> GetByRelease<T>(Guid releaseId) where T : ContentBlock;
     }
 }

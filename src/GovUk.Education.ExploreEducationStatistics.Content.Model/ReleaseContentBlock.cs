@@ -1,31 +1,33 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class ReleaseContentBlock
+    public class ReleaseContentBlock : ContentBlock
     {
-        public Release Release { get; set; }
+        public ReleaseContentSection ContentSection { get; set; } = null!;
 
-        public Guid ReleaseId { get; set; }
+        public Guid ContentSectionId { get; set; }
 
-        public ContentBlock ContentBlock { get; set; }
+        public string? Body { get; set; }
 
-        public Guid ContentBlockId { get; set; }
+        public Guid? DataBlockId { get; set; }
+
+        public DataBlock? DataBlock { get; set; }
 
         public ReleaseContentBlock Clone(Release newRelease, Release.CloneContext context)
         {
             var copy = MemberwiseClone() as ReleaseContentBlock;
 
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
-
-            var clonedContentBlock =
-                context.ContentBlocks.GetValueOrDefault(ContentBlock)
-                ?? ContentBlock.Clone(context, null);
-
-            copy.ContentBlock = clonedContentBlock;
-            copy.ContentBlockId = (Guid) clonedContentBlock.Id;
+            // copy.Release = newRelease;
+            // copy.ReleaseId = newRelease.Id;
+            //
+            // var clonedContentBlock =
+            //     context.ContentBlocks.GetValueOrDefault(ContentBlock)
+            //     ?? ContentBlock.Clone(context, null);
+            //
+            // copy.ContentBlock = clonedContentBlock;
+            // copy.ContentBlockId = (Guid) clonedContentBlock.Id;
 
             return copy;
         }

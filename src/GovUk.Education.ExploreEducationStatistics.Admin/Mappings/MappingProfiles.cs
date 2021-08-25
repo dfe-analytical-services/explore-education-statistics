@@ -236,8 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<DataBlock, DataBlockViewModel>();
 
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-            CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 
         private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)

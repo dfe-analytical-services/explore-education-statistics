@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -42,10 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPost("release/{releaseId}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
-            Guid releaseId, ContentSectionAddRequest request = null)
+            Guid releaseId, ContentSectionAddRequest? request)
         {
             return await _contentService
-                .AddContentSectionAsync(releaseId, request)
+                .AddContentSection(releaseId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
-                .UpdateContentSectionHeading(releaseId, contentSectionId, request.Heading)
+                .UpdateContentSectionHeading(contentSectionId, request.Heading)
                 .HandleFailuresOrOk();
         }
 
@@ -68,10 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/section/{contentSectionId}")]
-        public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
+        public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(
+            Guid releaseId, Guid contentSectionId)
         {
             return await _contentService
-                .GetContentSection(releaseId, contentSectionId)
+                .GetContentSection(contentSectionId)
                 .HandleFailuresOrOk();
         }
 
@@ -89,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             Guid releaseId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
-                .AddContentBlock(releaseId, contentSectionId, request)
+                .AddContentBlock(contentSectionId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -112,11 +114,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
-        public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
+        public async Task<ActionResult<IContentBlockViewModel>> UpdateContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
-                .UpdateTextBasedContentBlock(releaseId, contentSectionId, contentBlockId, request)
+                .UpdateContentBlock(releaseId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -124,16 +126,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return await _contentService
-                .GetUnattachedContentBlocks<DataBlock>(releaseId)
+                .GetUnattachedDataBlocks(releaseId)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
         public async Task<ActionResult<IContentBlockViewModel>> AttachDataBlock(
-            Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request)
+            Guid releaseId, Guid contentSectionId, DataBlockAttachRequest request)
         {
             return await _contentService
-                .AttachDataBlock(releaseId, contentSectionId, request)
+                .AttachDataBlock(contentSectionId, request)
                 .HandleFailuresOrOk();
         }
     }

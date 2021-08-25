@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Release = release,
                         ContentSection = new ContentSection
                         {
-                            Type = ContentSectionType.Headlines
+                            Type = ReleaseContentSectionType.Headlines
                         }
                     },
                     new ReleaseContentSection
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Release = release,
                         ContentSection = new ContentSection
                         {
-                            Type = ContentSectionType.KeyStatistics
+                            Type = ReleaseContentSectionType.KeyStatistics
                         }
                     },
                     new ReleaseContentSection
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Release = release,
                         ContentSection = new ContentSection
                         {
-                            Type = ContentSectionType.KeyStatisticsSecondary
+                            Type = ReleaseContentSectionType.KeyStatisticsSecondary
                         }
                     },
                     new ReleaseContentSection
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Release = release,
                         ContentSection = new ContentSection
                         {
-                            Type = ContentSectionType.ReleaseSummary
+                            Type = ReleaseContentSectionType.ReleaseSummary
                         }
                     },
                     new ReleaseContentSection
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Release = release,
                         ContentSection = new ContentSection
                         {
-                            Type = ContentSectionType.Generic
+                            Type = ReleaseContentSectionType.Generic
                         }
                     });
                 await contentDbContext.SaveChangesAsync();
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id))
+                    mock.GetUnattachedDataBlocks(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
             methodologyRepository.Setup(mock => mock.GetLatestByPublication(publication.Id))
@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 contentService.Verify(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id), Times.Once);
+                    mock.GetUnattachedDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);

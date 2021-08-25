@@ -36,9 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public List<ContentSection> Content { get; set; } = new();
+        public List<MethodologyContentSection> Content { get; set; } = new();
 
-        public List<ContentSection> Annexes { get; set; } = new();
+        public List<MethodologyContentSection> Annexes { get; set; } = new();
 
         public string? InternalReleaseNote { get; set; }
 
@@ -95,30 +95,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Methodology CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var copy = MemberwiseClone() as Methodology;
-            copy.Id = Guid.NewGuid();
-            copy.Status = Draft;
-            copy.Published = null;
-            copy.Updated = null;
-            copy.Version = Version + 1;
-            copy.Created = createdDate;
-            copy.CreatedBy = null;
-            copy.CreatedById = createdByUserId;
-            copy.PreviousVersion = null;
-            copy.PreviousVersionId = Id;
-            copy.PublishingStrategy = Immediately;
-            copy.ScheduledWithRelease = null;
-            copy.ScheduledWithReleaseId = null;
-            copy.MethodologyParent = null!;
-            copy.InternalReleaseNote = null;
-
-            copy.Annexes = Annexes
-                .Select(c => c.Clone(createdDate))
-                .ToList();
-
-            copy.Content = Content
-                .Select(c => c.Clone(createdDate))
-                .ToList();
-
+            // copy.Id = Guid.NewGuid();
+            // copy.Status = Draft;
+            // copy.Published = null;
+            // copy.Updated = null;
+            // copy.Version = Version + 1;
+            // copy.Created = createdDate;
+            // copy.CreatedBy = null;
+            // copy.CreatedById = createdByUserId;
+            // copy.PreviousVersion = null;
+            // copy.PreviousVersionId = Id;
+            // copy.PublishingStrategy = Immediately;
+            // copy.ScheduledWithRelease = null;
+            // copy.ScheduledWithReleaseId = null;
+            // copy.MethodologyParent = null!;
+            // copy.InternalReleaseNote = null;
+            //
+            // copy.Annexes = Annexes
+            //     .Select(c => c.Clone(createdDate))
+            //     .ToList();
+            //
+            // copy.Content = Content
+            //     .Select(c => c.Clone(createdDate))
+            //     .ToList();
+            //
             return copy;
         }
     }

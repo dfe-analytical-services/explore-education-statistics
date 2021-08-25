@@ -18,6 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseContentSectionType;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -130,34 +132,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
         {
             return await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
+                .Include(rcs => rcs.Content)
                 .Where(rcs =>
                     rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
+                    && rcs.Type == Generic)
+                .AnyAsync(rcs => rcs.Content.Count == 0);
         }
 
         private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
         {
-            var releaseGenericContentBlocks = await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .SelectMany(rcs => rcs.ContentSection.Content)
+            var contentBlocks = await _contentDbContext.ReleaseContentBlocks
+                .Include(contentBlock => contentBlock.ContentSection)
+                .Where(contentBlock =>
+                    contentBlock.ContentSection.ReleaseId == releaseId &&
+                    contentBlock.ContentSection.Type == Generic)
                 .ToListAsync();
-                
-            return releaseGenericContentBlocks 
-                .Any(block =>
-                {
-                    if (block is HtmlBlock htmlBlock)
-                    {
-                        return htmlBlock.Body.IsNullOrEmpty();
-                    }
-                    return false;
-                });
+
+            return contentBlocks.Any(contentBlock => contentBlock.Body.IsNullOrEmpty());
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

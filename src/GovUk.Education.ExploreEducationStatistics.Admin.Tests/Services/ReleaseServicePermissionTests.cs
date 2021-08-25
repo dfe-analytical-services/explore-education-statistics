@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -5,7 +6,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -23,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static Moq.MockBehavior;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
@@ -30,12 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServicePermissionTests
     {
-        private static readonly Publication Publication = new Publication
+        private static readonly Publication Publication = new()
         {
             Id = Guid.NewGuid()
         };
 
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
             PublicationId = Publication.Id,
@@ -226,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var list = new List<MyReleaseViewModel>
             {
-                new MyReleaseViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
@@ -265,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var list = new List<MyReleaseViewModel>
             {
-                new MyReleaseViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
@@ -330,42 +332,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseService BuildReleaseService(
-            ContentDbContext context = null,
-            IMapper mapper = null,
-            IPublishingService publishingService = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            IReleaseRepository releaseRepository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            ISubjectRepository subjectRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IDataImportService dataImportService = null,
-            IFootnoteService footnoteService = null,
-            StatisticsDbContext statisticsDbContext = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseChecklistService releaseChecklistService = null,
-            IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null)
+            ContentDbContext? context = null,
+            IMapper? mapper = null,
+            IPublishingService? publishingService = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            IReleaseRepository? releaseRepository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            ISubjectRepository? subjectRepository = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IDataImportService? dataImportService = null,
+            IFootnoteService? footnoteService = null,
+            StatisticsDbContext? statisticsDbContext = null,
+            IDataBlockService? dataBlockService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IContentBlockRepository? contentBlockRepository = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null)
         {
-            return new ReleaseService(
-                context ?? new Mock<ContentDbContext>().Object,
+            return new(
+                context ?? Mock.Of<ContentDbContext>(Strict),
                 mapper ?? AdminMapper(),
-                publishingService ?? new Mock<IPublishingService>().Object,
+                publishingService ?? Mock.Of<IPublishingService>(Strict),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                userService ?? new Mock<IUserService>().Object,
-                releaseRepository ?? new Mock<IReleaseRepository>().Object,
-                releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
-                subjectRepository ?? new Mock<ISubjectRepository>().Object,
-                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                dataImportService ?? new Mock<IDataImportService>().Object,
-                footnoteService ?? new Mock<IFootnoteService>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object,
-                releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
-                contentService ?? new Mock<IContentService>().Object,
-                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
+                userService ?? Mock.Of<IUserService>(Strict),
+                releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(Strict),
+                footnoteService ?? Mock.Of<IFootnoteService>(Strict),
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
+                dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
+                releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
+                contentBlockRepository ?? Mock.Of<IContentBlockRepository>(Strict),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
                 new SequentialGuidGenerator()
             );
         }

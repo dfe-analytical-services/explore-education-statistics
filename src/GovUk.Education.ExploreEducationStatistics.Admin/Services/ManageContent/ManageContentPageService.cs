@@ -54,12 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(query => query
-                        .Include(r => r.Type)
-                        .Where(r => r.Id == releaseId)
+                    .Include(r => r.Type)
+                    .Where(r => r.Id == releaseId)
                 )
                 .OnSuccess(HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))
+                .OnSuccessCombineWith(release => _contentService.GetUnattachedDataBlocks(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,
@@ -89,12 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Where(u => u.ReleaseId == release.Id)
                 .ToListAsync();
 
-            var publication = await _contentDbContext.Publications
+            release.Publication = await _contentDbContext.Publications
                 .Include(p => p.Releases)
                 .Include(p => p.Topic.Theme)
                 .Include(p => p.Contact)
                 .SingleAsync(p => p.Releases.Contains(release));
-            release.Publication = publication;
 
             await _contentDbContext.Entry(release.Publication)
                 .Collection(p => p.LegacyReleases)
@@ -104,16 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Collection(p => p.Releases)
                 .LoadAsync();
 
-            var content = await _contentDbContext.ReleaseContentSections
+            release.Content = await _contentDbContext.ReleaseContentSections
                 .Where(rcs => rcs.ReleaseId == release.Id)
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
+                .Include(rcs => rcs.Content)
                 .ToListAsync();
-            release.Content = content;
 
             await release.Content.ForEachAsync(async rcs =>
             {
-                await rcs.ContentSection.Content.ForEachAsync(async cb =>
+                await rcs.Content.ForEachAsync(async cb =>
                 {
                     cb.Comments = await _contentDbContext.Comment
                         .Where(c => c.ContentBlockId == cb.Id)
