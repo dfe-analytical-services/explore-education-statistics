@@ -95,12 +95,8 @@ const PublicationEditPage = ({
             }}
             confirmOnSubmit
           />
-          {user?.permissions.canAccessUserAdministrationPages && (
-            <>
-              <h2>Manage legacy releases</h2>
-              <LegacyReleasesTable publication={publication} />
-            </>
-          )}
+          <h2>Manage legacy releases</h2>
+          <LegacyReleasesTable publication={publication} />
         </div>
       </div>
     </Page>

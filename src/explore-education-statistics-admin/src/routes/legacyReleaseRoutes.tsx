@@ -5,13 +5,13 @@ import LegacyReleaseEditPage from '@admin/pages/legacy-releases/LegacyReleaseEdi
 export const legacyReleaseCreateRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/legacy-releases/create',
   component: LegacyReleaseCreatePage,
-  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const legacyReleaseEditRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/legacy-releases/:legacyReleaseId/edit',
   component: LegacyReleaseEditPage,
-  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };
