@@ -160,7 +160,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, FileType.Data, dataFileName) && replacingFile?.Filename != dataFileName)
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName) && 
+                (replacingFile == null || replacingFile.Filename != dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
             }

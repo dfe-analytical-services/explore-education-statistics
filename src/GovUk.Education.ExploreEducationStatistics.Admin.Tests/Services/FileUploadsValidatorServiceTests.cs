@@ -230,15 +230,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => false);
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
-                    .Returns(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
                 VerifyAllMocks(subjectRepository, fileTypeService);
@@ -263,14 +254,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => false);
-                fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
-                    .Returns(() => true);
+                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => false);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
                 VerifyAllMocks(subjectRepository, fileTypeService);
@@ -279,6 +267,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        // TODO EES-2576 - add test to check it's OK to use duplicate file name for replacing the same file
+        // TODO EES-2576 - add test to check it's not OK to use duplicate file name for replacing a different file
+        // TODO EES-2576 - add test to check it's OK to duplicate a meta file
         [Fact]
         public async Task ValidateDataFilesForUpload_DuplicateDataFile()
         {
@@ -286,8 +277,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (subjectRepository, fileTypeService) = Mocks();
 
+            var contextId = Guid.NewGuid().ToString();
             
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseFiles.Add(new ReleaseFile
                 {
@@ -302,28 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
             
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
 
                 var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
                 var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
 
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
-                    .Returns(() => true);
-
                 var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);
-                VerifyAllMocks(subjectRepository, fileTypeService);
 
                 result.AssertBadRequest(CannotOverwriteDataFile);
             }
@@ -340,14 +318,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var archiveFile = GetArchiveFile("data-zip-valid.zip");
 
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
-                        It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
-
                 var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                     archiveFile);
-                VerifyAllMocks(subjectRepository, fileTypeService);
 
                 Assert.True(result.IsRight);
             }

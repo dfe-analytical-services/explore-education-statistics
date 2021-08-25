@@ -2388,7 +2388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         dataFormFile,
                         metaFormFile,
-                        null))
+                        It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync(Unit.Instance);
 
                 dataImportService
