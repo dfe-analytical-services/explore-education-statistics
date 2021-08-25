@@ -1,9 +1,9 @@
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -32,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), publication.Id);
-
-            if (ContainPublicationOwnerRole(publicationRoles))
+            var isUserPublicationOwner = await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                publication.Id);
+            if (isUserPublicationOwner)
             {
                 context.Succeed(requirement);
             }
@@ -65,10 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), legacyRelease.PublicationId);
-
-            if (ContainPublicationOwnerRole(publicationRoles))
+            var isUserPublicationOwner = await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                legacyRelease.PublicationId);
+            if (isUserPublicationOwner)
             {
                 context.Succeed(requirement);
             }
@@ -98,10 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), legacyRelease.PublicationId);
-
-            if (ContainPublicationOwnerRole(publicationRoles))
+            var isUserPublicationOwner = await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                legacyRelease.PublicationId);
+            if (isUserPublicationOwner)
             {
                 context.Succeed(requirement);
             }
@@ -131,10 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository
-                .GetAllRolesByUser(context.User.GetUserId(), legacyRelease.PublicationId);
-
-            if (ContainPublicationOwnerRole(publicationRoles))
+            var isUserPublicationOwner = await _userPublicationRoleRepository.IsUserPublicationOwner(
+                context.User.GetUserId(),
+                legacyRelease.PublicationId);
+            if (isUserPublicationOwner)
             {
                 context.Succeed(requirement);
             }

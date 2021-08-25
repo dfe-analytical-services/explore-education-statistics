@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         
         public class PublicationHandlerTestScenario : HandlerTestScenario
         {
-            public List<UserPublicationRole> UserPublicationRoles { get; set; }
+            public List<UserPublicationRole>? UserPublicationRoles { get; set; }
         }
 
         public static async void AssertHandlerOnlySucceedsWithPublicationRole<TRequirement, TEntity>(
@@ -140,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var contentDbContextId = Guid.NewGuid().ToString();
                 using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    await contentDbContext.AddAsync(handleRequirementArgument);
+                    await contentDbContext.AddAsync(handleRequirementArgument!);
                     await contentDbContext.AddAsync(new UserPublicationRole
                     {
                         UserId = userId,
