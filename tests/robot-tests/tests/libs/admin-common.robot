@@ -132,8 +132,9 @@ user opens publication on the admin dashboard
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-
+    user waits until page contains link    Explore education statistics    10
     user waits until page does not contain loading spinner
+    user waits for page to finish loading
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
