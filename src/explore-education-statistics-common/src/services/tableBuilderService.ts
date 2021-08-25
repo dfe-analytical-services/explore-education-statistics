@@ -212,6 +212,10 @@ function generateMergedLocation<T extends LocationOption | FilterOption>(
 function mergeDuplicateLocationsInTableDataResponse(
   tableData: TableDataResponse,
 ): TableDataResponse {
+  if (!tableData.subjectMeta) {
+    return tableData;
+  }
+
   const locationsGroupedByLevelAndCode = groupBy(
     tableData.subjectMeta.locations,
     location => `${location.level}_${location.value}`,
