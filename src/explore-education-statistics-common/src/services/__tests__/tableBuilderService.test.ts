@@ -15,7 +15,7 @@ const combineMeasures = _combineMeasures as jest.Mocked<
 >;
 
 describe('tableBuilderService', () => {
-  test('locations with duplicate levels and codes are merged in getSubjectMeta()', async () => {
+  describe('merging of SubjectMeta locations', () => {
     const originalMeta: SubjectMeta = {
       filters: {},
       timePeriod: {
@@ -112,368 +112,170 @@ describe('tableBuilderService', () => {
       },
     };
 
-    dataApi.get.mockResolvedValue(originalMeta);
-
-    const meta = await tableBuilderService.getSubjectMeta('');
-    expect(meta).toEqual(expectedMeta);
-  });
-
-  test('locations with duplicate levels and codes are merged in filterSubjectMeta()', async () => {
-    const originalMeta: SubjectMeta = {
-      filters: {},
-      timePeriod: {
-        legend: '',
-        options: [],
-      },
-      indicators: {},
-      locations: {
-        provider: {
-          legend: '',
-          options: [
-            {
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 2',
-            },
-            {
-              value: 'unique-provider-2',
-              label: 'Unique Provider-2',
-            },
-            {
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1',
-            },
-          ],
-        },
-        'level-2': {
-          legend: '',
-          options: [
-            {
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-          ],
-        },
-        'level-3': {
-          legend: '',
-          options: [
-            {
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-      },
-    };
-
-    const expectedMeta: SubjectMeta = {
-      filters: {},
-      timePeriod: {
-        legend: '',
-        options: [],
-      },
-      indicators: {},
-      locations: {
-        provider: {
-          legend: '',
-          options: [
-            {
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1 / Duplicate Provider 2',
-            },
-            {
-              value: 'unique-provider-2',
-              label: 'Unique Provider-2',
-            },
-          ],
-        },
-        'level-2': {
-          legend: '',
-          options: [
-            {
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-          ],
-        },
-        'level-3': {
-          legend: '',
-          options: [
-            {
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-      },
-    };
-
-    dataApi.post.mockResolvedValue(originalMeta);
-
-    const meta = await tableBuilderService.filterSubjectMeta({
-      subjectId: '',
+    test('locations with duplicate levels and codes are merged in getSubjectMeta()', async () => {
+      dataApi.get.mockResolvedValue(originalMeta);
+      const meta = await tableBuilderService.getSubjectMeta('');
+      expect(meta).toEqual(expectedMeta);
     });
-    expect(meta).toEqual(expectedMeta);
+
+    test('locations with duplicate levels and codes are merged in filterSubjectMeta()', async () => {
+      dataApi.post.mockResolvedValue(originalMeta);
+      const meta = await tableBuilderService.filterSubjectMeta({
+        subjectId: '',
+      });
+      expect(meta).toEqual(expectedMeta);
+    });
   });
 
-  test(
-    'locations with duplicate levels and codes are merged in getTableData(), and ' +
-      'combineMeasuresWithDuplicateLocationCodes() called to merge any table rows belonging to duplicate Locations',
-    async () => {
-      const tableData: TableDataResponse = {
-        subjectMeta: {
-          geoJsonAvailable: false,
-          filters: {},
-          footnotes: [],
-          indicators: [],
-          boundaryLevels: [],
-          subjectName: '',
-          timePeriodRange: [],
-          publicationName: '',
-          locations: [
-            {
-              level: 'provider',
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'unique-provider-2',
-              label: 'Unique Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1',
-            },
-            {
-              level: 'level-2',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-            {
-              level: 'level-3',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-        results: [],
-      };
-
-      const combinedLocationResults: TableDataResult[] = [
-        {
-          geographicLevel: 'mock-response',
-          location: {},
-          filters: [],
-          measures: {},
-          timePeriod: '',
-        },
-      ];
-
-      combineMeasures.default.mockReturnValue(combinedLocationResults);
-
-      const expectedTableData: TableDataResponse = {
-        subjectMeta: {
-          geoJsonAvailable: false,
-          filters: {},
-          footnotes: [],
-          indicators: [],
-          boundaryLevels: [],
-          subjectName: '',
-          timePeriodRange: [],
-          publicationName: '',
-          locations: [
-            {
-              level: 'provider',
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1 / Duplicate Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'unique-provider-2',
-              label: 'Unique Provider 2',
-            },
-            {
-              level: 'level-2',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-            {
-              level: 'level-3',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-        results: combinedLocationResults,
-      };
-
-      dataApi.post.mockResolvedValue(tableData);
-
-      const response = await tableBuilderService.getTableData({
-        releaseId: '',
-        filters: [],
-        subjectId: '',
-        locations: {},
+  describe('merging of TableDataResponse SubjectMeta locations and table results', () => {
+    const tableData: TableDataResponse = {
+      subjectMeta: {
+        geoJsonAvailable: false,
+        filters: {},
+        footnotes: [],
         indicators: [],
-      });
+        boundaryLevels: [],
+        subjectName: '',
+        timePeriodRange: [],
+        publicationName: '',
+        locations: [
+          {
+            level: 'provider',
+            value: 'unique-provider',
+            label: 'Unique Provider',
+          },
+          {
+            level: 'provider',
+            value: 'duplicate-provider',
+            label: 'Duplicate Provider 2',
+          },
+          {
+            level: 'provider',
+            value: 'unique-provider-2',
+            label: 'Unique Provider 2',
+          },
+          {
+            level: 'provider',
+            value: 'duplicate-provider',
+            label: 'Duplicate Provider 1',
+          },
+          {
+            level: 'level-2',
+            value: 'duplicate-code-across-levels',
+            label: 'Level 2 Location',
+          },
+          {
+            level: 'level-3',
+            value: 'duplicate-code-across-levels',
+            label: 'Level 3 Location',
+          },
+        ],
+      },
+      results: [],
+    };
 
-      const deduplicatedLocations = [
-        {
-          level: 'provider',
-          value: 'duplicate-provider',
-          label: 'Duplicate Provider 1 / Duplicate Provider 2',
-        },
-      ];
+    const combinedLocationResults: TableDataResult[] = [
+      {
+        geographicLevel: 'mock-response',
+        location: {},
+        filters: [],
+        measures: {},
+        timePeriod: '',
+      },
+    ];
 
-      expect(combineMeasures.default).toHaveBeenCalledWith(
-        tableData.results,
-        deduplicatedLocations,
-      );
+    const expectedTableData: TableDataResponse = {
+      subjectMeta: {
+        geoJsonAvailable: false,
+        filters: {},
+        footnotes: [],
+        indicators: [],
+        boundaryLevels: [],
+        subjectName: '',
+        timePeriodRange: [],
+        publicationName: '',
+        locations: [
+          {
+            level: 'provider',
+            value: 'unique-provider',
+            label: 'Unique Provider',
+          },
+          {
+            level: 'provider',
+            value: 'duplicate-provider',
+            label: 'Duplicate Provider 1 / Duplicate Provider 2',
+          },
+          {
+            level: 'provider',
+            value: 'unique-provider-2',
+            label: 'Unique Provider 2',
+          },
+          {
+            level: 'level-2',
+            value: 'duplicate-code-across-levels',
+            label: 'Level 2 Location',
+          },
+          {
+            level: 'level-3',
+            value: 'duplicate-code-across-levels',
+            label: 'Level 3 Location',
+          },
+        ],
+      },
+      results: combinedLocationResults,
+    };
 
-      expect(response).toEqual(expectedTableData);
-    },
-  );
+    const expectedDeduplicatedLocations = [
+      {
+        level: 'provider',
+        value: 'duplicate-provider',
+        label: 'Duplicate Provider 1 / Duplicate Provider 2',
+      },
+    ];
 
-  test(
-    'locations with duplicate levels and codes are merged in getDataBlockTableData(), and ' +
-      'combineMeasuresWithDuplicateLocationCodes() called to merge any table rows belonging to duplicate Locations',
-    async () => {
-      const tableData: TableDataResponse = {
-        subjectMeta: {
-          geoJsonAvailable: false,
-          filters: {},
-          footnotes: [],
-          indicators: [],
-          boundaryLevels: [],
-          subjectName: '',
-          timePeriodRange: [],
-          publicationName: '',
-          locations: [
-            {
-              level: 'provider',
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'unique-provider-2',
-              label: 'Unique Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1',
-            },
-            {
-              level: 'level-2',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-            {
-              level: 'level-3',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-        results: [],
-      };
+    test(
+      'locations with duplicate levels and codes are merged in getTableData(), and ' +
+        'combineMeasuresWithDuplicateLocationCodes() called to merge any table rows belonging to duplicate Locations',
+      async () => {
+        combineMeasures.default.mockReturnValue(combinedLocationResults);
+        dataApi.post.mockResolvedValue(tableData);
 
-      const combinedLocationResults: TableDataResult[] = [
-        {
-          geographicLevel: 'mock-response',
-          location: {},
+        const response = await tableBuilderService.getTableData({
+          releaseId: '',
           filters: [],
-          measures: {},
-          timePeriod: '',
-        },
-      ];
-
-      combineMeasures.default.mockReturnValue(combinedLocationResults);
-
-      const expectedTableData: TableDataResponse = {
-        subjectMeta: {
-          geoJsonAvailable: false,
-          filters: {},
-          footnotes: [],
+          subjectId: '',
+          locations: {},
           indicators: [],
-          boundaryLevels: [],
-          subjectName: '',
-          timePeriodRange: [],
-          publicationName: '',
-          locations: [
-            {
-              level: 'provider',
-              value: 'unique-provider',
-              label: 'Unique Provider',
-            },
-            {
-              level: 'provider',
-              value: 'duplicate-provider',
-              label: 'Duplicate Provider 1 / Duplicate Provider 2',
-            },
-            {
-              level: 'provider',
-              value: 'unique-provider-2',
-              label: 'Unique Provider 2',
-            },
-            {
-              level: 'level-2',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 2 Location',
-            },
-            {
-              level: 'level-3',
-              value: 'duplicate-code-across-levels',
-              label: 'Level 3 Location',
-            },
-          ],
-        },
-        results: combinedLocationResults,
-      };
+        });
 
-      dataApi.get.mockResolvedValue(tableData);
+        expect(combineMeasures.default).toHaveBeenCalledWith(
+          tableData.results,
+          expectedDeduplicatedLocations,
+        );
 
-      const response = await tableBuilderService.getDataBlockTableData('', '');
+        expect(response).toEqual(expectedTableData);
+      },
+    );
 
-      const deduplicatedLocations = [
-        {
-          level: 'provider',
-          value: 'duplicate-provider',
-          label: 'Duplicate Provider 1 / Duplicate Provider 2',
-        },
-      ];
+    test(
+      'locations with duplicate levels and codes are merged in getDataBlockTableData(), and ' +
+        'combineMeasuresWithDuplicateLocationCodes() called to merge any table rows belonging to duplicate Locations',
+      async () => {
+        combineMeasures.default.mockReturnValue(combinedLocationResults);
+        dataApi.get.mockResolvedValue(tableData);
 
-      expect(combineMeasures.default).toHaveBeenCalledWith(
-        tableData.results,
-        deduplicatedLocations,
-      );
+        const response = await tableBuilderService.getDataBlockTableData(
+          '',
+          '',
+        );
 
-      expect(response).toEqual(expectedTableData);
-    },
-  );
+        expect(combineMeasures.default).toHaveBeenCalledWith(
+          tableData.results,
+          expectedDeduplicatedLocations,
+        );
+
+        expect(response).toEqual(expectedTableData);
+      },
+    );
+  });
 });

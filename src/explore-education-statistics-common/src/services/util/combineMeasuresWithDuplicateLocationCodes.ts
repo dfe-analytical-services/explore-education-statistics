@@ -18,7 +18,7 @@ type LocationGroupingKey = {
   code: string;
 };
 
-type MeasurementsMergeStrategy = (
+export type MeasurementsMergeStrategy = (
   measurementValues: (string | undefined)[],
 ) => string;
 
@@ -200,20 +200,6 @@ export default function combineMeasuresWithDuplicateLocationCodes(
     },
   );
 }
-
-/**
- * This is a strategy for merging measurement values from several duplicate Locations into a single value.
- * This strategy produces a string with each Location's value for this measurement separated with forward slashes.
- *
- * ${@param measurementValues} represents the multiple values from each Location for this measurement.
- */
-export const slashSeparatedStringMergeStrategy: MeasurementsMergeStrategy = (
-  measurementValues: (string | undefined)[],
-) => {
-  return measurementValues
-    .map(value => (typeof value === 'undefined' ? '0' : value))
-    .join(' / ');
-};
 
 /**
  * This is a strategy for merging measurement values from several duplicate Locations into a single value.
