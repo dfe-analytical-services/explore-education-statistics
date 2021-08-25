@@ -12,6 +12,7 @@ const DocumentationDesignStandards = () => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Content design standards guide' },
       ]}
+      title="Content design standards guide"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

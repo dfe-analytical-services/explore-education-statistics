@@ -40,6 +40,7 @@ const InvitedUsersPage = () => {
         { name: 'Platform administration', link: '/administration' },
         { name: 'Pending invites' },
       ]}
+      title="Pending invites"
     >
       <h1 className="govuk-heading-xl">
         <span className="govuk-caption-xl">Manage access to the service</span>

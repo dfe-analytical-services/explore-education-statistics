@@ -17,6 +17,7 @@ const PreReleaseUsersPage = () => {
         { name: 'Platform administration', link: '/administration' },
         { name: 'Pre-release users' },
       ]}
+      title="Pre-release users"
     >
       <h1 className="govuk-heading-xl">
         <span className="govuk-caption-xl">Manage pre-release users</span>
