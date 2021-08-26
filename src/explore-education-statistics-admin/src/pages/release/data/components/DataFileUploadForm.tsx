@@ -42,8 +42,6 @@ const baseErrorMappings = (
           DATA_FILE_CANNOT_BE_EMPTY: 'Choose a ZIP data file that is not empty',
           DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
             'ZIP data filename cannot contain spaces or special characters',
-          CANNOT_OVERWRITE_METADATA_FILE:
-            'Choose a unique ZIP metadata file name',
           METADATA_FILE_CANNOT_BE_EMPTY:
             'Choose a ZIP metadata file that is not empty',
           META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
@@ -73,7 +71,6 @@ const baseErrorMappings = (
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'metadataFile',
       messages: {
-        CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
         METADATA_FILE_CANNOT_BE_EMPTY:
           'Choose a metadata file that is not empty',
         META_FILE_MUST_BE_CSV_FILE:

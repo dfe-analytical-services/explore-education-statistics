@@ -133,7 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReplacementMustBeValid,
 
         // Meta file
-        CannotOverwriteMetadataFile,
         MetadataFileCannotBeEmpty,
         MetaFileMustBeCsvFile,
         UnableToFindMetadataFileToDelete,
