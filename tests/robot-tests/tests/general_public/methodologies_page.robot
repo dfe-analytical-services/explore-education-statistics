@@ -14,7 +14,7 @@ Navigate to /methodology page
     ...    10
 
 Validate page contents
-    [Tags]    Failing
+    [Tags]    NotAgainstDev    NotAgainstPreProd    NotAgainstProd
     user waits until page contains accordion section    Pupils and schools
     user opens accordion section    Pupils and schools
     user opens details dropdown    Exclusions

@@ -210,7 +210,7 @@ Validate accordion sections order
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
-    [Tags]    NotAgainstDev    NotAgainstLocal    NotAgainstPreProd
+    [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
     ...    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in    90
@@ -257,7 +257,7 @@ Validate Regional and local authority (LA) breakdown table
     user checks row cell contains text    ${row}    1    1.7%
 
 Validate Regional and local authority (LA) breakdown chart
-    [Tags]    NotAgainstDev    NotAgainstLocal    NotAgainstPreProd
+    [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section content    Regional and local authority (LA) breakdown    id:content
 
