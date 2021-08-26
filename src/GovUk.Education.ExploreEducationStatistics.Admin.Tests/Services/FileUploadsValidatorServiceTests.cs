@@ -267,9 +267,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        // TODO EES-2576 - add test to check it's OK to use duplicate file name for replacing the same file
-        // TODO EES-2576 - add test to check it's not OK to use duplicate file name for replacing a different file
-        // TODO EES-2576 - add test to check it's OK to duplicate a meta file
         [Fact]
         public async Task ValidateDataFilesForUpload_DuplicateDataFile()
         {
@@ -322,6 +319,186 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     archiveFile);
 
                 Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfSameName()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var (subjectRepository, fileTypeService) = Mocks();
+
+            var contextId = Guid.NewGuid().ToString();
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseFiles.Add(new ReleaseFile
+                {
+                    ReleaseId = releaseId,
+                    File = new File
+                    {
+                        Type = FileType.Data,
+                        Filename = "test.csv"
+                    }
+                });
+
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
+
+                // The replacement file here has the same name as the one it is replacing, so this should be ok.
+                var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
+
+                // The file being replaced here has the same name as the one being uploaded, but that's ok.
+                var fileBeingReplaced = new File
+                {
+                    Filename = "test.csv"
+                };
+                
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+
+                var result = await service.ValidateDataFilesForUpload(
+                    releaseId, dataFile, metaFile, fileBeingReplaced);
+                VerifyAllMocks(subjectRepository, fileTypeService);
+                
+                result.AssertRight();
+            }
+        }
+        
+        [Fact]
+        public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var (subjectRepository, fileTypeService) = Mocks();
+
+            var contextId = Guid.NewGuid().ToString();
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseFiles.AddRange(new ReleaseFile
+                {
+                    ReleaseId = releaseId,
+                    File = new File
+                    {
+                        Type = FileType.Data,
+                        Filename = "test.csv"
+                    }
+                }, new ReleaseFile
+                {
+                    ReleaseId = releaseId,
+                    File = new File
+                    {
+                        Type = FileType.Data,
+                        Filename = "another.csv"
+                    }
+                });
+
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
+
+                // The replacement file here has the same name as another unrelated data file i.e. one that's not being
+                // replaced here, which should be a problem as it would otherwise result in duplicate data file names
+                // in this Release after the replacement is complete.
+                var dataFile = CreateSingleLineFormFile("another.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
+
+                var fileBeingReplaced = new File
+                {
+                    Filename = "test.csv"
+                };
+
+                var result = await service.ValidateDataFilesForUpload(
+                    releaseId, dataFile, metaFile, fileBeingReplaced);
+                
+                result.AssertBadRequest(CannotOverwriteDataFile);
+            }
+        }
+        
+        [Fact]
+        public async Task ValidateFileForUpload_MetadataFileNamesCanBeDuplicated()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var (subjectRepository, fileTypeService) = Mocks();
+
+            var file = CreateSingleLineFormFile("test.csv", "test.csv");
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(() => true);
+            
+            var contextId = Guid.NewGuid().ToString();
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseFiles.AddRange(new ReleaseFile
+                {
+                    ReleaseId = releaseId,
+                    File = new File
+                    {
+                        Type = FileType.Data,
+                        Filename = "test.csv"
+                    }
+                }, new ReleaseFile
+                {
+                    ReleaseId = releaseId,
+                    File = new File
+                    {
+                        Type = Metadata,
+                        Filename = "test.meta.csv"
+                    }
+                });
+
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var dataFile = CreateSingleLineFormFile("another.csv", "another.csv");
+                
+                // This metafile has the same name as an existing metafile, but it shouldn't matter for metadata files
+                // as they don't appear anywhere where the filenames have to be unique (e.g. in zip files).
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
+
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+
+                var service = new FileUploadsValidatorService(subjectRepository.Object, fileTypeService.Object, context);
+
+                var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);
+                
+                result.AssertRight();
             }
         }
 
