@@ -32,11 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
             Release release)
         {
-            if (release.ApprovalStatus != Approved)
-            {
-                return;
-            }
-
             if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
             {
                 context.Succeed(requirement);

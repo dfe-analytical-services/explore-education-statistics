@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -124,26 +125,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Users
                             .Where(u => u.Email.ToLower() == email.ToLower())
                             .FirstOrDefaultAsync();
+                        var isExistingUser = existingUser != null;
 
-                        if (existingUser != null)
+                        if (isExistingUser)
                         {
                             _context.Add(
                                 new UserReleaseRole
                                 {
                                     ReleaseId = releaseId,
                                     Role = ReleaseRole.PrereleaseViewer,
-                                    UserId = existingUser.Id
+                                    UserId = existingUser!.Id
                                 }
                             );
 
                             await _context.SaveChangesAsync();
                         }
-                        else
+
+                        var releaseIsApproved = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
+
+                        if (releaseIsApproved)
                         {
-                            await CreateNewUserReleaseInvite(releaseId, email);
+                            SendPreReleaseInviteEmail(release, email, !isExistingUser);
                         }
 
-                        SendPreReleaseInviteEmail(release, email, existingUser == null);
+                        await CreateNewUserReleaseInvite(releaseId, email, isExistingUser, emailAlreadySent: releaseIsApproved);
 
                         return new PreReleaseUserViewModel
                         {
@@ -151,133 +156,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         };
                     }
                 );
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidateNewPreReleaseUser(Guid releaseId, string email)
-        {
-            var hasExistingReleaseRole = await _context
-                .UserReleaseRoles
-                .Include(r => r.User)
-                .Where(
-                    r =>
-                        r.ReleaseId == releaseId
-                        && r.User.Email.ToLower() == email.ToLower()
-                        && r.Role == ReleaseRole.PrereleaseViewer
-                )
-                .AnyAsync();
-
-            if (hasExistingReleaseRole)
-            {
-                return ValidationActionResult(UserAlreadyExists);
-            }
-
-            var hasExistingReleaseInvite = await _context
-                .UserReleaseInvites
-                .Where(
-                    i =>
-                        i.ReleaseId == releaseId
-                        && i.Email.ToLower() == email.ToLower()
-                         && i.Role == ReleaseRole.PrereleaseViewer
-                )
-                .AnyAsync();
-
-            if (hasExistingReleaseInvite)
-            {
-                return ValidationActionResult(UserAlreadyExists);
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email)
-        {
-            var hasExistingInvite = await _context
-                .UserReleaseInvites
-                .Where(
-                    i =>
-                        i.ReleaseId == releaseId
-                        && i.Email.ToLower() == email.ToLower()
-                        && i.Role == ReleaseRole.PrereleaseViewer
-                )
-                .AnyAsync();
-
-            if (hasExistingInvite)
-            {
-                return;
-            }
-
-            _context.Add(
-                new UserReleaseInvite
-                {
-                    Email = email.ToLower(),
-                    ReleaseId = releaseId,
-                    Role = ReleaseRole.PrereleaseViewer,
-                    Created = UtcNow,
-                    CreatedById = _userService.GetUserId()
-                }
-            );
-            await _context.SaveChangesAsync();
-
-            var hasExistingSystemInvite = await _usersAndRolesDbContext
-                .UserInvites
-                .Where(i => i.Email.ToLower() == email.ToLower())
-                .AnyAsync();
-
-            // TODO EES-1181 - allow multiple invites per email address to allow people to
-            // be assigned multiple roles upon first login
-            if (!hasExistingSystemInvite)
-            {
-                var role = await GetPreReleaseUserRole();
-
-                _usersAndRolesDbContext.Add(
-                    new UserInvite
-                    {
-                        Email = email.ToLower(),
-                        Role = role,
-                        Created = UtcNow,
-                        // TODO
-                        CreatedBy = ""
-                    }
-                );
-
-                await _usersAndRolesDbContext.SaveChangesAsync();
-            }
-        }
-
-        private void SendPreReleaseInviteEmail(Release release, string email, bool isNewUser)
-        {
-            var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
-
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host;
-
-            var prereleaseUrl =
-                $"{scheme}://{host}/publication/{release.PublicationId}/release/{release.Id}/prerelease/content";
-
-            var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
-            var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-            var publishScheduled = release.PublishScheduled?.ConvertUtcToUkTimeZone();
-            // TODO EES-828 This time should depend on the Publisher schedule
-            var publishScheduledTime = new TimeSpan(9, 30, 0);
-
-            var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
-            var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
-            var publishDay = FormatDayForEmail(publishScheduled);
-            var publishTime = FormatTimeForEmail(publishScheduledTime);
-
-            var emailValues = new Dictionary<string, dynamic>
-            {
-                {"newUser", isNewUser ? "yes" : "no"},
-                {"release name", release.Title},
-                {"publication name", release.Publication.Title},
-                {"prerelease link", prereleaseUrl},
-                {"prerelease day", preReleaseDay},
-                {"prerelease time", preReleaseTime},
-                {"publish day", publishDay},
-                {"publish time", publishTime}
-            };
-
-            _emailService.SendEmail(email, template, emailValues);
         }
 
         public async Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseId, string email)
@@ -316,6 +194,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                         await _context.SaveChangesAsync();
 
+                        // NOTE: UserInvites only stores whether a user has a particular role - not which release
+                        // that role may be against. So we only wanted to remove the user's prerelease role from
+                        // UserInvites if they no longer have any PrereleaseView roles.
                         var remainingReleaseInvites = await _context
                             .UserReleaseInvites
                             .Where(
@@ -345,6 +226,159 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
+        public async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(Release release)
+        {
+            var userReleaseInvites = await _context.UserReleaseInvites
+                .Where(i =>
+                    i.ReleaseId == release.Id
+                    && i.Role == ReleaseRole.PrereleaseViewer
+                    && i.EmailSent == false)
+                .ToListAsync();
+
+            await userReleaseInvites.ForEachAsync(async invite =>
+            {
+                var user = await _context.Users
+                    .SingleOrDefaultAsync(u => u.Email.ToLower() == invite.Email.ToLower());
+                var isNewUser = user == null;
+                SendPreReleaseInviteEmail(release, invite.Email.ToLower(), isNewUser);
+                invite.EmailSent = true;
+                _context.Update(invite);
+            });
+
+            await _context.SaveChangesAsync();
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateNewPreReleaseUser(Guid releaseId, string email)
+        {
+            var hasExistingReleaseRole = await _context
+                .UserReleaseRoles
+                .Include(r => r.User)
+                .Where(
+                    r =>
+                        r.ReleaseId == releaseId
+                        && r.User.Email.ToLower() == email.ToLower()
+                        && r.Role == ReleaseRole.PrereleaseViewer
+                )
+                .AnyAsync();
+
+            if (hasExistingReleaseRole)
+            {
+                return ValidationActionResult(UserAlreadyExists);
+            }
+
+            var hasExistingReleaseInvite = await _context
+                .UserReleaseInvites
+                .Where(
+                    i =>
+                        i.ReleaseId == releaseId
+                        && i.Email.ToLower() == email.ToLower()
+                         && i.Role == ReleaseRole.PrereleaseViewer
+                )
+                .AnyAsync();
+
+            if (hasExistingReleaseInvite)
+            {
+                return ValidationActionResult(UserAlreadyExists);
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task CreateNewUserReleaseInvite(Guid releaseId, string email, bool isExistingUser, bool emailAlreadySent)
+        {
+            var hasExistingInvite = await _context
+                .UserReleaseInvites
+                .Where(
+                    i =>
+                        i.ReleaseId == releaseId
+                        && i.Email.ToLower() == email.ToLower()
+                        && i.Role == ReleaseRole.PrereleaseViewer
+                )
+                .AnyAsync();
+
+            if (hasExistingInvite)
+            {
+                return;
+            }
+
+            _context.Add(
+                new UserReleaseInvite
+                {
+                    Email = email.ToLower(),
+                    ReleaseId = releaseId,
+                    Role = ReleaseRole.PrereleaseViewer,
+                    Created = UtcNow,
+                    CreatedById = _userService.GetUserId(),
+                    Accepted = isExistingUser,
+                    EmailSent = emailAlreadySent,
+                }
+            );
+            await _context.SaveChangesAsync();
+
+            var hasExistingSystemInvite = await _usersAndRolesDbContext
+                .UserInvites
+                .Where(i => i.Email.ToLower() == email.ToLower())
+                .AnyAsync();
+
+            // TODO EES-1181 - allow multiple invites per email address to allow people to
+            // be assigned multiple roles upon first login
+            if (!hasExistingSystemInvite)
+            {
+                var role = await GetPreReleaseUserRole();
+
+                _usersAndRolesDbContext.Add(
+                    new UserInvite
+                    {
+                        Email = email.ToLower(),
+                        Role = role,
+                        Created = UtcNow,
+                        // TODO
+                        CreatedBy = "",
+                        Accepted = isExistingUser,
+                    }
+                );
+
+                await _usersAndRolesDbContext.SaveChangesAsync();
+            }
+        }
+
+        private void SendPreReleaseInviteEmail(Release release, string email, bool isNewUser)
+        {
+            var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
+
+            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            var host = _httpContextAccessor.HttpContext.Request.Host;
+
+            var prereleaseUrl =
+                $"{scheme}://{host}/publication/{release.PublicationId}/release/{release.Id}/prerelease/content";
+
+            var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
+            var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
+            var publishScheduled = release.PublishScheduled?.ConvertUtcToUkTimeZone();
+            // TODO EES-828 This time should depend on the Publisher schedule
+            var publishScheduledTime = new TimeSpan(9, 30, 0);
+
+            var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
+            var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
+            var publishDay = FormatDayForEmail(publishScheduled);
+            var publishTime = FormatTimeForEmail(publishScheduledTime);
+
+            var emailValues = new Dictionary<string, dynamic?>
+            {
+                {"newUser", isNewUser ? "yes" : "no"},
+                {"release name", release.Title},
+                {"publication name", release.Publication.Title},
+                {"prerelease link", prereleaseUrl},
+                {"prerelease day", preReleaseDay},
+                {"prerelease time", preReleaseTime},
+                {"publish day", publishDay},
+                {"publish time", publishTime}
+            };
+
+            _emailService.SendEmail(email, template, emailValues);
+        }
+
         private async Task<IdentityRole> GetPreReleaseUserRole()
         {
             // TODO represent Roles with an Enum
@@ -364,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return timeSpan.ToString(@"hh\:mm");
         }
 
-        private static string FormatDayForEmail(DateTime? dateTime)
+        private static string? FormatDayForEmail(DateTime? dateTime)
         {
             return dateTime?.ToString("dddd dd MMMM yyyy");
         }
@@ -372,6 +406,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class PreReleaseUserViewModel
     {
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }

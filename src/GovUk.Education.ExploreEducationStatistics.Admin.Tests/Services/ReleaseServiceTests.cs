@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -431,6 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     releaseFileService: fileStorageService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
+
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
                 dataImportService.Verify(
@@ -521,6 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
+
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
                 dataBlockService.Verify(
@@ -611,6 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     releaseFileService: fileStorageService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
+
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
                 dataImportService.Verify(
@@ -671,8 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsRight);
-                var viewModel = result.Right;
+                var viewModel = result.AssertRight();
 
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(release.NextReleaseDate, viewModel.NextReleaseDate);
@@ -761,10 +764,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
                 result.AssertBadRequest(SlugNotUnique);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -832,14 +835,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsRight);
-                var viewModel = result.Right;
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
+                var viewModel = result.AssertRight();
 
                 Assert.Equal("2030", viewModel.ReleaseName);
                 Assert.Equal(TimeIdentifier.CalendarYear, viewModel.TimePeriodCoverage);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -898,16 +900,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsRight);
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
 
-                Assert.Equal(release.Publication.Id, result.Right.PublicationId);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
-                    result.Right.PublishScheduled);
-                Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
-                Assert.Equal(adHocReleaseType, result.Right.Type);
-                Assert.Equal("2030", result.Right.ReleaseName);
-                Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
-                Assert.Equal("Access list", result.Right.PreReleaseAccessList);
+                    viewModel.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, viewModel.NextReleaseDate);
+                Assert.Equal(adHocReleaseType, viewModel.Type);
+                Assert.Equal("2030", viewModel.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
+                Assert.Equal("Access list", viewModel.PreReleaseAccessList);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -928,15 +932,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(saved.ReleaseStatuses);
                 var status = saved.ReleaseStatuses[0];
+                Assert.NotNull(status.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(status.Created.Value).Milliseconds, 0, 1500);
+                    .Subtract(status.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(release.Id, status.ReleaseId);
                 Assert.Equal(ReleaseApprovalStatus.Draft, status.ApprovalStatus);
                 Assert.Equal(_userId, status.CreatedById);
                 Assert.Equal("Test internal note", status.InternalReleaseNote);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -995,12 +998,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService);
+
                 result.AssertBadRequest(
                     DataFileImportsMustBeCompleted, 
                     DataFileReplacementsMustBeCompleted);
             }
-
-            MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService);
         }
 
         [Fact]
@@ -1051,10 +1054,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
                 result.AssertBadRequest(ApprovedReleaseMustHavePublishScheduledDate);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -1103,10 +1106,123 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
                 result.AssertBadRequest(PublishedReleaseCannotBeUnapproved);
             }
+        }
 
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_SendPreReleaseEmails()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+            var preReleaseUserService = new Mock<IPreReleaseUserService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                releaseChecklistService
+                    .Setup(s =>
+                        s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(
+                        new List<ReleaseChecklistIssue>()
+                    );
+
+                contentService.Setup(mock =>
+                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+
+                preReleaseUserService.Setup(mock =>
+                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(Unit.Instance);
+
+            var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    preReleaseUserService: preReleaseUserService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService, preReleaseUserService);
+
+                result.AssertRight();
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                contentService.Setup(mock =>
+                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            LatestInternalReleaseNote = "Test note",
+                        }
+                    );
+
+                MockUtils.VerifyAllMocks(contentService);
+
+                result.AssertRight();
+            }
         }
 
         [Fact]
@@ -1196,8 +1312,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsRight);
-                var viewModel = result.Right;
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
+                var viewModel = result.AssertRight();
 
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
                     viewModel.PublishScheduled);
@@ -1232,11 +1349,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created.Value).Milliseconds, 0, 1500);
+                    .Subtract(savedStatus.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_userId, savedStatus.CreatedById);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -1325,15 +1440,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                Assert.True(result.IsRight);
-                var viewModel = result.Right;
-
                 releaseFileService.Verify(mock =>
                     mock.Delete(release.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
                     }, false), Times.Once);
+
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
+                var viewModel = result.AssertRight();
 
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1367,8 +1483,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);
                 Assert.Equal(_userId, savedStatus.CreatedById);
             }
-
-            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -1457,8 +1571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService.GetRelease(releaseId);
 
-                Assert.True(result.IsRight);
-                var viewModel = result.Right;
+                var viewModel = result.AssertRight();
 
                 Assert.Equal("2035", viewModel.ReleaseName);
                 Assert.Equal("2035-1", viewModel.Slug);
@@ -1510,8 +1623,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = await releaseService.GetRelease(release.Id);
-                Assert.True(result.IsRight);
-                Assert.Null(result.Right.LatestInternalReleaseNote);
+
+                var releaseViewModel = result.AssertRight();
+                Assert.Null(releaseViewModel.LatestInternalReleaseNote);
             }
         }
 
@@ -1570,9 +1684,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(contentDbContext);
                 var result = await releaseService.GetReleaseStatuses(release.Id);
-                Assert.True(result.IsRight);
 
-                var resultStatuses = result.Right;
+                var resultStatuses = result.AssertRight();
                 Assert.Equal(3, resultStatuses.Count);
 
                 var releaseStatuses = release.ReleaseStatuses
@@ -1611,9 +1724,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(contentDbContext);
                 var result = await releaseService.GetReleaseStatuses(release.Id);
-                Assert.True(result.IsRight);
 
-                var resultStatuses = result.Right;
+                var resultStatuses = result.AssertRight();
                 Assert.Empty(resultStatuses);
             }
         }
@@ -1863,19 +1975,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext = null,
-            IPublishingService publishingService = null,
-            IReleaseRepository releaseRepository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            ISubjectRepository subjectRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IDataImportService dataImportService = null,
-            IFootnoteService footnoteService = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseChecklistService releaseChecklistService = null,
-            IContentService contentService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null)
+            StatisticsDbContext? statisticsDbContext = null,
+            IPublishingService? publishingService = null,
+            IReleaseRepository? releaseRepository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            ISubjectRepository? subjectRepository = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IDataImportService? dataImportService = null,
+            IFootnoteService? footnoteService = null,
+            IDataBlockService? dataBlockService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IContentService? contentService = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IPreReleaseUserService? preReleaseUserService = null)
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -1901,7 +2014,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
                 contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                new SequentialGuidGenerator()
+                new SequentialGuidGenerator(),
+                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
             );
         }
     }
