@@ -30,6 +30,7 @@ import formatPretty, {
   defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
+import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
@@ -65,6 +66,7 @@ interface LegendEntry {
 
 interface MapDataSetCategory extends DataSetCategory {
   geoJson: GeoJsonFeature;
+  filter: LocationFilter;
 }
 
 function calculateScaledColour({
@@ -360,6 +362,33 @@ export const MapBlockInternal = ({
     return locations;
   }, [dataSetCategories]);
 
+  const locationType = useMemo(() => {
+    const locationLevelsMap: Dictionary<string> = {
+      country: 'Country',
+      englishDevolvedArea: 'English Devolved Area',
+      institution: 'Institution',
+      localAuthority: 'Local Authority',
+      localAuthorityDistrict: 'Local Authority District',
+      localEnterprisePartnership: 'Local Enterprise Partnership',
+      mayoralCombinedAuthority: 'Mayoral Combined Authority',
+      multiAcademyTrust: 'Multi Academy Trust',
+      opportunityArea: 'Opportunity Area',
+      parliamentaryConstituency: 'Parliamentary Constituency',
+      provider: 'Provider',
+      region: 'Region',
+      rscRegion: 'RSC Region',
+      school: 'School',
+      sponsor: 'Sponsor',
+      ward: 'Ward',
+      planningArea: 'Planning Area',
+    };
+    const levels = dataSetCategories.map(category => category.filter.level);
+    return !levels.every(level => level === levels[0]) ||
+      !locationLevelsMap[levels[0]]
+      ? 'location'
+      : locationLevelsMap[levels[0]];
+  }, [dataSetCategories]);
+
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
     (dataSetOptions[0]?.value as string) ?? '',
   );
@@ -575,7 +604,7 @@ export const MapBlockInternal = ({
             <FormSelect
               name="selectedLocation"
               id={`${id}-selectedLocation`}
-              label="2. Select a location"
+              label={`2. Select a ${locationType}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
               order={FormSelect.unordered}
