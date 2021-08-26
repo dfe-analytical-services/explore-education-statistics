@@ -36,6 +36,7 @@ const DocumentationManageContent = () => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Managing content' },
       ]}
+      title="Managing content"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">

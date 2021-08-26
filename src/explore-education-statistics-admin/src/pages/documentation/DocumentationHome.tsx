@@ -9,6 +9,7 @@ const BrowseReleasesPage = () => {
       breadcrumbs={[
         { name: "Administrator's guide", link: '/prototypes/documentation' },
       ]}
+      title="Documentation"
     >
       <h1>Documentation</h1>
 

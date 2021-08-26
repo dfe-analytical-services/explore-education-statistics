@@ -68,6 +68,7 @@ const UserInvitePage = ({
         { name: 'Invites', link: '/administration/users/invites' },
         { name: 'Invite user' },
       ]}
+      title="Invite user"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

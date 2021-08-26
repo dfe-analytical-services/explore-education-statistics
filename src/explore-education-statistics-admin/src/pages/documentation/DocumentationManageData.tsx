@@ -36,6 +36,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Managing data' },
       ]}
+      title="Managing data"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
