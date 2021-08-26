@@ -62,7 +62,7 @@ function ChartRenderer({
         return <p>Unable to render invalid chart type</p>;
     }
   }, [id, props]);
-  const { footnotes } = meta;
+  const footnotes = [...meta.footnotes];
 
   const boundaryFootnoteId = 'map-footnote';
   if (
