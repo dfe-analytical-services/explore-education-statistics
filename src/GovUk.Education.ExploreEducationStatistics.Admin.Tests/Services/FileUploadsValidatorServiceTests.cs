@@ -537,8 +537,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var fileTypeServiceMock = new Mock<IFileTypeService>(Strict);
 
             var service = new FileUploadsValidatorService(
-                subjectRepository ?? subjectRepositoryMock!.Object,
-                fileTypeService ?? fileTypeServiceMock!.Object,
+                subjectRepository ?? subjectRepositoryMock.Object,
+                fileTypeService ?? fileTypeServiceMock.Object,
                 contentDbContext!);
 
             return (service, (subjectRepositoryMock, fileTypeServiceMock));
