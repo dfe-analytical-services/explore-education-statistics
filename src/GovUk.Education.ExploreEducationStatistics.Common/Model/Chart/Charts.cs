@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public interface IChart
     {
         ChartType Type { get; }
-        string Title { get; set; }
+        string? Title { get; set; }
         string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public abstract class Chart : IChart
     {
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public string Alt { get; set; }
         public int Height { get; set; }
         public int? Width { get; set; }

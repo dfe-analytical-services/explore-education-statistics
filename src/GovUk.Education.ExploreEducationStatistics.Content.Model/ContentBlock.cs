@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -98,7 +100,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ObservationQueryContext Query { get; set; }
 
-        public List<IChart> Charts { get; set; }
+        [JsonIgnore]
+        public List<IChart> Charts
+        {
+            get
+            {
+                return ChartsAlternate.Select(chart =>
+                {
+                    if (chart.Title.IsNullOrEmpty())
+                    {
+                        chart.Title = Heading;
+                    }
+                    return chart;
+                }).ToList();
+
+            }
+            set => ChartsAlternate = value;
+        }
+
+        [JsonProperty("Charts")]
+        [NotMapped]
+        private List<IChart> ChartsAlternate { get; set; } = new();
 
         public DataBlockSummary Summary { get; set; }
 
