@@ -252,7 +252,7 @@ describe('PreReleaseTableToolPage', () => {
     },
   };
 
-  test('renders correctly on step 1 with subjects and featured table', async () => {
+  test('renders correctly on step 1 with subjects and featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
       testRelease,

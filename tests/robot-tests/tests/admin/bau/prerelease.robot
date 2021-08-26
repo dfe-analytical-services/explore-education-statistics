@@ -385,7 +385,7 @@ Validate featured tables as Analyst user
     user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
     ...    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
-Go to featured tableand validate table as Analyst user
+Go to featured table and validate table as Analyst user
     user clicks link    ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
