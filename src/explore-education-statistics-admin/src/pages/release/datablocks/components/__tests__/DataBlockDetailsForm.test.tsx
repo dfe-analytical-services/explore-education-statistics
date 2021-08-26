@@ -24,10 +24,10 @@ describe('DataBlockDetailsForm', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('Test name');
     expect(screen.getByLabelText('Table title')).toHaveValue('Test heading');
     expect(screen.getByLabelText('Source')).toHaveValue('Test source');
-    expect(screen.getByLabelText('Highlight name')).toHaveValue(
+    expect(screen.getByLabelText('Featured table name')).toHaveValue(
       'Test highlight name',
     );
-    expect(screen.getByLabelText('Highlight description')).toHaveValue(
+    expect(screen.getByLabelText('Featured table description')).toHaveValue(
       'Test highlight description',
     );
   });
@@ -58,49 +58,53 @@ describe('DataBlockDetailsForm', () => {
     });
   });
 
-  test('shows validation error if no name when table highlight checkbox is checked', async () => {
+  test('shows validation error if no name when featured table checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(
-      screen.getByLabelText('Set as a table highlight for this publication'),
+      screen.getByLabelText('Set as a featured table for this publication'),
     );
 
-    expect(screen.getByLabelText('Highlight name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Featured table name')).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Highlight name'));
+    userEvent.click(screen.getByLabelText('Featured table name'));
     userEvent.tab();
 
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Enter a highlight name' }),
+        screen.getByRole('link', { name: 'Enter a featured table name' }),
       ).toHaveAttribute('href', '#dataBlockDetailsForm-highlightName');
     });
   });
 
-  test('shows validation error if no description when table highlight checkbox is checked', async () => {
+  test('shows validation error if no description when featured table checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(
-      screen.getByLabelText('Set as a table highlight for this publication'),
+      screen.getByLabelText('Set as a featured table for this publication'),
     );
 
-    expect(screen.getByLabelText('Highlight description')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Featured table description'),
+    ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Highlight description'));
+    userEvent.click(screen.getByLabelText('Featured table description'));
     userEvent.tab();
 
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Enter a highlight description' }),
+        screen.getByRole('link', {
+          name: 'Enter a featured table description',
+        }),
       ).toHaveAttribute('href', '#dataBlockDetailsForm-highlightDescription');
     });
   });
 
-  test('submitting form with invalid values and table highlight checked shows error messages', async () => {
+  test('submitting form with invalid values and featured table checked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(
-      screen.getByLabelText('Set as a table highlight for this publication'),
+      screen.getByLabelText('Set as a featured table for this publication'),
     );
     userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
 
@@ -112,13 +116,13 @@ describe('DataBlockDetailsForm', () => {
       expect(errors[0]).toHaveTextContent('Enter a data block name');
       expect(errors[0]).toHaveAttribute('href', '#dataBlockDetailsForm-name');
 
-      expect(errors[1]).toHaveTextContent('Enter a highlight name');
+      expect(errors[1]).toHaveTextContent('Enter a featured table name');
       expect(errors[1]).toHaveAttribute(
         'href',
         '#dataBlockDetailsForm-highlightName',
       );
 
-      expect(errors[2]).toHaveTextContent('Enter a highlight description');
+      expect(errors[2]).toHaveTextContent('Enter a featured table description');
       expect(errors[2]).toHaveAttribute(
         'href',
         '#dataBlockDetailsForm-highlightDescription',
@@ -132,7 +136,7 @@ describe('DataBlockDetailsForm', () => {
     });
   });
 
-  test('submitting form with invalid values and table highlight unchecked shows error messages', async () => {
+  test('submitting form with invalid values and featured table unchecked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
@@ -163,15 +167,15 @@ describe('DataBlockDetailsForm', () => {
     await userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
     userEvent.click(
-      screen.getByLabelText('Set as a table highlight for this publication'),
+      screen.getByLabelText('Set as a featured table for this publication'),
     );
 
     await userEvent.type(
-      screen.getByLabelText('Highlight name'),
+      screen.getByLabelText('Featured table name'),
       'Test highlight name',
     );
     await userEvent.type(
-      screen.getByLabelText('Highlight description'),
+      screen.getByLabelText('Featured table description'),
       'Test highlight description',
     );
 

@@ -141,7 +141,7 @@ Save data block
     user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
     user enters text into element    id:dataBlockDetailsForm-source    UI test source
 
-    user clicks checkbox    Set as a table highlight for this publication
+    user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    id:dataBlockDetailsForm-highlightName
     user enters text into element    id:dataBlockDetailsForm-highlightName    UI test highlight name
     user enters text into element    id:dataBlockDetailsForm-highlightDescription    UI test highlight description
@@ -157,7 +157,7 @@ Validate data block is in list
     user checks table column heading contains    1    1    Name
     user checks table column heading contains    1    2    Has chart
     user checks table column heading contains    1    3    In content
-    user checks table column heading contains    1    4    Highlight name
+    user checks table column heading contains    1    4    Featured table name
     user checks table column heading contains    1    5    Created date
     user checks table column heading contains    1    6    Actions
 

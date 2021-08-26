@@ -252,7 +252,7 @@ describe('PreReleaseTableToolPage', () => {
     },
   };
 
-  test('renders correctly on step 1 with subjects and highlights', async () => {
+  test('renders correctly on step 1 with subjects and featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
       testRelease,
@@ -290,7 +290,7 @@ describe('PreReleaseTableToolPage', () => {
     });
   });
 
-  test('renders correctly on step 1 without highlights', async () => {
+  test('renders correctly on step 1 without featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
       ...testRelease,
@@ -309,7 +309,7 @@ describe('PreReleaseTableToolPage', () => {
 
       expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
       expect(
-        step1.queryByRole('heading', { name: 'Table highlights' }),
+        step1.queryByRole('heading', { name: 'Choose a table' }),
       ).not.toBeInTheDocument();
 
       expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();

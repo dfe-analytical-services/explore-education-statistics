@@ -60,7 +60,7 @@ Add metadata guidance
 
     user waits until page contains button    Edit guidance
 
-Add table highlight
+Add featured table
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -78,7 +78,7 @@ Add table highlight
     user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
     user enters text into element    id:dataBlockDetailsForm-source    UI test source
 
-    user clicks checkbox    Set as a table highlight for this publication
+    user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    id:dataBlockDetailsForm-highlightName
     user enters text into element    id:dataBlockDetailsForm-highlightName    ${DATABLOCK_HIGHLIGHT_NAME}
     user enters text into element    id:dataBlockDetailsForm-highlightDescription    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
@@ -275,14 +275,14 @@ Go to prerelease table tool page
     user waits until h1 is visible    Create your own tables    60
     user waits until table tool wizard step is available    Choose a subject    60
 
-Validate table highlights
+Validate featured tables
     user waits until page contains element    id:featuredTables
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
     ...    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
-Go to table highlight and validate table
+Go to featured table and validate table
     user clicks link    ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
@@ -378,14 +378,14 @@ Go to prerelease table tool page as Analyst user
     user waits until h1 is visible    Create your own tables    60
     user waits until table tool wizard step is available    Choose a subject    60
 
-Validate table highlights as Analyst user
+Validate featured tables as Analyst user
     user waits until page contains element    id:featuredTables    60
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_HIGHLIGHT_NAME}
     user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
     ...    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
-Go to table highlight and validate table as Analyst user
+Go to featured table and validate table as Analyst user
     user clicks link    ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
