@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
     public enum SecurityClaimTypes
@@ -9,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         AnalystPagesAccessGranted,
         PrereleasePagesAccessGranted,
         ManageAnyUser,
-        ManageAnyMethodology,
         AccessAllImports,
 
         /**
@@ -17,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          */
         CreateAnyPublication,
         UpdateAllPublications,
-        
+        AdoptAnyMethodology,
+
         /**
          * Release management
          */

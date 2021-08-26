@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyParentRepository _methodologyParentRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
@@ -49,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyRepository methodologyRepository,
+            IMethodologyParentRepository methodologyParentRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService)
@@ -60,9 +62,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyRepository = methodologyRepository;
+            _methodologyParentRepository = methodologyParentRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
+        }
+
+        public async Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, q =>
+                    q.Include(p => p.Methodologies))
+                .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
+                .OnSuccessDo(_ => _persistenceHelper.CheckEntityExists<MethodologyParent>(methodologyId))
+                .OnSuccess<ActionResult, Publication, Unit>(async publication =>
+                {
+                    if (publication.Methodologies.Any(pm => pm.MethodologyParentId == methodologyId))
+                    {
+                        return ValidationActionResult(CannotAdoptMethodologyAlreadyLinkedToPublication);
+                    }
+
+                    publication.Methodologies.Add(new PublicationMethodology
+                    {
+                        MethodologyParentId = methodologyId,
+                        Owner = false
+                    });
+
+                    _context.Publications.Update(publication);
+                    await _context.SaveChangesAsync();
+
+                    return Unit.Instance;
+                });
         }
 
         public Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
@@ -74,6 +104,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+        }
+
+        public async Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, q =>
+                    q.Include(p => p.Methodologies))
+                .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
+                .OnSuccessDo(_ =>_persistenceHelper.CheckEntityExists<MethodologyParent>(methodologyId))
+                .OnSuccess<ActionResult, Publication, Unit>(async publication =>
+                {
+                    var link =
+                        publication.Methodologies.SingleOrDefault(pm => pm.MethodologyParentId == methodologyId);
+
+                    if (link == null)
+                    {
+                        return new NotFoundResult();
+                    }
+
+                    if (link.Owner)
+                    {
+                        return ValidationActionResult(CannotDropOwnedMethodology);
+                    }
+
+                    publication.Methodologies.Remove(link);
+                    _context.Publications.Update(publication);
+                    await _context.SaveChangesAsync();
+
+                    return Unit.Instance;
+                });
+        }
+
+        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
+                .OnSuccess(async publication =>
+                {
+                    var methodologies = await _methodologyParentRepository.GetUnrelatedToPublication(publication.Id);
+                    return methodologies
+                        .Select(m => new TitleAndIdViewModel(m.Id, m.OwningPublicationTitle))
+                        .ToList();
+                });
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)

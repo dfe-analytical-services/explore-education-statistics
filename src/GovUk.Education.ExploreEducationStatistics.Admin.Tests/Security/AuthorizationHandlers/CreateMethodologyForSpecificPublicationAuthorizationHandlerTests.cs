@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -86,9 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     if (!expectedToPassByClaimAlone)
                     {
-                        publicationRoleRepository
-                            .Setup(s => s.IsUserPublicationOwner(UserId, publication.Id))
-                            .ReturnsAsync(false);
+                        publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, publication, false);
                     }
 
                     await handler.HandleAsync(authContext);
@@ -149,9 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, Publication);
 
-                publicationRoleRepository
-                    .Setup(s => s.IsUserPublicationOwner(UserId, Publication.Id))
-                    .ReturnsAsync(false);
+                publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, Publication, false);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(publicationRoleRepository);
@@ -177,9 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, publication);
 
-                publicationRoleRepository
-                    .Setup(s => s.IsUserPublicationOwner(UserId, publication.Id))
-                    .ReturnsAsync(true);
+                publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, publication, true);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(publicationRoleRepository);

@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -11,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
-        public DbSet<UserInvite> UserInvites { get; set; }
+        public DbSet<UserInvite> UserInvites { get; set; } = null!;
 
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
@@ -120,13 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         Id = -11,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.ManageAnyUser.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -12,
-                        RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.ManageAnyMethodology.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
@@ -296,6 +290,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         Id = -39,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.DeleteAllMethodologies.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -40,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.AdoptAnyMethodology.ToString(),
                         ClaimValue = "",
                     }
                 );

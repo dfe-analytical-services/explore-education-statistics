@@ -11,7 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyService
     {
+        Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId);
+
         Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId);
+
+        Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
+
+        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId);
 
         Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
 

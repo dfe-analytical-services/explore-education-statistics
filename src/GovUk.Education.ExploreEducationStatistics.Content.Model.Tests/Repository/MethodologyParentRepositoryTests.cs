@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -112,9 +114,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             }
         }
 
+        [Fact]
+        public async Task GetUnrelatedToPublication()
+        {
+            var publication = new Publication();
+
+            var methodologyOwnedByThisPublication = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = false
+                    }
+                }
+            };
+
+            var methodologyAdoptedByThisPublication = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = false
+                    }
+                }
+            };
+
+            var methodologyUnrelatedToThisPublication = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = false
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.MethodologyParents.AddRangeAsync(
+                    methodologyOwnedByThisPublication,
+                    methodologyAdoptedByThisPublication,
+                    methodologyUnrelatedToThisPublication
+                );
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyParentRepository(contentDbContext);
+
+                var result = await service.GetUnrelatedToPublication(publication.Id);
+
+                Assert.Single(result);
+                Assert.Equal(methodologyUnrelatedToThisPublication.Id, result[0].Id);
+            }
+        }
+
         private static MethodologyParentRepository BuildMethodologyParentRepository(ContentDbContext contentDbContext)
         {
-            return new MethodologyParentRepository(contentDbContext);
+            return new(contentDbContext);
         }
     }
 }

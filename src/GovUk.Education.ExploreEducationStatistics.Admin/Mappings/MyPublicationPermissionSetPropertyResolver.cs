@@ -32,6 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     .CheckCanCreateReleaseForPublication(source)
                     .Result
                     .IsRight,
+                CanAdoptMethodologies = _userService
+                    .CheckCanAdoptMethodologyForPublication(source)
+                    .Result
+                    .IsRight,
                 CanCreateMethodologies = _userService
                     .CheckCanCreateMethodologyForPublication(source)
                     .Result
