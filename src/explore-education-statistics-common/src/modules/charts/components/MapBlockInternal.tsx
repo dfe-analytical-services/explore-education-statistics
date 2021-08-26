@@ -381,9 +381,13 @@ export const MapBlockInternal = ({
 
   // initialise
   useEffect(() => {
-    import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
+    async function addGeo() {
+      const imported = await import(
+        '@common/modules/charts/files/ukGeoJson.json'
+      );
       setUkGeometry(imported.default as FeatureCollection);
-    });
+    }
+    addGeo();
   }, []);
 
   const [intersectionEntry] = useIntersectionObserver(container, {
