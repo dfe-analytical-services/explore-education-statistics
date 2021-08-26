@@ -9,7 +9,6 @@ import {
 import publicationService from '@admin/services/publicationService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -19,7 +18,6 @@ const PublicationEditPage = ({
   match,
 }: RouteComponentProps<PublicationRouteParams>) => {
   const { publicationId } = match.params;
-  const { user } = useAuthContext();
 
   const history = useHistory();
 
