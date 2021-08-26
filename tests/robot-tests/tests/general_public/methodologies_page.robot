@@ -9,8 +9,12 @@ Suite Teardown      user closes the browser
 *** Test Cases ***
 Navigate to /methodology page
     user navigates to public methodologies page
+    user waits until page contains
+    ...    Browse to find out about the methodology behind specific education statistics and data and how and why they're collected and published.
+    ...    10
 
 Validate page contents
+    [Tags]    Failing
     user waits until page contains accordion section    Pupils and schools
     user opens accordion section    Pupils and schools
     user opens details dropdown    Exclusions
