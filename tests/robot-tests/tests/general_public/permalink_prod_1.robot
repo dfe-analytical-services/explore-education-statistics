@@ -47,12 +47,12 @@ Validate footnotes
     ...    xpath://h3[text()="Footnotes"]/../ol/li[text()="x - 1 or 2 pupils, or a percentage based on 1 or 2."]
 
 Validate download files
-    user checks page contains element    xpath://button[text()="Download the data of this table (CSV)"]
-    user checks page contains element    xpath://button[text()="Download table as Excel spreadsheet (XLSX)"]
+    user checks page contains    Table in ODS format (spreadsheet, with title and footnotes)
+    user checks page contains    Table in CSV format (flat file, with location codes)
+    user checks page contains element    xpath://button[text()="Download table"]
     # TODO: More / Check CSV?
 
 Use Create tables button
     user waits until h2 is visible    Create your own tables
     user clicks link    Create tables
-
     user waits until h1 is visible    Create your own tables
