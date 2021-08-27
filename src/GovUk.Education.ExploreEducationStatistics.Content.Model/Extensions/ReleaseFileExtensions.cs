@@ -46,6 +46,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         // TODO: Remove after completion of EES-2343
         public static FileInfo ToFileInfoNotFound(this ReleaseFile releaseFile)
         {
+            var fileInfo = releaseFile.ToPublicFileInfoNotFound();
+
+            fileInfo.UserName = releaseFile.File.CreatedBy?.Email;
+            fileInfo.Created = releaseFile.File.Created;
+
+            return fileInfo;
+        }
+
+        // TODO: Remove after completion of EES-2343
+        public static FileInfo ToPublicFileInfoNotFound(this ReleaseFile releaseFile)
+        {
             return new FileInfo
             {
                 Id = releaseFile.FileId,
@@ -54,8 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Summary = releaseFile.Summary,
                 Size = FileInfo.UnknownSize,
                 Type = releaseFile.File.Type,
-                UserName = releaseFile.File.CreatedBy?.Email,
-                Created = releaseFile.File.Created
             };
         }
     }

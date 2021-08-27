@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
                     releaseFile.PublicPath());
 
-                return releaseFile.ToFileInfoNotFound();
+                return releaseFile.ToPublicFileInfoNotFound();
             }
 
             var blob = await _blobStorageService.GetBlob(
