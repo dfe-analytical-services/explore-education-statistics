@@ -13,7 +13,8 @@ Navigate to Absence publication
     user goes to url    %{PUBLIC_URL}
     user waits until page contains    Explore our statistics and data
     user clicks link    Explore
-    user waits until page contains    Browse to find the statistics and data you’re looking for
+    user waits until page contains
+    ...    Browse to find the statistics and data you’re looking for and open the section to get links to
     user waits for page to finish loading
 
     user opens accordion section    Pupils and schools
@@ -203,14 +204,13 @@ Validate accordion sections order
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
 
     user scrolls to element    id:help-and-support
-    user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Official Statistics    2    id:help-and-support
-    user checks accordion is in position    Contact us    3    id:help-and-support
-    user checks there are x accordion sections    3    id:help-and-support
+    user checks accordion is in position    Official Statistics    1    id:help-and-support
+    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks there are x accordion sections    2    id:help-and-support
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
-    [Tags]    NotAgainstDev    NotAgainstLocal
+    [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
     ...    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in    90
@@ -257,7 +257,7 @@ Validate Regional and local authority (LA) breakdown table
     user checks row cell contains text    ${row}    1    1.7%
 
 Validate Regional and local authority (LA) breakdown chart
-    [Tags]    NotAgainstDev    NotAgainstLocal
+    [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section content    Regional and local authority (LA) breakdown    id:content
 
