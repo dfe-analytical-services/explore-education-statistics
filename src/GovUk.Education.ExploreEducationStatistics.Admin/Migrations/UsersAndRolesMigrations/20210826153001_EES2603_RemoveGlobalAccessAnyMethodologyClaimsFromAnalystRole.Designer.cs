@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210826153001_EES2603_RemoveGlobalAccessAnyMethodologyClaimsFromAnalystRole")]
+    partial class EES2603_RemoveGlobalAccessAnyMethodologyClaimsFromAnalystRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,6 +337,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         },
                         new
                         {
+                            Id = -12,
+                            ClaimType = "ManageAnyMethodology",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
                             Id = -13,
                             ClaimType = "ApplicationAccessGranted",
                             ClaimValue = "",
@@ -491,13 +500,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         {
                             Id = -39,
                             ClaimType = "DeleteAllMethodologies",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -40,
-                            ClaimType = "AdoptAnyMethodology",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });
