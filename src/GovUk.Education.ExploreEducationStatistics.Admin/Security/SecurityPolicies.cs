@@ -64,8 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanAdoptMethodologyForSpecificPublication,
         CanCreateMethodologyForSpecificPublication,
         CanManageExternalMethodologyForSpecificPublication,
-        // TODO SOW4 EES-2603 Remove CanViewAllMethodologies
-        CanViewAllMethodologies,
         CanViewSpecificMethodology,
         CanUpdateSpecificMethodology,
         CanMarkSpecificMethodologyAsDraft,
