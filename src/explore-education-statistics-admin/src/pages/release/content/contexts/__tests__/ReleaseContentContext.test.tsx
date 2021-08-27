@@ -298,7 +298,7 @@ describe('ReleaseContentContext', () => {
     const newContent: EditableBlock[] = [
       {
         name: 'Test datablock',
-        heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
+        heading: "'prma' from 'My Pub' in England for 2017/18",
         source: '',
         query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',

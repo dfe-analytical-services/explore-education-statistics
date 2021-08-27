@@ -46,7 +46,7 @@ export function generateTableTitle({
     .filter(label => label !== 'Total');
   const filterString = filterList.length ? ` for ${commaList(filterList)}` : '';
 
-  return `Table showing ${indicatorString}'${subjectName}'${filterString}${locationsString}${timePeriodString}`;
+  return `${indicatorString}'${subjectName}'${filterString}${locationsString}${timePeriodString}`;
 }
 
 interface Props extends FullTableMeta {
