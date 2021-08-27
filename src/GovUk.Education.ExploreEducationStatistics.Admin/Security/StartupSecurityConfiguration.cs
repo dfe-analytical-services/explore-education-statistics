@@ -174,10 +174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy =>
                         policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
 
-                // TODO SOW4 EES-2603 Remove this but leave SecurityClaim
-                options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.AccessAllMethodologies.ToString()));
-
                 options.AddPolicy(SecurityPolicies.CanViewSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificMethodologyRequirement()));
 
