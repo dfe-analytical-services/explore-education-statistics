@@ -2203,7 +2203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateDataFilesForUpload(
                         release.Id,
                         dataFormFile,
-                        metaFormFile))
+                        metaFormFile,
+                        null))
                     .ReturnsAsync(Unit.Instance);
 
                 dataImportService
@@ -2384,7 +2385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateDataFilesForUpload(
                         release.Id,
                         dataFormFile,
-                        metaFormFile))
+                        metaFormFile,
+                        It.Is<File>(f => f.Id == originalDataReleaseFile.File.Id)))
                     .ReturnsAsync(Unit.Instance);
 
                 dataImportService

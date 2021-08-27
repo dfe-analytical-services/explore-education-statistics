@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -141,6 +142,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                         verifyNoOtherCallsMethod.Invoke(mock, null);
                     }
                 });
+        }
+        
+        public static void VerifyAllMocks(ITuple mocks)
+        {
+            Mock[] values = mocks
+                .GetType()
+                .GetFields()
+                .Select(f => f.GetValue(mocks))
+                .Cast<Mock>()
+                .ToArray();
+            
+            VerifyAllMocks(values);
         }
 
         public static Mock<IConfiguration> CreateMockConfiguration(params Tuple<string, string>[] keysAndValues)
