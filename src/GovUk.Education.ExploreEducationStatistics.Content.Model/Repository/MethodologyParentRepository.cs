@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await _contentDbContext.PublicationMethodologies
                 .Where(pm => pm.PublicationId == publicationId)
                 .Select(pm => pm.MethodologyParent)
+                .ToListAsync();
+        }
+
+        public async Task<List<MethodologyParent>> GetUnrelatedToPublication(Guid publicationId)
+        {
+            return await _contentDbContext.MethodologyParents
+                .Include(m => m.Publications)
+                .Where(m => m.Publications.All(pm => pm.PublicationId != publicationId))
                 .ToListAsync();
         }
     }

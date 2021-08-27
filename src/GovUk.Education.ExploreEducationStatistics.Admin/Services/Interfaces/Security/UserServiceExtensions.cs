@@ -36,9 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanAccessAllImports);
         }
 
+        // TODO SOW4 EES-2603 Remove this
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllMethodologies(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanViewAllMethodologies);
+        }
+
+        public static Task<Either<ActionResult, Publication>> CheckCanAdoptMethodologyForPublication(
+            this IUserService userService, Publication publication)
+        {
+            return userService.CheckPolicy(publication, SecurityPolicies.CanAdoptMethodologyForSpecificPublication);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateMethodologyForPublication(

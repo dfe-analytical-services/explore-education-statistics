@@ -21,96 +21,153 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _id = Guid.NewGuid();
 
         [Fact]
+        public async Task AdoptMethodology_Returns_Ok()
+        {
+            var publicationId = Guid.NewGuid();
+            var methodologyId = Guid.NewGuid();
+
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(s => s.AdoptMethodology(publicationId, methodologyId))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = SetupMethodologyController(methodologyService.Object);
+
+            var result = await controller.AdoptMethodology(publicationId, methodologyId);
+
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
+        }
+
+        [Fact]
         public async Task CreateMethodology_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.CreateMethodology(_id))
                 .ReturnsAsync(new MethodologySummaryViewModel());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
-            // Method under test
             var result = await controller.CreateMethodology(_id);
-            result.AssertOkResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
+        }
+
+        [Fact]
+        public async Task DropMethodology_Returns_Ok()
+        {
+            var publicationId = Guid.NewGuid();
+            var methodologyId = Guid.NewGuid();
+
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(s => s.DropMethodology(publicationId, methodologyId))
+                .ReturnsAsync(Unit.Instance);
+
+            var controller = SetupMethodologyController(methodologyService.Object);
+
+            var result = await controller.DropMethodology(publicationId, methodologyId);
+
+            VerifyAllMocks(methodologyService);
+
+            result.AssertNoContentResult();
+        }
+
+        [Fact]
+        public async Task GetAdoptableMethodologies_Returns_Ok()
+        {
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(s => s.GetAdoptableMethodologies(_id))
+                .ReturnsAsync(AsList(new TitleAndIdViewModel()));
+
+            var controller = SetupMethodologyController(methodologyService.Object);
+
+            var result = await controller.GetAdoptableMethodologies(_id);
+
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
         public async Task GetMethodologySummary_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.GetSummary(_id))
                 .ReturnsAsync(new MethodologySummaryViewModel());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
-            // Method under test
             var result = await controller.GetMethodologySummary(_id);
-            result.AssertOkResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
         public async Task GetMethodologySummary_Returns_NotFound()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.GetSummary(_id))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
-            // Method under test
             var result = await controller.GetMethodologySummary(_id);
-            result.AssertNotFoundResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertNotFoundResult();
         }
 
         [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.GetUnpublishedReleasesUsingMethodology(_id))
                 .ReturnsAsync(AsList(new TitleAndIdViewModel()));
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
             var result = await controller.GetUnpublishedReleasesUsingMethodology(_id);
-            result.AssertOkResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology_Returns_NotFound()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.GetUnpublishedReleasesUsingMethodology(_id))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
             var result = await controller.GetUnpublishedReleasesUsingMethodology(_id);
-            result.AssertNotFoundResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertNotFoundResult();
         }
 
         [Fact]
@@ -119,57 +176,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var request = new MethodologyUpdateRequest();
 
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.UpdateMethodology(_id, request))
-                .ReturnsAsync(new Either<ActionResult, MethodologySummaryViewModel>(new MethodologySummaryViewModel()));
+                .ReturnsAsync(new MethodologySummaryViewModel());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
-            // Method under test
             var result = await controller.UpdateMethodology(_id, request);
-            result.AssertOkResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
         public async void CreateMethodologyAmendment_Returns_Ok()
         {
-            var methodologyService = new Mock<IMethodologyService>(Strict);
             var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyAmendmentService
                 .Setup(s => s.CreateMethodologyAmendment(_id))
-                .ReturnsAsync(new Either<ActionResult, MethodologySummaryViewModel>(new MethodologySummaryViewModel()));
+                .ReturnsAsync(new MethodologySummaryViewModel());
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller =
+                SetupMethodologyController(methodologyAmendmentService: methodologyAmendmentService.Object);
 
-            // Method under test
             var result = await controller.CreateMethodologyAmendment(_id);
-            result.AssertOkResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyAmendmentService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
         public async void DeleteMethodologyAmendment_Returns_NoContent()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyAmendmentService = new Mock<IMethodologyAmendmentService>(Strict);
 
             methodologyService
                 .Setup(s => s.DeleteMethodology(_id, false))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
 
-            var controller = new MethodologyController(methodologyService.Object, methodologyAmendmentService.Object);
+            var controller = SetupMethodologyController(methodologyService.Object);
 
-            // Method under test
             var result = await controller.DeleteMethodology(_id);
-            result.AssertNoContentResult();
 
-            VerifyAllMocks(methodologyService, methodologyAmendmentService);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertNoContentResult();
+        }
+
+        private static MethodologyController SetupMethodologyController(
+            IMethodologyService? methodologyService = null,
+            IMethodologyAmendmentService? methodologyAmendmentService = null
+        )
+        {
+            return new(
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
+                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict)
+            );
         }
     }
 }

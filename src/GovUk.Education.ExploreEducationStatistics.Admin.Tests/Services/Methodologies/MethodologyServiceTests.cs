@@ -36,6 +36,242 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private static readonly Guid UserId = Guid.NewGuid();
 
         [Fact]
+        public async Task AdoptMethodology()
+        {
+            var publication = new Publication();
+
+            // Setup methodology owned by a different publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.AdoptMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the existing and new relationships between publications and methodologies
+                Assert.Equal(2, publicationMethodologies.Count);
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId != publication.Id
+                                                                  && pm.Owner));
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId == publication.Id
+                                                                  && !pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task AdoptMethodology_AlreadyAdoptedByPublicationFails()
+        {
+            var publication = new Publication();
+
+            // Setup methodology adopted by this publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = false
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.AdoptMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertBadRequest(CannotAdoptMethodologyAlreadyLinkedToPublication);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the relationships between publications and methodologies are not altered
+                Assert.Equal(2, publicationMethodologies.Count);
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId != publication.Id
+                                                                  && pm.Owner));
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId == publication.Id
+                                                                  && !pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task AdoptMethodology_AdoptingOwnedMethodologyFails()
+        {
+            var publication = new Publication();
+
+            // Setup methodology owned by this publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = true
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.AdoptMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertBadRequest(CannotAdoptMethodologyAlreadyLinkedToPublication);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the relationships between publications and methodologies are not altered
+                Assert.Single(publicationMethodologies);
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId == publication.Id
+                                                                  && pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task AdoptMethodology_PublicationNotFound()
+        {
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.AdoptMethodology(Guid.NewGuid(), methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task AdoptMethodology_MethodologyNotFound()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.AdoptMethodology(publication.Id, Guid.NewGuid());
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
         public async Task CreateMethodology()
         {
             var publication = new Publication();
@@ -74,6 +310,318 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var viewModel = result.AssertRight();
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
+            }
+        }
+
+        [Fact]
+        public async Task DropMethodology()
+        {
+            var publication = new Publication();
+
+            // Setup methodology adopted by this publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = false
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.DropMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the adopting relationship is removed
+                Assert.Single(publicationMethodologies);
+                Assert.False(publicationMethodologies.Exists(pm => pm.PublicationId == publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task DropMethodology_DropMethodologyNotAdoptedFails()
+        {
+            var publication = new Publication();
+
+            // Setup methodology which is not adopted by this publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = false
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.DropMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertNotFound();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the relationships between publications and methodologies are not altered
+                Assert.Equal(2, publicationMethodologies.Count);
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId != publication.Id
+                                                                  && pm.Owner));
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId != publication.Id
+                                                                  && !pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task DropMethodology_DropOwnedMethodologyFails()
+        {
+            var publication = new Publication();
+
+            // Setup methodology owned by this publication
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = publication,
+                        Owner = true
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.DropMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertBadRequest(CannotDropOwnedMethodology);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+
+                // Check the relationships between publications and methodologies are not altered
+                Assert.Single(publicationMethodologies);
+                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
+                                                                  && pm.PublicationId == publication.Id
+                                                                  && pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task DropMethodology_PublicationNotFound()
+        {
+            var methodology = new MethodologyParent
+            {
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.DropMethodology(Guid.NewGuid(), methodology.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task DropMethodology_MethodologyNotFound()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var result = await service.DropMethodology(publication.Id, Guid.NewGuid());
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task GetAdoptableMethodologies()
+        {
+            var publication = new Publication();
+
+            var methodologies = new List<MethodologyParent>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    OwningPublicationTitle = "Title"
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            methodologyParentRepository.Setup(mock =>
+                    mock.GetUnrelatedToPublication(publication.Id))
+                .ReturnsAsync(methodologies);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = (await service.GetAdoptableMethodologies(publication.Id)).AssertRight();
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                Assert.Single(result);
+                Assert.Equal("Title", result[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetAdoptableMethodologies_NoUnrelatedMethodologies()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+
+            methodologyParentRepository.Setup(mock =>
+                    mock.GetUnrelatedToPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyParent>());
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context,
+                    methodologyParentRepository: methodologyParentRepository.Object);
+
+                var result = (await service.GetAdoptableMethodologies(publication.Id)).AssertRight();
+
+                VerifyAllMocks(methodologyParentRepository);
+
+                Assert.Empty(result);
             }
         }
 
@@ -294,7 +842,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Publication A - Financial Year Q4 2020-21", result[2].Title);
                 Assert.Equal("Publication B - Calendar Year 2021", result[3].Title);
                 Assert.Equal("Publication B - Calendar Year 2020", result[4].Title);
-
             }
         }
 
@@ -1355,7 +1902,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
-                Title = "Publication title" 
+                Title = "Publication title"
             };
 
             // Create a release that is already published which the methodology cannot be made dependant on
@@ -1525,7 +2072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyRepository);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
-                
+
                 // Original release note is cleared if unapproving
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
@@ -1934,6 +2481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyRepository? methodologyRepository = null,
+            IMethodologyParentRepository? methodologyParentRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null)
@@ -1946,6 +2494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(Strict),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict),
+                methodologyParentRepository ?? Mock.Of<IMethodologyParentRepository>(Strict),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object);

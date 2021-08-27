@@ -43,6 +43,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         [Fact]
+        public async Task AdoptMethodology()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                                _publication.Id, _publication).Object,
+                            userService: userService.Object);
+                        return service.AdoptMethodology(_publication.Id, _methodology.Id);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task CreateMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -55,6 +72,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                                 _publication.Id, _publication).Object,
                             userService: userService.Object);
                         return service.CreateMethodology(_publication.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task DropMethodology()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                                _publication.Id, _publication).Object,
+                            userService: userService.Object);
+                        return service.DropMethodology(_publication.Id, _methodology.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task GetAdoptableMethodologies()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                                _publication.Id, _publication).Object,
+                            userService: userService.Object);
+                        return service.GetAdoptableMethodologies(_publication.Id);
                     }
                 );
         }
@@ -179,6 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyRepository? methodologyRepository = null,
+            IMethodologyParentRepository? methodologyParentRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null)
@@ -191,6 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(),
+                methodologyParentRepository ?? Mock.Of<IMethodologyParentRepository>(),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
                 publishingService ?? Mock.Of<IPublishingService>(),
                 userService ?? Mock.Of<IUserService>()
