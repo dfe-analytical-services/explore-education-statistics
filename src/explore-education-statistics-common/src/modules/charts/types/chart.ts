@@ -69,7 +69,8 @@ export type AxesConfiguration = {
 export interface ChartProps {
   data: TableDataResult[];
   meta: FullTableMeta;
-  title: string;
+  title?: string;
+  titleType?: 'default' | 'alternative';
   alt: string;
   height: number;
   width?: number;
@@ -100,7 +101,8 @@ export interface ChartDefinitionOptions {
   height: number;
   width?: number;
   barThickness?: number;
-  title: string;
+  title?: string;
+  titleType: 'default' | 'alternative';
   alt: string;
 }
 
