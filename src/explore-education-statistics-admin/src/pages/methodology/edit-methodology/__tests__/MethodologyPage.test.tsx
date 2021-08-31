@@ -35,6 +35,7 @@ describe('MethodologyPage', () => {
   const testMethodology: BasicMethodology = {
     id: 'm1',
     amendment: false,
+    methodologyParentId: 'm-p-1',
     title: 'Test methodology',
     slug: 'test-methodology',
     owningPublication: {

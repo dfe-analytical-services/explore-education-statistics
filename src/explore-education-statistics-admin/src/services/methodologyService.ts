@@ -30,6 +30,7 @@ export interface BasicMethodology {
   owningPublication: MethodologyPublication;
   otherPublications?: MethodologyPublication[];
   scheduledWithRelease?: IdTitlePair;
+  methodologyParentId: string; // EES-2666 Will be renamed methodologyId when MethodologyParent becomes Methodology
 }
 
 export interface MyMethodology extends BasicMethodology {

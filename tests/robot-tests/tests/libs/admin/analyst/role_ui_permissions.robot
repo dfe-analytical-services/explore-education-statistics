@@ -11,7 +11,7 @@ user navigates to publication on admin dashboard
 user cannot see the create methodologies controls for publication
     [Arguments]    ${PUBLICATION_ACCORDION}
     user checks element does not contain button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element does not contain button    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
+    user checks element does not contain link    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
 
 user cannot see the create amendment controls for release
     [Arguments]    ${RELEASE_DETAILS_SECTION}
@@ -46,7 +46,7 @@ user cannot see the enabled approve release controls for release
 user can see the create methodologies controls for publication
     [Arguments]    ${PUBLICATION_ACCORDION}
     user checks element contains button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element contains button    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
+    user checks element contains link    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
 
 user can see the create amendment controls for release
     [Arguments]    ${RELEASE_DETAILS_SECTION}

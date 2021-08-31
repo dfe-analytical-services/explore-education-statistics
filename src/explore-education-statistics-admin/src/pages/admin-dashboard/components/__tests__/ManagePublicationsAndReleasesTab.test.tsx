@@ -87,6 +87,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
       releases: [],
       methodologies: [],
       permissions: {
+        canAdoptMethodologies: true,
         canCreateReleases: true,
         canUpdatePublication: true,
         canCreateMethodologies: true,
@@ -100,6 +101,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
       releases: [],
       methodologies: [],
       permissions: {
+        canAdoptMethodologies: true,
         canCreateReleases: true,
         canUpdatePublication: true,
         canCreateMethodologies: true,

@@ -19,7 +19,7 @@ interface FormValues {
   url: string;
 }
 
-const MethodologyExternalLinkForm = ({
+const ExternalMethodologyForm = ({
   initialValues,
   onCancel,
   onSubmit,
@@ -59,7 +59,7 @@ const MethodologyExternalLinkForm = ({
           <FormFieldset
             id="methodology-external-fieldset"
             legend="Link to an externally hosted methodology"
-            legendSize="s"
+            legendHidden
           >
             <FormGroup>
               <FormFieldTextInput
@@ -93,4 +93,4 @@ const MethodologyExternalLinkForm = ({
   );
 };
 
-export default MethodologyExternalLinkForm;
+export default ExternalMethodologyForm;

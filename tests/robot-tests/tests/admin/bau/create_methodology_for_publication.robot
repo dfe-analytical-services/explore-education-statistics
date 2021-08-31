@@ -16,13 +16,13 @@ Create Publication and check available Methodology controls
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
-    user checks element contains button    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Link to an externally hosted methodology
 
 Create a Methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
-    user checks element contains button    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Link to an externally hosted methodology
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${details}    Edit this methodology
     user checks element contains button    ${details}    Remove
