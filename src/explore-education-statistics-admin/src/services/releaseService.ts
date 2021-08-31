@@ -119,20 +119,15 @@ export interface ReleaseStageStatuses {
   lastUpdated?: string;
 }
 
-export type ReleaseChecklistError =
-  | {
-      code:
-        | 'DataFileImportsMustBeCompleted'
-        | 'DataFileReplacementsMustBeCompleted'
-        | 'PublicMetaGuidanceRequired'
-        | 'ReleaseNoteRequired'
-        | 'EmptyContentSectionExists'
-        | 'GenericSectionsContainEmptyHtmlBlock';
-    }
-  | {
-      code: 'MethodologyMustBeApproved';
-      methodologyId: string;
-    };
+export type ReleaseChecklistError = {
+  code:
+    | 'DataFileImportsMustBeCompleted'
+    | 'DataFileReplacementsMustBeCompleted'
+    | 'PublicMetaGuidanceRequired'
+    | 'ReleaseNoteRequired'
+    | 'EmptyContentSectionExists'
+    | 'GenericSectionsContainEmptyHtmlBlock';
+};
 
 export type ReleaseChecklistWarning =
   | {
@@ -146,6 +141,10 @@ export type ReleaseChecklistWarning =
   | {
       code: 'NoFootnotesOnSubjects';
       totalSubjects: number;
+    }
+  | {
+      code: 'MethodologyNotApproved';
+      methodologyId: string;
     };
 
 export interface ReleaseChecklist {

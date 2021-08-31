@@ -43,10 +43,6 @@ describe('ReleaseStatusChecklist', () => {
             errors: [
               { code: 'DataFileImportsMustBeCompleted' },
               { code: 'DataFileReplacementsMustBeCompleted' },
-              {
-                code: 'MethodologyMustBeApproved',
-                methodologyId: 'methodology-1',
-              },
               { code: 'PublicMetaGuidanceRequired' },
               { code: 'ReleaseNoteRequired' },
             ],
@@ -64,7 +60,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('5 issues')).toBeInTheDocument();
+    expect(screen.getByText('4 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -83,12 +79,6 @@ describe('ReleaseStatusChecklist', () => {
       'href',
       '/publication/publication-1/release/release-1/data#data-uploads',
     );
-
-    expect(
-      screen.getByRole('link', {
-        name: 'Methodology must be approved',
-      }),
-    ).toHaveAttribute('href', '/methodology/methodology-1/status');
 
     expect(
       screen.getByRole('link', {
@@ -119,6 +109,14 @@ describe('ReleaseStatusChecklist', () => {
             valid: true,
             warnings: [
               { code: 'NoMethodology' },
+              {
+                code: 'MethodologyNotApproved',
+                methodologyId: 'methodology-1',
+              },
+              {
+                code: 'MethodologyNotApproved',
+                methodologyId: 'methodology-2',
+              },
               { code: 'NoNextReleaseDate' },
               { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
               { code: 'NoTableHighlights' },
@@ -142,7 +140,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('6 things')).toBeInTheDocument();
+    expect(screen.getByText('8 things')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -150,6 +148,18 @@ describe('ReleaseStatusChecklist', () => {
           'An in-EES methodology page has not been linked to this publication',
       }),
     ).toHaveAttribute('href', '/publication/publication-1/edit');
+
+    expect(
+      screen.getAllByRole('link', {
+        name: 'A methodology for this publication is not yet approved',
+      })[0],
+    ).toHaveAttribute('href', '/methodology/methodology-1/status');
+
+    expect(
+      screen.getAllByRole('link', {
+        name: 'A methodology for this publication is not yet approved',
+      })[1],
+    ).toHaveAttribute('href', '/methodology/methodology-2/status');
 
     expect(
       screen.getByRole('link', {

@@ -90,17 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
-            var methodologiesNotApproved = methodologies
-                .Where(m => m.Status != MethodologyStatus.Approved)
-                .ToList();
-
-            if (methodologiesNotApproved.Any())
-            {
-                errors.AddRange(methodologiesNotApproved.Select(m =>
-                    new MethodologyMustBeApprovedError(m.Id)));
-            }
-
             var isMetaGuidanceValid = await _metaGuidanceService.Validate(release.Id);
 
             if (isMetaGuidanceValid.IsLeft)
@@ -168,6 +157,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));
+            }
+            
+            var methodologiesNotApproved = methodologies
+                .Where(m => m.Status != MethodologyStatus.Approved)
+                .ToList();
+
+            if (methodologiesNotApproved.Any())
+            {
+                warnings.AddRange(methodologiesNotApproved.Select(m =>
+                    new MethodologyNotApprovedWarning(m.Id)));
             }
 
             if (release.NextReleaseDate == null)

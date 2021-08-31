@@ -96,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Methodology
         MethodologyMustBeDraft,
-        MethodologyMustBeApproved,
         MethodologyCannotDependOnPublishedRelease,
         MethodologyCannotDependOnRelease,
         CannotAdoptMethodologyAlreadyLinkedToPublication,
@@ -158,6 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoDataFiles,
         NoFootnotesOnSubjects,
         NoTableHighlights,
-        NoPublicPreReleaseAccessList
+        NoPublicPreReleaseAccessList,
+        MethodologyNotApproved
     }
 }

@@ -32,11 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         }
     }
 
-    public class MethodologyMustBeApprovedError : ReleaseChecklistIssue
+    public class MethodologyNotApprovedWarning : ReleaseChecklistIssue
     {
         public Guid MethodologyId { get; }
 
-        public MethodologyMustBeApprovedError(Guid methodologyId) : base(ValidationErrorMessages.MethodologyMustBeApproved)
+        public MethodologyNotApprovedWarning(Guid methodologyId) : base(ValidationErrorMessages.MethodologyNotApproved)
         {
             MethodologyId = methodologyId;
         }
