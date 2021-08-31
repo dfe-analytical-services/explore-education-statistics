@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -13,14 +14,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -145,20 +144,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyRepository: methodologyRepository.Object
                 );
 
-                var checklist = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(release.Id);
 
-                Assert.True(checklist.IsRight);
+                var checklist = result.AssertRight();
 
-                Assert.False(checklist.Right.Valid);
+                Assert.False(checklist.Valid);
 
-                Assert.Equal(6, checklist.Right.Errors.Count);
+                Assert.Equal(6, checklist.Errors.Count);
 
-                Assert.Equal(DataFileImportsMustBeCompleted, checklist.Right.Errors[0].Code);
-                Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Right.Errors[1].Code);
-                Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[2].Code);
-                Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[3].Code);
-                Assert.Equal(EmptyContentSectionExists, checklist.Right.Errors[4].Code);
-                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Right.Errors[5].Code);
+                Assert.Equal(DataFileImportsMustBeCompleted, checklist.Errors[0].Code);
+                Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Errors[1].Code);
+                Assert.Equal(PublicMetaGuidanceRequired, checklist.Errors[2].Code);
+                Assert.Equal(ReleaseNoteRequired, checklist.Errors[3].Code);
+                Assert.Equal(EmptyContentSectionExists, checklist.Errors[4].Code);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Errors[5].Code);
             }
 
             MockUtils.VerifyAllMocks(dataImportService,
@@ -212,17 +211,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     metaGuidanceService: metaGuidanceService.Object
                 );
 
-                var checklist = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(release.Id);
 
-                Assert.True(checklist.IsRight);
+                var checklist = result.AssertRight();
 
-                Assert.False(checklist.Right.Valid);
+                Assert.False(checklist.Valid);
 
-                Assert.Equal(4, checklist.Right.Warnings.Count);
-                Assert.Equal(NoMethodology, checklist.Right.Warnings[0].Code);
-                Assert.Equal(NoNextReleaseDate, checklist.Right.Warnings[1].Code);
-                Assert.Equal(NoDataFiles, checklist.Right.Warnings[2].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[3].Code);
+                Assert.Equal(4, checklist.Warnings.Count);
+                Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
+                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
+                Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
+                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceService,
@@ -324,22 +323,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
-                var checklist = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(release.Id);
 
-                Assert.True(checklist.IsRight);
+                var checklist = result.AssertRight();
 
-                Assert.False(checklist.Right.Valid);
+                Assert.False(checklist.Valid);
 
-                Assert.Equal(5, checklist.Right.Warnings.Count);
-                Assert.Equal(NoMethodology, checklist.Right.Warnings[0].Code);
-                Assert.Equal(NoNextReleaseDate, checklist.Right.Warnings[1].Code);
+                Assert.Equal(5, checklist.Warnings.Count);
+                Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
+                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
 
-                var noFootnotesWarning = Assert.IsType<NoFootnotesOnSubjectsWarning>(checklist.Right.Warnings[2]);
+                var noFootnotesWarning = Assert.IsType<NoFootnotesOnSubjectsWarning>(checklist.Warnings[2]);
                 Assert.Equal(NoFootnotesOnSubjects, noFootnotesWarning.Code);
                 Assert.Equal(1, noFootnotesWarning.TotalSubjects);
 
-                Assert.Equal(NoTableHighlights, checklist.Right.Warnings[3].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[4].Code);
+                Assert.Equal(NoTableHighlights, checklist.Warnings[3].Code);
+                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
             }
 
             MockUtils.VerifyAllMocks(dataBlockService,
@@ -399,22 +398,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     metaGuidanceService: metaGuidanceService.Object
                 );
 
-                var checklist = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(release.Id);
 
-                Assert.True(checklist.IsRight);
+                var checklist = result.AssertRight();
 
-                Assert.False(checklist.Right.Valid);
+                Assert.False(checklist.Valid);
 
-                Assert.Equal(4, checklist.Right.Warnings.Count);
+                Assert.Equal(4, checklist.Warnings.Count);
                 
                 var methodologyMustBeApprovedError =
-                    Assert.IsType<MethodologyNotApprovedWarning>(checklist.Right.Warnings[0]);
+                    Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
                 Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
                 Assert.Equal(methodology.Id, methodologyMustBeApprovedError.MethodologyId);
                 
-                Assert.Equal(NoNextReleaseDate, checklist.Right.Warnings[1].Code);
-                Assert.Equal(NoDataFiles, checklist.Right.Warnings[2].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[3].Code);
+                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
+                Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
+                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceService,
@@ -587,13 +586,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
-                var checklist = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(release.Id);
 
-                Assert.True(checklist.IsRight);
+                var checklist = result.AssertRight();
 
-                Assert.Empty(checklist.Right.Errors);
-                Assert.Empty(checklist.Right.Warnings);
-                Assert.True(checklist.Right.Valid);
+                Assert.Empty(checklist.Errors);
+                Assert.Empty(checklist.Warnings);
+                Assert.True(checklist.Valid);
             }
 
             MockUtils.VerifyAllMocks(dataBlockService,
@@ -619,11 +618,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 var service = BuildReleaseChecklistService(context);
-                var checklist = await service.GetChecklist(Guid.NewGuid());
-
-                Assert.True(checklist.IsLeft);
-
-                Assert.IsType<NotFoundResult>(checklist.Left);
+                var result = await service.GetChecklist(Guid.NewGuid());
+                result.AssertNotFound();
             }
         }
 
