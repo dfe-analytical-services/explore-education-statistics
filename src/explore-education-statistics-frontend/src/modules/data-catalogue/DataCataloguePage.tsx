@@ -1,6 +1,8 @@
 import themeService, {
   DownloadTheme,
   PublicationDownloadSummary,
+  PublicationSummary,
+  Theme,
 } from '@common/services/themeService';
 import Page from '@frontend/components/Page';
 import PublicationForm, {
@@ -106,10 +108,10 @@ const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
 
 interface Props {
   releases?: Release[];
-  selectedPublication?: PublicationDownloadSummary;
+  selectedPublication?: PublicationSummary;
   selectedRelease?: Release;
   subjects?: SubjectWithDownloadFiles[];
-  themes: DownloadTheme[];
+  themes: Theme[];
 }
 
 interface DataCatalogueState {
@@ -189,7 +191,6 @@ const DataCataloguePage: NextPage<Props> = ({
   }
 
   const PublicationStep = (props: InjectedWizardProps) => {
-    const options: DownloadTheme[] = themes;
     return (
       <PublicationForm
         {...props}
@@ -197,7 +198,7 @@ const DataCataloguePage: NextPage<Props> = ({
           publicationId: state.query.publicationId ?? '',
         }}
         onSubmit={handlePublicationFormSubmit}
-        options={options}
+        options={themes}
       />
     );
   };
@@ -258,7 +259,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     releaseSlug = '',
   } = context.query as Dictionary<string>;
 
-  const themes = await themeService.getDownloadThemes();
+  const themes = await themeService.listThemes({
+    publicationFilter: 'AnyData',
+  });
 
   const selectedPublication = themes
     .flatMap(option => option.topics)

@@ -33,7 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding
             if (bindingContext.ValueProvider is CompositeValueProvider compositeProvider)
             {
                 var queryStringProvider = compositeProvider
-                    .First(provider => provider is QueryStringValueProvider);
+                    .FirstOrDefault(provider => provider is QueryStringValueProvider);
+
+                if (queryStringProvider is null)
+                {
+                    return;
+                }
 
                 var index = compositeProvider.IndexOf(queryStringProvider);
 

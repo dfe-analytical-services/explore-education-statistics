@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,
-            IList<Guid> fileIds,
+            IEnumerable<Guid> fileIds,
             Stream outputStream,
             CancellationToken? cancellationToken = null)
         {
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
                     releaseFile.PublicPath());
 
-                return releaseFile.ToFileInfoNotFound();
+                return releaseFile.ToPublicFileInfoNotFound();
             }
 
             var blob = await _blobStorageService.GetBlob(
