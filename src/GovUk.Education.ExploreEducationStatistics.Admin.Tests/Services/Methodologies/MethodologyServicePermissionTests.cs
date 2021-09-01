@@ -19,6 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -79,16 +80,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task DropMethodology()
         {
+            var link = new PublicationMethodology
+            {
+                PublicationId = new Guid(),
+                MethodologyParentId = new Guid()
+            };
+
+            var persistenceHelper = new Mock<IPersistenceHelper<ContentDbContext>>(Strict);
+            SetupCall(persistenceHelper, link);
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
+                .SetupResourceCheckToFail(link, CanDropMethodologyLink)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                                _publication.Id, _publication).Object,
+                            contentPersistenceHelper: persistenceHelper.Object,
                             userService: userService.Object);
-                        return service.DropMethodology(_publication.Id, _methodology.Id);
+                        return service.DropMethodology(link.PublicationId, link.MethodologyParentId);
                     }
                 );
         }

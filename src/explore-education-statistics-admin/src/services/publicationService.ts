@@ -49,6 +49,9 @@ export interface MyPublication {
 export interface MyPublicationMethodology {
   owner: boolean;
   methodology: MyMethodology;
+  permissions: {
+    canDropMethodology: boolean;
+  };
 }
 
 export interface BasicPublicationDetails {

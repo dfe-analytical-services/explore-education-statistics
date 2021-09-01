@@ -103,17 +103,35 @@ const testPublicationNoMethodology: MyPublication = {
 
 const testPublicationWithMethodology = {
   ...testPublicationNoMethodology,
-  methodologies: [{ owner: true, methodology: testMethodology }],
+  methodologies: [
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testMethodology,
+    },
+  ],
 };
 
 const testPublicationWithDraftMethodology = {
   ...testPublicationWithMethodology,
-  methodologies: [{ owner: true, methodology: testDraftMethodology }],
+  methodologies: [
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testDraftMethodology,
+    },
+  ],
 };
 
 const testPublicationWithAmendmentMethodology = {
   ...testPublicationWithMethodology,
-  methodologies: [{ owner: true, methodology: testAmendmentMethodology }],
+  methodologies: [
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testAmendmentMethodology,
+    },
+  ],
 };
 
 const testPublicationWithExternalMethodology = {
@@ -122,17 +140,33 @@ const testPublicationWithExternalMethodology = {
 };
 const testPublicationWithMethodologyCanAmend = {
   ...testPublicationWithMethodology,
-  methodologies: [{ owner: true, methodology: testMethodologyCanAmend }],
+  methodologies: [
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testMethodologyCanAmend,
+    },
+  ],
 };
 const testPublicationWithMethodologyCanCancelAmend = {
   ...testPublicationWithMethodology,
   methodologies: [
-    { owner: true, methodology: testMethodologyCanRemoveAmendment },
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testMethodologyCanRemoveAmendment,
+    },
   ],
 };
 const testPublicationWithMethodologyCanRemove = {
   ...testPublicationWithMethodology,
-  methodologies: [{ owner: true, methodology: testMethodologyCanRemove }],
+  methodologies: [
+    {
+      owner: true,
+      permissions: { canDropMethodology: false },
+      methodology: testMethodologyCanRemove,
+    },
+  ],
 };
 
 const testTopicId = 'topic-id';
@@ -365,13 +399,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     permissions: {
                       ...testMethodology.permissions,
                       canApproveMethodology: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -403,13 +440,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     permissions: {
                       ...testMethodology.permissions,
                       canMarkMethodologyAsDraft: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -441,13 +481,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     permissions: {
                       ...testMethodology.permissions,
                       canUpdateMethodology: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -527,7 +570,6 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     amendment: true,
@@ -535,6 +577,10 @@ describe('MethodologySummary', () => {
                       ...testMethodology.permissions,
                       canApproveMethodology: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -566,7 +612,6 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     amendment: true,
@@ -574,6 +619,10 @@ describe('MethodologySummary', () => {
                       ...testMethodology.permissions,
                       canMarkMethodologyAsDraft: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -605,7 +654,6 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  owner: true,
                   methodology: {
                     ...testMethodology,
                     amendment: true,
@@ -613,6 +661,10 @@ describe('MethodologySummary', () => {
                       ...testMethodology.permissions,
                       canUpdateMethodology: true,
                     },
+                  },
+                  owner: true,
+                  permissions: {
+                    canDropMethodology: false,
                   },
                 },
               ],

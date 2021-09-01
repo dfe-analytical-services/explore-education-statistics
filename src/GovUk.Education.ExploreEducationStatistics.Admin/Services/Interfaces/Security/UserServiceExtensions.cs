@@ -26,6 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanAccessPrereleasePages);
         }
 
+        public static Task<Either<ActionResult, PublicationMethodology>> CheckCanDropMethodologyLink(
+            this IUserService userService, PublicationMethodology methodology)
+        {
+            return userService.CheckPolicy(methodology, SecurityPolicies.CanDropMethodologyLink);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllUsers(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanManageUsersOnSystem);

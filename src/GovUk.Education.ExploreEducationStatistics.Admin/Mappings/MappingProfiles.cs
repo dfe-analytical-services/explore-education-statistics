@@ -97,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<PublicationMethodology, MyPublicationMethodologyViewModel>()
                 .ForMember(dest => dest.Methodology,
-                    m => m.MapFrom(pm => pm.MethodologyParent.LatestVersion()));
+                    m => m.MapFrom(pm => pm.MethodologyParent.LatestVersion()))
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationMethodologyPermissionsPropertyResolver>());
 
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(

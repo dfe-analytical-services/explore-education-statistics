@@ -203,9 +203,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
-            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver, MyMethodologyPermissionSetPropertyResolver>();
+            services.AddTransient<IMyReleasePermissionSetPropertyResolver,
+                MyReleasePermissionSetPropertyResolver>();
+            services.AddTransient<IMyPublicationPermissionSetPropertyResolver,
+                MyPublicationPermissionSetPropertyResolver>();
+            services.AddTransient<IMyPublicationMethodologyPermissionsPropertyResolver,
+                MyPublicationMethodologyPermissionsPropertyResolver>();
+            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver,
+                MyMethodologyPermissionSetPropertyResolver>();
 
             services.AddMvc(options =>
                 {
