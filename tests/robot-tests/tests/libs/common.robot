@@ -136,6 +136,9 @@ user reloads page
 user scrolls to the top of the page
     execute javascript    window.scrollTo(0, 0);
 
+user scrolls to the bottom of the page
+    user scrolls to element    css:.govuk-footer__licence-description
+
 user scrolls down
     [Arguments]    ${px}
     execute javascript    window.scrollBy(0, ${px});

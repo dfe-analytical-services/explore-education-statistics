@@ -25,6 +25,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Using your administration dashboard' },
       ]}
+      title="Using your administration dashboard"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">

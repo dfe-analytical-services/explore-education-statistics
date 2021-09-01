@@ -96,9 +96,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Methodology
         MethodologyMustBeDraft,
-        MethodologyMustBeApproved,
         MethodologyCannotDependOnPublishedRelease,
         MethodologyCannotDependOnRelease,
+        CannotAdoptMethodologyAlreadyLinkedToPublication,
+        CannotDropOwnedMethodology,
 
         // Theme
         ThemeDoesNotExist,
@@ -133,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReplacementMustBeValid,
 
         // Meta file
-        CannotOverwriteMetadataFile,
         MetadataFileCannotBeEmpty,
         MetaFileMustBeCsvFile,
         UnableToFindMetadataFileToDelete,
@@ -157,6 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoDataFiles,
         NoFootnotesOnSubjects,
         NoTableHighlights,
-        NoPublicPreReleaseAccessList
+        NoPublicPreReleaseAccessList,
+        MethodologyNotApproved
     }
 }

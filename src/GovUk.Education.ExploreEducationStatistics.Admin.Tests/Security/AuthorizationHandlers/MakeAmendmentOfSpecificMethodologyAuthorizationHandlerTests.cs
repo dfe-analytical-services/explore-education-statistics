@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -60,9 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 mock.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                             .ReturnsAsync(OwningPublication);
 
-                        publicationRoleRepository
-                            .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                            .ReturnsAsync(false);
+                        publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                            UserId, OwningPublication, false);
                     }
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -115,9 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                         .ReturnsAsync(OwningPublication);
 
-                    publicationRoleRepository
-                        .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                        .ReturnsAsync(role == Owner);
+                    publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                        UserId, OwningPublication, role == Owner);
 
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext = CreateAuthContext(user, Methodology);
@@ -144,9 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                     .ReturnsAsync(OwningPublication);
 
-                publicationRoleRepository
-                    .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                    .ReturnsAsync(false);
+                publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                    UserId, OwningPublication, false);
 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, Methodology);

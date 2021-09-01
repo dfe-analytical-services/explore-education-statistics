@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
@@ -111,9 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                             .ReturnsAsync(OwningPublication);
 
-                        userPublicationRoleRepository
-                            .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                            .ReturnsAsync(false);
+                        userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                            UserId, OwningPublication, false);
 
                         userReleaseRoleRepository
                             .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
@@ -154,9 +154,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                         .ReturnsAsync(OwningPublication);
 
-                    userPublicationRoleRepository
-                        .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                        .ReturnsAsync(publicationRole == Owner);
+                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                        UserId, OwningPublication, publicationRole == Owner);
 
                     var expectedToPassByRole = publicationRole == Owner;
 
@@ -205,9 +204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                         .ReturnsAsync(OwningPublication);
 
-                    userPublicationRoleRepository
-                        .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                        .ReturnsAsync(false);
+                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                        UserId, OwningPublication, false);
 
                     userReleaseRoleRepository
                         .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
@@ -247,9 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleRepository
-                    .Setup(s => s.IsUserPublicationOwner(UserId, OwningPublication.Id))
-                    .ReturnsAsync(false);
+                userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication, false);
 
                 userReleaseRoleRepository
                     .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))

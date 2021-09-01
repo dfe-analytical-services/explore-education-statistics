@@ -136,9 +136,10 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
     const columnsWithText = columnHeadersCartesian.map(() => false);
 
     const excludedFilters = getExcludedFilters(tableHeadersConfig, subjectMeta);
+
     // Group measures by their respective combination of filters
     // allowing lookups later on to be MUCH faster.
-    const measuresByDataSet = groupResultMeasuresByCombination(
+    const measuresByFilterCombination = groupResultMeasuresByCombination(
       results,
       excludedFilters,
     );
@@ -184,7 +185,7 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
             }
 
             const text = getCellText(
-              measuresByDataSet,
+              measuresByFilterCombination,
               dataSet as ExpandedDataSet,
             );
 

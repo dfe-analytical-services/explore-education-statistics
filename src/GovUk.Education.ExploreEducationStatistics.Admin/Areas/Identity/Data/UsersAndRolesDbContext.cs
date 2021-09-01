@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -11,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
-        public DbSet<UserInvite> UserInvites { get; set; }
+        public DbSet<UserInvite> UserInvites { get; set; } = null!;
 
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
@@ -124,13 +125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     },
                     new IdentityRoleClaim<string>
                     {
-                        Id = -12,
-                        RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.ManageAnyMethodology.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
                         Id = -13,
                         RoleId = analystRoleId,
                         ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
@@ -213,14 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
-                    // TODO SOW4 EES-2603 Drop claim AccessAllMethodologies from the Analyst role
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -27,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
                     new IdentityRoleClaim<string>
                     {
                         Id = -29,
@@ -296,6 +282,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         Id = -39,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.DeleteAllMethodologies.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -40,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.AdoptAnyMethodology.ToString(),
                         ClaimValue = "",
                     }
                 );

@@ -1,12 +1,8 @@
-import Link from '@admin/components/Link';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
-import {
-  ReleaseRouteParams,
-  releaseStatusRoute,
-} from '@admin/routes/releaseRoutes';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import permissionService from '@admin/services/permissionService';
 import InsetText from '@common/components/InsetText';
@@ -14,7 +10,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import UrlContainer from '@common/components/UrlContainer';
-import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath } from 'react-router';
@@ -85,29 +80,10 @@ const ReleasePreReleaseAccessPage = () => {
               </>
             )}
 
-            {release.approvalStatus === 'Approved' ? (
-              <PreReleaseUserAccessForm
-                releaseId={release.id}
-                isReleaseLive={release.live}
-              />
-            ) : (
-              <WarningMessage>
-                Before you can invite users for pre-release access, the release
-                status must be approved. This can be done in the{' '}
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    releaseStatusRoute.path,
-                    {
-                      releaseId,
-                      publicationId: release.publicationId,
-                    },
-                  )}
-                >
-                  Sign off
-                </Link>{' '}
-                page.
-              </WarningMessage>
-            )}
+            <PreReleaseUserAccessForm
+              releaseId={release.id}
+              isReleaseLive={release.live}
+            />
           </TabsSection>
           <TabsSection
             id={releasePreReleaseAccessPageTabs.publicAccessList}

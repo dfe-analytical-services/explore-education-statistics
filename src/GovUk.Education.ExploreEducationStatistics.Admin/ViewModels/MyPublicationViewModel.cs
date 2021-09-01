@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -31,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanCreateReleases { get; set; }
+            public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }
             public bool CanManageExternalMethodology { get; set; }
         }

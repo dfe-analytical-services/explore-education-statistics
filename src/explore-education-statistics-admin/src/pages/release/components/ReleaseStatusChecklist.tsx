@@ -66,16 +66,6 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             )}#${releaseDataPageTabIds.dataUploads}`,
           };
-        case 'MethodologyMustBeApproved':
-          return {
-            message: 'Methodology must be approved',
-            link: generatePath<MethodologyRouteParams>(
-              methodologyStatusRoute.path,
-              {
-                methodologyId: error.methodologyId,
-              },
-            ),
-          };
         case 'PublicMetaGuidanceRequired':
           return {
             message:
@@ -123,6 +113,16 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
   const warnings = useMemo<ChecklistMessage[]>(() => {
     return checklist.warnings.map(warning => {
       switch (warning.code) {
+        case 'MethodologyNotApproved':
+          return {
+            message: 'A methodology for this publication is not yet approved',
+            link: generatePath<MethodologyRouteParams>(
+              methodologyStatusRoute.path,
+              {
+                methodologyId: warning.methodologyId,
+              },
+            ),
+          };
         case 'NoDataFiles':
           return {
             message: 'No data files uploaded',
@@ -208,7 +208,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
 
           <ul>
             {errors.map(error => (
-              <li key={error.message}>
+              <li key={`${error.message}${error.link}`}>
                 {error.link ? (
                   <Link to={error.link} unvisited>
                     {error.message}
@@ -232,13 +232,13 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
                 warnings.length === 1 ? 'thing' : 'things'
               }`}
             </strong>{' '}
-            you may have forgotten, but do not need to be resolved to publish
-            this release.
+            you may have forgotten, but do not need to resolve to publish this
+            release.
           </p>
 
           <ul>
             {warnings.map(warning => (
-              <li key={warning.message}>
+              <li key={`${warning.message}${warning.link}`}>
                 {warning.link ? (
                   <Link to={warning.link} unvisited>
                     {warning.message}

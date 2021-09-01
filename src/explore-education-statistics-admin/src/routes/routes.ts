@@ -127,7 +127,7 @@ export const releaseCreateRoute: ProtectedRouteProps = {
 export const legacyReleasesRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/legacy-releases',
   component: LegacyReleasesPageContainer,
-  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
 };
 
 export const preReleaseRoute: ProtectedRouteProps = {

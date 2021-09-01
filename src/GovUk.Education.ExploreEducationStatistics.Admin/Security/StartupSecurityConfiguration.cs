@@ -48,18 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
-                
+
                 // does this user have permission to update a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new UpdatePublicationRequirement()));
-                
-                // does this user have permission to create a methodology for a specific Publication?
-                options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
-                    policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
-
-                // does this user have permission to manage the external methodology for a specific Publication?
-                options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(), policy =>
-                    policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
 
                 /**
                  * Release management
@@ -169,8 +161,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Methodology management
                  */
-                options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.AccessAllMethodologies.ToString()));
+                // does this user have permission to adopt a methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanAdoptMethodologyForSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new AdoptMethodologyForSpecificPublicationRequirement()));
+
+                // does this user have permission to create a methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
+
+                // does this user have permission to manage the external methodology for a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(),
+                    policy =>
+                        policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanViewSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificMethodologyRequirement()));
@@ -189,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to create an Amendment of a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificMethodologyRequirement()));
-                
+
                 // does this user have permission to cancel a specific Methodology Amendment?
                 options.AddPolicy(SecurityPolicies.CanDeleteSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificMethodologyRequirement()));
@@ -248,6 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             /**
              * Methodology management
              */
+            services.AddTransient<IAuthorizationHandler, AdoptMethodologyForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftAuthorizationHandler>();

@@ -255,8 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 

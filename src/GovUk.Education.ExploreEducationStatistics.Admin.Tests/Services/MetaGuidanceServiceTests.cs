@@ -193,8 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Get(Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -215,8 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Subjects = new List<MetaGuidanceUpdateSubjectViewModel>()
                     });
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 
@@ -705,8 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Validate(Guid.NewGuid());
 
-                Assert.True(result.IsLeft);
-                Assert.IsType<NotFoundResult>(result.Left);
+                result.AssertNotFound();
             }
         }
 

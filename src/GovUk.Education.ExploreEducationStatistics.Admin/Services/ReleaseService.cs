@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IContentService _contentService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IPreReleaseUserService _preReleaseUserService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -72,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseChecklistService releaseChecklistService,
             IContentService contentService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator,
+            IPreReleaseUserService preReleaseUserService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -92,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentService = contentService;
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
+            _preReleaseUserService = preReleaseUserService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
@@ -365,6 +369,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _context.Update(release);
                             await _context.SaveChangesAsync();
 
+                            if (request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                            {
+                                await _preReleaseUserService.SendPreReleaseUserInviteEmails(release);
+                            }
+
                             return await GetRelease(releaseId);
                         });
                 });
@@ -389,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return ValidationActionResult(errors);
         }
 
-        public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestPublishedRelease(Guid publicationId)
+        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, queryable =>
@@ -659,8 +668,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         [JsonIgnore]
         public Guid SubjectId { get; set; }
 
-        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
+        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; } = null!;
 
-        public List<Guid> FootnoteIds { get; set; }
+        public List<Guid> FootnoteIds { get; set; } = null!;
     }
 }

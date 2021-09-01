@@ -11,6 +11,7 @@ const DocumentationGlossary = () => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Style guide' },
       ]}
+      title="Style guide"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

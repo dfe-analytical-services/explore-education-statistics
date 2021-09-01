@@ -2,14 +2,6 @@
 Resource    ./common.robot
 
 *** Keywords ***
-user waits for chart preview to update
-    # We check that the chart has updated using the number of renders as
-    # there is no other good way to check that the DOM has actually changed.
-    ${count}=    get element attribute    id:chartBuilderPreviewContainer    data-render-count
-    ${next_count}=    evaluate    int(${count}) + 1
-    user waits until page contains element    css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]
-    ...    90
-
 user waits until element contains line chart
     [Arguments]    ${locator}
     user waits until parent contains element    ${locator}    css:.recharts-line
@@ -176,8 +168,7 @@ user configures basic chart
     user waits until h3 is visible    Choose chart type    60
     user clicks button    ${CHART_TYPE}
 
-    user waits for chart preview to update
-
+    user waits until page does not contain loading spinner
     user enters text into element    id:chartConfigurationForm-height    ${CHART_HEIGHT}
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 

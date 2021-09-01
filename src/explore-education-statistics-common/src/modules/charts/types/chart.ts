@@ -46,6 +46,7 @@ export interface Label {
 export interface AxisConfiguration {
   type: AxisType;
   groupBy?: AxisGroupBy;
+  groupByFilter?: string;
   sortBy?: string;
   sortAsc?: boolean;
   dataSets: DataSet[];

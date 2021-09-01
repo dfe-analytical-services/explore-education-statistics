@@ -22,6 +22,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Creating a new publication' },
       ]}
+      title="Creating a new publication"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">

@@ -1,6 +1,9 @@
 import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
+import { groupBy, mapValues, uniq } from 'lodash';
+import combineMeasuresWithDuplicateLocationCodes from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
+import { produce } from 'immer';
 
 export interface FilterOption {
   label: string;
@@ -179,6 +182,89 @@ export interface SelectedPublication {
   };
 }
 
+/**
+ * Given a set of ${@param locations}, this function will return a single location record with a combined name.
+ */
+function generateMergedLocation<T extends LocationOption | FilterOption>(
+  locations: T[],
+): T {
+  // If there's only one Location provided, there's no need to do any merging.
+  if (locations.length === 1) {
+    return locations[0];
+  }
+  // Otherwise, produce a merged Location based upon the variations provided.
+  const distinctLocationNames = uniq(locations.map(l => l.label));
+  const mergedNames = distinctLocationNames.sort().join(' / ');
+  return produce(locations[0], draft => {
+    draft.label = mergedNames;
+  });
+}
+
+/**
+ * Given a set of ${@param tableData}, this function will merge any Locations that have duplicate codes and geographic
+ * levels into combined Locations with a label derived from all of the distinct Location names.  E.g. if 2 Locations,
+ * Provider 1 and Provider 2 share the same geographic level and code, this will merge those Locations into a single
+ * Location with the label "Provider 1 / Provider 2", combining in alphabetical order.
+ *
+ * This will merge not only the Locations in the TableDataSubjectMeta but also the TableDataResults for those duplicate
+ * Locations, merging duplicate rows into single rows with combined values derived form each duplicate Location.
+ */
+function mergeDuplicateLocationsInTableDataResponse(
+  tableData: TableDataResponse,
+): TableDataResponse {
+  if (!tableData.subjectMeta) {
+    return tableData;
+  }
+
+  const locationsGroupedByLevelAndCode = groupBy(
+    tableData.subjectMeta.locations,
+    location => `${location.level}_${location.value}`,
+  );
+
+  const mergedLocations = Object.values(
+    locationsGroupedByLevelAndCode,
+  ).flatMap(locations => [generateMergedLocation(locations)]);
+
+  const deduplicatedLocations = mergedLocations.filter(
+    location => !tableData.subjectMeta.locations.includes(location),
+  );
+
+  const mergedResults = combineMeasuresWithDuplicateLocationCodes(
+    tableData.results,
+    deduplicatedLocations,
+  );
+
+  return produce(tableData, draft => {
+    draft.subjectMeta.locations = mergedLocations;
+    draft.results = mergedResults;
+  });
+}
+
+/**
+ * Given ${@param subjectMeta}, this function will merge any Locations that have duplicate codes and geographic
+ * levels into combined Locations with a label derived from all of the distinct Location names.  E.g. if 2 Locations,
+ * Provider 1 and Provider 2 share the same geographic level and code, this will merge those Locations into a single
+ * Location with the label "Provider 1 / Provider 2", combining in alphabetical order.
+ */
+function mergeDuplicateLocationsInSubjectMeta(
+  subjectMeta: SubjectMeta,
+): SubjectMeta {
+  const mergedLocations = mapValues(subjectMeta.locations, level => {
+    const optionsGroupedByCode = groupBy(level.options, option => option.value);
+    const mergedOptions = Object.values(
+      optionsGroupedByCode,
+    ).flatMap(locations => [generateMergedLocation(locations)]);
+
+    return produce(level, draft => {
+      draft.options = mergedOptions;
+    });
+  });
+
+  return produce(subjectMeta, draft => {
+    draft.locations = mergedLocations;
+  });
+}
+
 const tableBuilderService = {
   getPublicationSubjectsAndHighlights(
     publicationId: string,
@@ -190,33 +276,42 @@ const tableBuilderService = {
   ): Promise<SubjectsAndHighlights> {
     return dataApi.get(`/releases/${releaseId}`);
   },
-  getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
-    return dataApi.get(`/meta/subject/${subjectId}`);
+  async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
+    return mergeDuplicateLocationsInSubjectMeta(
+      await dataApi.get(`/meta/subject/${subjectId}`),
+    );
   },
-  filterSubjectMeta(query: {
+  async filterSubjectMeta(query: {
     subjectId: string;
     timePeriod?: TimePeriodQuery;
     geographicLevel?: string;
     locations?: Dictionary<string[]>;
   }): Promise<SubjectMeta> {
-    return dataApi.post('/meta/subject', query);
+    return mergeDuplicateLocationsInSubjectMeta(
+      await dataApi.post('/meta/subject', query),
+    );
   },
-  getTableData({
+  async getTableData({
     releaseId,
     ...query
   }: ReleaseTableDataQuery): Promise<TableDataResponse> {
     if (releaseId) {
-      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
+      return mergeDuplicateLocationsInTableDataResponse(
+        await dataApi.post(`/tablebuilder/release/${releaseId}`, query),
+      );
     }
-
-    return dataApi.post(`/tablebuilder`, query);
+    return mergeDuplicateLocationsInTableDataResponse(
+      await dataApi.post(`/tablebuilder`, query),
+    );
   },
-  getDataBlockTableData(
+  async getDataBlockTableData(
     releaseId: string,
     dataBlockId: string,
   ): Promise<TableDataResponse> {
-    return dataApi.get(
-      `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
+    return mergeDuplicateLocationsInTableDataResponse(
+      await dataApi.get(
+        `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
+      ),
     );
   },
 };

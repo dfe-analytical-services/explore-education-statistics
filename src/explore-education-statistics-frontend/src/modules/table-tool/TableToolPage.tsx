@@ -127,8 +127,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
               setLoadingFastTrack(true);
               logEvent({
                 category: 'Table tool',
-                action: 'Clicked to view Table highlight',
-                label: `Table highlight name: ${highlight.name}`,
+                action: 'Clicked to view featured table',
+                label: `Featured table name: ${highlight.name}`,
               });
             }}
           >

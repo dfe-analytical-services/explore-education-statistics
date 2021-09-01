@@ -23,7 +23,7 @@ function FormFieldCheckboxGroup<FormValues>(props: Props<FormValues>) {
           id={id}
           onAllChange={(event, checked) => {
             if (props.onAllChange) {
-              props.onAllChange(event, checked);
+              props.onAllChange(event, checked, options);
             }
 
             if (event.isDefaultPrevented()) {

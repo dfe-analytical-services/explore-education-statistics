@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -154,8 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -201,8 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            Assert.True(result.IsLeft);
-            Assert.IsType<NotFoundResult>(result.Left);
+            result.AssertNotFound();
         }
 
         private static MetaGuidanceService SetupMetaGuidanceService(

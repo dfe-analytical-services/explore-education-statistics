@@ -30,6 +30,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
         { name: "Administrator's guide", link: '/documentation' },
         { name: 'Managing data blocks and creating tables and charts' },
       ]}
+      title="Managing data blocks and creating tables and charts"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">

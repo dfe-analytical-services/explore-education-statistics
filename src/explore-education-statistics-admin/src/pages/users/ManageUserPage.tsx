@@ -153,6 +153,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
         { name: 'Users', link: '/administration/users' },
         { name: 'Manage user' },
       ]}
+      title="Manage user"
     >
       <h1 className="govuk-heading-xl">
         <span className="govuk-caption-xl">Manage user</span>

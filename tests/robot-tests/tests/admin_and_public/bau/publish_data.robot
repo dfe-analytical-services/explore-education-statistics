@@ -361,12 +361,12 @@ Check created table has footnotes
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-Save data block as a highlight
+Save data block as a featured table
     user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test table title
     user enters text into element    id:dataBlockDetailsForm-source    UI Test source
 
-    user clicks checkbox    Set as a table highlight for this publication
+    user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    id:dataBlockDetailsForm-highlightName
     user enters text into element    id:dataBlockDetailsForm-highlightName    Test highlight name
     user enters text into element    id:dataBlockDetailsForm-highlightDescription    Test highlight description
@@ -512,7 +512,7 @@ Validate table has footnotes
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-Select table highlight from subjects step
+Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
     user waits until h1 is visible    Go back to previous step
     user clicks button    Confirm
@@ -532,10 +532,10 @@ Select table highlight from subjects step
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
-Validate table column headings for table highlight
+Validate table column headings for featured table
     user checks table column heading contains    1    1    Admission Numbers
 
-Validate table rows for table highlight
+Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 001 (E02000984)
     user checks table heading in offset row contains    ${row}    0    2    2019
 
@@ -590,7 +590,7 @@ Validate table rows for table highlight
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
-Validate table highlight has footnotes
+Validate featured table has footnotes
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
