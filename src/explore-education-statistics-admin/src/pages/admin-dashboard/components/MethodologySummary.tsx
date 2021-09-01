@@ -102,7 +102,9 @@ const MethodologySummary = ({
 
   return (
     <>
-      {methodologies.map(methodology => {
+      {methodologies.map(publicationMethodologyLink => {
+        const { methodology } = publicationMethodologyLink;
+
         const canEdit =
           methodology.permissions.canApproveMethodology ||
           methodology.permissions.canMarkMethodologyAsDraft ||
@@ -221,9 +223,8 @@ const MethodologySummary = ({
               data-testid={`Create methodology for ${title}`}
               disabled={showAddEditExternalMethodologyForm}
               onClick={async () => {
-                const {
-                  id: methodologyId,
-                } = await methodologyService.createMethodology(publicationId);
+                const { id: methodologyId } =
+                  await methodologyService.createMethodology(publicationId);
                 history.push(
                   generatePath<MethodologyRouteParams>(
                     methodologySummaryRoute.path,
@@ -293,9 +294,10 @@ const MethodologySummary = ({
         <ModalConfirm
           title="Confirm you want to amend this live methodology"
           onConfirm={async () => {
-            const amendment = await methodologyService.createMethodologyAmendment(
-              amendMethodologyId,
-            );
+            const amendment =
+              await methodologyService.createMethodologyAmendment(
+                amendMethodologyId,
+              );
             history.push(
               generatePath<MethodologyRouteParams>(
                 methodologySummaryRoute.path,

@@ -103,17 +103,17 @@ const testPublicationNoMethodology: MyPublication = {
 
 const testPublicationWithMethodology = {
   ...testPublicationNoMethodology,
-  methodologies: [testMethodology],
+  methodologies: [{ owner: true, methodology: testMethodology }],
 };
 
 const testPublicationWithDraftMethodology = {
   ...testPublicationWithMethodology,
-  methodologies: [testDraftMethodology],
+  methodologies: [{ owner: true, methodology: testDraftMethodology }],
 };
 
 const testPublicationWithAmendmentMethodology = {
   ...testPublicationWithMethodology,
-  methodologies: [testAmendmentMethodology],
+  methodologies: [{ owner: true, methodology: testAmendmentMethodology }],
 };
 
 const testPublicationWithExternalMethodology = {
@@ -122,15 +122,17 @@ const testPublicationWithExternalMethodology = {
 };
 const testPublicationWithMethodologyCanAmend = {
   ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanAmend],
+  methodologies: [{ owner: true, methodology: testMethodologyCanAmend }],
 };
 const testPublicationWithMethodologyCanCancelAmend = {
   ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanRemoveAmendment],
+  methodologies: [
+    { owner: true, methodology: testMethodologyCanRemoveAmendment },
+  ],
 };
 const testPublicationWithMethodologyCanRemove = {
   ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanRemove],
+  methodologies: [{ owner: true, methodology: testMethodologyCanRemove }],
 };
 
 const testTopicId = 'topic-id';
@@ -363,10 +365,13 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canApproveMethodology: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canApproveMethodology: true,
+                    },
                   },
                 },
               ],
@@ -398,10 +403,13 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canMarkMethodologyAsDraft: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canMarkMethodologyAsDraft: true,
+                    },
                   },
                 },
               ],
@@ -433,10 +441,13 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canUpdateMethodology: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canUpdateMethodology: true,
+                    },
                   },
                 },
               ],
@@ -516,11 +527,14 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canApproveMethodology: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canApproveMethodology: true,
+                    },
                   },
                 },
               ],
@@ -552,11 +566,14 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canMarkMethodologyAsDraft: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canMarkMethodologyAsDraft: true,
+                    },
                   },
                 },
               ],
@@ -588,11 +605,14 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
-                  permissions: {
-                    ...testMethodology.permissions,
-                    canUpdateMethodology: true,
+                  owner: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canUpdateMethodology: true,
+                    },
                   },
                 },
               ],
@@ -775,7 +795,8 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
         );
       });
     });
@@ -895,7 +916,8 @@ describe('MethodologySummary', () => {
         expect(
           methodologyService.createMethodologyAmendment,
         ).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
         );
         expect(history.push).toBeCalledWith(
           `/methodology/${mockMethodology.id}/summary`,
@@ -990,7 +1012,8 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
         );
       });
     });
