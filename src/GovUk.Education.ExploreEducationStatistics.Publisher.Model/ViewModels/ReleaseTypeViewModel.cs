@@ -1,11 +1,13 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
-    public class ReleaseTypeViewModel
+    public record ReleaseTypeViewModel
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public string Title { get; set; }
+        public string Title { get; init; } = string.Empty;
+
     }
 }

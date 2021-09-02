@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
@@ -10,16 +11,17 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.C
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers
 {
-    public class ViewReleaseAuthorizationHandlerTests
+    public class ViewPublicationAuthorizationHandlerTests
     {
         [Fact]
-        public async Task ReleaseIsLiveAndOnlyVersion()
+        public async Task HasLiveRelease()
         {
             var release = new Release
             {
                 Published = new DateTime(2021, 1, 1),
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear
             };
-
             var publication = new Publication
             {
                 Releases = ListOf(release)
@@ -35,12 +37,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
+                var handler = new ViewPublicationAuthorizationHandler(contentDbContext);
 
                 var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
+                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewPublicationRequirement>() },
                     null,
-                    release
+                    publication
                 );
 
                 await handler.HandleAsync(authContext);
@@ -50,15 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsLiveAndLatestVersion()
+        public async Task HasLiveReleaseWithDraftAmendment()
         {
             var originalRelease = new Release
             {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 Published = new DateTime(2020, 1, 1),
             };
             var amendedRelease = new Release
             {
-                Published = new DateTime(2021, 2, 1),
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 PreviousVersion = originalRelease,
             };
 
@@ -77,12 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
+                var handler = new ViewPublicationAuthorizationHandler(contentDbContext);
 
                 var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
+                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewPublicationRequirement>() },
                     null,
-                    amendedRelease
+                    publication
                 );
 
                 await handler.HandleAsync(authContext);
@@ -92,9 +97,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsNotLive()
+        public async Task HasLiveReleaseAndNewerDraftRelease()
         {
-            var release = new Release();
+            var olderRelease = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Published = new DateTime(2020, 1, 1),
+            };
+            var newerRelease = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear
+            };
+
+            var publication = new Publication
+            {
+                Releases = ListOf(olderRelease, newerRelease)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var handler = new ViewPublicationAuthorizationHandler(contentDbContext);
+
+                var authContext = new AuthorizationHandlerContext(
+                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewPublicationRequirement>() },
+                    null,
+                    publication
+                );
+
+                await handler.HandleAsync(authContext);
+
+                Assert.True(authContext.HasSucceeded);
+            }
+        }
+
+        [Fact]
+        public async Task HasNoLiveReleases()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+            };
 
             var publication = new Publication
             {
@@ -111,12 +164,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
+                var handler = new ViewPublicationAuthorizationHandler(contentDbContext);
 
                 var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
+                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewPublicationRequirement>() },
                     null,
-                    release
+                    publication
                 );
 
                 await handler.HandleAsync(authContext);
@@ -126,62 +179,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsLiveButNotLatestVersion()
+        public async Task DoesNotExist()
         {
-            var originalRelease = new Release
+            var release = new Release
             {
-                Published = new DateTime(2020, 1, 1),
-            };
-
-            var amendedRelease = new Release
-            {
-                Published = new DateTime(2020, 2, 1),
-                PreviousVersion = originalRelease,
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
             };
 
             var publication = new Publication
             {
-                Releases = ListOf(originalRelease, amendedRelease)
+                Releases = ListOf(release)
             };
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
-
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                    null,
-                    originalRelease
-                );
-
-                await handler.HandleAsync(authContext);
-
-                Assert.False(authContext.HasSucceeded);
-            }
-        }
-
-        [Fact]
-        public async Task ReleaseNotFound()
-        {
             await using var contentDbContext = InMemoryContentDbContext();
 
-            var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
+            var handler = new ViewPublicationAuthorizationHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
+                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewPublicationRequirement>() },
                 null,
-                new Release
-                {
-                    Id = Guid.NewGuid()
-                }
+                publication
             );
 
             await handler.HandleAsync(authContext);

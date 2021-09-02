@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -11,5 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
         Task<Either<ActionResult, ReleaseViewModel>> Get(string publicationPath, string releasePath);
 
         Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationPath, string releasePath);
+
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug);
     }
 }

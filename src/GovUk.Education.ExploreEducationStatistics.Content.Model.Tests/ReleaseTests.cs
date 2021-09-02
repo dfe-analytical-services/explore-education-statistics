@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void NextReleaseDate_Ok()
         {
-            var releaseDate = new PartialDate {Day = "01"};
+            var releaseDate = new PartialDate {Year = "2021", Month = "1"};
             var release = new Release
             {
                 NextReleaseDate = releaseDate

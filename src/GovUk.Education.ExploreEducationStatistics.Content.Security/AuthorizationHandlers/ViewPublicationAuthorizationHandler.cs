@@ -3,43 +3,41 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers
 {
-    public class ViewReleaseRequirement : IAuthorizationRequirement
+    public class ViewPublicationRequirement : IAuthorizationRequirement
     {
     }
 
-    public class ViewReleaseAuthorizationHandler
-        : AuthorizationHandler<ViewReleaseRequirement, Release>
+    public class ViewPublicationAuthorizationHandler
+        : AuthorizationHandler<ViewPublicationRequirement, Publication>
     {
         private readonly ContentDbContext _context;
 
-        public ViewReleaseAuthorizationHandler(ContentDbContext context)
+        public ViewPublicationAuthorizationHandler(ContentDbContext context)
         {
             _context = context;
         }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext authContext,
-            ViewReleaseRequirement requirement,
-            Release release)
+            ViewPublicationRequirement requirement,
+            Publication publication)
         {
-            if (!_context.TryReloadEntity(release, out var loadedRelease))
+            if (!_context.TryReloadEntity(publication, out var loadedPublication))
             {
                 return;
             }
 
-            await _context.Entry(loadedRelease)
-                .Reference(p => p.Publication)
-                .Query()
-                .Include(p => p.Releases)
+            await _context.Entry(loadedPublication)
+                .Collection(p => p.Releases)
                 .LoadAsync();
 
-            if (loadedRelease.IsLatestPublishedVersionOfRelease())
+            var release = loadedPublication.LatestPublishedRelease();
+
+            if (release is not null)
             {
                 authContext.Succeed(requirement);
             }

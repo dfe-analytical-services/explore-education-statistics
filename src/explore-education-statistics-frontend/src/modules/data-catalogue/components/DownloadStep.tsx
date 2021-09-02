@@ -9,7 +9,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { FileInfo } from '@common/services/types/file';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -32,7 +32,7 @@ export interface SubjectWithDownloadFiles extends Subject {
 }
 
 interface Props {
-  release?: Release;
+  release?: ReleaseSummary;
   subjects: SubjectWithDownloadFiles[];
   initialValues?: { files: string[] };
   onSubmit: DownloadFormSubmitHandler;

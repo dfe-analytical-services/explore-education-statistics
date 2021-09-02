@@ -3,7 +3,7 @@ import DownloadStep, {
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { getDescribedBy } from '@common-test/queries';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -81,12 +81,12 @@ describe('DownloadStep', () => {
   const testNotLatestRelease = {
     id: 'release-1',
     latestRelease: false,
-  } as Release;
+  } as ReleaseSummary;
 
   const testLatestRelease = {
     id: 'release-2',
     latestRelease: true,
-  } as Release;
+  } as ReleaseSummary;
 
   test('renders with downloads', () => {
     const { container } = render(

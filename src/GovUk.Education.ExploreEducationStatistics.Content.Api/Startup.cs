@@ -127,11 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             services.AddAuthorization(options =>
             {
+                // does this use have permission to view a specific Publication?
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new ViewPublicationRequirement()));
+
                 // does this use have permission to view a specific Release?
                 options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
             });
 
+            services.AddTransient<IAuthorizationHandler, ViewPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
 
             AddPersistenceHelper<ContentDbContext>(services);

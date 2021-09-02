@@ -1,32 +1,32 @@
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
 describe('ReleaseStep', () => {
-  const testReleases: Release[] = [
+  const testReleases: ReleaseSummary[] = [
     {
       id: 'test-rel-3',
-      published: '2021-01-01T11:21:17.7585345',
+      published: '2021-01-01T11:21:17',
       slug: 'test-rel-3-slug',
       title: 'Another Release',
-    } as Release,
+    } as ReleaseSummary,
     {
       id: 'test-rel-1',
       latestRelease: true,
-      published: '2021-06-30T11:21:17.7585345',
+      published: '2021-06-30T11:21:17',
       slug: 'test-rel-1-slug',
       title: 'Release 1',
-    } as Release,
+    } as ReleaseSummary,
     {
       id: 'test-rel-2',
-      published: '2021-05-30T11:21:17.7585345',
+      published: '2021-05-30T11:21:17',
       slug: 'test-rel-2-slug',
       title: 'Release 2',
-    } as Release,
+    } as ReleaseSummary,
   ];
 
   const wizardProps: InjectedWizardProps = {
