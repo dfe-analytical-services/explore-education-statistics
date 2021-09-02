@@ -1,10 +1,30 @@
 #nullable enable
+using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class DbContextExtensions
     {
+        /// <summary>
+        /// Ensure that an entity is not detached from the database context, reloading it if necessary before returning.
+        /// Throws an exception if the entity cannot be reloaded.
+        /// </summary>
+        public static T AssertEntityLoaded<T>(this DbContext context, T entity) where T : class
+        {
+            var reloaded = context.ReloadEntity(entity);
+
+            if (reloaded is null)
+            {
+                var displayString = context.GetDisplayString(entity);
+                throw new InvalidOperationException($"Unable to reload {displayString}");
+            }
+
+            return reloaded;
+        }
+
         /// <summary>
         /// Reload an entity into the context if it has been detached.
         /// </summary>
@@ -65,5 +85,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return true;
         }
 
+        private static string GetDisplayString(this DbContext context, object entity)
+        {
+            var entry = context.Entry(entity);
+            var primaryKey = entry.Metadata.FindPrimaryKey();
+            var typeName = entity.GetType().ShortDisplayName();
+            var primaryKeyValues = primaryKey.Properties
+                .Select(property => $"{property.Name}: '{property.PropertyInfo.GetValue(entity)}'")
+                .JoinToString(", ");
+
+            return $"{typeName} {{{primaryKeyValues}}}";
+        }
     }
 }

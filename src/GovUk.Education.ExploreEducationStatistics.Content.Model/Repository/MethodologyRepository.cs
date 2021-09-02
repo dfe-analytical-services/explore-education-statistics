@@ -54,10 +54,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return methodology;
         }
 
+        public async Task<Methodology> GetLatestByMethodologyParent(Guid methodologyParentId)
+        {
+            var methodology = await _contentDbContext.MethodologyParents
+                .Include(m => m.Versions)
+                .SingleAsync(mp => mp.Id == methodologyParentId);
+
+            return methodology.LatestVersion();
+        }
+
         public async Task<List<Methodology>> GetLatestByPublication(Guid publicationId)
         {
             // First check the publication exists
-            var publication = await _contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
+            var publication = await _contentDbContext.Publications
+                .SingleAsync(p => p.Id == publicationId);
 
             var methodologyParents = await _methodologyParentRepository.GetByPublication(publication.Id);
             return (await methodologyParents.SelectAsync(async methodologyParent =>

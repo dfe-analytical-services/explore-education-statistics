@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -10,9 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Repository
 {
@@ -71,52 +72,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
+        public async Task GetLatestByMethodologyParent()
+        {
+            var methodology = new MethodologyParent();
+
+            var version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                MethodologyParent = methodology,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var version2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = version1.Id,
+                MethodologyParent = methodology,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 1
+            };
+
+            var version3 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = version2.Id,
+                MethodologyParent = methodology,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Version = 2
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyParents.AddRangeAsync(methodology);
+                await contentDbContext.Methodologies.AddRangeAsync(version1, version2, version3);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyRepository(contentDbContext: contentDbContext);
+
+                var result = await service.GetLatestByMethodologyParent(methodology.Id);
+
+                // Check the result contains the latest versions of the methodologies
+                Assert.Equal(version3.Id, result.Id);
+            }
+        }
+
+        [Fact]
         public async Task GetLatestByPublication()
         {
             var publication = new Publication();
 
-            var methodologyParent1 = new MethodologyParent
+            var methodology1 = new MethodologyParent();
+            var methodology2 = new MethodologyParent();
+
+            var methodology1Version1 = new Methodology
             {
-                Versions = ListOf(
-                    new Methodology
-                    {
-                        Id = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Status = Approved,
-                        Version = 0
-                    },
-                    new Methodology
-                    {
-                        Id = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
-                        PreviousVersionId = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
-                        Version = 1
-                    }
-                )
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                MethodologyParent = methodology1,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
             };
 
-            var methodologyParent2 = new MethodologyParent
+            var methodology1Version2 = new Methodology
             {
-                Versions = ListOf(
-                    new Methodology
-                    {
-                        Id = Guid.Parse("4baee814-4c36-4850-9dc7-cfdae6026815"),
-                        PreviousVersionId = null,
-                        PublishingStrategy = Immediately,
-                        Status = Approved,
-                        Version = 0
-                    },
-                    new Methodology
-                    {
-                        Id = Guid.Parse("2d6632b9-2480-4c34-b298-123064b6f04e"),
-                        PreviousVersionId = Guid.Parse("4baee814-4c36-4850-9dc7-cfdae6026815"),
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
-                        Version = 1
-                    }
-                )
+                Id = Guid.NewGuid(),
+                PreviousVersionId = methodology1Version1.Id,
+                MethodologyParent = methodology1,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Version = 1
+            };
+
+            var methodology2Version1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                MethodologyParent = methodology2,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var methodology2Version2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = methodology2Version1.Id,
+                MethodologyParent = methodology2,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                Version = 1
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -124,44 +179,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.MethodologyParents.AddRangeAsync(methodologyParent1, methodologyParent2);
+                await contentDbContext.MethodologyParents.AddRangeAsync(methodology1, methodology2);
+                await contentDbContext.Methodologies.AddRangeAsync(methodology1Version1,
+                    methodology1Version2, methodology2Version1, methodology2Version2);
                 await contentDbContext.PublicationMethodologies.AddRangeAsync(
                     new PublicationMethodology
                     {
                         Publication = publication,
-                        MethodologyParent = methodologyParent1,
+                        MethodologyParent = methodology1,
                         Owner = true
                     },
                     new PublicationMethodology
                     {
                         Publication = publication,
-                        MethodologyParent = methodologyParent2,
+                        MethodologyParent = methodology2,
                         Owner = false
                     });
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.AttachRange(methodologyParent1, methodologyParent2);
+                contentDbContext.AttachRange(methodology1, methodology2);
 
                 var service = BuildMethodologyRepository(contentDbContext: contentDbContext,
                     methodologyParentRepository: methodologyParentRepository.Object);
 
                 methodologyParentRepository.Setup(mock => mock.GetByPublication(publication.Id))
-                    .ReturnsAsync(ListOf(methodologyParent1, methodologyParent2));
+                    .ReturnsAsync(ListOf(methodology1, methodology2));
 
                 var result = await service.GetLatestByPublication(publication.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 // Check the result contains the latest versions of the methodologies
                 Assert.Equal(2, result.Count);
-                Assert.True(result.Exists(mv => mv.Id == methodologyParent1.Versions[1].Id));
-                Assert.True(result.Exists(mv => mv.Id == methodologyParent2.Versions[1].Id));
+                Assert.True(result.Exists(mv => mv.Id == methodology1Version2.Id));
+                Assert.True(result.Exists(mv => mv.Id == methodology2Version2.Id));
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -187,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -203,13 +260,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     () => service.GetLatestByPublication(publication.Id));
             }
 
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
+            VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
         public async Task GetLatestByPublication_PublicationNotFoundThrowsException()
         {
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext())
             {
@@ -220,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     () => service.GetLatestByPublication(Guid.NewGuid()));
             }
 
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
+            VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -236,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -248,10 +305,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestByPublication(publication.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Empty(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -306,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -315,11 +372,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.NotNull(result);
                 Assert.Equal(latestPublishedVersion.Id, result.Id);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -353,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -362,10 +419,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Null(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -393,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -402,10 +459,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Null(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -441,7 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -450,10 +507,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Null(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -461,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -472,7 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     service.GetLatestPublishedByMethodologyParent(Guid.NewGuid()));
             }
 
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
+            VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -565,7 +622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -579,13 +636,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByPublication(publication.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 // Check the result contains the latest versions of the methodologies
                 Assert.Equal(2, result.Count);
                 Assert.True(result.Exists(mv => mv.Id == methodologyParent1.Versions[1].Id));
                 Assert.True(result.Exists(mv => mv.Id == methodologyParent2.Versions[1].Id));
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -622,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -636,10 +693,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByPublication(nonLivePublication.Id);
 
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Empty(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -694,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -707,10 +764,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     .ReturnsAsync(ListOf(methodologyParent1, methodologyParent2));
 
                 var result = await service.GetLatestPublishedByPublication(publication.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Empty(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -741,7 +799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -754,16 +812,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     .ReturnsAsync(ListOf(methodologyParent));
 
                 var result = await service.GetLatestPublishedByPublication(publication.Id);
+
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Empty(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
         public async Task GetLatestPublishedByPublication_PublicationNotFoundIsEmpty()
         {
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             methodologyParentRepository.Setup(mock => mock.GetByPublication(It.IsAny<Guid>()))
                 .ReturnsAsync(new List<MethodologyParent>());
@@ -774,10 +833,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     methodologyParentRepository: methodologyParentRepository.Object);
 
                 var result = await service.GetLatestPublishedByPublication(Guid.NewGuid());
+
+                VerifyAllMocks(methodologyParentRepository);
+
                 Assert.Empty(result);
             }
-
-            MockUtils.VerifyAllMocks(methodologyParentRepository);
         }
 
         [Fact]
@@ -796,7 +856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(MockBehavior.Strict);
+            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -808,9 +868,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 var result = await service.GetLatestPublishedByPublication(publication.Id);
 
-                Assert.Empty(result);
+                VerifyAllMocks(methodologyParentRepository);
 
-                MockUtils.VerifyAllMocks(methodologyParentRepository);
+                Assert.Empty(result);
             }
         }
 
@@ -849,7 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     )
                 }
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1556,7 +1616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             return new(
                 contentDbContext,
-                methodologyParentRepository ?? Mock.Of<IMethodologyParentRepository>());
+                methodologyParentRepository ?? Mock.Of<IMethodologyParentRepository>(Strict));
         }
     }
 }

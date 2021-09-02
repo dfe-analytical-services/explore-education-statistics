@@ -274,7 +274,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateMethodology()
         {
-            var publication = new Publication();
+            var publication = new Publication
+            {
+                Title = "Test publication"
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -297,19 +300,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Id = Guid.NewGuid(),
                     MethodologyParent = new MethodologyParent
                     {
-                        Slug = "methodology-slug"
-                    }
+                        Id = Guid.NewGuid(),
+                        OwningPublicationTitle = publication.Title,
+                        Publications = new List<PublicationMethodology>
+                        {
+                          new()
+                          {
+                              Owner = true,
+                              Publication = publication
+                          }
+                        }
+                    },
+                    Status = Draft
                 };
 
                 repository
                     .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
-                var result = await service.CreateMethodology(publication.Id);
+                context.Attach(createdMethodology);
+
+                var viewModel = (await service.CreateMethodology(publication.Id)).AssertRight();
                 VerifyAllMocks(repository);
 
-                var viewModel = result.AssertRight();
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
+                Assert.False(viewModel.Amendment);
+                Assert.Null(viewModel.LatestInternalReleaseNote);
+                Assert.Equal(createdMethodology.MethodologyParent.Id, viewModel.MethodologyParentId);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(Draft, viewModel.Status);
+                Assert.Equal("Test publication", viewModel.Title);
+
+                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal("Test publication", viewModel.OwningPublication.Title);
+                Assert.Empty(viewModel.OtherPublications);
             }
         }
 
@@ -499,43 +524,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetAdoptableMethodologies()
         {
-            var publication = new Publication();
+            var methodology = new MethodologyParent();
 
-            var methodologies = new List<MethodologyParent>
+            var publication = new Publication
             {
-                new()
+                Title = "Owning publication",
+                Methodologies = new List<PublicationMethodology>
                 {
-                    Id = Guid.NewGuid(),
-                    OwningPublicationTitle = "Title"
+                    new()
+                    {
+                        MethodologyParent = methodology,
+                        Owner = true
+                    }
                 }
             };
+
+            var methodologyVersion = new Methodology
+            {
+                MethodologyParent = methodology,
+                InternalReleaseNote = "Test approval",
+                Published = null,
+                PublishingStrategy = Immediately,
+                Status = Draft,
+                AlternativeTitle = "Alternative title"
+            };
+
+            var adoptingPublication = new Publication();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Publications.AddAsync(publication);
+                await context.Publications.AddRangeAsync(publication, adoptingPublication);
+                await context.MethodologyParents.AddAsync(methodology);
+                await context.Methodologies.AddAsync(methodologyVersion);
                 await context.SaveChangesAsync();
             }
 
             var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
 
             methodologyParentRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(publication.Id))
-                .ReturnsAsync(methodologies);
+                    mock.GetUnrelatedToPublication(adoptingPublication.Id))
+                .ReturnsAsync(ListOf(methodology));
+
+            methodologyRepository.Setup(mock => mock.GetLatestByMethodologyParent(methodology.Id))
+                .ReturnsAsync(methodologyVersion);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context,
-                    methodologyParentRepository: methodologyParentRepository.Object);
+                    methodologyParentRepository: methodologyParentRepository.Object,
+                    methodologyRepository: methodologyRepository.Object);
 
-                var result = (await service.GetAdoptableMethodologies(publication.Id)).AssertRight();
+                var result = (await service.GetAdoptableMethodologies(adoptingPublication.Id)).AssertRight();
 
-                VerifyAllMocks(methodologyParentRepository);
+                VerifyAllMocks(methodologyParentRepository, methodologyRepository);
 
                 Assert.Single(result);
-                Assert.Equal("Title", result[0].Title);
+
+                var viewModel = result[0];
+
+                Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.False(viewModel.Amendment);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
+                Assert.Equal(methodologyVersion.MethodologyParentId, viewModel.MethodologyParentId);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(Draft, viewModel.Status);
+                Assert.Equal("Alternative title", viewModel.Title);
+
+                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal("Owning publication", viewModel.OwningPublication.Title);
+                Assert.Empty(viewModel.OtherPublications);
             }
         }
 
@@ -575,39 +637,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetSummary()
         {
-            var methodology = new Methodology
-            {
-                MethodologyParent = new MethodologyParent
-                {
-                    Slug = "pupil-absence-statistics-methodology",
-                    OwningPublicationTitle = "Owning publication"
-                },
-                InternalReleaseNote = "Test approval",
-                Published = new DateTime(2020, 5, 25),
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                AlternativeTitle = "Alternative title"
-            };
+            var methodology = new MethodologyParent();
 
             var owningPublication = new Publication
             {
                 Title = "Owning publication",
-                Methodologies = ListOf(
-                    new PublicationMethodology
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
                     {
-                        MethodologyParent = methodology.MethodologyParent,
+                        MethodologyParent = methodology,
                         Owner = true
                     }
-                )
+                }
             };
 
             var adoptingPublication1 = new Publication
             {
-                Title = "Test publication",
+                Title = "Adopting publication 1",
                 Methodologies = ListOf(
                     new PublicationMethodology
                     {
-                        MethodologyParent = methodology.MethodologyParent,
+                        MethodologyParent = methodology,
                         Owner = false
                     }
                 )
@@ -615,22 +666,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var adoptingPublication2 = new Publication
             {
-                Title = "Test publication",
+                Title = "Adopting publication 2",
                 Methodologies = ListOf(
                     new PublicationMethodology
                     {
-                        MethodologyParent = methodology.MethodologyParent,
+                        MethodologyParent = methodology,
                         Owner = false
                     }
                 )
+            };
+
+            var methodologyVersion = new Methodology
+            {
+                MethodologyParent = methodology,
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = new Release
+                {
+                    Publication = owningPublication,
+                    TimePeriodCoverage = CalendarYear,
+                    ReleaseName = "2021"
+                },
+                Status = Approved,
+                AlternativeTitle = "Alternative title"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Methodologies.AddAsync(methodology);
+                await context.MethodologyParents.AddAsync(methodology);
                 await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
+                await context.Methodologies.AddAsync(methodologyVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -638,23 +706,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
-                var viewModel = (await service.GetSummary(methodology.Id)).AssertRight();
+                var viewModel = (await service.GetSummary(methodologyVersion.Id)).AssertRight();
 
-                Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal(methodology.InternalReleaseNote, viewModel.LatestInternalReleaseNote);
-                Assert.Equal(methodology.Published, viewModel.Published);
-                Assert.Equal(Immediately, methodology.PublishingStrategy);
-                Assert.Equal(methodology.Status, viewModel.Status);
-                Assert.Equal(methodology.Title, viewModel.Title);
+                Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.False(viewModel.Amendment);
+                Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
+                Assert.Equal(methodologyVersion.MethodologyParentId, viewModel.MethodologyParentId);
+                Assert.Equal(new DateTime(2020, 5, 25), viewModel.Published);
+                Assert.Equal(WithRelease, viewModel.PublishingStrategy);
+                Assert.Equal(Approved, viewModel.Status);
+                Assert.Equal("Alternative title", viewModel.Title);
 
                 Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
-                Assert.Equal(owningPublication.Title, viewModel.OwningPublication.Title);
+                Assert.Equal("Owning publication", viewModel.OwningPublication.Title);
 
                 Assert.Equal(2, viewModel.OtherPublications.Count);
                 Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
-                Assert.Equal(adoptingPublication1.Title, viewModel.OtherPublications[0].Title);
+                Assert.Equal("Adopting publication 1", viewModel.OtherPublications[0].Title);
                 Assert.Equal(adoptingPublication2.Id, viewModel.OtherPublications[1].Id);
-                Assert.Equal(adoptingPublication2.Title, viewModel.OtherPublications[1].Title);
+                Assert.Equal("Adopting publication 2", viewModel.OtherPublications[1].Title);
+
+                Assert.NotNull(viewModel.ScheduledWithRelease);
+                Assert.Equal(methodologyVersion.ScheduledWithReleaseId, viewModel.ScheduledWithRelease!.Id);
+                Assert.Equal("Owning publication - Calendar Year 2021", viewModel.ScheduledWithRelease.Title);
             }
         }
 
