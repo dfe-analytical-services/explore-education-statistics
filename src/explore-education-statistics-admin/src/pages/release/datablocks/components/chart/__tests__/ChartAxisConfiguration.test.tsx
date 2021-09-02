@@ -339,7 +339,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            showGroupByFilter // EES-2467 remove this when BE done.
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -388,7 +387,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            showGroupByFilter // EES-2467 remove this when BE done.
             onChange={noop}
             onSubmit={handleSubmit}
           />

@@ -49,7 +49,6 @@ interface Props {
   definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
-  showGroupByFilter?: boolean;
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -61,7 +60,6 @@ const ChartAxisConfiguration = ({
   id,
   data,
   meta,
-  showGroupByFilter = false, // EES-2467 remove when BE done.
   type,
   onChange,
   onSubmit,
@@ -100,48 +98,32 @@ const ChartAxisConfiguration = ({
       },
     ];
 
-    // Don't show 'Filters' option if we would end up with no
-    // categories due to every filter being siblingless filters.
-    const canGroupByFilters = Object.values(meta.filters).some(
-      filterGroup => filterGroup.options.length > 1,
-    );
+    const categories: SelectOption[] = Object.entries(meta.filters)
+      .filter(([, value]) => value.options.length > 1)
+      .map(([key, value]) => {
+        return {
+          label: key,
+          value: value.name,
+        };
+      });
 
-    if (canGroupByFilters) {
-      // EES-2467 remove this check when BE done.
-      if (showGroupByFilter) {
-        const categories: SelectOption[] = Object.entries(meta.filters)
-          .filter(([, value]) => value.options.length > 1)
-          .map(([key, value]) => {
-            return {
-              label: key,
-              value: value.name,
-            };
-          });
+    categories.unshift({ label: 'All filters', value: '' });
 
-        categories.unshift({ label: 'All filters', value: '' });
-
-        options.push({
-          label: 'Filters',
-          value: 'filters',
-          conditional: (
-            <FormFieldSelect<AxisConfiguration>
-              label="Select a filter"
-              name="groupByFilter"
-              options={categories}
-              order={[]}
-            />
-          ),
-        });
-      } else {
-        options.push({
-          label: 'Filters',
-          value: 'filters',
-        });
-      }
-    }
+    options.push({
+      label: 'Filters',
+      value: 'filters',
+      conditional: (
+        <FormFieldSelect<AxisConfiguration>
+          label="Select a filter"
+          name="groupByFilter"
+          options={categories}
+          order={[]}
+        />
+      ),
+    });
 
     return options;
-  }, [meta.filters, showGroupByFilter]);
+  }, [meta.filters]);
 
   // TODO EES-721: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
