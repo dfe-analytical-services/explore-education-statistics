@@ -363,29 +363,81 @@ export const MapBlockInternal = ({
   }, [dataSetCategories]);
 
   const locationType = useMemo(() => {
-    const locationLevelsMap: Dictionary<string> = {
-      country: 'Country',
-      englishDevolvedArea: 'English Devolved Area',
-      institution: 'Institution',
-      localAuthority: 'Local Authority',
-      localAuthorityDistrict: 'Local Authority District',
-      localEnterprisePartnership: 'Local Enterprise Partnership',
-      mayoralCombinedAuthority: 'Mayoral Combined Authority',
-      multiAcademyTrust: 'Multi Academy Trust',
-      opportunityArea: 'Opportunity Area',
-      parliamentaryConstituency: 'Parliamentary Constituency',
-      provider: 'Provider',
-      region: 'Region',
-      rscRegion: 'RSC Region',
-      school: 'School',
-      sponsor: 'Sponsor',
-      ward: 'Ward',
-      planningArea: 'Planning Area',
+    const locationLevelsMap: Dictionary<Dictionary<string>> = {
+      country: {
+        label: 'Country',
+        prefix: 'a',
+      },
+      englishDevolvedArea: {
+        label: 'English Devolved Area',
+        prefix: 'an',
+      },
+      institution: {
+        label: 'Institution',
+        prefix: 'an',
+      },
+      localAuthority: {
+        label: 'Local Authority',
+        prefix: 'a',
+      },
+      localAuthorityDistrict: {
+        label: 'Local Authority District',
+        prefix: 'a',
+      },
+      localEnterprisePartnership: {
+        label: 'Local Enterprise Partnership',
+        prefix: 'a',
+      },
+      mayoralCombinedAuthority: {
+        label: 'Mayoral Combined Authority',
+        prefix: 'a',
+      },
+      multiAcademyTrust: {
+        label: 'Multi Academy Trust',
+        prefix: 'a',
+      },
+      opportunityArea: {
+        label: 'Opportunity Area',
+        prefix: 'an',
+      },
+      parliamentaryConstituency: {
+        label: 'Parliamentary Constituency',
+        prefix: 'a',
+      },
+      provider: {
+        label: 'Provider',
+        prefix: 'a',
+      },
+      region: {
+        label: 'Region',
+        prefix: 'a',
+      },
+      rscRegion: {
+        label: 'RSC Region',
+        prefix: 'an',
+      },
+      school: {
+        label: 'School',
+        prefix: 'a',
+      },
+      sponsor: {
+        label: 'Sponsor',
+        prefix: 'a',
+      },
+      ward: {
+        label: 'Ward',
+        prefix: 'a',
+      },
+      planningArea: {
+        label: 'Planning Area',
+        prefix: 'a',
+      },
     };
+
     const levels = dataSetCategories.map(category => category.filter.level);
     return !levels.every(level => level === levels[0]) ||
       !locationLevelsMap[levels[0]]
-      ? 'location'
+      ? { label: 'location', prefix: 'a' }
       : locationLevelsMap[levels[0]];
   }, [dataSetCategories]);
 
@@ -604,7 +656,7 @@ export const MapBlockInternal = ({
             <FormSelect
               name="selectedLocation"
               id={`${id}-selectedLocation`}
-              label={`2. Select a ${locationType}`}
+              label={`2. Select ${locationType.prefix} ${locationType.label}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
               order={FormSelect.unordered}
