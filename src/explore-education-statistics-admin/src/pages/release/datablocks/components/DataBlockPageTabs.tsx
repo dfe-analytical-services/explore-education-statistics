@@ -56,9 +56,7 @@ const DataBlockPageTabs = ({
     error,
     isLoading,
   } = useAsyncRetry<InitialTableToolState>(async () => {
-    const {
-      subjects,
-    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
+    const subjects = await tableBuilderService.listReleaseSubjects(releaseId);
 
     if (!dataBlock) {
       return {
@@ -315,7 +313,12 @@ const DataBlockPageTabs = ({
                   onSave={handleTableHeadersSave}
                 />
               </TabsSection>,
-              <TabsSection title="Chart" key="chart" id="dataBlockTabs-chart">
+              <TabsSection
+                title="Chart"
+                key="chart"
+                id="dataBlockTabs-chart"
+                lazy
+              >
                 <ChartBuilderTabSection
                   key={saveNumber}
                   dataBlock={dataBlock}

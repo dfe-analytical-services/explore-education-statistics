@@ -34,12 +34,12 @@ const PreReleaseTableToolPage = ({
   const { value: tableToolState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const {
-      subjects,
-      ...release
-    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
+    const [featuredTables, subjects] = await Promise.all([
+      tableBuilderService.listReleaseFeaturedTables(releaseId),
+      tableBuilderService.listReleaseSubjects(releaseId),
+    ]);
 
-    const highlights = release.highlights.filter(
+    const filteredFeaturedTables = featuredTables.filter(
       highlight => highlight.id !== dataBlockId,
     );
 
@@ -60,7 +60,7 @@ const PreReleaseTableToolPage = ({
       return {
         initialStep: 5,
         subjects,
-        highlights,
+        featuredTables: filteredFeaturedTables,
         query: {
           ...query,
           publicationId,
@@ -77,7 +77,7 @@ const PreReleaseTableToolPage = ({
     return {
       initialStep: 1,
       subjects,
-      highlights,
+      featuredTables: filteredFeaturedTables,
       query: {
         publicationId,
         releaseId,
@@ -110,7 +110,7 @@ const PreReleaseTableToolPage = ({
             hidePublicationSelectionStage
             scrollOnMount
             initialState={tableToolState}
-            renderHighlightLink={highlight => (
+            renderFeaturedTable={highlight => (
               <Link
                 to={generatePath<PreReleaseTableToolRouteParams>(
                   preReleaseTableToolRoute.path,

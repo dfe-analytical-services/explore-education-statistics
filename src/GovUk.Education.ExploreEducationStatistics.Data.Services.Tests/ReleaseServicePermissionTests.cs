@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         };
 
         [Fact]
-        public async Task GetSubjectsMeta()
+        public async Task ListSubjects()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
@@ -30,17 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     userService =>
                     {
                         var service = BuildReleaseMetaService(userService: userService.Object);
-                        return service.GetRelease(_release.Id);
+                        return service.ListSubjects(_release.Id);
                     }
                 );
         }
 
         private ReleaseService BuildReleaseMetaService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            StatisticsDbContext statisticsDbContext = null,
-            IUserService userService = null,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            StatisticsDbContext? statisticsDbContext = null,
+            IUserService? userService = null,
+            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null)
         {
             return new ReleaseService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,

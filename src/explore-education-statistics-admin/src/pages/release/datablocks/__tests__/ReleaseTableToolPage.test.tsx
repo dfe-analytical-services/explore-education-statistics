@@ -36,31 +36,29 @@ describe('ReleaseTableToolPage', () => {
   test('renders correctly on step 1', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
 
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
-      subjects: [
-        {
-          id: 'subject-1',
-          name: 'Subject 1',
-          content: '<p>Test content 1</p>',
-          timePeriods: {
-            from: '2018',
-            to: '2020',
-          },
-          geographicLevels: ['National'],
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue([]);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue([
+      {
+        id: 'subject-1',
+        name: 'Subject 1',
+        content: '<p>Test content 1</p>',
+        timePeriods: {
+          from: '2018',
+          to: '2020',
         },
-        {
-          id: 'subject-2',
-          name: 'Subject 2',
-          content: '<p>Test content 2</p>',
-          timePeriods: {
-            from: '2015/16',
-            to: '2018/19',
-          },
-          geographicLevels: ['National'],
+        geographicLevels: ['National'],
+      },
+      {
+        id: 'subject-2',
+        name: 'Subject 2',
+        content: '<p>Test content 2</p>',
+        timePeriods: {
+          from: '2015/16',
+          to: '2018/19',
         },
-      ],
-      highlights: [],
-    });
+        geographicLevels: ['National'],
+      },
+    ]);
 
     renderPage();
 

@@ -3,21 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("api/data")]
+    [Route("api")]
     [ApiController]
-    [Authorize]
-    public class TableBuilderReleaseController : ControllerBase
+    public class ReleaseController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
 
-        public TableBuilderReleaseController(IReleaseService releaseService)
+        public ReleaseController(IReleaseService releaseService)
         {
             _releaseService = releaseService;
         }
@@ -25,14 +23,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
-            return await _releaseService.ListSubjects(releaseId)
+            return await _releaseService
+                .ListSubjects(releaseId)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("releases/{releaseId}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
-            return await _releaseService.ListFeaturedTables(releaseId)
+            return await _releaseService
+                .ListFeaturedTables(releaseId)
                 .HandleFailuresOrOk();
         }
     }

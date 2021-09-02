@@ -1,4 +1,6 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -18,19 +20,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _publicationService = publicationService;
         }
 
-        [HttpGet("publications/{publicationId}")]
-        public async Task<ActionResult<SubjectsAndHighlightsViewModel>> GetLatestPublicationSubjectsAndHighlights(Guid publicationId)
+        [HttpGet("publications/{publicationId}/subjects")]
+        public async Task<ActionResult<List<SubjectViewModel>>> ListLatestReleaseSubjects(Guid publicationId)
         {
             return await _publicationService
-                .GetLatestPublicationSubjectsAndHighlights(publicationId)
+                .ListLatestReleaseSubjects(publicationId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}")]
-        public async Task<ActionResult<SubjectsAndHighlightsViewModel>> GetReleaseSubjectsAndHighlights(Guid releaseId)
+        [HttpGet("publications/{publicationId}/featured-tables")]
+        public async Task<ActionResult<List<FeaturedTableViewModel>>> ListLatestReleaseFeaturedTables(Guid publicationId)
         {
             return await _publicationService
-                .GetReleaseSubjectsAndHighlights(releaseId)
+                .ListLatestReleaseFeaturedTables(publicationId)
                 .HandleFailuresOrOk();
         }
     }

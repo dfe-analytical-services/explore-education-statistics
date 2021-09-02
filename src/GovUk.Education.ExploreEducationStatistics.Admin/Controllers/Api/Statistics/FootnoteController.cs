@@ -106,10 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
-            return await _releaseService.GetRelease(releaseId)
-                .OnSuccess(async model =>
+            return await _releaseService.ListSubjects(releaseId)
+                .OnSuccess(async subjects =>
                 {
-                    var subjectMetaViewModels = await model.Subjects
+                    var subjectMetaViewModels = await subjects
                         .SelectAsync(async subject =>
                             new FootnotesSubjectMetaViewModel
                             {
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     {
                         Subjects = subjectMetaViewModels
                             .ToDictionary(
-                                result => result.SubjectId, 
+                                result => result.SubjectId,
                                 result => result)
                     };
                 })

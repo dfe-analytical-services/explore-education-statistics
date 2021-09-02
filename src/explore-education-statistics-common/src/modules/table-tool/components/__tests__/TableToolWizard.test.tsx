@@ -209,7 +209,7 @@ describe('TableToolWizard', () => {
           initialStep: 5,
           subjectMeta: testSubjectMeta,
           subjects: [testSubjects[0]],
-          highlights: [],
+          featuredTables: [],
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',

@@ -1,18 +1,18 @@
 import { FormTextSearchInput } from '@common/components/form';
-import { TableHighlight } from '@common/services/tableBuilderService';
+import { FeaturedTable } from '@common/services/tableBuilderService';
 import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import React, { cloneElement, ReactElement, ReactNode, useState } from 'react';
 
 interface Props {
-  highlights: TableHighlight[];
-  renderLink: (highlight: TableHighlight) => ReactNode;
+  featuredTables: FeaturedTable[];
+  renderLink: (highlight: FeaturedTable) => ReactNode;
 }
 
-const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
+const FeaturedTablesList = ({ featuredTables = [], renderLink }: Props) => {
   const [highlightSearch, setHighlightSearch] = useState('');
 
-  const filteredHighlights = naturalOrderBy(
-    highlights.filter(
+  const filteredTables = naturalOrderBy(
+    featuredTables.filter(
       highlight =>
         highlight.name.toLowerCase().includes(highlightSearch) ||
         highlight.description?.toLowerCase().includes(highlightSearch),
@@ -20,7 +20,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
     'name',
   );
 
-  if (!highlights.length) {
+  if (!featuredTables.length) {
     return (
       <p className="govuk-!-font-weight-bold">No featured tables available.</p>
     );
@@ -43,15 +43,15 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
       <div aria-live="polite">
         {highlightSearch && (
           <p className="govuk-!-font-weight-bold">
-            {`Found ${filteredHighlights.length} matching ${
-              filteredHighlights.length === 1 ? 'table' : 'tables'
+            {`Found ${filteredTables.length} matching ${
+              filteredTables.length === 1 ? 'table' : 'tables'
             }`}
           </p>
         )}
 
-        {filteredHighlights.length > 0 && (
+        {filteredTables.length > 0 && (
           <ul className="govuk-!-margin-bottom-6" id="featuredTables">
-            {filteredHighlights.map(highlight => {
+            {filteredTables.map(highlight => {
               const link = renderLink(highlight);
               const descriptionId = `highlight-description-${highlight.id}`;
 
@@ -80,4 +80,4 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
   );
 };
 
-export default TableHighlightsList;
+export default FeaturedTablesList;

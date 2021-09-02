@@ -1,8 +1,8 @@
 import { FastTrackTable } from '@common/services/fastTrackService';
 import {
   SelectedPublication,
+  Subject,
   SubjectMeta,
-  SubjectsAndHighlights,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
 import { render, screen } from '@testing-library/react';
@@ -139,18 +139,15 @@ describe('TableToolPage', () => {
     },
   };
 
-  const testPublicationSubjectsAndHighlights: SubjectsAndHighlights = {
-    highlights: [],
-    subjects: [
-      {
-        id: '1f1b1780-a607-454e-b331-08d9097c40f5',
-        name: 'Test subject',
-        content: '<p>ryt</p>',
-        timePeriods: { from: '2020 Week 13', to: '2021 Week 24' },
-        geographicLevels: ['National'],
-      },
-    ],
-  };
+  const testSubjects: Subject[] = [
+    {
+      id: '1f1b1780-a607-454e-b331-08d9097c40f5',
+      name: 'Test subject',
+      content: '<p>ryt</p>',
+      timePeriods: { from: '2020 Week 13', to: '2021 Week 24' },
+      geographicLevels: ['National'],
+    },
+  ];
 
   const testSubjectMeta: SubjectMeta = {
     filters: {
@@ -350,7 +347,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
-        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        subjects={testSubjects}
         themeMeta={testThemeMeta}
       />,
     );
@@ -378,7 +375,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
-        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
         fastTrack={testFastTrack}
@@ -392,7 +389,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithLatestRelease}
-        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
         fastTrack={testFastTrack}
@@ -412,7 +409,7 @@ describe('TableToolPage', () => {
     render(
       <TableToolPage
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
-        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        subjects={testSubjects}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
         fastTrack={testFastTrack}

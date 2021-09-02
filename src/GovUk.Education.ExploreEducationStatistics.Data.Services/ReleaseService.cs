@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,43 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseId)
+        public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
-                    var subjectsToInclude = _contentDbContext.ReleaseFiles
-                        .Include(rf => rf.File)
-                        .Where(rf => rf.ReleaseId == releaseId
-                                     && rf.File.Type == FileType.Data
-                                     // Exclude files that are replacements in progress
-                                     && !rf.File.ReplacingId.HasValue
-                                     && rf.File.SubjectId.HasValue)
-                        .Join(
-                            _contentDbContext.DataImports,
-                            releaseFile => releaseFile.File,
-                            import => import.File,
-                            (releaseFile, import) => new
-                            {
-                                ReleaseFile = releaseFile,
-                                DataImport = import
-                            }
-                        )
-                        .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
-                        .Select(join => join.ReleaseFile.File.SubjectId.Value)
-                        .ToList();
+                    var subjectsToInclude = GetPublishedSubjectIds(releaseId);
 
-                    var subjects = await GetSubjects(releaseId, subjectsToInclude);
-                    var highlights = await GetHighlights(releaseId, subjectsToInclude);
-
-                    return new ReleaseViewModel
-                    {
-                        Id = releaseId,
-                        Highlights = highlights,
-                        Subjects = subjects,
-                    };
+                    return await GetSubjects(releaseId, subjectsToInclude);
                 });
         }
 
@@ -101,10 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
-                            timePeriods:
-                            await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
-                            geographicLevels:
-                            await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
+                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
+                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
                         )
                     ))
                 .OrderBy(svm => svm.Name)
@@ -120,11 +92,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     rf.ReleaseId == releaseId
                     && rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data);
-            return rf.Name;
+
+            return rf.Name ?? string.Empty;
         }
 
-        private async Task<List<TableHighlightViewModel>> GetHighlights(Guid releaseId, List<Guid> subjectsToInclude)
+        public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
+            var subjectsToInclude = GetPublishedSubjectIds(releaseId);
+
             var releaseContentBlocks = await _contentDbContext.ReleaseContentBlocks
                 .Include(rcb => rcb.ContentBlock)
                 .Where(rcb => rcb.ReleaseId == releaseId)
@@ -137,13 +112,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return releaseContentBlocks
                 .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
                 .Select(
-                    dataBlock => new TableHighlightViewModel(
+                    dataBlock => new FeaturedTableViewModel(
                         id: dataBlock.Id,
-                        name: dataBlock.HighlightName,
-                        description: dataBlock.HighlightDescription
+                        name: dataBlock.HighlightName ?? string.Empty,
+                        description: dataBlock.HighlightDescription ?? string.Empty
                     )
                 )
-                .OrderBy(dataBlock => dataBlock.Name)
+                .OrderBy(featuredTable => featuredTable.Name)
+                .ToList();
+        }
+
+        private List<Guid> GetPublishedSubjectIds(Guid releaseId)
+        {
+            return _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.File.Type == FileType.Data
+                          // Exclude files that are replacements in progress
+                          && !rf.File.ReplacingId.HasValue
+                          && rf.File.SubjectId.HasValue
+                )
+                .Join(
+                    _contentDbContext.DataImports,
+                    releaseFile => releaseFile.File,
+                    import => import.File,
+                    (releaseFile, import) => new
+                    {
+                        ReleaseFile = releaseFile,
+                        DataImport = import
+                    }
+                )
+                .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
+                .Select(join => join.ReleaseFile.File.SubjectId!.Value)
                 .ToList();
         }
     }

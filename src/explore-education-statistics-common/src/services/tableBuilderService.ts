@@ -72,17 +72,11 @@ export interface Subject {
   geographicLevels: string[];
 }
 
-export interface TableHighlight {
+export interface FeaturedTable {
   id: string;
   name: string;
   description?: string;
 }
-
-export interface SubjectsAndHighlights {
-  subjects: Subject[];
-  highlights: TableHighlight[];
-}
-
 export interface SubjectMeta {
   filters: Dictionary<{
     legend: string;
@@ -266,15 +260,19 @@ function mergeDuplicateLocationsInSubjectMeta(
 }
 
 const tableBuilderService = {
-  getPublicationSubjectsAndHighlights(
-    publicationId: string,
-  ): Promise<SubjectsAndHighlights> {
-    return dataApi.get(`/publications/${publicationId}`);
+  listLatestReleaseSubjects(publicationId: string): Promise<Subject[]> {
+    return dataApi.get(`/publications/${publicationId}/subjects`);
   },
-  getReleaseSubjectsAndHighlights(
-    releaseId: string,
-  ): Promise<SubjectsAndHighlights> {
-    return dataApi.get(`/releases/${releaseId}`);
+  listLatestReleaseFeaturedTables(
+    publicationId: string,
+  ): Promise<FeaturedTable[]> {
+    return dataApi.get(`/publications/${publicationId}/featured-tables`);
+  },
+  listReleaseSubjects(releaseId: string): Promise<Subject[]> {
+    return dataApi.get(`/releases/${releaseId}/subjects`);
+  },
+  listReleaseFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
+    return dataApi.get(`/releases/${releaseId}/featured-tables`);
   },
   async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
     return mergeDuplicateLocationsInSubjectMeta(

@@ -1,9 +1,10 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class SubjectViewModel
+    public record SubjectViewModel
     {
         public Guid Id { get; }
 

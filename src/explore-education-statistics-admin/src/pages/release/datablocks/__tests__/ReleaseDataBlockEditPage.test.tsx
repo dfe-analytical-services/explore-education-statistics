@@ -14,7 +14,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import _tableBuilderService, {
-  SubjectsAndHighlights,
+  Subject,
 } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
@@ -137,23 +137,22 @@ describe('ReleaseDataBlockEditPage', () => {
     },
   ];
 
-  const testReleaseSubjectsAndHighlights: SubjectsAndHighlights = {
-    subjects: [
-      {
-        id: 'subject-1',
-        name: 'Test subject',
-        content: '<p>Test content</p>',
-        timePeriods: {
-          from: '2018',
-          to: '2020',
-        },
-        geographicLevels: ['National'],
+  const testSubjects: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Test subject',
+      content: '<p>Test content</p>',
+      timePeriods: {
+        from: '2018',
+        to: '2020',
       },
-    ],
-    highlights: [],
-  };
+      geographicLevels: ['National'],
+    },
+  ];
 
   beforeEach(() => {
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
@@ -164,40 +163,37 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   test('renders page elements correctly', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testReleaseSubjectsAndHighlights,
-    );
-
     renderPage();
 
     await waitFor(() => {
       expect(
         screen.getByRole('heading', { name: 'Edit data block' }),
       ).toBeInTheDocument();
-
-      const tabs = screen.getAllByRole('tab');
-
-      expect(tabs).toHaveLength(3);
-      expect(tabs[0]).toHaveTextContent('Data source');
-      expect(tabs[1]).toHaveTextContent('Table');
-      expect(tabs[2]).toHaveTextContent('Chart');
     });
+
+    const tabs = screen.getAllByRole('tab');
+
+    expect(tabs).toHaveLength(3);
+    expect(tabs[0]).toHaveTextContent('Data source');
+    expect(tabs[1]).toHaveTextContent('Table');
+    expect(tabs[2]).toHaveTextContent('Chart');
   });
 
   test('renders with correct data block details', async () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Test name 1' }),
-      ).toBeInTheDocument();
-
-      expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
-
-      expect(screen.getByLabelText('Url')).toHaveValue(
-        'http://localhost/data-tables/fast-track/block-1',
-      );
+      expect(screen.getByText('Test name 1')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Test name 1' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Url')).toHaveValue(
+      'http://localhost/data-tables/fast-track/block-1',
+    );
   });
 
   test('renders page selector with list of data blocks', async () => {
@@ -233,9 +229,7 @@ describe('ReleaseDataBlockEditPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: 'Delete this data block' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
     userEvent.click(
@@ -243,7 +237,7 @@ describe('ReleaseDataBlockEditPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Delete data block')).toBeInTheDocument();
     });
 
     const modal = within(screen.getByRole('dialog'));
@@ -271,9 +265,7 @@ describe('ReleaseDataBlockEditPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: 'Delete this data block' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
     userEvent.click(
@@ -281,10 +273,12 @@ describe('ReleaseDataBlockEditPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Delete data block')).toBeInTheDocument();
     });
 
     const modal = within(screen.getByRole('dialog'));
+
+    expect(modal.getByRole('heading')).toHaveTextContent('Delete data block');
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
@@ -311,9 +305,7 @@ describe('ReleaseDataBlockEditPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: 'Delete this data block' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
     userEvent.click(
@@ -321,10 +313,12 @@ describe('ReleaseDataBlockEditPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Delete data block')).toBeInTheDocument();
     });
 
     const modal = within(screen.getByRole('dialog'));
+
+    expect(modal.getByRole('heading')).toHaveTextContent('Delete data block');
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
@@ -341,25 +335,23 @@ describe('ReleaseDataBlockEditPage', () => {
     });
 
     test('renders page elements correctly', async () => {
-      tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-        testReleaseSubjectsAndHighlights,
-      );
+      tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
       renderPage();
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: 'View data block' }));
-
-        expect(
-          screen.queryByRole('button', { name: 'Delete this data block' }),
-        ).not.toBeInTheDocument();
-
-        const tabs = screen.getAllByRole('tab');
-
-        expect(tabs).toHaveLength(2);
-        expect(tabs[0]).toHaveTextContent('Table');
-        expect(tabs[1]).toHaveTextContent('Chart');
+        expect(screen.getByText('View data block')).toBeInTheDocument();
       });
+
+      expect(
+        screen.queryByRole('button', { name: 'Delete this data block' }),
+      ).not.toBeInTheDocument();
+
+      const tabs = screen.getAllByRole('tab');
+
+      expect(tabs).toHaveLength(2);
+      expect(tabs[0]).toHaveTextContent('Table');
+      expect(tabs[1]).toHaveTextContent('Chart');
     });
 
     test('renders with correct data block details with featured table name and description', async () => {

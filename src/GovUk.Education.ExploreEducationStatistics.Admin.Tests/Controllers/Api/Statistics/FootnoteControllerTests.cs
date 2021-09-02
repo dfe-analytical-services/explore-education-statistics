@@ -89,20 +89,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            releaseService.Setup(s => s.GetRelease(ReleaseId))
-                .ReturnsAsync(new ReleaseViewModel
-                {
-                    Id = ReleaseId,
-                    Subjects = subjectIds
-                        .Select(id => new SubjectViewModel(
-                            id: id,
-                            name: $"Subject {id}",
-                            content: "Test content",
-                            timePeriods: new TimePeriodLabels(),
-                            geographicLevels: new List<string>()
-                        ))
+            releaseService.Setup(s => s.ListSubjects(ReleaseId))
+                .ReturnsAsync(
+                    subjectIds
+                        .Select(
+                            id => new SubjectViewModel(
+                                id: id,
+                                name: $"Subject {id}",
+                                content: "Test content",
+                                timePeriods: new TimePeriodLabels(),
+                                geographicLevels: new List<string>()
+                            )
+                        )
                         .ToList()
-                });
+                );
 
             filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
                 new List<Filter>
