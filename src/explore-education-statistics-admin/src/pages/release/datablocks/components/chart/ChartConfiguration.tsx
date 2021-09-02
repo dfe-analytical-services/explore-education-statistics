@@ -226,6 +226,7 @@ const ChartConfiguration = ({
                     <FormFieldTextInput<FormValues>
                       label="Enter chart title"
                       name="title"
+                      hint="Use a concise descriptive title that summarises the main message in the chart."
                     />
                   ),
                 },

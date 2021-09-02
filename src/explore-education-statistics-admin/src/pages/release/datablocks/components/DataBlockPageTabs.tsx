@@ -173,7 +173,10 @@ const DataBlockPageTabs = ({
 
         // If old chart title is the same as the old table title, then the chart title is defaulting to
         // the table title, so don't inadvertently set the old chart/table title
-        if (dataBlock?.charts[0]?.title === dataBlock?.heading) {
+        if (
+          dataBlock?.charts[0] &&
+          dataBlock?.charts[0]?.title === dataBlock?.heading
+        ) {
           draft[0].title = undefined;
         }
 
