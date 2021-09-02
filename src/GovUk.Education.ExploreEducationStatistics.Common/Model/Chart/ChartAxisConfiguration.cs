@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -8,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
     public class ChartAxisConfiguration
     {
-        public string Name;
+        public string Name = null!;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AxisType Type;
@@ -16,17 +17,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         [JsonConverter(typeof(StringEnumConverter))]
         public AxisGroupBy GroupBy;
 
-        public string SortBy;
+        public string? GroupByFilter;
+
+        public string SortBy = null!;
         public bool SortAsc = true;
 
         public List<ChartDataSet> DataSets = new List<ChartDataSet>();
         public List<AxisReferenceLine> ReferenceLines = new List<AxisReferenceLine>();
         public bool Visible = true;
-        public string Title;
-        public string Unit;
+        public string Title = null!;
+        public string Unit = null!;
         public bool ShowGrid = true;
 
-        public AxisLabel Label;
+        public AxisLabel Label = null!;
 
         public int? Min;
         public int? Max;
@@ -56,15 +59,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class AxisLabel
     {
-        public string Text;
+        public string Text = null!;
         public int? Width;
         public bool? Rotated;
     }
 
     public class AxisReferenceLine
     {
-        public string Label;
-        public string Position;
+        public string Label = null!;
+        public string Position = null!;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
