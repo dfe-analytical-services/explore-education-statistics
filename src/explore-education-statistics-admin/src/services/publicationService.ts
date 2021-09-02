@@ -34,7 +34,7 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  methodologies: MyMethodology[];
+  methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact?: PublicationContactDetails;
@@ -43,6 +43,14 @@ export interface MyPublication {
     canUpdatePublication: boolean;
     canCreateMethodologies: boolean;
     canManageExternalMethodology: boolean;
+  };
+}
+
+export interface MyPublicationMethodology {
+  owner: boolean;
+  methodology: MyMethodology;
+  permissions: {
+    canDropMethodology: boolean;
   };
 }
 

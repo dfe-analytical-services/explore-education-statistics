@@ -431,59 +431,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task DropMethodology_DropOwnedMethodologyFails()
-        {
-            var publication = new Publication();
-
-            // Setup methodology owned by this publication
-            var methodology = new MethodologyParent
-            {
-                Publications = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Publication = publication,
-                        Owner = true
-                    }
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.MethodologyParents.AddAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var methodologyParentRepository = new Mock<IMethodologyParentRepository>(Strict);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    contentDbContext: context);
-
-                var result = await service.DropMethodology(publication.Id, methodology.Id);
-
-                VerifyAllMocks(methodologyParentRepository);
-
-                result.AssertBadRequest(CannotDropOwnedMethodology);
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
-
-                // Check the relationships between publications and methodologies are not altered
-                Assert.Single(publicationMethodologies);
-                Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyParentId == methodology.Id
-                                                                  && pm.PublicationId == publication.Id
-                                                                  && pm.Owner));
-            }
-        }
-
-        [Fact]
         public async Task DropMethodology_PublicationNotFound()
         {
             var methodology = new MethodologyParent

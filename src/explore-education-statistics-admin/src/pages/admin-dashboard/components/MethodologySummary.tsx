@@ -102,7 +102,9 @@ const MethodologySummary = ({
 
   return (
     <>
-      {methodologies.map(methodology => {
+      {methodologies.map(publicationMethodologyLink => {
+        const { methodology } = publicationMethodologyLink;
+
         const canEdit =
           methodology.permissions.canApproveMethodology ||
           methodology.permissions.canMarkMethodologyAsDraft ||

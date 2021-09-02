@@ -109,30 +109,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, q =>
-                    q.Include(p => p.Methodologies))
-                .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
-                .OnSuccessDo(_ =>_persistenceHelper.CheckEntityExists<MethodologyParent>(methodologyId))
-                .OnSuccess<ActionResult, Publication, Unit>(async publication =>
+                .CheckEntityExists<PublicationMethodology>(q =>
+                    q.Where(link => link.PublicationId == publicationId 
+                                    && link.MethodologyParentId == methodologyId))
+                .OnSuccess(link => _userService.CheckCanDropMethodologyLink(link))
+                .OnSuccessVoid(async link =>
                 {
-                    var link =
-                        publication.Methodologies.SingleOrDefault(pm => pm.MethodologyParentId == methodologyId);
-
-                    if (link == null)
-                    {
-                        return new NotFoundResult();
-                    }
-
-                    if (link.Owner)
-                    {
-                        return ValidationActionResult(CannotDropOwnedMethodology);
-                    }
-
-                    publication.Methodologies.Remove(link);
-                    _context.Publications.Update(publication);
+                    _context.PublicationMethodologies.Remove(link);
                     await _context.SaveChangesAsync();
-
-                    return Unit.Instance;
                 });
         }
 

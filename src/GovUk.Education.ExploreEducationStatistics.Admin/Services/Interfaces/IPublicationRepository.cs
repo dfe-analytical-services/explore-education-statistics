@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationRepository
     {
-        Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId);
+        Task<List<MyPublicationViewModel>> GetAllPublicationsForTopic(Guid topicId);
 
         Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(Guid topicId, Guid userId);
 
