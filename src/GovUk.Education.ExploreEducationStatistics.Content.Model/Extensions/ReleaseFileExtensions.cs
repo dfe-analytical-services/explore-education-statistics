@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return releaseFile.File.PublicPath(releaseFile.Release);
         }
 
+        // TODO: Remove BlobInfo as parameter after EES-2343
         public static FileInfo ToPublicFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             return new FileInfo
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             };
         }
 
+        // TODO: Remove BlobInfo as parameter after EES-2343
         public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             var info = releaseFile.ToPublicFileInfo(blobInfo);

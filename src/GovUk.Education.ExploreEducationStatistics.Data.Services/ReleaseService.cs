@@ -3,12 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -26,19 +29,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly IReleaseService.IBlobInfoGetter _blobInfoGetter;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService)
+            IMetaGuidanceSubjectService metaGuidanceSubjectService,
+            IReleaseService.IBlobInfoGetter blobInfoGetter)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _blobInfoGetter = blobInfoGetter;
         }
 
         public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseId)
@@ -62,23 +68,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var releaseSubjects = await _statisticsDbContext.ReleaseSubject
-                .Where(
-                    rs => rs.ReleaseId == releaseId
-                          && subjectsToInclude.Contains(rs.SubjectId)
-                )
+                .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
+                .ToListAsync();
+
+            var releaseFiles = await QueryReleaseDataFiles(releaseId)
+                .Where(rf => rf.File.SubjectId.HasValue
+                             && subjectsToInclude.Contains(rf.File.SubjectId.Value))
                 .ToListAsync();
 
             return (await releaseSubjects
                 .SelectAsync(
                     async rs =>
-                        new SubjectViewModel(
+                    {
+                        var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
+                        var blobInfo = await _blobInfoGetter.Get(releaseFile);
+
+                        return new SubjectViewModel(
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
                             timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
-                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
-                        )
-                    ))
+                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                            file: blobInfo is null
+                                ? releaseFile.ToPublicFileInfoNotFound()
+                                : releaseFile.ToFileInfo(blobInfo)
+                        );
+                    }
+                ))
                 .OrderBy(svm => svm.Name)
                 .ToList();
         }
@@ -124,15 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private List<Guid> GetPublishedSubjectIds(Guid releaseId)
         {
-            return _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .Where(
-                    rf => rf.ReleaseId == releaseId
-                          && rf.File.Type == FileType.Data
-                          // Exclude files that are replacements in progress
-                          && !rf.File.ReplacingId.HasValue
-                          && rf.File.SubjectId.HasValue
-                )
+            return QueryReleaseDataFiles(releaseId)
                 .Join(
                     _contentDbContext.DataImports,
                     releaseFile => releaseFile.File,
@@ -146,6 +154,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
                 .Select(join => join.ReleaseFile.File.SubjectId!.Value)
                 .ToList();
+        }
+
+        private IQueryable<ReleaseFile> QueryReleaseDataFiles(Guid releaseId)
+        {
+            return _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.File.Type == FileType.Data
+                          // Exclude files that are replacements in progress
+                          && !rf.File.ReplacingId.HasValue
+                          && rf.File.SubjectId.HasValue
+                );
+        }
+
+        // TODO: EES-2343 Remove when file sizes are stored in database
+        public class DefaultBlobInfoGetter : IReleaseService.IBlobInfoGetter
+        {
+            private readonly IBlobStorageService _blobStorageService;
+
+            public DefaultBlobInfoGetter(IBlobStorageService blobStorageService)
+            {
+                _blobStorageService = blobStorageService;
+            }
+
+            public async Task<BlobInfo?> Get(ReleaseFile releaseFile)
+            {
+                return await _blobStorageService.FindBlob(
+                    containerName: BlobContainers.PrivateReleaseFiles,
+                    path: releaseFile.File.PublicPath(releaseFile.ReleaseId)
+                );
+            }
         }
     }
 }

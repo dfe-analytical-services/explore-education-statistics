@@ -41,14 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
-            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null)
+            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? new Mock<IUserService>().Object,
-                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+                userService ?? Mock.Of<IUserService>(),
+                metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }
 

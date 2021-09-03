@@ -98,7 +98,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                 name: $"Subject {id}",
                                 content: "Test content",
                                 timePeriods: new TimePeriodLabels(),
-                                geographicLevels: new List<string>()
+                                geographicLevels: new List<string>(),
+                                file: new FileInfo
+                                {
+                                    Id = Guid.NewGuid(),
+                                    FileName = "test.csv",
+                                    Size = "1 Mb"
+                                }
                             )
                         )
                         .ToList()

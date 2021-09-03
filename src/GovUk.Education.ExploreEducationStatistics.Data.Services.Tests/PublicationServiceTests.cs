@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -55,10 +55,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     name: "Subject 1",
                     content: "Subject 1 content",
                     timePeriods: new TimePeriodLabels("2018", "2021"),
-                    geographicLevels: new List<string>
+                    geographicLevels: ListOf("National", "Local Authority"),
+                    file: new FileInfo
                     {
-                        "National",
-                        "Local Authority"
+                        Id = Guid.NewGuid(),
+                        FileName = "file1.csv",
+                        Size = "1 Mb"
                     }
                 );
                 var subject2 = new SubjectViewModel(
@@ -66,9 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     name: "Subject 2",
                     content: "Subject 2 content",
                     timePeriods: new TimePeriodLabels("2015", "2020"),
-                    geographicLevels: new List<string>
+                    geographicLevels: ListOf("Local Authority District"),
+                    file: new FileInfo
                     {
-                        "Local Authority District"
+                        Id = Guid.NewGuid(),
+                        FileName = "file2.csv",
+                        Size = "2 Mb"
                     }
                 );
 
