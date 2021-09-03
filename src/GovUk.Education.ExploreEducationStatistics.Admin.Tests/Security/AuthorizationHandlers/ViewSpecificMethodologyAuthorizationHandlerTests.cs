@@ -13,7 +13,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
@@ -25,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly Methodology Methodology = new()
+        private static readonly MethodologyVersion MethodologyVersion = new()
         {
             Id = Guid.NewGuid(),
-            MethodologyParentId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid()
         };
 
         private static readonly Publication OwningPublication = new()
@@ -56,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByClaimAlone)
                     {
                         methodologyRepository.Setup(s =>
-                                s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
+                                s.GetOwningPublication(MethodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
@@ -69,8 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, Methodology>
-                            (user, Methodology);
+                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                            (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, userPublicationRoleRepository, userReleaseRoleRepository);
@@ -95,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
-                            s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
+                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
@@ -112,8 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, Methodology>
-                            (user, Methodology);
+                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                            (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, userPublicationRoleRepository, userReleaseRoleRepository);
@@ -142,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
-                            s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
+                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
@@ -154,8 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, Methodology>
-                            (user, Methodology);
+                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                            (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(
@@ -180,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
-                        s.GetOwningPublicationByMethodologyParent(Methodology.MethodologyParentId))
+                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
@@ -192,8 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext =
-                    CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, Methodology>
-                        (user, Methodology);
+                    CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                        (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(

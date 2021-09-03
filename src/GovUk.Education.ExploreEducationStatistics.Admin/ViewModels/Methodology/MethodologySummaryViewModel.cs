@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
     {
         public Guid Id { get; set; }
 
-        public Guid MethodologyParentId { get; set; }
+        public Guid MethodologyId { get; set; }
 
         public string? LatestInternalReleaseNote { get; set; }
 

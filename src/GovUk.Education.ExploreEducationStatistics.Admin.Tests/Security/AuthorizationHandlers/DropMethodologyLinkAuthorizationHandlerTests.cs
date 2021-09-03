@@ -25,14 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             Owner = true,
             PublicationId = Guid.NewGuid(),
-            MethodologyParentId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid()
         };
 
         private static readonly PublicationMethodology NonOwningLink = new()
         {
             Owner = false,
             PublicationId = Guid.NewGuid(),
-            MethodologyParentId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid()
         };
 
         public class ClaimsTests

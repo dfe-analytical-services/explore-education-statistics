@@ -92,8 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         contentDbContext: provider.GetService<ContentDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         tableStorageService: new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
+                .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
-                .AddScoped<IMethodologyParentRepository, MethodologyParentRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>(provider =>
                     new NotificationsService(

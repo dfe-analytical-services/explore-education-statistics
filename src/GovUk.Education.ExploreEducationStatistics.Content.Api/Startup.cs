@@ -116,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();

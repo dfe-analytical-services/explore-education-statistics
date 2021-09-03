@@ -1,8 +1,8 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -28,12 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateMethodologyAmendment()
         {
-            var originalMethodology = new Methodology
+            var originalVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 Status = Approved,
                 Published = DateTime.Today,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     Slug = "methodology-slug",
                     OwningPublicationTitle = "Owning Publication Title"
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contextId = Guid.NewGuid().ToString();
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Methodologies.AddAsync(originalMethodology);
+                await context.MethodologyVersions.AddAsync(originalVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -69,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
                     .ReturnsAsync(summaryViewModel);
                 
-                var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
+                var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
                 
                 var resultingViewModel = result.AssertRight();
@@ -81,8 +80,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // the MethodologyTests class.
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                var amendment = await context.Methodologies.SingleAsync(m => m.Id == amendmentId);
-                Assert.Equal(originalMethodology.Id, amendment.PreviousVersionId);
+                var amendment = await context.MethodologyVersions.SingleAsync(m => m.Id == amendmentId);
+                Assert.Equal(originalVersion.Id, amendment.PreviousVersionId);
 
                 var contentSection = Assert.Single(amendment.Content);
                 Assert.NotNull(contentSection);
@@ -95,12 +94,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateMethodologyAmendmentWithMethodologyFiles()
         {
-            var originalMethodology = new Methodology
+            var originalVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 Status = Approved,
                 Published = DateTime.Today,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     Slug = "methodology-slug",
                     OwningPublicationTitle = "Owning Publication Title"
@@ -117,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var originalMethodologyFile1 = new MethodologyFile
             {
                 Id = Guid.NewGuid(),
-                MethodologyId = originalMethodology.Id,
+                MethodologyVersionId = originalVersion.Id,
                 File = new File
                 {
                     Id = Guid.NewGuid()
@@ -127,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var originalMethodologyFile2 = new MethodologyFile
             {
                 Id = Guid.NewGuid(),
-                MethodologyId = originalMethodology.Id,
+                MethodologyVersionId = originalVersion.Id,
                 File = new File
                 {
                     Id = Guid.NewGuid()
@@ -137,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contextId = Guid.NewGuid().ToString();
             await using(var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Methodologies.AddAsync(originalMethodology);
+                await context.MethodologyVersions.AddAsync(originalVersion);
                 await context.MethodologyFiles.AddRangeAsync(originalMethodologyFile1, originalMethodologyFile2);
                 await context.SaveChangesAsync();
             }
@@ -157,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
                     .ReturnsAsync(summaryViewModel);
                 
-                var result = await service.CreateMethodologyAmendment(originalMethodology.Id);
+                var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
                 
                 var resultingViewModel = result.AssertRight();
@@ -170,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var amendmentMethodologyFiles = await context
                     .MethodologyFiles
-                    .Where(m => m.MethodologyId == amendmentId)
+                    .Where(f => f.MethodologyVersionId == amendmentId)
                     .ToListAsync();
                 
                 Assert.Equal(2, amendmentMethodologyFiles.Count());
@@ -190,11 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private static MethodologyAmendmentService BuildService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IMethodologyService methodologyService = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IMethodologyService? methodologyService = null,
+            IUserService? userService = null)
         {
-            return new MethodologyAmendmentService(
+            return new(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? new Mock<IMethodologyService>().Object,

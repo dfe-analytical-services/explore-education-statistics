@@ -22,23 +22,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         }
 
         public PermissionsSet Resolve(
-            Methodology methodology,
+            MethodologyVersion methodologyVersion,
             MyMethodologyViewModel destination,
             PermissionsSet destMember,
             ResolutionContext context)
         {
             return new PermissionsSet
             {
-                CanApproveMethodology = CheckResult(_userService.CheckCanApproveMethodology(methodology)),
-                CanUpdateMethodology = CheckResult(_userService.CheckCanUpdateMethodology(methodology)),
-                CanDeleteMethodology = CheckResult(_userService.CheckCanDeleteMethodology(methodology)),
+                CanApproveMethodology = CheckResult(_userService.CheckCanApproveMethodology(methodologyVersion)),
+                CanUpdateMethodology = CheckResult(_userService.CheckCanUpdateMethodology(methodologyVersion)),
+                CanDeleteMethodology = CheckResult(_userService.CheckCanDeleteMethodology(methodologyVersion)),
                 CanMakeAmendmentOfMethodology =
-                    CheckResult(_userService.CheckCanMakeAmendmentOfMethodology(methodology)),
-                CanMarkMethodologyAsDraft = CheckResult(_userService.CheckCanMarkMethodologyAsDraft(methodology))
+                    CheckResult(_userService.CheckCanMakeAmendmentOfMethodology(methodologyVersion)),
+                CanMarkMethodologyAsDraft = CheckResult(_userService.CheckCanMarkMethodologyAsDraft(methodologyVersion))
             };
         }
 
-        private static bool CheckResult(Task<Either<ActionResult, Methodology>> result)
+        private static bool CheckResult(Task<Either<ActionResult, MethodologyVersion>> result)
         {
             return result.Result.IsRight;
         }

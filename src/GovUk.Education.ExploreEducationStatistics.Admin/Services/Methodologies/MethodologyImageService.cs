@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyId, IEnumerable<Guid> fileIds)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+                .CheckEntityExists<MethodologyVersion>(methodologyId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateMethodology(release))
                 .OnSuccess(async release =>
                     await fileIds.Select(fileId =>
@@ -67,10 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         await _methodologyFileRepository.Delete(methodologyId, file.Id);
 
-                        // If this Methodology is the only Methodology that is referencing this Blob and File, it
-                        // can be deleted from Blob Storage and the File table.  Otherwise preserve them for the other
-                        // Methodology versions that are still using them. 
-                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyId == methodologyId)
+                        // If this methodology version is the only version that is referencing this Blob and File, it
+                        // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
+                        // versions that are still using them. 
+                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyVersionId == methodologyId)
                         {
                             await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
                             await _fileRepository.Delete(file.Id);
@@ -79,12 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId)
+        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyFile>(q => q
                     .Include(mf => mf.File)
-                    .Where(mf => mf.MethodologyId == methodologyId && mf.FileId == fileId))
+                    .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
                 .OnSuccess(async methodologyFile =>
                 {
                     var path = methodologyFile.Path();
@@ -100,29 +100,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyId, IFormFile formFile)
+        public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyVersionId, IFormFile formFile)
         {
             return _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
-                    methodologyId,
+                    methodologyVersionId,
                     Image,
                     formFile))
-                .OnSuccess(fileInfo => new ImageFileViewModel($"/api/methodologies/{methodologyId}/images/{fileInfo.Id}")
+                .OnSuccess(fileInfo => new ImageFileViewModel($"/api/methodologies/{methodologyVersionId}/images/{fileInfo.Id}")
                 {
                     // TODO EES-1922 Add support for resizing the image
                 });
         }
 
-        private async Task<Either<ActionResult, FileInfo>> Upload(Guid methodologyId,
+        private async Task<Either<ActionResult, FileInfo>> Upload(Guid methodologyVersionId,
             FileType type,
             IFormFile formFile,
             IDictionary<string, string> metadata = null)
         {
             var methodologyFile = await _methodologyFileRepository.Create(
-                methodologyId: methodologyId,
+                methodologyVersionId: methodologyVersionId,
                 filename: formFile.FileName,
                 type: type,
                 createdById: _userService.GetUserId());

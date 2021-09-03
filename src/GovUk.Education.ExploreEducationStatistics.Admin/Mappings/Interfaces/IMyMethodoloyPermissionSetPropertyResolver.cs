@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces
 {
     public interface IMyMethodologyPermissionSetPropertyResolver
-        : IValueResolver<Methodology, MyMethodologyViewModel, MyMethodologyViewModel.PermissionsSet> 
+        : IValueResolver<MethodologyVersion, MyMethodologyViewModel, MyMethodologyViewModel.PermissionsSet> 
     {
         
     }

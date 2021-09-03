@@ -106,14 +106,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
             var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                methodologyRepository
-                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
-                    .ReturnsAsync(new List<Methodology>());
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<MethodologyVersion>());
                 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     dataImportService: dataImportService.Object,
                     metaGuidanceService: metaGuidanceService.Object,
-                    methodologyRepository: methodologyRepository.Object
+                    methodologyVersionRepository: methodologyVersionRepository.Object
                 );
 
                 var result = await service.GetChecklist(release.Id);
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             MockUtils.VerifyAllMocks(dataImportService,
                 metaGuidanceService,
-                methodologyRepository,
+                methodologyVersionRepository,
                 releaseDataFileRepository);
         }
 
@@ -183,14 +183,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                methodologyRepository
-                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
-                    .ReturnsAsync(new List<Methodology>());
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<MethodologyVersion>());
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyRepository: methodologyRepository.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
 
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceService,
-                methodologyRepository,
+                methodologyVersionRepository,
                 releaseDataFileRepository);
         }
 
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -262,9 +262,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                 };
 
-                methodologyRepository
-                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
-                    .ReturnsAsync(new List<Methodology>());
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .ReturnsAsync(new List<MethodologyVersion>());
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyRepository: methodologyRepository.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             MockUtils.VerifyAllMocks(dataBlockService,
                 footnoteRepository,
                 metaGuidanceService,
-                methodologyRepository,
+                methodologyVersionRepository,
                 releaseDataFileRepository);
         }
 
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Status = Draft
             };
@@ -370,14 +370,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                methodologyRepository
-                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
-                    .ReturnsAsync(AsList(methodology));
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .ReturnsAsync(AsList(methodologyVersion));
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyRepository: methodologyRepository.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
 
@@ -409,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologyMustBeApprovedError =
                     Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
                 Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
-                Assert.Equal(methodology.Id, methodologyMustBeApprovedError.MethodologyId);
+                Assert.Equal(methodologyVersion.Id, methodologyMustBeApprovedError.MethodologyId);
                 
                 Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
                 Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
@@ -417,7 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             MockUtils.VerifyAllMocks(metaGuidanceService,
-                methodologyRepository,
+                methodologyVersionRepository,
                 releaseDataFileRepository);
         }
 
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication();
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Status = Approved
             };
@@ -522,7 +522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>();
             var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -532,12 +532,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 };
 
-                methodologyRepository
-                    .Setup(mock => mock.GetLatestByPublication(release.PublicationId))
-                    .ReturnsAsync(new List<Methodology>
-                    {
-                        methodology
-                    });
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .ReturnsAsync(ListOf(methodologyVersion));
 
                 releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
@@ -582,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     metaGuidanceService: metaGuidanceService.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyRepository: methodologyRepository.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
@@ -598,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             MockUtils.VerifyAllMocks(dataBlockService,
                 footnoteRepository,
                 metaGuidanceService,
-                methodologyRepository,
+                methodologyVersionRepository,
                 releaseDataFileRepository);
         }
 
@@ -629,18 +626,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IReleaseDataFileRepository releaseDataFileRepository = null,
-            IMethodologyRepository methodologyRepository = null,
+            IMethodologyVersionRepository methodologyVersionRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
-            return new ReleaseChecklistService(
+            return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
+                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );

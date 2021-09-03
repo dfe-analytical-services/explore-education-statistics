@@ -244,15 +244,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
-        private static PublicationService BuildPublicationService((Mock<ContentDbContext>,
-            Mock<IMapper>,
-            Mock<IUserService> userService,
-            Mock<IPublicationRepository> publicationRepository,
-            Mock<IPublishingService> publishingService,
-            Mock<IMethodologyRepository> methodologyRepository,
-            Mock<IPersistenceHelper<ContentDbContext>>) mocks)
+        private static PublicationService BuildPublicationService(
+            (Mock<ContentDbContext>, Mock<IMapper>,
+                Mock<IUserService> userService,
+                Mock<IPublicationRepository> publicationRepository,
+                Mock<IPublishingService> publishingService,
+                Mock<IMethodologyVersionRepository> methodologyVersionRepository,
+                Mock<IPersistenceHelper<ContentDbContext>>) mocks)
         {
-            var (context, mapper, userService, publicationRepository, publishingService, methodologyRepository, persistenceHelper) = mocks;
+            var (context, mapper, userService, publicationRepository, publishingService, methodologyVersionRepository, persistenceHelper) = mocks;
 
             return new PublicationService(
                 context.Object,
@@ -261,16 +261,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService.Object, 
                 publicationRepository.Object, 
                 publishingService.Object, 
-                methodologyRepository.Object);
+                methodologyVersionRepository.Object);
         }
 
-        private (
-            Mock<ContentDbContext> ContentDbContext,
+        private (Mock<ContentDbContext> ContentDbContext,
             Mock<IMapper> Mapper,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
             Mock<IPublishingService> PublishingService,
-            Mock<IMethodologyRepository> MethodologyRepository,
+            Mock<IMethodologyVersionRepository> MethodologyVersionRepository,
             Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -283,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
                 new Mock<IPublishingService>(),
-                new Mock<IMethodologyRepository>(),
+                new Mock<IMethodologyVersionRepository>(),
                 persistenceHelper);
         }
     }

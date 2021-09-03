@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,31 +15,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class MethodologyService : IMethodologyService
     {
         private readonly ContentDbContext _context;
-        private readonly IMethodologyRepository _methodologyRepository;
-        
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+
         public MethodologyService(ContentDbContext context,
-            IMethodologyRepository methodologyRepository)
+            IMethodologyVersionRepository methodologyVersionRepository)
         {
             _context = context;
-            _methodologyRepository = methodologyRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
         }
 
-        public async Task<Methodology> Get(Guid id)
+        public async Task<MethodologyVersion> Get(Guid methodologyVersionId)
         {
-            return await _context.Methodologies.FindAsync(id);
+            return await _context.MethodologyVersions.FindAsync(methodologyVersionId);
         }
 
-        public async Task<List<Methodology>> GetLatestByRelease(Guid releaseId)
+        public async Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId)
         {
             var release = await _context.Releases.FindAsync(releaseId);
-            return await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+            return await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
         }
 
-        public async Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types)
+        public async Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types)
         {
             return await _context.MethodologyFiles
                 .Include(mf => mf.File)
-                .Where(mf => mf.MethodologyId == methodologyId)
+                .Where(mf => mf.MethodologyVersionId == methodologyVersionId)
                 .Select(mf => mf.File)
                 .Where(file => types.Contains(file.Type))
                 .ToListAsync();
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task SetPublishedDatesByPublication(Guid publicationId, DateTime published)
         {
-            var methodologies = await _methodologyRepository.GetLatestPublishedByPublication(publicationId);
+            var methodologies = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
 
             _context.UpdateRange(methodologies);
 

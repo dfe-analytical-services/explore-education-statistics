@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<MethodologyFile> Create(Guid methodologyId,
+        public async Task<MethodologyFile> Create(Guid methodologyVersionId,
             string filename,
             FileType type,
             Guid createdById)
@@ -40,12 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var methodologyFile = new MethodologyFile
             {
-                MethodologyId = methodologyId,
+                MethodologyVersionId = methodologyVersionId,
                 File = new File
                 {
                     Created = DateTime.UtcNow,
                     CreatedById = createdById,
-                    RootPath = methodologyId,
+                    RootPath = methodologyVersionId,
                     Filename = filename,
                     Type = type
                 }
@@ -56,12 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return created;
         }
 
-        public async Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyId,
+        public async Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyVersionId,
             Guid fileId,
             params FileType[] allowedFileTypes)
         {
-            // Ensure file is linked to the Methodology by getting the MethodologyFile first
-            var methodologyFile = await Get(methodologyId, fileId);
+            // Ensure file is linked to the version by getting the MethodologyFile first
+            var methodologyFile = await Get(methodologyVersionId, fileId);
 
             if (methodologyFile == null)
             {
@@ -76,9 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return methodologyFile.File;
         }
 
-        public async Task Delete(Guid methodologyId, Guid fileId)
+        public async Task Delete(Guid methodologyVersionId, Guid fileId)
         {
-            var methodologyFile = await Get(methodologyId, fileId);
+            var methodologyFile = await Get(methodologyVersionId, fileId);
             if (methodologyFile != null)
             {
                 _contentDbContext.MethodologyFiles.Remove(methodologyFile);
@@ -86,21 +86,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
         }
 
-        public async Task<MethodologyFile> Get(Guid methodologyId, Guid fileId)
+        public async Task<MethodologyFile> Get(Guid methodologyVersionId, Guid fileId)
         {
             return await _contentDbContext.MethodologyFiles
                 .Include(methodologyFile => methodologyFile.File)
                 .SingleOrDefaultAsync(methodologyFile =>
-                    methodologyFile.MethodologyId == methodologyId
+                    methodologyFile.MethodologyVersionId == methodologyVersionId
                     && methodologyFile.FileId == fileId);
         }
 
-        public async Task<List<MethodologyFile>> GetByFileType(Guid methodologyId, params FileType[] types)
+        public async Task<List<MethodologyFile>> GetByFileType(Guid methodologyVersionId, params FileType[] types)
         {
             return await _contentDbContext.MethodologyFiles
                 .Include(f => f.File)
                 .Where(methodologyFile =>
-                    methodologyFile.MethodologyId == methodologyId
+                    methodologyFile.MethodologyVersionId == methodologyVersionId
                     && types.Contains(methodologyFile.File.Type))
                 .ToListAsync();
         }

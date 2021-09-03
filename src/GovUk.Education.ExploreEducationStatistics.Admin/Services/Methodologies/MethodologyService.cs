@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IBlobCacheService _blobCacheService;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
-        private readonly IMethodologyParentRepository _methodologyParentRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IBlobCacheService blobCacheService,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
+            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
-            IMethodologyParentRepository methodologyParentRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService)
@@ -61,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _blobCacheService = blobCacheService;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
-            _methodologyParentRepository = methodologyParentRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
@@ -74,17 +74,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Publication>(publicationId, q =>
                     q.Include(p => p.Methodologies))
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
-                .OnSuccessDo(_ => _persistenceHelper.CheckEntityExists<MethodologyParent>(methodologyId))
+                .OnSuccessDo(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
                 .OnSuccess<ActionResult, Publication, Unit>(async publication =>
                 {
-                    if (publication.Methodologies.Any(pm => pm.MethodologyParentId == methodologyId))
+                    if (publication.Methodologies.Any(pm => pm.MethodologyId == methodologyId))
                     {
                         return ValidationActionResult(CannotAdoptMethodologyAlreadyLinkedToPublication);
                     }
 
                     publication.Methodologies.Add(new PublicationMethodology
                     {
-                        MethodologyParentId = methodologyId,
+                        MethodologyId = methodologyId,
                         Owner = false
                     });
 
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
-                .OnSuccess(() => _methodologyRepository
+                .OnSuccess(() => _methodologyVersionRepository
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
                 .OnSuccess(BuildMethodologySummaryViewModel);
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<PublicationMethodology>(q =>
                     q.Where(link => link.PublicationId == publicationId
-                                    && link.MethodologyParentId == methodologyId))
+                                    && link.MethodologyId == methodologyId))
                 .OnSuccess(link => _userService.CheckCanDropMethodologyLink(link))
                 .OnSuccessVoid(async link =>
                 {
@@ -128,9 +128,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
-                    var methodologies = await _methodologyParentRepository.GetUnrelatedToPublication(publication.Id);
+                    var methodologies = await _methodologyRepository.GetUnrelatedToPublication(publication.Id);
                     var latestVersions = await methodologies.SelectAsync(methodology =>
-                        _methodologyRepository.GetLatestByMethodologyParent(methodology.Id));
+                        _methodologyVersionRepository.GetLatestVersion(methodology.Id));
                     return (await latestVersions.SelectAsync(BuildMethodologySummaryViewModel)).ToList();
                 });
         }
@@ -138,24 +138,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
+                .CheckEntityExists<MethodologyVersion>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
                 .OnSuccess(BuildMethodologySummaryViewModel);
         }
 
         public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
-            Guid id)
+            Guid methodologyVersionId)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id, queryable =>
-                    queryable.Include(m => m.MethodologyParent)
+            return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId, queryable =>
+                    queryable.Include(m => m.Methodology)
                         .ThenInclude(mp => mp.Publications))
-                .OnSuccess(methodology => _userService.CheckCanApproveMethodology(methodology)
-                    .OrElse(() => _userService.CheckCanMarkMethodologyAsDraft(methodology)))
-                .OnSuccess(async methodology =>
+                .OnSuccess(methodologyVersion => _userService.CheckCanApproveMethodology(methodologyVersion)
+                    .OrElse(() => _userService.CheckCanMarkMethodologyAsDraft(methodologyVersion)))
+                .OnSuccess(async methodologyVersion =>
                 {
                     // Get all Publications using the Methodology including adopting Publications
                     var publicationIds =
-                        methodology.MethodologyParent.Publications.Select(pm => pm.PublicationId);
+                        methodologyVersion.Methodology.Publications.Select(pm => pm.PublicationId);
 
                     // Get the Releases of those publications
                     var releases = await _context.Releases
@@ -177,24 +177,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id, q =>
-                    q.Include(m => m.MethodologyParent))
-                .OnSuccess(methodology => UpdateMethodologyStatus(methodology, request))
-                .OnSuccess(methodology => UpdateMethodologyDetails(methodology, request))
+                .CheckEntityExists<MethodologyVersion>(id, q =>
+                    q.Include(m => m.Methodology))
+                .OnSuccess(methodology => UpdateStatus(methodology, request))
+                .OnSuccess(methodology => UpdateDetails(methodology, request))
                 .OnSuccess(_ => GetSummary(id));
         }
 
-        private async Task<MethodologySummaryViewModel> BuildMethodologySummaryViewModel(Methodology methodology)
+        private async Task<MethodologySummaryViewModel> BuildMethodologySummaryViewModel(MethodologyVersion methodologyVersion)
         {
-            var loadedMethodology = _context.AssertEntityLoaded(methodology);
+            var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
             await _context.Entry(loadedMethodology)
-                .Reference(m => m.MethodologyParent)
+                .Reference(m => m.Methodology)
                 .Query()
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
                 .LoadAsync();
 
-            var publicationLinks = loadedMethodology.MethodologyParent.Publications;
+            var publicationLinks = loadedMethodology.Methodology.Publications;
             var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
             var otherPublications = publicationLinks.Where(pm => !pm.Owner)
                 .Select(BuildPublicationViewModel)
@@ -229,16 +229,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return viewModel;
         }
 
-        private async Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
+        private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (!request.IsStatusUpdateForMethodology(methodologyToUpdate))
+            if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
             {
                 // Status unchanged
-                return methodologyToUpdate;
+                return methodologyVersionToUpdate;
             }
 
-            return await CheckCanUpdateMethodologyStatus(methodologyToUpdate, request.Status)
+            return await CheckCanUpdateStatus(methodologyVersionToUpdate, request.Status)
                 .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
                 .OnSuccessDo(RemoveUnusedImages)
                 .OnSuccess(async methodology =>
@@ -254,9 +254,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     methodology.Updated = DateTime.UtcNow;
 
-                    _context.Methodologies.Update(methodology);
+                    _context.MethodologyVersions.Update(methodology);
 
-                    if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                    if (await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id))
                     {
                         methodology.Published = DateTime.UtcNow;
 
@@ -271,29 +271,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private async Task<Either<ActionResult, Methodology>> UpdateMethodologyDetails(Methodology methodologyToUpdate,
+        private async Task<Either<ActionResult, MethodologyVersion>> UpdateDetails(MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (!request.IsDetailUpdateForMethodology(methodologyToUpdate))
+            if (!request.IsDetailUpdateForMethodology(methodologyVersionToUpdate))
             {
                 // Details unchanged
-                return methodologyToUpdate;
+                return methodologyVersionToUpdate;
             }
 
-            return await _userService.CheckCanUpdateMethodology(methodologyToUpdate)
+            return await _userService.CheckCanUpdateMethodology(methodologyVersionToUpdate)
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
                 // unlikely scenario, it's entirely possible. 
-                .OnSuccessDo(methodology => ValidateMethodologySlugUniqueForUpdate(methodology.Id, request.Slug))
-                .OnSuccess(async methodology =>
+                .OnSuccessDo(methodologyVersion => ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
+                .OnSuccess(async methodologyVersion =>
                 {
-                    methodology.Updated = DateTime.UtcNow;
+                    methodologyVersion.Updated = DateTime.UtcNow;
 
-                    if (request.Title != methodology.Title)
+                    if (request.Title != methodologyVersion.Title)
                     {
-                        methodology.AlternativeTitle =
-                            request.Title != methodology.MethodologyParent.OwningPublicationTitle
+                        methodologyVersion.AlternativeTitle =
+                            request.Title != methodologyVersion.Methodology.OwningPublicationTitle
                                 ? request.Title
                                 : null;
 
@@ -301,68 +301,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // visible and so its Slug can be updated.  At the point that a Methodology is publicly
                         // visible and the only means of updating it is via Amendments, we will no longer allow its
                         // Slug to change even though its AlternativeTitle can.
-                        if (!methodology.Amendment)
+                        if (!methodologyVersion.Amendment)
                         {
-                            methodology.MethodologyParent.Slug = request.Slug;
+                            methodologyVersion.Methodology.Slug = request.Slug;
                         }
                     }
 
                     await _context.SaveChangesAsync();
 
-                    return methodology;
+                    return methodologyVersion;
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false)
+        public Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Guid methodologyId, bool forceDelete = false)
         {
             return _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId,
-                    query => query.Include(m => m.MethodologyParent))
-                .OnSuccess(methodology => _userService.CheckCanDeleteMethodology(methodology, forceDelete))
-                .OnSuccessDo(UnlinkMethodologyFilesAndDeleteIfOrphaned)
-                .OnSuccessDo(DeleteMethodologyVersion)
-                .OnSuccessVoid(DeleteMethodologyParentIfOrphaned);
+                .CheckEntityExists<MethodologyVersion>(methodologyId,
+                    query => query.Include(m => m.Methodology))
+                .OnSuccess(methodologyVersion => _userService.CheckCanDeleteMethodology(methodologyVersion, forceDelete))
+                .OnSuccessDo(UnlinkFilesAndDeleteIfOrphaned)
+                .OnSuccessDo(DeleteVersion)
+                .OnSuccessVoid(DeleteMethodologyIfOrphaned);
         }
 
-        private async Task<Either<ActionResult, Unit>> UnlinkMethodologyFilesAndDeleteIfOrphaned(
-            Methodology methodology)
+        private async Task<Either<ActionResult, Unit>> UnlinkFilesAndDeleteIfOrphaned(
+            MethodologyVersion methodologyVersion)
         {
             var methodologyFileIds = await _context
                 .MethodologyFiles
-                .Where(f => f.MethodologyId == methodology.Id)
+                .Where(f => f.MethodologyVersionId == methodologyVersion.Id)
                 .Select(f => f.FileId)
                 .ToListAsync();
 
             if (methodologyFileIds.Count > 0)
             {
-                return await _methodologyImageService.Delete(methodology.Id, methodologyFileIds);
+                return await _methodologyImageService.Delete(methodologyVersion.Id, methodologyFileIds);
             }
 
             return Unit.Instance;
         }
 
-        private async Task DeleteMethodologyVersion(Methodology methodology)
+        private async Task DeleteVersion(MethodologyVersion methodologyVersion)
         {
-            _context.Methodologies.Remove(methodology);
+            _context.MethodologyVersions.Remove(methodologyVersion);
             await _context.SaveChangesAsync();
         }
 
-        private async Task DeleteMethodologyParentIfOrphaned(Methodology methodology)
+        private async Task DeleteMethodologyIfOrphaned(MethodologyVersion methodologyVersion)
         {
-            var methodologyParent = await _context
-                .MethodologyParents
+            var methodology = await _context
+                .Methodologies
                 .Include(p => p.Versions)
-                .SingleAsync(p => p.Id == methodology.MethodologyParentId);
+                .SingleAsync(p => p.Id == methodologyVersion.MethodologyId);
 
-            if (methodologyParent.Versions.Count == 0)
+            if (methodology.Versions.Count == 0)
             {
-                _context.MethodologyParents.Remove(methodologyParent);
+                _context.Methodologies.Remove(methodology);
                 await _context.SaveChangesAsync();
             }
         }
 
         private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
-            Methodology methodology,
+            MethodologyVersion methodologyVersion,
             MethodologyUpdateRequest request)
         {
             if (request.PublishingStrategy != WithRelease)
@@ -384,15 +384,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         return ValidationActionResult(MethodologyCannotDependOnPublishedRelease);
                     }
 
-                    await _context.Entry(methodology)
-                        .Reference(m => m.MethodologyParent)
+                    await _context.Entry(methodologyVersion)
+                        .Reference(m => m.Methodology)
                         .LoadAsync();
 
-                    await _context.Entry(methodology.MethodologyParent)
+                    await _context.Entry(methodologyVersion.Methodology)
                         .Collection(mp => mp.Publications)
                         .LoadAsync();
 
-                    var publicationIds = methodology.MethodologyParent.Publications
+                    var publicationIds = methodologyVersion.Methodology.Publications
                         .Select(pm => pm.PublicationId)
                         .ToList();
 
@@ -405,27 +405,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,
+        private Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateStatus(
+            MethodologyVersion methodologyVersion,
             MethodologyStatus requestedStatus)
         {
             return requestedStatus switch
             {
-                Draft => _userService.CheckCanMarkMethodologyAsDraft(methodology),
-                Approved => _userService.CheckCanApproveMethodology(methodology),
+                Draft => _userService.CheckCanMarkMethodologyAsDraft(methodologyVersion),
+                Approved => _userService.CheckCanApproveMethodology(methodologyVersion),
                 _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
             };
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Methodology methodology)
+        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(MethodologyVersion methodologyVersion)
         {
-            return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodology.Id)
+            return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodologyVersion.Id)
                 .OnSuccess(async contentBlocks =>
                 {
                     var contentImageIds = contentBlocks.SelectMany(contentBlock =>
                             HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
                         .Distinct();
 
-                    var imageFiles = await _methodologyFileRepository.GetByFileType(methodology.Id, Image);
+                    var imageFiles = await _methodologyFileRepository.GetByFileType(methodologyVersion.Id, Image);
 
                     var unusedImages = imageFiles
                         .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -434,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (unusedImages.Any())
                     {
-                        return await _methodologyImageService.Delete(methodology.Id, unusedImages);
+                        return await _methodologyImageService.Delete(methodologyVersion.Id, unusedImages);
                     }
 
                     return Unit.Instance;
@@ -447,17 +448,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new TitleAndIdViewModel(publication.Id, publication.Title);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
+            Guid methodologyVersionId, string slug)
         {
-            var methodologyParentId = await _context
-                .Methodologies
-                .Where(m => m.Id == id)
-                .Select(m => m.MethodologyParentId)
+            var methodologyId = await _context
+                .MethodologyVersions
+                .Where(m => m.Id == methodologyVersionId)
+                .Select(m => m.MethodologyId)
                 .SingleAsync();
 
             if (await _context
-                .MethodologyParents
-                .AnyAsync(p => p.Slug == slug && p.Id != methodologyParentId))
+                .Methodologies
+                .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
             {
                 return ValidationActionResult(SlugNotUnique);
             }

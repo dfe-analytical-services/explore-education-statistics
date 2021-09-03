@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceService _metaGuidanceService;
-        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IMetaGuidanceService metaGuidanceService,
             IReleaseDataFileRepository fileRepository,
-            IMethodologyRepository methodologyRepository,
+            IMethodologyVersionRepository methodologyVersionRepository,
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService)
         {
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _metaGuidanceService = metaGuidanceService;
             _fileRepository = fileRepository;
-            _methodologyRepository = methodologyRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
         }
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
-            var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+            var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
             if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));

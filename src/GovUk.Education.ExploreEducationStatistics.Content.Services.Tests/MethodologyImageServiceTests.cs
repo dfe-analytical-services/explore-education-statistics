@@ -24,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Stream()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var methodologyFile = new MethodologyFile
             {
-                Methodology = methodology,
+                MethodologyVersion = methodologyVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(methodology.Id, methodologyFile.File.Id);
+                var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
                 Assert.True(result.IsRight);
 
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodologyFile = new MethodologyFile
             {
-                Methodology = new Methodology(),
+                MethodologyVersion = new MethodologyVersion(),
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -142,13 +142,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Stream_MethodologyFileNotFound()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(methodology.Id, Guid.NewGuid());
+                var result = await service.Stream(methodologyVersion.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -170,11 +170,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Stream_BlobDoesNotExist()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var methodologyFile = new MethodologyFile
             {
-                Methodology = methodology,
+                MethodologyVersion = methodologyVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(methodology.Id, methodologyFile.File.Id);
+                var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
                 result.AssertNotFound();
 

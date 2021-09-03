@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,20 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IMethodologyFileRepository
     {
         public Task<MethodologyFile> Create(
-            Guid methodologyId,
+            Guid methodologyVersionId,
             string filename,
             FileType type,
             Guid createdById);
 
-        public Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyId,
+        public Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyVersionId,
             Guid fileId,
             params FileType[] allowedFileTypes);
 
-        public Task Delete(Guid methodologyId, Guid fileId);
+        public Task Delete(Guid methodologyVersionId, Guid fileId);
 
-        public Task<MethodologyFile> Get(Guid methodologyId, Guid fileId);
+        public Task<MethodologyFile> Get(Guid methodologyVersionId, Guid fileId);
 
-        public Task<List<MethodologyFile>> GetByFileType(Guid methodologyId, params FileType[] types);
+        public Task<List<MethodologyFile>> GetByFileType(Guid methodologyVersionId, params FileType[] types);
         
         public Task<List<MethodologyFile>> GetByFile(Guid fileId);
     }

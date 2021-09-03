@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyFile>(q => q
                     .Include(mf => mf.File)
-                    .Where(mf => mf.MethodologyId == methodologyId && mf.FileId == fileId))
+                    .Where(mf => mf.MethodologyVersionId == methodologyId && mf.FileId == fileId))
                 .OnSuccess(async mf =>
                 {
                     return await GetBlob(mf.Path())

@@ -60,45 +60,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyId}/summary")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummary(Guid methodologyId)
+        [HttpGet("methodology/{methodologyVersionId}/summary")]
+        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummary(Guid methodologyVersionId)
         {
             return await _methodologyService
-                .GetSummary(methodologyId)
+                .GetSummary(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyId}/unpublished-releases")]
+        [HttpGet("methodology/{methodologyVersionId}/unpublished-releases")]
         public async Task<ActionResult<List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
-            Guid methodologyId)
+            Guid methodologyVersionId)
         {
             return await _methodologyService
-                .GetUnpublishedReleasesUsingMethodology(methodologyId)
+                .GetUnpublishedReleasesUsingMethodology(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyId}")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodology(Guid methodologyId,
+        [HttpPut("methodology/{methodologyVersionId}")]
+        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodology(
+            Guid methodologyVersionId,
             MethodologyUpdateRequest request)
         {
             return await _methodologyService
-                .UpdateMethodology(methodologyId, request)
+                .UpdateMethodology(methodologyVersionId, request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("methodology/{methodologyId}/amendment")]
-        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAmendment(Guid methodologyId)
+        [HttpPost("methodology/{originalMethodologyVersionId}/amendment")]
+        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAmendment(
+            Guid originalMethodologyVersionId)
         {
             return _methodologyAmendmentService
-                .CreateMethodologyAmendment(methodologyId)
+                .CreateMethodologyAmendment(originalMethodologyVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("methodology/{methodologyId}")]
-        public Task<ActionResult> DeleteMethodology(Guid methodologyId)
+        [HttpDelete("methodology/{methodologyVersionId}")]
+        public Task<ActionResult> DeleteMethodologyVersion(Guid methodologyVersionId)
         {
             return _methodologyService
-                .DeleteMethodology(methodologyId)
+                .DeleteMethodologyVersion(methodologyVersionId)
                 .HandleFailuresOrNoContent();
         }
     }

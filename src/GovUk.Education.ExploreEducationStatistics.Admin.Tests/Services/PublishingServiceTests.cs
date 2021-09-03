@@ -212,13 +212,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task PublishMethodologyFiles()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Methodologies.AddAsync(methodology);
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             storageQueueService.Setup(
                     mock => mock.AddMessageAsync(PublishMethodologyFilesQueue,
                         It.Is<PublishMethodologyFilesMessage>(message =>
-                            message.MethodologyId == methodology.Id)))
+                            message.MethodologyId == methodologyVersion.Id)))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -236,12 +236,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     storageQueueService: storageQueueService.Object);
 
                 var result = await publishingService
-                    .PublishMethodologyFiles(methodology.Id);
+                    .PublishMethodologyFiles(methodologyVersion.Id);
 
                 storageQueueService.Verify(
                     mock => mock.AddMessageAsync(PublishMethodologyFilesQueue,
                         It.Is<PublishMethodologyFilesMessage>(message =>
-                            message.MethodologyId == methodology.Id)), Times.Once());
+                            message.MethodologyId == methodologyVersion.Id)), Times.Once());
 
                 result.AssertRight();
             }

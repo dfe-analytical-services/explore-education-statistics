@@ -25,17 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string Slug => SlugFromTitle(Title);
 
-        public bool IsStatusUpdateForMethodology(Content.Model.Methodology methodology)
+        public bool IsStatusUpdateForMethodology(Content.Model.MethodologyVersion methodologyVersion)
         {
-            return methodology.Status != Status
-                   || methodology.PublishingStrategy != PublishingStrategy
-                   || methodology.ScheduledWithReleaseId != WithReleaseId
-                   || methodology.InternalReleaseNote != LatestInternalReleaseNote;
+            return methodologyVersion.Status != Status
+                   || methodologyVersion.PublishingStrategy != PublishingStrategy
+                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId
+                   || methodologyVersion.InternalReleaseNote != LatestInternalReleaseNote;
         }
 
-        public bool IsDetailUpdateForMethodology(Content.Model.Methodology methodology)
+        public bool IsDetailUpdateForMethodology(Content.Model.MethodologyVersion methodologyVersion)
         {
-            return methodology.Title != Title;
+            return methodologyVersion.Title != Title;
         }
     }
 }
