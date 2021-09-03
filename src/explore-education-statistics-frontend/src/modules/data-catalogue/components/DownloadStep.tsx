@@ -8,7 +8,6 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
-import { FileInfo } from '@common/services/types/file';
 import { ReleaseSummary } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import SummaryList from '@common/components/SummaryList';
@@ -27,13 +26,9 @@ interface DownloadFormValues {
 }
 export type DownloadFormSubmitHandler = (values: { files: string[] }) => void;
 
-export interface SubjectWithDownloadFiles extends Subject {
-  downloadFile: FileInfo;
-}
-
 interface Props {
   release?: ReleaseSummary;
-  subjects: SubjectWithDownloadFiles[];
+  subjects: Subject[];
   initialValues?: { files: string[] };
   onSubmit: DownloadFormSubmitHandler;
 }
@@ -87,8 +82,8 @@ const DownloadStep = ({
         const hasDetails = content || geographicLevels || timePeriod;
 
         return {
-          label: `${subject.name} (${subject.downloadFile.extension}, ${subject.downloadFile.size})`,
-          value: subject.downloadFile.id,
+          label: `${subject.name} (${subject.file.extension}, ${subject.file.size})`,
+          value: subject.file.id,
           hint: hasDetails ? (
             <Details summary="More details" className="govuk-!-margin-bottom-2">
               <h4>This subject includes the following data:</h4>

@@ -115,28 +115,26 @@ const TableToolWizard = ({
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId,
-    publicationSlug,
-    publicationTitle,
+    publication,
   }) => {
     const [subjects, featuredTables] = await Promise.all([
-      tableBuilderService.listLatestReleaseSubjects(publicationId),
-      tableBuilderService.listLatestReleaseFeaturedTables(publicationId),
+      tableBuilderService.listLatestReleaseSubjects(publication.id),
+      tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
     ]);
 
     const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
-      publicationSlug,
+      publication.slug,
     );
 
     updateState(draft => {
       draft.subjects = subjects;
       draft.featuredTables = featuredTables;
 
-      draft.query.publicationId = publicationId;
+      draft.query.publicationId = publication.id;
       draft.selectedPublication = {
-        id: publicationId,
-        slug: publicationSlug,
-        title: publicationTitle,
+        id: publication.id,
+        slug: publication.slug,
+        title: publication.title,
         selectedRelease: {
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,

@@ -71,6 +71,14 @@ describe('DataBlockPageTabs', () => {
         to: '2020',
       },
       geographicLevels: ['National'],
+      file: {
+        id: 'file-1',
+        name: 'Test subject',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
+      },
     },
   ];
 

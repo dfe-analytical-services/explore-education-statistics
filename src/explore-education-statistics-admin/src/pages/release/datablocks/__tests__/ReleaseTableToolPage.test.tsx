@@ -47,6 +47,14 @@ describe('ReleaseTableToolPage', () => {
           to: '2020',
         },
         geographicLevels: ['National'],
+        file: {
+          id: 'file-1',
+          name: 'Subject 1',
+          fileName: 'file-1.csv',
+          extension: 'csv',
+          size: '10 Mb',
+          type: 'Data',
+        },
       },
       {
         id: 'subject-2',
@@ -57,6 +65,14 @@ describe('ReleaseTableToolPage', () => {
           to: '2018/19',
         },
         geographicLevels: ['National'],
+        file: {
+          id: 'file-2',
+          name: 'Subject 2',
+          fileName: 'file-2.csv',
+          extension: 'csv',
+          size: '20 Mb',
+          type: 'Data',
+        },
       },
     ]);
 

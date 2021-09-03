@@ -1,3 +1,4 @@
+import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { ReleaseSummary } from '@common/services/publicationService';
@@ -183,7 +184,9 @@ describe('ReleaseStep', () => {
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({ releaseId: 'test-rel-2' });
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ReleaseFormSubmitHandler>
+      >({ release: testReleases[2] });
     });
   });
 

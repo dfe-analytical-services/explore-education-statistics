@@ -1,4 +1,5 @@
 import { dataApi } from '@common/services/api';
+import { FileInfo } from '@common/services/types/file';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
 import { groupBy, mapValues, uniq } from 'lodash';
@@ -70,6 +71,7 @@ export interface Subject {
     to?: string;
   };
   geographicLevels: string[];
+  file: FileInfo;
 }
 
 export interface FeaturedTable {

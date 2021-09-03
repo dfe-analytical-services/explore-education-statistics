@@ -1,6 +1,5 @@
-import DownloadStep, {
-  SubjectWithDownloadFiles,
-} from '@frontend/modules/data-catalogue/components/DownloadStep';
+import { Subject } from '@common/services/tableBuilderService';
+import DownloadStep from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { getDescribedBy } from '@common-test/queries';
 import { ReleaseSummary } from '@common/services/publicationService';
@@ -21,22 +20,22 @@ describe('DownloadStep', () => {
     goToPreviousStep: noop,
   };
 
-  const testSubjects: SubjectWithDownloadFiles[] = [
+  const testSubjects: Subject[] = [
     {
       id: 'test-subject-1',
       name: 'Subject 1',
       content: 'Some content here 1',
-      geographicLevels: ['SoYo'],
+      geographicLevels: ['National'],
       timePeriods: {
         from: '2018',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-1',
-        extension: 'csv',
+        name: 'Subject 1',
         fileName: 'file-1.csv',
-        name: 'File 1',
-        size: '100mb',
+        extension: 'csv',
+        size: '10 Mb',
         type: 'Data',
       },
     },
@@ -44,17 +43,17 @@ describe('DownloadStep', () => {
       id: 'test-subject-2',
       name: 'Another Subject',
       content: 'Some content here 2',
-      geographicLevels: ['WeYo'],
+      geographicLevels: ['Local Authority'],
       timePeriods: {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-2',
-        extension: 'csv',
+        name: 'Another Subject',
         fileName: 'file-2.csv',
-        name: 'File 2',
-        size: '101mb',
+        extension: 'csv',
+        size: '20 Mb',
         type: 'Data',
       },
     },
@@ -62,17 +61,17 @@ describe('DownloadStep', () => {
       id: 'test-subject-3',
       name: 'Subject 3',
       content: 'Some content here 3',
-      geographicLevels: ['NoYo'],
+      geographicLevels: ['Local Authority District'],
       timePeriods: {
         from: '2017',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-3',
-        extension: 'csv',
+        name: 'Subject 3',
         fileName: 'file-3.csv',
-        name: 'File 3',
-        size: '100mb',
+        extension: 'csv',
+        size: '30 Mb',
         type: 'Data',
       },
     },
@@ -108,7 +107,7 @@ describe('DownloadStep', () => {
     expect(downloads[0]).toBeEnabled();
     expect(downloads[0]).not.toBeChecked();
     expect(downloads[0]).toEqual(
-      downloadsGroup.getByLabelText('Another Subject (csv, 101mb)'),
+      downloadsGroup.getByLabelText('Another Subject (csv, 20 Mb)'),
     );
 
     const subject2Hint = within(getDescribedBy(container, downloads[0]));
@@ -118,7 +117,7 @@ describe('DownloadStep', () => {
       ),
     ).toBeInTheDocument();
     expect(subject2Hint.getByTestId('Geographic levels')).toHaveTextContent(
-      'WeYo',
+      'Local Authority',
     );
     expect(subject2Hint.getByTestId('Time period')).toHaveTextContent(
       '2016 to 2019',
@@ -128,7 +127,7 @@ describe('DownloadStep', () => {
     expect(downloads[1]).toBeEnabled();
     expect(downloads[1]).not.toBeChecked();
     expect(downloads[1]).toEqual(
-      downloadsGroup.getByLabelText('Subject 1 (csv, 100mb)'),
+      downloadsGroup.getByLabelText('Subject 1 (csv, 10 Mb)'),
     );
     const subject1Hint = within(getDescribedBy(container, downloads[1]));
     expect(
@@ -137,7 +136,7 @@ describe('DownloadStep', () => {
       ),
     ).toBeInTheDocument();
     expect(subject1Hint.getByTestId('Geographic levels')).toHaveTextContent(
-      'SoYo',
+      'National',
     );
     expect(subject1Hint.getByTestId('Time period')).toHaveTextContent(
       '2018 to 2019',
@@ -147,7 +146,7 @@ describe('DownloadStep', () => {
     expect(downloads[2]).toBeEnabled();
     expect(downloads[2]).not.toBeChecked();
     expect(downloads[2]).toEqual(
-      downloadsGroup.getByLabelText('Subject 3 (csv, 100mb)'),
+      downloadsGroup.getByLabelText('Subject 3 (csv, 30 Mb)'),
     );
 
     const subject3Hint = within(getDescribedBy(container, downloads[2]));
@@ -157,7 +156,7 @@ describe('DownloadStep', () => {
       ),
     ).toBeInTheDocument();
     expect(subject3Hint.getByTestId('Geographic levels')).toHaveTextContent(
-      'NoYo',
+      'Local Authority District',
     );
     expect(subject3Hint.getByTestId('Time period')).toHaveTextContent(
       '2017 to 2019',
@@ -249,7 +248,7 @@ describe('DownloadStep', () => {
     );
 
     userEvent.click(
-      screen.getByRole('checkbox', { name: 'Subject 1 (csv, 100mb)' }),
+      screen.getByRole('checkbox', { name: 'Subject 1 (csv, 10 Mb)' }),
     );
     userEvent.click(
       screen.getByRole('button', { name: 'Download selected files' }),
