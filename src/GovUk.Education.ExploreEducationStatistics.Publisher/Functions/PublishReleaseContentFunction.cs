@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -9,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
@@ -22,19 +25,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseService _releaseService;
         private readonly IReleaseStatusService _releaseStatusService;
+        private readonly ContentDbContext _contentDbContext;
 
         public PublishReleaseContentFunction(
             IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseService releaseService,
-            IReleaseStatusService releaseStatusService)
+            IReleaseStatusService releaseStatusService,
+            ContentDbContext contentDbContext)
         {
             _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseService = releaseService;
             _releaseStatusService = releaseStatusService;
+            _contentDbContext = contentDbContext;
         }
 
         /// <summary>
@@ -83,7 +89,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
-                await _notificationsService.NotifySubscribers(message.ReleaseId);
+
+                var release = _contentDbContext.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .Single(r => r.Id == message.ReleaseId);
+                if (release.NotifySubscribers)
+                {
+                    await _notificationsService.NotifySubscribers(message.ReleaseId);
+                }
+
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
             }
             catch (Exception e)

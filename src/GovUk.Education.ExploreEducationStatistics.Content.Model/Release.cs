@@ -66,6 +66,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ReleaseStatus> ReleaseStatuses { get; set; }
 
+        public bool NotifySubscribers
+        {
+            get
+            {
+                return ReleaseStatuses.Any(rs => rs.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                       && ReleaseStatuses
+                           .Where(rs => rs.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                           .OrderBy(rs => rs.Created)
+                           .Last()
+                           .NotifySubscribers;
+            }
+        }
+
         public string LatestInternalReleaseNote
         {
             get

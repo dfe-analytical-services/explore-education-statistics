@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
@@ -24,13 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
+        private readonly ContentDbContext _contentDbContext;
 
         public PublishStagedReleaseContentFunction(IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseStatusService releaseStatusService,
             IPublishingService publishingService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            ContentDbContext contentDbContext)
         {
             _blobCacheService = blobCacheService;
             _contentService = contentService;
@@ -38,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
             _publishingService = publishingService;
             _releaseService = releaseService;
+            _contentDbContext = contentDbContext;
         }
 
         /// <summary>
@@ -102,7 +107,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
-                    await _notificationsService.NotifySubscribers(releaseIds);
+
+                    var releaseIdsToNotifySubscribersFor = _contentDbContext.Releases
+                        .Include(r => r.ReleaseStatuses)
+                        .Where(r => releaseIds.Contains(r.Id))
+                        .ToList()
+                        .Where(r => r.NotifySubscribers)
+                        .Select(r => r.Id)
+                        .ToArray();
+                    await _notificationsService.NotifySubscribers(releaseIdsToNotifySubscribersFor);
+
                     await UpdateStage(published, Complete);
                 }
                 catch (Exception e)

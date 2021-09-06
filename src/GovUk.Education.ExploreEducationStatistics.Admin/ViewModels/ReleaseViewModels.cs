@@ -1,4 +1,3 @@
-#enable nullable
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -57,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
+
+        public bool NotifySubscribers { get; set; }
 
         public string LatestInternalReleaseNote { get; set; }
 
