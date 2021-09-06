@@ -8,6 +8,7 @@ export interface Release {
   id: string;
   slug: string;
   approvalStatus: ReleaseApprovalStatus;
+  notifySubscribers?: boolean;
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
@@ -165,6 +166,7 @@ export interface ReleaseStatus {
   releaseStatusId: string;
   internalReleaseNote: string;
   approvalStatus: ReleaseApprovalStatus;
+  notifySubscribers: boolean;
   created: string;
   createdByEmail: string;
 }
