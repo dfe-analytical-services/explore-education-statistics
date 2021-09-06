@@ -10,9 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ReleaseId { get; set; }
 
-        public Release Release { get; set; }
+        public Release Release { get; set; } = null!;
 
-        public string InternalReleaseNote { get; set; }
+        public string InternalReleaseNote { get; set; } = null!;
+
+        public bool NotifySubscribers { get; set; }
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
