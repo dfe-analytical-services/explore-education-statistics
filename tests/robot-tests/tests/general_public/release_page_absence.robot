@@ -204,9 +204,11 @@ Validate accordion sections order
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
 
     user scrolls to element    id:help-and-support
-    user checks accordion is in position    Official Statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
-    user checks there are x accordion sections    2    id:help-and-support
+    user checks accordion is in position    Methodology    1    id:help-and-support
+    user checks accordion is in position    Official Statistics    2    id:help-and-support
+    user checks accordion is in position    Contact us    3    id:help-and-support
+
+    user checks there are x accordion sections    3    id:help-and-support
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
