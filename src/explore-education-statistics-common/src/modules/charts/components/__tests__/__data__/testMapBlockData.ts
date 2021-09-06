@@ -1,5 +1,6 @@
 import { TableDataResponse } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import produce from 'immer';
 
 export const testMapConfiguration: Chart = {
   axes: {
@@ -406,3 +407,221 @@ export const testMapTableData: TableDataResponse = {
     },
   ],
 };
+
+export const testMapTableDataRegion = produce(testMapTableData, draft => {
+  draft.subjectMeta.locations = [
+    {
+      level: 'region',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'region-1-value',
+            lat: 53.8227005,
+            long: -1.50735998,
+            name: 'Region 1',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'Region 1',
+      value: 'region-1-value',
+    },
+    {
+      level: 'region',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'region-2-value',
+            lat: 53.4701004,
+            long: -2.23358989,
+            name: 'Region 2',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'Region 2',
+      value: 'region-2-value',
+    },
+    {
+      level: 'region',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'region-3-value',
+            lat: 53.40359879,
+            long: -1.54253995,
+            name: 'Region 3',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'Region 3',
+      value: 'region-3-value',
+    },
+  ];
+  draft.results = [
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'region',
+      location: {
+        country: { code: 'E92000001', name: 'England' },
+        region: { code: 'region-1-value', name: 'Region 1' },
+      },
+      measures: {
+        'authorised-absence-rate': '3.5',
+        'overall-absence-rate': '4.8',
+        'unauthorised-absence-rate': '1.7',
+      },
+      timePeriod: '2016_AY',
+    },
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'region',
+      location: {
+        country: { code: 'E92000001', name: 'England' },
+        region: { code: 'region-2-value', name: 'Region 2' },
+      },
+      measures: {
+        'authorised-absence-rate': '3',
+        'overall-absence-rate': '4.7',
+        'unauthorised-absence-rate': '1.6',
+      },
+      timePeriod: '2016_AY',
+    },
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'region',
+      location: {
+        country: { code: 'E92000001', name: 'England' },
+        region: { code: 'region-3-value', name: 'Region 3' },
+      },
+      measures: {
+        'authorised-absence-rate': '4',
+        'overall-absence-rate': '5.1',
+        'unauthorised-absence-rate': '2',
+      },
+      timePeriod: '2016_AY',
+    },
+  ];
+});
+
+export const testMapTableDataMixed = produce(testMapTableData, draft => {
+  draft.subjectMeta.locations = [
+    {
+      level: 'localAuthority',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'la-1-value',
+            lat: 53.8227005,
+            long: -1.50735998,
+            name: 'Region 1',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'LA 1',
+      value: 'la-1-value',
+    },
+    {
+      level: 'country',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'country-1-value',
+            lat: 53.4701004,
+            long: -2.23358989,
+            name: 'Country 1',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'Region 2',
+      value: 'region-2-value',
+    },
+    {
+      level: 'region',
+      geoJson: [
+        {
+          type: 'Feature',
+          properties: {
+            code: 'region-3-value',
+            lat: 53.40359879,
+            long: -1.54253995,
+            name: 'Region 3',
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [],
+          },
+        },
+      ],
+      label: 'Region 3',
+      value: 'region-3-value',
+    },
+  ];
+  draft.results = [
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'localAuthority',
+      location: {
+        country: { code: 'country-1-value', name: 'Country' },
+        region: { code: 'region-1-value', name: 'Region 1' },
+        localAuthority: { code: 'la-1-value', name: 'LA 1' },
+      },
+      measures: {
+        'authorised-absence-rate': '3.5',
+        'overall-absence-rate': '4.8',
+        'unauthorised-absence-rate': '1.7',
+      },
+      timePeriod: '2016_AY',
+    },
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'country',
+      location: {
+        country: { code: 'country-1-value', name: 'Country' },
+      },
+      measures: {
+        'authorised-absence-rate': '3',
+        'overall-absence-rate': '4.7',
+        'unauthorised-absence-rate': '1.6',
+      },
+      timePeriod: '2016_AY',
+    },
+    {
+      filters: ['characteristic-total', 'school-type-total'],
+      geographicLevel: 'region',
+      location: {
+        country: { code: 'country-1-value', name: 'Country' },
+        region: { code: 'region-3-value', name: 'Region 3' },
+      },
+      measures: {
+        'authorised-absence-rate': '4',
+        'overall-absence-rate': '5.1',
+        'unauthorised-absence-rate': '2',
+      },
+      timePeriod: '2016_AY',
+    },
+  ];
+});
