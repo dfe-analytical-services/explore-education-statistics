@@ -9,5 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public OpportunityArea(string code, string name) : base(code, name)
         {
         }
+        
+        public static OpportunityArea Empty()
+        {
+            return new OpportunityArea(null, null);
+        }
     }
 }

@@ -179,23 +179,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var entityEntry = context.Location.Add(new Location
                 {
                     Id = _guidGenerator.NewGuid(),
-                    Country = country ?? new Country(),
-                    EnglishDevolvedArea = englishDevolvedArea ?? new EnglishDevolvedArea(),
-                    Institution = institution ?? new Institution(),
-                    LocalAuthority = localAuthority ?? new LocalAuthority(),
-                    LocalAuthorityDistrict = localAuthorityDistrict ?? new LocalAuthorityDistrict(),
-                    LocalEnterprisePartnership = localEnterprisePartnership ?? new LocalEnterprisePartnership(),
-                    MayoralCombinedAuthority = mayoralCombinedAuthority ?? new MayoralCombinedAuthority(),
-                    MultiAcademyTrust = multiAcademyTrust ?? new Mat(),
-                    OpportunityArea = opportunityArea ?? new OpportunityArea(),
-                    ParliamentaryConstituency = parliamentaryConstituency ?? new ParliamentaryConstituency(),
-                    Provider = provider ?? new Provider(),
-                    Region = region ?? new Region(),
-                    RscRegion = rscRegion ?? new RscRegion(),
-                    School = school ?? new School(),
-                    Sponsor = sponsor ?? new Sponsor(),
-                    Ward = ward ?? new Ward(),
-                    PlanningArea = planningArea ?? new PlanningArea()
+                    Country = country ?? Country.Empty(),
+                    EnglishDevolvedArea = englishDevolvedArea ?? EnglishDevolvedArea.Empty(),
+                    Institution = institution ?? Institution.Empty(),
+                    LocalAuthority = localAuthority ?? LocalAuthority.Empty(),
+                    LocalAuthorityDistrict = localAuthorityDistrict ?? LocalAuthorityDistrict.Empty(),
+                    LocalEnterprisePartnership = localEnterprisePartnership ?? LocalEnterprisePartnership.Empty(),
+                    MayoralCombinedAuthority = mayoralCombinedAuthority ?? MayoralCombinedAuthority.Empty(),
+                    MultiAcademyTrust = multiAcademyTrust ?? Mat.Empty(),
+                    OpportunityArea = opportunityArea ?? OpportunityArea.Empty(),
+                    ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
+                    Provider = provider ?? Provider.Empty(),
+                    Region = region ?? Region.Empty(),
+                    RscRegion = rscRegion ?? RscRegion.Empty(),
+                    School = school ?? School.Empty(),
+                    Sponsor = sponsor ?? Sponsor.Empty(),
+                    Ward = ward ?? Ward.Empty(),
+                    PlanningArea = planningArea ?? PlanningArea.Empty()
                 });
 
                 return entityEntry.Entity;

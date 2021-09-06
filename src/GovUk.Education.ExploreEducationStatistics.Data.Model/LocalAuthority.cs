@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class LocalAuthority : ObservationalUnit
     {
-        [JsonIgnore] public string OldCode { get; }
+        public string OldCode { get; }
 
         public LocalAuthority()
         {
@@ -19,6 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string GetCodeOrOldCodeIfEmpty()
         {
             return Code.IsNullOrEmpty() ? OldCode : Code;
+        }
+        
+        public static LocalAuthority Empty()
+        {
+            return new LocalAuthority(null, null, null);
         }
     }
 }
