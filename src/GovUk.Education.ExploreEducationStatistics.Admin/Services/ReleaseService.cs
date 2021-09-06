@@ -379,10 +379,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
+                    // NOTE: Subscribers should be notified if the release is approved and isn't amended,
+                    //       OR if the release is an amendment, is approved, and NotifySubscribers is true
+                    var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
+                        (!release.Amendment || (request.NotifySubscribers.HasValue && request.NotifySubscribers.Value));
+
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
                         InternalReleaseNote = request.LatestInternalReleaseNote,
+                        NotifySubscribers = notifySubscribers,
                         ApprovalStatus = request.ApprovalStatus,
                         Created = DateTime.UtcNow,
                         CreatedById = _userService.GetUserId()
