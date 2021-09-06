@@ -198,4 +198,4 @@ Switch to bau1 to approve release for immediate publication
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
     user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
     user clicks link    Edit this release
-    user approves release for immediate publication
+    user approves original release for immediate publication

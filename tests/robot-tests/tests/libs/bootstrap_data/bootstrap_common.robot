@@ -62,7 +62,7 @@ user creates a fully populated published release
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 user creates a fully populated draft release
     [Arguments]
