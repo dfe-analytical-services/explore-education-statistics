@@ -1,7 +1,10 @@
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import releaseService, { MyRelease } from '@admin/services/releaseService';
+import releaseService, {
+  DeleteReleasePlan,
+  MyRelease,
+} from '@admin/services/releaseService';
 import React, { useState } from 'react';
 
 interface Props {
@@ -10,8 +13,8 @@ interface Props {
 }
 
 const DraftReleasesTab = ({ releases, onChangeRelease }: Props) => {
-  const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
-    string
+  const [deleteReleasePlan, setDeleteReleasePlan] = useState<
+    DeleteReleasePlan
   >();
 
   return (
@@ -22,20 +25,27 @@ const DraftReleasesTab = ({ releases, onChangeRelease }: Props) => {
         releaseSummaryRenderer={release => (
           <NonScheduledReleaseSummary
             key={release.id}
-            onClickCancelAmendment={setCancelAmendmentReleaseId}
+            onClickCancelAmendment={async releaseId => {
+              setDeleteReleasePlan(
+                await releaseService.getDeleteReleasePlan(releaseId),
+              );
+            }}
             release={release}
           />
         )}
       />
 
-      {cancelAmendmentReleaseId && (
+      {deleteReleasePlan && (
         <CancelAmendmentModal
+          methodologiesScheduledWithRelease={
+            deleteReleasePlan.methodologiesScheduledWithRelease
+          }
           onConfirm={async () => {
-            await releaseService.deleteRelease(cancelAmendmentReleaseId);
-            setCancelAmendmentReleaseId(undefined);
+            await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+            setDeleteReleasePlan(undefined);
             onChangeRelease();
           }}
-          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+          onCancel={() => setDeleteReleasePlan(undefined)}
         />
       )}
     </>

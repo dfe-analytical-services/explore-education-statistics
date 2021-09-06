@@ -173,6 +173,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(release =>
+                {
+                    var methodologiesScheduledWithRelease = _context
+                        .Methodologies
+                        .Include(m => m.MethodologyParent)
+                        .Where(m => releaseId == m.ScheduledWithReleaseId)
+                        .Select(m => new TitleAndIdViewModel(m.Id, m.Title))
+                        .ToList();
+
+                    return new DeleteReleasePlan
+                    {
+                        MethodologiesScheduledWithRelease = methodologiesScheduledWithRelease
+                    };
+                });
+
+        }
+
         public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId)
         {
             return _persistenceHelper
@@ -671,5 +693,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; } = null!;
 
         public List<Guid> FootnoteIds { get; set; } = null!;
+    }
+
+    public class DeleteReleasePlan
+    {
+        public List<TitleAndIdViewModel> MethodologiesScheduledWithRelease { get; set; }
     }
 }

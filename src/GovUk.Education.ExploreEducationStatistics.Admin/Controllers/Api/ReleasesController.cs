@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -215,11 +216,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data/{fileId}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
+        [HttpGet("release/{releaseId}/delete-plan")]
+        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseId, fileId)
+                .GetDeleteReleasePlan(releaseId)
                 .HandleFailuresOrOk();
         }
 

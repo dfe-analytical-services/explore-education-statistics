@@ -9,7 +9,10 @@ import {
   releaseCreateRoute,
 } from '@admin/routes/routes';
 import { MyPublication } from '@admin/services/publicationService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService, {
+  DeleteReleasePlan,
+  Release,
+} from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
@@ -32,11 +35,11 @@ const PublicationSummary = ({
   const history = useHistory();
 
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
-  const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
-    string
-  >();
-
   const { contact, permissions, releases, id, title } = publication;
+
+  const [deleteReleasePlan, setDeleteReleasePlan] = useState<
+    DeleteReleasePlan
+  >();
 
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
@@ -139,7 +142,13 @@ const PublicationSummary = ({
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
                         onClickAmendRelease={setAmendReleaseId}
-                        onClickCancelAmendment={setCancelAmendmentReleaseId}
+                        onClickCancelAmendment={async releaseId => {
+                          setDeleteReleasePlan(
+                            await releaseService.getDeleteReleasePlan(
+                              releaseId,
+                            ),
+                          );
+                        }}
                         release={release}
                       />
                     </li>
@@ -179,14 +188,17 @@ const PublicationSummary = ({
         </ModalConfirm>
       )}
 
-      {cancelAmendmentReleaseId && (
+      {deleteReleasePlan && (
         <CancelAmendmentModal
+          methodologiesScheduledWithRelease={
+            deleteReleasePlan.methodologiesScheduledWithRelease
+          }
           onConfirm={async () => {
-            await releaseService.deleteRelease(cancelAmendmentReleaseId);
-            setCancelAmendmentReleaseId(undefined);
+            await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+            setDeleteReleasePlan(undefined);
             onChangePublication();
           }}
-          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+          onCancel={() => setDeleteReleasePlan(undefined)}
         />
       )}
     </>
