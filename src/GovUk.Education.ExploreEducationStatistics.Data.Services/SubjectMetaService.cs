@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
-            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits)
         {
             var viewModels = observationalUnits
                 .OrderBy(pair => pair.Key.GetEnumLabel())
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
         }
 
-        private static LabelValue MapObservationalUnitToLabelValue(IObservationalUnit unit)
+        private static LabelValue MapObservationalUnitToLabelValue(ObservationalUnit unit)
         {
             var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
             return new LabelValue
