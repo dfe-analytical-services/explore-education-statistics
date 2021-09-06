@@ -12,5 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public School(string urn, string name) : base(urn, name)
         {
         }
+        
+        public static School Empty()
+        {
+            return new School(null, null);
+        }
     }
 }

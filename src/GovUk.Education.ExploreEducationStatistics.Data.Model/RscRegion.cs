@@ -14,5 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public RscRegion(string code) : base(code, code)
         {
         }
+        
+        public static RscRegion Empty()
+        {
+            return new RscRegion(null);
+        }
     }
 }
