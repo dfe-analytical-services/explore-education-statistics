@@ -8,7 +8,8 @@ import noop from 'lodash/noop';
 describe('AdoptMethodologyForm', () => {
   const testMethodologies: BasicMethodology[] = [
     {
-      id: 'm1',
+      id: '1',
+      methodologyId: 'm1',
       amendment: false,
       owningPublication: {
         title: 'owning pub 1',
@@ -17,7 +18,8 @@ describe('AdoptMethodologyForm', () => {
       title: 'methodology 1',
     } as BasicMethodology,
     {
-      id: 'm2',
+      id: '2',
+      methodologyId: 'm2',
       amendment: true,
       owningPublication: {
         title: 'owning pub 2',
@@ -27,7 +29,8 @@ describe('AdoptMethodologyForm', () => {
       title: 'methodology 2',
     } as BasicMethodology,
     {
-      id: 'm3',
+      id: '3',
+      methodologyId: 'm3',
       amendment: true,
       owningPublication: {
         title: 'owning pub 3',
@@ -36,7 +39,8 @@ describe('AdoptMethodologyForm', () => {
       title: 'methodology 3',
     } as BasicMethodology,
     {
-      id: 'm4',
+      id: '4',
+      methodologyId: 'm4',
       owningPublication: {
         title: 'owning pub 4',
       },

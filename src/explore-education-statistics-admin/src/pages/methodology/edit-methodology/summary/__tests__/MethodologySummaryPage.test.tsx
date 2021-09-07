@@ -13,7 +13,7 @@ import { Route } from 'react-router-dom';
 const testMethodology: BasicMethodology = {
   id: 'm1',
   amendment: false,
-  methodologyParentId: 'm-p-1',
+  methodologyId: 'm-1',
   title: 'Test methodology',
   slug: 'test-methodology',
   status: 'Draft',

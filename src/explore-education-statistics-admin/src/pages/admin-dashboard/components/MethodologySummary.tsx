@@ -194,7 +194,7 @@ const MethodologySummary = ({
                 <div className="govuk-grid-column-two-thirds">
                   <Button
                     onClick={() => {
-                      setDropMethodologyId(methodology.methodologyParentId);
+                      setDropMethodologyId(methodology.methodologyId);
                     }}
                     variant="warning"
                   >

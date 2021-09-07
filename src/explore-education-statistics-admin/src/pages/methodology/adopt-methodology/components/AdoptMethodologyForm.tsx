@@ -33,7 +33,7 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
       methodologies?.map(methodology => {
         return {
           label: methodology.title,
-          value: methodology.id,
+          value: methodology.methodologyId,
           hint: (
             <Details summary="More details" className="govuk-!-margin-bottom-2">
               <SummaryList className="govuk-!-margin-bottom-3">
@@ -41,7 +41,7 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
                   {methodology.owningPublication?.title}
                 </SummaryListItem>
                 <SummaryListItem term="Status">
-                  <TagGroup className="govuk-!-margin-left-2">
+                  <TagGroup>
                     <Tag>{methodology.status}</Tag>
                     {methodology.amendment && <Tag>Amendment</Tag>}
                   </TagGroup>

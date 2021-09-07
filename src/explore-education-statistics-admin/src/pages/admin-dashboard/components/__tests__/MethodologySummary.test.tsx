@@ -38,7 +38,7 @@ const testMethodology: MyMethodology = {
   amendment: false,
   id: '1234',
   latestInternalReleaseNote: 'this is the release note',
-  methodologyParentId: 'm-p-1',
+  methodologyId: 'm-1',
   previousVersionId: 'lfkjdlfj',
   published: '2021-06-08T09:04:17.9805585',
   slug: 'meth-1',
@@ -60,7 +60,7 @@ const testMethodology2: MyMethodology = {
   amendment: false,
   id: '4321',
   latestInternalReleaseNote: 'this is another release note',
-  methodologyParentId: 'm-p-2',
+  methodologyId: 'm-2',
   previousVersionId: '9876',
   published: '2021-06-10T09:04:17.9805585',
   slug: 'meth-2',
@@ -992,7 +992,7 @@ describe('MethodologySummary', () => {
         amendment: true,
         id: '12345',
         latestInternalReleaseNote: 'this is the release note',
-        methodologyParentId: 'm-p-1',
+        methodologyId: 'm-1',
         previousVersionId: 'lfkjdlfj',
         owningPublication: {
           id: 'p1',
@@ -1268,7 +1268,7 @@ describe('MethodologySummary', () => {
         expect(publicationService.dropMethodology).toHaveBeenCalledWith(
           testPublicationWithAdoptedMethodologies.id,
           testPublicationWithAdoptedMethodologies.methodologies[0].methodology
-            .methodologyParentId,
+            .methodologyId,
         );
       });
     });
