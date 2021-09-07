@@ -510,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var locations = _locationRepository.GetObservationalUnits(geographicLevel, originalCodes);
             var replacementLocations = replacementSubjectMeta.ObservationalUnits
                 .GetValueOrDefault(geographicLevel)
-                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, IObservationalUnit>();
+                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ObservationalUnit>();
 
             return new LocationReplacementViewModel(
                 label: geographicLevel.GetEnumLabel(),
@@ -521,8 +521,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
-            IObservationalUnit location,
-            Dictionary<string, IObservationalUnit> replacementLocations)
+            ObservationalUnit location,
+            Dictionary<string, ObservationalUnit> replacementLocations)
         {
             return new ObservationalUnitReplacementViewModel(
                 label: location.Name,
@@ -928,7 +928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             public Dictionary<string, Filter> Filters { get; set; }
             public Dictionary<string, Indicator> Indicators { get; set; }
-            public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> ObservationalUnits { get; set; }
+            public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> ObservationalUnits { get; set; }
             public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
         }
     }

@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward,
             PlanningArea planningArea)
         {
-            var observationalUnits = new IObservationalUnit[]
+            var observationalUnits = new ObservationalUnit[]
             {
                 country,
                 englishDevolvedArea,

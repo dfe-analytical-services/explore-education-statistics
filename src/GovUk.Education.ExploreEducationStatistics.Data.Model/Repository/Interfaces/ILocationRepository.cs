@@ -7,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface ILocationRepository : IRepository<Location, Guid>
     {
-        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(Guid subjectId);
+        Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(Guid subjectId);
 
-        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
+        Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(
             IQueryable<Observation> observations);
 
-        IEnumerable<IObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes);
+        IEnumerable<ObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes);
     }
 }
