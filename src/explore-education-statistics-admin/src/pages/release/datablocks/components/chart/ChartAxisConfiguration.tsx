@@ -98,6 +98,16 @@ const ChartAxisConfiguration = ({
       },
     ];
 
+    // Don't show 'Filters' option if we would end up with no
+    // categories due to every filter being siblingless filters.
+    const canGroupByFilters = Object.values(meta.filters).some(
+      filterGroup => filterGroup.options.length > 1,
+    );
+
+    if (!canGroupByFilters) {
+      return options;
+    }
+
     const categories: SelectOption[] = Object.entries(meta.filters)
       .filter(([, value]) => value.options.length > 1)
       .map(([key, value]) => {
@@ -245,6 +255,7 @@ const ChartAxisConfiguration = ({
           ['locations', 'timePeriod', 'filters', 'indicators'],
           'Choose a valid group by',
         ),
+        groupByFilter: Yup.string(),
       });
     }
 
@@ -375,6 +386,11 @@ const ChartAxisConfiguration = ({
                     legendSize="s"
                     name="groupBy"
                     options={groupByOptions}
+                    onChange={e => {
+                      if (e.target.value !== 'filters') {
+                        form.setFieldValue('groupByFilter', '');
+                      }
+                    }}
                   />
                 )}
 

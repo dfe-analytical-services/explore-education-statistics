@@ -355,6 +355,7 @@ describe('ChartAxisConfiguration', () => {
         const formValues: AxisConfiguration = {
           dataSets: [],
           groupBy: 'locations',
+          groupByFilter: '',
           min: 0,
           max: undefined,
           referenceLines: [],
