@@ -344,7 +344,8 @@ if args.env == 'preprod':
 
 if args.env == 'prod':
     robotArgs += ['--include', 'Prod',
-                  '--exclude', 'AltersData']
+                  '--exclude', 'AltersData',
+                  '--exclude', 'NotAgainstProd']
 
 if args.visual:
     robotArgs += ["-v", "headless:0"]
