@@ -24,6 +24,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -129,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Publication",
                         Releases = new List<Release>
                         {
-                            new Release // Template release
+                            new() // Template release
                             {
                                 Id = templateReleaseId,
                                 ReleaseName = "2018",
@@ -379,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.SoftDeleteReleaseSubject(release.Id, subject.Id),
                     Times.Once());
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
             }
         }
 
@@ -549,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.SoftDeleteReleaseSubject(release.Id,
                         It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
             }
         }
 
@@ -1812,8 +1813,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var latest = releaseService.GetLatestPublishedRelease(publication.Id).Result.Right;
 
                 Assert.NotNull(latest);
-                Assert.Equal(latestReleaseV1.Id, latest.Id);
+                Assert.Equal(latestReleaseV1.Id, latest!.Id);
                 Assert.Equal("June 2036", latest.Title);
+            }
+        }
+        
+        [Fact]
+        public async Task GetDeleteReleasePlan()
+        {
+            var release1 = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            var release2 = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var methodology1ScheduledWithRelease1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                ScheduledWithReleaseId = release1.Id,
+                AlternativeTitle = "Methodology 1 with alternative title",
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Methodology 1 owned Publication title"
+                }
+            };
+            
+            var methodology2ScheduledWithRelease1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                ScheduledWithReleaseId = release1.Id,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Methodology 2 with owned Publication title"
+                }
+            };
+
+            var methodologyScheduledWithRelease2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                ScheduledWithReleaseId = release2.Id
+            };
+
+            var methodologyNotScheduled = new Methodology
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Releases.AddRangeAsync(release1, release2);
+                await context.Methodologies.AddRangeAsync(
+                    methodology1ScheduledWithRelease1, 
+                    methodology2ScheduledWithRelease1,
+                    methodologyScheduledWithRelease2,
+                    methodologyNotScheduled);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetDeleteReleasePlan(release1.Id);
+                var plan = result.AssertRight();
+
+                // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
+                // up in the Plan.
+                Assert.Equal(2, plan.MethodologiesScheduledWithRelease.Count);
+                var methodology1 = plan.MethodologiesScheduledWithRelease.Single(m => m.Id == methodology1ScheduledWithRelease1.Id);
+                var methodology2 = plan.MethodologiesScheduledWithRelease.Single(m => m.Id == methodology2ScheduledWithRelease1.Id);
+                
+                Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
+                Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);
             }
         }
 
@@ -1824,8 +1901,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var release = new Release
             {
+                Id = Guid.NewGuid(),
                 Publication = publication,
                 Version = 0,
+            };
+
+            var methodologyScheduledWithRelease = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = Immediately,
+                ScheduledWithReleaseId = release.Id,
+                MethodologyParent = new MethodologyParent
+                {
+                    OwningPublicationTitle = "Methodology scheduled with this Release"
+                }
             };
 
             var userReleaseRole = new UserReleaseRole
@@ -1865,6 +1954,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddRangeAsync(release, anotherRelease);
                 await context.AddRangeAsync(userReleaseRole, anotherUserReleaseRole);
                 await context.AddRangeAsync(userReleaseInvite, anotherUserReleaseInvite);
+                await context.AddAsync(methodologyScheduledWithRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -1891,7 +1981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService.Verify(mock =>
                     mock.DeleteAll(release.Id, false), Times.Once);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 // assert that soft-deleted entities are no longer discoverable by default
                 var unableToFindDeletedRelease = context
@@ -1970,6 +2060,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .First(r => r.Id == anotherUserReleaseInvite.Id);
 
                 Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
+                
+                // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
+                // to do so
+                var retrievedMethodology = context.Methodologies.Single();
+                Assert.True(retrievedMethodology.ScheduledForPublishingImmediately);
+                Assert.Null(retrievedMethodology.ScheduledWithReleaseId);
             }
         }
 

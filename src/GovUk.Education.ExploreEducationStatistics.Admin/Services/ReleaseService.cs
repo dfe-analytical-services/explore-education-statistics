@@ -180,10 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanDeleteRelease)
                 .OnSuccess(release =>
                 {
-                    var methodologiesScheduledWithRelease = _context
-                        .Methodologies
-                        .Include(m => m.MethodologyParent)
-                        .Where(m => releaseId == m.ScheduledWithReleaseId)
+                    var methodologiesScheduledWithRelease = 
+                        GetMethodologiesScheduledWithRelease(releaseId)
                         .Select(m => new TitleAndIdViewModel(m.Id, m.Title))
                         .ToList();
 
@@ -204,24 +202,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
                 .OnSuccessVoid(async release =>
                 {
+                    release.SoftDeleted = true;
+                    _context.Update(release);
+                    
                     var roles = await _context
                         .UserReleaseRoles
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
-
+                    roles.ForEach(r => r.SoftDeleted = true);
+                    _context.UpdateRange(roles);
+                    
                     var invites = await _context
                         .UserReleaseInvites
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
-
-                    release.SoftDeleted = true;
-                    roles.ForEach(r => r.SoftDeleted = true);
                     invites.ForEach(r => r.SoftDeleted = true);
-
-                    _context.Update(release);
-                    _context.UpdateRange(roles);
                     _context.UpdateRange(invites);
 
+                    var methodologiesScheduledWithRelease = 
+                        GetMethodologiesScheduledWithRelease(releaseId);
+                    methodologiesScheduledWithRelease.ForEach(m =>
+                    {
+                        m.PublishingStrategy = MethodologyPublishingStrategy.Immediately;
+                        m.ScheduledWithRelease = null;
+                        m.ScheduledWithReleaseId = null;
+                    });
+                    _context.UpdateRange(methodologiesScheduledWithRelease);
+                    
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(releaseId);
@@ -679,6 +686,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .LoadAsync()
             );
             return release;
+        }
+
+        private IQueryable<Methodology> GetMethodologiesScheduledWithRelease(Guid releaseId)
+        {
+            return _context
+                .Methodologies
+                .Include(m => m.MethodologyParent)
+                .Where(m => releaseId == m.ScheduledWithReleaseId);
         }
     }
 

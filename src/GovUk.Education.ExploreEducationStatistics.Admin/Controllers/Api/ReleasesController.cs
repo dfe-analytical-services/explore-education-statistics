@@ -224,6 +224,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("release/{releaseId}/data/{fileId}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
+        {
+            return await _releaseService
+                .GetDeleteDataFilePlan(releaseId, fileId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpDelete("release/{releaseId}/data/{fileId}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseId, Guid fileId)
         {
@@ -233,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId}/data/{fileId}/import/cancel")]
-        public async Task<IActionResult> CancelFileImport(Guid releaseId, Guid fileId)
+        public async Task<ActionResult> CancelFileImport(Guid releaseId, Guid fileId)
         {
             return await _dataImportService
                 .CancelImport(releaseId, fileId)
