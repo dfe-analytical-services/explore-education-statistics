@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,13 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -316,17 +315,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var topicId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
-            var methodologyId = Guid.NewGuid();
-            
+            var methodologyVersionId = Guid.NewGuid();
+
             var publicationMethodology = new PublicationMethodology
             {
                 PublicationId = publicationId,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
-                    Versions = AsList(new Methodology
+                    Versions = new List<MethodologyVersion>
                     {
-                        Id = methodologyId
-                    })
+                        new()
+                        {
+                            Id = methodologyVersionId
+                        }
+                    }
                 }
             };
 
@@ -351,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = releaseId,
                 PublicationId = publicationId
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -367,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(1, contentContext.Publications.Count());
                 Assert.Equal(1, contentContext.Topics.Count());
-                Assert.Equal(1, contentContext.Methodologies.Count());
+                Assert.Equal(1, contentContext.MethodologyVersions.Count());
                 Assert.Equal(1, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(1, contentContext.Releases.Count());
                 Assert.Equal(1, statisticsContext.Release.Count());
@@ -382,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupTopicService(
-                    contentContext, 
+                    contentContext,
                     statisticsContext,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseFileService: releaseFileService.Object,
@@ -392,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 releaseFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
                     .ReturnsAsync(Unit.Instance);
@@ -402,11 +404,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 methodologyService
-                    .Setup(s => s.DeleteMethodology(methodologyId, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyVersionId, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var result = await service.DeleteTopic(topicId);
-                VerifyAllMocks(releaseDataFileService, releaseFileService, releaseSubjectRepository, methodologyService);
+                VerifyAllMocks(releaseDataFileService, releaseFileService, releaseSubjectRepository,
+                    methodologyService);
                 result.AssertRight();
 
                 Assert.Equal(0, contentContext.Publications.Count());
@@ -435,27 +438,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationMethodology = new PublicationMethodology
             {
                 PublicationId = publicationId,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
-                    Versions = AsList(new Methodology
+                    Versions = new List<MethodologyVersion>
                     {
-                        Id = methodologyVersion2Id,
-                        PreviousVersionId = methodologyVersion1Id
-                    },
-                    new Methodology
-                    {
-                        Id = methodologyVersion1Id
-                    },
-                    new Methodology
-                    {
-                        Id = methodologyVersion4Id,
-                        PreviousVersionId = methodologyVersion3Id
-                    },
-                    new Methodology
-                    {
-                        Id = methodologyVersion3Id,
-                        PreviousVersionId = methodologyVersion2Id,
-                    })
+                        new()
+                        {
+                            Id = methodologyVersion2Id,
+                            PreviousVersionId = methodologyVersion1Id
+                        },
+                        new()
+                        {
+                            Id = methodologyVersion1Id
+                        },
+                        new()
+                        {
+                            Id = methodologyVersion4Id,
+                            PreviousVersionId = methodologyVersion3Id
+                        },
+                        new()
+                        {
+                            Id = methodologyVersion3Id,
+                            PreviousVersionId = methodologyVersion2Id,
+                        }
+                    }
                 }
             };
 
@@ -527,7 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(1, contentContext.Publications.Count());
                 Assert.Equal(1, contentContext.Topics.Count());
-                Assert.Equal(4, contentContext.Methodologies.Count());
+                Assert.Equal(4, contentContext.MethodologyVersions.Count());
                 Assert.Equal(1, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(4, contentContext.Releases.Count());
                 Assert.Equal(4, statisticsContext.Release.Count());
@@ -542,7 +548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupTopicService(
-                    contentContext, 
+                    contentContext,
                     statisticsContext,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseFileService: releaseFileService.Object,
@@ -550,7 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyService: methodologyService.Object);
 
                 var releaseDataFileDeleteSequence = new MockSequence();
-                
+
                 releaseDataFileService
                     .InSequence(releaseDataFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion4Id, true))
@@ -570,24 +576,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .InSequence(releaseDataFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion1Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var releaseFileDeleteSequence = new MockSequence();
 
                 releaseFileService
                     .InSequence(releaseFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion4Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 releaseFileService
                     .InSequence(releaseFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion3Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 releaseFileService
                     .InSequence(releaseFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion2Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 releaseFileService
                     .InSequence(releaseFileDeleteSequence)
                     .Setup(s => s.DeleteAll(releaseVersion1Id, true))
@@ -599,17 +605,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .InSequence(releaseSubjectDeleteSequence)
                     .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion4Id, false))
                     .Returns(Task.CompletedTask);
-                
+
                 releaseSubjectRepository
                     .InSequence(releaseSubjectDeleteSequence)
                     .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion3Id, false))
                     .Returns(Task.CompletedTask);
-                
+
                 releaseSubjectRepository
                     .InSequence(releaseSubjectDeleteSequence)
                     .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion2Id, false))
                     .Returns(Task.CompletedTask);
-                
+
                 releaseSubjectRepository
                     .InSequence(releaseSubjectDeleteSequence)
                     .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion1Id, false))
@@ -619,24 +625,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 methodologyService
                     .InSequence(methodologyDeleteSequence)
-                    .Setup(s => s.DeleteMethodology(methodologyVersion4Id, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyVersion4Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 methodologyService
                     .InSequence(methodologyDeleteSequence)
-                    .Setup(s => s.DeleteMethodology(methodologyVersion3Id, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyVersion3Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 methodologyService
                     .InSequence(methodologyDeleteSequence)
-                    .Setup(s => s.DeleteMethodology(methodologyVersion2Id, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyVersion2Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 methodologyService
                     .InSequence(methodologyDeleteSequence)
-                    .Setup(s => s.DeleteMethodology(methodologyVersion1Id, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyVersion1Id, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var result = await service.DeleteTopic(topicId);
                 VerifyAllMocks(releaseDataFileService, releaseFileService, releaseSubjectRepository, methodologyService);
                 result.AssertRight();
@@ -647,7 +653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(0, statisticsContext.Release.Count());
             }
         }
-        
+
         [Fact]
         public async Task DeleteTopic_DisallowedByNamingConvention()
         {
@@ -709,7 +715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(1, statisticsContext.Release.Count());
             }
         }
-        
+
         [Fact]
         public async Task DeleteTopic_DisallowedByConfiguration()
         {
@@ -761,8 +767,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupTopicService(
-                    contentContext, 
-                    statisticsContext, 
+                    contentContext,
+                    statisticsContext,
                     enableThemeDeletion: false);
 
                 var result = await service.DeleteTopic(topicId);
@@ -774,7 +780,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(1, statisticsContext.Release.Count());
             }
         }
-        
+
         [Fact]
         public async Task DeleteTopic_OtherTopicsUnaffected()
         {
@@ -782,7 +788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
             var methodologyId = Guid.NewGuid();
-            
+
             var otherTopicId = Guid.NewGuid();
             var otherReleaseId = Guid.NewGuid();
             var otherPublicationId = Guid.NewGuid();
@@ -791,12 +797,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationMethodology = new PublicationMethodology
             {
                 PublicationId = publicationId,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
-                    Versions = AsList(new Methodology
+                    Versions = new List<MethodologyVersion>
                     {
-                        Id = methodologyId
-                    })
+                        new()
+                        {
+                            Id = methodologyId
+                        }
+                    }
                 }
             };
 
@@ -821,16 +830,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = releaseId,
                 PublicationId = publicationId
             };
-            
+
             var otherPublicationMethodology = new PublicationMethodology
             {
                 PublicationId = otherPublicationId,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
-                    Versions = AsList(new Methodology
+                    Versions = new List<MethodologyVersion>
                     {
-                        Id = otherMethodologyId
-                    })
+                        new()
+                        {
+                            Id = otherMethodologyId
+                        }
+                    }
                 }
             };
 
@@ -855,7 +867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = otherReleaseId,
                 PublicationId = otherPublicationId
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -871,7 +883,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, contentContext.Publications.Count());
                 Assert.Equal(2, contentContext.Topics.Count());
-                Assert.Equal(2, contentContext.Methodologies.Count());
+                Assert.Equal(2, contentContext.MethodologyVersions.Count());
                 Assert.Equal(2, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(2, contentContext.Releases.Count());
                 Assert.Equal(2, statisticsContext.Release.Count());
@@ -886,7 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupTopicService(
-                    contentContext, 
+                    contentContext,
                     statisticsContext,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseFileService: releaseFileService.Object,
@@ -896,7 +908,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 releaseFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
                     .ReturnsAsync(Unit.Instance);
@@ -906,9 +918,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 methodologyService
-                    .Setup(s => s.DeleteMethodology(methodologyId, true))
+                    .Setup(s => s.DeleteMethodologyVersion(methodologyId, true))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var result = await service.DeleteTopic(topicId);
                 VerifyAllMocks(releaseDataFileService, releaseFileService, releaseSubjectRepository, methodologyService);
                 result.AssertRight();
@@ -919,23 +931,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(otherReleaseId, statisticsContext.Release.Select(r => r.Id).Single());
             }
         }
-        
+
         [Fact]
         public void VersionedEntityDeletionOrderComparer()
         {
             var version1Id = Guid.NewGuid();
             var version2Id = Guid.NewGuid();
             var version3Id = Guid.NewGuid();
-            
+
             var version1 = new TopicService.IdAndPreviousVersionIdPair(version1Id, null);
             var version2 = new TopicService.IdAndPreviousVersionIdPair(version2Id, version1Id);
             var version3 = new TopicService.IdAndPreviousVersionIdPair(version3Id, version2Id);
-            
+
             var comparer = new TopicService.VersionedEntityDeletionOrderComparer();
-            
+
             Assert.Equal(-1, comparer.Compare(version2, version1));
             Assert.Equal(-1, comparer.Compare(version3, version2));
-            
+
             Assert.Equal(1, comparer.Compare(version1, version2));
             Assert.Equal(1, comparer.Compare(version2, version3));
 

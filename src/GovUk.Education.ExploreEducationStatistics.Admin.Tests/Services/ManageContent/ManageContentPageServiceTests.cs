@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -134,12 +135,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             };
 
             var methodologies = AsList(
-                new Methodology
+                new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
                     AlternativeTitle = "Methodology 1 title"
                 },
-                new Methodology
+                new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
                     AlternativeTitle = "Methodology 2 title"
@@ -197,14 +198,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             }
 
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
                     mock.GetUnattachedContentBlocks<DataBlock>(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
-            methodologyRepository.Setup(mock => mock.GetLatestByPublication(publication.Id))
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestVersionByPublication(publication.Id))
                 .ReturnsAsync(methodologies);
 
             releaseFileService.Setup(mock =>
@@ -215,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 var service = SetupManageContentPageService(contentDbContext: contentDbContext,
                     contentService: contentService.Object,
-                    methodologyRepository: methodologyRepository.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
@@ -318,24 +320,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
             }
 
-            MockUtils.VerifyAllMocks(contentService, methodologyRepository, releaseFileService);
+            MockUtils.VerifyAllMocks(contentService, methodologyVersionRepository, releaseFileService);
         }
 
         private static ManageContentPageService SetupManageContentPageService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IMapper mapper = null,
-            IContentService contentService = null,
-            IMethodologyRepository methodologyRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IMapper? mapper = null,
+            IContentService? contentService = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IReleaseFileService? releaseFileService = null,
+            IUserService? userService = null)
         {
-            return new ManageContentPageService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+            return new(
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.AdminMapper(),
                 contentService ?? new Mock<IContentService>().Object,
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
+                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );

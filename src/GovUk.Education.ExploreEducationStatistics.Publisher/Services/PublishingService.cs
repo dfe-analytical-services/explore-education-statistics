@@ -180,11 +180,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             );
         }
 
-        private async Task PublishMethodologyFiles(Methodology methodology)
+        private async Task PublishMethodologyFiles(MethodologyVersion methodologyVersion)
         {
-            var files = await _methodologyService.GetFiles(methodology.Id, Image);
+            var files = await _methodologyService.GetFiles(methodologyVersion.Id, Image);
 
-            var directoryPath = $"{methodology.Id}/";
+            var directoryPath = $"{methodologyVersion.Id}/";
 
             // Delete any existing blobs in public storage
             await _publicBlobStorageService.DeleteBlobs(

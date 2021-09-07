@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPublication()
         {
-            var methodology1Version1 = new Methodology
+            var methodology1Version1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Methodology 1 Version 1",
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = Draft
             };
             
-            var methodology2Version1 = new Methodology
+            var methodology2Version1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Methodology 2 Version 1",
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = Approved
             };
             
-            var methodology2Version2 = new Methodology
+            var methodology2Version2 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Methodology 2 Version 2",
@@ -74,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Methodologies = AsList(
                     new PublicationMethodology
                     {
-                        MethodologyParent = new MethodologyParent
+                        Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
                             Versions = AsList(methodology1Version1)
@@ -83,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     },
                     new PublicationMethodology
                     {
-                        MethodologyParent = new MethodologyParent
+                        Methodology = new Methodology
                         {
                             Slug = "methodology-2-slug",
                             Versions = AsList(methodology2Version1, methodology2Version2)
@@ -302,11 +303,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
                 
-                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
+                var publicationService = BuildPublicationService(context, methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                methodologyRepository
+                methodologyVersionRepository
                     .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "new-title"))
                     .Returns(Task.CompletedTask);
                 
@@ -327,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
                 
-                VerifyAllMocks(methodologyRepository);
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal("New title", result.Right.Title);
 
@@ -394,12 +395,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
                 
-                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
+                var publicationService = BuildPublicationService(context, methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 // Expect the title to change but not the slug, as the Publication is already published. 
-                methodologyRepository
+                methodologyVersionRepository
                     .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "old-title"))
                     .Returns(Task.CompletedTask);
                 
@@ -420,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
                 
-                VerifyAllMocks(methodologyRepository);
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal("New title", result.Right.Title);
 
@@ -488,9 +489,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 // Expect no calls to be made on this Mock as the Publication's Title hasn't changed.  
-                var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
                 
-                var publicationService = BuildPublicationService(context, methodologyRepository: methodologyRepository.Object);
+                var publicationService = BuildPublicationService(context, methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -509,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
                 
-                VerifyAllMocks(methodologyRepository);
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal("Old title", result.Right.Title);
                 Assert.Equal("John Smith", result.Right.Contact.ContactName);
@@ -832,19 +833,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static PublicationService BuildPublicationService(ContentDbContext context,
-            IUserService userService = null,
-            IPublicationRepository publicationRepository = null,
-            IPublishingService publishingService = null,
-            IMethodologyRepository methodologyRepository = null)
+            IUserService? userService = null,
+            IPublicationRepository? publicationRepository = null,
+            IPublishingService? publishingService = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null)
         {
-            return new PublicationService(
+            return new(
                 context,
                 AdminMapper(), 
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object, 
                 publicationRepository ?? new Mock<IPublicationRepository>().Object, 
                 publishingService ?? new Mock<IPublishingService>().Object, 
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object);
+                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object);
         }
     }
 }

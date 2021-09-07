@@ -7,20 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 {
     public interface IMethodologyRepository
     {
-        Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId);
+        public Task<List<Methodology>> GetByPublication(Guid publicationId);
 
-        Task<Methodology> GetLatestByMethodologyParent(Guid methodologyParentId);
+        Task<Publication> GetOwningPublication(Guid methodologyId);
 
-        Task<List<Methodology>> GetLatestByPublication(Guid publicationId);
-
-        Task<Methodology?> GetLatestPublishedByMethodologyParent(Guid methodologyParentId);
-
-        Task<List<Methodology>> GetLatestPublishedByPublication(Guid publicationId);
-
-        Task<Publication> GetOwningPublicationByMethodologyParent(Guid methodologyParentId);
-
-        Task<bool> IsPubliclyAccessible(Guid methodologyId);
-
-        Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug);
+        public Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId);
     }
 }

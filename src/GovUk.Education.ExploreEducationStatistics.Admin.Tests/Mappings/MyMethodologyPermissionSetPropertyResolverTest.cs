@@ -15,19 +15,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
         [Fact]
         public void ResolvePermissions()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var userService = new Mock<IUserService>(Strict);
             var resolver = new MyMethodologyPermissionSetPropertyResolver(userService.Object);
 
-            userService.Setup(s => s.MatchesPolicy(methodology, CanApproveSpecificMethodology)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(methodology, CanUpdateSpecificMethodology)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(methodology, CanDeleteSpecificMethodology)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(methodology, CanMakeAmendmentOfSpecificMethodology))
+            userService.Setup(s => s.MatchesPolicy(methodologyVersion, CanApproveSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(methodologyVersion, CanUpdateSpecificMethodology))
                 .ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(methodology, CanMarkSpecificMethodologyAsDraft)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(methodologyVersion, CanDeleteSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(methodologyVersion, CanMakeAmendmentOfSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(methodologyVersion, CanMarkSpecificMethodologyAsDraft))
+                .ReturnsAsync(true);
 
-            var permissionsSet = resolver.Resolve(methodology, null, null, null);
+            var permissionsSet = resolver.Resolve(methodologyVersion, null, null, null);
             VerifyAllMocks(userService);
 
             Assert.True(permissionsSet.CanApproveMethodology);

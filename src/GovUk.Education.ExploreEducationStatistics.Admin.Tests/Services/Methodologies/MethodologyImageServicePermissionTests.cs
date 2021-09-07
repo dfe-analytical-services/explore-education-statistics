@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyImageServicePermissionTests
     {
-        private readonly Methodology _methodology = new Methodology
+        private readonly MethodologyVersion _methodologyVersion = new MethodologyVersion
         {
             Id = Guid.NewGuid()
         };
@@ -30,12 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyImageService(userService: userService.Object);
-                        return service.Delete(methodologyId: _methodology.Id,
+                        return service.Delete(methodologyId: _methodologyVersion.Id,
                             fileIds: new List<Guid>());
                     }
                 );
@@ -45,12 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task Upload()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyImageService(userService: userService.Object);
-                        return service.Upload(methodologyId: _methodology.Id,
+                        return service.Upload(methodologyVersionId: _methodologyVersion.Id,
                             formFile: new Mock<IFormFile>().Object);
                     }
                 );
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockUtils.MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology);
+            return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
         }
     }
 }

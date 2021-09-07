@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -21,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContentBlocks_NoContentSections()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(methodology.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(methodologyVersion.Id);
 
                 Assert.True(result.IsRight);
 
@@ -46,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContentBlocks_NoContentBlocks()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Annexes = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 },
                 Content = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -72,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -80,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(methodology.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(methodologyVersion.Id);
 
                 Assert.True(result.IsRight);
 
@@ -111,11 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Annexes = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -129,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             }
                         }
                     },
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -146,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 },
                 Content = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -160,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             }
                         }
                     },
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
@@ -181,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -189,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(methodology.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(methodologyVersion.Id);
 
                 Assert.True(result.IsRight);
 
@@ -206,14 +207,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task AddContentSection_Draft()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Status = MethodologyStatus.Draft,
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -221,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var methodologyContentService = SetupMethodologyContentService(contentDbContext);
                 var result = await methodologyContentService.AddContentSection(
-                    methodology.Id,
+                    methodologyVersion.Id,
                     new ContentSectionAddRequest(),
                     MethodologyContentService.ContentListType.Content);
 
@@ -234,14 +235,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task AddContentSection_Approved()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Status = MethodologyStatus.Approved,
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -249,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var methodologyContentService = SetupMethodologyContentService(contentDbContext);
                 var result = await methodologyContentService.AddContentSection(
-                    methodology.Id,
+                    methodologyVersion.Id,
                     new ContentSectionAddRequest(),
                     MethodologyContentService.ContentListType.Content);
 
@@ -259,10 +260,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private static MethodologyContentService SetupMethodologyContentService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IUserService? userService = null)
         {
-            return new MethodologyContentService(
+            return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,

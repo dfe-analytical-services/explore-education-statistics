@@ -215,9 +215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new()
                             {
                                 Owner = false,
-                                MethodologyParent = new MethodologyParent
+                                Methodology = new Methodology
                                 {
-                                    Versions = new List<Methodology>
+                                    Versions = new List<MethodologyVersion>
                                     {
                                         new()
                                         {
@@ -232,9 +232,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new()
                             {
                                 Owner = true,
-                                MethodologyParent = new MethodologyParent
+                                Methodology = new Methodology
                                 {
-                                    Versions = new List<Methodology>
+                                    Versions = new List<MethodologyVersion>
                                     {
                                         new()
                                         {
@@ -249,9 +249,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new()
                             {
                                 Owner = false,
-                                MethodologyParent = new MethodologyParent
+                                Methodology = new Methodology
                                 {
-                                    Versions = new List<Methodology>
+                                    Versions = new List<MethodologyVersion>
                                     {
                                         new()
                                         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,11 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IMethodologyService
     {
-        Task<Methodology> Get(Guid id);
+        Task<MethodologyVersion> Get(Guid methodologyVersionId);
 
-        Task<List<Methodology>> GetLatestByRelease(Guid releaseId);
+        Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId);
 
-        Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types);
+        Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
 
         Task SetPublishedDatesByPublication(Guid publicationId, DateTime published);
     }

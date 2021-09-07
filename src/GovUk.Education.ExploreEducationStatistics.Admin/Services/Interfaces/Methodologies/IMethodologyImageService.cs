@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -14,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
             Guid methodologyId,
             IEnumerable<Guid> fileIds);
 
-        Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId);
+        Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId);
 
-        Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyId, IFormFile formFile);
+        Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyVersionId, IFormFile formFile);
     }
 }

@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IContentService _contentService;
-        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
 
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IContentService contentService,
-            IMethodologyRepository methodologyRepository,
+            IMethodologyVersionRepository methodologyVersionRepository,
             IReleaseFileService releaseFileService,
             IUserService userService)
         {
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _contentService = contentService;
-            _methodologyRepository = methodologyRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
             _releaseFileService = releaseFileService;
             _userService = userService;
         }
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (release, blocks, files) = releaseBlocksAndFiles;
 
-                    var methodologies = await _methodologyRepository.GetLatestByPublication(release.PublicationId);
+                    var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();

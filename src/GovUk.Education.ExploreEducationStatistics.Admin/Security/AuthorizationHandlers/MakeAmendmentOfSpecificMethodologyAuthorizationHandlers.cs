@@ -14,15 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class MakeAmendmentOfSpecificMethodologyAuthorizationHandler
-        : AuthorizationHandler<MakeAmendmentOfSpecificMethodologyRequirement, Methodology>
+        : AuthorizationHandler<MakeAmendmentOfSpecificMethodologyRequirement, MethodologyVersion>
     {
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
-        public MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
+        public MakeAmendmentOfSpecificMethodologyAuthorizationHandler(IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository)
         {
+            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
@@ -30,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             MakeAmendmentOfSpecificMethodologyRequirement requirement,
-            Methodology methodology)
+            MethodologyVersion methodologyVersion)
         {
             // Amendments can only be created from Methodologies that are already publicly-accessible.
-            if (!await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+            if (!await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
             {
                 return;
             }
@@ -47,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var owningPublication =
-                await _methodologyRepository.GetOwningPublicationByMethodologyParent(methodology.MethodologyParentId);
+                await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can create 
             // an Amendment of this Methodology.

@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         {
             var methodologyFile = new MethodologyFile
             {
-                Methodology = new Methodology(),
+                MethodologyVersion = new MethodologyVersion(),
                 File = new File
                 {
                     Id = Guid.NewGuid(),

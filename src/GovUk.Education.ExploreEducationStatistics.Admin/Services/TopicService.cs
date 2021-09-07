@@ -174,16 +174,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var methodologiesToDelete = _contentContext
                         .PublicationMethodologies
-                        .Include(pm => pm.MethodologyParent)
+                        .Include(pm => pm.Methodology)
                         .ThenInclude(pm => pm.Versions)
                         .Where(pm => publicationIdsToDelete.Contains(pm.PublicationId))
-                        .SelectMany(pm => pm.MethodologyParent.Versions)
+                        .SelectMany(pm => pm.Methodology.Versions)
                         .ToList()
                         .OrderBy(m => new IdAndPreviousVersionIdPair(m.Id, m.PreviousVersionId),
                             VersionedEntityComparer);
 
                     await methodologiesToDelete.ForEachAsync(methodology =>
-                        _methodologyService.DeleteMethodology(methodology.Id, forceDelete: true));
+                        _methodologyService.DeleteMethodologyVersion(methodology.Id, forceDelete: true));
 
                     var releaseIdsToDelete = _statisticsContext
                         .Release

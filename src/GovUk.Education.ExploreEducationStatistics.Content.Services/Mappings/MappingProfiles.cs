@@ -18,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
-            CreateMap<Methodology, MethodologySummaryViewModel>();
+            CreateMap<MethodologyVersion, MethodologySummaryViewModel>();
 
-            CreateMap<Methodology, MethodologyViewModel>()
+            CreateMap<MethodologyVersion, MethodologyViewModel>()
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Annexes,

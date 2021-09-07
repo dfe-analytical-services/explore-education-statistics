@@ -14,15 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class DeleteSpecificMethodologyAuthorizationHandler
-        : AuthorizationHandler<DeleteSpecificMethodologyRequirement, Methodology>
+        : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
     {
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
 
         public DeleteSpecificMethodologyAuthorizationHandler(
+            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository)
         {
+            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
         }
@@ -30,17 +33,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             DeleteSpecificMethodologyRequirement requirement,
-            Methodology methodology)
+            MethodologyVersion methodologyVersion)
         {
             // If the Methodology is already public, it cannot be deleted.
-            if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+            if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
             {
                 return;
             }
 
             // If the Methodology is the first version added to a Publication and is still in Draft, or if it is a 
             // subsequent version but is still an amendment, it can potentially be deleted.  Otherwise it cannot.
-            if (!methodology.Amendment && !methodology.DraftFirstVersion)
+            if (!methodologyVersion.Amendment && !methodologyVersion.DraftFirstVersion)
             {
                 return;
             }
@@ -52,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var owningPublication =
-                await _methodologyRepository.GetOwningPublicationByMethodologyParent(methodology.MethodologyParentId);
+                await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can delete it.
             if (await _userPublicationRoleRepository.IsUserPublicationOwner(

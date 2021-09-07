@@ -60,42 +60,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanViewMethodology(
+            this IUserService userService, MethodologyVersion methodology)
         {
             return userService.CheckPolicy(methodology, SecurityPolicies.CanViewSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodology(
+            this IUserService userService, MethodologyVersion methodology)
         {
             return userService.CheckPolicy(methodology, SecurityPolicies.CanUpdateSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanMarkMethodologyAsDraft(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyAsDraft(
+            this IUserService userService, MethodologyVersion methodology)
         {
             return userService.CheckPolicy(methodology, SecurityPolicies.CanMarkSpecificMethodologyAsDraft);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanApproveMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanApproveMethodology(
+            this IUserService userService, MethodologyVersion methodology)
         {
             return userService.CheckPolicy(methodology, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanMakeAmendmentOfMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMakeAmendmentOfMethodology(
+            this IUserService userService, MethodologyVersion methodology)
         {
             return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanDeleteMethodology(
-            this IUserService userService, Methodology methodology, bool ignoreCheck = false)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanDeleteMethodology(
+            this IUserService userService, MethodologyVersion methodology, bool ignoreCheck = false)
         {
             if (ignoreCheck)
             {
-                return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
+                return Task.FromResult(new Either<ActionResult, MethodologyVersion>(methodology));
             }
             return userService.CheckPolicy(methodology, SecurityPolicies.CanDeleteSpecificMethodology);
         }
