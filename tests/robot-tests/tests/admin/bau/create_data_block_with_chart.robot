@@ -77,7 +77,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Table showing Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
     user checks table column heading contains    1    1    Admission Numbers

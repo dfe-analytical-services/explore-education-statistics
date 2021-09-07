@@ -18,11 +18,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(dataBlock.Id);
@@ -110,11 +110,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Get_ChartWithoutTitleReturnsHeading()
+        {
+            var dataBlock = new DataBlock
+            {
+                Heading = "Test heading",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        // No title
+                        Height = 400,
+                        Width = 500,
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = new Release(),
+                        ContentBlock = dataBlock,
+                    }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Get(dataBlock.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(dataBlock.Heading, viewModel.Heading);
+                Assert.Equal(dataBlock.Charts, viewModel.Charts);
+
+                Assert.Single(viewModel.Charts);
+                Assert.Equal(dataBlock.Heading, viewModel.Charts[0].Title);
+            }
+        }
+
+        [Fact]
         public async Task Get_NotFound()
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(Guid.NewGuid());
@@ -133,13 +178,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(dataBlock);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(dataBlock.Id);
@@ -238,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(
                     new ReleaseContentBlock
@@ -255,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.List(release.Id);
@@ -342,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(
                     new ReleaseContentBlock
@@ -359,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.List(release.Id);
@@ -411,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -424,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
@@ -455,13 +500,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(release.Id, Guid.NewGuid());
@@ -501,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -514,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(Guid.NewGuid(), dataBlock.Id);
@@ -555,7 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -568,7 +613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var releaseFileService = new Mock<IReleaseFileService>();
 
@@ -587,7 +632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.VerifyAllMocks(releaseFileService);
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 Assert.Empty(context.DataBlocks.ToList());
                 Assert.Empty(context.ContentBlocks.ToList());
@@ -602,13 +647,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Delete(release.Id, Guid.NewGuid());
@@ -624,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -636,7 +681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Delete(Guid.NewGuid(), dataBlock.Id);
@@ -652,7 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.SaveChangesAsync();
@@ -701,36 +746,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Create(release.Id, createRequest);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
-                // Validate Created date is in the DB, even if not returned in result
-                var dataBlock = await context.DataBlocks.FindAsync(result.Right.Id);
-                Assert.True(dataBlock.Created.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(createRequest.Heading, viewModel.Heading);
+                Assert.Equal(createRequest.Name, viewModel.Name);
+                Assert.Equal(createRequest.HighlightName, viewModel.HighlightName);
+                Assert.Equal(createRequest.HighlightDescription, viewModel.HighlightDescription);
+                Assert.Equal(createRequest.Source, viewModel.Source);
 
-                Assert.Equal(createRequest.Heading, result.Right.Heading);
-                Assert.Equal(createRequest.Name, result.Right.Name);
-                Assert.Equal(createRequest.HighlightName, result.Right.HighlightName);
-                Assert.Equal(createRequest.HighlightDescription, result.Right.HighlightDescription);
-                Assert.Equal(createRequest.Source, result.Right.Source);
+                Assert.Equal(createRequest.Query, viewModel.Query);
+                Assert.Equal(createRequest.Table, viewModel.Table);
+                Assert.Equal(createRequest.Charts, viewModel.Charts);
 
-                Assert.Equal(createRequest.Query, result.Right.Query);
-                Assert.Equal(createRequest.Table, result.Right.Table);
-                Assert.Equal(createRequest.Charts, result.Right.Charts);
+                Assert.Single(viewModel.Charts);
+                Assert.NotEqual(createRequest.Heading, viewModel.Charts[0].Title);
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var dataBlocks = context.DataBlocks.ToList();
 
                 Assert.Single(dataBlocks);
 
                 var dataBlock = dataBlocks[0];
+
+                // Validate Created date is in the DB, even if not returned in result
+                Assert.True(dataBlock.Created.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
@@ -753,13 +800,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Create_BlankChartTitleUsesHeading()
+        {
+            var release = new Release();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var createRequest = new DataBlockCreateViewModel
+            {
+                Heading = "Test heading",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        // No title
+                        Height = 600,
+                        Width = 700,
+                    }
+                },
+            };
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Create(release.Id, createRequest);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(createRequest.Heading, viewModel.Heading);
+                Assert.Equal(createRequest.Charts, viewModel.Charts);
+
+                Assert.Single(viewModel.Charts);
+                Assert.Equal(createRequest.Heading, viewModel.Charts[0].Title);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var dataBlocks = context.DataBlocks.ToList();
+
+                Assert.Single(dataBlocks);
+
+                var dataBlock = dataBlocks[0];
+
+                Assert.Equal(createRequest.Heading, dataBlock.Heading);
+                Assert.Equal(createRequest.Charts, dataBlock.Charts);
+
+                Assert.Single(dataBlock.Charts);
+                Assert.Equal(createRequest.Heading, dataBlock.Charts[0].Title);
+            }
+        }
+
+        [Fact]
         public async Task Create_ReleaseNotFound()
         {
             var contextId = Guid.NewGuid().ToString();
 
             var createRequest = new DataBlockCreateViewModel();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Create(Guid.NewGuid(), createRequest);
@@ -767,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertNotFound();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var dataBlocks = context.DataBlocks.ToList();
 
@@ -826,7 +929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -856,7 +959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
                 var result = await service.Update(dataBlock.Id, updateRequest);
@@ -876,7 +979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Charts, result.Right.Charts);
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
@@ -893,11 +996,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Update_HeadingUpdateAlsoChangesChartTitle()
+        {
+            var release = new Release();
+
+            var dataBlock = new DataBlock
+            {
+                Heading = "Old heading",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        // No title
+                        Height = 400,
+                        Width = 500,
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            var updateRequest = new DataBlockUpdateViewModel
+            {
+                Heading = "New heading",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        // No title
+                        Height = 600,
+                        Width = 700,
+                    }
+                },
+            };
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Update(dataBlock.Id, updateRequest);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(dataBlock.Id, viewModel.Id);
+                Assert.Equal(updateRequest.Heading, viewModel.Heading);
+                Assert.Equal(updateRequest.Charts, viewModel.Charts);
+
+                Assert.Single(viewModel.Charts);
+                Assert.Equal(updateRequest.Heading, viewModel.Charts[0].Title);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
+
+                Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
+                Assert.Equal(updateRequest.Charts, updatedDataBlock.Charts);
+
+                Assert.Single(updatedDataBlock.Charts);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock.Charts[0].Title);
+            }
+        }
+
+        [Fact]
         public async Task Update_NotFound()
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using var context = ContentDbUtils.InMemoryContentDbContext(contextId);
+            await using var context = InMemoryContentDbContext(contextId);
 
             var service = BuildDataBlockService(context);
             var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateViewModel());
@@ -933,7 +1109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
                     new ReleaseContentBlock
@@ -959,7 +1135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var releaseFileService = new Mock<IReleaseFileService>();
 

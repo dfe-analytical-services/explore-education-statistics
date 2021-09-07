@@ -437,7 +437,7 @@ user chooses location, time period and filters
 user validates table rows
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    testid:dataTableCaption
-    ...    Table showing Admission Numbers for 'UI test subject' in Nailsea Youngwood and Syon between 2005 and 2017
+    ...    Admission Numbers for 'UI test subject' in Nailsea Youngwood and Syon between 2005 and 2017
 
     user checks table column heading contains    1    1    Admission Numbers
 

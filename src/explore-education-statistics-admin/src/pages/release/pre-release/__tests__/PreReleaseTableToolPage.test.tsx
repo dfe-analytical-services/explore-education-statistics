@@ -353,7 +353,7 @@ describe('PreReleaseTableToolPage', () => {
       );
 
       expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
-        /Table showing Number of authorised absence sessions for 'Absence by characteristic'/,
+        /Number of authorised absence sessions for 'Absence by characteristic'/,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();

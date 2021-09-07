@@ -36,6 +36,7 @@ describe('chartBuilderReducer', () => {
     options: {
       defaults: {
         height: 300,
+        titleType: 'default',
       },
     },
     legend: {
@@ -81,6 +82,7 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       },
     };
@@ -105,6 +107,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       });
     });
@@ -129,6 +132,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Some title',
+          titleType: 'alternative',
           alt: 'Some alt',
         },
         legend: {
@@ -160,6 +164,7 @@ describe('chartBuilderReducer', () => {
         // Height is set to the definition default
         height: 300,
         title: 'Some title',
+        titleType: 'alternative',
         alt: 'Some alt',
       });
       expect(nextState.legend).toEqual<LegendConfiguration>({
@@ -275,6 +280,7 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       },
     };
@@ -345,6 +351,7 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       },
     };
@@ -356,6 +363,7 @@ describe('chartBuilderReducer', () => {
           height: 500,
           width: 400,
           title: 'Test title',
+          titleType: 'alternative',
           alt: 'Test alt',
         },
       };
@@ -366,6 +374,7 @@ describe('chartBuilderReducer', () => {
         height: 500,
         width: 400,
         title: 'Test title',
+        titleType: 'alternative',
         alt: 'Test alt',
       });
     });
@@ -376,6 +385,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           title: '',
+          titleType: 'default',
           alt: '',
           stacked: true,
         },
@@ -387,6 +397,7 @@ describe('chartBuilderReducer', () => {
           height: 500,
           width: 400,
           title: '',
+          titleType: 'default',
           alt: '',
         },
       };
@@ -400,6 +411,7 @@ describe('chartBuilderReducer', () => {
         height: 500,
         width: 400,
         title: '',
+        titleType: 'default',
         alt: '',
         stacked: true,
       });
@@ -412,6 +424,7 @@ describe('chartBuilderReducer', () => {
           height: 300,
           width: 400,
           title: '',
+          titleType: 'default',
           alt: '',
         },
       };
@@ -422,6 +435,7 @@ describe('chartBuilderReducer', () => {
           height: 300,
           width: undefined,
           title: '',
+          titleType: 'default',
           alt: '',
         },
       };
@@ -434,6 +448,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       });
     });
@@ -453,6 +468,7 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
         title: '',
+        titleType: 'default',
         alt: '',
       },
     };
@@ -494,6 +510,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Something',
+          titleType: 'alternative',
           alt: 'Some alt',
         },
       };
@@ -504,16 +521,20 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState).toEqual<ChartBuilderState>({
         axes: {},
+        titleType: 'default',
       });
     });
   });
 
   describe('useChartBuilderReducer', () => {
     test('has correct state when no initial configuration', () => {
-      const { result } = renderHook(() => useChartBuilderReducer());
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(undefined, 'Table title'),
+      );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
         axes: {},
+        titleType: 'default',
       });
     });
 
@@ -567,12 +588,12 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
-        title: '',
+        title: 'Table title',
         alt: '',
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration),
+        useChartBuilderReducer(initialConfiguration, 'Table title'),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
@@ -625,7 +646,8 @@ describe('chartBuilderReducer', () => {
         definition: lineChartBlockDefinition,
         options: {
           height: 300,
-          title: '',
+          title: 'Table title',
+          titleType: 'default',
           alt: '',
         },
         legend: {
@@ -672,12 +694,12 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
-        title: '',
+        title: 'Table title',
         alt: '',
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration),
+        useChartBuilderReducer(initialConfiguration, 'Table title'),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
@@ -724,7 +746,8 @@ describe('chartBuilderReducer', () => {
         definition: lineChartBlockDefinition,
         options: {
           height: 300,
-          title: '',
+          title: 'Table title',
+          titleType: 'default',
           alt: '',
         },
         legend: {
@@ -786,6 +809,125 @@ describe('chartBuilderReducer', () => {
         label: {
           text: '',
           width: 100,
+        },
+      });
+    });
+
+    test('has correct state with initial configuration with custom chart title', () => {
+      const initialConfiguration: Chart = {
+        legend: {
+          position: 'top',
+          items: [],
+        },
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            sortBy: 'something',
+            sortAsc: true,
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            size: 100,
+            showGrid: true,
+            min: 2,
+            max: 10,
+            tickConfig: 'default',
+            unit: '%',
+            label: {
+              text: 'Test major axis label',
+              width: 300,
+            },
+          },
+          minor: {
+            type: 'minor',
+            sortAsc: true,
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+            size: 75,
+            showGrid: true,
+            min: 500,
+            max: 1000,
+            tickConfig: 'default',
+            label: {
+              text: 'Test minor axis label',
+              rotated: true,
+            },
+          },
+        },
+        type: 'line',
+        height: 300,
+        title: 'Chart title',
+        alt: '',
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(initialConfiguration, 'Table title'),
+      );
+
+      expect(result.current.state).toEqual<ChartBuilderState>({
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            sortBy: 'something',
+            sortAsc: true,
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            showGrid: true,
+            size: 100,
+            min: 2,
+            max: 10,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '%',
+            label: {
+              text: 'Test major axis label',
+              width: 300,
+            },
+          },
+          minor: {
+            type: 'minor',
+            sortAsc: true,
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+            showGrid: true,
+            size: 75,
+            min: 500,
+            max: 1000,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '',
+            label: {
+              text: 'Test minor axis label',
+              rotated: true,
+              width: 100,
+            },
+          },
+        },
+        definition: lineChartBlockDefinition,
+        options: {
+          height: 300,
+          title: 'Chart title',
+          titleType: 'alternative',
+          alt: '',
+        },
+        legend: {
+          position: 'top',
+          items: [],
         },
       });
     });
