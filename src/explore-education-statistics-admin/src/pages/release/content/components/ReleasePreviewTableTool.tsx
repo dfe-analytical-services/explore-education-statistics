@@ -20,20 +20,24 @@ interface Props {
   publication: Publication | BasicPublicationDetails;
 }
 const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
-  const [highlightId, setHighlightId] = useState<string>();
+  const [featuredTableId, setHighlightId] = useState<string>();
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const {
-      highlights,
-      subjects,
-    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
+    const [featuredTables, subjects] = await Promise.all([
+      tableBuilderService.listReleaseFeaturedTables(releaseId),
+      tableBuilderService.listReleaseSubjects(releaseId),
+    ]);
 
-    highlights.filter(highlight => highlight.id !== highlightId);
+    const filteredFeaturedTables = featuredTables.filter(
+      table => table.id !== featuredTableId,
+    );
 
-    if (highlightId) {
-      const { table, query } = await dataBlockService.getDataBlock(highlightId);
+    if (featuredTableId) {
+      const { table, query } = await dataBlockService.getDataBlock(
+        featuredTableId,
+      );
 
       const [subjectMeta, tableData] = await Promise.all([
         tableBuilderService.getSubjectMeta(query.subjectId),
@@ -49,7 +53,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
       return {
         initialStep: 5,
         subjects,
-        highlights,
+        featuredTables: filteredFeaturedTables,
         query: {
           ...query,
           publicationId: publication.id,
@@ -66,7 +70,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
     return {
       initialStep: 1,
       subjects,
-      highlights,
+      featuredTables: filteredFeaturedTables,
       query: {
         publicationId: publication.id,
         releaseId,
@@ -76,7 +80,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
         locations: {},
       },
     };
-  }, [releaseId, highlightId]);
+  }, [releaseId, featuredTableId]);
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -89,7 +93,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
             hidePublicationSelectionStage
             initialState={initialState}
             onSubjectStepBack={() => setHighlightId(undefined)}
-            renderHighlightLink={highlight => (
+            renderFeaturedTable={highlight => (
               <ButtonText
                 onClick={() => {
                   setHighlightId(highlight.id);

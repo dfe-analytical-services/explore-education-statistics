@@ -8,7 +8,7 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { Theme } from '@common/services/themeService';
+import { PublicationSummary, Theme } from '@common/services/themeService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -22,12 +22,9 @@ export interface PublicationFormValues {
   publicationId: string;
 }
 
-export type PublicationFormSubmitHandler = (
-  values: PublicationFormValues & {
-    publicationSlug: string;
-    publicationTitle: string;
-  },
-) => void;
+export type PublicationFormSubmitHandler = (values: {
+  publication: PublicationSummary;
+}) => void;
 
 interface Props {
   initialValues?: PublicationFormValues;
@@ -69,24 +66,17 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
       validationSchema={Yup.object<PublicationFormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}
-      onSubmit={async values => {
-        const { publicationId } = values;
+      onSubmit={async ({ publicationId }) => {
         const publications = options.flatMap(theme =>
           theme.topics.flatMap(topic => topic.publications),
         );
-        const selectedPublication = publications.find(
-          publication => publication.id === publicationId,
-        );
+        const publication = publications.find(p => p.id === publicationId);
 
-        if (!selectedPublication) {
+        if (!publication) {
           throw new Error('Selected publication not found');
         }
 
-        await onSubmit({
-          publicationId,
-          publicationSlug: selectedPublication.slug,
-          publicationTitle: selectedPublication.title,
-        });
+        await onSubmit({ publication });
 
         goToNextStep();
       }}

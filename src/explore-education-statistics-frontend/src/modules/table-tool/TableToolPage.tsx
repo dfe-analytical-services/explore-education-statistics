@@ -8,9 +8,10 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import { FastTrackTable } from '@common/services/fastTrackService';
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
+  FeaturedTable,
   SelectedPublication,
+  Subject,
   SubjectMeta,
-  SubjectsAndHighlights,
 } from '@common/services/tableBuilderService';
 import themeService, { Theme } from '@common/services/themeService';
 import { Dictionary } from '@common/types';
@@ -26,17 +27,19 @@ const TableToolFinalStep = dynamic(
 );
 
 export interface TableToolPageProps {
-  selectedPublication?: SelectedPublication;
-  subjectsAndHighlights?: SubjectsAndHighlights;
   fastTrack?: FastTrackTable;
+  featuredTables?: FeaturedTable[];
+  selectedPublication?: SelectedPublication;
+  subjects?: Subject[];
   subjectMeta?: SubjectMeta;
   themeMeta: Theme[];
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
-  selectedPublication,
-  subjectsAndHighlights: initialSubjectsAndHighlights,
   fastTrack,
+  featuredTables = [],
+  selectedPublication,
+  subjects,
   subjectMeta,
   themeMeta,
 }) => {
@@ -48,14 +51,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   }, [fastTrack, subjectMeta]);
 
   const initialState = useMemo<InitialTableToolState | undefined>(() => {
-    if (!initialSubjectsAndHighlights) {
+    if (!subjects) {
       return undefined;
     }
 
-    const { subjects } = initialSubjectsAndHighlights;
-
-    const highlights = initialSubjectsAndHighlights.highlights.filter(
-      highlight => highlight.id !== fastTrack?.id,
+    const filteredFeaturedTables = featuredTables.filter(
+      table => table.id !== fastTrack?.id,
     );
 
     if (fastTrack && subjectMeta) {
@@ -68,7 +69,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return {
         initialStep: 6,
         subjects,
-        highlights,
+        featuredTables: filteredFeaturedTables,
         query: {
           ...fastTrack.query,
           releaseId: selectedPublication?.selectedRelease.id,
@@ -85,7 +86,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
     return {
       initialStep: 2,
       subjects,
-      highlights,
+      featuredTables: filteredFeaturedTables,
       query: {
         publicationId: selectedPublication?.id,
         releaseId: selectedPublication?.selectedRelease.id,
@@ -96,12 +97,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       },
       selectedPublication,
     };
-  }, [
-    selectedPublication,
-    fastTrack,
-    initialSubjectsAndHighlights,
-    subjectMeta,
-  ]);
+  }, [selectedPublication, fastTrack, subjects, featuredTables, subjectMeta]);
 
   return (
     <Page title="Create your own tables" caption="Table Tool" wide>
@@ -119,7 +115,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         themeMeta={themeMeta}
         initialState={initialState}
         loadingFastTrack={loadingFastTrack}
-        renderHighlightLink={highlight => (
+        renderFeaturedTable={highlight => (
           <Link
             to="/data-tables/fast-track/[fastTrackId]"
             as={`/data-tables/fast-track/${highlight.id}`}
@@ -212,9 +208,10 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
           releaseSlug,
         );
 
-  const subjectsAndHighlights = await tableBuilderService.getReleaseSubjectsAndHighlights(
-    selectedRelease.id,
-  );
+  const [subjects, featuredTables] = await Promise.all([
+    tableBuilderService.listReleaseSubjects(selectedRelease.id),
+    tableBuilderService.listReleaseFeaturedTables(selectedRelease.id),
+  ]);
 
   return {
     props: {
@@ -233,7 +230,8 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
           title: latestRelease.title,
         },
       },
-      subjectsAndHighlights,
+      subjects,
+      featuredTables,
     },
   };
 };

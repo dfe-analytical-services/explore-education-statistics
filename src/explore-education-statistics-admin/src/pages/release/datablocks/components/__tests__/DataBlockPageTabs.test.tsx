@@ -7,7 +7,7 @@ import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
 import _tableBuilderService, {
-  SubjectsAndHighlights,
+  Subject,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -61,15 +61,29 @@ describe('DataBlockPageTabs', () => {
     charts: [],
   };
 
-  const testRelease: SubjectsAndHighlights = {
-    subjects: [],
-    highlights: [],
-  };
+  const testSubjects: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Test subject',
+      content: '<p>Test content</p>',
+      timePeriods: {
+        from: '2018',
+        to: '2020',
+      },
+      geographicLevels: ['National'],
+      file: {
+        id: 'file-1',
+        name: 'Test subject',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
+      },
+    },
+  ];
 
   test('renders uninitialised table tool when no data block is selected', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
@@ -82,13 +96,15 @@ describe('DataBlockPageTabs', () => {
       );
 
       expect(screen.getAllByRole('listitem')).toHaveLength(1);
+
+      const radios = screen.getAllByRole('radio');
+      expect(radios).toHaveLength(1);
+      expect(radios[0]).toEqual(screen.getByLabelText('Test subject'));
     });
   });
 
   test('does not render table or chart tabs when no data block is selected', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
@@ -101,10 +117,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders fully initialised table tool when data block is selected', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
-
+    tableBuilderService.listReleaseSubjects.mockResolvedValue([]);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
@@ -135,10 +148,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders table and chart tabs when data block is selected', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
-
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
@@ -161,10 +171,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders partially initialised table tool when there are no table results', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
-
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue({
       ...testTableData,
@@ -197,10 +204,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders partially initialised table tool when table header configuration would be invalid', async () => {
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
-    );
-
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
@@ -243,10 +247,7 @@ describe('DataBlockPageTabs', () => {
 
   describe('updating data block', () => {
     test('submitting data source form calls correct service to update data block', async () => {
-      tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-        testRelease,
-      );
-
+      tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
       tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
       tableBuilderService.getTableData.mockResolvedValue(testTableData);
 

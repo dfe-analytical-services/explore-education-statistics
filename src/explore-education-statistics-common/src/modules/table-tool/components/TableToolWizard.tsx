@@ -27,7 +27,7 @@ import tableBuilderService, {
   SelectedPublication,
   Subject,
   SubjectMeta,
-  TableHighlight,
+  FeaturedTable,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
 import React, { ReactElement, ReactNode } from 'react';
@@ -38,7 +38,7 @@ export interface InitialTableToolState {
   initialStep: number;
   selectedPublication?: SelectedPublication;
   subjects?: Subject[];
-  highlights?: TableHighlight[];
+  featuredTables?: FeaturedTable[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
   response?: {
@@ -49,7 +49,7 @@ export interface InitialTableToolState {
 
 interface TableToolState extends InitialTableToolState {
   subjects: Subject[];
-  highlights: TableHighlight[];
+  featuredTables: FeaturedTable[];
   subjectMeta: SubjectMeta;
   query: ReleaseTableDataQuery;
 }
@@ -68,7 +68,7 @@ export interface TableToolWizardProps {
   initialState?: Partial<InitialTableToolState>;
   hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
-  renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
+  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
   onSubjectStepBack?: () => void;
@@ -80,7 +80,7 @@ const TableToolWizard = ({
   initialState = {},
   scrollOnMount,
   hidePublicationSelectionStage,
-  renderHighlightLink,
+  renderFeaturedTable,
   finalStep,
   onSubmit,
   onSubjectStepBack,
@@ -90,7 +90,7 @@ const TableToolWizard = ({
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
-    highlights: [],
+    featuredTables: [],
     subjectMeta: {
       timePeriod: {
         hint: '',
@@ -115,27 +115,26 @@ const TableToolWizard = ({
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId: selectedPublicationId,
-    publicationSlug,
-    publicationTitle,
+    publication,
   }) => {
-    const subjectsAndHighlights = await tableBuilderService.getPublicationSubjectsAndHighlights(
-      selectedPublicationId,
-    );
+    const [subjects, featuredTables] = await Promise.all([
+      tableBuilderService.listLatestReleaseSubjects(publication.id),
+      tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
+    ]);
 
     const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
-      publicationSlug,
+      publication.slug,
     );
 
     updateState(draft => {
-      draft.subjects = subjectsAndHighlights.subjects;
-      draft.highlights = subjectsAndHighlights.highlights;
+      draft.subjects = subjects;
+      draft.featuredTables = featuredTables;
 
-      draft.query.publicationId = selectedPublicationId;
+      draft.query.publicationId = publication.id;
       draft.selectedPublication = {
-        id: selectedPublicationId,
-        slug: publicationSlug,
-        title: publicationTitle,
+        id: publication.id,
+        slug: publication.slug,
+        title: publication.title,
         selectedRelease: {
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,
@@ -323,10 +322,10 @@ const TableToolWizard = ({
               {stepProps => (
                 <SubjectStep
                   {...stepProps}
-                  highlights={state.highlights}
+                  featuredTables={state.featuredTables}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderHighlightLink={renderHighlightLink}
+                  renderFeaturedTable={renderFeaturedTable}
                   onSubmit={handleSubjectFormSubmit}
                   loadingFastTrack={loadingFastTrack}
                 />

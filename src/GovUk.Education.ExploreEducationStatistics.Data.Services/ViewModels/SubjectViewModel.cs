@@ -1,9 +1,11 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class SubjectViewModel
+    public record SubjectViewModel
     {
         public Guid Id { get; }
 
@@ -15,18 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public List<string> GeographicLevels { get; }
 
+        public FileInfo File { get; }
+
         public SubjectViewModel(
             Guid id,
             string name,
             string content,
             TimePeriodLabels timePeriods,
-            List<string> geographicLevels)
+            List<string> geographicLevels,
+            FileInfo file)
         {
             Id = id;
             Name = name;
             Content = content;
             TimePeriods = timePeriods;
             GeographicLevels = geographicLevels;
+            File = file;
         }
     }
 }

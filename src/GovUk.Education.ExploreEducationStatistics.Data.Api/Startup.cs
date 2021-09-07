@@ -108,6 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            // TODO: EES-2343 Remove when file sizes are stored in database
+            services.AddTransient<IReleaseService.IBlobInfoGetter, ReleaseService.DefaultBlobInfoGetter>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
@@ -139,7 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IFastTrackService, FastTrackService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+                new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
 
             services

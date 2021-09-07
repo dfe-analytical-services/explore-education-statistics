@@ -10,9 +10,10 @@ import _publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
-  SubjectsAndHighlights,
   SubjectMeta,
   TableDataResponse,
+  FeaturedTable,
+  Subject,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -188,27 +189,33 @@ describe('PreReleaseTableToolPage', () => {
     legacyReleases: [],
   };
 
-  const testRelease: SubjectsAndHighlights = {
-    highlights: [
-      {
-        id: 'block-1',
-        name: 'Test highlight',
-        description: 'Test highlight description',
+  const testFeaturedTables: FeaturedTable[] = [
+    {
+      id: 'block-1',
+      name: 'Test highlight',
+      description: 'Test highlight description',
+    },
+  ];
+  const testSubjects: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Test subject',
+      content: '<p>Test content</p>',
+      timePeriods: {
+        from: '2018',
+        to: '2020',
       },
-    ],
-    subjects: [
-      {
-        id: 'subject-1',
+      geographicLevels: ['National'],
+      file: {
+        id: 'file-1',
         name: 'Test subject',
-        content: '<p>Test content</p>',
-        timePeriods: {
-          from: '2018',
-          to: '2020',
-        },
-        geographicLevels: ['National'],
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
       },
-    ],
-  };
+    },
+  ];
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
@@ -254,8 +261,9 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 with subjects and featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
     );
 
     renderPage();
@@ -292,10 +300,8 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 without featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
-      ...testRelease,
-      highlights: [],
-    });
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue([]);
 
     renderPage();
 
@@ -321,9 +327,11 @@ describe('PreReleaseTableToolPage', () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
 
-    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
-      testRelease,
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
     );
+
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
 

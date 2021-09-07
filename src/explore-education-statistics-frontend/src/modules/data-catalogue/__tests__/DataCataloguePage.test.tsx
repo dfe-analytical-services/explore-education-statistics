@@ -1,22 +1,24 @@
+import _tableBuilderService, {
+  Subject,
+} from '@common/services/tableBuilderService';
 import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
-import {
-  DownloadTheme,
-  PublicationSummary,
-  Theme,
-} from '@common/services/themeService';
+import { PublicationSummary, Theme } from '@common/services/themeService';
 import _publicationService, {
   ReleaseSummary,
 } from '@common/services/publicationService';
-import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import React from 'react';
 
 jest.mock('@common/services/publicationService');
+jest.mock('@common/services/tableBuilderService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
+>;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
 >;
 
 describe('DataCataloguePage', () => {
@@ -24,20 +26,23 @@ describe('DataCataloguePage', () => {
     {
       id: 'theme-1',
       title: 'Pupils and schools',
+      summary: '',
       topics: [
         {
           id: 'topic-1',
           title: 'Admission appeals',
+          summary: '',
           publications: [
             {
               id: 'publication-1',
               title: 'Test publication',
               slug: 'test-publication',
+              summary: '',
             },
           ],
         },
       ],
-    } as DownloadTheme,
+    },
   ];
 
   const testPublication = {
@@ -70,7 +75,7 @@ describe('DataCataloguePage', () => {
     } as ReleaseSummary,
   ];
 
-  const testSubjects: SubjectWithDownloadFiles[] = [
+  const testSubjects: Subject[] = [
     {
       id: 'subject-1',
       name: 'Subject 1',
@@ -80,12 +85,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-1',
-        extension: 'csv',
+        name: 'Subject 1',
         fileName: 'file-1.csv',
-        name: 'File 1',
-        size: '100mb',
+        extension: 'csv',
+        size: '10 Mb',
         type: 'Data',
       },
     },
@@ -98,12 +103,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-2',
-        extension: 'csv',
+        name: 'Another Subject',
         fileName: 'file-2.csv',
-        name: 'File 2',
-        size: '100mb',
+        extension: 'csv',
+        size: '20 Mb',
         type: 'Data',
       },
     },
@@ -116,12 +121,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-3',
-        extension: 'csv',
+        name: 'Subject 3',
         fileName: 'file-3.csv',
-        name: 'File 3',
-        size: '100mb',
+        extension: 'csv',
+        size: '30 Mb',
         type: 'Data',
       },
     },
@@ -150,6 +155,7 @@ describe('DataCataloguePage', () => {
 
   test('can go through all the steps to get to download files', async () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(<DataCataloguePage themes={testThemes} />);
 
@@ -251,11 +257,18 @@ describe('DataCataloguePage', () => {
       'step',
     );
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
-    expect(
-      screen.getByLabelText('Another Subject (csv, 100mb)'),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText('Subject 1 (csv, 100mb)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Subject 3 (csv, 100mb)')).toBeInTheDocument();
+
+    const checkboxes = screen.getAllByRole('checkbox');
+
+    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes[0]).toEqual(
+      screen.getByLabelText('Another Subject (csv, 20 Mb)'),
+    );
+    expect(checkboxes[1]).toEqual(
+      screen.getByLabelText('Subject 1 (csv, 10 Mb)'),
+    );
+    expect(checkboxes[2]).toEqual(
+      screen.getByLabelText('Subject 3 (csv, 30 Mb)'),
+    );
   });
 });

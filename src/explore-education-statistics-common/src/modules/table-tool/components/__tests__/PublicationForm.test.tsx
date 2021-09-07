@@ -1,5 +1,5 @@
 import PublicationForm, {
-  PublicationFormValues,
+  PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { Theme } from '@common/services/themeService';
@@ -406,18 +406,18 @@ describe('PublicationForm', () => {
     );
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
-    const expected: PublicationFormValues & {
-      publicationSlug: string;
-      publicationTitle: string;
-    } = {
-      publicationId: 'publication-5',
-      publicationSlug: 'pupil-absence-in-schools-in-england',
-      publicationTitle: 'Pupil absence in schools in England',
-    };
-
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
-      expect(handleSubmit).toHaveBeenCalledWith(expected);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<PublicationFormSubmitHandler>
+      >({
+        publication: {
+          id: 'publication-5',
+          slug: 'pupil-absence-in-schools-in-england',
+          title: 'Pupil absence in schools in England',
+          summary: '',
+        },
+      });
     });
   });
 });

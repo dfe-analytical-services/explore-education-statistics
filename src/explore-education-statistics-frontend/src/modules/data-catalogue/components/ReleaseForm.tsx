@@ -24,7 +24,9 @@ export interface ReleaseFormValues {
   releaseId: string;
 }
 
-export type ReleaseFormSubmitHandler = (values: { releaseId: string }) => void;
+export type ReleaseFormSubmitHandler = (values: {
+  release: ReleaseSummary;
+}) => void;
 
 const formId = 'releaseForm';
 
@@ -80,10 +82,18 @@ const ReleaseForm = ({
     [options, searchTerm],
   );
 
-  const handleSubmit = useFormSubmit(async (values: ReleaseFormValues) => {
-    await onSubmit(values);
-    goToNextStep();
-  });
+  const handleSubmit = useFormSubmit(
+    async ({ releaseId }: ReleaseFormValues) => {
+      const release = options.find(r => r.id === releaseId);
+
+      if (!release) {
+        throw new Error('Selected release not found');
+      }
+
+      await onSubmit({ release });
+      goToNextStep();
+    },
+  );
 
   return (
     <Formik<ReleaseFormValues>

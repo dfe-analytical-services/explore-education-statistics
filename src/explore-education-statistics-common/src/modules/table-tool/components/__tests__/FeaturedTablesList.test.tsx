@@ -1,12 +1,12 @@
 import { getDescribedBy } from '@common-test/queries';
-import TableHighlightsList from '@common/modules/table-tool/components/TableHighlightsList';
-import { TableHighlight } from '@common/services/tableBuilderService';
+import FeaturedTablesList from '@common/modules/table-tool/components/FeaturedTablesList';
+import { FeaturedTable } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-describe('TableHighlightsList', () => {
-  const testHighlights: TableHighlight[] = [
+describe('FeaturedTablesList', () => {
+  const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'highlight-1',
       name: '1 - Unique name',
@@ -24,7 +24,7 @@ describe('TableHighlightsList', () => {
     },
   ];
 
-  const renderLink = (highlight: TableHighlight) => (
+  const renderLink = (highlight: FeaturedTable) => (
     <a href="/">{highlight.name}</a>
   );
 
@@ -38,8 +38,8 @@ describe('TableHighlightsList', () => {
 
   test('renders highlights in correct order', () => {
     render(
-      <TableHighlightsList
-        highlights={testHighlights}
+      <FeaturedTablesList
+        featuredTables={testFeaturedTables}
         renderLink={renderLink}
       />,
     );
@@ -77,8 +77,8 @@ describe('TableHighlightsList', () => {
 
   test('does not add `aria-describedby` to highlight link if `description` is empty', () => {
     render(
-      <TableHighlightsList
-        highlights={[
+      <FeaturedTablesList
+        featuredTables={[
           {
             id: 'highlight-1',
             name: 'Highlight 1',
@@ -95,7 +95,7 @@ describe('TableHighlightsList', () => {
   });
 
   test('renders empty message if no highlights', () => {
-    render(<TableHighlightsList highlights={[]} renderLink={renderLink} />);
+    render(<FeaturedTablesList featuredTables={[]} renderLink={renderLink} />);
 
     expect(
       screen.getByText(/No featured tables available/),
@@ -105,8 +105,8 @@ describe('TableHighlightsList', () => {
 
   test('renders single result for search term on name', async () => {
     render(
-      <TableHighlightsList
-        highlights={testHighlights}
+      <FeaturedTablesList
+        featuredTables={testFeaturedTables}
         renderLink={renderLink}
       />,
     );
@@ -127,8 +127,8 @@ describe('TableHighlightsList', () => {
 
   test('renders multiple results for search term on name', async () => {
     render(
-      <TableHighlightsList
-        highlights={testHighlights}
+      <FeaturedTablesList
+        featuredTables={testFeaturedTables}
         renderLink={renderLink}
       />,
     );
@@ -150,8 +150,8 @@ describe('TableHighlightsList', () => {
 
   test('renders single result for search term on description', async () => {
     render(
-      <TableHighlightsList
-        highlights={testHighlights}
+      <FeaturedTablesList
+        featuredTables={testFeaturedTables}
         renderLink={renderLink}
       />,
     );
@@ -177,8 +177,8 @@ describe('TableHighlightsList', () => {
     };
 
     render(
-      <TableHighlightsList
-        highlights={[highlightWithoutDescription, ...testHighlights]}
+      <FeaturedTablesList
+        featuredTables={[highlightWithoutDescription, ...testFeaturedTables]}
         renderLink={renderLink}
       />,
     );
@@ -199,8 +199,8 @@ describe('TableHighlightsList', () => {
 
   test('renders empty message if no results', async () => {
     render(
-      <TableHighlightsList
-        highlights={testHighlights}
+      <FeaturedTablesList
+        featuredTables={testFeaturedTables}
         renderLink={renderLink}
       />,
     );

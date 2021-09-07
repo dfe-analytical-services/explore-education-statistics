@@ -5,10 +5,10 @@ import TabsSection from '@common/components/TabsSection';
 import SubjectForm, {
   SubjectFormSubmitHandler,
 } from '@common/modules/table-tool/components/SubjectForm';
-import TableHighlightsList from '@common/modules/table-tool/components/TableHighlightsList';
+import FeaturedTablesList from '@common/modules/table-tool/components/FeaturedTablesList';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { Subject, TableHighlight } from '@common/services/tableBuilderService';
+import { Subject, FeaturedTable } from '@common/services/tableBuilderService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import WizardStepEditButton from './WizardStepEditButton';
@@ -20,34 +20,34 @@ const subjectTabIds = {
 };
 
 interface Props {
-  highlights?: TableHighlight[];
+  featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
   subjects: Subject[];
   subjectId?: string;
-  renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
+  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   onSubmit: SubjectFormSubmitHandler;
 }
 
 const SubjectStep = ({
-  highlights = [],
+  featuredTables = [],
   loadingFastTrack = false,
   subjects,
   subjectId = '',
-  renderHighlightLink,
+  renderFeaturedTable,
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
   const { isActive, currentStep, stepNumber } = stepProps;
 
-  const hasHighlights = renderHighlightLink && highlights.length > 0;
+  const hasFeaturedTables = renderFeaturedTable && featuredTables.length > 0;
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
     <WizardStepHeading
       {...stepProps}
-      fieldsetHeading={!hasHighlights}
+      fieldsetHeading={!hasFeaturedTables}
       stepEnabled={stepEnabled}
     >
-      {hasHighlights
+      {hasFeaturedTables
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
     </WizardStepHeading>
@@ -62,9 +62,9 @@ const SubjectStep = ({
         }}
         options={subjects}
         onSubmit={onSubmit}
-        legendSize={hasHighlights ? 'm' : 'l'}
+        legendSize={hasFeaturedTables ? 'm' : 'l'}
         legend={
-          hasHighlights ? (
+          hasFeaturedTables ? (
             <h3 className="govuk-fieldset__heading">Choose a subject</h3>
           ) : (
             stepHeading
@@ -74,7 +74,7 @@ const SubjectStep = ({
       />
     );
 
-    return hasHighlights ? (
+    return hasFeaturedTables ? (
       <>
         {stepHeading}
 
@@ -91,10 +91,10 @@ const SubjectStep = ({
                 and change filters to quickly see different results.
               </span>
 
-              {renderHighlightLink && (
-                <TableHighlightsList
-                  highlights={highlights}
-                  renderLink={renderHighlightLink}
+              {renderFeaturedTable && (
+                <FeaturedTablesList
+                  featuredTables={featuredTables}
+                  renderLink={renderFeaturedTable}
                 />
               )}
 

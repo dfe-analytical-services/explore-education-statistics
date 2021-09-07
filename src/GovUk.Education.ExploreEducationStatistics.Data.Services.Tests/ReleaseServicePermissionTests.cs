@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         };
 
         [Fact]
-        public async Task GetSubjectsMeta()
+        public async Task ListSubjects()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
@@ -30,24 +31,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     userService =>
                     {
                         var service = BuildReleaseMetaService(userService: userService.Object);
-                        return service.GetRelease(_release.Id);
+                        return service.ListSubjects(_release.Id);
                     }
                 );
         }
 
         private ReleaseService BuildReleaseMetaService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            StatisticsDbContext statisticsDbContext = null,
-            IUserService userService = null,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            StatisticsDbContext? statisticsDbContext = null,
+            IUserService? userService = null,
+            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? new Mock<IUserService>().Object,
-                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+                userService ?? Mock.Of<IUserService>(),
+                metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }
 

@@ -1,8 +1,9 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class TableHighlightViewModel
+    public record FeaturedTableViewModel
     {
         public Guid Id { get; }
 
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public string Description { get; }
 
-        public TableHighlightViewModel(Guid id, string name, string description = "")
+        public FeaturedTableViewModel(Guid id, string name, string description = "")
         {
             Id = id;
             Name = name;
