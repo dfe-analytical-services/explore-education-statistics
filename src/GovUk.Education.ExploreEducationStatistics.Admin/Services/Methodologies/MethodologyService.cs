@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -19,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -103,14 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(() => _methodologyRepository
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
-                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
+                .OnSuccess(BuildMethodologySummaryViewModel);
         }
 
         public async Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<PublicationMethodology>(q =>
-                    q.Where(link => link.PublicationId == publicationId 
+                    q.Where(link => link.PublicationId == publicationId
                                     && link.MethodologyParentId == methodologyId))
                 .OnSuccess(link => _userService.CheckCanDropMethodologyLink(link))
                 .OnSuccessVoid(async link =>
@@ -120,7 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetAdoptableMethodologies(
+            Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -128,53 +129,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(async publication =>
                 {
                     var methodologies = await _methodologyParentRepository.GetUnrelatedToPublication(publication.Id);
-                    return methodologies
-                        .Select(m => new TitleAndIdViewModel(m.Id, m.OwningPublicationTitle))
-                        .ToList();
+                    var latestVersions = await methodologies.SelectAsync(methodology =>
+                        _methodologyRepository.GetLatestByMethodologyParent(methodology.Id));
+                    return (await latestVersions.SelectAsync(BuildMethodologySummaryViewModel)).ToList();
                 });
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id, HydrateMethodologyForMethodologySummaryViewModel)
+                .CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(async methodology =>
-                {
-                    var publicationLinks = methodology.MethodologyParent.Publications;
-                    var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
-                    var otherPublications = publicationLinks.Where(pm => !pm.Owner)
-                        .Select(BuildPublicationViewModel)
-                        .OrderBy(model => model.Title)
-                        .ToList();
-
-                    var viewModel = _mapper.Map<MethodologySummaryViewModel>(methodology);
-
-                    viewModel.OwningPublication = owningPublication;
-                    viewModel.OtherPublications = otherPublications;
-
-                    if (methodology.ScheduledForPublishingWithRelease)
-                    {
-                        await _context.Entry(methodology)
-                            .Reference(m => m.ScheduledWithRelease)
-                            .LoadAsync();
-
-                        await _context.Entry(methodology.ScheduledWithRelease)
-                            .Reference(r => r!.Publication)
-                            .LoadAsync();
-
-                        if (methodology.ScheduledWithRelease != null)
-                        {
-                            var title =
-                                $"{methodology.ScheduledWithRelease.Publication.Title} - {methodology.ScheduledWithRelease.Title}";
-                            viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
-                                methodology.ScheduledWithRelease.Id,
-                                title);
-                        }
-                    }
-
-                    return viewModel;
-                });
+                .OnSuccess(BuildMethodologySummaryViewModel);
         }
 
         public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
@@ -211,10 +177,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id, HydrateMethodologyForManageMethodologySummaryViewModel)
+                .CheckEntityExists<Methodology>(id, q =>
+                    q.Include(m => m.MethodologyParent))
                 .OnSuccess(methodology => UpdateMethodologyStatus(methodology, request))
                 .OnSuccess(methodology => UpdateMethodologyDetails(methodology, request))
                 .OnSuccess(_ => GetSummary(id));
+        }
+
+        private async Task<MethodologySummaryViewModel> BuildMethodologySummaryViewModel(Methodology methodology)
+        {
+            var loadedMethodology = _context.AssertEntityLoaded(methodology);
+            await _context.Entry(loadedMethodology)
+                .Reference(m => m.MethodologyParent)
+                .Query()
+                .Include(m => m.Publications)
+                .ThenInclude(p => p.Publication)
+                .LoadAsync();
+
+            var publicationLinks = loadedMethodology.MethodologyParent.Publications;
+            var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
+            var otherPublications = publicationLinks.Where(pm => !pm.Owner)
+                .Select(BuildPublicationViewModel)
+                .OrderBy(model => model.Title)
+                .ToList();
+
+            var viewModel = _mapper.Map<MethodologySummaryViewModel>(loadedMethodology);
+
+            viewModel.OwningPublication = owningPublication;
+            viewModel.OtherPublications = otherPublications;
+
+            if (loadedMethodology.ScheduledForPublishingWithRelease)
+            {
+                await _context.Entry(loadedMethodology)
+                    .Reference(m => m.ScheduledWithRelease)
+                    .LoadAsync();
+
+                if (loadedMethodology.ScheduledWithRelease != null)
+                {
+                    await _context.Entry(loadedMethodology.ScheduledWithRelease)
+                        .Reference(r => r!.Publication)
+                        .LoadAsync();
+
+                    var title =
+                        $"{loadedMethodology.ScheduledWithRelease.Publication.Title} - {loadedMethodology.ScheduledWithRelease.Title}";
+                    viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
+                        loadedMethodology.ScheduledWithRelease.Id,
+                        title);
+                }
+            }
+
+            return viewModel;
         }
 
         private async Task<Either<ActionResult, Methodology>> UpdateMethodologyStatus(Methodology methodologyToUpdate,
@@ -451,21 +463,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return Unit.Instance;
-        }
-
-        private static IIncludableQueryable<Methodology, Publication> HydrateMethodologyForMethodologySummaryViewModel(
-            IQueryable<Methodology> queryable)
-        {
-            return queryable
-                .Include(methodology => methodology.MethodologyParent)
-                .ThenInclude(mp => mp.Publications)
-                .ThenInclude(pm => pm.Publication);
-        }
-
-        private static IQueryable<Methodology> HydrateMethodologyForManageMethodologySummaryViewModel(
-            IQueryable<Methodology> queryable)
-        {
-            return queryable.Include(methodology => methodology.MethodologyParent);
         }
     }
 }

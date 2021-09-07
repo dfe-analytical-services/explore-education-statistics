@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
 
-        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId);
+        Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId);
 
         Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
 

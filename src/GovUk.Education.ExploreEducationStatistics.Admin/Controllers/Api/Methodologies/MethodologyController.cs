@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("publication/{publicationId}/adoptable-methodologies")]
-        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+        public async Task<ActionResult<List<MethodologySummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId)
         {
             return await _methodologyService
                 .GetAdoptableMethodologies(publicationId)

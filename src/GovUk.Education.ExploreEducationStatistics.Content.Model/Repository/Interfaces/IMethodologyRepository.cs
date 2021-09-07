@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
     {
         Task<Methodology> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId);
 
+        Task<Methodology> GetLatestByMethodologyParent(Guid methodologyParentId);
+
         Task<List<Methodology>> GetLatestByPublication(Guid publicationId);
 
         Task<Methodology?> GetLatestPublishedByMethodologyParent(Guid methodologyParentId);

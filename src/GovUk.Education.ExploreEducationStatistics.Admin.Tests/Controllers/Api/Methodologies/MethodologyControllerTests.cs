@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetAdoptableMethodologies(_id))
-                .ReturnsAsync(AsList(new TitleAndIdViewModel()));
+                .ReturnsAsync(AsList(new MethodologySummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
