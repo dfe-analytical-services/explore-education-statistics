@@ -7,10 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     {
         public string OldCode { get; }
 
-        public LocalAuthority()
-        {
-        }
-
         public LocalAuthority(string code, string oldCode, string name) : base(code, name)
         {
             OldCode = oldCode;

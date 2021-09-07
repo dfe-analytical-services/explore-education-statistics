@@ -7,10 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
      */
     public class RscRegion : ObservationalUnit
     {
-        public RscRegion()
-        {
-        }
-        
         public RscRegion(string code) : base(code, code)
         {
         }

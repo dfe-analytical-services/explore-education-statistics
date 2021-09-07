@@ -2,10 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class OpportunityArea : ObservationalUnit
     {
-        public OpportunityArea()
-        {
-        }
-        
         public OpportunityArea(string code, string name) : base(code, name)
         {
         }
