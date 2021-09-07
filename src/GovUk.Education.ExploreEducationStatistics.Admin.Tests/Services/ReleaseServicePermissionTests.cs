@@ -205,6 +205,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetDeleteReleasePlan()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanDeleteSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService: userService.Object);
+                        return service.GetDeleteReleasePlan(_release.Id);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task DeleteRelease()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
