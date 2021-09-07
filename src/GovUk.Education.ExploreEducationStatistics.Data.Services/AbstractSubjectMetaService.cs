@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         protected IEnumerable<ObservationalUnitMetaViewModel> BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(
             GeographicLevel geographicLevel,
-            ICollection<IObservationalUnit> observationalUnits,
+            ICollection<ObservationalUnit> observationalUnits,
             bool geoJsonRequested,
             long? boundaryLevelId)
         {
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         protected bool HasBoundaryLevelDataForAnyObservationalUnits(
-            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits)
         {
             return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
         }

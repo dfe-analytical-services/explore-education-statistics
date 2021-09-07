@@ -634,11 +634,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
 
             mocks.locationRepository
                 .Setup(s => s.GetObservationalUnits(GeographicLevel.Country, new [] { CountryCodeEngland }))
-                .Returns(new List<IObservationalUnit>(new List<IObservationalUnit>
+                .Returns(new List<ObservationalUnit>(new List<ObservationalUnit>
                 {
                     country
                 }));
@@ -1085,7 +1085,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
                 {
                     {
                         GeographicLevel.Country,
@@ -1098,7 +1098,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             mocks.locationRepository
                 .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<IObservationalUnit>
+                .Returns(new List<ObservationalUnit>
                 {
                     country
                 });
@@ -1358,7 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
                 {
                     {
                         GeographicLevel.Country,
@@ -1371,7 +1371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             mocks.locationRepository
                 .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<IObservationalUnit>
+                .Returns(new List<ObservationalUnit>
                 {
                     country
                 });
@@ -1656,7 +1656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
                 {
                     {
                         GeographicLevel.Country,
@@ -1669,7 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             mocks.locationRepository
                 .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<IObservationalUnit>
+                .Returns(new List<ObservationalUnit>
                 {
                     country
                 });
@@ -2076,7 +2076,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
                 {
                     {
                         GeographicLevel.Country,
@@ -2089,7 +2089,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             mocks.locationRepository
                 .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<IObservationalUnit>
+                .Returns(new List<ObservationalUnit>
                 {
                     country
                 });
@@ -2465,7 +2465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -2887,7 +2887,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
                 {
                     {
                         GeographicLevel.Country,

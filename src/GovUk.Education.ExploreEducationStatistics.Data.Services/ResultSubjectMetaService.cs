@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private IEnumerable<ObservationalUnitMetaViewModel> GetGeoJsonObservationalUnits(
-            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits,
+            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits,
             bool geoJsonRequested,
             long? boundaryLevelId)
         {

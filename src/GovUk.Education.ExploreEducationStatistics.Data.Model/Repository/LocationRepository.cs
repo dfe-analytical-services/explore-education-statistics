@@ -14,14 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(Guid subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(Guid subjectId)
         {
             var observations = _context.Observation
                 .Where(o => o.SubjectId == subjectId);
             return GetObservationalUnits(observations);
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
+        public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
             var list = observations
@@ -61,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                     });
         }
 
-        public IEnumerable<IObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes)
+        public IEnumerable<ObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes)
         {
-            IQueryable<IObservationalUnit> query = level switch
+            IQueryable<ObservationalUnit> query = level switch
             {
                 GeographicLevel.EnglishDevolvedArea =>
                     _context.Location
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return query.ToList();
         }
 
-        private static IObservationalUnit GetObservationalUnit(GeographicLevel geographicLevel, Location location)
+        private static ObservationalUnit GetObservationalUnit(GeographicLevel geographicLevel, Location location)
         {
             switch (geographicLevel)
             {

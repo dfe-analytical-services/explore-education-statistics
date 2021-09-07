@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
             CreateMap<Location, LocationViewModel>();
 
             AppDomain.CurrentDomain.GetAssemblies().SelectMany(GetTypesFromAssembly)
-                .Where(p => typeof(IObservationalUnit).IsAssignableFrom(p))
+                .Where(p => p.IsSubclassOf(typeof(ObservationalUnit)))
                 .ToList().ForEach(type =>
                 {
                     if (type == typeof(LocalAuthority))
