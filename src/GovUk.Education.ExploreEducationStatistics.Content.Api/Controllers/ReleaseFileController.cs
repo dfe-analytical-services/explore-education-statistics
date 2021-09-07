@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseId}/files")]
-        [Produces(MediaTypeNames.Application.Zip)]
+        [Produces(MediaTypeNames.Application.Octet)]
         public async Task StreamFilesToZip(
             Guid releaseId,
             [FromQuery] IList<Guid> fileIds)
@@ -80,11 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         // Create a hash just so that we have some uniqueness
                         // to attach to the end of the file name.
                         var fileIdsHash = GetFileIdsHash(fileIds);
+                        var filename = $"{release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip";
 
-                        Response.Headers.Add(
-                            "Content-Disposition",
-                            $"attachment; filename={release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip"
-                        );
+                        Response.Headers.Add(HeaderNames.ContentDisposition, $"attachment; filename={filename}");
+                        Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
                         // We start the response immediately, before all of the files have
                         // even downloaded from blob storage. As we download them, they are
