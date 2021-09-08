@@ -212,6 +212,7 @@ const ChartConfiguration = ({
 
             <FormFieldRadioGroup<FormValues>
               legend="Chart title"
+              legendSize="s"
               name="titleType"
               order={[]}
               options={[
