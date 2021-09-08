@@ -339,7 +339,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            showGroupByFilter // EES-2467 remove this when BE done.
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -356,6 +355,7 @@ describe('ChartAxisConfiguration', () => {
         const formValues: AxisConfiguration = {
           dataSets: [],
           groupBy: 'locations',
+          groupByFilter: '',
           min: 0,
           max: undefined,
           referenceLines: [],
@@ -388,7 +388,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            showGroupByFilter // EES-2467 remove this when BE done.
             onChange={noop}
             onSubmit={handleSubmit}
           />
