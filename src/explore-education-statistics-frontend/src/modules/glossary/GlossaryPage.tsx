@@ -6,17 +6,28 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
+import { GetServerSideProps, NextPage } from 'next';
+import sanitizeHtml, {
+  defaultSanitizeOptions,
+  SanitizeHtmlOptions,
+} from '@common/utils/sanitizeHtml';
+import glossaryService, {
+  GlossaryCategory,
+} from '@common/services/glossaryService';
 
-export interface GlossaryEntry {
-  heading: string;
-  content: string;
+export interface Props {
+  categories: GlossaryCategory[];
 }
 
-export interface GlossaryPageProps {
-  entries: GlossaryEntry[];
-}
+const sanitizeHtmlOptions: SanitizeHtmlOptions = {
+  ...defaultSanitizeOptions,
+  allowedAttributes: {
+    ...defaultSanitizeOptions.allowedAttributes,
+    a: ['href', 'rel', 'target'],
+  },
+};
 
-function GlossaryPage({ entries }: GlossaryPageProps) {
+const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
   return (
     <Page title="Glossary">
       <div className="govuk-grid-row">
@@ -55,29 +66,46 @@ function GlossaryPage({ entries }: GlossaryPageProps) {
           });
         }}
       >
-        {entries.map(entry => (
+        {categories.map(category => (
           <AccordionSection
-            key={entry.heading}
-            heading={entry.heading}
-            id={`glossary-${entry.heading}`}
+            key={category.heading}
+            heading={category.heading}
+            id={`glossary-${category.heading}`}
           >
-            {entry.content ? (
-              <div
-                // eslint-disable-next-line react/no-danger
-                dangerouslySetInnerHTML={{
-                  __html: entry.content,
-                }}
-              />
-            ) : (
-              <p className="govuk-inset-text">
-                There are currently no entries under this section
-              </p>
-            )}
+            <>
+              {category.entries.length ? (
+                category.entries.map(entry => (
+                  <div id={entry.slug} key={entry.slug}>
+                    <h3>{entry.title}</h3>
+                    <div
+                      // eslint-disable-next-line react/no-danger
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(entry.body, sanitizeHtmlOptions),
+                      }}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="govuk-inset-text">
+                  There are currently no entries under this section.
+                </p>
+              )}
+            </>
           </AccordionSection>
         ))}
       </Accordion>
     </Page>
   );
-}
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const categories = await glossaryService.listGlossaryEntries();
+
+  return {
+    props: {
+      categories,
+    },
+  };
+};
 
 export default GlossaryPage;
