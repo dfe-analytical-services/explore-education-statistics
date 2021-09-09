@@ -70,12 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             get
             {
-                return ReleaseStatuses.Any(rs => rs.ApprovalStatus == ReleaseApprovalStatus.Approved)
-                       && ReleaseStatuses
-                           .Where(rs => rs.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                var status = ReleaseStatuses
                            .OrderBy(rs => rs.Created)
-                           .Last()
-                           .NotifySubscribers;
+                           .LastOrDefault();
+                return status != null
+                       && status.NotifySubscribers
+                       && status.NotifiedOn == null;
             }
         }
 

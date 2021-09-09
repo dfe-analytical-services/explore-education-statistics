@@ -192,12 +192,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(rs => rs.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : (DateTime?) null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.NotifiedOn)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : (DateTime?) null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.ApprovalStatus)

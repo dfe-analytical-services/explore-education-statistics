@@ -1410,54 +1410,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Draft_NotifySubscribers()
-        {
-            var release = new Release
-            {
-                Type = new ReleaseType {Title = "Ad Hoc"},
-                Publication = new Publication {Title = "Old publication"},
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(release);
-                await context.SaveChangesAsync();
-            }
-
-            var contentService = new Mock<IContentService>(MockBehavior.Strict);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(release.Id))
-                    .ReturnsAsync(new List<HtmlBlock>());
-
-                var releaseService = BuildReleaseService(contentDbContext: context,
-                    contentService: contentService.Object);
-
-                var result = await releaseService
-                    .CreateReleaseStatus(
-                        release.Id,
-                        new ReleaseStatusCreateViewModel
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            LatestInternalReleaseNote = "Test note",
-                        }
-                    );
-
-                MockUtils.VerifyAllMocks(contentService);
-
-                var viewModel = result.AssertRight();
-
-                Assert.False(viewModel.NotifySubscribers);
-            }
-        }
-
-        [Fact]
         public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
         {
             var release = new Release
