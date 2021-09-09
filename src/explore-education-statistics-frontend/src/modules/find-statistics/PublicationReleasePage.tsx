@@ -325,6 +325,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       {release.downloadFiles && (
         <ReleaseDataAndFilesAccordion
+          release={release}
           onSectionOpen={accordionSection => {
             logEvent({
               category: `${release.publication.title} release page`,
@@ -332,12 +333,27 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               label: `${accordionSection.title}`,
             });
           }}
-          release={release}
           renderCreateTablesButton={
             <CreateTablesButton
               className="govuk-!-width-full"
               release={release}
             />
+          }
+          renderDataCatalogueLink={
+            <Link
+              to={
+                release.latestRelease
+                  ? '/data-catalogue/[publication]'
+                  : '/data-catalogue/[publication]/[release]'
+              }
+              as={
+                release.latestRelease
+                  ? `/data-catalogue/${release.publication.slug}`
+                  : `/data-catalogue/${release.publication.slug}/${release.slug}`
+              }
+            >
+              data catalogue
+            </Link>
           }
           renderDownloadLink={file => {
             const isAllFiles = !file.id && file.name === 'All files';

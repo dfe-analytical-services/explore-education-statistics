@@ -55,7 +55,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
     slug: 'release-1',
   } as Release;
 
-  test('renders the accordion with files', () => {
+  test('renders with files', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={testRelease}
@@ -140,7 +140,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the accordion without files', () => {
+  test('renders without files', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={{
@@ -158,11 +158,12 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the create tables button', () => {
+  test('renders data catalogue link', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={testRelease as Release}
-        renderCreateTablesButton={<a href="#">mock create tables button</a>}
+        renderCreateTablesButton={<a href="#">mock create tables link</a>}
+        renderDataCatalogueLink={<a href="#">mock data catalogue link</a>}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
       />,
@@ -170,11 +171,27 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     expect(screen.getByText('Create your own tables')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'mock create tables button' }),
+      screen.getByRole('link', { name: 'mock data catalogue link' }),
     ).toBeInTheDocument();
   });
 
-  test('renders the pre-release access link', () => {
+  test('renders create tables link', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease as Release}
+        renderCreateTablesButton={<a href="#">mock create tables link</a>}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
+      />,
+    );
+
+    expect(screen.getByText('Create your own tables')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'mock create tables link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders pre-release access link', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={testRelease as Release}

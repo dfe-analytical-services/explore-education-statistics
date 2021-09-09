@@ -10,6 +10,7 @@ import styles from './ReleaseDataAndFilesAccordion.module.scss';
 interface Props {
   release: Release;
   renderCreateTablesButton?: ReactNode;
+  renderDataCatalogueLink?: ReactNode;
   renderDownloadLink: (file: FileInfo) => ReactNode;
   renderMetaGuidanceLink: ReactNode;
   renderPreReleaseAccessLink?: ReactNode;
@@ -19,6 +20,7 @@ interface Props {
 const ReleaseDataAndFilesAccordion = ({
   release,
   renderCreateTablesButton,
+  renderDataCatalogueLink,
   renderDownloadLink,
   renderMetaGuidanceLink,
   renderPreReleaseAccessLink,
@@ -106,6 +108,13 @@ const ReleaseDataAndFilesAccordion = ({
                 Learn more about the data files used in this release using our{' '}
                 {renderMetaGuidanceLink}.
               </p>
+
+              {renderDataCatalogueLink && (
+                <p>
+                  Browse and download individual open data files in our{' '}
+                  {renderDataCatalogueLink}.
+                </p>
+              )}
             </>
           )}
 
