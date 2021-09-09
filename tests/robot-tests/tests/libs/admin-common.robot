@@ -70,6 +70,19 @@ user navigates to editable release summary from admin dashboard
     ...    ${TOPIC_NAME}
     ...    Edit this release
 
+user navigates to editable release amendment summary from admin dashboard
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${DETAILS_HEADING}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release summary from admin dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${DETAILS_HEADING}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
+    ...    Edit this release amendment
+
 user navigates to readonly release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
@@ -90,17 +103,29 @@ user navigates to release summary from admin dashboard
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_SUMMARY_LINK_TEXT}=Edit this release
+    ${details}=    user opens release summary on the admin dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${DETAILS_HEADING}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
+
+    ${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}    60
+    user clicks element    ${summary_button}
+    user waits until h2 is visible    Release summary    60
+    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+
+user opens release summary on the admin dashboard
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${DETAILS_HEADING}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${DETAILS_HEADING}    ${accordion}
     ${details}=    user gets details content element    ${DETAILS_HEADING}    ${accordion}
-
-    ${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}    60
-    user clicks element    ${summary_button}
-
-    user waits until h2 is visible    Release summary    60
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+    [Return]    ${details}
 
 user creates publication
     [Arguments]    ${title}
@@ -228,10 +253,14 @@ user approves methodology for publication
     ...    ${publishing_strategy}=Immediately
     ...    ${with_release}=
 
-    ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
-    user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    Edit this methodology    ${accordion}
-    approve methodology from methodology view    ${publishing_strategy}    ${with_release}
+    approve methodology for publication
+    ...    ${publication}
+    ...    ${methodology_title}
+    ...    ${theme}
+    ...    ${topic}
+    ...    ${publishing_strategy}
+    ...    ${with_release}
+    ...    Edit this methodology
 
 user approves methodology amendment for publication
     [Arguments]
@@ -242,9 +271,28 @@ user approves methodology amendment for publication
     ...    ${publishing_strategy}=Immediately
     ...    ${with_release}=
 
+    approve methodology for publication
+    ...    ${publication}
+    ...    ${methodology_title}
+    ...    ${theme}
+    ...    ${topic}
+    ...    ${publishing_strategy}
+    ...    ${with_release}
+    ...    Edit this amendment
+
+approve methodology for publication
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}
+    ...    ${theme}
+    ...    ${topic}
+    ...    ${publishing_strategy}
+    ...    ${with_release}
+    ...    ${edit_button_text}
+
     ${accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    Edit this amendment    ${accordion}
+    user clicks link    ${edit_button_text}    ${accordion}
     approve methodology from methodology view    ${publishing_strategy}    ${with_release}
 
 approve methodology from methodology view
@@ -636,6 +684,8 @@ user waits until modal is visible
     IF    "${MODAL_TEXT}" != "${EMPTY}"
         user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
     END
+    ${modal_element}=    get webelement    css:.ReactModal__Content
+    [Return]    ${modal_element}
 
 user gets comment
     [Arguments]    ${comment_text}
