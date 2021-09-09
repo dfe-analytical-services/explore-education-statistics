@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -184,7 +185,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => GetSummary(id));
         }
 
-        private async Task<MethodologySummaryViewModel> BuildMethodologySummaryViewModel(MethodologyVersion methodologyVersion)
+        private async Task<MethodologySummaryViewModel> BuildMethodologySummaryViewModel(
+            MethodologyVersion methodologyVersion)
         {
             var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
             await _context.Entry(loadedMethodology)
@@ -229,7 +231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return viewModel;
         }
 
-        private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(MethodologyVersion methodologyVersionToUpdate,
+        private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(
+            MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
             if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
@@ -271,7 +274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private async Task<Either<ActionResult, MethodologyVersion>> UpdateDetails(MethodologyVersion methodologyVersionToUpdate,
+        private async Task<Either<ActionResult, MethodologyVersion>> UpdateDetails(
+            MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
             if (!request.IsDetailUpdateForMethodology(methodologyVersionToUpdate))
@@ -285,7 +289,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
                 // unlikely scenario, it's entirely possible. 
-                .OnSuccessDo(methodologyVersion => ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
+                .OnSuccessDo(methodologyVersion =>
+                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -313,38 +318,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Guid methodologyId, bool forceDelete = false)
+        public async Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId,
+                    query => query.Include(m => m.Versions))
+                .OnSuccess(async methodology =>
+                {
+                    return await methodology.Versions
+                        .OrderBy(methodologyVersion => new IdAndPreviousVersionIdPair(
+                                methodologyVersion.Id,
+                                methodologyVersion.PreviousVersionId),
+                            new VersionedEntityDeletionOrderComparer())
+                        .Select(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
+                        .OnSuccessAll()
+                        .OnSuccessVoid(async () =>
+                        {
+                            _context.Methodologies.Remove(methodology);
+                            await _context.SaveChangesAsync();
+                        });
+                });
+        }
+
+        public Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(
+            Guid methodologyVersionId,
+            bool forceDelete = false)
         {
             return _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyId,
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId,
                     query => query.Include(m => m.Methodology))
-                .OnSuccess(methodologyVersion => _userService.CheckCanDeleteMethodology(methodologyVersion, forceDelete))
-                .OnSuccessDo(UnlinkFilesAndDeleteIfOrphaned)
-                .OnSuccessDo(DeleteVersion)
+                .OnSuccessDo(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                 .OnSuccessVoid(DeleteMethodologyIfOrphaned);
         }
 
-        private async Task<Either<ActionResult, Unit>> UnlinkFilesAndDeleteIfOrphaned(
-            MethodologyVersion methodologyVersion)
+        private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
+            bool forceDelete = false)
         {
-            var methodologyFileIds = await _context
-                .MethodologyFiles
-                .Where(f => f.MethodologyVersionId == methodologyVersion.Id)
-                .Select(f => f.FileId)
-                .ToListAsync();
-
-            if (methodologyFileIds.Count > 0)
-            {
-                return await _methodologyImageService.Delete(methodologyVersion.Id, methodologyFileIds);
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task DeleteVersion(MethodologyVersion methodologyVersion)
-        {
-            _context.MethodologyVersions.Remove(methodologyVersion);
-            await _context.SaveChangesAsync();
+            return await _userService.CheckCanDeleteMethodology(methodologyVersion, forceDelete)
+                .OnSuccess(() => _methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
+                .OnSuccessVoid(async () =>
+                {
+                    _context.MethodologyVersions.Remove(methodologyVersion);
+                    await _context.SaveChangesAsync();
+                });
         }
 
         private async Task DeleteMethodologyIfOrphaned(MethodologyVersion methodologyVersion)

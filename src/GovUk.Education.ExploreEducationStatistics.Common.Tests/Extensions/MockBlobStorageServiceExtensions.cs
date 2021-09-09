@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -29,6 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             return service.Setup(s => s.CheckBlobExists(container, path))
                 .ReturnsAsync(exists);
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupDeleteBlob(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path)
+        {
+            return service.Setup(s => s.DeleteBlob(container, path))
+                .Returns(Task.CompletedTask);
         }
 
         public static IReturnsResult<IBlobStorageService> SetupDownloadToStream(
