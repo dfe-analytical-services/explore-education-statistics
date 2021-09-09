@@ -19,12 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IReleaseFileService _releaseFileFileService;
 
-        public ThemeService(ContentDbContext contentDbContext, IReleaseFileService releaseFileService)
+        public ThemeService(ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
-            _releaseFileFileService = releaseFileService;
         }
 
         [BlobCache(typeof(PublicationTreeCacheKey))]
@@ -130,81 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             };
         }
 
-        // TODO: EES-2365 Remove once 'Download latest data' page no longer exists
-        [BlobCache(typeof(PublicationDownloadsTreeCacheKey))]
-        public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetPublicationDownloadsTree()
-        {
-            var themes = await ListThemes();
-
-            return await themes
-                .ToAsyncEnumerable()
-                .SelectAwait(async theme => await BuildThemeDownloadsTree(theme))
-                .Where(theme => theme.Topics.Any())
-                .OrderBy(theme => theme.Title)
-                .ToListAsync();
-        }
-
-        private async Task<ThemeTree<PublicationDownloadsTreeNode>> BuildThemeDownloadsTree(Theme theme)
-        {
-            var topics = await theme.Topics
-                .ToAsyncEnumerable()
-                .SelectAwait(async topic => await BuildTopicDownloadsTree(topic))
-                .Where(topic => topic.Publications.Any())
-                .ToListAsync();
-
-            return new ThemeTree<PublicationDownloadsTreeNode>
-            {
-                Id = theme.Id,
-                Title = theme.Title,
-                Summary = theme.Summary,
-                Topics = topics
-                    .Where(topic => topic.Publications.Any())
-                    .OrderBy(topic => topic.Title).ToList()
-            };
-        }
-
-        private async Task<TopicTree<PublicationDownloadsTreeNode>> BuildTopicDownloadsTree(Topic topic)
-        {
-            var publications = await topic.Publications
-                .ToAsyncEnumerable()
-                .Where(IsPublicationPublished)
-                .SelectAwait(async publication => await BuildPublicationDownloadsNode(publication))
-                .ToListAsync();
-
-            return new TopicTree<PublicationDownloadsTreeNode>
-            {
-                Id = topic.Id,
-                Title = topic.Title,
-                Publications = publications
-                    .Where(publicationTree => publicationTree.DownloadFiles.Any())
-                    .OrderBy(publication => publication.Title)
-                    .ToList()
-            };
-        }
-
-        private async Task<PublicationDownloadsTreeNode> BuildPublicationDownloadsNode(Publication publication)
-        {
-            var releases = publication.Releases
-                .Where(r => r.IsLatestPublishedVersionOfRelease())
-                .OrderBy(r => r.Year)
-                .ThenBy(r => r.TimePeriodCoverage)
-                .ToList();
-
-            var latestRelease = releases.Last();
-
-            return new PublicationDownloadsTreeNode
-            {
-                Id = publication.Id,
-                Title = publication.Title,
-                Summary = publication.Summary,
-                Slug = publication.Slug,
-                DownloadFiles = await _releaseFileFileService.ListDownloadFiles(latestRelease),
-                EarliestReleaseTime = releases.FirstOrDefault()?.Title,
-                LatestReleaseTime = releases.LastOrDefault()?.Title,
-                LatestReleaseId = latestRelease.Id
-            };
-        }
-
         private async Task<List<Theme>> ListThemes()
         {
             return await _contentDbContext.Themes
@@ -212,11 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
                 .ToListAsync();
-        }
-
-        private static bool IsPublicationPublished(Publication publication)
-        {
-            return publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
         }
     }
 }

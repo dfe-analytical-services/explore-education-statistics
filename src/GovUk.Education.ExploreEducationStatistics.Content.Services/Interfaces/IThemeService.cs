@@ -9,7 +9,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
     public interface IThemeService
     {
         Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(PublicationTreeFilter? filter = null);
-
-        Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetPublicationDownloadsTree();
     }
 }
