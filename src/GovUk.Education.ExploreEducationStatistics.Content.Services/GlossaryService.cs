@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
+        [BlobCache(typeof(GlossaryCacheKey))]
         public async Task<List<GlossaryCategoryViewModel>> GetAllGlossaryEntries()
         {
             var categories = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
