@@ -1,12 +1,6 @@
 import ModalConfirm from '@common/components/ModalConfirm';
 import React from 'react';
 import { IdTitlePair } from '@admin/services/types/common';
-import Link from '@admin/components/Link';
-import { generatePath } from 'react-router';
-import {
-  MethodologyRouteParams,
-  methodologyStatusRoute,
-} from '@admin/routes/methodologyRoutes';
 
 interface Props {
   onConfirm: () => void;

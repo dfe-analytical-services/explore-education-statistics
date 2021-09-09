@@ -1,23 +1,14 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
-import {
   publicationEditRoute,
   PublicationRouteParams,
   releaseCreateRoute,
 } from '@admin/routes/routes';
 import { MyPublication } from '@admin/services/publicationService';
-import releaseService, {
-  DeleteReleasePlan,
-  Release,
-} from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ModalConfirm from '@common/components/ModalConfirm';
-import React, { useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
-import CancelAmendmentModal from './CancelAmendmentModal';
+import React from 'react';
+import { generatePath } from 'react-router';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 import MethodologySummary from './MethodologySummary';
 
@@ -32,14 +23,7 @@ const PublicationSummary = ({
   topicId,
   onChangePublication,
 }: Props) => {
-  const history = useHistory();
-
-  const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const { contact, permissions, releases, id, title } = publication;
-
-  const [deleteReleasePlan, setDeleteReleasePlan] = useState<
-    DeleteReleasePlan
-  >();
 
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
@@ -141,14 +125,8 @@ const PublicationSummary = ({
                   {releases.filter(noAmendmentInProgressFilter).map(release => (
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
-                        onClickAmendRelease={setAmendReleaseId}
-                        onClickCancelAmendment={async releaseId => {
-                          setDeleteReleasePlan(
-                            await releaseService.getDeleteReleasePlan(
-                              releaseId,
-                            ),
-                          );
-                        }}
+                        includeCreateAmendmentControls
+                        onAmendmentCancelled={onChangePublication}
                         release={release}
                       />
                     </li>
@@ -161,46 +139,6 @@ const PublicationSummary = ({
           </tr>
         </tbody>
       </table>
-
-      {amendReleaseId && (
-        <ModalConfirm
-          title="Confirm you want to amend this live release"
-          onConfirm={async () => {
-            const amendment = await releaseService.createReleaseAmendment(
-              amendReleaseId,
-            );
-
-            history.push(
-              generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-                publicationId: id,
-                releaseId: amendment.id,
-              }),
-            );
-          }}
-          onExit={() => setAmendReleaseId(undefined)}
-          onCancel={() => setAmendReleaseId(undefined)}
-          open
-        >
-          <p>
-            Please note, any changes made to this live release must be approved
-            before updates can be published.
-          </p>
-        </ModalConfirm>
-      )}
-
-      {deleteReleasePlan && (
-        <CancelAmendmentModal
-          methodologiesScheduledWithRelease={
-            deleteReleasePlan.methodologiesScheduledWithRelease
-          }
-          onConfirm={async () => {
-            await releaseService.deleteRelease(deleteReleasePlan.releaseId);
-            setDeleteReleasePlan(undefined);
-            onChangePublication();
-          }}
-          onCancel={() => setDeleteReleasePlan(undefined)}
-        />
-      )}
     </>
   );
 };

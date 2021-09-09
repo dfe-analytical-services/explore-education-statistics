@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import { noop } from 'lodash';
 import PublicationSummary from '@admin/pages/admin-dashboard/components/PublicationSummary';
@@ -7,13 +7,8 @@ import {
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { MemoryRouter } from 'react-router-dom';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import { MyRelease } from '@admin/services/releaseService';
 import { MyMethodology } from '@admin/services/methodologyService';
-import userEvent from '@testing-library/user-event';
-
-jest.mock('@admin/services/releaseService');
-
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationSummary', () => {
   const testTopicId = 'test-topic';
@@ -327,89 +322,5 @@ describe('PublicationSummary', () => {
       'href',
       testExternalMethodology.url,
     );
-  });
-
-  test('handles the cancelling of Release Amendments successfully', async () => {
-    const onChangePublicationCallback = jest.fn();
-
-    render(
-      <MemoryRouter>
-        <PublicationSummary
-          publication={{
-            ...testPublication,
-            releases: testReleases,
-            permissions: fullPermissions,
-          }}
-          topicId={testTopicId}
-          onChangePublication={onChangePublicationCallback}
-        />
-      </MemoryRouter>,
-    );
-
-    // Expand the Release Amendment to see the controls within it.
-    userEvent.click(
-      screen.getByRole('button', {
-        name: `${testReleases[1].title} (not Live) Draft Amendment`,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('button', {
-          name: 'Cancel amendment',
-        }),
-      ).toBeInTheDocument();
-    });
-
-    // Now click the "Cancel amendment" button and check that the warning modal appears.
-    releaseService.getDeleteReleasePlan.mockResolvedValue({
-      releaseId: testReleases[1].id,
-      methodologiesScheduledWithRelease: [
-        {
-          id: 'methodology-1',
-          title: 'Methodology 1',
-        },
-        {
-          id: 'methodology-2',
-          title: 'Methodology 2',
-        },
-      ],
-    });
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Cancel amendment',
-      }),
-    );
-
-    await waitFor(() => {
-      expect(releaseService.getDeleteReleasePlan).toHaveBeenCalledWith(
-        testReleases[1].id,
-      );
-    });
-
-    expect(
-      screen.getByText('Confirm you want to cancel this amended release'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Methodology 1')).toBeInTheDocument();
-    expect(screen.getByText('Methodology 2')).toBeInTheDocument();
-
-    // Confirm the cancelling of the Release Amendment.
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Confirm',
-      }),
-    );
-
-    await waitFor(() => {
-      expect(releaseService.deleteRelease).toHaveBeenCalledWith(
-        testReleases[1].id,
-      );
-      expect(onChangePublicationCallback).toHaveBeenCalled();
-    });
-
-    expect(
-      screen.queryByText('Confirm you want to cancel this amended release'),
-    ).not.toBeInTheDocument();
   });
 });
