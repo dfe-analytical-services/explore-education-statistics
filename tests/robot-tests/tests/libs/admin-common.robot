@@ -157,6 +157,7 @@ user opens publication on the admin dashboard
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
+    user navigates to admin dashboard
     user waits until page contains link    Explore education statistics    10
     user waits until page does not contain loading spinner
     user waits for page to finish loading

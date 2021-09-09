@@ -148,11 +148,12 @@ Schedule a methodology amendment to be published with a release amendment
     user waits until element contains    ${modal}    ${PUBLICATION_NAME} - Amended methodology
     user clicks button    Confirm
     user waits until page does not contain    Confirm you want to cancel this amended release
-    user views methodology amendment for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - Amended methodology
+    user views methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Amended methodology
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user clicks button    Edit status
     user waits until h2 is visible    Edit methodology status
-    user checks radio is checked    Draft
+    user checks radio is checked    In draft
     user clicks radio    Approved for publication
     user checks radio is checked    Immediately

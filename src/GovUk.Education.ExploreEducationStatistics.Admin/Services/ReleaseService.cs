@@ -24,6 +24,8 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -190,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         MethodologiesScheduledWithRelease = methodologiesScheduledWithRelease
                     };
                 });
-
         }
 
         public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId)
@@ -221,11 +222,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var methodologiesScheduledWithRelease = 
                         GetMethodologiesScheduledWithRelease(releaseId);
+                    
                     methodologiesScheduledWithRelease.ForEach(m =>
                     {
-                        m.PublishingStrategy = MethodologyPublishingStrategy.Immediately;
+                        m.PublishingStrategy = Immediately;
+                        m.Status = Draft;
                         m.ScheduledWithRelease = null;
                         m.ScheduledWithReleaseId = null;
+                        m.InternalReleaseNote = null;
+                        m.Updated = DateTime.UtcNow;
                     });
                     _context.UpdateRange(methodologiesScheduledWithRelease);
                     
@@ -688,12 +693,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return release;
         }
 
-        private IQueryable<Methodology> GetMethodologiesScheduledWithRelease(Guid releaseId)
+        private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)
         {
             return _context
-                .Methodologies
-                .Include(m => m.MethodologyParent)
-                .Where(m => releaseId == m.ScheduledWithReleaseId);
+                .MethodologyVersions
+                .Include(m => m.Methodology)
+                .Where(m => releaseId == m.ScheduledWithReleaseId)
+                .ToList();
         }
     }
 
@@ -712,6 +718,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<TitleAndIdViewModel> MethodologiesScheduledWithRelease { get; set; }
+        public List<TitleAndIdViewModel> MethodologiesScheduledWithRelease { get; set; } =
+            new List<TitleAndIdViewModel>();
     }
 }

@@ -1832,34 +1832,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var methodology1ScheduledWithRelease1 = new Methodology
+            var methodology1ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 ScheduledWithReleaseId = releaseBeingDeleted.Id,
                 AlternativeTitle = "Methodology 1 with alternative title",
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     OwningPublicationTitle = "Methodology 1 owned Publication title"
                 }
             };
             
-            var methodology2ScheduledWithRelease1 = new Methodology
+            var methodology2ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 ScheduledWithReleaseId = releaseBeingDeleted.Id,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     OwningPublicationTitle = "Methodology 2 with owned Publication title"
                 }
             };
 
-            var methodologyScheduledWithRelease2 = new Methodology
+            var methodologyScheduledWithRelease2 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 ScheduledWithReleaseId = releaseNotBeingDeleted.Id
             };
 
-            var methodologyNotScheduled = new Methodology
+            var methodologyNotScheduled = new MethodologyVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -1869,7 +1869,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 await context.Releases.AddRangeAsync(releaseBeingDeleted, releaseNotBeingDeleted);
-                await context.Methodologies.AddRangeAsync(
+                await context.MethodologyVersions.AddRangeAsync(
                     methodology1ScheduledWithRelease1, 
                     methodology2ScheduledWithRelease1,
                     methodologyScheduledWithRelease2,
@@ -1908,24 +1908,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             // This Methodology is scheduled to go out with the Release being deleted.
-            var methodologyScheduledWithRelease = new Methodology
+            var methodologyScheduledWithRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = WithRelease,
                 ScheduledWithReleaseId = release.Id,
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     OwningPublicationTitle = "Methodology scheduled with this Release"
-                }
+                },
+                InternalReleaseNote = "A note"
             };
 
             // This Methodology has nothing to do with the Release being deleted.
-            var methodologyScheduledWithAnotherRelease = new Methodology
+            var methodologyScheduledWithAnotherRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = WithRelease,
                 ScheduledWithReleaseId = Guid.NewGuid(),
-                MethodologyParent = new MethodologyParent
+                Methodology = new Methodology
                 {
                     OwningPublicationTitle = "Methodology scheduled with another Release"
                 }
@@ -2077,12 +2078,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
-                var retrievedMethodology = context.Methodologies.Single(m => m.Id == methodologyScheduledWithRelease.Id);
+                var retrievedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodology.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodology.ScheduledWithReleaseId);
+                Assert.Null(retrievedMethodology.InternalReleaseNote);
+                Assert.Equal(MethodologyStatus.Draft, retrievedMethodology.Status);
+                Assert.InRange(DateTime.UtcNow
+                    .Subtract(retrievedMethodology.Updated!.Value).Milliseconds, 0, 1500);
                 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
-                var unrelatedMethodology = context.Methodologies.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                var unrelatedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseId, 
                     unrelatedMethodology.ScheduledWithReleaseId);
