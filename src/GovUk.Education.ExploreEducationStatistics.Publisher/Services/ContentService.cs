@@ -132,7 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
-            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         public async Task UpdateTaxonomy(PublishContext context)
@@ -142,7 +141,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
-            await _blobCacheService.DeleteItem(new PublicationDownloadsTreeCacheKey());
         }
 
         private async Task DeleteAllContent()
