@@ -4,11 +4,11 @@ import { noop } from 'lodash';
 import PublicationSummary from '@admin/pages/admin-dashboard/components/PublicationSummary';
 import {
   MyPublication,
+  MyPublicationMethodology,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { MemoryRouter } from 'react-router-dom';
 import { MyRelease } from '@admin/services/releaseService';
-import { MyMethodology } from '@admin/services/methodologyService';
 
 describe('PublicationSummary', () => {
   const testTopicId = 'test-topic';
@@ -84,26 +84,32 @@ describe('PublicationSummary', () => {
     } as MyRelease,
   ];
 
-  const testMethodologies: MyMethodology[] = [
+  const testMethodologies: MyPublicationMethodology[] = [
     {
-      amendment: false,
-      id: '1234',
-      latestInternalReleaseNote: 'this is the release note',
-      previousVersionId: 'lfkjdlfj',
-      published: '2021-06-08T09:04:17.9805585',
-      slug: 'meth-1',
-      status: 'Approved',
-      title: 'I am a methodology',
-      owningPublication: {
-        id: 'p1',
-        title: 'Publication title',
+      owner: true,
+      methodology: {
+        amendment: false,
+        id: '1234',
+        latestInternalReleaseNote: 'this is the release note',
+        previousVersionId: 'lfkjdlfj',
+        published: '2021-06-08T09:04:17.9805585',
+        slug: 'meth-1',
+        status: 'Approved',
+        title: 'I am a methodology',
+        owningPublication: {
+          id: 'p1',
+          title: 'Publication title',
+        },
+        permissions: {
+          canApproveMethodology: false,
+          canUpdateMethodology: false,
+          canDeleteMethodology: false,
+          canMakeAmendmentOfMethodology: false,
+          canMarkMethodologyAsDraft: false,
+        },
       },
       permissions: {
-        canApproveMethodology: false,
-        canUpdateMethodology: false,
-        canDeleteMethodology: false,
-        canMakeAmendmentOfMethodology: false,
-        canMarkMethodologyAsDraft: false,
+        canDropMethodology: false,
       },
     },
   ];
@@ -307,7 +313,7 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     expect(
       screen.getByRole('button', {
-        name: `${testMethodologies[0].title} Approved`,
+        name: `${testMethodologies[0].methodology.title} Approved`,
       }),
     ).toBeInTheDocument();
 
