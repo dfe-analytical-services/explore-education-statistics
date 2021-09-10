@@ -272,6 +272,7 @@ Navigate to Chart tab
 
 Configure basic line chart
     user clicks button    Line
+    user clicks radio    Set an alternative title
     user enters text into element    id:chartConfigurationForm-title    Test chart title
     user enters text into element    id:chartConfigurationForm-alt    Test chart alt
     user enters text into element    id:chartConfigurationForm-height    400

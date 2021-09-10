@@ -126,7 +126,7 @@ Create chart for data block
 
     user clicks button    Choose an infographic as alternative
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
-    user enters text into element    id:chartConfigurationForm-title    Sample title
+    user checks radio is checked    Use table title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
 
     user clicks button    Save chart options
@@ -153,7 +153,7 @@ Add data block to first accordion section
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until page contains element    ${datablock}    60
     user waits until element contains infographic chart    ${datablock}
-    user checks chart title contains    ${datablock}    Sample title
+    user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
 Add test text to second accordion section
@@ -315,7 +315,7 @@ Verify Dates data block accordion section
     user scrolls to accordion section content    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
-    user checks chart title contains    ${section}    Sample title
+    user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
     user clicks link    Table    ${section}
@@ -480,8 +480,11 @@ Update data block chart for amendment
     user clicks link    Chart
 
     user waits until page contains element    id:chartConfigurationForm-title
+
+    user checks radio is checked    Use table title
+    user clicks radio    Set an alternative title
     user enters text into element    id:chartConfigurationForm-title    Updated sample title
-    user checks textarea contains    id:chartConfigurationForm-title    Updated sample title
+    user checks input field contains    id:chartConfigurationForm-title    Updated sample title
     user enters text into element    id:chartConfigurationForm-alt    Updated sample alt text
     user checks textarea contains    id:chartConfigurationForm-alt    Updated sample alt text
 
