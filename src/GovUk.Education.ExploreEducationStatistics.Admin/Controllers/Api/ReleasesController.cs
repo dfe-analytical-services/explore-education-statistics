@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -184,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId}/releases/template")]
-        public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateRelease(
+        public async Task<ActionResult<TitleAndIdViewModel>> GetTemplateRelease(
             [Required] Guid publicationId)
         {
             return await _releaseService
