@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,26 +52,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyId, IEnumerable<Guid> fileIds)
+        public async Task<Either<ActionResult, Unit>> DeleteAll(Guid methodologyVersionId,
+            bool forceDelete = false)
+        {
+            var methodologyFiles = await _methodologyFileRepository.GetByFileType(methodologyVersionId, Image);
+
+            return await Delete(methodologyVersionId,
+                methodologyFiles.Select(methodologyFile => methodologyFile.FileId),
+                forceDelete);
+        }
+
+        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyVersionId,
+            IEnumerable<Guid> fileIds,
+            bool forceDelete = false)
         {
             return await _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyId)
-                .OnSuccess(async release => await _userService.CheckCanUpdateMethodology(release))
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .OnSuccess(async release => await _userService.CheckCanUpdateMethodology(release, forceDelete))
                 .OnSuccess(async release =>
                     await fileIds.Select(fileId =>
-                        _methodologyFileRepository.CheckFileExists(methodologyId, fileId, Image)).OnSuccessAll())
+                        _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     await files.ForEachAsync(async file =>
                     {
                         var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
 
-                        await _methodologyFileRepository.Delete(methodologyId, file.Id);
+                        await _methodologyFileRepository.Delete(methodologyVersionId, file.Id);
 
                         // If this methodology version is the only version that is referencing this Blob and File, it
                         // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
                         // versions that are still using them. 
-                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyVersionId == methodologyId)
+                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
                         {
                             await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
                             await _fileRepository.Delete(file.Id);
@@ -119,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, FileInfo>> Upload(Guid methodologyVersionId,
             FileType type,
             IFormFile formFile,
-            IDictionary<string, string> metadata = null)
+            IDictionary<string, string>? metadata = null)
         {
             var methodologyFile = await _methodologyFileRepository.Create(
                 methodologyVersionId: methodologyVersionId,

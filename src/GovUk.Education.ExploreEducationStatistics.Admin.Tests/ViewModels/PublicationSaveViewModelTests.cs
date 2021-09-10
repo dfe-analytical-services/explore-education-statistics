@@ -1,9 +1,10 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.ViewModels
 {
-    public class CreatePublicationViewModelTests
+    public class PublicationSaveViewModelTests
     {
         [Fact]
         public void ManualSlugOverride()

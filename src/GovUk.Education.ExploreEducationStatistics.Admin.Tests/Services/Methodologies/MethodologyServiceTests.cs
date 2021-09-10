@@ -1497,7 +1497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
-                    }))
+                    }, false))
                 .ReturnsAsync(Unit.Instance);
 
             methodologyVersionRepository.Setup(mock =>
@@ -1518,7 +1518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
-                    }), Times.Once);
+                    }, false), Times.Once);
 
                 VerifyAllMocks(contentService, imageService, methodologyVersionRepository);
 
@@ -2202,6 +2202,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task DeleteMethodology()
+        {
+            var methodologyVersion1Id = Guid.NewGuid();
+            var methodologyVersion2Id = Guid.NewGuid();
+            var methodologyVersion3Id = Guid.NewGuid();
+            var methodologyVersion4Id = Guid.NewGuid();
+
+            var methodology = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = methodologyVersion2Id,
+                        PreviousVersionId = methodologyVersion1Id
+                    },
+                    new()
+                    {
+                        Id = methodologyVersion1Id
+                    },
+                    new()
+                    {
+                        Id = methodologyVersion4Id,
+                        PreviousVersionId = methodologyVersion3Id
+                    },
+                    new()
+                    {
+                        Id = methodologyVersion3Id,
+                        PreviousVersionId = methodologyVersion2Id,
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Sanity check that the Methodology and MethodologyVersions were created.
+                Assert.Equal(1, context.Methodologies.Count());
+                Assert.Equal(4, context.MethodologyVersions.Count());
+            }
+
+            var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+
+            // Since the MethodologyVersions should be deleted in sequence, expect a call to delete images for each of the
+            // versions in the same sequence
+            
+            var deleteSequence = new MockSequence();
+
+            methodologyImageService
+                .InSequence(deleteSequence)
+                .Setup(s => s.DeleteAll(methodologyVersion4Id, false))
+                .ReturnsAsync(Unit.Instance);
+
+            methodologyImageService
+                .InSequence(deleteSequence)
+                .Setup(s => s.DeleteAll(methodologyVersion3Id, false))
+                .ReturnsAsync(Unit.Instance);
+
+            methodologyImageService
+                .InSequence(deleteSequence)
+                .Setup(s => s.DeleteAll(methodologyVersion2Id, false))
+                .ReturnsAsync(Unit.Instance);
+
+            methodologyImageService
+                .InSequence(deleteSequence)
+                .Setup(s => s.DeleteAll(methodologyVersion1Id, false))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context,
+                    methodologyImageService: methodologyImageService.Object);
+
+                var result = await service.DeleteMethodology(methodology.Id);
+
+                VerifyAllMocks(methodologyImageService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the methodology and the versions have been successfully deleted
+                Assert.Equal(0, context.Methodologies.Count());
+                Assert.Equal(0, context.MethodologyVersions.Count());
+            }
+        }
+
+        [Fact]
         public async Task DeleteMethodologyVersion()
         {
             var methodologyId = Guid.NewGuid();
@@ -2241,14 +2337,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     m => m.MethodologyId == methodologyId));
             }
 
+            var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+
+            methodologyImageService.Setup(mock => mock.DeleteAll(methodologyVersion.Id, false))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Verify that no methods to delete Methodology images are called if no files are linked to this
-                // version.
-                var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+                var service = SetupMethodologyService(context,
+                    methodologyImageService: methodologyImageService.Object);
 
-                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodologyVersion(methodologyVersion.Id);
+
+                VerifyAllMocks(methodologyImageService);
+
                 result.AssertRight();
             }
 
@@ -2306,10 +2408,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodology.Versions[1].Id));
             }
 
+            var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+
+            methodologyImageService.Setup(mock => mock.DeleteAll(methodology.Versions[1].Id, false))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(context);
+                var service = SetupMethodologyService(contentDbContext: context,
+                    methodologyImageService: methodologyImageService.Object);
+
                 var result = await service.DeleteMethodologyVersion(methodology.Versions[1].Id);
+
+                // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
+                // the version being deleted.
+                VerifyAllMocks(methodologyImageService);
+
                 result.AssertRight();
             }
 
@@ -2324,92 +2438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task DeleteMethodologyVersion_FilesAreLinkedToThisVersion()
-        {
-            var methodologyId = Guid.NewGuid();
-
-            var methodology = new Methodology
-            {
-                Id = methodologyId,
-                Slug = "pupil-absence-statistics-methodology",
-                OwningPublicationTitle = "Pupil absence statistics: methodology",
-                Versions = ListOf(new MethodologyVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    },
-                    new MethodologyVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
-                    })
-            };
-
-            var file1 = new File();
-            var file2 = new File();
-
-            var methodologyVersion1File1Link = new MethodologyFile
-            {
-                File = file1,
-                MethodologyVersion = methodology.Versions[0]
-            };
-
-            var methodologyVersion2File1Link = new MethodologyFile
-            {
-                File = file1,
-                MethodologyVersion = methodology.Versions[1]
-            };
-
-            var methodologyVersion2File2Link = new MethodologyFile
-            {
-                File = file2,
-                MethodologyVersion = methodology.Versions[1]
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddAsync(methodology);
-                await context.Files.AddRangeAsync(file1, file2);
-                await context.MethodologyFiles.AddRangeAsync(
-                    methodologyVersion1File1Link, methodologyVersion2File1Link, methodologyVersion2File2Link);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var methodologyImageService = new Mock<IMethodologyImageService>();
-                var methodologyVersion2FileIds =
-                    AsArray(methodologyVersion2File1Link.File.Id, methodologyVersion2File2Link.File.Id);
-
-                methodologyImageService
-                    .Setup(s => s.Delete(methodology.Versions[1].Id,
-                        methodologyVersion2FileIds))
-                    .ReturnsAsync(Unit.Instance);
-
-                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
-                var result = await service.DeleteMethodologyVersion(methodology.Versions[1].Id);
-
-                // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
-                // the Methodology Version being deleted.
-                VerifyAllMocks(methodologyImageService);
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                // Assert that the version has successfully been deleted.
-                Assert.False(context.MethodologyVersions.Any(m => m.Id == methodology.Versions[1].Id));
-                Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodology.Versions[0].Id));
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyId));
-            }
-        }
-
-        [Fact]
-        public async Task DeleteMethodology_UnrelatedMethodologiesAreUnaffected()
+        public async Task DeleteMethodologyVersion_UnrelatedMethodologiesAreUnaffected()
         {
             var methodologyId = Guid.NewGuid();
             var unrelatedMethodologyId = Guid.NewGuid();
@@ -2440,46 +2469,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 })
             };
 
-            var relatedFile = new File();
-            var unrelatedFile = new File();
-
-            var relatedFileMethodologyLink = new MethodologyFile
-            {
-                File = relatedFile,
-                MethodologyVersion = methodology.Versions[0]
-            };
-
-            var unrelatedFileMethodologyLink = new MethodologyFile
-            {
-                File = unrelatedFile,
-                MethodologyVersion = unrelatedMethodology.Versions[0]
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Methodologies.AddRangeAsync(methodology, unrelatedMethodology);
-                await context.Files.AddRangeAsync(relatedFile, unrelatedFile);
-                await context.MethodologyFiles.AddRangeAsync(relatedFileMethodologyLink, unrelatedFileMethodologyLink);
                 await context.SaveChangesAsync();
             }
 
+            var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
+
+            methodologyImageService.Setup(mock => mock.DeleteAll(methodology.Versions[0].Id, false))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyImageService = new Mock<IMethodologyImageService>();
-                var relatedMethodologyFileLinks = AsArray(relatedFileMethodologyLink.File.Id);
+                var service = SetupMethodologyService(context,
+                    methodologyImageService: methodologyImageService.Object);
 
-                methodologyImageService
-                    .Setup(s => s.Delete(methodology.Versions[0].Id, relatedMethodologyFileLinks))
-                    .ReturnsAsync(Unit.Instance);
-
-                var service = SetupMethodologyService(context, methodologyImageService: methodologyImageService.Object);
                 var result = await service.DeleteMethodologyVersion(methodology.Versions[0].Id);
 
                 // Verify that the Methodology Image Service was called to remove only the Methodology Files linked to
                 // the version being deleted.
                 VerifyAllMocks(methodologyImageService);
+
                 result.AssertRight();
             }
 
