@@ -5,6 +5,7 @@ import Wizard, {
   InjectedWizardProps,
 } from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import downloadService from '@common/services/downloadService';
 import publicationService, {
   ReleaseSummary,
 } from '@common/services/publicationService';
@@ -22,7 +23,6 @@ import DownloadStep, {
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
-import ErrorPage from '@frontend/modules/ErrorPage';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -109,14 +109,15 @@ const DataCataloguePage: NextPage<Props> = ({
     });
   };
 
-  const handleDownloadFormSubmit: DownloadFormSubmitHandler = ({ files }) => {
-    // EES-2007  DO STUFF!
-  };
+  const handleDownloadFormSubmit: DownloadFormSubmitHandler = async ({
+    files,
+  }) => {
+    if (!state.query.release) {
+      throw new Error('Release has not been selected');
+    }
 
-  // EES-2007 temp until page is complete
-  if (process.env.APP_ENV === 'Production') {
-    return <ErrorPage statusCode={404} />;
-  }
+    await downloadService.downloadFiles(state.query.release.id, files);
+  };
 
   const PublicationStep = (props: InjectedWizardProps) => {
     return (
@@ -171,17 +172,6 @@ const DataCataloguePage: NextPage<Props> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
-  // EES-2007 temp until page is complete
-  if (process.env.APP_ENV === 'Production') {
-    // eslint-disable-next-line no-param-reassign
-    context.res.statusCode = 404;
-    return {
-      props: {
-        themes: [],
-      },
-    };
-  }
-
   const {
     publicationSlug = '',
     releaseSlug = '',
