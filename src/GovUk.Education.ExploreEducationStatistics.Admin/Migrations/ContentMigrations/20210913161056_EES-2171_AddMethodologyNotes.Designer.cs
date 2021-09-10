@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210913161056_EES-2171_AddMethodologyNotes")]
+    partial class EES2171_AddMethodologyNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,37 +270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("SourceId");
 
                     b.ToTable("Files");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.ToTable("GlossaryEntries");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
@@ -1064,15 +1035,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "Source")
                         .WithMany()
                         .HasForeignKey("SourceId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>

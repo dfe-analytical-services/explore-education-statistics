@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<DataImportError> DataImportErrors { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
+        public DbSet<MethodologyNote> MethodologyNotes { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
@@ -138,6 +139,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<MethodologyFile>()
                 .HasOne(mf => mf.File)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<MethodologyNote>()
+                .HasOne(m => m.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.DisplayDate)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.Updated)
+                .HasConversion(
+                    v => v, 
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .HasOne(m => m.UpdatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
