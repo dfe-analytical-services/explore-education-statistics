@@ -59,6 +59,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={testRelease}
+        renderAllFilesButton={<a href="#">Mock all files button</a>}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
       />,
@@ -66,46 +67,11 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     expect(screen.getByText('Explore data and files')).toBeInTheDocument();
 
-    // Files should be ordered alphabetically, with the
-    // 'All files' zip always being at the top
-    const downloadFiles = within(
-      screen.getByTestId('download-files'),
-    ).getAllByRole('listitem');
-
-    // File 1
     expect(
-      within(downloadFiles[0]).getByRole('link', {
-        name: 'All files',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[0]).getByText('(zip, 100 KB)'),
-    ).toBeInTheDocument();
-
-    // File 2
-    expect(
-      within(downloadFiles[1]).getByRole('link', {
-        name: 'A Test data file 1',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[1]).getByText('(csv, 15 KB)'),
-    ).toBeInTheDocument();
-
-    // File 3
-    expect(
-      within(downloadFiles[2]).getByRole('link', {
-        name: 'Test data file 2',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[2]).getByText('(csv, 10 KB)'),
+      screen.getByRole('link', { name: 'Mock all files button' }),
     ).toBeInTheDocument();
 
     expect(screen.getByText('Open data')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'mock meta guidance link' }),
-    ).toBeInTheDocument();
 
     expect(screen.getByText('Other files')).toBeInTheDocument();
     expect(screen.getByText('List of other files')).toBeInTheDocument();
@@ -140,6 +106,37 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).toBeInTheDocument();
   });
 
+  test('renders meta guidance link', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'mock meta guidance link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not render meta guidance link if there is no meta guidance', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          hasMetaGuidance: false,
+        }}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'mock meta guidance link' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders without files', () => {
     render(
       <ReleaseDataAndFilesAccordion
@@ -161,25 +158,63 @@ describe('ReleaseDataAndFilesAccordion', () => {
   test('renders data catalogue link', () => {
     render(
       <ReleaseDataAndFilesAccordion
-        release={testRelease as Release}
-        renderCreateTablesButton={<a href="#">mock create tables link</a>}
+        release={testRelease}
         renderDataCatalogueLink={<a href="#">mock data catalogue link</a>}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
       />,
     );
 
-    expect(screen.getByText('Create your own tables')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'mock data catalogue link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders data files if there is no data catalogue link', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'mock data catalogue link' }),
+    ).not.toBeInTheDocument();
+
+    // Files should be ordered alphabetically, with the
+    // 'All files' zip always being at the top
+    const downloadFiles = within(
+      screen.getByTestId('download-files'),
+    ).getAllByRole('listitem');
+
+    // File 1
+    expect(
+      within(downloadFiles[0]).getByRole('link', {
+        name: 'A Test data file 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[0]).getByText('(csv, 15 KB)'),
+    ).toBeInTheDocument();
+
+    // File 2
+    expect(
+      within(downloadFiles[1]).getByRole('link', {
+        name: 'Test data file 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[1]).getByText('(csv, 10 KB)'),
     ).toBeInTheDocument();
   });
 
   test('renders create tables link', () => {
     render(
       <ReleaseDataAndFilesAccordion
-        release={testRelease as Release}
-        renderCreateTablesButton={<a href="#">mock create tables link</a>}
+        release={testRelease}
+        renderCreateTablesButton={<a href="#">mock create tables button</a>}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderMetaGuidanceLink={<a href="#">mock meta guidance link</a>}
       />,
@@ -187,14 +222,14 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     expect(screen.getByText('Create your own tables')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'mock create tables link' }),
+      screen.getByRole('link', { name: 'mock create tables button' }),
     ).toBeInTheDocument();
   });
 
   test('renders pre-release access link', () => {
     render(
       <ReleaseDataAndFilesAccordion
-        release={testRelease as Release}
+        release={testRelease}
         renderPreReleaseAccessLink={
           <a href="#">mock pre-release access link</a>
         }

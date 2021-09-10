@@ -4,10 +4,10 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
 import SummaryList from '@common/components/SummaryList';
-import ButtonLink from '@common/components/ButtonLink';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import publicationService, {
   Release,
   ReleaseType,
@@ -17,7 +17,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -26,9 +26,9 @@ import PublicationSectionBlocks from '@frontend/modules/find-statistics/componen
 import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
+import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import orderBy from 'lodash/orderBy';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -333,6 +333,21 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               label: `${accordionSection.title}`,
             });
           }}
+          renderAllFilesButton={
+            <ButtonLink
+              className="govuk-!-width-full"
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/all`}
+              onClick={() => {
+                logEvent({
+                  category: 'Downloads',
+                  action: 'Release page all files downloaded',
+                  label: `Publication: ${release.title}, File: All files`,
+                });
+              }}
+            >
+              Download all files
+            </ButtonLink>
+          }
           renderCreateTablesButton={
             <CreateTablesButton
               className="govuk-!-width-full"
@@ -356,27 +371,18 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </Link>
           }
           renderDownloadLink={file => {
-            const isAllFiles = !file.id && file.name === 'All files';
-            const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
-              release.id
-            }/files/${isAllFiles ? 'all' : file.id}`;
-
             return (
               <Link
-                to={url}
+                to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
                 onClick={() => {
                   logEvent({
                     category: 'Downloads',
-                    action: `Release page ${
-                      isAllFiles ? 'all files' : 'file'
-                    } downloaded`,
+                    action: 'Release page file downloaded',
                     label: `Publication: ${release.title}, File: ${file.fileName}`,
                   });
                 }}
               >
-                {isAllFiles
-                  ? 'Download all data and files for this release'
-                  : `${file.name}`}
+                {file.name}
               </Link>
             );
           }}
@@ -459,7 +465,6 @@ const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
       className={className}
       to="/data-tables/[publication]"
       as={`/data-tables/${release.publication.slug}`}
-      href={`/data-tables/${release.publication.slug}`}
     >
       Create tables
     </ButtonLink>
@@ -468,7 +473,6 @@ const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
       className={className}
       to="/data-tables/[publication]/[release]"
       as={`/data-tables/${release.publication.slug}/${release.slug}`}
-      href={`/data-tables/${release.publication.slug}/${release.slug}`}
     >
       Create tables
     </ButtonLink>
