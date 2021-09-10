@@ -134,6 +134,8 @@ Navigate to Create chart tab
     user clicks link    Chart
     user clicks button    Choose an infographic as alternative
     choose file    id:chartConfigurationForm-file    ${FILES_DIR}dfe-logo.jpg
+    user checks radio is checked    Use table title
+    user clicks radio    Set an alternative title
     user enters text into element    id:chartConfigurationForm-title    Sample title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
     user clicks button    Save chart options
