@@ -3,37 +3,37 @@ import React from 'react';
 import { IdTitlePair } from '@admin/services/types/common';
 
 interface Props {
-  onConfirm: () => void;
+  scheduledMethodologies: IdTitlePair[];
   onCancel: () => void;
-  methodologiesScheduledWithRelease: IdTitlePair[];
+  onConfirm: () => void;
 }
 
 const CancelAmendmentModal = ({
-  onConfirm,
+  scheduledMethodologies,
   onCancel,
-  methodologiesScheduledWithRelease,
+  onConfirm,
 }: Props) => {
   return (
     <ModalConfirm
+      open
       title="Confirm you want to cancel this amended release"
+      onCancel={onCancel}
       onConfirm={onConfirm}
       onExit={onCancel}
-      onCancel={onCancel}
-      open
     >
       <p>
         By cancelling the amendments you will lose any changes made, and the
         original release will remain unchanged.
       </p>
-      {methodologiesScheduledWithRelease.length > 0 && (
+      {scheduledMethodologies.length > 0 && (
         <>
           <p>
             The following methodologies are scheduled to be published with this
             amended release:
           </p>
           <ul>
-            {methodologiesScheduledWithRelease.map(m => (
-              <li key={m.id}>{m.title}</li>
+            {scheduledMethodologies.map(methodology => (
+              <li key={methodology.id}>{methodology.title}</li>
             ))}
           </ul>
         </>

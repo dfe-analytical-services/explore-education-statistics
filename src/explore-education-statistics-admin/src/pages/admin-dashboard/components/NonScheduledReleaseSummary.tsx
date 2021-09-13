@@ -29,7 +29,9 @@ const NonScheduledReleaseSummary = ({
   const history = useHistory();
 
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
-    DeleteReleasePlan
+    DeleteReleasePlan & {
+      releaseId: string;
+    }
   >();
 
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
@@ -111,9 +113,10 @@ const NonScheduledReleaseSummary = ({
           release.amendment && (
             <Button
               onClick={async () => {
-                setDeleteReleasePlan(
-                  await releaseService.getDeleteReleasePlan(release.id),
-                );
+                setDeleteReleasePlan({
+                  ...(await releaseService.getDeleteReleasePlan(release.id)),
+                  releaseId: release.id,
+                });
               }}
               className="govuk-button--warning"
             >
@@ -125,9 +128,7 @@ const NonScheduledReleaseSummary = ({
 
       {deleteReleasePlan && (
         <CancelAmendmentModal
-          methodologiesScheduledWithRelease={
-            deleteReleasePlan.methodologiesScheduledWithRelease
-          }
+          scheduledMethodologies={deleteReleasePlan.scheduledMethodologies}
           onConfirm={async () => {
             await releaseService.deleteRelease(deleteReleasePlan.releaseId);
             setDeleteReleasePlan(undefined);
@@ -139,7 +140,9 @@ const NonScheduledReleaseSummary = ({
 
       {amendReleaseId && (
         <ModalConfirm
+          open
           title="Confirm you want to amend this live release"
+          onCancel={() => setAmendReleaseId(undefined)}
           onConfirm={async () => {
             const amendment = await releaseService.createReleaseAmendment(
               amendReleaseId,
@@ -153,8 +156,6 @@ const NonScheduledReleaseSummary = ({
             );
           }}
           onExit={() => setAmendReleaseId(undefined)}
-          onCancel={() => setAmendReleaseId(undefined)}
-          open
         >
           <p>
             Please note, any changes made to this live release must be approved

@@ -9,7 +9,7 @@ import _releaseService, {
 import userEvent from '@testing-library/user-event';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import produce from 'immer';
-import createMemoryHistoryWithMockedPush from '@admin-test/createMemoryHistoryWithMockedPush';
+import { createMemoryHistory } from 'history';
 
 jest.mock('@admin/services/releaseService');
 
@@ -19,7 +19,7 @@ describe('NonScheduledReleaseSummary', () => {
   const testRelease: MyRelease = {
     id: 'rel-3',
     latestRelease: false,
-    published: '2021-01-01T11:21:17.7585345',
+    published: '2021-01-01T11:21:17',
     slug: 'rel-3-slug',
     title: 'The Release',
     previousVersionId: 'rel-2',
@@ -36,8 +36,8 @@ describe('NonScheduledReleaseSummary', () => {
     render(
       <MemoryRouter>
         <NonScheduledReleaseSummary
-          release={testRelease}
           includeCreateAmendmentControls
+          release={testRelease}
           onAmendmentCancelled={noop}
         />
       </MemoryRouter>,
@@ -51,14 +51,14 @@ describe('NonScheduledReleaseSummary', () => {
     );
 
     expect(
-      screen.getByText('View this release', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'View this release',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release',
       }),
     ).not.toBeInTheDocument();
 
@@ -75,20 +75,20 @@ describe('NonScheduledReleaseSummary', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('View this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('View original release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View original release',
       }),
     ).not.toBeInTheDocument();
   });
@@ -97,11 +97,11 @@ describe('NonScheduledReleaseSummary', () => {
     render(
       <MemoryRouter>
         <NonScheduledReleaseSummary
+          includeCreateAmendmentControls
           release={produce(testRelease, draft => {
             draft.permissions.canUpdateRelease = true;
             draft.permissions.canMakeAmendmentOfRelease = true;
           })}
-          includeCreateAmendmentControls
           onAmendmentCancelled={noop}
         />
       </MemoryRouter>,
@@ -115,14 +115,14 @@ describe('NonScheduledReleaseSummary', () => {
     );
 
     expect(
-      screen.queryByText('View this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByText('Edit this release', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'Edit this release',
       }),
     ).toBeInTheDocument();
 
@@ -139,20 +139,20 @@ describe('NonScheduledReleaseSummary', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('View this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('View original release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View original release',
       }),
     ).not.toBeInTheDocument();
   });
@@ -161,11 +161,11 @@ describe('NonScheduledReleaseSummary', () => {
     render(
       <MemoryRouter>
         <NonScheduledReleaseSummary
+          includeCreateAmendmentControls
           release={produce(testRelease, draft => {
             draft.amendment = true;
             draft.previousVersionId = 'rel-2';
           })}
-          includeCreateAmendmentControls
           onAmendmentCancelled={noop}
         />
       </MemoryRouter>,
@@ -179,14 +179,14 @@ describe('NonScheduledReleaseSummary', () => {
     );
 
     expect(
-      screen.queryByText('View this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release',
       }),
     ).not.toBeInTheDocument();
 
@@ -203,20 +203,20 @@ describe('NonScheduledReleaseSummary', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByText('View this release amendment', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'View this release amendment',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByText('View original release', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'View original release',
       }),
     ).toBeInTheDocument();
   });
@@ -225,13 +225,13 @@ describe('NonScheduledReleaseSummary', () => {
     render(
       <MemoryRouter>
         <NonScheduledReleaseSummary
+          includeCreateAmendmentControls
           release={produce(testRelease, draft => {
             draft.amendment = true;
             draft.previousVersionId = 'rel-2';
             draft.permissions.canUpdateRelease = true;
             draft.permissions.canDeleteRelease = true;
           })}
-          includeCreateAmendmentControls
           onAmendmentCancelled={noop}
         />
       </MemoryRouter>,
@@ -245,14 +245,14 @@ describe('NonScheduledReleaseSummary', () => {
     );
 
     expect(
-      screen.queryByText('View this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Edit this release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Edit this release',
       }),
     ).not.toBeInTheDocument();
 
@@ -269,34 +269,34 @@ describe('NonScheduledReleaseSummary', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText('View this release amendment', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'View this release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByText('Edit this release amendment', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'Edit this release amendment',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('View original release', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'View original release',
       }),
     ).toBeInTheDocument();
   });
 
   test('handles creating amendments ok', async () => {
-    const history = createMemoryHistoryWithMockedPush();
+    const history = createMemoryHistory();
 
     render(
       <Router history={history}>
         <NonScheduledReleaseSummary
+          includeCreateAmendmentControls
           release={produce(testRelease, draft => {
             draft.permissions.canMakeAmendmentOfRelease = true;
           })}
-          includeCreateAmendmentControls
           onAmendmentCancelled={noop}
         />
       </Router>,
@@ -337,24 +337,24 @@ describe('NonScheduledReleaseSummary', () => {
       );
     });
 
-    expect(history.push).toBeCalledWith(
+    expect(history.location.pathname).toBe(
       `/publication/${testRelease.publicationId}/release/release-amendment-id/summary`,
     );
   });
 
   test('handles cancelling amendments ok', async () => {
-    const amendmentCancelledCallback = jest.fn();
+    const onAmendmentCancelled = jest.fn();
 
     render(
       <MemoryRouter>
         <NonScheduledReleaseSummary
+          includeCreateAmendmentControls
           release={produce(testRelease, draft => {
             draft.permissions.canDeleteRelease = true;
             draft.amendment = true;
             draft.previousVersionId = 'rel-2';
           })}
-          includeCreateAmendmentControls
-          onAmendmentCancelled={amendmentCancelledCallback}
+          onAmendmentCancelled={onAmendmentCancelled}
         />
       </MemoryRouter>,
     );
@@ -368,8 +368,7 @@ describe('NonScheduledReleaseSummary', () => {
 
     // Now click the "Cancel amendment" button and check that the warning modal appears.
     releaseService.getDeleteReleasePlan.mockResolvedValue({
-      releaseId: testRelease.id,
-      methodologiesScheduledWithRelease: [
+      scheduledMethodologies: [
         {
           id: 'methodology-1',
           title: 'Methodology 1',
@@ -408,11 +407,39 @@ describe('NonScheduledReleaseSummary', () => {
 
     await waitFor(() => {
       expect(releaseService.deleteRelease).toHaveBeenCalledWith(testRelease.id);
-      expect(amendmentCancelledCallback).toHaveBeenCalled();
+      expect(onAmendmentCancelled).toHaveBeenCalled();
     });
 
     expect(
       screen.queryByText('Confirm you want to cancel this amended release'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('false "includeCreateAmendmentControls" flag hides Create Amendment controls', async () => {
+    render(
+      <MemoryRouter>
+        <NonScheduledReleaseSummary
+          release={produce(testRelease, draft => {
+            draft.permissions.canMakeAmendmentOfRelease = true;
+          })}
+          onAmendmentCancelled={noop}
+        />
+      </MemoryRouter>,
+    );
+
+    // Expand the Release to see the controls within it.
+    userEvent.click(
+      screen.getByRole('button', {
+        name: `${testRelease.title} (not Live) Draft`,
+      }),
+    );
+
+    // Assert that the Amend release controls are not displayed as per our usage if the "includeCreateAmendmentControls"
+    // flag.
+    expect(
+      screen.queryByRole('button', {
+        name: 'Amend this release',
+      }),
     ).not.toBeInTheDocument();
   });
 });

@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return new DeleteReleasePlan
                     {
-                        MethodologiesScheduledWithRelease = methodologiesScheduledWithRelease
+                        ScheduledMethodologies = methodologiesScheduledWithRelease
                     };
                 });
         }
@@ -724,7 +724,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<TitleAndIdViewModel> MethodologiesScheduledWithRelease { get; set; } =
-            new List<TitleAndIdViewModel>();
+        public List<TitleAndIdViewModel> ScheduledMethodologies { get; set; } = new List<TitleAndIdViewModel>();
     }
 }

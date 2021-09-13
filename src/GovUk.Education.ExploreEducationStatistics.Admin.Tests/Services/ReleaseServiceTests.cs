@@ -1886,9 +1886,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
                 // up in the Plan.
-                Assert.Equal(2, plan.MethodologiesScheduledWithRelease.Count);
-                var methodology1 = plan.MethodologiesScheduledWithRelease.Single(m => m.Id == methodology1ScheduledWithRelease1.Id);
-                var methodology2 = plan.MethodologiesScheduledWithRelease.Single(m => m.Id == methodology2ScheduledWithRelease1.Id);
+                Assert.Equal(2, plan.ScheduledMethodologies.Count);
+                var methodology1 = plan.ScheduledMethodologies.Single(m => m.Id == methodology1ScheduledWithRelease1.Id);
+                var methodology2 = plan.ScheduledMethodologies.Single(m => m.Id == methodology2ScheduledWithRelease1.Id);
                 
                 Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
                 Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);

@@ -46,7 +46,7 @@ describe('PublicationSummary', () => {
     {
       id: 'rel-1',
       latestRelease: true,
-      published: '2021-06-30T11:21:17.7585345',
+      published: '2021-06-30T11:21:17',
       slug: 'rel-1-slug',
       title: 'Release 1',
       publicationId: testPublication.id,
@@ -58,7 +58,7 @@ describe('PublicationSummary', () => {
     {
       id: 'rel-3',
       latestRelease: false,
-      published: '2021-01-01T11:21:17.7585345',
+      published: '2021-01-01T11:21:17',
       slug: 'rel-3-slug',
       title: 'Amendment Release',
       amendment: true,
@@ -73,7 +73,7 @@ describe('PublicationSummary', () => {
     {
       id: 'rel-2',
       latestRelease: true,
-      published: '2021-05-30T11:21:17.7585345',
+      published: '2021-05-30T11:21:17',
       slug: 'rel-2-slug',
       title: 'Release 2',
       publicationId: testPublication.id,
@@ -150,14 +150,14 @@ describe('PublicationSummary', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Manage this publication', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Manage this publication',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText('Create new release', {
-        selector: 'a',
+      screen.queryByRole('link', {
+        name: 'Create new release',
       }),
     ).not.toBeInTheDocument();
   });
@@ -179,29 +179,21 @@ describe('PublicationSummary', () => {
     expect(screen.queryByText('No team name')).not.toBeInTheDocument();
     expect(screen.queryByText('No contact name')).not.toBeInTheDocument();
 
-    expect(
-      screen.getByText(testContact.teamName as string),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Team Smith')).toBeInTheDocument();
 
-    const teamEmailLink = screen.getByText(testContact.teamEmail as string, {
-      selector: 'a',
+    const teamEmailLink = screen.getByRole('link', {
+      name: 'john.smith@test.com',
     });
     expect(teamEmailLink).toBeInTheDocument();
-    expect(teamEmailLink).toHaveAttribute(
-      'href',
-      `mailto:${testContact.teamEmail}`,
-    );
+    expect(teamEmailLink).toHaveAttribute('href', 'mailto:john.smith@test.com');
 
     expect(
       screen.getByText(testContact.contactName as string),
     ).toBeInTheDocument();
 
-    const contactTelNoLink = screen.getByText(
-      testContact.contactTelNo as string,
-      {
-        selector: 'a',
-      },
-    );
+    const contactTelNoLink = screen.getByRole('link', {
+      name: '0777777777',
+    });
     expect(contactTelNoLink).toBeInTheDocument();
     expect(contactTelNoLink).toHaveAttribute(
       'href',
@@ -240,14 +232,14 @@ describe('PublicationSummary', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('Manage this publication', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'Manage this publication',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('Create new release', {
-        selector: 'a',
+      screen.getByRole('link', {
+        name: 'Create new release',
       }),
     ).toBeInTheDocument();
   });
@@ -285,12 +277,12 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     const release1 = releaseExpandButtons[0];
     expect(release1.textContent).toEqual(
-      `${testReleases[0].title} (not Live)Draft`,
+      `${testReleases[0].title} (not Live) Draft`,
     );
 
     const release2 = releaseExpandButtons[1];
     expect(release2.textContent).toEqual(
-      `${testReleases[1].title} (not Live)DraftAmendment`,
+      `${testReleases[1].title} (not Live) Draft Amendment`,
     );
   });
 
@@ -317,12 +309,9 @@ describe('PublicationSummary', () => {
       }),
     ).toBeInTheDocument();
 
-    const externalMethodologyLink = screen.getByText(
-      `${testExternalMethodology.title} (external methodology)`,
-      {
-        selector: 'a',
-      },
-    );
+    const externalMethodologyLink = screen.getByRole('link', {
+      name: `${testExternalMethodology.title} (external methodology)`,
+    });
     expect(externalMethodologyLink).toBeInTheDocument();
     expect(externalMethodologyLink).toHaveAttribute(
       'href',

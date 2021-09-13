@@ -170,8 +170,7 @@ export interface ReleaseStatus {
 }
 
 export interface DeleteReleasePlan {
-  releaseId: string;
-  methodologiesScheduledWithRelease: IdTitlePair[];
+  scheduledMethodologies: IdTitlePair[];
 }
 
 const releaseService = {
@@ -204,14 +203,8 @@ const releaseService = {
     return client.post(`/releases/${releaseId}/status`, createRequest);
   },
 
-  async getDeleteReleasePlan(releaseId: string): Promise<DeleteReleasePlan> {
-    const deletePlan = await client.get<Omit<DeleteReleasePlan, 'releaseId'>>(
-      `/release/${releaseId}/delete-plan`,
-    );
-    return {
-      ...deletePlan,
-      releaseId,
-    };
+  getDeleteReleasePlan(releaseId: string): Promise<DeleteReleasePlan> {
+    return client.get<DeleteReleasePlan>(`/release/${releaseId}/delete-plan`);
   },
 
   deleteRelease(releaseId: string): Promise<void> {

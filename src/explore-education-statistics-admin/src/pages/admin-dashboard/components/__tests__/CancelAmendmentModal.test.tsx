@@ -9,9 +9,9 @@ describe('CancelAmendmentModal', () => {
   test('renders with no methodologies supplied', async () => {
     render(
       <CancelAmendmentModal
-        methodologiesScheduledWithRelease={[]}
-        onConfirm={noop}
+        scheduledMethodologies={[]}
         onCancel={noop}
+        onConfirm={noop}
       />,
     );
 
@@ -27,7 +27,7 @@ describe('CancelAmendmentModal', () => {
   test('renders with methodologies supplied', async () => {
     render(
       <CancelAmendmentModal
-        methodologiesScheduledWithRelease={[
+        scheduledMethodologies={[
           {
             id: 'methodology-1',
             title: 'Methodology 1',
@@ -37,8 +37,8 @@ describe('CancelAmendmentModal', () => {
             title: 'Methodology 2',
           },
         ]}
-        onConfirm={noop}
         onCancel={noop}
+        onConfirm={noop}
       />,
     );
 
@@ -56,14 +56,14 @@ describe('CancelAmendmentModal', () => {
   });
 
   test('clicking confirm and cancel call the correct callbacks', async () => {
-    const confirmCallback = jest.fn();
-    const cancelCallback = jest.fn();
+    const onCancel = jest.fn();
+    const onConfirm = jest.fn();
 
     render(
       <CancelAmendmentModal
-        methodologiesScheduledWithRelease={[]}
-        onConfirm={confirmCallback}
-        onCancel={cancelCallback}
+        scheduledMethodologies={[]}
+        onCancel={onCancel}
+        onConfirm={onConfirm}
       />,
     );
 
@@ -74,11 +74,11 @@ describe('CancelAmendmentModal', () => {
     );
 
     await waitFor(() => {
-      expect(confirmCallback).toHaveBeenCalled();
-      expect(cancelCallback).not.toHaveBeenCalled();
+      expect(onConfirm).toHaveBeenCalled();
+      expect(onCancel).not.toHaveBeenCalled();
     });
 
-    confirmCallback.mockClear();
+    onConfirm.mockClear();
 
     userEvent.click(
       screen.getByRole('button', {
@@ -87,8 +87,8 @@ describe('CancelAmendmentModal', () => {
     );
 
     await waitFor(() => {
-      expect(confirmCallback).not.toHaveBeenCalled();
-      expect(cancelCallback).toHaveBeenCalled();
+      expect(onConfirm).not.toHaveBeenCalled();
+      expect(onCancel).toHaveBeenCalled();
     });
   });
 });
