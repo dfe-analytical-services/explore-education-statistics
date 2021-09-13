@@ -1,5 +1,4 @@
 import { contentApi } from '@common/services/api';
-import { FileInfo } from '@common/services/types/file';
 import { MethodologySummary } from '@common/services/types/methodology';
 
 interface BasePublicationSummary {
@@ -11,16 +10,6 @@ interface BasePublicationSummary {
 
 export interface PublicationSummary extends BasePublicationSummary {
   legacyPublicationUrl?: string;
-}
-
-/**
- * @deprecated
- */
-export interface PublicationDownloadSummary extends BasePublicationSummary {
-  downloadFiles: FileInfo[];
-  earliestReleaseTime: string;
-  latestReleaseTime: string;
-  latestReleaseId: string;
 }
 
 export interface PublicationMethodologySummary extends BasePublicationSummary {
@@ -41,11 +30,6 @@ export interface Theme<PublicationNode = PublicationSummary> {
   topics: Topic<PublicationNode>[];
 }
 
-/**
- * @deprecated
- */
-export type DownloadTheme = Theme<PublicationDownloadSummary>;
-
 export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
 interface ListThemesOptions {
@@ -57,12 +41,6 @@ const themeService = {
     return contentApi.get('/themes', {
       params: { publicationFilter },
     });
-  },
-  /**
-   * @deprecated
-   */
-  getDownloadThemes(): Promise<DownloadTheme[]> {
-    return contentApi.get('/download-themes');
   },
   getMethodologyThemes(): Promise<MethodologyTheme[]> {
     return contentApi.get(`/methodology-themes`);

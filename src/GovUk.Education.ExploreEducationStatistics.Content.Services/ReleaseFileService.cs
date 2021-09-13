@@ -20,7 +20,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -201,86 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return blob;
         }
 
-        public async Task<List<FileInfo>> ListDownloadFiles(Release release)
-        {
-            var releaseFiles = await ListDownloadableFiles(release.Id);
-
-            // There are no files for this release
-            if (releaseFiles.Count == 0)
-            {
-                return new List<FileInfo>();
-            }
-
-            var orderedFiles = (
-                    await releaseFiles
-                        .SelectAsync(async releaseFile => await GetPublicFileInfo(releaseFile))
-                )
-                .OrderBy(file => file.Name)
-                .ToList();
-
-            // Prepend the "All files" zip
-            var allFilesZip = await GetAllFilesZip(release);
-
-            return orderedFiles.Prepend(allFilesZip).ToList();
-        }
-
-        private async Task<FileInfo> GetPublicFileInfo(ReleaseFile releaseFile)
-        {
-            var file = releaseFile.File;
-
-            var exists = await _blobStorageService.CheckBlobExists(
-                containerName: PublicReleaseFiles,
-                path: file.PublicPath(releaseFile.Release));
-
-            if (!exists)
-            {
-                _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
-                    releaseFile.PublicPath());
-
-                return releaseFile.ToPublicFileInfoNotFound();
-            }
-
-            var blob = await _blobStorageService.GetBlob(
-                containerName: PublicReleaseFiles,
-                path: file.PublicPath(releaseFile.Release));
-
-            return releaseFile.ToPublicFileInfo(blob);
-        }
-
-        private async Task<FileInfo> GetAllFilesZip(Release release)
-        {
-            var path = release.AllFilesZipPath();
-
-            var exists = await _blobStorageService.CheckBlobExists(
-                containerName: PublicReleaseFiles,
-                path: path);
-
-            if (!exists)
-            {
-                _logger.LogError("Public blob not found for 'All files' zip at: {0}", path);
-
-                return new FileInfo
-                {
-                    FileName = release.AllFilesZipFileName(),
-                    Name = "All files",
-                    Size = "0.00 B",
-                    Type = FileType.Ancillary
-                };
-            }
-
-            var blob = await _blobStorageService.GetBlob(
-                containerName: PublicReleaseFiles,
-                path: path);
-
-            return new FileInfo
-            {
-                FileName = blob.FileName,
-                Name = "All files",
-                Size = blob.Size,
-                Type = FileType.Ancillary
-            };
-        }
-
         private IQueryable<ReleaseFile> QueryByFileType(Guid releaseId, params FileType[] types)
         {
             return _contentDbContext.ReleaseFiles
@@ -289,16 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(f => f.File)
                 .Where(releaseFile => releaseFile.ReleaseId == releaseId
                                       && types.Contains(releaseFile.File.Type));
-        }
-
-        private Task<List<ReleaseFile>> ListDownloadableFiles(Guid releaseId)
-        {
-            return ListByFileType(releaseId, DownloadableFileTypes);
-        }
-
-        private async Task<List<ReleaseFile>> ListByFileType(Guid releaseId, params FileType[] types)
-        {
-            return await QueryByFileType(releaseId, types).ToListAsync();
         }
     }
 }

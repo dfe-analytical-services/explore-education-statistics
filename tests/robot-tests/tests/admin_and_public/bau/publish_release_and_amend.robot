@@ -215,9 +215,8 @@ Verify release associated files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user waits until page contains element    ${downloads}    60
 
-    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
+    user checks element should contain    ${downloads}    Download all files
     ...    60
-    user checks element should contain    ${downloads}    Dates test subject (csv, 17 Kb)    60
     user checks element should contain    ${downloads}
     ...    All data used to create this release is published as open data and is available for download.
     user checks element should contain    ${downloads}
@@ -561,7 +560,7 @@ Verify amendment is published
 Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all data and files for this release (zip, 4 Kb)
+    user checks element should contain    ${downloads}    Download all files
     ...    30
 
     user opens details dropdown    List of other files

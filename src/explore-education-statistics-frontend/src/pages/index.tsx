@@ -71,12 +71,20 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h3 className="govuk-!-margin-bottom-1">
+            <Link to="/data-catalogue">Data catalogue</Link>
+          </h3>
+          <p className="govuk-caption-m">
+            View all of the open data available and choose files to download.
+          </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
             <Link to="/methodology">Methodology</Link>
           </h3>
           <p className="govuk-caption-m">
             Browse to find out more about the methodology behind our statistics
             and how and why they&apos;re collected and published.
           </p>
+
           <h3 className="govuk-!-margin-bottom-1">
             <Link to="/glossary">Glossary</Link>
           </h3>
