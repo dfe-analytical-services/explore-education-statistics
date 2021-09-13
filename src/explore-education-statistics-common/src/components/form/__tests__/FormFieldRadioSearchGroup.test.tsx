@@ -149,14 +149,17 @@ describe('FormFieldRadioSearchGroup', () => {
 
     const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
     const radio2 = screen.getByLabelText('Radio 2') as HTMLInputElement;
+    const radio3 = screen.getByLabelText('Radio 3') as HTMLInputElement;
 
     expect(radio1.checked).toBe(true);
     expect(radio2.checked).toBe(false);
+    expect(radio3.checked).toBe(false);
 
     fireEvent.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
+    expect(radio3.checked).toBe(false);
   });
 
   describe('error messages', () => {
