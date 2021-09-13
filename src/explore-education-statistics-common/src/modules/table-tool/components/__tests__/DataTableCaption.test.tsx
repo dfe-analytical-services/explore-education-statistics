@@ -86,7 +86,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in England for 2015/16
+        Authorised absence rate for 'Absence by characteristic' in England for 2015/16
       </strong>
     `);
   });
@@ -136,7 +136,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' for Female, State-funded primary and State-funded secondary in England for 2015/16
+        Authorised absence rate for 'Absence by characteristic' for Female, State-funded primary and State-funded secondary in England for 2015/16
       </strong>
     `);
   });
@@ -172,7 +172,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in England between 2015/16 and 2018/19
+        Authorised absence rate for 'Absence by characteristic' in England between 2015/16 and 2018/19
       </strong>
     `);
   });
@@ -210,7 +210,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in Adur, Allerdale, Barking and Dagenham, Barnet and England for 2015/16
+        Authorised absence rate for 'Absence by characteristic' in Adur, Allerdale, Barking and Dagenham, Barnet and England for 2015/16
       </strong>
     `);
   });
@@ -283,7 +283,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten and 2 other locations... for 2015/16
+        Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten and 2 other locations... for 2015/16
       </strong>
     `);
 
@@ -295,7 +295,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten, Three and Two for 2015/16
+        Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten, Three and Two for 2015/16
       </strong>
     `);
 
@@ -307,7 +307,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten and 2 other locations... for 2015/16
+        Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten and 2 other locations... for 2015/16
       </strong>
     `);
   });
@@ -331,7 +331,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Table showing 'Absence by characteristic' in England for 2015/16
+        'Absence by characteristic' in England for 2015/16
       </strong>
     `);
   });

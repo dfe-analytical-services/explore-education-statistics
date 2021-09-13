@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -163,73 +163,113 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     () => _persistenceHelper.CheckEntityExists<Topic>(
                         topicId,
                         q => q.Include(t => t.Publications)
-                            .ThenInclude(p => p.Releases)
                     )
                 )
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
-                .OnSuccessDo(CheckCanDeleteTopic)
-                .OnSuccessVoid(async topic =>
+                .OnSuccess(CheckCanDeleteTopic)
+                .OnSuccessDo(async topic =>
                 {
-                    var publicationIdsToDelete = topic.Publications.Select(p => p.Id);
+                    var publicationIdsToDelete = topic.Publications
+                        .Select(p => p.Id)
+                        .ToList();
 
-                    var methodologiesToDelete = _contentContext
-                        .PublicationMethodologies
-                        .Include(pm => pm.Methodology)
-                        .ThenInclude(pm => pm.Versions)
-                        .Where(pm => publicationIdsToDelete.Contains(pm.PublicationId))
-                        .SelectMany(pm => pm.Methodology.Versions)
-                        .ToList()
-                        .OrderBy(m => new IdAndPreviousVersionIdPair(m.Id, m.PreviousVersionId),
-                            VersionedEntityComparer);
-
-                    await methodologiesToDelete.ForEachAsync(methodology =>
-                        _methodologyService.DeleteMethodologyVersion(methodology.Id, forceDelete: true));
-
-                    var releaseIdsToDelete = _statisticsContext
-                        .Release
-                        .Where(r => publicationIdsToDelete.Contains(r.PublicationId))
-                        .ToList()
-                        .OrderBy(release => new IdAndPreviousVersionIdPair(release.Id, release.PreviousVersionId),
-                            VersionedEntityComparer)
-                        .Select(r => r.Id);
-
-                    foreach (var releaseId in releaseIdsToDelete)
-                    {
-                        await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true);
-                        await _releaseFileService.DeleteAll(releaseId, forceDelete: true);
-                        await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseId);
-
-                        var statsRelease = await _statisticsContext
-                            .Release
-                            .Where(r => r.Id == releaseId)
-                            .SingleAsync();
-
-                        var contentRelease = await _contentContext
-                            .Releases
-                            .Where(r => r.Id == releaseId)
-                            .SingleAsync();
-
-                        _statisticsContext.Release.Remove(statsRelease);
-                        _contentContext.Releases.Remove(contentRelease);
-                    }
-
+                    return await DeleteMethodologiesForPublications(publicationIdsToDelete)
+                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete));
+                })
+                .OnSuccess(async topic =>
+                {
+                    _contentContext.Topics.Remove(topic);
                     await _contentContext.SaveChangesAsync();
-                    await _statisticsContext.SaveChangesAsync();
-
-                    _contentContext.Topics.Remove(
-                        await _contentContext
-                            .Topics
-                            .Where(t => t.Id == topic.Id)
-                            .SingleAsync()
-                    );
-
-                    await _contentContext.SaveChangesAsync();
-
-                    await _publishingService.TaxonomyChanged();
+                    return await _publishingService.TaxonomyChanged();
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteTopic(Topic topic)
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(IEnumerable<Guid> publicationIds)
+        {
+            var methodologyIdsToDelete = await _contentContext
+                .PublicationMethodologies
+                .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
+                .Select(pm => pm.MethodologyId)
+                .ToListAsync();
+
+            return await methodologyIdsToDelete
+                .Select(methodologyId => _methodologyService.DeleteMethodology(methodologyId, true))
+                .OnSuccessAll()
+                .OnSuccessVoid();
+        }
+
+        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublications(IEnumerable<Guid> publicationIds)
+        {
+            // Some Content Db Releases may be soft-deleted and therefore not visible.
+            // Ignore the query filter to make sure they are found
+            var releasesIdsToDelete = _contentContext
+                .Releases
+                .IgnoreQueryFilters()
+                .Where(r => publicationIds.Contains(r.PublicationId))
+                .ToList()
+                .OrderBy(release => new IdAndPreviousVersionIdPair(release.Id, release.PreviousVersionId),
+                    VersionedEntityComparer)
+                .Select(r => r.Id);
+
+            return await releasesIdsToDelete.Select(DeleteContentAndStatsRelease)
+                .OnSuccessAll()
+                .OnSuccessVoid();
+        }
+
+        private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseId)
+        {
+            var contentRelease = await _contentContext
+                .Releases
+                .SingleOrDefaultAsync(r => r.Id == releaseId);
+            
+            if (contentRelease == null)
+            {
+                // The Content Db Release may already be soft-deleted and therefore not visible.
+                // Attempt to hard delete the Content Db Release by ignoring the query filter
+                await DeleteSoftDeletedContentDbRelease(releaseId);
+                await DeleteStatsDbRelease(releaseId);
+                return Unit.Instance;
+            }
+
+            return await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
+                .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
+                .OnSuccessVoid(async () =>
+                {
+                    _contentContext.Releases.Remove(contentRelease);
+                    await _contentContext.SaveChangesAsync();
+
+                    await DeleteStatsDbRelease(releaseId);
+                });
+        }
+
+        private async Task DeleteSoftDeletedContentDbRelease(Guid releaseId)
+        {
+            var contentRelease = await _contentContext.Releases
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync(r => r.Id == releaseId && r.SoftDeleted);
+
+            if (contentRelease != null)
+            {
+                _contentContext.Releases.Remove(contentRelease);
+                await _contentContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task DeleteStatsDbRelease(Guid releaseId)
+        {
+            var statsRelease = await _statisticsContext
+                .Release
+                .SingleOrDefaultAsync(r => r.Id == releaseId);
+
+            if (statsRelease != null)
+            {
+                await _releaseSubjectRepository.DeleteAllReleaseSubjects(statsRelease.Id);
+                _statisticsContext.Release.Remove(statsRelease);
+                await _statisticsContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task<Either<ActionResult, Topic>> CheckCanDeleteTopic(Topic topic)
         {
             if (!_topicDeletionAllowed)
             {
@@ -245,62 +285,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return new ForbidResult();
             }
 
-            return Unit.Instance;
+            return topic;
         }
 
         private static IQueryable<Topic> HydrateTopicForTopicViewModel(IQueryable<Topic> values)
         {
             return values.Include(p => p.Publications);
-        }
-
-        /// <summary>
-        /// An IComparer implementation that orders entities based upon having previous versions.  This IComparer will
-        /// order the entities so that entities that have no previous versions will appear at the end of the list,
-        /// entities that have that set of entities as previous versions will appear before them etc. 
-        /// </summary>
-        public class VersionedEntityDeletionOrderComparer : IComparer<IdAndPreviousVersionIdPair>
-        {
-            public int Compare(IdAndPreviousVersionIdPair? entity1Ids, IdAndPreviousVersionIdPair? entity2Ids)
-            {
-                if (entity1Ids == null)
-                {
-                    return 1;
-                }
-
-                if (entity2Ids == null)
-                {
-                    return -1;
-                }
-
-                if (entity1Ids.PreviousVersionId == null)
-                {
-                    return 1;
-                }
-
-                if (entity2Ids.PreviousVersionId == null)
-                {
-                    return -1;
-                }
-
-                if (entity1Ids.PreviousVersionId == entity2Ids.Id)
-                {
-                    return -1;
-                }
-
-                return entity2Ids.PreviousVersionId == entity1Ids.Id ? 1 : -1;
-            }
-        }
-
-        public class IdAndPreviousVersionIdPair
-        {
-            public readonly Guid Id;
-            public readonly Guid? PreviousVersionId;
-
-            public IdAndPreviousVersionIdPair(Guid id, Guid? previousVersionId)
-            {
-                Id = id;
-                PreviousVersionId = previousVersionId;
-            }
         }
     }
 }

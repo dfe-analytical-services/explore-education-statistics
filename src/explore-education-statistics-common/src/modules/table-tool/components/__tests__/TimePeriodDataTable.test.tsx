@@ -66,7 +66,7 @@ describe('TimePeriodDataTable', () => {
 
     expect(
       findByText(
-        "Table showing 'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
+        "'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
       ),
     ).not.toBeNull();
   });
@@ -123,7 +123,7 @@ describe('TimePeriodDataTable', () => {
 
     expect(
       findByText(
-        "Table showing Authorised absence rate for 'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
+        "Authorised absence rate for 'Absence by characteristic' from 'Pupil absence' for 2013/14 to 2014/15 for Barnet and Barnsley",
       ),
     ).not.toBeNull();
   });
@@ -180,7 +180,7 @@ describe('TimePeriodDataTable', () => {
 
     expect(
       findByText(
-        "Table showing 'Absence by characteristic' from 'Pupil absence' for 2014/15 for Barnet and Barnsley",
+        "'Absence by characteristic' from 'Pupil absence' for 2014/15 for Barnet and Barnsley",
       ),
     ).not.toBeNull();
   });

@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel release);
 
+        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId);
+
         Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId);
 
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId);

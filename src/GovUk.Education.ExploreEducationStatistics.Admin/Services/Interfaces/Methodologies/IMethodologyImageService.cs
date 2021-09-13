@@ -11,9 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyImageService
     {
+        Task<Either<ActionResult, Unit>> DeleteAll(Guid methodologyVersionId, bool forceDelete = false);
+
         Task<Either<ActionResult, Unit>> Delete(
-            Guid methodologyId,
-            IEnumerable<Guid> fileIds);
+            Guid methodologyVersionId,
+            IEnumerable<Guid> fileIds,
+            bool forceDelete = false);
 
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId);
 

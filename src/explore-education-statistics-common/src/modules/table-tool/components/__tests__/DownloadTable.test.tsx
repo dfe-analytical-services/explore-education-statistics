@@ -140,7 +140,7 @@ describe('DownloadTable', () => {
       const workbook = mockedWriteFile.mock.calls[0][0] as WorkBook;
 
       expect(workbook.Sheets.Sheet1.A1.v).toBe(
-        "Table showing Authorised absence rate for 'The subject' for Female in England for 2015/16",
+        "Authorised absence rate for 'The subject' for Female in England for 2015/16",
       );
       expect(workbook.Sheets.Sheet1.B3.v).toBe('Date 1');
       expect(workbook.Sheets.Sheet1.C3.v).toBe('Date 2');

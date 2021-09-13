@@ -126,7 +126,8 @@ const DownloadStep = ({
       onSubmit={handleSubmit}
     >
       {form => {
-        // isMounted check required as Formik context can be undefined if the step is active on page load.
+        // isMounted check required as Formik context can be undefined
+        // if the step is active on page load.
         return isActive && isMounted ? (
           <Form id="downloadForm" showSubmitError>
             <FormFieldset id="downloadFiles" legend={stepHeading}>

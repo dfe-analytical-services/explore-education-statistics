@@ -120,7 +120,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Table showing Admission Numbers for 'UI test subject' in Bolton 001 for 2019
+    ...    Admission Numbers for 'UI test subject' in Bolton 001 for 2019
     sleep    1    # Because otherwise the "Set as featured table" checkbox gets checked on CI pipeline?!?!
     user enters text into element    id:dataBlockDetailsForm-name    UI test table name
     user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
@@ -134,6 +134,8 @@ Navigate to Create chart tab
     user clicks link    Chart
     user clicks button    Choose an infographic as alternative
     choose file    id:chartConfigurationForm-file    ${FILES_DIR}dfe-logo.jpg
+    user checks radio is checked    Use table title
+    user clicks radio    Set an alternative title
     user enters text into element    id:chartConfigurationForm-title    Sample title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
     user clicks button    Save chart options

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -28,6 +29,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private readonly Publication _publication = new()
         {
             Id = Guid.NewGuid()
+        };
+
+        private readonly Methodology _methodology = new()
+        {
+            Id = Guid.NewGuid(),
+            Versions = new List<MethodologyVersion>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid()
+                }
+            }
         };
 
         private readonly MethodologyVersion _methodologyVersion = new()
@@ -217,6 +230,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         [Fact]
         public async Task DeleteMethodology()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodology.Versions[0], CanDeleteSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
+                                _methodology.Id, _methodology).Object,
+                            userService: userService.Object);
+                        return service.DeleteMethodology(_methodology.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task DeleteMethodologyVersion()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_methodologyVersion, CanDeleteSpecificMethodology)

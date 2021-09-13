@@ -24,6 +24,8 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -106,6 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
             Guid releaseId)
         {
@@ -173,6 +176,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(release =>
+                {
+                    var methodologiesScheduledWithRelease = 
+                        GetMethodologiesScheduledWithRelease(releaseId)
+                        .Select(m => new TitleAndIdViewModel(m.Id, m.Title))
+                        .ToList();
+
+                    return new DeleteReleasePlan
+                    {
+                        ScheduledMethodologies = methodologiesScheduledWithRelease
+                    };
+                });
+        }
+
         public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId)
         {
             return _persistenceHelper
@@ -182,24 +204,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
                 .OnSuccessVoid(async release =>
                 {
+                    release.SoftDeleted = true;
+                    _context.Update(release);
+                    
                     var roles = await _context
                         .UserReleaseRoles
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
-
+                    roles.ForEach(r => r.SoftDeleted = true);
+                    _context.UpdateRange(roles);
+                    
                     var invites = await _context
                         .UserReleaseInvites
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
-
-                    release.SoftDeleted = true;
-                    roles.ForEach(r => r.SoftDeleted = true);
                     invites.ForEach(r => r.SoftDeleted = true);
-
-                    _context.Update(release);
-                    _context.UpdateRange(roles);
                     _context.UpdateRange(invites);
 
+                    var methodologiesScheduledWithRelease = 
+                        GetMethodologiesScheduledWithRelease(releaseId);
+
+                    // TODO EES-2687 - as part of a ReleaseService refactor to extract Release Status update logic into
+                    // its own Service, this should be looked at to see how best to reuse similar "set to draft" logic
+                    // in MethodologyService.
+                    methodologiesScheduledWithRelease.ForEach(m =>
+                    {
+                        m.PublishingStrategy = Immediately;
+                        m.Status = Draft;
+                        m.ScheduledWithRelease = null;
+                        m.ScheduledWithReleaseId = null;
+                        m.InternalReleaseNote = null;
+                        m.Updated = DateTime.UtcNow;
+                    });
+                    _context.UpdateRange(methodologiesScheduledWithRelease);
+                    
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(releaseId);
@@ -288,6 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
             Guid releaseId, ReleaseUpdateViewModel request)
         {
@@ -309,6 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseStatus(
             Guid releaseId, ReleaseStatusCreateViewModel request)
         {
@@ -658,6 +698,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
             return release;
         }
+
+        private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)
+        {
+            return _context
+                .MethodologyVersions
+                .Include(m => m.Methodology)
+                .Where(m => releaseId == m.ScheduledWithReleaseId)
+                .ToList();
+        }
     }
 
     public class DeleteDataFilePlan
@@ -671,5 +720,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; } = null!;
 
         public List<Guid> FootnoteIds { get; set; } = null!;
+    }
+
+    public class DeleteReleasePlan
+    {
+        public List<TitleAndIdViewModel> ScheduledMethodologies { get; set; } = new List<TitleAndIdViewModel>();
     }
 }

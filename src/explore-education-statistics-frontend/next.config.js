@@ -80,6 +80,15 @@ const nextConfig = {
     HOTJAR_ID: process.env.HOTJAR_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
   },
+  async redirects() {
+    return [
+      {
+        source: '/download-latest-data',
+        destination: '/data-catalogue',
+        permanent: true,
+      },
+    ];
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 

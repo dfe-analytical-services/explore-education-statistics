@@ -2,7 +2,7 @@ import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
 import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
-import downloadFile from './utils/file/downloadFile';
+import downloadFile from '@common/utils/file/downloadFile';
 
 interface DataFileInfo extends FileInfo {
   type: 'Data';

@@ -12,6 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=            UI tests - publish methodology %{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL}=      %{PUBLIC_URL}/methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+${RELEASE_NAME}=                Academic Year 2021/22
 
 *** Test Cases ***
 Create a draft release
@@ -42,7 +43,7 @@ Alter the approval to publish the methodology with the release
     user approves methodology for publication
     ...    publication=${PUBLICATION_NAME}
     ...    publishing_strategy=WithRelease
-    ...    with_release=${PUBLICATION_NAME} - Academic Year 2021/22
+    ...    with_release=${PUBLICATION_NAME} - ${RELEASE_NAME}
 
 Verify that the publication is still not visible on the public methodologies page without publishing the release
     user navigates to public methodologies page
@@ -54,7 +55,7 @@ Verify that the methodology is still not publicly accessible by URL without publ
 
 Approve the release
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2021/22 (not Live)
+    ...    ${RELEASE_NAME} (not Live)
     user approves release for immediate publication
 
 Verify that the methodology is visible on the public methodologies page with the expected URL
@@ -130,3 +131,33 @@ Verify that the amended methodology content is correct
     ${content}=    user gets accordion section content element    New and Updated Title
     user checks element contains    ${content}    Adding Methodology content
     user checks element contains    ${content}    New & Updated content
+
+Schedule a methodology amendment to be published with a release amendment
+    user navigates to admin dashboard
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    user approves methodology amendment for publication
+    ...    publication=${PUBLICATION_NAME}
+    ...    publishing_strategy=WithRelease
+    ...    with_release=${PUBLICATION_NAME} - ${RELEASE_NAME}
+
+Cancel the release amendment and validate that the appropriate warning modal is shown
+    ${details}=    user opens release summary on the admin dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+    user clicks button    Cancel amendment    ${details}
+    ${modal}=    user waits until modal is visible    Confirm you want to cancel this amended release
+    user waits until element contains    ${modal}
+    ...    The following methodologies are scheduled to be published with this amended release
+    user waits until element contains    ${modal}    ${PUBLICATION_NAME} - Amended methodology
+    user clicks button    Confirm
+    user waits until page does not contain    Confirm you want to cancel this amended release
+
+Verify that the methodology that was scheduled with the cancelled release amendment is set back to Draft / Immediately
+    user views methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Amended methodology
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+    user clicks button    Edit status
+    user waits until h2 is visible    Edit methodology status
+    user checks radio is checked    In draft
+    user clicks radio    Approved for publication
+    user checks radio is checked    Immediately

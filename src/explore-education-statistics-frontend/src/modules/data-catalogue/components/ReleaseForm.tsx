@@ -15,10 +15,8 @@ import createErrorHelper from '@common/validation/createErrorHelper';
 import { ReleaseSummary } from '@common/services/publicationService';
 import Tag from '@common/components/Tag';
 import useFormSubmit from '@common/hooks/useFormSubmit';
-import { format } from 'date-fns';
 import { Formik } from 'formik';
 import React, { ReactNode, useMemo, useState } from 'react';
-import orderBy from 'lodash/orderBy';
 
 export interface ReleaseFormValues {
   releaseId: string;
@@ -56,7 +54,7 @@ const ReleaseForm = ({
 
   const radioOptions = useMemo<RadioOption[]>(
     () =>
-      orderBy(options, 'published', 'desc')
+      options
         .filter(option => {
           if (!searchTerm) {
             return option;
@@ -68,10 +66,7 @@ const ReleaseForm = ({
         })
         .map(option => {
           return {
-            label: `${option.title} (${format(
-              new Date(option.published ?? ''),
-              'd MMMM yyyy',
-            )})`,
+            label: option.title,
             hint: option.latestRelease ? (
               <Tag strong>This is the latest data</Tag>
             ) : undefined,

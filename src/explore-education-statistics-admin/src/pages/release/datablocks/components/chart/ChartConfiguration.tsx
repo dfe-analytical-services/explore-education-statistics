@@ -2,7 +2,13 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import { Form, FormGroup, FormSelect } from '@common/components/form';
+import {
+  Form,
+  FormFieldRadioGroup,
+  FormFieldTextInput,
+  FormGroup,
+  FormSelect,
+} from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
@@ -72,7 +78,16 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      title: Yup.string().required('Enter chart title'),
+      titleType: Yup.mixed<FormValues['titleType']>()
+        .oneOf(['default', 'alternative'])
+        .required('Choose a title type'),
+      title: Yup.string()
+        .when('titleType', {
+          is: 'alternative',
+          then: Yup.string().required('Enter a chart title'),
+          otherwise: Yup.string,
+        })
+        .required('Enter chart title'),
       alt: Yup.string()
         .required('Enter chart alt text')
         .test({
@@ -195,13 +210,28 @@ const ChartConfiguration = ({
               />
             )}
 
-            <FormFieldTextArea<FormValues>
-              name="title"
-              label="Title"
-              className="govuk-!-width-three-quarters"
-              rows={3}
-              hint="Use a concise descriptive title that summarises the main message in the chart."
-              onChange={replaceNewLines}
+            <FormFieldRadioGroup<FormValues>
+              legend="Chart title"
+              legendSize="s"
+              name="titleType"
+              order={[]}
+              options={[
+                {
+                  label: 'Use table title',
+                  value: 'default',
+                },
+                {
+                  label: 'Set an alternative title',
+                  value: 'alternative',
+                  conditional: (
+                    <FormFieldTextInput<FormValues>
+                      label="Enter chart title"
+                      name="title"
+                      hint="Use a concise descriptive title that summarises the main message in the chart."
+                    />
+                  ),
+                },
+              ]}
             />
 
             <FormFieldTextArea<FormValues>

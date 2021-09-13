@@ -32,13 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return await _themeService.GetPublicationTree(filter);
         }
 
-        // TODO: EES-2365 Remove once 'Download latest data' page no longer exists
-        [HttpGet("download-themes")]
-        public async Task<IList<ThemeTree<PublicationDownloadsTreeNode>>> GetDownloadThemes()
-        {
-            return await _themeService.GetPublicationDownloadsTree();
-        }
-
         [HttpGet("methodology-themes")]
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {

@@ -152,6 +152,7 @@ function getCategoryFilters(
       // one filter as these don't really make sense to display
       // on the chart (this is similar to what we do in table tool).
       // Also take into account the specific filter category it's grouped by.
+      // If grouped by filters and groupByFilter is empty then group by all filters.
       const filteredFilters = filterGroups
         .filter(filterGroup => {
           if (groupByFilter) {

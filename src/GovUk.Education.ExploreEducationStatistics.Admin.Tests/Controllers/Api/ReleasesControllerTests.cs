@@ -4,11 +4,11 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +17,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -36,6 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.CreateRelease(new ReleaseCreateViewModel(), _publicationId);
+            VerifyAllMocks(mocks.ReleaseService);
+            
             result.AssertOkResult();
         }
 
@@ -67,6 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
+            VerifyAllMocks(mocks.ReleaseDataFilesService);
+            
             var dataFileInfoResult = result.AssertOkResult();
             Assert.Equal("Subject name", dataFileInfoResult.Name);
         }
@@ -95,7 +100,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
-            result.Result.AssertBadRequest(CannotOverwriteFile);
+            VerifyAllMocks(mocks.ReleaseDataFilesService);
+
+            result.AssertBadRequest(CannotOverwriteFile);
         }
 
         [Fact]
@@ -125,6 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.GetDataFileInfo(_releaseId);
+            VerifyAllMocks(mocks.ReleaseDataFilesService);
+
             var unboxed = result.AssertOkResult();
             Assert.Contains(unboxed, f => f.Name == "Release a file 1");
             Assert.Contains(unboxed, f => f.Name == "Release a file 2");
@@ -142,6 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
+            VerifyAllMocks(mocks.ReleaseService);
+
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
@@ -158,6 +169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
+            VerifyAllMocks(mocks.ReleaseService);
+
             result.AssertBadRequest(UnableToFindMetadataFileToDelete);
         }
 
@@ -176,6 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Method under test
             var result = await controller.UpdateRelease(new ReleaseUpdateViewModel(), _releaseId);
+            VerifyAllMocks(mocks.ReleaseService);
+
             var unboxed = result.AssertOkResult();
             Assert.Equal(_releaseId, unboxed.Id);
         }
@@ -193,6 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Method under test
             var result = await controller.GetTemplateRelease(_releaseId);
+            VerifyAllMocks(mocks.ReleaseService);
+
             result.AssertOkResult();
         }
 
@@ -210,9 +227,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             var result = await controller.CancelFileImport(_releaseId, fileId);
-            Assert.IsType<AcceptedResult>(result);
-
-            MockUtils.VerifyAllMocks(mocks.ImportService);
+            VerifyAllMocks(mocks.ImportService);
+            
+            result.AssertAccepted();
         }
 
         [Fact]
@@ -229,9 +246,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             var result = await controller.CancelFileImport(_releaseId, fileId);
-            Assert.IsType<ForbidResult>(result);
+            VerifyAllMocks(mocks.ImportService);
+            
+            result.AssertForbidden();
+        }
 
-            MockUtils.VerifyAllMocks(mocks.ImportService);
+        [Fact]
+        public async Task GetDeleteDataFilePlan()
+        {
+            var mocks = Mocks();
+            
+            var fileId = Guid.NewGuid();
+
+            var deleteDataFilePlan = new DeleteDataFilePlan();
+            
+            mocks.ReleaseService
+                .Setup(s => s.GetDeleteDataFilePlan(_releaseId, fileId))
+                .ReturnsAsync(new Either<ActionResult, DeleteDataFilePlan>(deleteDataFilePlan));
+
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            var result = await controller.GetDeleteDataFilePlan(_releaseId, fileId);
+            VerifyAllMocks(mocks.ReleaseService);
+
+            var plan = result.AssertOkResult();
+            Assert.Equal(deleteDataFilePlan, plan);
+        }
+
+        [Fact]
+        public async Task GetDeleteReleasePlan()
+        {
+            var mocks = Mocks();
+            
+            var deleteReleasePlan = new DeleteReleasePlan();
+            
+            mocks.ReleaseService
+                .Setup(s => s.GetDeleteReleasePlan(_releaseId))
+                .ReturnsAsync(new Either<ActionResult, DeleteReleasePlan>(deleteReleasePlan));
+
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            var result = await controller.GetDeleteReleasePlan(_releaseId);
+            VerifyAllMocks(mocks.ReleaseService);
+
+            var plan = result.AssertOkResult();
+            Assert.Equal(deleteReleasePlan, plan);
         }
 
         private static IFormFile MockFile(string fileName)

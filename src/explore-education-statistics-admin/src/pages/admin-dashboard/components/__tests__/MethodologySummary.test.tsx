@@ -988,6 +988,7 @@ describe('MethodologySummary', () => {
 
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
       const history = createMemoryHistory();
+
       const mockMethodology: BasicMethodology = {
         amendment: true,
         id: 'methodology-v1',

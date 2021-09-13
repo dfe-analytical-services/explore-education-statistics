@@ -97,7 +97,7 @@ export const testEditableRelease: EditableRelease = {
           ],
         },
         {
-          heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
+          heading: "'prma' from 'My Pub' in England for 2017/18",
           name: 'DataBlock 1',
           source: '',
           query: {
@@ -163,7 +163,7 @@ export const testEditableRelease: EditableRelease = {
     content: [
       {
         heading:
-          "Table showing Main reason for issue: Unauthorised family holiday absence for 'prma' from 'My Pub' in England for 2017/18",
+          "Main reason for issue: Unauthorised family holiday absence for 'prma' from 'My Pub' in England for 2017/18",
         name: 'Holiday (Key Stat)',
         source: '',
         query: {
@@ -190,7 +190,7 @@ export const testEditableRelease: EditableRelease = {
       },
       {
         heading:
-          "Table showing Main reason for issue: Arriving late for 'prma' from 'My Pub' in England for 2017/18",
+          "Main reason for issue: Arriving late for 'prma' from 'My Pub' in England for 2017/18",
         name: 'Main Reason (Key Stat)',
         source: '',
         query: {
@@ -217,7 +217,7 @@ export const testEditableRelease: EditableRelease = {
       },
       {
         heading:
-          "Table showing Main reason for issue: Absence due to other unauthorised circumstances for 'prma' from 'My Pub' in England for 2017/18",
+          "Main reason for issue: Absence due to other unauthorised circumstances for 'prma' from 'My Pub' in England for 2017/18",
         name: "Unauth'd (Key Stat)",
         source: '',
         query: {
@@ -250,7 +250,7 @@ export const testEditableRelease: EditableRelease = {
     order: 0,
     content: [
       {
-        heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
+        heading: "'prma' from 'My Pub' in England for 2017/18",
         name: 'Aggregate table (Secondary)',
         source: '',
         query: {

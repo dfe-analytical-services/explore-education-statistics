@@ -1,6 +1,6 @@
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
-import downloadFile from './utils/file/downloadFile';
+import downloadFile from '@common/utils/file/downloadFile';
 
 interface AncillaryFileInfo extends FileInfo {
   summary: string;
