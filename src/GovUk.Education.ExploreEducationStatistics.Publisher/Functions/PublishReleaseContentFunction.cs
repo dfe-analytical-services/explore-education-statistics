@@ -78,6 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 // are now accessible for the first time after publishing these releases
                 await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                 await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+                await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
                 await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
