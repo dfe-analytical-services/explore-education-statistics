@@ -22,6 +22,7 @@ describe('PublicationSummary', () => {
   };
 
   const fullPermissions: MyPublication['permissions'] = {
+    canAdoptMethodologies: true,
     canCreateReleases: true,
     canUpdatePublication: true,
     canCreateMethodologies: true,
@@ -35,6 +36,7 @@ describe('PublicationSummary', () => {
     releases: [],
     methodologies: [],
     permissions: {
+      canAdoptMethodologies: false,
       canCreateReleases: false,
       canUpdatePublication: false,
       canCreateMethodologies: false,
@@ -89,16 +91,17 @@ describe('PublicationSummary', () => {
       owner: true,
       methodology: {
         amendment: false,
-        id: '1234',
+        id: 'methodology-v1',
         latestInternalReleaseNote: 'this is the release note',
-        previousVersionId: 'lfkjdlfj',
+        methodologyId: 'methodology-1',
+        previousVersionId: 'methodology-previous-version-1',
         published: '2021-06-08T09:04:17.9805585',
-        slug: 'meth-1',
+        slug: 'methodology-slug-1',
         status: 'Approved',
-        title: 'I am a methodology',
+        title: 'Methodology 1',
         owningPublication: {
-          id: 'p1',
-          title: 'Publication title',
+          id: 'owning-publication-1',
+          title: 'Owning publication title',
         },
         permissions: {
           canApproveMethodology: false,
@@ -144,7 +147,7 @@ describe('PublicationSummary', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', {
+      screen.queryByRole('link', {
         name: 'Link to an externally hosted methodology',
       }),
     ).not.toBeInTheDocument();
@@ -226,7 +229,7 @@ describe('PublicationSummary', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', {
+      screen.getByRole('link', {
         name: 'Link to an externally hosted methodology',
       }),
     ).toBeInTheDocument();
@@ -305,17 +308,14 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     expect(
       screen.getByRole('button', {
-        name: `${testMethodologies[0].methodology.title} Approved`,
+        name: `${testMethodologies[0].methodology.title} (Owned) Approved`,
       }),
     ).toBeInTheDocument();
 
-    const externalMethodologyLink = screen.getByRole('link', {
-      name: `${testExternalMethodology.title} (external methodology)`,
-    });
-    expect(externalMethodologyLink).toBeInTheDocument();
-    expect(externalMethodologyLink).toHaveAttribute(
-      'href',
-      testExternalMethodology.url,
-    );
+    expect(
+      screen.getByRole('button', {
+        name: `${testExternalMethodology.title} (External)`,
+      }),
+    ).toBeInTheDocument();
   });
 });
