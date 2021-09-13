@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -254,7 +255,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                             CreatedBy = new User()
                         })
                     }),
-                })
+                }),
+
+                // notes field
+                Notes = new List<MethodologyNote>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "Note content",
+                        Created = DateTime.Today.AddDays(-4),
+                        CreatedBy = new User(),
+                        CreatedById = Guid.NewGuid(),
+                        DisplayDate = DateTime.Today.ToUniversalTime(),
+                        Updated = DateTime.Today.AddDays(-3),
+                        UpdatedBy = new User(),
+                        UpdatedById = Guid.NewGuid()
+                    }
+                }
             };
             
             Assert.False(originalVersion.Amendment);
@@ -302,6 +320,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var amendmentContentSection = Assert.Single(amendment.Content);
             var originalContentSection = originalVersion.Content[0];
             AssertContentSectionAmendedCorrectly(amendmentContentSection, originalContentSection, creationTime);
+
+            // Check notes
+            var amendmentNote = Assert.Single(amendment.Notes);
+            var originalNote = originalVersion.Notes[0];
+            AssertMethodologyNoteAmendedCorrectly(amendmentNote, originalNote, amendment);
         }
 
         private static void AssertContentSectionAmendedCorrectly(ContentSection amendmentContentSection,
@@ -335,6 +358,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             // Check the amendment's Content Block Comments are empty as we are starting with a clean slate.
             Assert.Empty(amendmentContentBlock.Comments);
+        }
+
+        private static void AssertMethodologyNoteAmendedCorrectly(
+            MethodologyNote amendmentNote,
+            MethodologyNote originalNote,
+            MethodologyVersion amendment)
+        {
+            // Check the note has a new id.
+            Assert.NotEqual(Guid.Empty, amendmentNote.Id);
+            Assert.NotEqual(originalNote.Id, amendmentNote.Id);
+
+            // Check the note has the amended methodology version
+            Assert.Equal(amendment, amendmentNote.MethodologyVersion);
+            Assert.Equal(amendment.Id, amendmentNote.MethodologyVersionId);
+
+            // Check the other fields are the same
+            Assert.Equal(originalNote.Content, amendmentNote.Content);
+            Assert.Equal(originalNote.Created, amendmentNote.Created);
+            Assert.Equal(originalNote.CreatedBy, amendmentNote.CreatedBy);
+            Assert.Equal(originalNote.CreatedById, amendmentNote.CreatedById);
+            Assert.Equal(originalNote.DisplayDate, amendmentNote.DisplayDate);
+            Assert.Equal(originalNote.Updated, amendmentNote.Updated);
+            Assert.Equal(originalNote.UpdatedBy, amendmentNote.UpdatedBy);
+            Assert.Equal(originalNote.UpdatedById, amendmentNote.UpdatedById);
         }
 
         [Fact]

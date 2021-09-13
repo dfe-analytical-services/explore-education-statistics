@@ -26,5 +26,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? UpdatedById { get; set; }
 
         public User UpdatedBy { get; set; } = null!;
+
+        public MethodologyNote Clone(MethodologyVersion newVersion)
+        {
+            var copy = (MethodologyNote) MemberwiseClone();
+
+            copy.Id = Guid.NewGuid();
+            copy.MethodologyVersion = newVersion;
+            copy.MethodologyVersionId = newVersion.Id;
+
+            return copy;
+        }
     }
 }
