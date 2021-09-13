@@ -6,6 +6,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
 import publicationService, {
   ExternalMethodology,
+  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -27,7 +28,7 @@ const ExternalMethodologyPage = ({
     if (!publication) {
       return;
     }
-    const updatedPublication = {
+    const updatedPublication: UpdatePublicationRequest = {
       title: publication.title,
       contact: {
         contactName: publication.contact?.contactName ?? '',
@@ -51,14 +52,17 @@ const ExternalMethodologyPage = ({
 
   return (
     <Page
-      wide
-      breadcrumbs={[
-        {
-          name: publication?.externalMethodology
-            ? 'Edit external methodology link'
-            : 'Link to an externally hosted methodology',
-        },
-      ]}
+      breadcrumbs={
+        isLoading
+          ? []
+          : [
+              {
+                name: publication?.externalMethodology
+                  ? 'Edit external methodology link'
+                  : 'Link to an externally hosted methodology',
+              },
+            ]
+      }
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

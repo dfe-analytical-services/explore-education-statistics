@@ -17,6 +17,16 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useMemo } from 'react';
 
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'methodologyId',
+    messages: {
+      CANNOT_ADOPT_METHODOLOGY_ALREADY_LINKED_TO_PUBLICATION:
+        'Select a methodology that has not already been adopted by this publication',
+    },
+  }),
+];
+
 interface FormValues {
   methodologyId: string;
 }
@@ -30,7 +40,7 @@ interface Props {
 const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
   const radioOptions = useMemo<RadioOption[]>(
     () =>
-      methodologies?.map(methodology => {
+      methodologies.map(methodology => {
         return {
           label: methodology.title,
           value: methodology.methodologyId,
@@ -61,16 +71,6 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
     [methodologies],
   );
 
-  const errorMappings = [
-    mapFieldErrors<FormValues>({
-      target: 'methodologyId',
-      messages: {
-        CANNOT_ADOPT_METHODOLOGY_ALREADY_LINKED_TO_PUBLICATION:
-          'Select a methodology that has not already been adopted by this publication',
-      },
-    }),
-  ];
-
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     await onSubmit(values);
   }, errorMappings);
@@ -89,6 +89,7 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
           legend="Select a methodology"
           name="methodologyId"
           options={radioOptions}
+          searchLabel="Search for a methodology"
         />
         <ButtonGroup>
           <Button type="submit">Save</Button>

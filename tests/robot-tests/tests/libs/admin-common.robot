@@ -309,7 +309,7 @@ user edits an external methodology
     ...    ${original_link}=https://example.com
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks link    Edit    ${accordion}
+    user clicks link    Edit external methodology    ${accordion}
     user waits until page contains title    Edit external methodology link
     user checks input field contains    label:Link title    ${original_title}
     user checks input field contains    label:URL    ${original_link}
@@ -320,7 +320,7 @@ user edits an external methodology
 user removes an external methodology from publication
     [Arguments]    ${publication}
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks button    Remove    ${accordion}
+    user clicks button    Remove external methodology    ${accordion}
 
 user adds basic release content
     [Arguments]    ${publication}

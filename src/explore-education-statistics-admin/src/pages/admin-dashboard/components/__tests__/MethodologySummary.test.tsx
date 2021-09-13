@@ -36,17 +36,17 @@ const testContact: PublicationContactDetails = {
 
 const testMethodology: MyMethodology = {
   amendment: false,
-  id: '1234',
+  id: 'methodology-v1',
   latestInternalReleaseNote: 'this is the release note',
-  methodologyId: 'm-1',
-  previousVersionId: 'lfkjdlfj',
-  published: '2021-06-08T09:04:17.9805585',
-  slug: 'meth-1',
+  methodologyId: 'methodology-1',
+  previousVersionId: 'methodology-previous-version-1',
+  published: '2021-06-08T09:04:17',
+  slug: 'methodology-slug-1',
   status: 'Approved',
   title: 'I am a methodology',
   owningPublication: {
-    id: 'p1',
-    title: 'Publication title',
+    id: 'owning-publication-1',
+    title: 'Owning publication title',
   },
   permissions: {
     canApproveMethodology: false,
@@ -58,17 +58,17 @@ const testMethodology: MyMethodology = {
 };
 const testMethodology2: MyMethodology = {
   amendment: false,
-  id: '4321',
+  id: 'methodology-v2',
   latestInternalReleaseNote: 'this is another release note',
-  methodologyId: 'm-2',
-  previousVersionId: '9876',
-  published: '2021-06-10T09:04:17.9805585',
+  methodologyId: 'methodology-2',
+  previousVersionId: 'methodology-previous-version-2',
+  published: '2021-06-10T09:04:17',
   slug: 'meth-2',
   status: 'Approved',
   title: 'I am a methodology 2',
   owningPublication: {
-    id: 'p2',
-    title: 'Publication title 2',
+    id: 'owning-publication-2',
+    title: 'Owning publication title 2',
   },
   permissions: {
     canApproveMethodology: false,
@@ -102,8 +102,8 @@ const externalMethodology: ExternalMethodology = {
 };
 
 const testPublicationNoMethodology: MyPublication = {
-  id: 'publication-1',
-  title: 'Publication 1',
+  id: 'publication-3',
+  title: 'Publication 3',
   contact: testContact,
   releases: [],
   methodologies: [],
@@ -274,7 +274,7 @@ describe('MethodologySummary', () => {
   });
 
   describe('renders correctly when no Methodology is supplied', () => {
-    test('the create, adopt and link methodology buttons are shown if the user has permission to use them', () => {
+    test('the correct buttons are shown if the user has permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -310,7 +310,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('the create, adopt and link methodology buttons are not shown if the user does not have permission to use them', () => {
+    test('the methodology buttons are not shown if the user does not have permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -772,12 +772,12 @@ describe('MethodologySummary', () => {
 
         expect(
           screen.getByRole('link', {
-            name: 'Edit',
+            name: 'Edit external methodology',
           }),
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', { name: 'Remove' }),
+          screen.getByRole('button', { name: 'Remove external methodology' }),
         ).toBeInTheDocument();
       },
     );
@@ -814,12 +814,12 @@ describe('MethodologySummary', () => {
 
         expect(
           screen.queryByRole('link', {
-            name: 'Edit',
+            name: 'Edit external methodology',
           }),
         ).not.toBeInTheDocument();
 
         expect(
-          screen.queryByRole('button', { name: 'Remove' }),
+          screen.queryByRole('button', { name: 'Remove external methodology' }),
         ).not.toBeInTheDocument();
       },
     );
@@ -990,16 +990,16 @@ describe('MethodologySummary', () => {
       const history = createMemoryHistoryWithMockedPush();
       const mockMethodology: BasicMethodology = {
         amendment: true,
-        id: '12345',
+        id: 'methodology-v1',
         latestInternalReleaseNote: 'this is the release note',
-        methodologyId: 'm-1',
-        previousVersionId: 'lfkjdlfj',
+        methodologyId: 'methodology-1',
+        previousVersionId: 'methodology-previous-version-1',
         owningPublication: {
-          id: 'p1',
-          title: 'Publication title',
+          id: 'owning-publication-1',
+          title: 'Owning publication title',
         },
-        published: '2021-06-08T09:04:17.9805585',
-        slug: 'meth-1',
+        published: '2021-06-08T09:04:17',
+        slug: 'methodology-slug-1',
         status: 'Approved',
         title: 'I am a methodology amendment',
       };

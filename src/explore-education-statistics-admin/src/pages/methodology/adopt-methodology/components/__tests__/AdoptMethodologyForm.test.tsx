@@ -8,45 +8,45 @@ import noop from 'lodash/noop';
 describe('AdoptMethodologyForm', () => {
   const testMethodologies: BasicMethodology[] = [
     {
-      id: '1',
-      methodologyId: 'm1',
+      id: 'methodology-v1',
+      methodologyId: 'methodology-1',
       amendment: false,
       owningPublication: {
-        title: 'owning pub 1',
+        title: 'Owning publication 1',
       },
       status: 'Draft',
-      title: 'methodology 1',
+      title: 'Methodology 1',
     } as BasicMethodology,
     {
-      id: '2',
-      methodologyId: 'm2',
+      id: 'methodology-v2',
+      methodologyId: 'methodology-2',
       amendment: true,
       owningPublication: {
-        title: 'owning pub 2',
+        title: 'Owning publication 2',
       },
       published: '2021-06-08T09:04:17.9805585',
       status: 'Approved',
-      title: 'methodology 2',
+      title: 'Methodology 2',
     } as BasicMethodology,
     {
-      id: '3',
-      methodologyId: 'm3',
+      id: 'methodology-v3',
+      methodologyId: 'methodology-3',
       amendment: true,
       owningPublication: {
-        title: 'owning pub 3',
+        title: 'Owning publication 3',
       },
       status: 'Draft',
-      title: 'methodology 3',
+      title: 'Methodology 3',
     } as BasicMethodology,
     {
-      id: '4',
-      methodologyId: 'm4',
+      id: 'methodology-v4',
+      methodologyId: 'methodology-4',
       owningPublication: {
-        title: 'owning pub 4',
+        title: 'Owning publication 4',
       },
       published: '2021-06-10T09:04:17.9805585',
       status: 'Approved',
-      title: 'methodology 4',
+      title: 'Methodology 4',
     } as BasicMethodology,
   ];
 
@@ -61,25 +61,27 @@ describe('AdoptMethodologyForm', () => {
 
     expect(screen.getByText('Select a methodology')).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Search')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Search for a methodology'),
+    ).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');
     expect(radios.length).toBe(4);
-    expect(screen.getByLabelText('methodology 1')).toHaveAttribute(
+    expect(screen.getByLabelText('Methodology 1')).toHaveAttribute(
       'value',
-      'm1',
+      'methodology-1',
     );
-    expect(screen.getByLabelText('methodology 2')).toHaveAttribute(
+    expect(screen.getByLabelText('Methodology 2')).toHaveAttribute(
       'value',
-      'm2',
+      'methodology-2',
     );
-    expect(screen.getByLabelText('methodology 3')).toHaveAttribute(
+    expect(screen.getByLabelText('Methodology 3')).toHaveAttribute(
       'value',
-      'm3',
+      'methodology-3',
     );
-    expect(screen.getByLabelText('methodology 4')).toHaveAttribute(
+    expect(screen.getByLabelText('Methodology 4')).toHaveAttribute(
       'value',
-      'm4',
+      'methodology-4',
     );
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
@@ -95,29 +97,29 @@ describe('AdoptMethodologyForm', () => {
       />,
     );
 
-    const radio1 = screen.getByTestId('Radio item for methodology 1');
+    const radio1 = screen.getByTestId('Radio item for Methodology 1');
     expect(radio1).toBeInTheDocument();
-    expect(within(radio1).getByText('owning pub 1'));
+    expect(within(radio1).getByText('Owning publication 1'));
     expect(within(radio1).getByText('Draft'));
     expect(within(radio1).getByText('Not yet published'));
 
-    const radio2 = screen.getByTestId('Radio item for methodology 2');
+    const radio2 = screen.getByTestId('Radio item for Methodology 2');
     expect(radio2).toBeInTheDocument();
-    expect(within(radio2).getByText('owning pub 2'));
+    expect(within(radio2).getByText('Owning publication 2'));
     expect(within(radio2).getByText('Approved'));
     expect(within(radio2).getByText('Amendment'));
     expect(within(radio2).getByText('8 June 2021'));
 
-    const radio3 = screen.getByTestId('Radio item for methodology 3');
+    const radio3 = screen.getByTestId('Radio item for Methodology 3');
     expect(radio3).toBeInTheDocument();
-    expect(within(radio3).getByText('owning pub 3'));
+    expect(within(radio3).getByText('Owning publication 3'));
     expect(within(radio3).getByText('Draft'));
     expect(within(radio3).getByText('Amendment'));
     expect(within(radio3).getByText('Not yet published'));
 
-    const radio4 = screen.getByTestId('Radio item for methodology 4');
+    const radio4 = screen.getByTestId('Radio item for Methodology 4');
     expect(radio4).toBeInTheDocument();
-    expect(within(radio4).getByText('owning pub 4'));
+    expect(within(radio4).getByText('Owning publication 4'));
     expect(within(radio4).getByText('Approved'));
     expect(within(radio4).getByText('10 June 2021'));
   });
@@ -154,14 +156,14 @@ describe('AdoptMethodologyForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('methodology 2'));
-    expect(screen.getByLabelText('methodology 2')).toBeChecked();
+    userEvent.click(screen.getByLabelText('Methodology 2'));
+    expect(screen.getByLabelText('Methodology 2')).toBeChecked();
 
     userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
-        methodologyId: 'm2',
+        methodologyId: 'methodology-2',
       });
     });
   });
