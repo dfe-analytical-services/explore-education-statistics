@@ -169,6 +169,10 @@ export interface ReleaseStatus {
   createdByEmail: string;
 }
 
+export interface DeleteReleasePlan {
+  scheduledMethodologies: IdTitlePair[];
+}
+
 const releaseService = {
   createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseSummary> {
     return client.post(
@@ -199,9 +203,14 @@ const releaseService = {
     return client.post(`/releases/${releaseId}/status`, createRequest);
   },
 
+  getDeleteReleasePlan(releaseId: string): Promise<DeleteReleasePlan> {
+    return client.get<DeleteReleasePlan>(`/release/${releaseId}/delete-plan`);
+  },
+
   deleteRelease(releaseId: string): Promise<void> {
     return client.delete(`/release/${releaseId}`);
   },
+
   getDraftReleases(): Promise<MyRelease[]> {
     return client.get('/releases/draft');
   },

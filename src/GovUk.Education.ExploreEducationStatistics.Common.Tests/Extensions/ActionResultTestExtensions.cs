@@ -24,7 +24,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
         
+        public static void AssertForbidden(this ActionResult result)
+        {
+            Assert.IsAssignableFrom<ForbidResult>(result);
+        }
+        
+        public static void AssertForbidden<T>(this ActionResult<T> result)
+        {
+            Assert.IsAssignableFrom<ForbidResult>(result);
+        }
+        
+        public static void AssertAccepted(this ActionResult result)
+        {
+            Assert.IsAssignableFrom<AcceptedResult>(result);
+        }
+        
+        public static void AssertBadRequest<T>(this ActionResult<T> result, params Enum[] expectedValidationErrors)
+        {
+            AssertBadRequestWithValidationErrors(result.Result, expectedValidationErrors);
+        }
+        
         public static void AssertBadRequest(this ActionResult result, params Enum[] expectedValidationErrors)
+        {
+            AssertBadRequestWithValidationErrors(result, expectedValidationErrors);
+        }
+        
+        private static void AssertBadRequestWithValidationErrors(this object result, params Enum[] expectedValidationErrors)
         {
             var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
             var validationProblem = Assert.IsAssignableFrom<ValidationProblemDetails>(badRequest?.Value);

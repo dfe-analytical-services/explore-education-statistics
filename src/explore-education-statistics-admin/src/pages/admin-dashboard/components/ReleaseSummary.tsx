@@ -41,7 +41,10 @@ const ReleaseSummary = ({
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
           {release.approvalStatus !== 'Approved' && (
-            <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+            <>
+              {' '}
+              <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+            </>
           )}
           {release.approvalStatus === 'Approved' && (
             <LazyLoad
@@ -50,14 +53,22 @@ const ReleaseSummary = ({
                 <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
               }
             >
-              <ReleaseServiceStatus
-                exclude="details"
-                releaseId={release.id}
-                isApproved
-              />
+              <>
+                {' '}
+                <ReleaseServiceStatus
+                  exclude="details"
+                  releaseId={release.id}
+                  isApproved
+                />
+              </>
             </LazyLoad>
           )}
-          {release.amendment && <Tag>Amendment</Tag>}
+          {release.amendment && (
+            <>
+              {' '}
+              <Tag>Amendment</Tag>
+            </>
+          )}
         </TagGroup>
       }
     >
