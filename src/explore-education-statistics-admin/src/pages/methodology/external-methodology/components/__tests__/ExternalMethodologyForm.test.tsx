@@ -1,16 +1,14 @@
-import MethodologyExternalLinkForm from '@admin/pages/admin-dashboard/components/MethodologyExternalLinkForm';
+import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
-describe('MethodologyExternalLinkForm', () => {
+describe('ExternalMethodologyForm', () => {
   test('can submit with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
-      <MethodologyExternalLinkForm onSubmit={handleSubmit} onCancel={noop} />,
-    );
+    render(<ExternalMethodologyForm onSubmit={handleSubmit} onCancel={noop} />);
 
     await userEvent.type(screen.getByLabelText('Link title'), 'Test title');
 
@@ -29,7 +27,7 @@ describe('MethodologyExternalLinkForm', () => {
   });
 
   test('show validation errors when no external methodology link title', async () => {
-    render(<MethodologyExternalLinkForm onSubmit={noop} onCancel={noop} />);
+    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
     userEvent.click(screen.getByLabelText('Link title'));
     userEvent.tab();
@@ -44,7 +42,7 @@ describe('MethodologyExternalLinkForm', () => {
   });
 
   test('show validation error when no external methodology URL', async () => {
-    render(<MethodologyExternalLinkForm onSubmit={noop} onCancel={noop} />);
+    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
     await userEvent.clear(screen.getByLabelText('URL'));
     userEvent.tab();
@@ -59,7 +57,7 @@ describe('MethodologyExternalLinkForm', () => {
   });
 
   test('show validation error when invalid external methodology URL', async () => {
-    render(<MethodologyExternalLinkForm onSubmit={noop} onCancel={noop} />);
+    render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
     await userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
     userEvent.tab();

@@ -39,6 +39,7 @@ export interface MyPublication {
   releases: MyRelease[];
   contact?: PublicationContactDetails;
   permissions: {
+    canAdoptMethodologies: boolean;
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
     canCreateMethodologies: boolean;
@@ -115,6 +116,32 @@ const publicationService = {
     publicationId: string,
   ): Promise<IdTitlePair | undefined> => {
     return client.get(`/publications/${publicationId}/releases/template`);
+  },
+
+  getAdoptableMethodologies(
+    publicationId: string,
+  ): Promise<BasicMethodology[]> {
+    return client.get<BasicMethodology[]>(
+      `/publication/${publicationId}/adoptable-methodologies`,
+    );
+  },
+
+  adoptMethodology(
+    publicationId: string,
+    methodologyId: string,
+  ): Promise<BasicMethodology> {
+    return client.put(
+      `/publication/${publicationId}/methodology/${methodologyId}`,
+    );
+  },
+
+  dropMethodology(
+    publicationId: string,
+    methodologyId: string,
+  ): Promise<BasicMethodology> {
+    return client.delete(
+      `/publication/${publicationId}/methodology/${methodologyId}`,
+    );
   },
 
   updatePublicationMethodology({

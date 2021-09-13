@@ -340,12 +340,11 @@ user cancels methodology amendment for publication
 user links publication to external methodology
     [Arguments]
     ...    ${publication}
-    ...    ${title}=${publication}
+    ...    ${title}=External methodology
     ...    ${link}=https://example.com
-
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks button    Link to an externally hosted methodology    ${accordion}
-    user waits until legend is visible    Link to an externally hosted methodology
+    user clicks link    Link to an externally hosted methodology
+    user waits until page contains title    Link to an externally hosted methodology
     user enters text into element    label:Link title    ${title}
     user enters text into element    label:URL    ${link}
     user clicks button    Save
@@ -353,14 +352,14 @@ user links publication to external methodology
 user edits an external methodology
     [Arguments]
     ...    ${publication}
-    ...    ${new_title}=${publication} updated
+    ...    ${new_title}=External methodology updated
     ...    ${new_link}=https://example.com/updated
-    ...    ${original_title}=${publication}
+    ...    ${original_title}=External methodology
     ...    ${original_link}=https://example.com
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks button    Edit externally hosted methodology    ${accordion}
-    user waits until legend is visible    Link to an externally hosted methodology
+    user clicks link    Edit external methodology    ${accordion}
+    user waits until page contains title    Edit external methodology link
     user checks input field contains    label:Link title    ${original_title}
     user checks input field contains    label:URL    ${original_link}
     user enters text into element    label:Link title    ${new_title}
@@ -370,7 +369,7 @@ user edits an external methodology
 user removes an external methodology from publication
     [Arguments]    ${publication}
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks button    Remove    ${accordion}
+    user clicks button    Remove external methodology    ${accordion}
 
 user adds basic release content
     [Arguments]    ${publication}
