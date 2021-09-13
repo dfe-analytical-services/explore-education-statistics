@@ -108,6 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
             Guid releaseId)
         {
@@ -222,7 +223,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var methodologiesScheduledWithRelease = 
                         GetMethodologiesScheduledWithRelease(releaseId);
-                    
+
+                    // TODO EES-2687 - as part of a ReleaseService refactor to extract Release Status update logic into
+                    // its own Service, this should be looked at to see how best to reuse similar "set to draft" logic
+                    // in MethodologyService.
                     methodologiesScheduledWithRelease.ForEach(m =>
                     {
                         m.PublishingStrategy = Immediately;
@@ -322,6 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
             Guid releaseId, ReleaseUpdateViewModel request)
         {
@@ -343,6 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        // TODO EES-2687 - extract Release Status methods into separate Service  
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseStatus(
             Guid releaseId, ReleaseStatusCreateViewModel request)
         {

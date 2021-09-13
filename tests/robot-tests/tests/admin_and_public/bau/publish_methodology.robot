@@ -140,6 +140,8 @@ Schedule a methodology amendment to be published with a release amendment
     ...    publication=${PUBLICATION_NAME}
     ...    publishing_strategy=WithRelease
     ...    with_release=${PUBLICATION_NAME} - ${RELEASE_NAME}
+
+Cancel the release amendment and validate that the appropriate warning modal is shown
     ${details}=    user opens release summary on the admin dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user clicks button    Cancel amendment    ${details}
     ${modal}=    user waits until modal is visible    Confirm you want to cancel this amended release
@@ -148,6 +150,8 @@ Schedule a methodology amendment to be published with a release amendment
     user waits until element contains    ${modal}    ${PUBLICATION_NAME} - Amended methodology
     user clicks button    Confirm
     user waits until page does not contain    Confirm you want to cancel this amended release
+
+Verify that the methodology that was scheduled with the cancelled release amendment is set back to Draft / Immediately
     user views methodology amendment for publication    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
     user clicks link    Sign off
