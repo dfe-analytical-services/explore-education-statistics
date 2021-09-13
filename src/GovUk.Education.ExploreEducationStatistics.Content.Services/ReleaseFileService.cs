@@ -18,18 +18,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class ReleaseFileService : IReleaseFileService
     {
-        private static readonly FileType[] DownloadableFileTypes = {
-            FileType.Ancillary,
-            FileType.Data,
-        };
-
         private static readonly FileType[] ZipFileTypes = {
             FileType.Ancillary,
             FileType.Data,
@@ -41,22 +35,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
         private readonly IUserService _userService;
-        private readonly ILogger<ReleaseFileService> _logger;
 
         public ReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
             IDataGuidanceFileWriter dataGuidanceFileWriter,
-            IUserService userService,
-            ILogger<ReleaseFileService> logger)
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
             _dataGuidanceFileWriter = dataGuidanceFileWriter;
             _userService = userService;
-            _logger = logger;
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid fileId)

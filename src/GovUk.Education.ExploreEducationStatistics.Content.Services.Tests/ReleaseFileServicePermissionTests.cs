@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -96,8 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? Mock.Of<IBlobStorageService>(),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                userService ?? Mock.Of<IUserService>(),
-                Mock.Of<ILogger<ReleaseFileService>>()
+                userService ?? Mock.Of<IUserService>()
             );
         }
 
