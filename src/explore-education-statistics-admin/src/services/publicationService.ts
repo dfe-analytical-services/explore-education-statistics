@@ -140,7 +140,7 @@ const publicationService = {
     methodologyId: string,
   ): Promise<BasicMethodology> {
     return client.delete(
-      `publication/${publicationId}/methodology/${methodologyId}`,
+      `/publication/${publicationId}/methodology/${methodologyId}`,
     );
   },
 
