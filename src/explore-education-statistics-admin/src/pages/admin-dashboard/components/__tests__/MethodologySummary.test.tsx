@@ -13,7 +13,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import createMemoryHistoryWithMockedPush from '@admin-test/createMemoryHistoryWithMockedPush';
+import { createMemoryHistory } from 'history';
 import produce from 'immer';
 
 jest.mock('@admin/services/methodologyService');
@@ -218,7 +218,7 @@ describe('MethodologySummary', () => {
     test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
       methodologyService.createMethodology.mockResolvedValue(testMethodology);
 
-      const history = createMemoryHistoryWithMockedPush();
+      const history = createMemoryHistory();
 
       render(
         <Router history={history}>
@@ -238,7 +238,7 @@ describe('MethodologySummary', () => {
         expect(methodologyService.createMethodology).toHaveBeenCalledWith(
           testPublicationNoMethodology.id,
         );
-        expect(history.push).toBeCalledWith(
+        expect(history.location.pathname).toBe(
           `/methodology/${testMethodology.id}/summary`,
         );
       });
@@ -722,7 +722,7 @@ describe('MethodologySummary', () => {
     test('clicking the link to external methodology button takes the user to the page', async () => {
       methodologyService.createMethodology.mockResolvedValue(testMethodology);
 
-      const history = createMemoryHistoryWithMockedPush();
+      const history = createMemoryHistory();
 
       render(
         <Router history={history}>
@@ -741,7 +741,7 @@ describe('MethodologySummary', () => {
       );
 
       await waitFor(() => {
-        expect(history.push).toBeCalledWith(
+        expect(history.location.pathname).toBe(
           `/publication/${testPublicationNoMethodology.id}/external-methodology`,
         );
       });
@@ -987,7 +987,7 @@ describe('MethodologySummary', () => {
     });
 
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
-      const history = createMemoryHistoryWithMockedPush();
+      const history = createMemoryHistory();
       const mockMethodology: BasicMethodology = {
         amendment: true,
         id: 'methodology-v1',
@@ -1038,7 +1038,7 @@ describe('MethodologySummary', () => {
           testPublicationWithMethodologyCanAmend.methodologies[0].methodology
             .id,
         );
-        expect(history.push).toBeCalledWith(
+        expect(history.location.pathname).toBe(
           `/methodology/${mockMethodology.id}/summary`,
         );
       });
