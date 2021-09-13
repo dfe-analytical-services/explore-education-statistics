@@ -131,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
         }
 
@@ -140,6 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
         }
 
