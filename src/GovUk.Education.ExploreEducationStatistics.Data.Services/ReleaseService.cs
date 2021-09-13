@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             public async Task<BlobInfo?> Get(ReleaseFile releaseFile)
             {
                 return await _blobStorageService.FindBlob(
-                    containerName: BlobContainers.PrivateReleaseFiles,
+                    containerName: BlobContainers.PublicReleaseFiles,
                     path: releaseFile.File.PublicPath(releaseFile.ReleaseId)
                 );
             }
