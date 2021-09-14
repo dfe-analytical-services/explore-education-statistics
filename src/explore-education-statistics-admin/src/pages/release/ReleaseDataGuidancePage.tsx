@@ -65,7 +65,10 @@ const ReleaseDataGuidancePage = ({
                     data catalogue
                   </Link>
                 ) : (
-                  'data catalogue'
+                  <Link to="#">
+                    data catalogue (link will become live when release is
+                    published)
+                  </Link>
                 )
               }
               subjects={model.metaGuidance.subjects}
