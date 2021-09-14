@@ -771,3 +771,15 @@ lookup or return webelement
 user closes Set Page View box
     user clicks element    id:pageViewToggleButton
     user waits until element is not visible    id:editingMode
+
+user checks page for details section
+    [Arguments]    ${heading}
+    user checks page contains element    testid:Expand Details Section ${heading}
+
+user expands details section
+    [Arguments]    ${heading}
+    user clicks element    testid:Expand Details Section ${heading}
+
+user checks page for details dropdown
+    [Arguments]    ${text}
+    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
