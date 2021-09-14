@@ -390,13 +390,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <Link
               to={
                 release.latestRelease
-                  ? '/find-statistics/[publication]/meta-guidance'
-                  : '/find-statistics/[publication]/[release]/meta-guidance'
+                  ? '/find-statistics/[publication]/data-guidance'
+                  : '/find-statistics/[publication]/[release]/data-guidance'
               }
               as={
                 release.latestRelease
-                  ? `/find-statistics/${release.publication.slug}/meta-guidance`
-                  : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
+                  ? `/find-statistics/${release.publication.slug}/data-guidance`
+                  : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
               }
             >
               data files guide

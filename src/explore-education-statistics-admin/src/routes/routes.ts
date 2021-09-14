@@ -158,7 +158,7 @@ export const preReleaseAccessListRoute: ProtectedRouteProps = {
 };
 
 export const releaseDataGuidanceRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/meta-guidance',
+  path: '/publication/:publicationId/release/:releaseId/data-guidance',
   component: ReleaseDataGuidancePage,
   protectionAction: user => user.permissions.canAccessPrereleasePages,
   exact: true,
