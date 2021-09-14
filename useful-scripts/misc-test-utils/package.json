@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "cross-env NODE_ENV=production ts-node --transpile-only src/index.ts",
+    "start": "cross-env NODE_ENV=production esr src/index.ts",
     "tsc": "tsc -p tsconfig.json",
     "clean": "rm -rf *.zip test-files/*.csv zip-files/*.zip node_modules && npm ci && npm run start",
     "gen-env": "gen-env-types .env -o src/types/env.d.ts -e ."
@@ -13,9 +13,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/archiver": "^5.1.0",
+    "@types/faker": "^5.5.8",
     "@types/form-data": "^2.5.0",
     "@types/inquirer": "^7.3.2",
-    "@types/node": "^15.14.0",
+    "@types/node": "^15.14.9",
     "@types/rimraf": "^3.0.0",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
@@ -25,15 +26,15 @@
     "eslint-plugin-import": "^2.23.4",
     "gen-env-types": "^1.3.0",
     "inquirer": "^8.1.1",
-    "ts-node": "^10.0.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
     "archiver": "^5.3.0",
     "axios": "^0.21.1",
     "cross-env": "^7.0.3",
-    "dotenv": "^8.6.0",
     "dotenv-safe": "^8.2.0",
+    "esbuild-runner": "^2.2.1",
+    "faker": "^5.5.3",
     "form-data": "^4.0.0",
     "formdata-node": "^3.5.4",
     "globby": "^11.0.4",
