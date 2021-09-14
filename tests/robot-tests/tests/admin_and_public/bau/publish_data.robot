@@ -228,8 +228,8 @@ Add meta guidance to subjects
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
     user waits until page contains element    id:metaGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
@@ -610,7 +610,7 @@ Go to meta guidance document
 
     user waits until page contains title caption    ${RELEASE_2_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Metadata guidance document
+    user waits until h2 is visible    Data guidance
 
 Validate meta guidance document file details
     user waits until page contains accordion section    ${SUBJECT_1_NAME}

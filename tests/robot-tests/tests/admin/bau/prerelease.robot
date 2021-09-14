@@ -35,8 +35,8 @@ Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Add metadata guidance
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
     user waits until page contains element    id:metaGuidance-dataFiles
 
@@ -227,7 +227,7 @@ Validate metadata guidance page
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
-    user waits until h2 is visible    Metadata guidance document    60
+    user waits until h2 is visible    Data guidance    60
     user waits until page contains    Test metadata guidance content    60
 
     user waits until page contains accordion section    UI test subject    60
@@ -324,7 +324,7 @@ Validate public metdata guidance for Analyst user
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
-    user waits until h2 is visible    Metadata guidance document    60
+    user waits until h2 is visible    Data guidance    60
     user waits until page contains    Test metadata guidance content    60
 
     user waits until page contains accordion section    UI test subject    60

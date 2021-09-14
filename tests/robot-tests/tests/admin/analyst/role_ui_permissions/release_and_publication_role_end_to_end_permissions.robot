@@ -47,7 +47,7 @@ Check publication owner can upload subject file
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add meta guidance to ${SUBJECT_NAME}
-    user clicks link    Metadata guidance
+    user clicks link    Data guidance
     user waits until page does not contain loading spinner
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
@@ -106,7 +106,7 @@ Check publication owner can upload subject file on new release
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add meta guidance to ${SUBJECT_NAME} on new release
-    user clicks link    Metadata guidance
+    user clicks link    Data guidance
     user waits until page does not contain loading spinner
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}

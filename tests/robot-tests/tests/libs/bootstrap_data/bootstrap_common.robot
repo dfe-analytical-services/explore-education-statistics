@@ -86,7 +86,7 @@ user creates a fully populated draft release
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
     # add meta guidance
-    user clicks link    Metadata guidance
+    user clicks link    Data guidance
     user waits until page does not contain loading spinner
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}

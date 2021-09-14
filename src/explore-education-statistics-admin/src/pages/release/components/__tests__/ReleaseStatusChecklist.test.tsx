@@ -83,7 +83,7 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name:
-          'All summary information must be completed on the metadata guidance page',
+          'All summary information must be completed on the data guidance page',
       }),
     ).toHaveAttribute(
       'href',
@@ -232,7 +232,7 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name:
-          'All summary information must be completed on the metadata guidance page',
+          'All summary information must be completed on the data guidance page',
       }),
     ).toBeInTheDocument();
 

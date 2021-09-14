@@ -3,6 +3,7 @@ import releaseMetaGuidanceService, {
   ReleaseMetaGuidanceSummary,
 } from '@common/services/releaseMetaGuidanceService';
 import Page from '@frontend/components/Page';
+import Link from '@frontend/components/Link';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
@@ -24,13 +25,21 @@ const ReleaseMetaGuidancePage = ({ release }: Props) => {
             : `/find-statistics/${release.publication.slug}/${release.slug}`,
         },
       ]}
-      breadcrumbLabel="Metadata guidance document"
+      breadcrumbLabel="Data guidance"
     >
-      <h2>Metadata guidance document</h2>
+      <h2>Data guidance</h2>
 
       <ReleaseMetaGuidancePageContent
         published={release.published}
         metaGuidance={release.metaGuidance}
+        renderDataCatalogueLink={
+          <Link
+            to="/data-catalogue/[publication]/[release]"
+            as={`/data-catalogue/${release.publication.slug}/${release.slug}`}
+          >
+            data catalogue
+          </Link>
+        }
         subjects={release.subjects}
       />
     </Page>

@@ -34,8 +34,8 @@ Upload subject
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
 Add meta guidance
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
     user waits until page contains element    id:metaGuidanceForm-content
     user waits until page contains element    id:metaGuidance-dataFiles
@@ -248,13 +248,13 @@ Verify public metadata guidance document
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document    30
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance    30
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
+    user waits until h2 is visible    Data guidance
     user waits until page contains    Test meta guidance content
 
     user waits until page contains accordion section    Dates test subject
@@ -388,8 +388,8 @@ Confirm data replacement
 
 Verify existing meta guidance for amendment
     user clicks link    Data and files
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
     user waits until element contains    id:metaGuidanceForm-content    Test meta guidance content
 
@@ -593,13 +593,13 @@ Verify amendment public metadata guidance document
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
+    user waits until h2 is visible    Data guidance
     user waits until page contains    Updated test meta guidance content
 
     user waits until page contains accordion section    Dates test subject

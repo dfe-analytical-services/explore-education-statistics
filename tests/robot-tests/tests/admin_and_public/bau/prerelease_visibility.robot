@@ -62,8 +62,8 @@ Update public prerelease access list
 
 Add meta guidance to subject
     user clicks link    Data and files
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
     user waits until page contains element    id:metaGuidanceForm-content
     user waits until page contains element    id:metaGuidance-dataFiles
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content

@@ -54,7 +54,7 @@ const ReleaseDataPage = () => {
         </TabsSection>
         <TabsSection
           id={releaseDataPageTabIds.metaGuidance}
-          title="Metadata guidance"
+          title="Data guidance"
           lazy
         >
           <ReleaseMetaGuidanceSection

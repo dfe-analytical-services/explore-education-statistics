@@ -126,7 +126,7 @@ describe('ReleaseMetaGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            'Before you can change the public metadata guidance, you must upload at least one data file.',
+            'Before you can change the public data guidance, you must upload at least one data file.',
           ),
         ).toBeInTheDocument();
       });
@@ -719,7 +719,7 @@ describe('ReleaseMetaGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            'The public metadata guidance document has not been created as no data files were uploaded.',
+            'The public data guidance has not been created as no data files were uploaded.',
           ),
         ).toBeInTheDocument();
       });

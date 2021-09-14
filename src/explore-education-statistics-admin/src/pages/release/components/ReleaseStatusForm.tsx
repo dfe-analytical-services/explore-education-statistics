@@ -43,7 +43,7 @@ const errorMappings = [
       PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
         'Release has already been published and cannot be un-approved',
       PUBLIC_META_GUIDANCE_REQUIRED:
-        'All public metadata guidance must be populated before the release can be approved',
+        'All public data guidance must be populated before the release can be approved',
       PUBLIC_PRE_RELEASE_ACCESS_LIST_REQUIRED:
         'Public pre-release access list is required before the release can be approved',
       DATA_FILE_REPLACEMENTS_MUST_BE_COMPLETED:

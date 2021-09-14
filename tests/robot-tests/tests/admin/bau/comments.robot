@@ -50,8 +50,8 @@ Create new release
 
 Add meta guidance to subject
     [Tags]    HappyPath
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document    90
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance    90
     user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
 
     user waits until page contains accordion section    ${SUBJECT_NAME}

@@ -77,7 +77,7 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
   return (
     <>
-      <h2>Public metadata guidance document</h2>
+      <h2>Public data guidance</h2>
 
       {canUpdateRelease ? (
         <InsetText>
@@ -85,11 +85,10 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
           <ul>
             <li>
-              upload at least one data file before creating the metadata
-              guidance document
+              upload at least one data file before creating the data guidance
             </li>
             <li>
-              ensure all metadata guidance has been populated and is up-to-date
+              ensure all data guidance has been populated and is up-to-date
               before seeking release approval
             </li>
             <li>
@@ -233,13 +232,13 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
               <>
                 {canUpdateRelease ? (
                   <WarningMessage>
-                    Before you can change the public metadata guidance, you must
+                    Before you can change the public data guidance, you must
                     upload at least one data file.
                   </WarningMessage>
                 ) : (
                   <InsetText>
-                    The public metadata guidance document has not been created
-                    as no data files were uploaded.
+                    The public data guidance has not been created as no data
+                    files were uploaded.
                   </InsetText>
                 )}
               </>
