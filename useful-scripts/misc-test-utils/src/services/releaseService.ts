@@ -28,7 +28,7 @@ const releaseService = {
     );
     return releaseId;
   },
-  addMetaGuidance: async (
+  addDataGuidance: async (
     subjArr: { id: string; content: string }[],
     releaseId: string,
   ): Promise<boolean> => {

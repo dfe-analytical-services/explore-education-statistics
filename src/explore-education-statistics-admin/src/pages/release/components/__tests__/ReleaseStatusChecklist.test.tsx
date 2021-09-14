@@ -87,7 +87,7 @@ describe('ReleaseStatusChecklist', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#metadata-guidance',
+      '/publication/publication-1/release/release-1/data#data-guidance',
     );
 
     expect(

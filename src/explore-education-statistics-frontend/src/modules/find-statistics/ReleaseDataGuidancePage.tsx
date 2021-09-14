@@ -1,17 +1,17 @@
-import ReleaseMetaGuidancePageContent from '@common/modules/release/components/ReleaseMetaGuidancePageContent';
-import releaseMetaGuidanceService, {
-  ReleaseMetaGuidanceSummary,
-} from '@common/services/releaseMetaGuidanceService';
+import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
+import releaseDataGuidanceService, {
+  ReleaseDataGuidanceSummary,
+} from '@common/services/releaseDataGuidanceService';
 import Page from '@frontend/components/Page';
 import Link from '@frontend/components/Link';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
 interface Props {
-  release: ReleaseMetaGuidanceSummary;
+  release: ReleaseDataGuidanceSummary;
 }
 
-const ReleaseMetaGuidancePage = ({ release }: Props) => {
+const ReleaseDataGuidancePage = ({ release }: Props) => {
   return (
     <Page
       title={release.publication.title}
@@ -29,9 +29,9 @@ const ReleaseMetaGuidancePage = ({ release }: Props) => {
     >
       <h2>Data guidance</h2>
 
-      <ReleaseMetaGuidancePageContent
+      <ReleaseDataGuidancePageContent
         published={release.published}
-        metaGuidance={release.metaGuidance}
+        dataGuidance={release.metaGuidance}
         renderDataCatalogueLink={
           <Link
             to="/data-catalogue/[publication]/[release]"
@@ -46,7 +46,7 @@ const ReleaseMetaGuidancePage = ({ release }: Props) => {
   );
 };
 
-export default ReleaseMetaGuidancePage;
+export default ReleaseDataGuidancePage;
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
@@ -57,8 +57,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   };
 
   const data = await (release
-    ? releaseMetaGuidanceService.getReleaseMetaGuidance(publication, release)
-    : releaseMetaGuidanceService.getLatestReleaseMetaGuidance(publication));
+    ? releaseDataGuidanceService.getReleaseDataGuidance(publication, release)
+    : releaseDataGuidanceService.getLatestReleaseDataGuidance(publication));
 
   return {
     props: {

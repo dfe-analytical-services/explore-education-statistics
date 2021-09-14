@@ -73,7 +73,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
-            )}#${releaseDataPageTabIds.metaGuidance}`,
+            )}#${releaseDataPageTabIds.dataGuidance}`,
           };
         case 'ReleaseNoteRequired':
           return {

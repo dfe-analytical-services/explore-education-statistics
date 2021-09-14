@@ -1,13 +1,13 @@
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import releaseMetaGuidanceService, {
-  ReleaseMetaGuidance,
-} from '@admin/services/releaseMetaGuidanceService';
+import releaseDataGuidanceService, {
+  ReleaseDataGuidance,
+} from '@admin/services/releaseDataGuidanceService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import ReleaseMetaGuidancePageContent from '@common/modules/release/components/ReleaseMetaGuidancePageContent';
+import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import Link from '@admin/components/Link';
 import React from 'react';
@@ -18,11 +18,11 @@ interface LocationState {
 }
 
 interface Model {
-  metaGuidance: ReleaseMetaGuidance;
+  metaGuidance: ReleaseDataGuidance;
   release: Release;
 }
 
-const ReleaseMetaGuidancePage = ({
+const ReleaseDataGuidancePage = ({
   match,
   location,
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
@@ -30,7 +30,7 @@ const ReleaseMetaGuidancePage = ({
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [metaGuidance, release] = await Promise.all([
-      releaseMetaGuidanceService.getMetaGuidance(releaseId),
+      releaseDataGuidanceService.getDataGuidance(releaseId),
       releaseService.getRelease(releaseId),
     ]);
 
@@ -54,9 +54,9 @@ const ReleaseMetaGuidancePage = ({
 
             <h2>Data guidance</h2>
 
-            <ReleaseMetaGuidancePageContent
+            <ReleaseDataGuidancePageContent
               published={model.release.published}
-              metaGuidance={model.metaGuidance.content}
+              dataGuidance={model.metaGuidance.content}
               renderDataCatalogueLink={
                 model.release.published ? (
                   <Link
@@ -77,4 +77,4 @@ const ReleaseMetaGuidancePage = ({
   );
 };
 
-export default ReleaseMetaGuidancePage;
+export default ReleaseDataGuidancePage;

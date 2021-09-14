@@ -2,20 +2,20 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import ContentHtml from '@common/components/ContentHtml';
-import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
-import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
+import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
+import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
 import React, { ReactNode } from 'react';
 
 interface Props {
   published?: string;
-  metaGuidance: string;
+  dataGuidance: string;
   renderDataCatalogueLink?: ReactNode;
-  subjects: SubjectMetaGuidance[];
+  subjects: SubjectDataGuidance[];
 }
 
-const ReleaseMetaGuidancePageContent = ({
+const ReleaseDataGuidancePageContent = ({
   published,
-  metaGuidance,
+  dataGuidance,
   renderDataCatalogueLink,
   subjects,
 }: Props) => {
@@ -29,8 +29,8 @@ const ReleaseMetaGuidancePageContent = ({
         </p>
       )}
 
-      {metaGuidance && (
-        <ContentHtml html={metaGuidance} testId="metaGuidance-content" />
+      {dataGuidance && (
+        <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
       )}
 
       {subjects.length > 0 && (
@@ -48,7 +48,7 @@ const ReleaseMetaGuidancePageContent = ({
           <Accordion id="dataFiles">
             {subjects.map(subject => (
               <AccordionSection heading={subject.name} key={subject.id}>
-                <ReleaseMetaGuidanceDataFile
+                <ReleaseDataGuidanceDataFile
                   key={subject.id}
                   subject={subject}
                 />
@@ -61,4 +61,4 @@ const ReleaseMetaGuidancePageContent = ({
   );
 };
 
-export default ReleaseMetaGuidancePageContent;
+export default ReleaseDataGuidancePageContent;

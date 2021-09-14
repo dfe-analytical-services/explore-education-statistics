@@ -466,19 +466,19 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
-user gets meta guidance data file content editor
+user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
-    user waits until page contains element    id:metaGuidance-dataFiles
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    user waits until page contains element    id:dataGuidance-dataFiles
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
     user waits until parent contains element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     ${editor}=    get child element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     [Return]    ${editor}
 
-user enters text into meta guidance data file content editor
+user enters text into data guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
     user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
-    ${editor}=    user gets meta guidance data file content editor    ${accordion_heading}
+    ${editor}=    user gets data guidance data file content editor    ${accordion_heading}
     user clicks element    ${editor}
     user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}

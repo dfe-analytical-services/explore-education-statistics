@@ -224,25 +224,25 @@ Confirm created footnotes
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_MIXTURE}
 
-Add meta guidance to subjects
+Add data guidance to subjects
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
 
-    user waits until page contains element    id:metaGuidance-dataFiles
+    user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_1_NAME}
-    ...    ${SUBJECT_1_NAME} meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_1_NAME}
+    ...    ${SUBJECT_1_NAME} data guidance content
 
     user waits until page contains accordion section    ${SUBJECT_2_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_2_NAME}
-    ...    ${SUBJECT_2_NAME} meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_2_NAME}
+    ...    ${SUBJECT_2_NAME} data guidance content
 
-Validate meta guidance variables and descriptions
+Validate data guidance variables and descriptions
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
 
     ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
@@ -267,7 +267,7 @@ Validate meta guidance variables and descriptions
     user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Variable names and descriptions    ${subject_2_content}
 
     ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
@@ -282,9 +282,9 @@ Validate meta guidance variables and descriptions
     user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
-Validate meta guidance footnotes
+Validate data guidance footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Footnotes    ${subject_1_content}
 
     user checks list has x items    testid:Footnotes    9    ${subject_1_content}
@@ -301,7 +301,7 @@ Validate meta guidance footnotes
     user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Footnotes    ${subject_2_content}
 
     user checks list has x items    testid:Footnotes    3    ${subject_2_content}
@@ -309,7 +309,7 @@ Validate meta guidance footnotes
     user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_2_content}
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
 
-Save meta guidance
+Save data guidance
     user clicks button    Save guidance
 
 Navigate to Data blocks page
@@ -603,7 +603,7 @@ Go to release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    90
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
-Go to meta guidance document
+Go to data guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
     user clicks link    data files guide
@@ -612,7 +612,7 @@ Go to meta guidance document
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    Data guidance
 
-Validate meta guidance document file details
+Validate data guidance document file details
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
     user waits until page contains accordion section    ${SUBJECT_2_NAME}
     user checks there are x accordion sections    2
@@ -623,7 +623,7 @@ Validate meta guidance document file details
     user checks summary list contains    Filename    tiny-two-filters.csv    ${subject_1_content}
     user checks summary list contains    Geographic levels    National    ${subject_1_content}
     user checks summary list contains    Time period    2017/18    ${subject_1_content}
-    user checks summary list contains    Content    UI test subject 1 meta guidance content    ${subject_1_content}
+    user checks summary list contains    Content    UI test subject 1 data guidance content    ${subject_1_content}
 
     user opens accordion section    ${SUBJECT_2_NAME}
 
@@ -633,9 +633,9 @@ Validate meta guidance document file details
     ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
     ...    ${subject_2_content}
     user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
-    user checks summary list contains    Content    UI test subject 2 meta guidance content    ${subject_2_content}
+    user checks summary list contains    Content    UI test subject 2 data guidance content    ${subject_2_content}
 
-Validate meta guidance document variables
+Validate data guidance document variables
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
 
@@ -675,7 +675,7 @@ Validate meta guidance document variables
     user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
-Validate meta guidance document footnotes
+Validate data guidance document footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Footnotes    ${subject_1_content}
 

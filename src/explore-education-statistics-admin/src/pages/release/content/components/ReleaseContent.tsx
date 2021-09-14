@@ -16,7 +16,7 @@ import useReleaseContentActions from '@admin/pages/release/content/contexts/useR
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import {
   preReleaseAccessListRoute,
-  releaseMetaGuidanceRoute,
+  releaseDataGuidanceRoute,
 } from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
@@ -294,11 +294,11 @@ const ReleaseContent = () => {
               {file.name}
             </ButtonText>
           )}
-          renderMetaGuidanceLink={
+          renderDataGuidanceLink={
             <Link
               to={{
                 pathname: generatePath<ReleaseRouteParams>(
-                  releaseMetaGuidanceRoute.path,
+                  releaseDataGuidanceRoute.path,
                   {
                     publicationId: release.publication.id,
                     releaseId: release.id,

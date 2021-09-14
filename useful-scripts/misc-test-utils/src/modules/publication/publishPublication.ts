@@ -60,7 +60,7 @@ const createReleaseAndPublish = async () => {
 
   const subjectArray = await subjectService.getSubjectIdArr(releaseId);
 
-  await releaseService.addMetaGuidance(
+  await releaseService.addDataGuidance(
     subjectArray as { id: string; content: string }[],
     releaseId,
   );

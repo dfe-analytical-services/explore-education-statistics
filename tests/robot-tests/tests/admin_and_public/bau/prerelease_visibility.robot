@@ -60,15 +60,15 @@ Add public prerelease access list
 Update public prerelease access list
     user updates public prerelease access list    Updated test public access list
 
-Add meta guidance to subject
+Add data guidance to subject
     user clicks link    Data and files
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
-    user waits until page contains element    id:metaGuidanceForm-content
-    user waits until page contains element    id:metaGuidance-dataFiles
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user waits until page contains element    id:dataGuidanceForm-content
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    UI test subject
-    user enters text into meta guidance data file content editor    UI test subject    metaguidance content
+    user enters text into data guidance data file content editor    UI test subject    dataguidance content
     user clicks button    Save guidance
 
 Go to "Sign off" page

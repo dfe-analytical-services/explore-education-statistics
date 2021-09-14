@@ -46,13 +46,13 @@ Check publication owner can upload subject file
     user waits until page does not contain loading spinner
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-Check publication owner can add meta guidance to ${SUBJECT_NAME}
+Check publication owner can add data guidance to ${SUBJECT_NAME}
     user clicks link    Data guidance
     user waits until page does not contain loading spinner
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
@@ -105,13 +105,13 @@ Check publication owner can upload subject file on new release
     user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-Check publication owner can add meta guidance to ${SUBJECT_NAME} on new release
+Check publication owner can add data guidance to ${SUBJECT_NAME} on new release
     user clicks link    Data guidance
     user waits until page does not contain loading spinner
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
     user clicks button    Save guidance
 
 Navigate to administration as bau1 and swap publication owner role for release approver

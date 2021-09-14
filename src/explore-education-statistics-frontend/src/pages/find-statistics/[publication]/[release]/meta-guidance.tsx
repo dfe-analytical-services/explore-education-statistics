@@ -1,4 +1,4 @@
 export {
   default,
   getServerSideProps,
-} from '@frontend/modules/find-statistics/ReleaseMetaGuidancePage';
+} from '@frontend/modules/find-statistics/ReleaseDataGuidancePage';
