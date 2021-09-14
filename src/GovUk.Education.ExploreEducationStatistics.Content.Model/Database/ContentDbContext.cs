@@ -50,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<User> Users { get; set; }
         public DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
         public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public DbSet<GlossaryEntry> GlossaryEntries { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
@@ -370,6 +371,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
                     Title = "National Statistics"
                 });
+
+            modelBuilder.Entity<GlossaryEntry>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<GlossaryEntry>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
