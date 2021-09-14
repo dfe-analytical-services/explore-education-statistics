@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -12,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Title { get; set; } = string.Empty;
 
-        public List<AllMethodologiesTopicViewModel> Topics { get; set; } = new List<AllMethodologiesTopicViewModel>();
+        public List<AllMethodologiesTopicViewModel> Topics { get; set; } = new();
 
         public void RemoveTopicNodesWithoutMethodologiesAndSort()
         {
@@ -68,8 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Title { get; set; } = string.Empty;
 
-        public List<MethodologySummaryViewModel> Methodologies { get; set; } =
-            new List<MethodologySummaryViewModel>();
+        public List<MethodologySummaryViewModel> Methodologies { get; set; } = new();
 
 
         public int CompareTo(AllMethodologiesPublicationViewModel? other)

@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,7 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         return new NotFoundResult();
                     }
 
-                    return _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
+                    var loadedMethodologyVersion = _contentDbContext.AssertEntityLoaded(latestPublishedVersion);
+                    await _contentDbContext.Entry(loadedMethodologyVersion)
+                        .Collection(m => m.Notes)
+                        .LoadAsync();
+
+                    return _mapper.Map<MethodologyViewModel>(loadedMethodologyVersion);
                 });
         }
 

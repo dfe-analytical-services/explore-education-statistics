@@ -31,16 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyId}/content/sections")]
-        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(
-            Guid methodologyId,
-            [FromQuery] MethodologyContentService.ContentListType type)
-        {
-            return await _contentService
-                .GetContentSections(methodologyId, type)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPut("methodology/{methodologyId}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid methodologyId, Dictionary<Guid, int> newSectionOrder)

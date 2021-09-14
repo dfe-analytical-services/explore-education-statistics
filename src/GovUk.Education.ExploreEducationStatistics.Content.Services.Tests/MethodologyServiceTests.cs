@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -29,18 +32,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
-                Versions = AsList(
-                    new MethodologyVersion
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
                     {
                         Id = Guid.NewGuid(),
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
                         Status = Approved,
                         AlternativeTitle = "Alternative title",
                         Version = 0
-                    })
+                    }
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -63,19 +66,216 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
 
+                VerifyAllMocks(methodologyVersionRepository);
+
                 Assert.Equal(methodology.Versions[0].Id, result.Id);
                 Assert.Equal("Alternative title", result.Title);
+                Assert.Empty(result.Annexes);
+                Assert.Empty(result.Content);
+                Assert.Empty(result.Notes);
+            }
+        }
 
-                var annexes = result.Annexes;
-                Assert.NotNull(annexes);
-                Assert.Empty(annexes);
+        [Fact]
+        public async Task GetLatestMethodologyBySlug_TestContentSections()
+        {
+            var methodology = new Methodology
+            {
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Annexes = new List<ContentSection>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 2,
+                                Heading = "Annex 3 heading",
+                                Caption = "Annex 3 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 0,
+                                Heading = "Annex 1 heading",
+                                Caption = "Annex 1 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 1,
+                                Heading = "Annex 2 heading",
+                                Caption = "Annex 2 caption"
+                            }
+                        },
+                        Content = new List<ContentSection>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 2,
+                                Heading = "Section 3 heading",
+                                Caption = "Section 3 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 0,
+                                Heading = "Section 1 heading",
+                                Caption = "Section 1 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 1,
+                                Heading = "Section 2 heading",
+                                Caption = "Section 2 caption"
+                            }
+                        },
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                        AlternativeTitle = "Alternative title"
+                    }
+                }
+            };
+            var methodologyVersion = methodology.Versions[0];
 
-                var content = result.Content;
-                Assert.NotNull(content);
-                Assert.Empty(content);
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            VerifyAllMocks(methodologyVersionRepository);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+
+            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+                .ReturnsAsync(methodology.Versions[0]);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
+
+                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+
+                VerifyAllMocks(methodologyVersionRepository);
+
+                Assert.Equal(3, result.Annexes.Count);
+                Assert.Equal(3, result.Content.Count);
+
+                var expectedAnnex1 = methodologyVersion.Annexes.Single(section => section.Order == 0);
+                var expectedAnnex2 = methodologyVersion.Annexes.Single(section => section.Order == 1);
+                var expectedAnnex3 = methodologyVersion.Annexes.Single(section => section.Order == 2);
+
+                AssertContentSectionAndViewModelEqual(expectedAnnex1, result.Annexes[0]);
+                AssertContentSectionAndViewModelEqual(expectedAnnex2, result.Annexes[1]);
+                AssertContentSectionAndViewModelEqual(expectedAnnex3, result.Annexes[2]);
+
+                var expectedContent1 = methodologyVersion.Content.Single(section => section.Order == 0);
+                var expectedContent2 = methodologyVersion.Content.Single(section => section.Order == 1);
+                var expectedContent3 = methodologyVersion.Content.Single(section => section.Order == 2);
+
+                AssertContentSectionAndViewModelEqual(expectedContent1, result.Content[0]);
+                AssertContentSectionAndViewModelEqual(expectedContent2, result.Content[1]);
+                AssertContentSectionAndViewModelEqual(expectedContent3, result.Content[2]);
+            }
+        }
+
+        private static void AssertContentSectionAndViewModelEqual(
+            ContentSection expected,
+            ContentSectionViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Caption, actual.Caption);
+            Assert.Equal(expected.Heading, actual.Heading);
+            Assert.Equal(expected.Order, actual.Order);
+        }
+
+        [Fact(Skip = "TODO EES-2304 Should be returning 3 notes not 6?")]
+        public async Task GetLatestMethodologyBySlug_TestNotes()
+        {
+            var methodology = new Methodology
+            {
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                        AlternativeTitle = "Alternative title"
+                    }
+                }
+            };
+            var methodologyVersion = methodology.Versions[0];
+
+            var otherNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-2).ToUniversalTime(),
+                Content = "Other note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var earliestNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-3).ToUniversalTime(),
+                Content = "Earliest note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var latestNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-1).ToUniversalTime(),
+                Content = "Latest note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyNotes.AddRangeAsync(otherNote, earliestNote, latestNote);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+
+            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+                .ReturnsAsync(methodology.Versions[0]);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
+
+                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+
+                VerifyAllMocks(methodologyVersionRepository);
+
+                Assert.Equal(3, result.Notes.Count);
+
+                AssertMethodologyNoteAndViewModelEqual(latestNote, result.Notes[0]);
+                AssertMethodologyNoteAndViewModelEqual(otherNote, result.Notes[1]);
+                AssertMethodologyNoteAndViewModelEqual(earliestNote, result.Notes[2]);
+            }
+        }
+
+        private static void AssertMethodologyNoteAndViewModelEqual(
+            MethodologyNote expected,
+            MethodologyNoteViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Content, actual.Content);
+            Assert.Equal(expected.DisplayDate, actual.DisplayDate);
         }
 
         [Fact]
@@ -98,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
-                .ReturnsAsync((MethodologyVersion) null!);
+                .ReturnsAsync((MethodologyVersion?) null);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -107,10 +307,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.GetLatestMethodologyBySlug(methodology.Slug);
 
+                VerifyAllMocks(methodologyVersionRepository);
+
                 result.AssertNotFound();
             }
-
-            VerifyAllMocks(methodologyVersionRepository);
         }
 
         [Fact]
@@ -142,10 +342,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.GetLatestMethodologyBySlug("methodology-slug");
 
+                VerifyAllMocks(methodologyVersionRepository);
+
                 result.AssertNotFound();
             }
-
-            VerifyAllMocks(methodologyVersionRepository);
         }
 
         [Fact]
@@ -504,11 +704,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IMapper? mapper = null)
         {
-            return new (
+            return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
-                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
             );
         }
     }

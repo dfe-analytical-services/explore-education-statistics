@@ -3,7 +3,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using Microsoft.Azure.Management.DataFactory.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
