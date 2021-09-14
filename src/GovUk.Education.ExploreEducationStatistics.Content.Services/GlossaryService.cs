@@ -32,11 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     Entries = new List<GlossaryEntryViewModel>(),
                 });
 
-            var allGlossaryEntries = _contentDbContext.GlossaryEntries
-                .ToList();
+            var allGlossaryEntries = await _contentDbContext.GlossaryEntries
+                .ToAsyncEnumerable()
+                .OrderBy(e => e.Title)
+                .ToListAsync();
 
             allGlossaryEntries
-                .OrderBy(e => e.Title)
                 .ForEach(e =>
                 {
                     categoryDictionary[e.Title[..1].ToUpper()].Entries
@@ -48,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     });
                 });
 
-            return categories
-                .Select(category => categoryDictionary[category.ToString()])
+            return categoryDictionary
+                .Values
                 .OrderBy(c => c.Heading)
                 .ToList();
         }
