@@ -54,7 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     new()
                     {
-                        Content = "Original version"
+                        Content = "Note 1"
+                    },
+                    new()
+                    {
+                        Content = "Note 2"
                     }
                 }
             };
@@ -106,8 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotNull(contentBlock);
                 Assert.Equal("Content!", contentBlock.Body);
 
-                var note = Assert.Single(amendment.Notes);
-                Assert.Equal("Original version", note.Content);
+                Assert.Equal(2, amendment.Notes.Count);
+                Assert.Equal("Note 1", amendment.Notes[0].Content);
+                Assert.Equal("Note 2", amendment.Notes[1].Content);
             }
         }
 
