@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                methodologyService ?? new Mock<IMethodologyService>(Strict).Object,
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 contentDbContext
             );
         }

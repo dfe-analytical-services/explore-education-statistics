@@ -1,11 +1,12 @@
 ﻿#nullable enable
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology
 {
     public class MethodologyNoteUpdateRequest
     {
-        public string Content { get; set; } = null!;
+        [Required] public string Content { get; set; } = string.Empty;
 
         public DateTime DisplayDate { get; set; }
     }

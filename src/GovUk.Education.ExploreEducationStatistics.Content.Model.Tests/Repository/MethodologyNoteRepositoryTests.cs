@@ -32,10 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyNoteRepository(contentDbContext);
 
-                var result = await service.AddNote(methodologyVersion.Id,
-                    createdById,
-                    content,
-                    displayDate);
+                var result = await service.AddNote(
+                    methodologyVersionId: methodologyVersion.Id,
+                    createdByUserId: createdById,
+                    content: content,
+                    displayDate: displayDate);
 
                 Assert.NotNull(result);
             }
@@ -48,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     await contentDbContext.MethodologyNotes.SingleAsync(n =>
                         n.MethodologyVersionId == methodologyVersion.Id);
 
+                Assert.NotEqual(Guid.Empty, addedNote.Id);
                 Assert.Equal(content, addedNote.Content);
                 Assert.InRange(DateTime.UtcNow.Subtract(addedNote.Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, addedNote.CreatedById);
@@ -114,10 +116,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyNoteRepository(contentDbContext);
 
-                var result = await service.UpdateNote(methodologyNote.Id,
-                    updatedById,
-                    content,
-                    displayDate);
+                var result = await service.UpdateNote(
+                    methodologyNoteId: methodologyNote.Id,
+                    updatedByUserId: updatedById,
+                    content: content,
+                    displayDate: displayDate);
 
                 Assert.NotNull(result);
             }

@@ -46,10 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async methodologyVersion =>
                 {
                     var addedNote = await _methodologyNoteRepository.AddNote(
-                        methodologyVersion.Id,
-                        _userService.GetUserId(),
-                        request.Content,
-                        request.DisplayDate);
+                        methodologyVersionId: methodologyVersion.Id,
+                        createdByUserId: _userService.GetUserId(),
+                        content: request.Content,
+                        displayDate: request.DisplayDate);
 
                     return BuildMethodologyNoteViewModel(addedNote);
                 });
@@ -89,10 +89,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async methodologyNote =>
                 {
                     var updatedNote = await _methodologyNoteRepository.UpdateNote(
-                        methodologyNoteId,
-                        _userService.GetUserId(),
-                        request.Content,
-                        request.DisplayDate
+                        methodologyNoteId: methodologyNoteId,
+                        updatedByUserId: _userService.GetUserId(),
+                        content: request.Content,
+                        displayDate: request.DisplayDate
                     );
 
                     return BuildMethodologyNoteViewModel(updatedNote);

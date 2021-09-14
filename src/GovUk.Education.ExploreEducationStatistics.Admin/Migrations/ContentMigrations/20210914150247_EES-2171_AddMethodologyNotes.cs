@@ -12,11 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Created = table.Column<DateTime>(nullable: false),
-                    CreatedById = table.Column<Guid>(nullable: false),
                     Content = table.Column<string>(nullable: false),
                     DisplayDate = table.Column<DateTime>(nullable: false),
                     MethodologyVersionId = table.Column<Guid>(nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    CreatedById = table.Column<Guid>(nullable: false),
                     Updated = table.Column<DateTime>(nullable: true),
                     UpdatedById = table.Column<Guid>(nullable: true)
                 },

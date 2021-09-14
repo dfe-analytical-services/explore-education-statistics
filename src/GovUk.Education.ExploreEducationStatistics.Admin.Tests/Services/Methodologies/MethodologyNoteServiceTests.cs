@@ -8,13 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -33,13 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 DisplayDate = DateTime.Today.ToUniversalTime()
             };
 
-            var expectedResult = new MethodologyNote
-            {
-                Id = Guid.NewGuid(),
-                Content = request.Content,
-                DisplayDate = request.DisplayDate
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -48,30 +40,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyNoteRepository = new Mock<IMethodologyNoteRepository>(Strict);
-
-            methodologyNoteRepository.Setup(mock => mock.AddNote(
-                    methodologyVersion.Id,
-                    UserId,
-                    request.Content,
-                    request.DisplayDate
-                ))
-                .ReturnsAsync(expectedResult);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext,
-                    methodologyNoteRepository: methodologyNoteRepository.Object);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 var result = (await service.AddNote(
-                    methodologyVersion.Id,
-                    request)).AssertRight();
+                    methodologyVersionId: methodologyVersion.Id,
+                    request: request)).AssertRight();
 
-                VerifyAllMocks(methodologyNoteRepository);
-
-                Assert.Equal(expectedResult.Id, result.Id);
-                Assert.Equal(expectedResult.Content, result.Content);
-                Assert.Equal(expectedResult.DisplayDate, result.DisplayDate);
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(request.Content, result.Content);
+                Assert.Equal(request.DisplayDate, result.DisplayDate);
             }
         }
 
@@ -80,11 +59,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var service = SetupMethodologyNoteService(contentDbContext: contentDbContext);
+            var service = SetupMethodologyNoteService(contentDbContext);
 
             var result = await service.AddNote(
-                Guid.NewGuid(),
-                new MethodologyNoteAddRequest
+                methodologyVersionId: Guid.NewGuid(),
+                request: new MethodologyNoteAddRequest
                 {
                     Content = "Adding note",
                     DisplayDate = DateTime.Today.ToUniversalTime()
@@ -96,38 +75,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task DeleteNote()
         {
-            var methodologyVersion = new MethodologyVersion();
-
             var methodologyNote = new MethodologyNote
             {
-                MethodologyVersion = methodologyVersion
+                MethodologyVersion = new MethodologyVersion()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.MethodologyNotes.AddAsync(methodologyNote);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyNoteRepository = new Mock<IMethodologyNoteRepository>(Strict);
-
-            methodologyNoteRepository.Setup(mock => mock.DeleteNote(
-                methodologyNote.Id
-            )).Returns(Task.CompletedTask);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext,
-                    methodologyNoteRepository: methodologyNoteRepository.Object);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 var result = await service.DeleteNote(
-                    methodologyVersion.Id,
-                    methodologyNote.Id);
-
-                VerifyAllMocks(methodologyNoteRepository);
+                    methodologyVersionId: methodologyNote.MethodologyVersionId,
+                    methodologyNoteId: methodologyNote.Id);
 
                 result.AssertRight();
             }
@@ -151,15 +118,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 // Attempt to delete the note using a different methodology version
                 var result = await service.DeleteNote(
-                    Guid.NewGuid(),
-                    methodologyNote.Id);
-
-                // No interaction with the repository is expected
-                // since a note matching the id and methodology version id won't be found
+                    methodologyVersionId: Guid.NewGuid(),
+                    methodologyNoteId: methodologyNote.Id);
 
                 result.AssertNotFound();
             }
@@ -180,14 +144,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 var result = await service.DeleteNote(
-                    methodologyVersion.Id,
-                    Guid.NewGuid());
-
-                // No interaction with the repository is expected
-                // since a note matching the id and methodology version id won't be found
+                    methodologyVersionId: methodologyVersion.Id,
+                    methodologyNoteId: Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -196,25 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateNote()
         {
-            var methodologyVersion = new MethodologyVersion();
-
             var methodologyNote = new MethodologyNote
             {
-                Id = Guid.NewGuid(),
-                MethodologyVersion = methodologyVersion
+                MethodologyVersion = new MethodologyVersion()
             };
 
             var request = new MethodologyNoteUpdateRequest
             {
                 Content = "Updating note",
                 DisplayDate = DateTime.Today.ToUniversalTime()
-            };
-
-            var expectedResult = new MethodologyNote
-            {
-                Id = methodologyNote.Id,
-                Content = request.Content,
-                DisplayDate = request.DisplayDate
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -225,31 +176,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyNoteRepository = new Mock<IMethodologyNoteRepository>(Strict);
-
-            methodologyNoteRepository.Setup(mock => mock.UpdateNote(
-                    methodologyNote.Id,
-                    UserId,
-                    request.Content,
-                    request.DisplayDate
-                ))
-                .ReturnsAsync(expectedResult);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext,
-                    methodologyNoteRepository: methodologyNoteRepository.Object);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 var result = (await service.UpdateNote(
-                    methodologyVersion.Id,
-                    methodologyNote.Id,
-                    request)).AssertRight();
+                    methodologyVersionId: methodologyNote.MethodologyVersionId,
+                    methodologyNoteId: methodologyNote.Id,
+                    request: request)).AssertRight();
 
-                VerifyAllMocks(methodologyNoteRepository);
-
-                Assert.Equal(expectedResult.Id, result.Id);
-                Assert.Equal(expectedResult.Content, result.Content);
-                Assert.Equal(expectedResult.DisplayDate, result.DisplayDate);
+                Assert.Equal(methodologyNote.Id, result.Id);
+                Assert.Equal(request.Content, result.Content);
+                Assert.Equal(request.DisplayDate, result.DisplayDate);
             }
         }
 
@@ -271,20 +209,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 // Attempt to update the note using a different methodology version
                 var result = await service.UpdateNote(
-                    Guid.NewGuid(),
-                    methodologyNote.Id,
-                    new MethodologyNoteUpdateRequest
+                    methodologyVersionId: Guid.NewGuid(),
+                    methodologyNoteId: methodologyNote.Id,
+                    request: new MethodologyNoteUpdateRequest
                     {
                         Content = "Updating note",
                         DisplayDate = DateTime.Today.ToUniversalTime()
                     });
-
-                // No interaction with the repository is expected
-                // since a note matching the id and methodology version id won't be found
 
                 result.AssertNotFound();
             }
@@ -305,19 +240,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyNoteService(contentDbContext: contentDbContext);
+                var service = SetupMethodologyNoteService(contentDbContext);
 
                 var result = await service.UpdateNote(
-                    methodologyVersion.Id,
-                    Guid.NewGuid(),
-                    new MethodologyNoteUpdateRequest
+                    methodologyVersionId: methodologyVersion.Id,
+                    methodologyNoteId: Guid.NewGuid(),
+                    request: new MethodologyNoteUpdateRequest
                     {
                         Content = "Updating note",
                         DisplayDate = DateTime.Today.ToUniversalTime()
                     });
-
-                // No interaction with the repository is expected
-                // since a note matching the id and methodology version id won't be found
 
                 result.AssertNotFound();
             }
@@ -332,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 AdminMapper(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                methodologyNoteRepository ?? Mock.Of<IMethodologyNoteRepository>(),
+                methodologyNoteRepository ?? new MethodologyNoteRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }

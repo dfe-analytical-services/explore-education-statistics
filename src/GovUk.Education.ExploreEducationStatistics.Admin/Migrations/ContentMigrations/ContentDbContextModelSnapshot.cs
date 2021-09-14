@@ -1108,7 +1108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
-                        .WithMany()
+                        .WithMany("Notes")
                         .HasForeignKey("MethodologyVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -7,12 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public DateTime Created { get; set; }
-
-        public User CreatedBy { get; set; } = null!;
-
-        public Guid CreatedById { get; set; }
-
         public string Content { get; set; } = null!;
 
         public DateTime DisplayDate { get; set; }
@@ -20,6 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid MethodologyVersionId { get; set; }
 
         public MethodologyVersion MethodologyVersion { get; set; } = null!;
+
+        public DateTime Created { get; set; }
+
+        public User CreatedBy { get; set; } = null!;
+
+        public Guid CreatedById { get; set; }
 
         public DateTime? Updated { get; set; }
 
