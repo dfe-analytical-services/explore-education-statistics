@@ -56,9 +56,7 @@ const DataBlockPageTabs = ({
     error,
     isLoading,
   } = useAsyncRetry<InitialTableToolState>(async () => {
-    const {
-      subjects,
-    } = await tableBuilderService.getReleaseSubjectsAndHighlights(releaseId);
+    const subjects = await tableBuilderService.listReleaseSubjects(releaseId);
 
     if (!dataBlock) {
       return {
@@ -171,14 +169,21 @@ const DataBlockPageTabs = ({
         const majorAxis = draft[0]?.axes?.major;
         const legend = draft[0]?.legend;
 
-        // Remove data sets that are no longer applicable to a given table's subject meta.
+        // If old chart title is the same as the old table title, then the chart title is defaulting to
+        // the table title, so don't inadvertently set the old chart/table title
+        if (
+          dataBlock?.charts[0] &&
+          dataBlock?.charts[0]?.title === dataBlock?.heading
+        ) {
+          draft[0].title = undefined;
+        }
 
+        // Remove data sets that are no longer applicable to a given table's subject meta.
         if (majorAxis?.dataSets) {
           majorAxis.dataSets = majorAxis.dataSets.filter(
             dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
           );
         }
-
         if (legend?.items) {
           legend.items = legend.items.filter(
             item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
@@ -315,7 +320,12 @@ const DataBlockPageTabs = ({
                   onSave={handleTableHeadersSave}
                 />
               </TabsSection>,
-              <TabsSection title="Chart" key="chart" id="dataBlockTabs-chart">
+              <TabsSection
+                title="Chart"
+                key="chart"
+                id="dataBlockTabs-chart"
+                lazy
+              >
                 <ChartBuilderTabSection
                   key={saveNumber}
                   dataBlock={dataBlock}

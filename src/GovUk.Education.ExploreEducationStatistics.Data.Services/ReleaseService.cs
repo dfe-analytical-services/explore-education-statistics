@@ -1,13 +1,17 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -25,58 +29,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly IReleaseService.IBlobInfoGetter _blobInfoGetter;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService)
+            IMetaGuidanceSubjectService metaGuidanceSubjectService,
+            IReleaseService.IBlobInfoGetter blobInfoGetter)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _blobInfoGetter = blobInfoGetter;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseId)
+        public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
-                    var subjectsToInclude = _contentDbContext.ReleaseFiles
-                        .Include(rf => rf.File)
-                        .Where(rf => rf.ReleaseId == releaseId
-                                     && rf.File.Type == FileType.Data
-                                     // Exclude files that are replacements in progress
-                                     && !rf.File.ReplacingId.HasValue
-                                     && rf.File.SubjectId.HasValue)
-                        .Join(
-                            _contentDbContext.DataImports,
-                            releaseFile => releaseFile.File,
-                            import => import.File,
-                            (releaseFile, import) => new
-                            {
-                                ReleaseFile = releaseFile,
-                                DataImport = import
-                            }
-                        )
-                        .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
-                        .Select(join => join.ReleaseFile.File.SubjectId.Value)
-                        .ToList();
+                    var subjectsToInclude = GetPublishedSubjectIds(releaseId);
 
-                    var subjects = await GetSubjects(releaseId, subjectsToInclude);
-                    var highlights = await GetHighlights(releaseId, subjectsToInclude);
-
-                    return new ReleaseViewModel
-                    {
-                        Id = releaseId,
-                        Highlights = highlights,
-                        Subjects = subjects,
-                    };
+                    return await GetSubjects(releaseId, subjectsToInclude);
                 });
         }
 
@@ -88,25 +68,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var releaseSubjects = await _statisticsDbContext.ReleaseSubject
-                .Where(
-                    rs => rs.ReleaseId == releaseId
-                          && subjectsToInclude.Contains(rs.SubjectId)
-                )
+                .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
+                .ToListAsync();
+
+            var releaseFiles = await QueryReleaseDataFiles(releaseId)
+                .Where(rf => rf.File.SubjectId.HasValue
+                             && subjectsToInclude.Contains(rf.File.SubjectId.Value))
                 .ToListAsync();
 
             return (await releaseSubjects
                 .SelectAsync(
                     async rs =>
-                        new SubjectViewModel(
+                    {
+                        var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
+                        var blobInfo = await _blobInfoGetter.Get(releaseFile);
+
+                        return new SubjectViewModel(
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
-                            timePeriods:
-                            await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
-                            geographicLevels:
-                            await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
-                        )
-                    ))
+                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
+                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                            file: blobInfo is null
+                                ? releaseFile.ToPublicFileInfoNotFound()
+                                : releaseFile.ToFileInfo(blobInfo)
+                        );
+                    }
+                ))
                 .OrderBy(svm => svm.Name)
                 .ToList();
         }
@@ -120,11 +108,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     rf.ReleaseId == releaseId
                     && rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data);
-            return rf.Name;
+
+            return rf.Name ?? string.Empty;
         }
 
-        private async Task<List<TableHighlightViewModel>> GetHighlights(Guid releaseId, List<Guid> subjectsToInclude)
+        public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
+            var subjectsToInclude = GetPublishedSubjectIds(releaseId);
+
             var releaseContentBlocks = await _contentDbContext.ReleaseContentBlocks
                 .Include(rcb => rcb.ContentBlock)
                 .Where(rcb => rcb.ReleaseId == releaseId)
@@ -137,14 +128,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return releaseContentBlocks
                 .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
                 .Select(
-                    dataBlock => new TableHighlightViewModel(
+                    dataBlock => new FeaturedTableViewModel(
                         id: dataBlock.Id,
-                        name: dataBlock.HighlightName,
-                        description: dataBlock.HighlightDescription
+                        name: dataBlock.HighlightName ?? string.Empty,
+                        description: dataBlock.HighlightDescription ?? string.Empty
                     )
                 )
-                .OrderBy(dataBlock => dataBlock.Name)
+                .OrderBy(featuredTable => featuredTable.Name)
                 .ToList();
+        }
+
+        private List<Guid> GetPublishedSubjectIds(Guid releaseId)
+        {
+            return QueryReleaseDataFiles(releaseId)
+                .Join(
+                    _contentDbContext.DataImports,
+                    releaseFile => releaseFile.File,
+                    import => import.File,
+                    (releaseFile, import) => new
+                    {
+                        ReleaseFile = releaseFile,
+                        DataImport = import
+                    }
+                )
+                .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
+                .Select(join => join.ReleaseFile.File.SubjectId!.Value)
+                .ToList();
+        }
+
+        private IQueryable<ReleaseFile> QueryReleaseDataFiles(Guid releaseId)
+        {
+            return _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.File.Type == FileType.Data
+                          // Exclude files that are replacements in progress
+                          && !rf.File.ReplacingId.HasValue
+                          && rf.File.SubjectId.HasValue
+                );
+        }
+
+        // TODO: EES-2343 Remove when file sizes are stored in database
+        public class DefaultBlobInfoGetter : IReleaseService.IBlobInfoGetter
+        {
+            private readonly IBlobStorageService _blobStorageService;
+
+            public DefaultBlobInfoGetter(IBlobStorageService blobStorageService)
+            {
+                _blobStorageService = blobStorageService;
+            }
+
+            public async Task<BlobInfo?> Get(ReleaseFile releaseFile)
+            {
+                return await _blobStorageService.FindBlob(
+                    containerName: BlobContainers.PublicReleaseFiles,
+                    path: releaseFile.File.PublicPath(releaseFile.ReleaseId)
+                );
+            }
         }
     }
 }

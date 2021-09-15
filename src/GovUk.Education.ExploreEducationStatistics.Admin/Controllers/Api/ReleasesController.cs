@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId}/releases/template")]
-        public async Task<ActionResult<TitleAndIdViewModel?>> GetTemplateRelease(
+        public async Task<ActionResult<TitleAndIdViewModel>> GetTemplateRelease(
             [Required] Guid publicationId)
         {
             return await _releaseService
@@ -215,6 +215,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("release/{releaseId}/delete-plan")]
+        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId)
+        {
+            return await _releaseService
+                .GetDeleteReleasePlan(releaseId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("release/{releaseId}/data/{fileId}/delete-plan")]
         public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
@@ -232,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId}/data/{fileId}/import/cancel")]
-        public async Task<IActionResult> CancelFileImport(Guid releaseId, Guid fileId)
+        public async Task<ActionResult> CancelFileImport(Guid releaseId, Guid fileId)
         {
             return await _dataImportService
                 .CancelImport(releaseId, fileId)

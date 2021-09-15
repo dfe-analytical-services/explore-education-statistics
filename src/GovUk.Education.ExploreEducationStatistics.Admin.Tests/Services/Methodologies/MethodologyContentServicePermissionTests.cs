@@ -23,28 +23,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContent()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
-                MethodologyParent = new MethodologyParent()
+                Methodology = new Methodology()
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanViewSpecificMethodology)
                     .AssertForbidden(
                         userService =>
                         {
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
-                            return methodologyContentService.GetContent(methodology.Id);
+                            return methodologyContentService.GetContent(methodologyVersion.Id);
                         });
             }
         }
@@ -52,25 +52,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContentBlocks()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanViewSpecificMethodology)
                     .AssertForbidden(
                         userService =>
                         {
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
-                            return methodologyContentService.GetContentBlocks<ContentBlock>(methodology.Id);
+                            return methodologyContentService.GetContentBlocks<ContentBlock>(methodologyVersion.Id);
                         });
             }
         }
@@ -78,25 +78,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContentSections()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanViewSpecificMethodology)
                     .AssertForbidden(
                         userService =>
                         {
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
-                            return methodologyContentService.GetContentSections(methodology.Id,
+                            return methodologyContentService.GetContentSections(methodologyVersion.Id,
                                 MethodologyContentService.ContentListType.Content);
                         });
             }
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetContentSection()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
@@ -115,22 +115,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanViewSpecificMethodology)
                     .AssertForbidden(
                         userService =>
                         {
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
-                            return methodologyContentService.GetContentSection(methodology.Id,
-                                methodology.Content.First().Id);
+                            return methodologyContentService.GetContentSection(methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id);
                         });
             }
         }
@@ -138,25 +138,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task ReorderContentSections()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
                         {
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
-                            return methodologyContentService.ReorderContentSections(methodology.Id,
+                            return methodologyContentService.ReorderContentSections(methodologyVersion.Id,
                                 new Dictionary<Guid, int>());
                         });
             }
@@ -165,18 +165,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task AddContentSection()
         {
-            var methodology = new Methodology();
+            var methodologyVersion = new MethodologyVersion();
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.AddContentSection(
-                                methodology.Id,
+                                methodologyVersion.Id,
                                 new ContentSectionAddRequest(),
                                 MethodologyContentService.ContentListType.Content);
                         });
@@ -194,25 +194,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateContentSectionHeading()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection()
+                    new()
                 }
 
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -220,8 +220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.UpdateContentSectionHeading(
-                                methodology.Id,
-                                methodology.Content.First().Id,
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id,
                                 "New heading");
                         });
             }
@@ -230,25 +230,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task RemoveContentSection()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection()
+                    new()
                 }
 
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -256,8 +256,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.RemoveContentSection(
-                                methodology.Id,
-                                methodology.Content.First().Id);
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id);
                         });
             }
         }
@@ -265,25 +265,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task ReorderContentBlocks()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection()
+                    new()
                 }
 
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -291,8 +291,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.ReorderContentBlocks(
-                                methodology.Id,
-                                methodology.Content.First().Id,
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id,
                                 new Dictionary<Guid, int>()
                             );
                         });
@@ -302,11 +302,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task AddContentBlock()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Id = Guid.NewGuid()
                     }
@@ -316,14 +316,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -331,8 +331,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.AddContentBlock(
-                                methodology.Id,
-                                methodology.Content.First().Id,
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id,
                                 new ContentBlockAddRequest()
                             );
                         });
@@ -342,11 +342,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task RemoveContentBlock()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Content = new List<ContentBlock>
                         {
@@ -359,14 +359,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -374,9 +374,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.RemoveContentBlock(
-                                methodology.Id,
-                                methodology.Content.First().Id,
-                                methodology.Content.First().Content.First().Id
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id,
+                                methodologyVersion.Content.First().Content.First().Id
                             );
                         });
             }
@@ -385,11 +385,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateTextBasedContentBlock()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Content = new List<ContentSection>
                 {
-                    new ContentSection
+                    new()
                     {
                         Content = new List<ContentBlock>
                         {
@@ -402,14 +402,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<Methodology>(m => m.Id == methodology.Id,
+                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
                         CanUpdateSpecificMethodology)
                     .AssertForbidden(
                         userService =>
@@ -417,9 +417,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.UpdateTextBasedContentBlock(
-                                methodology.Id,
-                                methodology.Content.First().Id,
-                                methodology.Content.First().Content.First().Id,
+                                methodologyVersion.Id,
+                                methodologyVersion.Content.First().Id,
+                                methodologyVersion.Content.First().Content.First().Id,
                                 new ContentBlockUpdateRequest()
                             );
                         });

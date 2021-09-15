@@ -99,7 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MethodologyCannotDependOnPublishedRelease,
         MethodologyCannotDependOnRelease,
         CannotAdoptMethodologyAlreadyLinkedToPublication,
-        CannotDropOwnedMethodology,
 
         // Theme
         ThemeDoesNotExist,

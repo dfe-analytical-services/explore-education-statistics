@@ -12,19 +12,19 @@ import Yup from '@common/validation/yup';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import createErrorHelper from '@common/validation/createErrorHelper';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import Tag from '@common/components/Tag';
 import useFormSubmit from '@common/hooks/useFormSubmit';
-import { format } from 'date-fns';
 import { Formik } from 'formik';
 import React, { ReactNode, useMemo, useState } from 'react';
-import orderBy from 'lodash/orderBy';
 
 export interface ReleaseFormValues {
   releaseId: string;
 }
 
-export type ReleaseFormSubmitHandler = (values: { releaseId: string }) => void;
+export type ReleaseFormSubmitHandler = (values: {
+  release: ReleaseSummary;
+}) => void;
 
 const formId = 'releaseForm';
 
@@ -34,7 +34,7 @@ interface Props {
   legendHint?: string;
   initialValues?: { releaseId: string };
   onSubmit: ReleaseFormSubmitHandler;
-  options: Release[];
+  options: ReleaseSummary[];
 }
 
 const ReleaseForm = ({
@@ -54,7 +54,7 @@ const ReleaseForm = ({
 
   const radioOptions = useMemo<RadioOption[]>(
     () =>
-      orderBy(options, 'published', 'desc')
+      options
         .filter(option => {
           if (!searchTerm) {
             return option;
@@ -66,10 +66,7 @@ const ReleaseForm = ({
         })
         .map(option => {
           return {
-            label: `${option.title} (${format(
-              new Date(option.published),
-              'd MMMM yyyy',
-            )})`,
+            label: option.title,
             hint: option.latestRelease ? (
               <Tag strong>This is the latest data</Tag>
             ) : undefined,
@@ -80,10 +77,18 @@ const ReleaseForm = ({
     [options, searchTerm],
   );
 
-  const handleSubmit = useFormSubmit(async (values: ReleaseFormValues) => {
-    await onSubmit(values);
-    goToNextStep();
-  });
+  const handleSubmit = useFormSubmit(
+    async ({ releaseId }: ReleaseFormValues) => {
+      const release = options.find(r => r.id === releaseId);
+
+      if (!release) {
+        throw new Error('Selected release not found');
+      }
+
+      await onSubmit({ release });
+      goToNextStep();
+    },
+  );
 
   return (
     <Formik<ReleaseFormValues>

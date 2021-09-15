@@ -45,19 +45,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IReleaseDataFileRepository releaseDataFileRepository = null,
-            IMethodologyRepository methodologyRepository = null,
+            IMethodologyVersionRepository methodologyVersionRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
 
-            return new ReleaseChecklistService(
+            return new(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
-                methodologyRepository ?? new Mock<IMethodologyRepository>().Object,
+                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );

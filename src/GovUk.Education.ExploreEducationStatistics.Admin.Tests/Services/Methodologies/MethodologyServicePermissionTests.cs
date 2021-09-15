@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -19,6 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -32,11 +34,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private readonly Methodology _methodology = new()
         {
             Id = Guid.NewGuid(),
+            Versions = new List<MethodologyVersion>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid()
+                }
+            }
+        };
+
+        private readonly MethodologyVersion _methodologyVersion = new()
+        {
+            Id = Guid.NewGuid(),
             AlternativeTitle = "Title",
             Status = Draft
         };
 
-        private readonly Methodology _approvedMethodology = new()
+        private readonly MethodologyVersion _approvedMethodologyVersion = new()
         {
             Id = Guid.NewGuid(),
             Status = Approved
@@ -54,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
                                 _publication.Id, _publication).Object,
                             userService: userService.Object);
-                        return service.AdoptMethodology(_publication.Id, _methodology.Id);
+                        return service.AdoptMethodology(_publication.Id, _methodologyVersion.Id);
                     }
                 );
         }
@@ -79,16 +93,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task DropMethodology()
         {
+            var link = new PublicationMethodology
+            {
+                PublicationId = new Guid(),
+                MethodologyId = new Guid()
+            };
+
+            var persistenceHelper = new Mock<IPersistenceHelper<ContentDbContext>>(Strict);
+            SetupCall(persistenceHelper, link);
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
+                .SetupResourceCheckToFail(link, CanDropMethodologyLink)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                                _publication.Id, _publication).Object,
+                            contentPersistenceHelper: persistenceHelper.Object,
                             userService: userService.Object);
-                        return service.DropMethodology(_publication.Id, _methodology.Id);
+                        return service.DropMethodology(link.PublicationId, link.MethodologyId);
                     }
                 );
         }
@@ -114,15 +136,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetSummary()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanViewSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, CanViewSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                                _methodology.Id, _methodology).Object,
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
-                        return service.GetSummary(_methodology.Id);
+                        return service.GetSummary(_methodologyVersion.Id);
                     }
                 );
         }
@@ -131,16 +153,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetUnpublishedReleasesUsingMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanApproveSpecificMethodology)
-                .SetupResourceCheckToFail(_methodology, CanMarkSpecificMethodologyAsDraft)
+                .SetupResourceCheckToFail(_methodologyVersion, CanApproveSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, CanMarkSpecificMethodologyAsDraft)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                                _methodology.Id, _methodology).Object,
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
-                        return service.GetUnpublishedReleasesUsingMethodology(_methodology.Id);
+                        return service.GetUnpublishedReleasesUsingMethodology(_methodologyVersion.Id);
                     }
                 );
         }
@@ -149,15 +171,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UpdateMethodologyDetails()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanUpdateSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                                _methodology.Id, _methodology).Object,
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
-                        return service.UpdateMethodology(_methodology.Id, new MethodologyUpdateRequest
+                        return service.UpdateMethodology(_methodologyVersion.Id, new MethodologyUpdateRequest
                         {
                             Status = Draft,
                             Title = "Updated Title"
@@ -170,15 +192,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UpdateMethodologyStatus_Approve()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanApproveSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, CanApproveSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                                _methodology.Id, _methodology).Object,
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
-                        return service.UpdateMethodology(_methodology.Id, new MethodologyUpdateRequest
+                        return service.UpdateMethodology(_methodologyVersion.Id, new MethodologyUpdateRequest
                         {
                             Status = Approved
                         });
@@ -190,15 +212,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UpdateMethodologyStatus_MarkAsDraft()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_approvedMethodology, CanMarkSpecificMethodologyAsDraft)
+                .SetupResourceCheckToFail(_approvedMethodologyVersion, CanMarkSpecificMethodologyAsDraft)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                                _approvedMethodology.Id, _approvedMethodology).Object,
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _approvedMethodologyVersion.Id, _approvedMethodologyVersion).Object,
                             userService: userService.Object);
-                        return service.UpdateMethodology(_approvedMethodology.Id, new MethodologyUpdateRequest
+                        return service.UpdateMethodology(_approvedMethodologyVersion.Id, new MethodologyUpdateRequest
                         {
                             Status = Draft
                         });
@@ -210,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task DeleteMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanDeleteSpecificMethodology)
+                .SetupResourceCheckToFail(_methodology.Versions[0], CanDeleteSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
@@ -223,14 +245,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 );
         }
 
+        [Fact]
+        public async Task DeleteMethodologyVersion()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodologyVersion, CanDeleteSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+                                _methodologyVersion.Id, _methodologyVersion).Object,
+                            userService: userService.Object);
+                        return service.DeleteMethodologyVersion(_methodologyVersion.Id);
+                    }
+                );
+        }
+
         private MethodologyService SetupMethodologyService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IBlobCacheService? blobCacheService = null,
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
             IMethodologyRepository? methodologyRepository = null,
-            IMethodologyParentRepository? methodologyParentRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null)
@@ -242,8 +281,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 blobCacheService ?? Mock.Of<IBlobCacheService>(),
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(),
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(),
-                methodologyParentRepository ?? Mock.Of<IMethodologyParentRepository>(),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
                 publishingService ?? Mock.Of<IPublishingService>(),
                 userService ?? Mock.Of<IUserService>()
@@ -252,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology);
+            return MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
         }
     }
 }

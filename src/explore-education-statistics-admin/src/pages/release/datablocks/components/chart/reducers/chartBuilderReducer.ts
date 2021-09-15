@@ -26,6 +26,7 @@ export interface ChartBuilderState {
   options?: ChartOptions;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
+  titleType?: 'default' | 'alternative';
 }
 
 export type ChartBuilderActions =
@@ -56,6 +57,7 @@ export type ChartBuilderActions =
 const defaultOptions: ChartOptions = {
   height: 300,
   title: '',
+  titleType: 'default',
   alt: '',
 };
 
@@ -96,9 +98,13 @@ const updateAxis = (
   );
 };
 
-const getInitialState = (initialChart?: Chart): ChartBuilderState => {
+const getInitialState = (
+  initialChart?: Chart,
+  tableTitle?: string,
+): ChartBuilderState => {
   if (!initialChart) {
     return {
+      titleType: 'default',
       axes: {},
     };
   }
@@ -111,7 +117,10 @@ const getInitialState = (initialChart?: Chart): ChartBuilderState => {
 
   return {
     definition,
-    options,
+    options: {
+      ...options,
+      titleType: initialChart.title === tableTitle ? 'default' : 'alternative',
+    },
     legend: {
       ...defaultLegend,
       ...(legend ?? {}),
@@ -226,11 +235,18 @@ export const chartBuilderReducer: Reducer<
   return draft;
 };
 
-export function useChartBuilderReducer(initialChart?: Chart) {
+export function useChartBuilderReducer(
+  initialChart?: Chart,
+  tableTitle?: string,
+) {
   const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
-  >('Chart builder', chartBuilderReducer, getInitialState(initialChart));
+  >(
+    'Chart builder',
+    chartBuilderReducer,
+    getInitialState(initialChart, tableTitle),
+  );
 
   const updateDataSets = useCallback(
     (dataSets: DataSet[]) => {

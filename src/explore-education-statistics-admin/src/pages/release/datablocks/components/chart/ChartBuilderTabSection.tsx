@@ -115,6 +115,7 @@ const ChartBuilderTabSection = ({
       data={table.results}
       meta={meta}
       initialChart={dataBlock.charts[0]}
+      tableTitle={dataBlock.heading}
       onChartSave={handleChartSave}
       onChartDelete={handleChartDelete}
       onTableQueryUpdate={handleTableQueryUpdate}

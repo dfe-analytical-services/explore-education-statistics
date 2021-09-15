@@ -14,10 +14,3 @@
     }
   }
 }
-
-.createTablesButtonContainer {
-  @include govuk-media-query($from: tablet) {
-    display: flex;
-    justify-content: space-between;
-  }
-}

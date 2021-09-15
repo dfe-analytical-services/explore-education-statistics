@@ -67,7 +67,11 @@ const filterChartProps = (props: ChartBuilderChartProps): Chart => {
   const excludedProps: (
     | keyof ChartBuilderChartProps
     | keyof InfographicChartProps
-  )[] = ['data', 'meta', 'getInfographic', 'file'];
+  )[] = ['data', 'meta', 'getInfographic', 'file', 'titleType'];
+
+  if (props.titleType === 'default') {
+    excludedProps.push('title');
+  }
 
   if (props.type !== 'infographic') {
     excludedProps.push('fileId');
@@ -97,6 +101,7 @@ interface Props {
   meta: FullTableMeta;
   releaseId: string;
   initialChart?: Chart;
+  tableTitle: string;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
   onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
@@ -108,6 +113,7 @@ const ChartBuilder = ({
   meta,
   releaseId,
   initialChart,
+  tableTitle,
   onChartSave,
   onChartDelete,
   onTableQueryUpdate,
@@ -121,6 +127,7 @@ const ChartBuilder = ({
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialChart,
+    tableTitle,
   );
 
   const { axes, definition, options, legend } = chartBuilderState;

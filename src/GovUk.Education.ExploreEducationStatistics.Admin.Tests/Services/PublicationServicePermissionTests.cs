@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServicePermissionTests
     {
-        private readonly Topic _topic = new Topic
+        private readonly Topic _topic = new()
         {
             Id = Guid.NewGuid(),
             Title = "Test topic"
         };
 
-        private readonly Publication _publication = new Publication
+        private readonly Publication _publication = new()
         {
             Id = Guid.NewGuid(),
             Title = "Test publication",
@@ -45,15 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
 
-            var list = new List<MyPublicationViewModel>()
+            var list = new List<MyPublicationViewModel>
             {
-                new MyPublicationViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
             };
 
-            publicationRepository.Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).ReturnsAsync(list);
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topicId)).ReturnsAsync(list);
 
             var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Left;
             Assert.IsAssignableFrom<ForbidResult>(result);
@@ -80,15 +81,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).ReturnsAsync(true);
 
-            var list = new List<MyPublicationViewModel>()
+            var list = new List<MyPublicationViewModel>
             {
-                new MyPublicationViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
             };
 
-            publicationRepository.Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).ReturnsAsync(list);
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topicId)).ReturnsAsync(list);
 
             var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Right;
             Assert.Equal(list, result);
@@ -98,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.VerifyNoOtherCalls();
 
-            publicationRepository.Verify(s => s.GetAllPublicationsForTopicAsync(topicId));
+            publicationRepository.Verify(s => s.GetAllPublicationsForTopic(topicId));
             publicationRepository.VerifyNoOtherCalls();
         }
 
@@ -120,9 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(userId);
 
-            var list = new List<MyPublicationViewModel>()
+            var list = new List<MyPublicationViewModel>
             {
-                new MyPublicationViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
@@ -243,15 +244,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
-        private static PublicationService BuildPublicationService((Mock<ContentDbContext>,
-            Mock<IMapper>,
-            Mock<IUserService> userService,
-            Mock<IPublicationRepository> publicationRepository,
-            Mock<IPublishingService> publishingService,
-            Mock<IMethodologyRepository> methodologyRepository,
-            Mock<IPersistenceHelper<ContentDbContext>>) mocks)
+        private static PublicationService BuildPublicationService(
+            (Mock<ContentDbContext>, Mock<IMapper>,
+                Mock<IUserService> userService,
+                Mock<IPublicationRepository> publicationRepository,
+                Mock<IPublishingService> publishingService,
+                Mock<IMethodologyVersionRepository> methodologyVersionRepository,
+                Mock<IPersistenceHelper<ContentDbContext>>) mocks)
         {
-            var (context, mapper, userService, publicationRepository, publishingService, methodologyRepository, persistenceHelper) = mocks;
+            var (context, mapper, userService, publicationRepository, publishingService, methodologyVersionRepository, persistenceHelper) = mocks;
 
             return new PublicationService(
                 context.Object,
@@ -260,16 +261,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService.Object, 
                 publicationRepository.Object, 
                 publishingService.Object, 
-                methodologyRepository.Object);
+                methodologyVersionRepository.Object);
         }
 
-        private (
-            Mock<ContentDbContext> ContentDbContext,
+        private (Mock<ContentDbContext> ContentDbContext,
             Mock<IMapper> Mapper,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
             Mock<IPublishingService> PublishingService,
-            Mock<IMethodologyRepository> MethodologyRepository,
+            Mock<IMethodologyVersionRepository> MethodologyVersionRepository,
             Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
                 new Mock<IPublishingService>(),
-                new Mock<IMethodologyRepository>(),
+                new Mock<IMethodologyVersionRepository>(),
                 persistenceHelper);
         }
     }

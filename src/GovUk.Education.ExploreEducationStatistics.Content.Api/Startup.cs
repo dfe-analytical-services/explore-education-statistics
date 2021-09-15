@@ -116,22 +116,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+            services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IGlossaryService, GlossaryService>();
 
             services.AddAuthorization(options =>
             {
+                // does this use have permission to view a specific Publication?
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
+                    policy.Requirements.Add(new ViewPublicationRequirement()));
+
                 // does this use have permission to view a specific Release?
                 options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
             });
 
+            services.AddTransient<IAuthorizationHandler, ViewPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
 
             AddPersistenceHelper<ContentDbContext>(services);

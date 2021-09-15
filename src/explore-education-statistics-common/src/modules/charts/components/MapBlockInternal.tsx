@@ -30,6 +30,7 @@ import formatPretty, {
   defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
+import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
@@ -65,6 +66,7 @@ interface LegendEntry {
 
 interface MapDataSetCategory extends DataSetCategory {
   geoJson: GeoJsonFeature;
+  filter: LocationFilter;
 }
 
 function calculateScaledColour({
@@ -360,6 +362,85 @@ export const MapBlockInternal = ({
     return locations;
   }, [dataSetCategories]);
 
+  const locationType = useMemo(() => {
+    const locationLevelsMap: Dictionary<Dictionary<string>> = {
+      country: {
+        label: 'Country',
+        prefix: 'a',
+      },
+      englishDevolvedArea: {
+        label: 'English Devolved Area',
+        prefix: 'an',
+      },
+      institution: {
+        label: 'Institution',
+        prefix: 'an',
+      },
+      localAuthority: {
+        label: 'Local Authority',
+        prefix: 'a',
+      },
+      localAuthorityDistrict: {
+        label: 'Local Authority District',
+        prefix: 'a',
+      },
+      localEnterprisePartnership: {
+        label: 'Local Enterprise Partnership',
+        prefix: 'a',
+      },
+      mayoralCombinedAuthority: {
+        label: 'Mayoral Combined Authority',
+        prefix: 'a',
+      },
+      multiAcademyTrust: {
+        label: 'Multi Academy Trust',
+        prefix: 'a',
+      },
+      opportunityArea: {
+        label: 'Opportunity Area',
+        prefix: 'an',
+      },
+      parliamentaryConstituency: {
+        label: 'Parliamentary Constituency',
+        prefix: 'a',
+      },
+      provider: {
+        label: 'Provider',
+        prefix: 'a',
+      },
+      region: {
+        label: 'Region',
+        prefix: 'a',
+      },
+      rscRegion: {
+        label: 'RSC Region',
+        prefix: 'an',
+      },
+      school: {
+        label: 'School',
+        prefix: 'a',
+      },
+      sponsor: {
+        label: 'Sponsor',
+        prefix: 'a',
+      },
+      ward: {
+        label: 'Ward',
+        prefix: 'a',
+      },
+      planningArea: {
+        label: 'Planning Area',
+        prefix: 'a',
+      },
+    };
+
+    const levels = dataSetCategories.map(category => category.filter.level);
+    return !levels.every(level => level === levels[0]) ||
+      !locationLevelsMap[levels[0]]
+      ? { label: 'location', prefix: 'a' }
+      : locationLevelsMap[levels[0]];
+  }, [dataSetCategories]);
+
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
     (dataSetOptions[0]?.value as string) ?? '',
   );
@@ -575,7 +656,7 @@ export const MapBlockInternal = ({
             <FormSelect
               name="selectedLocation"
               id={`${id}-selectedLocation`}
-              label="2. Select a location"
+              label={`2. Select ${locationType.prefix} ${locationType.label}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
               order={FormSelect.unordered}

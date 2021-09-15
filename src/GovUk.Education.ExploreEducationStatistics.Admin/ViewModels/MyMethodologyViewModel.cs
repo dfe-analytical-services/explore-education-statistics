@@ -10,11 +10,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid Id { get; set; }
 
+        public Guid MethodologyId { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
-        
+
         public bool Amendment { get; set; }
-        
+
         public Guid PreviousVersionId { get; set; }
 
         public DateTime? Published { get; set; }

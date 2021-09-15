@@ -5,9 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
@@ -25,12 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
         /// <returns>An Either returning nothing if successful</returns>
         Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,
-            IList<Guid> fileIds,
+            IEnumerable<Guid> fileIds,
             Stream outputStream,
             CancellationToken? cancellationToken = null);
 
         Task<Either<ActionResult, FileStreamResult>> StreamAllFilesZip(Guid releaseId);
-
-        Task<List<FileInfo>> ListDownloadFiles(Release release);
     }
 }

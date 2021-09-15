@@ -13,8 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public DateTime? NextUpdate { get; set; }
 
         public List<MyReleaseViewModel> Releases { get; set; }
-        
-        public List<MyMethodologyViewModel> Methodologies { get; set; }
+
+        public List<MyPublicationMethodologyViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
         

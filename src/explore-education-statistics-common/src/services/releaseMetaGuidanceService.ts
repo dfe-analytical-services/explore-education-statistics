@@ -1,5 +1,8 @@
 import { contentApi } from '@common/services/api';
-import { ReleaseSummary } from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseSummary,
+} from '@common/services/publicationService';
 
 export interface SubjectMetaGuidance {
   id: string;
@@ -22,6 +25,7 @@ export interface SubjectMetaGuidance {
 }
 
 export interface ReleaseMetaGuidanceSummary extends ReleaseSummary {
+  publication: PublicationSummary;
   metaGuidance: string;
   subjects: SubjectMetaGuidance[];
 }

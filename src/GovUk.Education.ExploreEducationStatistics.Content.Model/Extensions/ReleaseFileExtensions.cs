@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return releaseFile.File.PublicPath(releaseFile.Release);
         }
 
+        // TODO: Remove BlobInfo as parameter after EES-2343
         public static FileInfo ToPublicFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             return new FileInfo
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             };
         }
 
+        // TODO: Remove BlobInfo as parameter after EES-2343
         public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             var info = releaseFile.ToPublicFileInfo(blobInfo);
@@ -46,6 +48,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         // TODO: Remove after completion of EES-2343
         public static FileInfo ToFileInfoNotFound(this ReleaseFile releaseFile)
         {
+            var fileInfo = releaseFile.ToPublicFileInfoNotFound();
+
+            fileInfo.UserName = releaseFile.File.CreatedBy?.Email;
+            fileInfo.Created = releaseFile.File.Created;
+
+            return fileInfo;
+        }
+
+        // TODO: Remove after completion of EES-2343
+        public static FileInfo ToPublicFileInfoNotFound(this ReleaseFile releaseFile)
+        {
             return new FileInfo
             {
                 Id = releaseFile.FileId,
@@ -54,8 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Summary = releaseFile.Summary,
                 Size = FileInfo.UnknownSize,
                 Type = releaseFile.File.Type,
-                UserName = releaseFile.File.CreatedBy?.Email,
-                Created = releaseFile.File.Created
             };
         }
     }

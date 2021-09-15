@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DateTime? Created { get; set; }
 
         public User? CreatedBy { get; set; }
+
         public Guid? CreatedById { get; set; }
 
         [Required] public DateTime On { get; set; }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<List<MyPublicationViewModel>> GetAllPublicationsForTopicAsync(Guid topicId)
+        public async Task<List<MyPublicationViewModel>> GetAllPublicationsForTopic(Guid topicId)
         {
             var results = await HydratePublicationForPublicationViewModel(_context.Publications)
                 .Where(publication => publication.TopicId == topicId)
                 .ToListAsync();
-                
+
             return results
                 .Select(publication => _mapper.Map<MyPublicationViewModel>(publication))
                 .ToList();
@@ -92,7 +93,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var userReleaseIdsForPublication = await _context
                 .UserReleaseRoles
                 .Include(r => r.Release)
-                .Where(r => r.UserId == userId && r.Release.PublicationId == publicationId && r.Role != ReleaseRole.PrereleaseViewer)
+                .Where(r => r.UserId == userId
+                            && r.Release.PublicationId == publicationId
+                            && r.Role != ReleaseRole.PrereleaseViewer)
                 .Select(r => r.ReleaseId)
                 .Distinct()
                 .ToListAsync();
@@ -107,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
         }
-        
+
         public async Task<Release?> GetLatestReleaseForPublication(Guid publicationId)
         {
             var publication = await _context
@@ -117,7 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return publication.LatestRelease();
         }
-
 
         private async Task<MyPublicationViewModel> GetPublicationWithFilteredReleases(Guid publicationId,
             IEnumerable<Guid> releaseIds)

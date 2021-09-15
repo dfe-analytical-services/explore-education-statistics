@@ -15,7 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extens
             Publication publication,
             bool hasRole)
         {
-            return service.Setup(s => s.IsUserPublicationOwner(userId, publication.Id))
+            return service.SetupPublicationOwnerRoleExpectations(userId, publication.Id, hasRole);
+        }
+        
+        public static IReturnsResult<IUserPublicationRoleRepository> SetupPublicationOwnerRoleExpectations(
+            this Mock<IUserPublicationRoleRepository> service,
+            Guid userId,
+            Guid publicationId,
+            bool hasRole)
+        {
+            return service.Setup(s => s.IsUserPublicationOwner(userId, publicationId))
                 .ReturnsAsync(hasRole);
         }
     }

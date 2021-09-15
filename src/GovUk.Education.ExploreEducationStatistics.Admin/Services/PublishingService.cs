@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> PublishMethodologyFiles(Guid methodologyId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+                .CheckEntityExists<MethodologyVersion>(methodologyId)
                 .OnSuccessVoid(async release =>
                 {
                     await _storageQueueService.AddMessageAsync(PublishMethodologyFilesQueue,

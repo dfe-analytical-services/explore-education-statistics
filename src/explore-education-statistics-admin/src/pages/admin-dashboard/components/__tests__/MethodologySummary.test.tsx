@@ -3,7 +3,7 @@ import _methodologyService, {
   BasicMethodology,
   MyMethodology,
 } from '@admin/services/methodologyService';
-import {
+import _publicationService, {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
@@ -13,12 +13,17 @@ import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import createMemoryHistoryWithMockedPush from '@admin-test/createMemoryHistoryWithMockedPush';
+import { createMemoryHistory } from 'history';
+import produce from 'immer';
 
 jest.mock('@admin/services/methodologyService');
+jest.mock('@admin/services/publicationService');
 
 const methodologyService = _methodologyService as jest.Mocked<
   typeof _methodologyService
+>;
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
 const testContact: PublicationContactDetails = {
@@ -31,16 +36,17 @@ const testContact: PublicationContactDetails = {
 
 const testMethodology: MyMethodology = {
   amendment: false,
-  id: '1234',
+  id: 'methodology-v1',
   latestInternalReleaseNote: 'this is the release note',
-  previousVersionId: 'lfkjdlfj',
-  published: '2021-06-08T09:04:17.9805585',
-  slug: 'meth-1',
+  methodologyId: 'methodology-1',
+  previousVersionId: 'methodology-previous-version-1',
+  published: '2021-06-08T09:04:17',
+  slug: 'methodology-slug-1',
   status: 'Approved',
   title: 'I am a methodology',
   owningPublication: {
-    id: 'p1',
-    title: 'Publication title',
+    id: 'owning-publication-1',
+    title: 'Owning publication title',
   },
   permissions: {
     canApproveMethodology: false,
@@ -50,37 +56,45 @@ const testMethodology: MyMethodology = {
     canMarkMethodologyAsDraft: false,
   },
 };
-const testDraftMethodology: MyMethodology = {
-  ...testMethodology,
-  status: 'Draft',
-};
-const testAmendmentMethodology: MyMethodology = {
-  ...testMethodology,
-  amendment: true,
-};
-const testMethodologyCanAmend: MyMethodology = {
-  ...testMethodology,
-  permissions: {
-    ...testMethodology.permissions,
-    canMakeAmendmentOfMethodology: true,
-  },
-};
-const testMethodologyCanRemove: MyMethodology = {
-  ...testMethodology,
+const testMethodology2: MyMethodology = {
   amendment: false,
+  id: 'methodology-v2',
+  latestInternalReleaseNote: 'this is another release note',
+  methodologyId: 'methodology-2',
+  previousVersionId: 'methodology-previous-version-2',
+  published: '2021-06-10T09:04:17',
+  slug: 'meth-2',
+  status: 'Approved',
+  title: 'I am a methodology 2',
+  owningPublication: {
+    id: 'owning-publication-2',
+    title: 'Owning publication title 2',
+  },
   permissions: {
-    ...testMethodology.permissions,
-    canDeleteMethodology: true,
+    canApproveMethodology: false,
+    canUpdateMethodology: false,
+    canDeleteMethodology: false,
+    canMakeAmendmentOfMethodology: false,
+    canMarkMethodologyAsDraft: false,
   },
 };
-const testMethodologyCanRemoveAmendment: MyMethodology = {
-  ...testMethodology,
-  amendment: true,
-  permissions: {
-    ...testMethodology.permissions,
-    canDeleteMethodology: true,
-  },
-};
+const testDraftMethodology = produce(testMethodology, draft => {
+  draft.status = 'Draft';
+});
+const testAmendmentMethodology = produce(testMethodology, draft => {
+  draft.amendment = true;
+});
+const testMethodologyCanAmend = produce(testMethodology, draft => {
+  draft.permissions.canMakeAmendmentOfMethodology = true;
+});
+const testMethodologyCanRemove = produce(testMethodology, draft => {
+  draft.amendment = false;
+  draft.permissions.canDeleteMethodology = true;
+});
+const testMethodologyCanRemoveAmendment = produce(testMethodology, draft => {
+  draft.amendment = true;
+  draft.permissions.canDeleteMethodology = true;
+});
 
 const externalMethodology: ExternalMethodology = {
   title: 'Ext methodolology title',
@@ -88,50 +102,114 @@ const externalMethodology: ExternalMethodology = {
 };
 
 const testPublicationNoMethodology: MyPublication = {
-  id: 'publication-1',
-  title: 'Publication 1',
+  id: 'publication-3',
+  title: 'Publication 3',
   contact: testContact,
   releases: [],
   methodologies: [],
   permissions: {
+    canAdoptMethodologies: true,
     canCreateReleases: true,
     canUpdatePublication: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
   },
 };
-
-const testPublicationWithMethodology = {
-  ...testPublicationNoMethodology,
-  methodologies: [testMethodology],
-};
-
-const testPublicationWithDraftMethodology = {
-  ...testPublicationWithMethodology,
-  methodologies: [testDraftMethodology],
-};
-
-const testPublicationWithAmendmentMethodology = {
-  ...testPublicationWithMethodology,
-  methodologies: [testAmendmentMethodology],
-};
-
-const testPublicationWithExternalMethodology = {
-  ...testPublicationNoMethodology,
-  externalMethodology,
-};
-const testPublicationWithMethodologyCanAmend = {
-  ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanAmend],
-};
-const testPublicationWithMethodologyCanCancelAmend = {
-  ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanRemoveAmendment],
-};
-const testPublicationWithMethodologyCanRemove = {
-  ...testPublicationWithMethodology,
-  methodologies: [testMethodologyCanRemove],
-};
+const testPublicationWithMethodology = produce(
+  testPublicationNoMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testMethodology,
+      },
+    ];
+  },
+);
+const testPublicationWithDraftMethodology = produce(
+  testPublicationNoMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testDraftMethodology,
+      },
+    ];
+  },
+);
+const testPublicationWithAmendmentMethodology = produce(
+  testPublicationNoMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testAmendmentMethodology,
+      },
+    ];
+  },
+);
+const testPublicationWithAdoptedMethodologies = produce(
+  testPublicationNoMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: false,
+        permissions: { canDropMethodology: true },
+        methodology: testMethodology,
+      },
+      {
+        owner: false,
+        permissions: { canDropMethodology: false },
+        methodology: testMethodology2,
+      },
+    ];
+  },
+);
+const testPublicationWithExternalMethodology = produce(
+  testPublicationNoMethodology,
+  draft => {
+    draft.externalMethodology = externalMethodology;
+  },
+);
+const testPublicationWithMethodologyCanAmend = produce(
+  testPublicationWithMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testMethodologyCanAmend,
+      },
+    ];
+  },
+);
+const testPublicationWithMethodologyCanCancelAmend = produce(
+  testPublicationWithMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testMethodologyCanRemoveAmendment,
+      },
+    ];
+  },
+);
+const testPublicationWithMethodologyCanRemove = produce(
+  testPublicationWithMethodology,
+  draft => {
+    draft.methodologies = [
+      {
+        owner: true,
+        permissions: { canDropMethodology: false },
+        methodology: testMethodologyCanRemove,
+      },
+    ];
+  },
+);
 
 const testTopicId = 'topic-id';
 
@@ -140,7 +218,7 @@ describe('MethodologySummary', () => {
     test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
       methodologyService.createMethodology.mockResolvedValue(testMethodology);
 
-      const history = createMemoryHistoryWithMockedPush();
+      const history = createMemoryHistory();
 
       render(
         <Router history={history}>
@@ -160,7 +238,7 @@ describe('MethodologySummary', () => {
         expect(methodologyService.createMethodology).toHaveBeenCalledWith(
           testPublicationNoMethodology.id,
         );
-        expect(history.push).toBeCalledWith(
+        expect(history.location.pathname).toBe(
           `/methodology/${testMethodology.id}/summary`,
         );
       });
@@ -188,7 +266,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {
+        screen.getByRole('link', {
           name: 'Link to an externally hosted methodology',
         }),
       ).toBeInTheDocument();
@@ -196,7 +274,7 @@ describe('MethodologySummary', () => {
   });
 
   describe('renders correctly when no Methodology is supplied', () => {
-    test('the create and link methodology buttons are shown if the user has permission to use them', () => {
+    test('the correct buttons are shown if the user has permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -216,7 +294,13 @@ describe('MethodologySummary', () => {
       ).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', {
+        screen.getByRole('link', {
+          name: 'Adopt a methodology',
+        }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('link', {
           name: 'Link to an externally hosted methodology',
         }),
       ).toBeInTheDocument();
@@ -226,7 +310,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('the create and link methodology buttons are not shown if the user does not have permission to use them', () => {
+    test('the methodology buttons are not shown if the user does not have permission to use them', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -236,6 +320,7 @@ describe('MethodologySummary', () => {
                 ...testPublicationNoMethodology.permissions,
                 canCreateMethodologies: false,
                 canManageExternalMethodology: false,
+                canAdoptMethodologies: false,
               },
             }}
             topicId={testTopicId}
@@ -253,42 +338,18 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', {
+        screen.queryByRole('link', {
           name: 'Link to an externally hosted methodology',
         }),
       ).not.toBeInTheDocument();
 
-      expect(screen.getByText('No methodologies added.')).toBeInTheDocument();
-    });
-
-    test('clicking the link external methodology button shows the form', async () => {
-      render(
-        <MemoryRouter>
-          <MethodologySummary
-            publication={testPublicationNoMethodology}
-            topicId={testTopicId}
-            onChangePublication={noop}
-          />
-        </MemoryRouter>,
-      );
-
-      userEvent.click(
-        screen.getByRole('button', {
-          name: 'Link to an externally hosted methodology',
+      expect(
+        screen.queryByRole('link', {
+          name: 'Adopt a methodology',
         }),
-      );
+      ).not.toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Link to an externally hosted methodology', {
-            selector: 'legend',
-          }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.queryByText('Create methodology', { selector: 'a' }),
-        ).not.toBeInTheDocument();
-      });
+      expect(screen.getByText('No methodologies added.')).toBeInTheDocument();
     });
   });
 
@@ -305,10 +366,12 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
-      expect(screen.getByText(testMethodology.title)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${testMethodology.title} (Owned)`),
+      ).toBeInTheDocument();
 
       expect(screen.getByText('8 June 2021')).toBeInTheDocument();
 
@@ -363,10 +426,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canApproveMethodology: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canApproveMethodology: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -378,7 +447,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -398,10 +467,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canMarkMethodologyAsDraft: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canMarkMethodologyAsDraft: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -413,7 +488,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -433,10 +508,16 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
+                  methodology: {
+                    ...testMethodology,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canUpdateMethodology: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canUpdateMethodology: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -448,7 +529,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -474,10 +555,12 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
-      expect(screen.getByText(testMethodology.title)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${testMethodology.title} (Owned)`),
+      ).toBeInTheDocument();
 
       expect(screen.getByText('8 June 2021')).toBeInTheDocument();
 
@@ -516,11 +599,17 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canApproveMethodology: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canApproveMethodology: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -532,7 +621,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -552,11 +641,17 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canMarkMethodologyAsDraft: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canMarkMethodologyAsDraft: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -568,7 +663,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -588,11 +683,17 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  ...testMethodology,
-                  amendment: true,
+                  methodology: {
+                    ...testMethodology,
+                    amendment: true,
+                    permissions: {
+                      ...testMethodology.permissions,
+                      canUpdateMethodology: true,
+                    },
+                  },
+                  owner: true,
                   permissions: {
-                    ...testMethodology.permissions,
-                    canUpdateMethodology: true,
+                    canDropMethodology: false,
                   },
                 },
               ],
@@ -604,7 +705,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -617,7 +718,34 @@ describe('MethodologySummary', () => {
     });
   });
 
-  describe('Has an external methodology', () => {
+  describe('External methodologies', () => {
+    test('clicking the link to external methodology button takes the user to the page', async () => {
+      methodologyService.createMethodology.mockResolvedValue(testMethodology);
+
+      const history = createMemoryHistory();
+
+      render(
+        <Router history={history}>
+          <MethodologySummary
+            publication={testPublicationNoMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </Router>,
+      );
+
+      userEvent.click(
+        screen.getByRole('link', {
+          name: 'Link to an externally hosted methodology',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(history.location.pathname).toBe(
+          `/publication/${testPublicationNoMethodology.id}/external-methodology`,
+        );
+      });
+    });
     test(
       'renders the external methodology link, and renders the Edit and Remove buttons if the user has ' +
         'permission',
@@ -633,19 +761,23 @@ describe('MethodologySummary', () => {
         );
 
         expect(
+          screen.getByText('Ext methodolology title (External)'),
+        ).toBeInTheDocument();
+
+        userEvent.click(
+          screen.getByTestId(
+            'Expand Details Section Ext methodolology title (External)',
+          ),
+        );
+
+        expect(
           screen.getByRole('link', {
-            name: 'Ext methodolology title (external methodology)',
+            name: 'Edit external methodology',
           }),
         ).toBeInTheDocument();
 
         expect(
-          screen.getByRole('button', {
-            name: 'Edit externally hosted methodology',
-          }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Remove' }),
+          screen.getByRole('button', { name: 'Remove external methodology' }),
         ).toBeInTheDocument();
       },
     );
@@ -671,17 +803,23 @@ describe('MethodologySummary', () => {
         );
 
         expect(
-          screen.getByText('Ext methodolology title (external methodology)'),
+          screen.getByText('Ext methodolology title (External)'),
         ).toBeInTheDocument();
 
+        userEvent.click(
+          screen.getByTestId(
+            'Expand Details Section Ext methodolology title (External)',
+          ),
+        );
+
         expect(
-          screen.queryByRole('button', {
-            name: 'Edit externally hosted methodology',
+          screen.queryByRole('link', {
+            name: 'Edit external methodology',
           }),
         ).not.toBeInTheDocument();
 
         expect(
-          screen.queryByRole('button', { name: 'Remove' }),
+          screen.queryByRole('button', { name: 'Remove external methodology' }),
         ).not.toBeInTheDocument();
       },
     );
@@ -700,7 +838,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       await waitFor(() => {
@@ -726,7 +864,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Remove' }));
@@ -760,7 +898,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Remove' }));
@@ -775,7 +913,8 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
         );
       });
     });
@@ -794,7 +933,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -830,7 +969,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(
@@ -848,18 +987,20 @@ describe('MethodologySummary', () => {
     });
 
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
-      const history = createMemoryHistoryWithMockedPush();
+      const history = createMemoryHistory();
+
       const mockMethodology: BasicMethodology = {
         amendment: true,
-        id: '12345',
+        id: 'methodology-v1',
         latestInternalReleaseNote: 'this is the release note',
-        previousVersionId: 'lfkjdlfj',
+        methodologyId: 'methodology-1',
+        previousVersionId: 'methodology-previous-version-1',
         owningPublication: {
-          id: 'p1',
-          title: 'Publication title',
+          id: 'owning-publication-1',
+          title: 'Owning publication title',
         },
-        published: '2021-06-08T09:04:17.9805585',
-        slug: 'meth-1',
+        published: '2021-06-08T09:04:17',
+        slug: 'methodology-slug-1',
         status: 'Approved',
         title: 'I am a methodology amendment',
       };
@@ -877,7 +1018,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(
@@ -895,9 +1036,10 @@ describe('MethodologySummary', () => {
         expect(
           methodologyService.createMethodologyAmendment,
         ).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
         );
-        expect(history.push).toBeCalledWith(
+        expect(history.location.pathname).toBe(
           `/methodology/${mockMethodology.id}/summary`,
         );
       });
@@ -917,7 +1059,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       expect(
@@ -941,7 +1083,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Cancel amendment' }));
@@ -976,7 +1118,7 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(
-        screen.getByTestId('Expand Details Section I am a methodology'),
+        screen.getByTestId('Expand Details Section I am a methodology (Owned)'),
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Cancel amendment' }));
@@ -990,7 +1132,144 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
+            .id,
+        );
+      });
+    });
+  });
+
+  describe('Adopted methodologies', () => {
+    test('renders adopted methodologies correctly', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithAdoptedMethodologies}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.getByText('I am a methodology (Adopted)'),
+      ).toBeInTheDocument();
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology (Adopted)',
+        ),
+      );
+      expect(screen.getByText('8 June 2021')).toBeInTheDocument();
+      expect(screen.getByText('this is the release note')).toBeInTheDocument();
+
+      expect(
+        screen.getByText('I am a methodology 2 (Adopted)'),
+      ).toBeInTheDocument();
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology (Adopted)',
+        ),
+      );
+      expect(screen.getByText('10 June 2021')).toBeInTheDocument();
+      expect(
+        screen.getByText('this is another release note'),
+      ).toBeInTheDocument();
+    });
+
+    test('the remove methodology button is only displayed if user has permission', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithAdoptedMethodologies}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology 2 (Adopted)',
+        ),
+      );
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology (Adopted)',
+        ),
+      );
+
+      expect(
+        screen.getAllByRole('button', { name: 'Remove methodology' }).length,
+      ).toBe(1);
+    });
+
+    test('shows the confirm modal when clicking the remove button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithAdoptedMethodologies}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology (Adopted)',
+        ),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText(
+          'Are you sure you want to remove this adopted methodology?',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+    });
+
+    test('calls the service to remove the adopted Methodology when the confirm button is clicked', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithAdoptedMethodologies}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section I am a methodology (Adopted)',
+        ),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(publicationService.dropMethodology).toHaveBeenCalledWith(
+          testPublicationWithAdoptedMethodologies.id,
+          testPublicationWithAdoptedMethodologies.methodologies[0].methodology
+            .methodologyId,
         );
       });
     });

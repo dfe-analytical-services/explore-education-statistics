@@ -1,8 +1,9 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public class PreReleaseAccessListViewModel : ReleaseSummaryViewModel
+    public record PreReleaseAccessListViewModel : ReleaseSummaryViewModel
     {
         public string PreReleaseAccessList { get; }
 

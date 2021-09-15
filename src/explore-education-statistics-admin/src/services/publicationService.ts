@@ -34,15 +34,24 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  methodologies: MyMethodology[];
+  methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact?: PublicationContactDetails;
   permissions: {
+    canAdoptMethodologies: boolean;
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
     canCreateMethodologies: boolean;
     canManageExternalMethodology: boolean;
+  };
+}
+
+export interface MyPublicationMethodology {
+  owner: boolean;
+  methodology: MyMethodology;
+  permissions: {
+    canDropMethodology: boolean;
   };
 }
 
@@ -107,6 +116,32 @@ const publicationService = {
     publicationId: string,
   ): Promise<IdTitlePair | undefined> => {
     return client.get(`/publications/${publicationId}/releases/template`);
+  },
+
+  getAdoptableMethodologies(
+    publicationId: string,
+  ): Promise<BasicMethodology[]> {
+    return client.get<BasicMethodology[]>(
+      `/publication/${publicationId}/adoptable-methodologies`,
+    );
+  },
+
+  adoptMethodology(
+    publicationId: string,
+    methodologyId: string,
+  ): Promise<BasicMethodology> {
+    return client.put(
+      `/publication/${publicationId}/methodology/${methodologyId}`,
+    );
+  },
+
+  dropMethodology(
+    publicationId: string,
+    methodologyId: string,
+  ): Promise<BasicMethodology> {
+    return client.delete(
+      `/publication/${publicationId}/methodology/${methodologyId}`,
+    );
   },
 
   updatePublicationMethodology({

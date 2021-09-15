@@ -270,6 +270,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("GlossaryEntries");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.Property<Guid>("Id")
@@ -303,6 +334,85 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("OwningPublicationTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Methodologies");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MethodologyVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("MethodologyVersionId");
+
+                    b.ToTable("MethodologyFiles");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyNote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DisplayDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MethodologyVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("MethodologyVersionId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("MethodologyNotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("AlternativeTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -323,7 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("MethodologyParentId")
+                    b.Property<Guid>("MethodologyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("PreviousVersionId")
@@ -353,53 +463,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("MethodologyParentId");
+                    b.HasIndex("MethodologyId");
 
                     b.HasIndex("PreviousVersionId");
 
                     b.HasIndex("ScheduledWithReleaseId");
 
-                    b.ToTable("Methodologies");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MethodologyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FileId");
-
-                    b.HasIndex("MethodologyId");
-
-                    b.ToTable("MethodologyFiles");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyParent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OwningPublicationTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MethodologyParents");
+                    b.ToTable("MethodologyVersions");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
@@ -453,15 +523,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("MethodologyParentId")
+                    b.Property<Guid>("MethodologyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Owner")
                         .HasColumnType("bit");
 
-                    b.HasKey("PublicationId", "MethodologyParentId");
+                    b.HasKey("PublicationId", "MethodologyId");
 
-                    b.HasIndex("MethodologyParentId");
+                    b.HasIndex("MethodologyId");
 
                     b.ToTable("PublicationMethodologies");
                 });
@@ -996,6 +1066,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("SourceId");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
@@ -1003,28 +1082,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyParent", "MethodologyParent")
-                        .WithMany("Versions")
-                        .HasForeignKey("MethodologyParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "PreviousVersion")
-                        .WithMany()
-                        .HasForeignKey("PreviousVersionId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "ScheduledWithRelease")
-                        .WithMany()
-                        .HasForeignKey("ScheduledWithReleaseId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
@@ -1035,11 +1092,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "Methodology")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
                         .WithMany()
-                        .HasForeignKey("MethodologyId")
+                        .HasForeignKey("MethodologyVersionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyNote", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
+                        .WithMany("Notes")
+                        .HasForeignKey("MethodologyVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "Methodology")
+                        .WithMany("Versions")
+                        .HasForeignKey("MethodologyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "PreviousVersion")
+                        .WithMany()
+                        .HasForeignKey("PreviousVersionId");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "ScheduledWithRelease")
+                        .WithMany()
+                        .HasForeignKey("ScheduledWithReleaseId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
@@ -1078,9 +1177,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationMethodology", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyParent", "MethodologyParent")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "Methodology")
                         .WithMany("Publications")
-                        .HasForeignKey("MethodologyParentId")
+                        .HasForeignKey("MethodologyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

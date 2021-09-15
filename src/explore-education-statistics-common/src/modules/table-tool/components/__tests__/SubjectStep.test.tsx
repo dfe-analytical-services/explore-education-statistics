@@ -2,7 +2,7 @@ import { getDescribedBy } from '@common-test/queries';
 import { SubjectFormValues } from '@common/modules/table-tool/components/SubjectForm';
 import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { Subject, TableHighlight } from '@common/services/tableBuilderService';
+import { Subject, FeaturedTable } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -20,6 +20,14 @@ describe('SubjectStep', () => {
         to: '2020/21',
       },
       geographicLevels: ['Local Authority District', 'Ward'],
+      file: {
+        id: 'file-1',
+        name: 'Subject 1',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
+      },
     },
     {
       id: 'subject-2',
@@ -30,10 +38,18 @@ describe('SubjectStep', () => {
         to: '2020',
       },
       geographicLevels: ['National', 'Local Authority'],
+      file: {
+        id: 'file-2',
+        name: 'Subject 2',
+        fileName: 'file-2.csv',
+        extension: 'csv',
+        size: '20 Mb',
+        type: 'Data',
+      },
     },
   ];
 
-  const testHighlights: TableHighlight[] = [
+  const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'highlight-1',
       name: 'Test highlight 1',
@@ -115,11 +131,11 @@ describe('SubjectStep', () => {
     render(
       <SubjectStep
         {...wizardProps}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjects={testSubjects}
         subjectId=""
         onSubmit={noop}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
       />,
     );
 
@@ -154,7 +170,7 @@ describe('SubjectStep', () => {
     render(
       <SubjectStep
         {...wizardProps}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjects={testSubjects}
         subjectId=""
         onSubmit={noop}
@@ -171,11 +187,11 @@ describe('SubjectStep', () => {
     render(
       <SubjectStep
         {...wizardProps}
-        highlights={[]}
+        featuredTables={[]}
         subjects={testSubjects}
         subjectId=""
         onSubmit={noop}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
       />,
     );
 
@@ -206,11 +222,11 @@ describe('SubjectStep', () => {
     render(
       <SubjectStep
         {...wizardProps}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjects={testSubjects}
         subjectId=""
         onSubmit={noop}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
       />,
     );
 
@@ -239,11 +255,11 @@ describe('SubjectStep', () => {
     render(
       <SubjectStep
         {...wizardProps}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjectId="subject-1"
         subjects={testSubjects}
         isActive={false}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
         onSubmit={noop}
       />,
     );
@@ -259,10 +275,10 @@ describe('SubjectStep', () => {
       <SubjectStep
         {...wizardProps}
         isActive={false}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjects={testSubjects}
         onSubmit={noop}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
       />,
     );
 
@@ -295,11 +311,11 @@ describe('SubjectStep', () => {
       <SubjectStep
         {...wizardProps}
         isActive={false}
-        highlights={testHighlights}
+        featuredTables={testFeaturedTables}
         subjects={testSubjects}
         subjectId=""
         onSubmit={noop}
-        renderHighlightLink={highlight => <a href="/">{highlight.name}</a>}
+        renderFeaturedTable={highlight => <a href="/">{highlight.name}</a>}
       />,
     );
 

@@ -15,17 +15,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodology(Guid publicationId);
 
+        Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false);
+
+        Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Guid methodologyVersionId, bool forceDelete = false);
+
         Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
 
-        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetAdoptableMethodologies(Guid publicationId);
+        Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId);
 
-        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid id);
+        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummary(Guid methodologyVersionId);
 
-        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(Guid id);
+        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+            Guid methodologyVersionId);
 
-        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid id,
+        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodology(Guid methodologyVersionId,
             MethodologyUpdateRequest request);
-
-        Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false);
     }
 }

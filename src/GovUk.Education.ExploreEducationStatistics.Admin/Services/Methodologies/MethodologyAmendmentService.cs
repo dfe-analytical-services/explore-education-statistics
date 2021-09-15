@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
 
         public MethodologyAmendmentService(
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IMethodologyService methodologyService,
             ContentDbContext context)
@@ -34,36 +35,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAmendment(
-            Guid originalMethodologyId)
+            Guid originalMethodologyVersionId)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(originalMethodologyId)
+            return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
-                .OnSuccess(HydrateMethodologyForAmendment)
+                .OnSuccess(HydrateMethodologyVersionForAmendment)
                 .OnSuccess(CreateAndSaveAmendment)
                 .OnSuccessDo(LinkOriginalMethodologyFilesToAmendment)
                 .OnSuccess(amendment => _methodologyService.GetSummary(amendment.Id));
         }
-        
-        private async Task<Either<ActionResult, Methodology>> CreateAndSaveAmendment(Methodology methodology)
+
+        private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(
+            MethodologyVersion methodologyVersion)
         {
-            var amendment = methodology.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
-            var savedAmendment = (await _context.Methodologies.AddAsync(amendment)).Entity;
+            var amendment = methodologyVersion.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
+            var savedAmendment = (await _context.MethodologyVersions.AddAsync(amendment)).Entity;
             await _context.SaveChangesAsync();
             return savedAmendment;
         }
-        
-        private async Task<Either<ActionResult, Unit>> LinkOriginalMethodologyFilesToAmendment(Methodology amendment)
+
+        private async Task<Either<ActionResult, Unit>> LinkOriginalMethodologyFilesToAmendment(
+            MethodologyVersion methodologyVersion)
         {
             var originalFiles = await _context
                 .MethodologyFiles
-                .Where(f => f.MethodologyId == amendment.PreviousVersionId)
+                .Where(f => f.MethodologyVersionId == methodologyVersion.PreviousVersionId)
                 .ToListAsync();
 
             var fileCopies = originalFiles
                 .Select(f => new MethodologyFile
                 {
                     FileId = f.FileId,
-                    MethodologyId = amendment.Id
+                    MethodologyVersionId = methodologyVersion.Id
                 });
 
             await _context.AddRangeAsync(fileCopies);
@@ -71,14 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Methodology>> HydrateMethodologyForAmendment(Methodology methodology)
+        private async Task<Either<ActionResult, MethodologyVersion>> HydrateMethodologyVersionForAmendment(
+            MethodologyVersion methodologyVersion)
         {
             await _context
-                .Entry(methodology)
-                .Reference(m => m.MethodologyParent)
+                .Entry(methodologyVersion)
+                .Collection(m => m.Notes)
                 .LoadAsync();
 
-            return methodology;
+            await _context
+                .Entry(methodologyVersion)
+                .Reference(m => m.Methodology)
+                .LoadAsync();
+
+            return methodologyVersion;
         }
     }
 }

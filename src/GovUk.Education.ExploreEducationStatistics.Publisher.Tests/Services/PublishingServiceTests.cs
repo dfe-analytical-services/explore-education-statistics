@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task PublishMethodologyFiles()
         {
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -37,23 +37,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.Get(methodology.Id))
-                .ReturnsAsync(methodology);
+            methodologyService.Setup(mock => mock.Get(methodologyVersion.Id))
+                .ReturnsAsync(methodologyVersion);
 
-            methodologyService.Setup(mock => mock.GetFiles(methodology.Id, Image))
+            methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
                 .ReturnsAsync(new List<File>());
             
             publicBlobStorageService.Setup(mock => mock.DeleteBlobs(
                     PublicMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     null))
                 .Returns(Task.CompletedTask);
 
             privateBlobStorageService.Setup(mock => mock.CopyDirectory(
                 PrivateMethodologyFiles,
-                $"{methodology.Id}/",
+                $"{methodologyVersion.Id}/",
                 PublicMethodologyFiles,
-                $"{methodology.Id}/",
+                $"{methodologyVersion.Id}/",
                 It.Is<IBlobStorageService.CopyDirectoryOptions>(options =>
                     options.DestinationConnectionString == PublicStorageConnectionString)))
                 .ReturnsAsync(new List<BlobInfo>());
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 privateBlobStorageService: privateBlobStorageService.Object,
                 logger: logger.Object);
 
-            await service.PublishMethodologyFiles(methodology.Id);
+            await service.PublishMethodologyFiles(methodologyVersion.Id);
 
             MockUtils.VerifyAllMocks(methodologyService, publicBlobStorageService, privateBlobStorageService);
         }
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(releaseId))
-                .ReturnsAsync(new List<Methodology>());
+                .ReturnsAsync(new List<MethodologyVersion>());
 
             // No other invocations on the services expected because the release has no related methodologies
 
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = Immediately,
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
-                .ReturnsAsync(AsList(methodology));
+                .ReturnsAsync(ListOf(methodologyVersion));
 
             publicationService.Setup(mock => mock.IsPublicationPublished(release.PublicationId))
                 .ReturnsAsync(true);
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = WithRelease,
@@ -172,9 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
-                .ReturnsAsync(AsList(methodology));
+                .ReturnsAsync(AsList(methodologyVersion));
 
-            methodologyService.Setup(mock => mock.GetFiles(methodology.Id, Image))
+            methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
                 .ReturnsAsync(new List<File>());
 
             publicationService.Setup(mock => mock.IsPublicationPublished(release.PublicationId))
@@ -184,15 +184,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             publicBlobStorageService.Setup(mock => mock.DeleteBlobs(
                     PublicMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     null))
                 .Returns(Task.CompletedTask);
 
             privateBlobStorageService.Setup(mock => mock.CopyDirectory(
                     PrivateMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     PublicMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     It.Is<IBlobStorageService.CopyDirectoryOptions>(options =>
                         options.DestinationConnectionString == PublicStorageConnectionString)))
                 .ReturnsAsync(new List<BlobInfo>());
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = WithRelease,
@@ -240,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
-                .ReturnsAsync(AsList(methodology));
+                .ReturnsAsync(ListOf(methodologyVersion));
 
             publicationService.Setup(mock => mock.IsPublicationPublished(release.PublicationId))
                 .ReturnsAsync(true);
@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = Immediately,
@@ -288,9 +288,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
-                .ReturnsAsync(AsList(methodology));
+                .ReturnsAsync(ListOf(methodologyVersion));
 
-            methodologyService.Setup(mock => mock.GetFiles(methodology.Id, Image))
+            methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
                 .ReturnsAsync(new List<File>());
 
             publicationService.Setup(mock => mock.IsPublicationPublished(release.PublicationId))
@@ -301,15 +301,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             publicBlobStorageService.Setup(mock => mock.DeleteBlobs(
                     PublicMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     null))
                 .Returns(Task.CompletedTask);
 
             privateBlobStorageService.Setup(mock => mock.CopyDirectory(
                     PrivateMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     PublicMethodologyFiles,
-                    $"{methodology.Id}/",
+                    $"{methodologyVersion.Id}/",
                     It.Is<IBlobStorageService.CopyDirectoryOptions>(options =>
                         options.DestinationConnectionString == PublicStorageConnectionString)))
                 .ReturnsAsync(new List<BlobInfo>());
@@ -342,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = Guid.NewGuid()
             };
 
-            var methodology = new Methodology
+            var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 PublishingStrategy = Immediately,
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
-                .ReturnsAsync(AsList(methodology));
+                .ReturnsAsync(ListOf(methodologyVersion));
 
             publicationService.Setup(mock => mock.IsPublicationPublished(release.PublicationId))
                 .ReturnsAsync(true);

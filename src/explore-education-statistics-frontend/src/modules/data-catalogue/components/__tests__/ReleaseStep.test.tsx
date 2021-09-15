@@ -1,32 +1,32 @@
+import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { Release } from '@common/services/publicationService';
+import { ReleaseSummary } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
 describe('ReleaseStep', () => {
-  const testReleases: Release[] = [
+  const testReleases: ReleaseSummary[] = [
     {
-      id: 'test-rel-3',
-      published: '2021-01-01T11:21:17.7585345',
-      slug: 'test-rel-3-slug',
-      title: 'Another Release',
-    } as Release,
-    {
-      id: 'test-rel-1',
+      id: 'release-3',
       latestRelease: true,
-      published: '2021-06-30T11:21:17.7585345',
-      slug: 'test-rel-1-slug',
-      title: 'Release 1',
-    } as Release,
+      slug: 'release-3-slug',
+      title: 'Academic Year 2021/22',
+    } as ReleaseSummary,
     {
-      id: 'test-rel-2',
-      published: '2021-05-30T11:21:17.7585345',
-      slug: 'test-rel-2-slug',
-      title: 'Release 2',
-    } as Release,
+      id: 'release-2',
+      latestRelease: false,
+      slug: 'release-2-slug',
+      title: 'Academic Year 2020/21',
+    } as ReleaseSummary,
+    {
+      id: 'release-1',
+      latestRelease: false,
+      slug: 'release-1-slug',
+      title: 'Academic Year 2019/20',
+    } as ReleaseSummary,
   ];
 
   const wizardProps: InjectedWizardProps = {
@@ -57,28 +57,28 @@ describe('ReleaseStep', () => {
     const releases = releasesGroup.getAllByRole('radio');
 
     expect(releases.length).toBe(3);
-    expect(releases[0]).toHaveAttribute('value', 'test-rel-1');
+    expect(releases[0]).toHaveAttribute('value', 'release-3');
     expect(releases[0]).toBeEnabled();
     expect(releases[0]).not.toBeChecked();
     expect(releases[0]).toEqual(
-      releasesGroup.getByLabelText('Release 1 (30 June 2021)'),
+      releasesGroup.getByLabelText('Academic Year 2021/22'),
     );
     expect(
-      screen.getByTestId('Radio item for Release 1 (30 June 2021)'),
+      screen.getByTestId('Radio item for Academic Year 2021/22'),
     ).toHaveTextContent('This is the latest data');
 
-    expect(releases[1]).toHaveAttribute('value', 'test-rel-2');
+    expect(releases[1]).toHaveAttribute('value', 'release-2');
     expect(releases[1]).toBeEnabled();
     expect(releases[1]).not.toBeChecked();
     expect(releases[1]).toEqual(
-      releasesGroup.getByLabelText('Release 2 (30 May 2021)'),
+      releasesGroup.getByLabelText('Academic Year 2020/21'),
     );
 
-    expect(releases[2]).toHaveAttribute('value', 'test-rel-3');
+    expect(releases[2]).toHaveAttribute('value', 'release-1');
     expect(releases[2]).toBeEnabled();
     expect(releases[2]).not.toBeChecked();
     expect(releases[2]).toEqual(
-      releasesGroup.getByLabelText('Another Release (1 January 2021)'),
+      releasesGroup.getByLabelText('Academic Year 2019/20'),
     );
 
     expect(
@@ -93,14 +93,14 @@ describe('ReleaseStep', () => {
 
     expect(screen.getAllByRole('radio')).toHaveLength(3);
 
-    userEvent.type(screen.getByLabelText('Search releases'), 'Another');
+    await userEvent.type(screen.getByLabelText('Search releases'), '2020/21');
 
     await waitFor(() => {
       expect(screen.getAllByRole('radio')).toHaveLength(1);
 
       expect(
-        screen.getByLabelText('Another Release (1 January 2021)'),
-      ).toHaveAttribute('type', 'radio');
+        screen.getByLabelText('Academic Year 2020/21'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -112,6 +112,7 @@ describe('ReleaseStep', () => {
         onSubmit={noop}
       />,
     );
+
     expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
 
     const releasesGroup = within(
@@ -122,13 +123,14 @@ describe('ReleaseStep', () => {
     const releases = releasesGroup.getAllByRole('radio');
 
     expect(releases.length).toBe(1);
-    expect(releases[0]).toHaveAttribute('value', 'test-rel-3');
+    expect(releases[0]).toHaveAttribute('value', 'release-3');
     expect(releases[0]).toBeEnabled();
     expect(releases[0]).toBeChecked();
   });
 
   test('renders a message when there are no releases', () => {
     render(<ReleaseStep {...wizardProps} releases={[]} onSubmit={noop} />);
+
     expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
 
     expect(
@@ -177,13 +179,13 @@ describe('ReleaseStep', () => {
       />,
     );
 
-    userEvent.click(
-      screen.getByRole('radio', { name: 'Release 2 (30 May 2021)' }),
-    );
+    userEvent.click(screen.getByLabelText('Academic Year 2019/20'));
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({ releaseId: 'test-rel-2' });
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ReleaseFormSubmitHandler>
+      >({ release: testReleases[2] });
     });
   });
 
@@ -200,6 +202,8 @@ describe('ReleaseStep', () => {
 
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
 
-    expect(screen.getByTestId('Release')).toHaveTextContent('Release 1');
+    expect(screen.getByTestId('Release')).toHaveTextContent(
+      'Academic Year 2020/21',
+    );
   });
 });

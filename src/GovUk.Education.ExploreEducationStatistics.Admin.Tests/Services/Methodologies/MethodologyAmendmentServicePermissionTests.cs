@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyAmendmentServicePermissionTests
     {
-        private readonly Methodology _methodology = new Methodology
+        private readonly MethodologyVersion _methodologyVersion = new MethodologyVersion
         {
             Id = Guid.NewGuid()
         };
@@ -27,12 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task CreateMethodologyAmendment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodology, CanMakeAmendmentOfSpecificMethodology)
+                .SetupResourceCheckToFail(_methodologyVersion, CanMakeAmendmentOfSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupMethodologyAmendmentService(userService: userService.Object);
-                        return service.CreateMethodologyAmendment(_methodology.Id);
+                        return service.CreateMethodologyAmendment(_methodologyVersion.Id);
                     }
                 );
         }
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockUtils.MockPersistenceHelper<ContentDbContext, Methodology>(_methodology.Id, _methodology);
+            return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
         }
     }
 }

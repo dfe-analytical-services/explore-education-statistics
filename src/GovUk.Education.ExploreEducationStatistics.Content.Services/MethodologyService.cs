@@ -24,29 +24,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
-        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
         public MethodologyService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            IMethodologyRepository methodologyRepository)
+            IMethodologyVersionRepository methodologyVersionRepository)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
-            _methodologyRepository = methodologyRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
         }
 
         public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
         {
             return await _persistenceHelper
-                .CheckEntityExists<MethodologyParent>(
+                .CheckEntityExists<Methodology>(
                     query => query
                         .Where(mp => mp.Slug == slug))
-                .OnSuccess<ActionResult, MethodologyParent, MethodologyViewModel>(async methodologyParent =>
+                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async methodology =>
                 {
                     var latestPublishedVersion =
-                        await _methodologyRepository.GetLatestPublishedByMethodologyParent(methodologyParent.Id);
+                        await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
         {
             var latestPublishedMethodologies =
-                await _methodologyRepository.GetLatestPublishedByPublication(publicationId);
+                await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
             return _mapper.Map<List<MethodologySummaryViewModel>>(latestPublishedMethodologies);
         }
     }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -6,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public Methodology Methodology { get; set; }
+        public MethodologyVersion MethodologyVersion { get; set; } = null!;
 
-        public Guid MethodologyId { get; set; }
+        public Guid MethodologyVersionId { get; set; }
 
-        public File File { get; set; }
+        public File File { get; set; } = null!;
 
         public Guid FileId { get; set; }
     }

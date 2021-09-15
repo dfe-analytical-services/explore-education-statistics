@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetAdoptableMethodologies(_id))
-                .ReturnsAsync(AsList(new TitleAndIdViewModel()));
+                .ReturnsAsync(AsList(new MethodologySummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -210,17 +210,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void DeleteMethodologyAmendment_Returns_NoContent()
+        public async void DeleteMethodologyVersion_Returns_NoContent()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.DeleteMethodology(_id, false))
+                .Setup(s => s.DeleteMethodologyVersion(_id, false))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
-            var result = await controller.DeleteMethodology(_id);
+            var result = await controller.DeleteMethodologyVersion(_id);
 
             VerifyAllMocks(methodologyService);
 

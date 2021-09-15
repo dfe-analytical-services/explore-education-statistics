@@ -203,9 +203,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
-            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver, MyMethodologyPermissionSetPropertyResolver>();
+            services.AddTransient<IMyReleasePermissionSetPropertyResolver,
+                MyReleasePermissionSetPropertyResolver>();
+            services.AddTransient<IMyPublicationPermissionSetPropertyResolver,
+                MyPublicationPermissionSetPropertyResolver>();
+            services.AddTransient<IMyPublicationMethodologyPermissionsPropertyResolver,
+                MyPublicationMethodologyPermissionsPropertyResolver>();
+            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver,
+                MyMethodologyPermissionSetPropertyResolver>();
 
             services.AddMvc(options =>
                 {
@@ -262,8 +267,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
+            services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
+            services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
-            services.AddTransient<IMethodologyParentRepository, MethodologyParentRepository>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
@@ -317,6 +324,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
+            // TODO: EES-2343 Remove when file sizes are stored in database
+            services.AddTransient<Data.Services.Interfaces.IReleaseService.IBlobInfoGetter, ReleaseBlobInfoGetter>();
             services.AddTransient<IReleaseContentBlockRepository, ReleaseContentBlockRepository>();
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();

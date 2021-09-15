@@ -138,11 +138,15 @@ export interface ReleaseSummary {
     title: ReleaseType;
   };
   latestRelease: boolean;
-  publication: PublicationSummary;
   dataLastPublished: string;
 }
 
+export interface PublicationReleaseSummary extends ReleaseSummary {
+  publication: PublicationSummary;
+}
+
 export interface PreReleaseAccessListSummary extends ReleaseSummary {
+  publication: PublicationSummary;
   preReleaseAccessList: string;
 }
 
@@ -150,12 +154,15 @@ export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
   },
+  listReleases(publicationSlug: string): Promise<ReleaseSummary[]> {
+    return contentApi.get(`/publications/${publicationSlug}/releases`);
+  },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
   getLatestPublicationReleaseSummary(
     publicationSlug: string,
-  ): Promise<ReleaseSummary> {
+  ): Promise<PublicationReleaseSummary> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/latest/summary`,
     );
@@ -171,7 +178,7 @@ export default {
   getPublicationReleaseSummary(
     publicationSlug: string,
     releaseSlug: string,
-  ): Promise<ReleaseSummary> {
+  ): Promise<PublicationReleaseSummary> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
     );

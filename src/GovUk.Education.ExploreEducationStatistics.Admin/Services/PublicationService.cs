@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
         public PublicationService(ContentDbContext context,
             IMapper mapper,
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IPublishingService publishingService,
-            IMethodologyRepository methodologyRepository)
+            IMethodologyVersionRepository methodologyVersionRepository)
         {
             _context = context;
             _mapper = mapper;
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _publicationRepository = publicationRepository;
             _publishingService = publishingService;
-            _methodologyRepository = methodologyRepository;
+            _methodologyVersionRepository = methodologyVersionRepository;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopicAsync(topicId))
+                    .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
                     .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
                 );
         }
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     
                     if (originalTitle != publication.Title)
                     {
-                        await _methodologyRepository.PublicationTitleChanged(publicationId, originalSlug, publication.Title, publication.Slug);
+                        await _methodologyVersionRepository.PublicationTitleChanged(publicationId, originalSlug, publication.Title, publication.Slug);
                     }
 
                     if (publication.Live)
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .Include(p => p.Methodologies)
-                .ThenInclude(p => p.MethodologyParent)
+                .ThenInclude(p => p.Methodology)
                 .ThenInclude(p => p.Versions);
         }
     }

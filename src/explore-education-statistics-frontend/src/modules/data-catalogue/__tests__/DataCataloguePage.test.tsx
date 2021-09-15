@@ -1,67 +1,83 @@
+import _downloadService from '@common/services/downloadService';
+import _tableBuilderService, {
+  Subject,
+} from '@common/services/tableBuilderService';
 import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
-import {
-  DownloadTheme,
-  PublicationDownloadSummary,
-} from '@common/services/themeService';
-import { Release } from '@common/services/publicationService';
-import { SubjectWithDownloadFiles } from '@frontend/modules/data-catalogue/components/DownloadStep';
-import { render, screen, waitFor } from '@testing-library/react';
+import { PublicationSummary, Theme } from '@common/services/themeService';
+import _publicationService, {
+  ReleaseSummary,
+} from '@common/services/publicationService';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import React from 'react';
 
+jest.mock('@common/services/downloadService');
+jest.mock('@common/services/publicationService');
+jest.mock('@common/services/tableBuilderService');
+
+const downloadService = _downloadService as jest.Mocked<
+  typeof _downloadService
+>;
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
+
 describe('DataCataloguePage', () => {
-  const testThemes: DownloadTheme[] = [
+  const testThemes: Theme[] = [
     {
       id: 'theme-1',
       title: 'Pupils and schools',
+      summary: '',
       topics: [
         {
           id: 'topic-1',
           title: 'Admission appeals',
+          summary: '',
           publications: [
             {
               id: 'publication-1',
               title: 'Test publication',
               slug: 'test-publication',
+              summary: '',
             },
           ],
         },
       ],
-    } as DownloadTheme,
+    },
   ];
 
   const testPublication = {
     id: 'publication-1',
     title: 'Test publication',
     slug: 'test-publication',
-  } as PublicationDownloadSummary;
+  } as PublicationSummary;
 
-  const testReleases: Release[] = [
+  const testReleases: ReleaseSummary[] = [
     {
-      id: 'rel-1',
+      id: 'release-3',
       latestRelease: true,
-      published: '2021-06-30T11:21:17.7585345',
-      slug: 'rel-1-slug',
-      title: 'Release 1',
-    } as Release,
+      slug: 'release-3-slug',
+      title: 'Academic Year 2021/22',
+    } as ReleaseSummary,
     {
-      id: 'rel-3',
+      id: 'release-2',
       latestRelease: false,
-      published: '2021-01-01T11:21:17.7585345',
-      slug: 'rel-3-slug',
-      title: 'Another Release',
-    } as Release,
+      slug: 'release-2-slug',
+      title: 'Academic Year 2020/21',
+    } as ReleaseSummary,
     {
-      id: 'rel-2',
+      id: 'release-1',
       latestRelease: false,
-      published: '2021-05-30T11:21:17.7585345',
-      slug: 'rel-2-slug',
-      title: 'Release 2',
-    } as Release,
+      slug: 'release-1-slug',
+      title: 'Academic Year 2019/20',
+    } as ReleaseSummary,
   ];
 
-  const testSubjects: SubjectWithDownloadFiles[] = [
+  const testSubjects: Subject[] = [
     {
       id: 'subject-1',
       name: 'Subject 1',
@@ -71,12 +87,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-1',
-        extension: 'csv',
+        name: 'Subject 1',
         fileName: 'file-1.csv',
-        name: 'File 1',
-        size: '100mb',
+        extension: 'csv',
+        size: '10 Mb',
         type: 'Data',
       },
     },
@@ -89,12 +105,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-2',
-        extension: 'csv',
+        name: 'Another Subject',
         fileName: 'file-2.csv',
-        name: 'File 2',
-        size: '100mb',
+        extension: 'csv',
+        size: '20 Mb',
         type: 'Data',
       },
     },
@@ -107,12 +123,12 @@ describe('DataCataloguePage', () => {
         from: '2016',
         to: '2019',
       },
-      downloadFile: {
+      file: {
         id: 'file-3',
-        extension: 'csv',
+        name: 'Subject 3',
         fileName: 'file-3.csv',
-        name: 'File 3',
-        size: '100mb',
+        extension: 'csv',
+        size: '30 Mb',
         type: 'Data',
       },
     },
@@ -139,19 +155,27 @@ describe('DataCataloguePage', () => {
     expect(screen.getByLabelText('Test publication')).toBeVisible();
   });
 
-  // EES-2207 this test will need to be updated to mock the api responses insted of using the fake data
-  test('can go through all the steps to get to download files', async () => {
+  test('can go through all the steps to download files', async () => {
+    publicationService.listReleases.mockResolvedValue(testReleases);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+
     render(<DataCataloguePage themes={testThemes} />);
 
-    expect(screen.getByText('Choose a publication')).toBeInTheDocument();
     expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
       'aria-current',
       'step',
     );
-    userEvent.click(screen.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(screen.getByRole('button', { name: 'Admission appeals' }));
-    userEvent.click(screen.getByRole('radio', { name: 'Test publication' }));
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    // Step 1
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+
+    expect(step1.getByText('Choose a publication')).toBeInTheDocument();
+
+    userEvent.click(step1.getByRole('button', { name: 'Pupils and schools' }));
+    userEvent.click(step1.getByRole('button', { name: 'Admission appeals' }));
+    userEvent.click(step1.getByRole('radio', { name: 'Test publication' }));
+    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
@@ -164,12 +188,26 @@ describe('DataCataloguePage', () => {
       );
     });
 
-    expect(screen.getByText('Choose a release')).toBeInTheDocument();
-    expect(screen.getAllByRole('radio')).toHaveLength(3);
-    userEvent.click(
-      screen.getByRole('radio', { name: 'Another Release (1 January 2021)' }),
+    // Step 2
+
+    const step2 = within(screen.getByTestId('wizardStep-2'));
+
+    expect(step2.getByText('Choose a release')).toBeInTheDocument();
+
+    const releaseRadios = step2.getAllByRole('radio');
+    expect(releaseRadios).toHaveLength(3);
+    expect(releaseRadios[0]).toEqual(
+      step2.getByLabelText('Academic Year 2021/22'),
     );
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    expect(releaseRadios[1]).toEqual(
+      step2.getByLabelText('Academic Year 2020/21'),
+    );
+    expect(releaseRadios[2]).toEqual(
+      step2.getByLabelText('Academic Year 2019/20'),
+    );
+
+    userEvent.click(releaseRadios[0]);
+    userEvent.click(step2.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
@@ -182,11 +220,37 @@ describe('DataCataloguePage', () => {
       );
     });
 
+    // Step 3
+
+    const step3 = within(screen.getByTestId('wizardStep-3'));
+
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
-    expect(
-      screen.getByRole('button', { name: 'Download selected files' }),
-    ).toBeInTheDocument();
+
+    const fileCheckboxes = step3.getAllByRole('checkbox');
+
+    expect(fileCheckboxes).toHaveLength(3);
+    expect(fileCheckboxes[0]).toEqual(
+      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
+    );
+    expect(fileCheckboxes[1]).toEqual(
+      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
+    );
+    expect(fileCheckboxes[2]).toEqual(
+      step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
+    );
+
+    userEvent.click(fileCheckboxes[1]);
+    userEvent.click(fileCheckboxes[2]);
+
+    userEvent.click(
+      step3.getByRole('button', { name: 'Download selected files' }),
+    );
+
+    await waitFor(() => {
+      expect(downloadService.downloadFiles).toHaveBeenCalledWith<
+        Parameters<typeof downloadService.downloadFiles>
+      >('release-3', ['file-1', 'file-3']);
+    });
   });
 
   test('direct link to step 2', async () => {
@@ -205,17 +269,22 @@ describe('DataCataloguePage', () => {
       'aria-current',
       'step',
     );
-    expect(screen.getByText('Choose a release')).toBeInTheDocument();
-    expect(screen.getAllByRole('radio')).toHaveLength(3);
-    expect(
-      screen.getByLabelText('Release 1 (30 June 2021)'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('Release 2 (30 May 2021)'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('Another Release (1 January 2021)'),
-    ).toBeInTheDocument();
+
+    const step2 = within(screen.getByTestId('wizardStep-2'));
+
+    expect(step2.getByText('Choose a release')).toBeInTheDocument();
+
+    const releaseRadios = step2.getAllByRole('radio');
+    expect(releaseRadios).toHaveLength(3);
+    expect(releaseRadios[0]).toEqual(
+      step2.getByLabelText('Academic Year 2021/22'),
+    );
+    expect(releaseRadios[1]).toEqual(
+      step2.getByLabelText('Academic Year 2020/21'),
+    );
+    expect(releaseRadios[2]).toEqual(
+      step2.getByLabelText('Academic Year 2019/20'),
+    );
   });
 
   test('direct link to step 3', async () => {
@@ -240,12 +309,21 @@ describe('DataCataloguePage', () => {
       'aria-current',
       'step',
     );
+    const step3 = within(screen.getByTestId('wizardStep-3'));
+
     expect(screen.getByText('Choose files to download')).toBeInTheDocument();
-    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
-    expect(
-      screen.getByLabelText('Another Subject (csv, 100mb)'),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText('Subject 1 (csv, 100mb)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Subject 3 (csv, 100mb)')).toBeInTheDocument();
+
+    const fileCheckboxes = step3.getAllByRole('checkbox');
+
+    expect(fileCheckboxes).toHaveLength(3);
+    expect(fileCheckboxes[0]).toEqual(
+      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
+    );
+    expect(fileCheckboxes[1]).toEqual(
+      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
+    );
+    expect(fileCheckboxes[2]).toEqual(
+      step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
+    );
   });
 });

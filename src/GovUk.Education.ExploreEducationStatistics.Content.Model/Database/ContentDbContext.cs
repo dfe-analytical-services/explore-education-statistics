@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
-        public DbSet<MethodologyParent> MethodologyParents { get; set; }
+        public DbSet<MethodologyVersion> MethodologyVersions { get; set; }
         public DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public DbSet<Theme> Themes { get; set; }
@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<DataImportError> DataImportErrors { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
+        public DbSet<MethodologyNote> MethodologyNotes { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<User> Users { get; set; }
         public DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
         public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public DbSet<GlossaryEntry> GlossaryEntries { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
@@ -99,44 +101,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Content)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.PublishingStrategy)
                 .HasConversion(new EnumToStringConverter<MethodologyPublishingStrategy>());
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Created)
                 .HasConversion(
                     v => v, 
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
-            modelBuilder.Entity<Methodology>()
+            modelBuilder.Entity<MethodologyVersion>()
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<MethodologyFile>()
-                .HasOne(mf => mf.Methodology)
+                .HasOne(mf => mf.MethodologyVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<MethodologyFile>()
                 .HasOne(mf => mf.File)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<MethodologyNote>()
+                .HasOne(m => m.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.DisplayDate)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.Updated)
+                .HasConversion(
+                    v => v, 
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<MethodologyNote>()
+                .HasOne(m => m.UpdatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
@@ -151,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("ExternalMethodology");
 
             modelBuilder.Entity<PublicationMethodology>()
-                .HasKey(pm => new {pm.PublicationId, pm.MethodologyParentId});
+                .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.Publication)
@@ -160,9 +190,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PublicationMethodology>()
-                .HasOne(pm => pm.MethodologyParent)
+                .HasOne(pm => pm.Methodology)
                 .WithMany(m => m.Publications)
-                .HasForeignKey(pm => pm.MethodologyParentId)
+                .HasForeignKey(pm => pm.MethodologyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Release>()
@@ -370,6 +400,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
                     Title = "National Statistics"
                 });
+
+            modelBuilder.Entity<GlossaryEntry>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<GlossaryEntry>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -53,53 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var topic = Assert.Single(theme!.Topics);
 
             Assert.Single(topic!.Publications);
-
-            MockUtils.VerifyAllMocks(themeService);
-        }
-
-        [Fact]
-        public async Task GetDownloadThemes()
-        {
-            var themeService = new Mock<IThemeService>(MockBehavior.Strict);
-
-            themeService
-                .Setup(s => s.GetPublicationDownloadsTree())
-                .ReturnsAsync(
-                    new List<ThemeTree<PublicationDownloadsTreeNode>>
-                    {
-                        new()
-                        {
-                            Topics = new List<TopicTree<PublicationDownloadsTreeNode>>
-                            {
-                                new()
-                                {
-                                    Publications = new List<PublicationDownloadsTreeNode>
-                                    {
-                                        new()
-                                        {
-                                            DownloadFiles = new List<FileInfo>
-                                            {
-                                                new()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                );
-
-            var controller = BuildThemeController(themeService.Object);
-
-            var result = await controller.GetDownloadThemes();
-
-            var theme = Assert.Single(result);
-            Assert.IsType<ThemeTree<PublicationDownloadsTreeNode>>(theme);
-
-            var topic = Assert.Single(theme!.Topics);
-            var publication = Assert.Single(topic!.Publications);
-
-            Assert.Single(publication!.DownloadFiles);
 
             MockUtils.VerifyAllMocks(themeService);
         }

@@ -26,6 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanAccessPrereleasePages);
         }
 
+        public static Task<Either<ActionResult, PublicationMethodology>> CheckCanDropMethodologyLink(
+            this IUserService userService, PublicationMethodology methodology)
+        {
+            return userService.CheckPolicy(methodology, SecurityPolicies.CanDropMethodologyLink);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllUsers(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanManageUsersOnSystem);
@@ -54,44 +60,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanViewMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanViewSpecificMethodology);
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanViewSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanUpdateSpecificMethodology);
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanMarkMethodologyAsDraft(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion, bool ignoreCheck)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanMarkSpecificMethodologyAsDraft);
+            return ignoreCheck
+                ? Task.FromResult(new Either<ActionResult, MethodologyVersion>(methodologyVersion))
+                : userService.CheckCanUpdateMethodology(methodologyVersion);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanApproveMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyAsDraft(
+            this IUserService userService, MethodologyVersion methodologyVersion)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanApproveSpecificMethodology);
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanMarkSpecificMethodologyAsDraft);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanMakeAmendmentOfMethodology(
-            this IUserService userService, Methodology methodology)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanApproveMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion)
         {
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, Methodology>> CheckCanDeleteMethodology(
-            this IUserService userService, Methodology methodology, bool ignoreCheck = false)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMakeAmendmentOfMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion)
         {
-            if (ignoreCheck)
-            {
-                return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
-            }
-            return userService.CheckPolicy(methodology, SecurityPolicies.CanDeleteSpecificMethodology);
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
+        }
+
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanDeleteMethodology(
+            this IUserService userService, MethodologyVersion methodologyVersion, bool ignoreCheck = false)
+        {
+            return ignoreCheck
+                ? Task.FromResult(new Either<ActionResult, MethodologyVersion>(methodologyVersion))
+                : userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanDeleteSpecificMethodology);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)
@@ -145,11 +157,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
             this IUserService userService, Release release, bool ignoreCheck)
         {
-            if (ignoreCheck)
-            {
-                return Task.FromResult(new Either<ActionResult, Release>(release));
-            }
-            return userService.CheckCanUpdateRelease(release);
+            return ignoreCheck
+                ? Task.FromResult(new Either<ActionResult, Release>(release))
+                : userService.CheckCanUpdateRelease(release);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanDeleteRelease(

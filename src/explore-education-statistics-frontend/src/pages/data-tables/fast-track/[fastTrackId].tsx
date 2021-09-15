@@ -44,14 +44,16 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     );
   }
 
-  const [subjectsAndHighlights, subjectMeta] = await Promise.all([
-    tableBuilderService.getReleaseSubjectsAndHighlights(fastTrack.releaseId),
+  const [subjects, featuredTables, subjectMeta] = await Promise.all([
+    tableBuilderService.listReleaseSubjects(fastTrack.releaseId),
+    tableBuilderService.listReleaseFeaturedTables(fastTrack.releaseId),
     tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
   ]);
 
   return {
     props: {
       fastTrack,
+      featuredTables,
       selectedPublication: {
         id: selectedPublication.id,
         title: selectedPublication.title,
@@ -67,7 +69,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
         },
       },
       subjectMeta,
-      subjectsAndHighlights,
+      subjects,
       themeMeta,
     },
   };

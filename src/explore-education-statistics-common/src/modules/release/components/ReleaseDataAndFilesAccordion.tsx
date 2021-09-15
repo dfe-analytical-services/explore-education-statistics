@@ -3,13 +3,16 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
+import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode } from 'react';
 import styles from './ReleaseDataAndFilesAccordion.module.scss';
 
 interface Props {
   release: Release;
+  renderAllFilesButton?: ReactNode;
   renderCreateTablesButton?: ReactNode;
+  renderDataCatalogueLink?: ReactNode;
   renderDownloadLink: (file: FileInfo) => ReactNode;
   renderMetaGuidanceLink: ReactNode;
   renderPreReleaseAccessLink?: ReactNode;
@@ -18,7 +21,9 @@ interface Props {
 
 const ReleaseDataAndFilesAccordion = ({
   release,
+  renderAllFilesButton,
   renderCreateTablesButton,
+  renderDataCatalogueLink,
   renderDownloadLink,
   renderMetaGuidanceLink,
   renderPreReleaseAccessLink,
@@ -42,6 +47,8 @@ const ReleaseDataAndFilesAccordion = ({
     ['name'],
   );
 
+  const hasAllFilesButton = allFilesZip && renderAllFilesButton;
+
   return (
     <div className={styles.container}>
       <Accordion
@@ -54,60 +61,79 @@ const ReleaseDataAndFilesAccordion = ({
         }}
       >
         <AccordionSection heading="Explore data and files">
-          <p>
-            All data used to create this release is published as open data and
-            is available for download.
-          </p>
-          <p>
-            You can create your own tables from this data using our table tool,
-            or view featured tables that we have built for you.
-          </p>
+          <div className="govuk-grid-row">
+            <div
+              className={classNames({
+                'govuk-grid-column-three-quarters': hasAllFilesButton,
+                'govuk-grid-column-full': !hasAllFilesButton,
+              })}
+            >
+              <p>
+                All data used to create this release is published as open data
+                and is available for download.
+              </p>
+            </div>
 
-          {(allFilesZip || files.length > 0) && (
-            <ul className="govuk-list" data-testid="download-files">
-              {allFilesZip && (
-                <li>
-                  {renderDownloadLink(allFilesZip)}
-                  {` (${allFilesZip.extension}, ${allFilesZip.size})`}
-                </li>
-              )}
-
-              {files.map(file => (
-                <li key={file.id}>
-                  {renderDownloadLink(file)}
-                  {` (${file.extension}, ${file.size})`}
-                </li>
-              ))}
-            </ul>
-          )}
+            {hasAllFilesButton && (
+              <div className="govuk-grid-column-one-quarter">
+                {renderAllFilesButton}
+              </div>
+            )}
+          </div>
 
           {renderCreateTablesButton && (
-            <div className={styles.createTablesButtonContainer}>
-              <div>
-                <h3>Create your own tables</h3>
-                <p>
-                  Explore our range of data and build your own tables from it.
-                </p>
+            <>
+              <h3>Create your own tables</h3>
+
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-three-quarters">
+                  <p>
+                    You can create your own tables from this data using our
+                    table tool, or view featured tables that we have built for
+                    you.
+                  </p>
+                </div>
+                <div className="govuk-grid-column-one-quarter">
+                  {renderCreateTablesButton}
+                </div>
               </div>
-              <div className="govuk-!-width-one-quarter">
-                {renderCreateTablesButton}
-              </div>
-            </div>
+            </>
           )}
 
-          {release.hasMetaGuidance && (
-            <>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-three-quarters">
               <h3>Open data</h3>
               <p>
                 The open data files contain all data used in this release in a
                 machine readable format.
               </p>
-              <p>
-                Learn more about the data files used in this release using our{' '}
-                {renderMetaGuidanceLink}.
-              </p>
-            </>
-          )}
+
+              {!renderDataCatalogueLink && files.length > 0 && (
+                <ul className="govuk-list" data-testid="download-files">
+                  {files.map(file => (
+                    <li key={file.id}>
+                      {renderDownloadLink(file)}
+                      {` (${file.extension}, ${file.size})`}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {release.hasMetaGuidance && (
+                <p>
+                  Learn more about the data files used in this release using our{' '}
+                  {renderMetaGuidanceLink}.
+                </p>
+              )}
+
+              {renderDataCatalogueLink && (
+                <p>
+                  Browse and download individual open data files in our{' '}
+                  {renderDataCatalogueLink}.
+                </p>
+              )}
+            </div>
+          </div>
 
           {otherFiles.length > 0 && (
             <>

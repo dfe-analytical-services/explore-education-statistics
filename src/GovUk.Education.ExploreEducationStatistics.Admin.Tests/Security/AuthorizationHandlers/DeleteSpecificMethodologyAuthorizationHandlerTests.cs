@@ -28,17 +28,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly Methodology DraftMethodology = new()
+        private static readonly MethodologyVersion DraftMethodologyVersion = new()
         {
             Id = Guid.NewGuid(),
-            MethodologyParentId = Guid.NewGuid(),
+            MethodologyId = Guid.NewGuid(),
             Status = Draft
         };
 
-        private static readonly Methodology ApprovedMethodology = new()
+        private static readonly MethodologyVersion ApprovedMethodologyVersion = new()
         {
             Id = Guid.NewGuid(),
-            MethodologyParentId = Guid.NewGuid(),
+            MethodologyId = Guid.NewGuid(),
             Status = Approved
         };
 
@@ -57,13 +57,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var expectClaimToSucceed = claim == DeleteAllMethodologies;
 
                     await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(DraftMethodology);
+                    context.Attach(DraftMethodologyVersion);
 
-                    var (handler, methodologyRepository, publicationRoleRepository) =
-                        CreateHandlerAndDependencies();
+                    var (
+                        handler,
+                        methodologyRepository,
+                        methodologyVersionRepository,
+                        publicationRoleRepository
+                        ) = CreateHandlerAndDependencies();
 
-                    methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
+                    methodologyVersionRepository
+                        .Setup(s => s.IsPubliclyAccessible(DraftMethodologyVersion.Id))
                         .ReturnsAsync(false);
 
                     // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
@@ -71,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectClaimToSucceed)
                     {
                         methodologyRepository.Setup(s =>
-                                s.GetOwningPublicationByMethodologyParent(DraftMethodology.MethodologyParentId))
+                                s.GetOwningPublication(DraftMethodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
 
                         publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
@@ -79,10 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     }
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, DraftMethodology);
+                    var authContext = CreateAuthContext(user, DraftMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
+                        publicationRoleRepository);
 
                     // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
                     Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
@@ -94,18 +99,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var (handler, methodologyRepository, publicationRoleRepository) =
-                        CreateHandlerAndDependencies();
+                    var (
+                        handler,
+                        _,
+                        methodologyVersionRepository,
+                        publicationRoleRepository
+                        ) = CreateHandlerAndDependencies();
 
-                    methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
+                    methodologyVersionRepository
+                        .Setup(s => s.IsPubliclyAccessible(DraftMethodologyVersion.Id))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, DraftMethodology);
+                    var authContext = CreateAuthContext(user, DraftMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                    VerifyAllMocks(methodologyVersionRepository, publicationRoleRepository);
 
                     // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
                     // do this with a Methodology in this state.
@@ -118,18 +127,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    var (handler, methodologyRepository, publicationRoleRepository) =
-                        CreateHandlerAndDependencies();
+                    var (
+                        handler,
+                        _,
+                        methodologyVersionRepository,
+                        publicationRoleRepository
+                        ) = CreateHandlerAndDependencies();
 
-                    methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(ApprovedMethodology.Id))
+                    methodologyVersionRepository
+                        .Setup(s => s.IsPubliclyAccessible(ApprovedMethodologyVersion.Id))
                         .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext = CreateAuthContext(user, ApprovedMethodology);
+                    var authContext = CreateAuthContext(user, ApprovedMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                    VerifyAllMocks(methodologyVersionRepository, publicationRoleRepository);
 
                     // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
                     // do this with a Methodology in this state.
@@ -145,25 +158,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
                 {
-                    var (handler, methodologyRepository, publicationRoleRepository) =
-                        CreateHandlerAndDependencies();
+                    var (
+                        handler,
+                        methodologyRepository,
+                        methodologyVersionRepository,
+                        publicationRoleRepository
+                        ) = CreateHandlerAndDependencies();
 
-                    methodologyRepository
-                        .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
+                    methodologyVersionRepository
+                        .Setup(s => s.IsPubliclyAccessible(DraftMethodologyVersion.Id))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(s =>
-                            s.GetOwningPublicationByMethodologyParent(DraftMethodology.MethodologyParentId))
+                            s.GetOwningPublication(DraftMethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication,
                         role == Owner);
 
                     var user = CreateClaimsPrincipal(UserId);
-                    var authContext = CreateAuthContext(user, DraftMethodology);
+                    var authContext = CreateAuthContext(user, DraftMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
+                        publicationRoleRepository);
 
                     // Verify that the presence of a Publication Owner role for this user that is related to a
                     // Publication that uses this Methodology will pass the handler test
@@ -174,24 +192,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithNoPublicationRolesCannotDeleteDraftMethodology()
             {
-                var (handler, methodologyRepository, publicationRoleRepository) =
-                    CreateHandlerAndDependencies();
+                var (
+                    handler,
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    publicationRoleRepository
+                    ) = CreateHandlerAndDependencies();
 
-                methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(DraftMethodology.Id))
+                methodologyVersionRepository
+                    .Setup(s => s.IsPubliclyAccessible(DraftMethodologyVersion.Id))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
-                        s.GetOwningPublicationByMethodologyParent(DraftMethodology.MethodologyParentId))
+                        s.GetOwningPublication(DraftMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication, false);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, DraftMethodology);
+                var authContext = CreateAuthContext(user, DraftMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, publicationRoleRepository);
 
                 // Verify that the user cannot perform this action if they have no Publication Roles.
                 Assert.False(authContext.HasSucceeded);
@@ -200,66 +222,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCannotDeletePubliclyAccessibleMethodology()
             {
-                var (handler, methodologyRepository, publicationRoleRepository) =
-                    CreateHandlerAndDependencies();
+                var (
+                    handler,
+                    _,
+                    methodologyVersionRepository,
+                    publicationRoleRepository
+                    ) = CreateHandlerAndDependencies();
 
-                methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(ApprovedMethodology.Id))
+                methodologyVersionRepository
+                    .Setup(s => s.IsPubliclyAccessible(ApprovedMethodologyVersion.Id))
                     .ReturnsAsync(true);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, ApprovedMethodology);
+                var authContext = CreateAuthContext(user, ApprovedMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
                 // Verify that the fact that the Methodology is publicly accessible doesn't even need to check the
                 // users' Publication Roles to determine whether or not they can do this.
-                VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                VerifyAllMocks(methodologyVersionRepository, publicationRoleRepository);
                 Assert.False(authContext.HasSucceeded);
             }
 
             [Fact]
             public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodology()
             {
-                var (handler, methodologyRepository, publicationRoleRepository) =
-                    CreateHandlerAndDependencies();
+                var (
+                    handler,
+                    _,
+                    methodologyVersionRepository,
+                    publicationRoleRepository
+                    ) = CreateHandlerAndDependencies();
 
-                methodologyRepository
-                    .Setup(s => s.IsPubliclyAccessible(ApprovedMethodology.Id))
+                methodologyVersionRepository
+                    .Setup(s => s.IsPubliclyAccessible(ApprovedMethodologyVersion.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);
-                var authContext = CreateAuthContext(user, ApprovedMethodology);
+                var authContext = CreateAuthContext(user, ApprovedMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
                 // Verify that the fact that the Methodology is Approved doesn't even need to check the
                 // users' Publication Roles to determine whether or not they can do this.
-                VerifyAllMocks(methodologyRepository, publicationRoleRepository);
+                VerifyAllMocks(methodologyVersionRepository, publicationRoleRepository);
                 Assert.False(authContext.HasSucceeded);
             }
         }
 
-        private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Methodology methodology)
+        private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
+            MethodologyVersion methodologyVersion)
         {
-            return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, Methodology>
-                (user, methodology);
+            return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, MethodologyVersion>
+                (user, methodologyVersion);
         }
 
         private static (
             DeleteSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
+            Mock<IMethodologyVersionRepository>,
             Mock<IUserPublicationRoleRepository>)
             CreateHandlerAndDependencies()
         {
             var publicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
             var handler = new DeleteSpecificMethodologyAuthorizationHandler(
+                methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 publicationRoleRepository.Object);
 
-            return (handler, methodologyRepository, publicationRoleRepository);
+            return (handler, methodologyRepository, methodologyVersionRepository, publicationRoleRepository);
         }
     }
 }

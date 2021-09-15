@@ -1,9 +1,9 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userReleaseRoles.AddRange(new List<UserReleaseRole>
             {
-                new UserReleaseRole
+                new()
                 {
                     Release = new Release
                     {
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     User = user,
                     Role = Contributor
                 },
-                new UserReleaseRole
+                new()
                 {
                     Release = new Release
                     {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     User = user,
                     Role = Viewer
                 },
-                new UserReleaseRole
+                new()
                 {
                     Release = new Release
                     {
@@ -82,12 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Related publication 2",
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ReleaseName = "2015",
                             TimePeriodCoverage = AcademicYear
                         },
-                        new Release
+                        new()
                         {
                             ReleaseName = "2016",
                             TimePeriodCoverage = AcademicYear
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Unrelated publication 2",
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ReleaseName = "2012",
                             TimePeriodCoverage = AcademicYear
@@ -196,53 +196,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user = new User();
             var topic = new Topic();
 
-            var methodology1Version1 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                AlternativeTitle = "Methodology 1 Version 1",
-                Version = 0,
-                Status = Draft,
-            };
-            
-            var methodology2Version1 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                AlternativeTitle = "Methodology 2 Version 1",
-                Version = 0,
-                Status = Approved,
-            };
-            
-            var methodology2Version2 = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                AlternativeTitle = "Methodology 2 Version 2",
-                Version = 1,
-                Status = Approved,
-                PreviousVersionId = methodology2Version1.Id
-            };
-            
-            // Set up a publication and releases related to the topic that will be granted via a publication role
+            var methodology1Id = Guid.NewGuid();
+            var methodology2Id = Guid.NewGuid();
+            var methodology3Version0Id = Guid.NewGuid();
+            var methodology3Version1Id = Guid.NewGuid();
+
+            // Set up a publication related to the topic granted via a publication role
+            // Include a mix of owned and adopted methodologies that are deliberately not in any title order
             var userPublicationRoles = new List<UserPublicationRole>
             {
-                new UserPublicationRole
+                new()
                 {
                     Publication = new Publication
                     {
                         Title = "Related publication",
                         Methodologies = new List<PublicationMethodology>
                         {
-                            new PublicationMethodology
+                            new()
                             {
-                                MethodologyParent = new MethodologyParent
+                                Owner = false,
+                                Methodology = new Methodology
                                 {
-                                    Versions = AsList(methodology1Version1)
+                                    Versions = new List<MethodologyVersion>
+                                    {
+                                        new()
+                                        {
+                                            Id = methodology2Id,
+                                            AlternativeTitle = "Methodology 2",
+                                            Version = 0,
+                                            Status = Draft
+                                        }
+                                    }
+                                }
+                            },                          
+                            new()
+                            {
+                                Owner = true,
+                                Methodology = new Methodology
+                                {
+                                    Versions = new List<MethodologyVersion>
+                                    {
+                                        new()
+                                        {
+                                            Id = methodology1Id,
+                                            AlternativeTitle = "Methodology 1",
+                                            Version = 0,
+                                            Status = Draft
+                                        }
+                                    }
                                 }
                             },
-                            new PublicationMethodology
+                            new()
                             {
-                                MethodologyParent = new MethodologyParent
+                                Owner = false,
+                                Methodology = new Methodology
                                 {
-                                    Versions = AsList(methodology2Version1, methodology2Version2)
+                                    Versions = new List<MethodologyVersion>
+                                    {
+                                        new()
+                                        {
+                                            Id = methodology3Version0Id,
+                                            AlternativeTitle = "Methodology 3 Version 0",
+                                            Version = 0,
+                                            Status = Approved
+                                        },
+                                        new()
+                                        {
+                                            Id = methodology3Version1Id,
+                                            AlternativeTitle = "Methodology 3 Version 1",
+                                            Version = 1,
+                                            Status = Approved,
+                                            PreviousVersionId = methodology3Version0Id
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -270,16 +296,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var publication = Assert.Single(result);
                 Assert.NotNull(publication);
-                Assert.Equal(2, publication.Methodologies.Count);
+                Assert.Equal(3, publication.Methodologies.Count);
 
-                var methodology1 = publication.Methodologies[0];
-                var methodology2 = publication.Methodologies[1];
-                
-                Assert.Equal(methodology1Version1.Id, methodology1.Id);
-                Assert.Equal(methodology2Version2.Id, methodology2.Id);
+                // Check that the latest versions of the methodologies are returned in title order 
+
+                var link1 = publication.Methodologies[0];
+                Assert.True(link1.Owner);
+                Assert.Equal(methodology1Id, link1.Methodology.Id);
+                Assert.Equal("Methodology 1", link1.Methodology.Title);
+
+                var link2 = publication.Methodologies[1];
+                Assert.False(link2.Owner);
+                Assert.Equal(methodology2Id, link2.Methodology.Id);
+                Assert.Equal("Methodology 2", link2.Methodology.Title);
+
+                var link3 = publication.Methodologies[2];
+                Assert.False(link3.Owner);
+                Assert.Equal(methodology3Version1Id, link3.Methodology.Id);
+                Assert.Equal("Methodology 3 Version 1", link3.Methodology.Title);
             }
         }
-        
+
         [Fact]
         public async Task GetPublicationsForTopicRelatedToUser_NoPublicationsForTopic()
         {
@@ -313,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Unrelated publication 2",
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ReleaseName = "2012",
                             TimePeriodCoverage = AcademicYear
@@ -378,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Related publication 2",
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ReleaseName = "2012",
                             TimePeriodCoverage = AcademicYear
@@ -421,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userPublicationRoles = new List<UserPublicationRole>
             {
-                new UserPublicationRole
+                new()
                 {
                     Publication = new Publication
                     {
@@ -432,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     User = user,
                     Role = Owner
                 },
-                new UserPublicationRole
+                new()
                 {
                     Publication = new Publication
                     {
@@ -495,13 +532,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userReleaseRoles.AddRange(new List<UserReleaseRole>
             {
-                new UserReleaseRole
+                new()
                 {
                     Release = release,
                     User = user,
                     Role = Contributor
                 },
-                new UserReleaseRole
+                new()
                 {
                     Release = release,
                     User = user,
@@ -542,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ReleasesCorrectlyOrdered()
+        public async Task GetAllPublicationsForTopic_ReleasesCorrectlyOrdered()
         {
             var topicId = Guid.NewGuid();
             var contextId = Guid.NewGuid().ToString();
@@ -554,49 +591,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = topicId,
                     Publications = new List<Publication>
                     {
-                        new Publication
+                        new()
                         {
                             Id = Guid.NewGuid(),
                             Title = "Publication",
                             TopicId = topicId,
                             Releases = new List<Release>
                             {
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "2000",
                                     TimePeriodCoverage = Week1,
                                     Published = DateTime.UtcNow
                                 },
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "2000",
                                     TimePeriodCoverage = Week11,
                                     Published = DateTime.UtcNow
                                 },
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "2000",
                                     TimePeriodCoverage = Week3,
                                     Published = DateTime.UtcNow
                                 },
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "2000",
                                     TimePeriodCoverage = Week2,
                                     Published = DateTime.UtcNow
                                 },
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "2001",
                                     TimePeriodCoverage = Week1,
                                     Published = DateTime.UtcNow
                                 },
-                                new Release
+                                new()
                                 {
                                     Id = Guid.NewGuid(),
                                     ReleaseName = "1999",
@@ -613,7 +650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var publicationService = SetupPublicationRepository(context);
-                var publications = await publicationService.GetAllPublicationsForTopicAsync(topicId);
+                var publications = await publicationService.GetAllPublicationsForTopic(topicId);
                 var releases = publications.Single().Releases;
                 Assert.Equal("Week 1 2001", releases[0].Title);
                 Assert.Equal("Week 11 2000", releases[1].Title);
@@ -625,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task LatestReleaseCorrectlyReportedInPublication()
+        public async Task GetAllPublicationsForTopic_LatestReleaseCorrectlyReportedInPublication()
         {
             var latestReleaseId = Guid.NewGuid();
             var notLatestReleaseId = Guid.NewGuid();
@@ -639,7 +676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = topicId,
                     Publications = new List<Publication>
                     {
-                        new Publication
+                        new()
                         {
                             Id = Guid.NewGuid(),
                             Title = "Publication",
@@ -659,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     TimePeriodCoverage = June,
                                     Published = DateTime.UtcNow
                                 }
-                            )    
+                            )
                         }
                     }
                 });
@@ -673,7 +710,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test - this return a list of publication for a user. The releases in the publication
                 // should correctly report whether they are the latest or not. Note that this is dependent on the mapper
                 // that we are passing in.
-                var publications = await publicationService.GetAllPublicationsForTopicAsync(topicId);
+                var publications = await publicationService.GetAllPublicationsForTopic(topicId);
                 var releases = publications.Single().Releases;
                 Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease));
                 Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
@@ -822,7 +859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
         {
-            return new PublicationRepository(contentDbContext, AdminMapper());
+            return new(contentDbContext, AdminMapper());
         }
     }
 }

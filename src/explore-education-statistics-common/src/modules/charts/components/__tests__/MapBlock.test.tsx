@@ -1,6 +1,8 @@
 import {
   testMapConfiguration,
   testMapTableData,
+  testMapTableDataRegion,
+  testMapTableDataMixed,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import MapBlock, {
   MapBlockProps,
@@ -115,7 +117,9 @@ describe('MapBlock', () => {
     render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
-      const select = screen.getByLabelText('2. Select a location');
+      const select = screen.getByLabelText(
+        '2. Select a Local Authority District',
+      );
 
       expect(select).toBeVisible();
 
@@ -173,10 +177,14 @@ describe('MapBlock', () => {
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('2. Select a Local Authority District'),
+      ).toBeInTheDocument();
     });
 
-    const select = screen.getByLabelText('2. Select a location');
+    const select = screen.getByLabelText(
+      '2. Select a Local Authority District',
+    );
 
     expect(select.children[1]).toHaveTextContent('Leeds');
 
@@ -199,10 +207,14 @@ describe('MapBlock', () => {
     render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('2. Select a Local Authority District'),
+      ).toBeInTheDocument();
     });
 
-    const select = screen.getByLabelText('2. Select a location');
+    const select = screen.getByLabelText(
+      '2. Select a Local Authority District',
+    );
 
     userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
@@ -248,10 +260,14 @@ describe('MapBlock', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('2. Select a Local Authority District'),
+      ).toBeInTheDocument();
     });
 
-    const select = screen.getByLabelText('2. Select a location');
+    const select = screen.getByLabelText(
+      '2. Select a Local Authority District',
+    );
 
     userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
@@ -288,10 +304,14 @@ describe('MapBlock', () => {
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('2. Select a Local Authority District'),
+      ).toBeInTheDocument();
     });
 
-    const select = screen.getByLabelText('2. Select a location');
+    const select = screen.getByLabelText(
+      '2. Select a Local Authority District',
+    );
 
     userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
@@ -303,5 +323,39 @@ describe('MapBlock', () => {
 
     userEvent.selectOptions(select, select.children[0] as HTMLElement);
     expect(paths[3]).not.toHaveClass('selected');
+  });
+
+  describe('Location dropdown', () => {
+    test('shows the data set location type in the label', async () => {
+      const testFullTableRegion = mapFullTable(testMapTableDataRegion);
+
+      const testBlockPropsRegion = produce(testBlockProps, draft => {
+        draft.meta = testFullTableRegion.subjectMeta;
+        draft.data = testFullTableRegion.results;
+      });
+
+      render(<MapBlock {...testBlockPropsRegion} />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('2. Select a Region')).toBeInTheDocument();
+      });
+    });
+
+    test('shows the default label if the data set contains multiple types', async () => {
+      const testFullTableRegion = mapFullTable(testMapTableDataMixed);
+
+      const testBlockPropsRegion = produce(testBlockProps, draft => {
+        draft.meta = testFullTableRegion.subjectMeta;
+        draft.data = testFullTableRegion.results;
+      });
+
+      render(<MapBlock {...testBlockPropsRegion} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('2. Select a location'),
+        ).toBeInTheDocument();
+      });
+    });
   });
 });

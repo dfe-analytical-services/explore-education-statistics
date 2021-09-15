@@ -1,124 +1,48 @@
-import themeService, {
-  DownloadTheme,
-  PublicationDownloadSummary,
-} from '@common/services/themeService';
-import Page from '@frontend/components/Page';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import { Release } from '@common/services/publicationService';
-import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import Wizard, {
   InjectedWizardProps,
 } from '@common/modules/table-tool/components/Wizard';
-import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
-import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import downloadService from '@common/services/downloadService';
+import publicationService, {
+  ReleaseSummary,
+} from '@common/services/publicationService';
+import tableBuilderService, {
+  Subject,
+} from '@common/services/tableBuilderService';
+import themeService, {
+  PublicationSummary,
+  Theme,
+} from '@common/services/themeService';
+import { Dictionary } from '@common/types';
+import Page from '@frontend/components/Page';
 import DownloadStep, {
   DownloadFormSubmitHandler,
-  SubjectWithDownloadFiles,
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
-import { Dictionary } from '@common/types';
-import ErrorPage from '@frontend/modules/ErrorPage';
+import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
+import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { GetServerSideProps, NextPage } from 'next';
-import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
+import React, { useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
-const fakeReleases: Release[] = [
-  {
-    id: 'rel-1',
-    latestRelease: true,
-    published: '2021-06-30T11:21:17.7585345',
-    slug: 'rel-1-slug',
-    title: 'Release 1',
-  } as Release,
-  {
-    id: 'rel-3',
-    latestRelease: false,
-    published: '2021-01-01T11:21:17.7585345',
-    slug: 'rel-3-slug',
-    title: 'Another Release',
-  } as Release,
-  {
-    id: 'rel-2',
-    latestRelease: false,
-    published: '2021-05-30T11:21:17.7585345',
-    slug: 'rel-2-slug',
-    title: 'Release 2',
-  } as Release,
-];
-const fakeSubjectsWithDownloadFiles: SubjectWithDownloadFiles[] = [
-  {
-    id: 'subject-1',
-    name: 'Subject 1',
-    content: 'Some content here',
-    geographicLevels: ['SoYo'],
-    timePeriods: {
-      from: '2016',
-      to: '2019',
-    },
-    downloadFile: {
-      id: 'file-1',
-      extension: 'csv',
-      fileName: 'file-1.csv',
-      name: 'File 1',
-      size: '100mb',
-      type: 'Data',
-    },
-  },
-  {
-    id: 'subject-2',
-    name: 'Another Subject',
-    content: 'Some content here',
-    geographicLevels: ['SoYo'],
-    timePeriods: {
-      from: '2016',
-      to: '2019',
-    },
-    downloadFile: {
-      id: 'file-2',
-      extension: 'csv',
-      fileName: 'file-2.csv',
-      name: 'File 2',
-      size: '100mb',
-      type: 'Data',
-    },
-  },
-  {
-    id: 'subject-3',
-    name: 'Subject 3',
-    content: 'Some content here',
-    geographicLevels: ['SoYo'],
-    timePeriods: {
-      from: '2016',
-      to: '2019',
-    },
-    downloadFile: {
-      id: 'file-3',
-      extension: 'csv',
-      fileName: 'file-3.csv',
-      name: 'File 3',
-      size: '100mb',
-      type: 'Data',
-    },
-  },
-];
-
 interface Props {
-  releases?: Release[];
-  selectedPublication?: PublicationDownloadSummary;
-  selectedRelease?: Release;
-  subjects?: SubjectWithDownloadFiles[];
-  themes: DownloadTheme[];
+  releases?: ReleaseSummary[];
+  selectedPublication?: PublicationSummary;
+  selectedRelease?: ReleaseSummary;
+  subjects?: Subject[];
+  themes: Theme[];
 }
 
 interface DataCatalogueState {
   initialStep: number;
-  releases: Release[];
-  subjects: SubjectWithDownloadFiles[];
+  releases: ReleaseSummary[];
+  subjects: Subject[];
   query: {
-    publicationId?: string;
-    release?: Release;
+    publication?: PublicationSummary;
+    release?: ReleaseSummary;
   };
 }
 
@@ -147,8 +71,8 @@ const DataCataloguePage: NextPage<Props> = ({
       releases,
       subjects,
       query: {
-        publicationId: selectedPublication?.id || '',
-        release: (selectedPublication && selectedRelease) || undefined,
+        publication: selectedPublication,
+        release: selectedRelease,
       },
     };
   }, [releases, selectedPublication, selectedRelease, subjects]);
@@ -160,44 +84,50 @@ const DataCataloguePage: NextPage<Props> = ({
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId,
+    publication,
   }) => {
+    const nextReleases = await publicationService.listReleases(
+      publication.slug,
+    );
+
     updateState(draft => {
-      draft.releases = fakeReleases;
-      draft.query.publicationId = publicationId;
+      draft.releases = nextReleases;
+      draft.query.publication = publication;
     });
   };
 
   const handleReleaseFormSubmit: ReleaseFormSubmitHandler = async ({
-    releaseId: selectedReleaseId,
+    release,
   }) => {
+    const nextSubjects = await tableBuilderService.listReleaseSubjects(
+      release.id,
+    );
+
     updateState(draft => {
-      draft.query.release = draft.releases.find(
-        rel => rel.id === selectedReleaseId,
-      );
-      draft.subjects = fakeSubjectsWithDownloadFiles;
+      draft.query.release = release;
+      draft.subjects = nextSubjects;
     });
   };
 
-  const handleDownloadFormSubmit: DownloadFormSubmitHandler = ({ files }) => {
-    // EES-2007  DO STUFF!
+  const handleDownloadFormSubmit: DownloadFormSubmitHandler = async ({
+    files,
+  }) => {
+    if (!state.query.release) {
+      throw new Error('Release has not been selected');
+    }
+
+    await downloadService.downloadFiles(state.query.release.id, files);
   };
 
-  // EES-2007 temp until page is complete
-  if (process.env.APP_ENV === 'Production') {
-    return <ErrorPage statusCode={404} />;
-  }
-
   const PublicationStep = (props: InjectedWizardProps) => {
-    const options: DownloadTheme[] = themes;
     return (
       <PublicationForm
         {...props}
         initialValues={{
-          publicationId: state.query.publicationId ?? '',
+          publicationId: state.query.publication?.id ?? '',
         }}
         onSubmit={handlePublicationFormSubmit}
-        options={options}
+        options={themes}
       />
     );
   };
@@ -242,48 +172,46 @@ const DataCataloguePage: NextPage<Props> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
-  // EES-2007 temp until page is complete
-  if (process.env.APP_ENV === 'Production') {
-    // eslint-disable-next-line no-param-reassign
-    context.res.statusCode = 404;
-    return {
-      props: {
-        themes: [],
-      },
-    };
-  }
-
   const {
     publicationSlug = '',
     releaseSlug = '',
   } = context.query as Dictionary<string>;
 
-  const themes = await themeService.getDownloadThemes();
+  const themes = await themeService.listThemes({
+    publicationFilter: 'AnyData',
+  });
 
   const selectedPublication = themes
     .flatMap(option => option.topics)
     .flatMap(option => option.publications)
     .find(option => option.slug === publicationSlug);
 
-  // EES-2007 Get real releases here
-  const releases = fakeReleases;
+  let releases: ReleaseSummary[] = [];
 
-  let selectedRelease: Release | undefined;
+  if (selectedPublication) {
+    releases = await publicationService.listReleases(publicationSlug);
+  }
+
+  let selectedRelease: ReleaseSummary | undefined;
+
   if (releaseSlug) {
     selectedRelease = releases.find(rel => rel.slug === releaseSlug);
   }
 
-  let subjects;
+  let subjects: Subject[] = [];
+
   if (selectedPublication && selectedRelease) {
-    // EES-2007 Get real subjects here
-    subjects = fakeSubjectsWithDownloadFiles;
+    subjects = await tableBuilderService.listReleaseSubjects(
+      selectedRelease.id,
+    );
   }
 
   const props: Props = {
-    releases: releases ?? [],
-    subjects: subjects ?? [],
+    releases,
+    subjects,
     themes,
   };
+
   if (selectedPublication) {
     props.selectedPublication = selectedPublication;
 

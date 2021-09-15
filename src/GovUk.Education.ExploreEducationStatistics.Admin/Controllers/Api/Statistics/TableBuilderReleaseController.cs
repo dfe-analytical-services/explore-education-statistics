@@ -1,4 +1,6 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -20,10 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseService = releaseService;
         }
 
-        [HttpGet("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseId)
+        [HttpGet("releases/{releaseId}/subjects")]
+        public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
-            return await _releaseService.GetRelease(releaseId)
+            return await _releaseService.ListSubjects(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}/featured-tables")]
+        public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
+        {
+            return await _releaseService.ListFeaturedTables(releaseId)
                 .HandleFailuresOrOk();
         }
     }

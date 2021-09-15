@@ -17,26 +17,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
 
         public class ApproveSpecificMethodologyAuthorizationHandler :
-            AuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
+            AuthorizationHandler<ApproveSpecificMethodologyRequirement, MethodologyVersion>
         {
+            private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
             private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-            public ApproveSpecificMethodologyAuthorizationHandler(
+            public ApproveSpecificMethodologyAuthorizationHandler(IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
                 IUserReleaseRoleRepository userReleaseRoleRepository)
             {
+                _methodologyVersionRepository = methodologyVersionRepository;
                 _methodologyRepository = methodologyRepository;
                 _userReleaseRoleRepository = userReleaseRoleRepository;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
                 ApproveSpecificMethodologyRequirement requirement,
-                Methodology methodology)
+                MethodologyVersion methodologyVersion)
             {
                 // If the Methodology is already public, it cannot be approved
                 // An approved Methodology that isn't public can be approved to change attributes associated with approval  
-                if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
                 {
                     return;
                 }
@@ -48,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 }
 
                 var owningPublication =
-                    await _methodologyRepository.GetOwningPublicationByMethodologyParent(
-                        methodology.MethodologyParentId);
+                    await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
                 // this Methodology, they can approve it.
@@ -68,25 +69,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         public class
             MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
-                MarkSpecificMethodologyAsDraftRequirement, Methodology>
+                MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
         {
+            private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
             private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-            public MarkSpecificMethodologyAsDraftAuthorizationHandler(
+            public MarkSpecificMethodologyAsDraftAuthorizationHandler(IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
                 IUserReleaseRoleRepository userReleaseRoleRepository)
             {
+                _methodologyVersionRepository = methodologyVersionRepository;
                 _methodologyRepository = methodologyRepository;
                 _userReleaseRoleRepository = userReleaseRoleRepository;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
                 MarkSpecificMethodologyAsDraftRequirement requirement,
-                Methodology methodology)
+                MethodologyVersion methodologyVersion)
             {
                 // If the Methodology is already public, it cannot be marked as draft
-                if (await _methodologyRepository.IsPubliclyAccessible(methodology.Id))
+                if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
                 {
                     return;
                 }
@@ -98,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 }
 
                 var owningPublication =
-                    await _methodologyRepository.GetOwningPublicationByMethodologyParent(
-                        methodology.MethodologyParentId);
+                    await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
                 // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
                 // this Methodology, they can mark it as draft.

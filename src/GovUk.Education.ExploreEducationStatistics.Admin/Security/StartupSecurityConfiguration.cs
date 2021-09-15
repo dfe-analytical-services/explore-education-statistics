@@ -169,6 +169,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
 
+                // does this user have permission to drop a link to an adopted Methodology?
+                options.AddPolicy(SecurityPolicies.CanDropMethodologyLink.ToString(), policy =>
+                    policy.Requirements.Add(new DropMethodologyLinkRequirement()));
+
                 // does this user have permission to manage the external methodology for a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(),
                     policy =>
@@ -251,6 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Methodology management
              */
             services.AddTransient<IAuthorizationHandler, AdoptMethodologyForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DropMethodologyLinkAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftAuthorizationHandler>();
