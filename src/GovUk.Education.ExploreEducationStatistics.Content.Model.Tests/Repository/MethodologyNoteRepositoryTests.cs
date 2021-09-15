@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -63,28 +64,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         [Fact]
         public async Task DeleteNote()
         {
-            var methodologyNote = new MethodologyNote
+            var methodologyVersion = new MethodologyVersion
             {
-                MethodologyVersion = new MethodologyVersion()
+                Notes = new List<MethodologyNote>
+                {
+                    new()
+                    {
+                        Content = "Note 1"
+                    },
+                    new()
+                    {
+                        Content = "Note 2"
+                    }
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyNotes.AddAsync(methodologyNote);
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyNoteRepository(contentDbContext);
-                await service.DeleteNote(methodologyNote.Id);
+                await service.DeleteNote(methodologyVersion.Notes[0].Id);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                Assert.Empty(contentDbContext.MethodologyNotes);
+                Assert.Single(contentDbContext.MethodologyNotes);
+
+                Assert.Null(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id));
+                Assert.NotNull(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[1].Id));
             }
         }
 
@@ -129,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Assert.Single(contentDbContext.MethodologyNotes);
 
-                var updatedNote = await contentDbContext.MethodologyNotes.FindAsync(methodologyNote.Id);
+                var updatedNote = await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyNote.Id);
 
                 Assert.Equal(content, updatedNote.Content);
                 Assert.Equal(methodologyNote.Created, updatedNote.Created);
@@ -137,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(displayDate, updatedNote.DisplayDate);
                 Assert.Equal(methodologyNote.MethodologyVersion.Id, updatedNote.MethodologyVersionId);
                 Assert.NotNull(updatedNote.Updated);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedNote.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedNote.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(updatedById, updatedNote.UpdatedById);
             }
         }
