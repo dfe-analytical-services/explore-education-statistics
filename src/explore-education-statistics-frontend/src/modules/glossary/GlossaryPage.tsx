@@ -75,7 +75,11 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
             <>
               {category.entries.length ? (
                 category.entries.map(entry => (
-                  <div id={entry.slug} key={entry.slug}>
+                  <div
+                    id={entry.slug}
+                    key={entry.slug}
+                    className="govuk-!-margin-bottom-7"
+                  >
                     <h3>{entry.title}</h3>
                     <div
                       // eslint-disable-next-line react/no-danger
