@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 {
     public partial class EES2676CreateGlossaryEntriesTableAndAddEntries : Migration
     {
-        private const string GlossaryEntriesSqlFile = "20210908110527_InitialGlossaryEntries.sql";
+        private const string GlossaryEntriesSqlFile = "20210913123447_InitialGlossaryEntries.sql";
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
