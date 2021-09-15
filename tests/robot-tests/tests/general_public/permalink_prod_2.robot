@@ -26,7 +26,7 @@ Validate breadcrumbs
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020
     user waits until element contains    testid:dataTableCaption
-    ...    Table showing 'Exclusions by characteristic' in England between 2013/14 and 2015/16
+    ...    'Exclusions by characteristic' in England between 2013/14 and 2015/16
     user waits until page contains button    Print this page
 
 Validate table

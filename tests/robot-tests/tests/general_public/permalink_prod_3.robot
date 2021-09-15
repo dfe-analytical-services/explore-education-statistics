@@ -26,7 +26,7 @@ Validate breadcrumbs
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020
     user waits until element contains    testid:dataTableCaption
-    ...    Table showing 'Exclusions by geographic level' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
+    ...    'Exclusions by geographic level' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
     user waits until page contains button    Print this page
 
 Validate table
