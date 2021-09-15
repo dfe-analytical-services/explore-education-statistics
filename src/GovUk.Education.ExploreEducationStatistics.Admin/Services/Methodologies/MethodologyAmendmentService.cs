@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
 
         public MethodologyAmendmentService(
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IMethodologyService methodologyService,
             ContentDbContext context)
@@ -39,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
-                .OnSuccess(HydrateMethodologyForAmendment)
+                .OnSuccess(HydrateMethodologyVersionForAmendment)
                 .OnSuccess(CreateAndSaveAmendment)
                 .OnSuccessDo(LinkOriginalMethodologyFilesToAmendment)
                 .OnSuccess(amendment => _methodologyService.GetSummary(amendment.Id));
         }
-        
+
         private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(
             MethodologyVersion methodologyVersion)
         {
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             await _context.SaveChangesAsync();
             return savedAmendment;
         }
-        
+
         private async Task<Either<ActionResult, Unit>> LinkOriginalMethodologyFilesToAmendment(
             MethodologyVersion methodologyVersion)
         {
@@ -74,9 +74,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, MethodologyVersion>> HydrateMethodologyForAmendment(
+        private async Task<Either<ActionResult, MethodologyVersion>> HydrateMethodologyVersionForAmendment(
             MethodologyVersion methodologyVersion)
         {
+            await _context
+                .Entry(methodologyVersion)
+                .Collection(m => m.Notes)
+                .LoadAsync();
+
             await _context
                 .Entry(methodologyVersion)
                 .Reference(m => m.Methodology)

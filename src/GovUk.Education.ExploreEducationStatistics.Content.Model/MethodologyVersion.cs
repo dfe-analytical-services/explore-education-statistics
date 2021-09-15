@@ -40,6 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ContentSection> Annexes { get; set; } = new();
 
+        public List<MethodologyNote> Notes { get; set; } = new();
+
         public string? InternalReleaseNote { get; set; }
 
         public Methodology Methodology { get; set; } = null!;
@@ -94,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public MethodologyVersion CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
-            var copy = MemberwiseClone() as MethodologyVersion;
+            var copy = (MethodologyVersion) MemberwiseClone();
+
             copy.Id = Guid.NewGuid();
             copy.Status = Draft;
             copy.Published = null;
@@ -117,6 +120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             copy.Content = Content
                 .Select(c => c.Clone(createdDate))
+                .ToList();
+
+            copy.Notes = copy
+                .Notes
+                .Select(n => n.Clone(copy))
                 .ToList();
 
             return copy;

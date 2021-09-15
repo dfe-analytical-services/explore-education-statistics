@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -137,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                     OwningPublicationTitle = "Owning Publication Title"
                 }
             };
-            
+
             Assert.Equal(methodology.Methodology.OwningPublicationTitle, methodology.Title);
         }
 
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 },
                 AlternativeTitle = "Alternative Title"
             };
-            
+
             Assert.Equal(methodology.AlternativeTitle, methodology.Title);
         }
 
@@ -166,12 +167,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                     Slug = "owning-publication-slug"
                 }
             };
-            
+
             Assert.Equal(methodology.Methodology.Slug, methodology.Slug);
         }
 
         [Fact]
-        public void CreateMethodologyAmendment()
+        public void CreateMethodologyAmendment_ClonesBasicFields()
         {
             var userId = Guid.NewGuid();
 
@@ -187,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 CreatedBy = new User(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-10),
-                
+
                 // approval and publishing fields
                 Status = Approved,
                 Published = DateTime.Today.AddDays(-1),
@@ -199,70 +200,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 Version = 1,
                 PreviousVersion = new MethodologyVersion(),
                 PreviousVersionId = Guid.NewGuid(),
-                
+
                 // methodology field
                 Methodology = new Methodology(),
-                MethodologyId = Guid.NewGuid(),
-                
-                // annex field
-                Annexes = AsList(new ContentSection
-                {
-                    Id = Guid.NewGuid(),
-                    Caption = "Annex caption",
-                    Heading = "Annex heading",
-                    Order = 2,
-                    Type = ContentSectionType.Generic,
-                    Content = AsList<ContentBlock>(new HtmlBlock
-                    {
-                        Id = Guid.NewGuid(),
-                        Body = "Annex body",
-                        Created = DateTime.Today.AddDays(-13),
-                        Order = 5,
-                        ContentSection = new ContentSection(),
-                        ContentSectionId = Guid.NewGuid(),
-                        Comments = AsList(new Comment
-                        {
-                            Id = Guid.NewGuid(),
-                            Content = "Annex comment",
-                            Created = DateTime.Today.AddDays(-4),
-                            CreatedById = Guid.NewGuid(),
-                            Updated = DateTime.Today.AddDays(-3),
-                            CreatedBy = new User()
-                        })
-                    })
-                }),
-                
-                // content field
-                Content = AsList(new ContentSection
-                {
-                    Id = Guid.NewGuid(),
-                    Caption = "Content caption",
-                    Heading = "Content heading",
-                    Order = 2,
-                    Type = ContentSectionType.Generic,
-                    Content = AsList<ContentBlock>(new HtmlBlock
-                    {
-                        Id = Guid.NewGuid(),
-                        Body = "Content body",
-                        Comments = AsList(new Comment
-                        {
-                            Id = Guid.NewGuid(),
-                            Content = "Content comment",
-                            Created = DateTime.Today.AddDays(-4),
-                            CreatedById = Guid.NewGuid(),
-                            Updated = DateTime.Today.AddDays(-3),
-                            CreatedBy = new User()
-                        })
-                    }),
-                })
+                MethodologyId = Guid.NewGuid()
             };
-            
+
             Assert.False(originalVersion.Amendment);
 
             var creationTime = DateTime.Today.AddMinutes(-2);
-            
+
             var amendment = originalVersion.CreateMethodologyAmendment(creationTime, userId);
-            
+
             Assert.True(amendment.Amendment);
 
             // Check general fields.
@@ -292,16 +241,94 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             // Check methodology field.
             Assert.Equal(originalVersion.MethodologyId, amendment.MethodologyId);
             Assert.Null(amendment.Methodology);
+        }
 
-            // Check Annex Content Sections.
-            var amendmentAnnexSection = Assert.Single(amendment.Annexes);
-            var originalAnnexSection = originalVersion.Annexes[0];
-            AssertContentSectionAmendedCorrectly(amendmentAnnexSection, originalAnnexSection, creationTime);
-            
-            // Check Content Content Sections.
-            var amendmentContentSection = Assert.Single(amendment.Content);
-            var originalContentSection = originalVersion.Content[0];
-            AssertContentSectionAmendedCorrectly(amendmentContentSection, originalContentSection, creationTime);
+        [Fact]
+        public void CreateMethodologyAmendment_ClonesAnnexContentSections()
+        {
+            var originalVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                Annexes = new List<ContentSection>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Caption = "Annex caption",
+                        Heading = "Annex heading",
+                        Order = 2,
+                        Type = ContentSectionType.Generic,
+                        Content = ListOf<ContentBlock>(new HtmlBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Body = "Annex body",
+                            Created = DateTime.Today.AddDays(-13),
+                            Order = 5,
+                            ContentSection = new ContentSection(),
+                            ContentSectionId = Guid.NewGuid(),
+                            Comments = new List<Comment>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Annex comment",
+                                    Created = DateTime.Today.AddDays(-4),
+                                    CreatedById = Guid.NewGuid(),
+                                    Updated = DateTime.Today.AddDays(-3),
+                                    CreatedBy = new User()
+                                }
+                            }
+                        })
+                    }
+                }
+            };
+
+
+            var createdDate = DateTime.Today.AddMinutes(-2);
+            var amendment = originalVersion.CreateMethodologyAmendment(createdDate, Guid.NewGuid());
+            AssertContentSectionAmendedCorrectly(amendment.Annexes[0], originalVersion.Annexes[0], createdDate);
+        }
+
+        [Fact]
+        public void CreateMethodologyAmendment_ClonesContentSections()
+        {
+            var originalVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                Content = new List<ContentSection>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Caption = "Content caption",
+                        Heading = "Content heading",
+                        Order = 2,
+                        Type = ContentSectionType.Generic,
+                        Content = ListOf<ContentBlock>(new HtmlBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Body = "Content body",
+                            Comments = new List<Comment>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Content comment",
+                                    Created = DateTime.Today.AddDays(-4),
+                                    CreatedById = Guid.NewGuid(),
+                                    Updated = DateTime.Today.AddDays(-3),
+                                    CreatedBy = new User()
+                                }
+                            }
+                        })
+                    }
+                }
+            };
+
+
+            var createdDate = DateTime.Today.AddMinutes(-2);
+            var amendment = originalVersion.CreateMethodologyAmendment(createdDate, Guid.NewGuid());
+            AssertContentSectionAmendedCorrectly(amendment.Content[0], originalVersion.Content[0], createdDate);
         }
 
         private static void AssertContentSectionAmendedCorrectly(ContentSection amendmentContentSection,
@@ -323,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             // Check the Content Block has a new id.
             Assert.NotEqual(Guid.Empty, amendmentContentBlock.Id);
             Assert.NotEqual(originalContentBlock.Id, amendmentContentBlock.Id);
-            
+
             // Check the other Content Block basic fields.
             Assert.Equal(originalContentBlock.Body, amendmentContentBlock.Body);
             Assert.Equal(creationTime, amendmentContentBlock.Created);
@@ -338,6 +365,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         }
 
         [Fact]
+        public void CreateMethodologyAmendment_ClonesNotes()
+        {
+            var originalVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid()
+            };
+
+            originalVersion.Notes = new List<MethodologyNote>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Content = "Note 1",
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                    MethodologyVersion = originalVersion,
+                    MethodologyVersionId = originalVersion.Id,
+                    Created = DateTime.Today.AddDays(-6).ToUniversalTime(),
+                    CreatedBy = new User(),
+                    CreatedById = Guid.NewGuid(),
+                    Updated = DateTime.Today.AddDays(-5).ToUniversalTime(),
+                    UpdatedBy = new User(),
+                    UpdatedById = Guid.NewGuid()
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Content = "Note 2",
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                    MethodologyVersion = originalVersion,
+                    MethodologyVersionId = originalVersion.Id,
+                    Created = DateTime.Today.AddDays(-4).ToUniversalTime(),
+                    CreatedBy = new User(),
+                    CreatedById = Guid.NewGuid(),
+                    Updated = DateTime.Today.AddDays(-3).ToUniversalTime(),
+                    UpdatedBy = new User(),
+                    UpdatedById = Guid.NewGuid()
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Content = "Note 3",
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                    MethodologyVersion = originalVersion,
+                    MethodologyVersionId = originalVersion.Id,
+                    Created = DateTime.Today.AddDays(-2).ToUniversalTime(),
+                    CreatedBy = new User(),
+                    CreatedById = Guid.NewGuid(),
+                    Updated = DateTime.Today.AddDays(-1).ToUniversalTime(),
+                    UpdatedBy = new User(),
+                    UpdatedById = Guid.NewGuid()
+                }
+            };
+
+            var createdDate = DateTime.Today.AddMinutes(-2);
+            var amendment = originalVersion.CreateMethodologyAmendment(createdDate, Guid.NewGuid());
+            Assert.Equal(3, amendment.Notes.Count);
+
+            AssertMethodologyNoteAmendedCorrectly(amendment.Notes[0], originalVersion.Notes[0], amendment);
+            AssertMethodologyNoteAmendedCorrectly(amendment.Notes[1], originalVersion.Notes[1], amendment);
+            AssertMethodologyNoteAmendedCorrectly(amendment.Notes[2], originalVersion.Notes[2], amendment);
+        }
+
+        private static void AssertMethodologyNoteAmendedCorrectly(
+            MethodologyNote amendmentNote,
+            MethodologyNote originalNote,
+            MethodologyVersion amendment)
+        {
+            // Check the note has a new id.
+            Assert.NotEqual(Guid.Empty, amendmentNote.Id);
+            Assert.NotEqual(originalNote.Id, amendmentNote.Id);
+
+            // Check the note has the amended methodology version
+            Assert.Equal(amendment, amendmentNote.MethodologyVersion);
+            Assert.Equal(amendment.Id, amendmentNote.MethodologyVersionId);
+
+            // Check the other fields are the same
+            Assert.Equal(originalNote.Content, amendmentNote.Content);
+            Assert.Equal(originalNote.Created, amendmentNote.Created);
+            Assert.Equal(originalNote.CreatedBy, amendmentNote.CreatedBy);
+            Assert.Equal(originalNote.CreatedById, amendmentNote.CreatedById);
+            Assert.Equal(originalNote.DisplayDate, amendmentNote.DisplayDate);
+            Assert.Equal(originalNote.Updated, amendmentNote.Updated);
+            Assert.Equal(originalNote.UpdatedBy, amendmentNote.UpdatedBy);
+            Assert.Equal(originalNote.UpdatedById, amendmentNote.UpdatedById);
+        }
+
+        [Fact]
         public void AmendmentFlag_NotAmendment_FirstUnpublishedVersion()
         {
             var methodology = new MethodologyVersion
@@ -345,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 PreviousVersionId = null,
                 Published = null
             };
-            
+
             Assert.False(methodology.Amendment);
         }
 
@@ -357,7 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 PreviousVersionId = null,
                 Published = DateTime.Now
             };
-            
+
             Assert.False(methodology.Amendment);
         }
 
@@ -369,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 PreviousVersionId = Guid.NewGuid(),
                 Published = null
             };
-            
+
             Assert.True(methodology.Amendment);
         }
 
@@ -381,7 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 PreviousVersionId = Guid.NewGuid(),
                 Published = DateTime.Now
             };
-            
+
             Assert.False(methodology.Amendment);
         }
 
@@ -393,7 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 Status = Draft,
                 PreviousVersionId = null
             };
-            
+
             Assert.True(methodology.DraftFirstVersion);
         }
 
@@ -405,10 +519,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 Status = Approved,
                 PreviousVersionId = null
             };
-            
+
             Assert.False(methodology.DraftFirstVersion);
         }
-        
+
         [Fact]
         public void DraftFirstVersionFlag_NotFirstVersion()
         {
@@ -417,7 +531,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 Status = Draft,
                 PreviousVersionId = Guid.NewGuid()
             };
-            
+
             Assert.False(methodology.DraftFirstVersion);
         }
     }

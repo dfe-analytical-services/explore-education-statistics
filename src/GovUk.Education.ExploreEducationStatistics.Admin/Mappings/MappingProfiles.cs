@@ -66,6 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
+            CreateMap<MethodologyNote, MethodologyNoteViewModel>();
+
             CreateMap<MethodologyVersion, MethodologySummaryViewModel>()
                 .ForMember(dest => dest.LatestInternalReleaseNote,
                     m => m.MapFrom(model => model.InternalReleaseNote))
