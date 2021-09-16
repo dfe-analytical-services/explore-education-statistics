@@ -2,16 +2,16 @@ import Details from '@common/components/Details';
 import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
+import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
 import React, { ReactNode, useMemo } from 'react';
-import styles from './ReleaseMetaGuidanceDataFile.module.scss';
+import styles from './ReleaseDataGuidanceDataFile.module.scss';
 
 interface Props {
-  subject: SubjectMetaGuidance;
-  renderContent?: (subject: SubjectMetaGuidance) => ReactNode;
+  subject: SubjectDataGuidance;
+  renderContent?: (subject: SubjectDataGuidance) => ReactNode;
 }
 
-const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
+const ReleaseDataGuidanceDataFile = ({ subject, renderContent }: Props) => {
   const { filename, variables, footnotes } = subject;
 
   const geographicLevels = useMemo(
@@ -106,4 +106,4 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
   );
 };
 
-export default ReleaseMetaGuidanceDataFile;
+export default ReleaseDataGuidanceDataFile;

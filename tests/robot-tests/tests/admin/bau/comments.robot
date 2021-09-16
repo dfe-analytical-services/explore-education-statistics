@@ -48,15 +48,15 @@ Create new release
     user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-Add meta guidance to subject
+Add data guidance to subject
     [Tags]    HappyPath
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document    90
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance    90
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
 
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page

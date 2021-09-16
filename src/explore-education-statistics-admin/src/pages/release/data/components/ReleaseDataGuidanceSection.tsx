@@ -1,6 +1,6 @@
 import { toolbarConfigs } from '@admin/components/form/FormEditor';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import releaseMetaGuidanceService from '@admin/services/releaseMetaGuidanceService';
+import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -14,14 +14,14 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
-import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
+import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
 import minDelay from '@common/utils/minDelay';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import toPath from 'lodash/toPath';
 import React from 'react';
 
-export interface MetaGuidanceFormValues {
+export interface DataGuidanceFormValues {
   content: string;
   subjects: {
     id: string;
@@ -29,7 +29,7 @@ export interface MetaGuidanceFormValues {
   }[];
 }
 
-const initialReleaseMetaGuidance = `
+const initialReleaseDataGuidance = `
 <h3>Description</h3>
 <p>---</p>
 
@@ -45,29 +45,29 @@ interface Props {
   canUpdateRelease: boolean;
 }
 
-const formId = 'metaGuidanceForm';
+const formId = 'dataGuidanceForm';
 
-const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
+const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
   const {
-    value: metaGuidance,
+    value: dataGuidance,
     isLoading,
-    setState: setMetaGuidance,
+    setState: setDataGuidance,
   } = useAsyncHandledRetry(
-    () => releaseMetaGuidanceService.getMetaGuidance(releaseId),
+    () => releaseDataGuidanceService.getDataGuidance(releaseId),
     [releaseId, canUpdateRelease],
   );
 
   const [isEditing, toggleEditing] = useToggle(canUpdateRelease);
 
-  const handleSubmit = useFormSubmit<MetaGuidanceFormValues>(
+  const handleSubmit = useFormSubmit<DataGuidanceFormValues>(
     async (values, helpers) => {
       await minDelay(async () => {
-        const updatedGuidance = await releaseMetaGuidanceService.updateMetaGuidance(
+        const updatedGuidance = await releaseDataGuidanceService.updateDataGuidance(
           releaseId,
           values,
         );
 
-        setMetaGuidance({ value: updatedGuidance });
+        setDataGuidance({ value: updatedGuidance });
 
         helpers.resetForm();
         toggleEditing.off();
@@ -77,7 +77,7 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
   return (
     <>
-      <h2>Public metadata guidance document</h2>
+      <h2>Public data guidance</h2>
 
       {canUpdateRelease ? (
         <InsetText>
@@ -85,11 +85,10 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
           <ul>
             <li>
-              upload at least one data file before creating the metadata
-              guidance document
+              upload at least one data file before creating the data guidance
             </li>
             <li>
-              ensure all metadata guidance has been populated and is up-to-date
+              ensure all data guidance has been populated and is up-to-date
               before seeking release approval
             </li>
             <li>
@@ -105,26 +104,26 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
       )}
 
       <LoadingSpinner loading={isLoading}>
-        {metaGuidance && (
+        {dataGuidance && (
           <>
-            {metaGuidance.subjects.length > 0 ? (
-              <Formik<MetaGuidanceFormValues>
+            {dataGuidance.subjects.length > 0 ? (
+              <Formik<DataGuidanceFormValues>
                 enableReinitialize
                 initialValues={{
-                  content: metaGuidance.content || initialReleaseMetaGuidance,
-                  subjects: metaGuidance.subjects.map(subject => ({
+                  content: dataGuidance.content || initialReleaseDataGuidance,
+                  subjects: dataGuidance.subjects.map(subject => ({
                     id: subject.id,
                     content: subject.content,
                   })),
                 }}
-                validationSchema={Yup.object<MetaGuidanceFormValues>({
+                validationSchema={Yup.object<DataGuidanceFormValues>({
                   content: Yup.string().required('Enter main guidance content'),
                   subjects: Yup.array().of(
                     Yup.object({
                       id: Yup.string(),
                       content: Yup.string().required(params => {
                         const [, index] = toPath(params.path);
-                        const subject = metaGuidance?.subjects[Number(index)];
+                        const subject = dataGuidance?.subjects[Number(index)];
 
                         if (!subject) {
                           return null;
@@ -144,13 +143,13 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                   return (
                     <Form id={formId}>
                       {isEditing ? (
-                        <FormFieldEditor<MetaGuidanceFormValues>
+                        <FormFieldEditor<DataGuidanceFormValues>
                           name="content"
                           label="Main guidance content"
                         />
                       ) : (
                         <>
-                          {!canUpdateRelease && !metaGuidance?.content ? (
+                          {!canUpdateRelease && !dataGuidance?.content ? (
                             <InsetText>
                               No guidance content was saved.
                             </InsetText>
@@ -163,25 +162,25 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                         </>
                       )}
 
-                      {metaGuidance.subjects.length > 0 && (
+                      {dataGuidance.subjects.length > 0 && (
                         <>
                           <h3 className="govuk-!-margin-top-6">Data files</h3>
 
                           <Accordion
-                            id="metaGuidance-dataFiles"
+                            id="dataGuidance-dataFiles"
                             openAll={hasSubmitValidationError || isEditing}
                           >
-                            {metaGuidance.subjects.map((subject, index) => (
+                            {dataGuidance.subjects.map((subject, index) => (
                               <AccordionSection
                                 heading={subject.name}
                                 key={subject.id}
                               >
-                                <ReleaseMetaGuidanceDataFile
+                                <ReleaseDataGuidanceDataFile
                                   key={subject.id}
                                   subject={subject}
                                   renderContent={() =>
                                     isEditing ? (
-                                      <FormFieldEditor<MetaGuidanceFormValues>
+                                      <FormFieldEditor<DataGuidanceFormValues>
                                         toolbarConfig={toolbarConfigs.simple}
                                         name={`subjects[${index}].content`}
                                         label="File guidance content"
@@ -233,13 +232,13 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
               <>
                 {canUpdateRelease ? (
                   <WarningMessage>
-                    Before you can change the public metadata guidance, you must
+                    Before you can change the public data guidance, you must
                     upload at least one data file.
                   </WarningMessage>
                 ) : (
                   <InsetText>
-                    The public metadata guidance document has not been created
-                    as no data files were uploaded.
+                    The public data guidance has not been created as no data
+                    files were uploaded.
                   </InsetText>
                 )}
               </>
@@ -251,4 +250,4 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
   );
 };
 
-export default ReleaseMetaGuidanceSection;
+export default ReleaseDataGuidanceSection;

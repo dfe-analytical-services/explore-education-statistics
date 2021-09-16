@@ -33,21 +33,21 @@ Upload subject
     user clicks link    Data and files
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
-Add meta guidance
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+Add data guidance
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until page contains element    id:metaGuidanceForm-content
-    user waits until page contains element    id:metaGuidance-dataFiles
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user waits until page contains element    id:dataGuidanceForm-content
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    Dates test subject
 
     user checks summary list contains    Filename    dates.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
 
-    user enters text into meta guidance data file content editor    Dates test subject
-    ...    Dates test subject test meta guidance content
+    user enters text into data guidance data file content editor    Dates test subject
+    ...    Dates test subject test data guidance content
     user clicks button    Save guidance
 
 Add ancillary file
@@ -248,14 +248,14 @@ Verify public metadata guidance document
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document    30
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance    30
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
-    user waits until page contains    Test meta guidance content
+    user waits until h2 is visible    Data guidance
+    user waits until page contains    Test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -264,7 +264,7 @@ Verify public metadata guidance document
     user checks summary list contains    Filename    dates.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Dates test subject test meta guidance content
+    user checks summary list contains    Content    Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 
@@ -386,12 +386,12 @@ Confirm data replacement
     user clicks button    Confirm data replacement
     user waits until h2 is visible    Data replacement complete
 
-Verify existing meta guidance for amendment
+Verify existing data guidance for amendment
     user clicks link    Data and files
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until element contains    id:metaGuidanceForm-content    Test meta guidance content
+    user waits until element contains    id:dataGuidanceForm-content    Test data guidance content
 
     user waits until page contains accordion section    Dates test subject
 
@@ -399,13 +399,13 @@ Verify existing meta guidance for amendment
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
 
-    ${editor}=    user gets meta guidance data file content editor    Dates test subject
-    user waits until element contains    ${editor}    Dates test subject test meta guidance content
+    ${editor}=    user gets data guidance data file content editor    Dates test subject
+    user waits until element contains    ${editor}    Dates test subject test data guidance content
 
-Update existing meta guidance for amendment
-    user enters text into element    id:metaGuidanceForm-content    Updated test meta guidance content
-    user enters text into meta guidance data file content editor    Dates test subject
-    ...    Updated Dates test subject test meta guidance content
+Update existing data guidance for amendment
+    user enters text into element    id:dataGuidanceForm-content    Updated test data guidance content
+    user enters text into data guidance data file content editor    Dates test subject
+    ...    Updated Dates test subject test data guidance content
 
     user clicks button    Save guidance
 
@@ -593,14 +593,14 @@ Verify amendment public metadata guidance document
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
-    user waits until page contains    Updated test meta guidance content
+    user waits until h2 is visible    Data guidance
+    user waits until page contains    Updated test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -609,7 +609,7 @@ Verify amendment public metadata guidance document
     user checks summary list contains    Filename    dates-replacement.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Updated Dates test subject test meta guidance content
+    user checks summary list contains    Content    Updated Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 

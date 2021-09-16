@@ -14,7 +14,7 @@ interface Props {
   renderCreateTablesButton?: ReactNode;
   renderDataCatalogueLink?: ReactNode;
   renderDownloadLink: (file: FileInfo) => ReactNode;
-  renderMetaGuidanceLink: ReactNode;
+  renderDataGuidanceLink: ReactNode;
   renderPreReleaseAccessLink?: ReactNode;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
 }
@@ -25,7 +25,7 @@ const ReleaseDataAndFilesAccordion = ({
   renderCreateTablesButton,
   renderDataCatalogueLink,
   renderDownloadLink,
-  renderMetaGuidanceLink,
+  renderDataGuidanceLink,
   renderPreReleaseAccessLink,
   onSectionOpen,
 }: Props) => {
@@ -122,7 +122,7 @@ const ReleaseDataAndFilesAccordion = ({
               {release.hasMetaGuidance && (
                 <p>
                   Learn more about the data files used in this release using our{' '}
-                  {renderMetaGuidanceLink}.
+                  {renderDataGuidanceLink}.
                 </p>
               )}
 

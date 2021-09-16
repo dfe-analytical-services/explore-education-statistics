@@ -10,7 +10,7 @@ import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
-import ReleaseMetaGuidancePage from '@admin/pages/release/ReleaseMetaGuidancePage';
+import ReleaseDataGuidancePage from '@admin/pages/release/ReleaseDataGuidancePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
 import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
@@ -157,9 +157,9 @@ export const preReleaseAccessListRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const releaseMetaGuidanceRoute: ProtectedRouteProps = {
+export const releaseDataGuidanceRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/meta-guidance',
-  component: ReleaseMetaGuidancePage,
+  component: ReleaseDataGuidancePage,
   protectionAction: user => user.permissions.canAccessPrereleasePages,
   exact: true,
 };
@@ -184,7 +184,7 @@ const routes = {
   preReleaseContentRoute,
   preReleaseTableToolRoute,
   preReleaseAccessListRoute,
-  releaseMetaGuidanceRoute,
+  releaseDataGuidanceRoute,
   releaseRoute,
   releaseCreateRoute,
   legacyReleasesRoute,

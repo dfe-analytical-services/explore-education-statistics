@@ -1,19 +1,19 @@
-import ReleaseMetaGuidanceSection from '@admin/pages/release/data/components/ReleaseMetaGuidanceSection';
-import _releaseMetaGuidanceService, {
-  ReleaseMetaGuidance,
-} from '@admin/services/releaseMetaGuidanceService';
+import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
+import _releaseDataGuidanceService, {
+  ReleaseDataGuidance,
+} from '@admin/services/releaseDataGuidanceService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-jest.mock('@admin/services/releaseMetaGuidanceService');
+jest.mock('@admin/services/releaseDataGuidanceService');
 
-const releaseMetaGuidanceService = _releaseMetaGuidanceService as jest.Mocked<
-  typeof _releaseMetaGuidanceService
+const releaseDataGuidanceService = _releaseDataGuidanceService as jest.Mocked<
+  typeof _releaseDataGuidanceService
 >;
 
-describe('ReleaseMetaGuidanceSection', () => {
-  const testMetaGuidance: ReleaseMetaGuidance = {
+describe('ReleaseDataGuidanceSection', () => {
+  const testDataGuidance: ReleaseDataGuidance = {
     id: 'release-1',
     content: '<p>Test main content</p>',
     subjects: [
@@ -68,12 +68,12 @@ describe('ReleaseMetaGuidanceSection', () => {
 
   describe('can update release', () => {
     test('renders correct edit buttons', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -87,13 +87,13 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders empty guidance correctly', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue({
-        ...testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
+        ...testDataGuidance,
         content: '',
       });
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -114,19 +114,19 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders correct message when there are no subjects', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue({
-        ...testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
+        ...testDataGuidance,
         subjects: [],
       });
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
         expect(
           screen.getByText(
-            'Before you can change the public metadata guidance, you must upload at least one data file.',
+            'Before you can change the public data guidance, you must upload at least one data file.',
           ),
         ).toBeInTheDocument();
       });
@@ -139,12 +139,12 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders existing guidance with subjects', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -260,12 +260,12 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders correctly with subjects in preview mode', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -413,12 +413,12 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('shows validation message when main guidance content is empty', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -441,22 +441,22 @@ describe('ReleaseMetaGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByRole('link', { name: 'Enter main guidance content' }),
-        ).toHaveAttribute('href', '#metaGuidanceForm-content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-content');
 
         expect(mainGuidanceContent).toHaveAttribute(
           'id',
-          'metaGuidanceForm-content',
+          'dataGuidanceForm-content',
         );
       });
     });
 
     test('shows validation message when file guidance content is empty', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -484,22 +484,22 @@ describe('ReleaseMetaGuidanceSection', () => {
           screen.getByRole('link', {
             name: 'Enter file guidance content for Subject 1',
           }),
-        ).toHaveAttribute('href', '#metaGuidanceForm-subjects0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-subjects0Content');
 
         expect(fileGuidanceContent).toHaveAttribute(
           'id',
-          'metaGuidanceForm-subjects-0-content',
+          'dataGuidanceForm-subjects-0-content',
         );
       });
     });
 
     test('cannot submit with invalid main guidance content', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -511,7 +511,7 @@ describe('ReleaseMetaGuidanceSection', () => {
       userEvent.clear(screen.getByLabelText('Main guidance content'));
 
       expect(
-        releaseMetaGuidanceService.updateMetaGuidance,
+        releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Save guidance' }));
@@ -521,21 +521,21 @@ describe('ReleaseMetaGuidanceSection', () => {
           screen.getByRole('link', {
             name: 'Enter main guidance content',
           }),
-        ).toHaveAttribute('href', '#metaGuidanceForm-content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-content');
 
         expect(
-          releaseMetaGuidanceService.updateMetaGuidance,
+          releaseDataGuidanceService.updateDataGuidance,
         ).not.toHaveBeenCalled();
       });
     });
 
     test('cannot submit with invalid subject content', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -549,7 +549,7 @@ describe('ReleaseMetaGuidanceSection', () => {
       );
 
       expect(
-        releaseMetaGuidanceService.updateMetaGuidance,
+        releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Save guidance' }));
@@ -559,21 +559,21 @@ describe('ReleaseMetaGuidanceSection', () => {
           screen.getByRole('link', {
             name: 'Enter file guidance content for Subject 1',
           }),
-        ).toHaveAttribute('href', '#metaGuidanceForm-subjects0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-subjects0Content');
 
         expect(
-          releaseMetaGuidanceService.updateMetaGuidance,
+          releaseDataGuidanceService.updateDataGuidance,
         ).not.toHaveBeenCalled();
       });
     });
 
     test('can successfully submit with updated values', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataGuidanceSection releaseId="release-1" canUpdateRelease />,
       );
 
       await waitFor(() => {
@@ -607,22 +607,22 @@ describe('ReleaseMetaGuidanceSection', () => {
 
       // Not the right return value, but we'll just
       // return something to make sure things don't break.
-      releaseMetaGuidanceService.updateMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.updateDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       expect(
-        releaseMetaGuidanceService.updateMetaGuidance,
+        releaseDataGuidanceService.updateDataGuidance,
       ).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Save guidance' }));
 
       await waitFor(() => {
         expect(
-          releaseMetaGuidanceService.updateMetaGuidance,
+          releaseDataGuidanceService.updateDataGuidance,
         ).toHaveBeenCalledTimes(1);
         expect(
-          releaseMetaGuidanceService.updateMetaGuidance,
+          releaseDataGuidanceService.updateDataGuidance,
         ).toHaveBeenCalledWith('release-1', {
           content: '<p>Updated main guidance content</p>',
           subjects: [
@@ -642,12 +642,12 @@ describe('ReleaseMetaGuidanceSection', () => {
 
   describe('cannot update release', () => {
     test('renders with warning message', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection
+        <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
         />,
@@ -663,12 +663,12 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('does not render any edit buttons', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection
+        <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
         />,
@@ -684,13 +684,13 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders empty guidance correctly', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue({
-        ...testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
+        ...testDataGuidance,
         content: '',
       });
 
       render(
-        <ReleaseMetaGuidanceSection
+        <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
         />,
@@ -704,13 +704,13 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders message when there are no subjects', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue({
-        ...testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
+        ...testDataGuidance,
         subjects: [],
       });
 
       render(
-        <ReleaseMetaGuidanceSection
+        <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
         />,
@@ -719,7 +719,7 @@ describe('ReleaseMetaGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            'The public metadata guidance document has not been created as no data files were uploaded.',
+            'The public data guidance has not been created as no data files were uploaded.',
           ),
         ).toBeInTheDocument();
       });
@@ -732,12 +732,12 @@ describe('ReleaseMetaGuidanceSection', () => {
     });
 
     test('renders existing guidance with subjects', async () => {
-      releaseMetaGuidanceService.getMetaGuidance.mockResolvedValue(
-        testMetaGuidance,
+      releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
+        testDataGuidance,
       );
 
       render(
-        <ReleaseMetaGuidanceSection
+        <ReleaseDataGuidanceSection
           releaseId="release-1"
           canUpdateRelease={false}
         />,

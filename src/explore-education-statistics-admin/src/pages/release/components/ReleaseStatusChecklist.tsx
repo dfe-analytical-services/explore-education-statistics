@@ -69,11 +69,11 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
         case 'PublicMetaGuidanceRequired':
           return {
             message:
-              'All summary information must be completed on the metadata guidance page',
+              'All summary information must be completed on the data guidance page',
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
-            )}#${releaseDataPageTabIds.metaGuidance}`,
+            )}#${releaseDataPageTabIds.dataGuidance}`,
           };
         case 'ReleaseNoteRequired':
           return {

@@ -33,20 +33,20 @@ Upload another subject (for deletion later)
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
     user uploads subject    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
 
-Add meta guidance to subject
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document    90
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+Add data guidance to subject
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance    90
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
 
-Add meta guidance to second Subject
-    user waits until h2 is visible    Public metadata guidance document
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+Add data guidance to second Subject
+    user waits until h2 is visible    Public data guidance
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
-    user enters text into meta guidance data file content editor    ${SECOND_SUBJECT}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
+    ...    data guidance content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
@@ -374,9 +374,9 @@ Add subject to release
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
-Add meta guidance to third subject
-    user clicks link    Metadata guidance
-    user enters text into meta guidance data file content editor    ${THIRD_SUBJECT}    meta content
+Add data guidance to third subject
+    user clicks link    Data guidance
+    user enters text into data guidance data file content editor    ${THIRD_SUBJECT}    meta content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' Tab

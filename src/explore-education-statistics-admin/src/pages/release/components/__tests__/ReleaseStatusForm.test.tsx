@@ -583,7 +583,7 @@ describe('ReleaseStatusForm', () => {
         expect(
           screen.getByRole('link', {
             name:
-              'All public metadata guidance must be populated before the release can be approved',
+              'All public data guidance must be populated before the release can be approved',
           }),
         ).toBeInTheDocument();
       });

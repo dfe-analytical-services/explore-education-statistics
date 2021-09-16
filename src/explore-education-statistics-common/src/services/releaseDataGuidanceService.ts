@@ -4,7 +4,7 @@ import {
   ReleaseSummary,
 } from '@common/services/publicationService';
 
-export interface SubjectMetaGuidance {
+export interface SubjectDataGuidance {
   id: string;
   filename: string;
   name: string;
@@ -24,28 +24,28 @@ export interface SubjectMetaGuidance {
   }[];
 }
 
-export interface ReleaseMetaGuidanceSummary extends ReleaseSummary {
+export interface ReleaseDataGuidanceSummary extends ReleaseSummary {
   publication: PublicationSummary;
   metaGuidance: string;
-  subjects: SubjectMetaGuidance[];
+  subjects: SubjectDataGuidance[];
 }
 
-const releaseMetaGuidanceService = {
-  getLatestReleaseMetaGuidance(
+const releaseDataGuidanceService = {
+  getLatestReleaseDataGuidance(
     publicationSlug: string,
-  ): Promise<ReleaseMetaGuidanceSummary> {
+  ): Promise<ReleaseDataGuidanceSummary> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/latest/meta-guidance`,
     );
   },
-  getReleaseMetaGuidance(
+  getReleaseDataGuidance(
     publicationSlug: string,
     releaseSlug: string,
-  ): Promise<ReleaseMetaGuidanceSummary> {
+  ): Promise<ReleaseDataGuidanceSummary> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/meta-guidance`,
     );
   },
 };
 
-export default releaseMetaGuidanceService;
+export default releaseDataGuidanceService;

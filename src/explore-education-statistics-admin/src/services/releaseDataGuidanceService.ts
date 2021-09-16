@@ -1,17 +1,17 @@
 import client from '@admin/services/utils/service';
-import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
+import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
 
-export interface ReleaseMetaGuidance {
+export interface ReleaseDataGuidance {
   id: string;
   content: string;
-  subjects: SubjectMetaGuidance[];
+  subjects: SubjectDataGuidance[];
 }
 
-const releaseMetaGuidanceService = {
-  getMetaGuidance(releaseId: string): Promise<ReleaseMetaGuidance> {
+const releaseDataGuidanceService = {
+  getDataGuidance(releaseId: string): Promise<ReleaseDataGuidance> {
     return client.get(`/release/${releaseId}/meta-guidance`);
   },
-  updateMetaGuidance(
+  updateDataGuidance(
     releaseId: string,
     data: {
       content: string;
@@ -20,9 +20,9 @@ const releaseMetaGuidanceService = {
         content: string;
       }[];
     },
-  ): Promise<ReleaseMetaGuidance> {
+  ): Promise<ReleaseDataGuidance> {
     return client.patch(`/release/${releaseId}/meta-guidance`, data);
   },
 };
 
-export default releaseMetaGuidanceService;
+export default releaseDataGuidanceService;

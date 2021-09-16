@@ -1,11 +1,11 @@
-import ReleaseMetaGuidancePageContent from '@common/modules/release/components/ReleaseMetaGuidancePageContent';
-import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
+import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
+import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-describe('ReleaseMetaGuidancePageContent', () => {
-  const testSubjectMetaGuidance: SubjectMetaGuidance[] = [
+describe('ReleaseDataGuidancePageContent', () => {
+  const testSubjectDataGuidance: SubjectDataGuidance[] = [
     {
       id: 'subject-1',
       name: 'Subject 1',
@@ -56,9 +56,9 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('renders published date if present', () => {
     render(
-      <ReleaseMetaGuidancePageContent
+      <ReleaseDataGuidancePageContent
         published="2020-10-22T12:00:00"
-        metaGuidance="Test meta guidance content"
+        dataGuidance="Test data guidance content"
         subjects={[]}
       />,
     );
@@ -70,8 +70,8 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render published date if not present', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[]}
       />,
     );
@@ -79,14 +79,14 @@ describe('ReleaseMetaGuidancePageContent', () => {
     expect(screen.queryByTestId('published-date')).not.toBeInTheDocument();
   });
 
-  test('renders meta guidance content as HTML', () => {
-    const metaGuidance = `
+  test('renders data guidance content as HTML', () => {
+    const dataGuidance = `
       <h2>Description</h2>
-      <p>Test meta guidance content</p>`;
+      <p>Test data guidance content</p>`;
 
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance={metaGuidance}
+      <ReleaseDataGuidancePageContent
+        dataGuidance={dataGuidance}
         subjects={[]}
       />,
     );
@@ -95,23 +95,23 @@ describe('ReleaseMetaGuidancePageContent', () => {
       screen.getByText('Description', { selector: 'h2' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Test meta guidance content', { selector: 'p' }),
+      screen.getByText('Test data guidance content', { selector: 'p' }),
     ).toBeInTheDocument();
   });
 
-  test('does not render empty meta guidance content', () => {
-    render(<ReleaseMetaGuidancePageContent metaGuidance="" subjects={[]} />);
+  test('does not render empty data guidance content', () => {
+    render(<ReleaseDataGuidancePageContent dataGuidance="" subjects={[]} />);
 
     expect(
-      screen.queryByTestId('metaGuidance-content'),
+      screen.queryByTestId('dataGuidance-content'),
     ).not.toBeInTheDocument();
   });
 
   test('renders guidance for subjects', async () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
-        subjects={testSubjectMetaGuidance}
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
+        subjects={testSubjectDataGuidance}
       />,
     );
 
@@ -217,11 +217,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('renders single time period when `from` and `to` are the same', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             timePeriods: {
               from: '2020',
               to: '2020',
@@ -243,11 +243,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render empty geographic levels', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             geographicLevels: [],
           },
         ]}
@@ -263,11 +263,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render empty time periods', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             timePeriods: {
               from: '',
               to: '',
@@ -286,11 +286,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render empty variables section', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             variables: [],
           },
         ]}
@@ -311,11 +311,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render empty footnotes section', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             footnotes: [],
           },
         ]}
@@ -334,11 +334,11 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('does not render empty file content', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[
           {
-            ...testSubjectMetaGuidance[0],
+            ...testSubjectDataGuidance[0],
             content: '',
           },
         ]}
@@ -354,8 +354,8 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
   test('renders no subject guidance when empty', () => {
     render(
-      <ReleaseMetaGuidancePageContent
-        metaGuidance="Test meta guidance content"
+      <ReleaseDataGuidancePageContent
+        dataGuidance="Test data guidance content"
         subjects={[]}
       />,
     );
