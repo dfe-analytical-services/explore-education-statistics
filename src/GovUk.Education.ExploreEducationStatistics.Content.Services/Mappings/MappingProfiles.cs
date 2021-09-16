@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#nullable enable
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -15,16 +16,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
         {
             CreateContentBlockMap();
 
-            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
-                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
+            CreateMap<ContentSection, ContentSectionViewModel>()
+                .ForMember(dest => dest.Content,
+                    m => m.MapFrom(section =>
+                        section.Content.OrderBy(contentBlock => contentBlock.Order)));
+
+            CreateMap<MethodologyNote, MethodologyNoteViewModel>();
 
             CreateMap<MethodologyVersion, MethodologySummaryViewModel>();
 
             CreateMap<MethodologyVersion, MethodologyViewModel>()
-                .ForMember(dest => dest.Content,
-                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Annexes,
-                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Annexes.OrderBy(annexSection => annexSection.Order)))
+                .ForMember(dest => dest.Content,
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Content.OrderBy(contentSection => contentSection.Order)))
+                .ForMember(dest => dest.Notes,
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
         }
 
         private void CreateContentBlockMap()

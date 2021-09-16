@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,34 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         });
             }
         }
-        
-        [Fact]
-        public async Task GetContentSections()
-        {
-            var methodologyVersion = new MethodologyVersion();
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                        CanViewSpecificMethodology)
-                    .AssertForbidden(
-                        userService =>
-                        {
-                            var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
-
-                            return methodologyContentService.GetContentSections(methodologyVersion.Id,
-                                MethodologyContentService.ContentListType.Content);
-                        });
-            }
-        }
-        
         [Fact]
         public async Task GetContentSection()
         {
@@ -428,10 +402,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         
         private static MethodologyContentService SetupMethodologyContentService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IUserService userService = null)
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IUserService? userService = null)
         {
-            return new MethodologyContentService(
+            return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
