@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
     {
         [Required] public string Content { get; set; } = string.Empty;
 
-        public DateTime DisplayDate { get; set; }
+        [Required] public DateTime? DisplayDate { get; set; }
     }
 }
