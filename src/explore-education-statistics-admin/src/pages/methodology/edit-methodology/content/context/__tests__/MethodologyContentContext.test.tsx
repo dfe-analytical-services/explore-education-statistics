@@ -67,6 +67,7 @@ const basicMethodology: MethodologyContent = {
       caption: '',
     },
   ],
+  notes: [],
 };
 
 const methodologyReducer = (
