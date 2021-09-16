@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         methodologyVersionId: methodologyVersion.Id,
                         createdByUserId: _userService.GetUserId(),
                         content: request.Content,
-                        displayDate: request.DisplayDate);
+                        displayDate: request.DisplayDate ?? DateTime.Today.ToUniversalTime());
 
                     return BuildMethodologyNoteViewModel(addedNote);
                 });
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         methodologyNoteId: methodologyNoteId,
                         updatedByUserId: _userService.GetUserId(),
                         content: request.Content,
-                        displayDate: request.DisplayDate
+                        displayDate: request.DisplayDate ?? DateTime.Today.ToUniversalTime()
                     );
 
                     return BuildMethodologyNoteViewModel(updatedNote);
