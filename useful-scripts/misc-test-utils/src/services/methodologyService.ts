@@ -50,14 +50,13 @@ const methodologyService = {
     methodologyId: string,
     sectionId: string,
     blockId: string,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     await adminApi.put(
       `/api/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
       {
         body: `<p>${faker.lorem.lines(100)}</p>`,
       },
     );
-    return true;
   },
 };
 export default methodologyService;

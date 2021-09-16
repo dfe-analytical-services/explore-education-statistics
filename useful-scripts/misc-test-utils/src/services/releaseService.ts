@@ -33,12 +33,11 @@ const releaseService = {
   addMetaGuidance: async (
     subjArr: { id: string; content: string }[],
     releaseId: string,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     await adminApi.patch(`/api/release/${releaseId}/meta-guidance`, {
       content: '<p>testing</p>',
       subjects: subjArr,
     });
-    return true;
   },
 
   getReleaseProgress: async (
@@ -104,14 +103,13 @@ const releaseService = {
     releaseId: string,
     sectionId: string,
     blockId: string,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     await adminApi.put(
       `/api/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       {
         body: `<p>${faker.lorem.lines(100)}</p>`,
       },
     );
-    return true;
   },
 };
 export default releaseService;
