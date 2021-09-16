@@ -23,6 +23,7 @@ Create test theme and topic
     Import bootstrap data roles and permissions variables
     ${THEME_ID}=    user creates theme via api    ${THEME_NAME}
     ${TOPIC_ID}=    user creates topic via api    ${TOPIC_NAME}    ${THEME_ID}
+    user reloads page
     Set Suite Variable    ${TOPIC_ID}
 
 Create new publications and published releases - for Publication Owner
