@@ -6,8 +6,7 @@ import adminApi from '../utils/adminApi';
 const { TOPIC_ID } = process.env;
 
 const publicationService = {
-  // eslint-disable-next-line consistent-return
-  createPublication: async () => {
+  createPublication: async (): Promise<string> => {
     console.time('createPublication');
     const res = await adminApi.post('/api/publications', {
       title: `importer-testing-${v4()}`,

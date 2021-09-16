@@ -32,7 +32,7 @@ const createReleaseAndPublish = async () => {
   if (!releaseId) {
     throw new Error(
       chalk.red(
-        'No release ID returned from `createRelease` function! Exiting test with errors',
+        'No release ID returned from "createRelease" function! Exiting test with errors',
       ),
     );
   }
@@ -69,11 +69,9 @@ const createReleaseAndPublish = async () => {
 
   await releaseService.publishRelease(finalReleaseObject as never, releaseId);
   console.time('publication elapsed time');
-  console.log(
-    chalk.green(
-      `Started publication of release: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`,
-    ),
-  );
-  await releaseService.getReleaseProgress(releaseId);
+  const url = `${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`;
+
+  console.log(chalk.green(`Started publication of release: ${url}`));
+  await releaseService.getReleaseProgress(releaseId, url);
 };
 export default createReleaseAndPublish;
