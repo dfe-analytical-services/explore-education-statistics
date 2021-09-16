@@ -1192,7 +1192,7 @@
         "[variables('ees-storage-public')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
@@ -1298,7 +1298,7 @@
     {
       "type": "Microsoft.Insights/components",
       "name": "[variables('dataAppInsights')]",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2020-02-02",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1414,7 +1414,7 @@
         "[variables('ees-storage-public')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
@@ -1520,7 +1520,7 @@
     {
       "type": "Microsoft.Insights/components",
       "name": "[variables('contentAppInsights')]",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2020-02-02",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1635,8 +1635,8 @@
         "[variables('ees-storage-publisher')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]",
-        "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
@@ -1758,7 +1758,7 @@
     {
       "type": "Microsoft.Insights/components",
       "name": "[variables('adminAppInsights')]",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2020-02-02",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1834,7 +1834,7 @@
       ],
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -1882,7 +1882,7 @@
     {
       "type": "Microsoft.Insights/components",
       "name": "[variables('publicAppInsights')]",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2020-02-02",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2548,7 +2548,7 @@
       }
     },
     {
-      "apiVersion": "2015-05-01",
+      "apiVersion": "2020-02-02",
       "name": "[variables('notificationsAppInsights')]",
       "type": "Microsoft.Insights/components",
       "kind": "web",
@@ -2682,7 +2682,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
         "BaseUrl": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]",
         "WebApplicationBaseUrl": "[concat(variables('publicAppUrl'), '/')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey'), '2018-02-14').secretUriWithVersion, ')')]",
@@ -2694,7 +2694,7 @@
       }
     },
     {
-      "apiVersion": "2015-05-01",
+      "apiVersion": "2020-02-02",
       "name": "[variables('importerAppInsights')]",
       "type": "Microsoft.Insights/components",
       "kind": "web",
@@ -2842,13 +2842,13 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
         "RowsPerBatch": "3000",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
     {
-      "apiVersion": "2015-05-01",
+      "apiVersion": "2020-02-02",
       "name": "[variables('publisherAppInsights')]",
       "type": "Microsoft.Insights/components",
       "kind": "web",
@@ -3016,7 +3016,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2015-05-01').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "NotificationStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
