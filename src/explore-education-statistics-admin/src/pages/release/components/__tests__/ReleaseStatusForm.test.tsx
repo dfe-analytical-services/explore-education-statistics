@@ -644,6 +644,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
+            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -680,6 +681,7 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         latestInternalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
+        notifySubscribers: true,
         publishScheduled: new Date('2022-10-10'),
         publishMethod: 'Scheduled',
         nextReleaseDate: {
@@ -708,6 +710,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
+            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -736,11 +739,62 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         latestInternalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
+        notifySubscribers: true,
         publishMethod: 'Immediate',
         nextReleaseDate: {
           month: 5,
           year: 2021,
         },
+      };
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
+      });
+    });
+
+    test('Amendment should have "Notify subscribers by email" checkbox', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            amendment: true,
+            notifySubscribers: true,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      await userEvent.type(
+        screen.getByLabelText('Internal note'),
+        'Test release note',
+      );
+
+      expect(
+        screen.getByLabelText('Notify subscribers by email'),
+      ).toBeChecked();
+
+      userEvent.click(screen.getByLabelText('Notify subscribers by email'));
+
+      expect(
+        screen.getByLabelText('Notify subscribers by email'),
+      ).not.toBeChecked();
+
+      userEvent.click(screen.getByLabelText('Immediately'));
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      const expectedValues: ReleaseStatusFormValues = {
+        latestInternalReleaseNote: 'Test release note',
+        approvalStatus: 'Approved',
+        notifySubscribers: false,
+        publishMethod: 'Immediate',
       };
 
       await waitFor(() => {

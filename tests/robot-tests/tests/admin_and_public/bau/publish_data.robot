@@ -50,7 +50,7 @@ Add public prerelease access list
 
 Go to "Sign off" page and approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Create another release for the same publication
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}
@@ -403,7 +403,7 @@ Add public prerelease access list for release
 
 Approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 User goes to public Find Statistics page
     user navigates to find statistics page on public frontend

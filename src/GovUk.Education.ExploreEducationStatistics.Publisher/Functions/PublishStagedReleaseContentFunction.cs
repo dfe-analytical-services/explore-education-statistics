@@ -102,7 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
-                    await _notificationsService.NotifySubscribers(releaseIds);
+
+                    await _notificationsService.NotifySubscribersIfApplicable(releaseIds);
+
                     await UpdateStage(published, Complete);
                 }
                 catch (Exception e)

@@ -174,7 +174,7 @@ Verify release is scheduled
     user checks summary list contains    Next release expected    December 3001
 
 Approve release for immediate publication
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 User goes to public Find Statistics page
     user navigates to find statistics page on public frontend
@@ -516,7 +516,7 @@ Update public prerelease access list for amendment
 
 Approve amendment for immediate release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves amended release for immediate publication
 
 Go back to public find-statistics page
     user goes to url    %{PUBLIC_URL}/find-statistics

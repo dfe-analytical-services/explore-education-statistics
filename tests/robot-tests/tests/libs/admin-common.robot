@@ -503,14 +503,25 @@ user deletes subject file
     user clicks element    ${button}
     user clicks button    Confirm
 
+user approves original release for immediate publication
+    user approves release for immediate publication    original
+
+user approves amended release for immediate publication
+    user approves release for immediate publication    amendment
+
 user approves release for immediate publication
+    [Arguments]    ${release_type}=original
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off
     user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
+    user checks page does not contain    Notify subscribers by email
     user clicks radio    Approved for publication
+    IF    '${release_type}' == 'amendment'
+        user waits until page contains    Notify subscribers by email
+    END
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
     user clicks button    Update status

@@ -56,7 +56,7 @@ Verify that the methodology is still not publicly accessible by URL without publ
 Approve the release
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Verify that the methodology is visible on the public methodologies page with the expected URL
     user navigates to public methodologies page

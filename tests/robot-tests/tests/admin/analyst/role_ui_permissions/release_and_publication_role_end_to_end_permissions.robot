@@ -162,7 +162,7 @@ Check release approver can create a release note
 
 Check release approver can publish a release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Navigate to administration as bau1 and swap release approver role for publication owner now that the publication is live
     user changes to bau1

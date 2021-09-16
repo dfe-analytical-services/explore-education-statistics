@@ -100,7 +100,7 @@ Add public prerelease access list
 
 Approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Go to public Table Tool page
     user navigates to data tables page on public frontend
@@ -292,7 +292,7 @@ Add release note to release amendment
 
 Go to "Sign off" page and approve release amendment
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves amended release for immediate publication
 
 Go to permalink page & check for error element to be present
     user goes to url    ${PERMA_LOCATION_URL}
@@ -410,9 +410,9 @@ Add release note for new release amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note two
 
-Go to "Sign off" to approve release for immediate publication
+Go to "Sign off" to approve amended release for immediate publication
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment
     user goes to url    %{PUBLIC_URL}/data-tables

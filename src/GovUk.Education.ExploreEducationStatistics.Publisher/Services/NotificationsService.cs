@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
@@ -24,11 +26,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _storageQueueService = storageQueueService;
         }
 
-        public async Task NotifySubscribers(params Guid[] releaseIds)
+        public async Task NotifySubscribersIfApplicable(params Guid[] releaseIds)
         {
-            var publications = GetPublications(releaseIds);
-            var messages = publications.Select(BuildPublicationNotificationMessage);
-            await _storageQueueService.AddMessages(PublicationQueue, messages);
+            var releasesToNotify = _context.Releases
+                .Include(r => r.ReleaseStatuses)
+                .Where(r => releaseIds.Contains(r.Id))
+                .ToList()
+                .Where(r => r.NotifySubscribers)
+                .ToList();
+            var releaseIdsToNotify = releasesToNotify
+                .Select(r => r.Id)
+                .ToArray();
+            var publications = GetPublications(releaseIdsToNotify);
+            var messages = publications
+                .Select(BuildPublicationNotificationMessage)
+                .ToList();
+            if (messages.Count > 0)
+            {
+                await _storageQueueService.AddMessages(PublicationQueue, messages);
+                releasesToNotify
+                    .ForEach(release =>
+                    {
+                        var status = release.ReleaseStatuses
+                            .OrderBy(rs => rs.Created)
+                            .Last();
+                        _context.Update(status);
+                        status.NotifiedOn = DateTime.UtcNow;
+                    });
+                await _context.SaveChangesAsync();
+            }
         }
 
         private IEnumerable<Publication> GetPublications(IEnumerable<Guid> releaseIds)
