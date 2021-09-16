@@ -61,6 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                contentDbContext.Attach(methodology.Versions[0]);
+
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
@@ -159,6 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                contentDbContext.Attach(methodology.Versions[0]);
+
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
@@ -197,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Assert.Equal(expected.Order, actual.Order);
         }
 
-        [Fact(Skip = "TODO EES-2304 Should be returning 3 notes not 6?")]
+        [Fact]
         public async Task GetLatestMethodologyBySlug_TestNotes()
         {
             var methodology = new Methodology
@@ -254,6 +258,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                contentDbContext.Attach(methodology.Versions[0]);
+
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 

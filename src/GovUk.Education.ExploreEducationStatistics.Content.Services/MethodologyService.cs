@@ -51,12 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         return new NotFoundResult();
                     }
 
-                    var loadedMethodologyVersion = _contentDbContext.AssertEntityLoaded(latestPublishedVersion);
-                    await _contentDbContext.Entry(loadedMethodologyVersion)
+                    await _contentDbContext.Entry(latestPublishedVersion)
                         .Collection(m => m.Notes)
                         .LoadAsync();
 
-                    return _mapper.Map<MethodologyViewModel>(loadedMethodologyVersion);
+                    return _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
                 });
         }
 
