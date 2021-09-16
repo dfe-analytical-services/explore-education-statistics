@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 /* eslint-disable no-case-declarations */
@@ -70,7 +69,7 @@ const start = async () => {
             "would you like the uploadSubject function to exit as soon as a 'QUEUED' status is received? (this can be useful for uploading lots of subjects quickly)",
         });
 
-        for (let i = 0; i < numOfSubjects.number; i++) {
+        for (let i = 0; i < numOfSubjects.number; i += 1) {
           await uploadSingleSubject(release.id, fast.shouldBeFast);
         }
         break;
@@ -118,7 +117,7 @@ const start = async () => {
                 prefix: '>',
               });
 
-              for (let i = 0; i < times.number; i++) {
+              for (let i = 0; i < times.number; i += 1) {
                 await addMethodlogyTextContentBlock(methodology.id);
               }
             }
@@ -127,7 +126,7 @@ const start = async () => {
             );
             const { publicationId } = await createPublicationAndRelease();
             const methodologyId = await createMethodology(publicationId);
-            for (let i = 0; i < times.number; i++) {
+            for (let i = 0; i < times.number; i += 1) {
               await addMethodlogyTextContentBlock(methodologyId);
             }
             break;
@@ -143,18 +142,18 @@ const start = async () => {
             if (!releaseExists.exists) {
               const { releaseId } = await createPublicationAndRelease();
 
-              for (let i = 0; i < times.number; i++) {
+              for (let i = 0; i < times.number; i += 1) {
                 await addReleaseTextContentBlock(releaseId);
               }
             } else {
-              const rl = await inquirer.prompt({
+              const existingRelease = await inquirer.prompt({
                 name: 'id',
                 type: 'input',
                 message: 'release ID from existing release',
                 prefix: '>',
               });
-              for (let i = 0; i < times.number; i++) {
-                await addReleaseTextContentBlock(rl.id);
+              for (let i = 0; i < times.number; i += 1) {
+                await addReleaseTextContentBlock(existingRelease.id);
               }
             }
             break;

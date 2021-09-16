@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import faker from 'faker';
+import chalk from 'chalk';
 import adminApi from '../utils/adminApi';
 
 const { ADMIN_URL } = process.env;
@@ -10,7 +11,9 @@ const methodologyService = {
       `/api/publication/${publicationId}/methodology`,
     );
     console.log(
-      `Methodology created: ${ADMIN_URL}/methodology/${res.data.id}/summary`,
+      chalk.green(
+        `Methodology created: ${ADMIN_URL}/methodology/${res.data.id}/summary`,
+      ),
     );
     return res.data.id;
   },
@@ -24,8 +27,7 @@ const methodologyService = {
         type: 'HtmlBlock',
       },
     );
-    const { id } = res.data;
-    return id;
+    return res.data.id;
   },
 
   addTextBlock: async (

@@ -58,7 +58,7 @@ const releaseService = {
       await sleep(1500);
       await releaseService.getReleaseProgress(releaseId);
     }
-    console.log(`Published release: ${url}`);
+    console.log(chalk.green(`Published release: ${url}`));
     return res.data;
   },
   publishRelease: async (obj: ReleaseData, releaseId: string) => {
@@ -84,8 +84,7 @@ const releaseService = {
         order: 0,
       },
     );
-    const sectionId = res.data.id;
-    return sectionId;
+    return res.data.id;
   },
   addTextBlock: async (
     releaseId: string,
@@ -99,8 +98,7 @@ const releaseService = {
         type: 'HtmlBlock',
       },
     );
-    const blockId = res.data.id;
-    return blockId;
+    return res.data.id;
   },
   addTextContent: async (
     releaseId: string,

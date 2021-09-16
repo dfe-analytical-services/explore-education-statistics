@@ -10,6 +10,8 @@ import releaseService from '../../services/releaseService';
 import sleep from '../../utils/sleep';
 
 const cwd = projectRoot;
+const { SUBJECT_POLL_TIME } = process.env;
+
 export type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
 
 const uploadSingleSubject = async (releaseId: string, fast: boolean) => {
@@ -53,7 +55,7 @@ const uploadSingleSubject = async (releaseId: string, fast: boolean) => {
         releaseId,
         subjectId as string,
       );
-      await sleep(3000);
+      await sleep(parseInt(SUBJECT_POLL_TIME, 10));
     }
   }
   console.timeEnd('import subject upload');
