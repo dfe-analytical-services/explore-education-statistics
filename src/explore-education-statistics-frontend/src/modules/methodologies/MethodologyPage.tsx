@@ -1,7 +1,10 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedInformation from '@common/components/RelatedInformation';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -16,7 +19,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 interface Props {
-  methodologySlug: string;
   data: Methodology;
 }
 
@@ -30,26 +32,51 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <dl className="dfe-meta-content govuk-!-margin-top-0">
-            <div>
-              <dt className="govuk-caption-m">Published: </dt>
-              <dd data-testid="published-date">
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>{' '}
-                </strong>
-              </dd>
-            </div>
-            {data.lastUpdated && data.lastUpdated.length > 0 && (
-              <>
-                <dt className="govuk-caption-m">Last updated: </dt>
-                <dd data-testid="last-updated">
-                  <strong>
-                    <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
-                  </strong>
-                </dd>
-              </>
+          <SummaryList>
+            <SummaryListItem term="Published">
+              <FormattedDate>{data.published}</FormattedDate>
+            </SummaryListItem>
+
+            {data.notes.length > 0 && (
+              <SummaryListItem term="Last updated">
+                <FormattedDate>{data.notes[0].displayDate}</FormattedDate>
+
+                <Details
+                  id="methodologyNotes"
+                  summary={`See all notes (${data.notes.length})`}
+                  onToggle={open => {
+                    if (open) {
+                      logEvent({
+                        category: 'Methodology Notes',
+                        action: 'Methodology page notes dropdown opened',
+                        label: window.location.pathname,
+                      });
+                    }
+                  }}
+                >
+                  <ol className="govuk-list" data-testid="notes">
+                    {data.notes.map(note => (
+                      <li key={note.id}>
+                        <FormattedDate
+                          className="govuk-body govuk-!-font-weight-bold"
+                          testId="note-displayDate"
+                        >
+                          {note.displayDate}
+                        </FormattedDate>
+                        <p data-testid="note-content">{note.content}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </Details>
+              </SummaryListItem>
             )}
-          </dl>
+          </SummaryList>
+
+          <PageSearchFormWithAnalytics
+            inputLabel="Search in this methodology page."
+            className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
+          />
+
           <PrintThisPage
             onClick={() => {
               logEvent({
@@ -59,38 +86,20 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               });
             }}
           />
-          <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <RelatedInformation>
+            <ul className="govuk-list">
+              <li>
+                <Link to="/find-statistics">Find statistics and data</Link>
+              </li>
+              <li>
+                <Link to="/glossary">Education statistics: glossary</Link>
+              </li>
+            </ul>
+          </RelatedInformation>
         </div>
       </div>
-
-      {data.publication && (
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <p className="govuk-body-l">
-              {`Find out about the methodology behind ${data.publication.title} statistics and
-              data and how and why they're collected and published.`}
-            </p>
-          </div>
-
-          <div className="govuk-grid-column-one-third">
-            <RelatedAside>
-              <h2 className="govuk-heading-m" id="subsection-title">
-                Related content
-              </h2>
-              <ul className="govuk-list">
-                <li>
-                  <Link
-                    to="/find-statistics/[publication]"
-                    as={`/find-statistics/${data.publication.slug}`}
-                  >
-                    {data.publication.title}
-                  </Link>{' '}
-                </li>
-              </ul>
-            </RelatedAside>
-          </div>
-        </div>
-      )}
 
       {data.content && (
         <Accordion
@@ -182,7 +191,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   return {
     props: {
       data,
-      methodologySlug: methodologySlug as string,
     },
   };
 };
