@@ -26,7 +26,7 @@ Go to Create publication page for "UI tests topic" topic
 Enters contact details
     user enters text into element    id:publicationForm-teamName    Post-16 statistics team
     user enters text into element    id:publicationForm-teamEmail    post16.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Suzanne Wallace
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
 
 Error message appears when submitting and title is empty
@@ -47,7 +47,7 @@ Verify that new publication has been created
     user checks testid element contains    Team name for ${PUBLICATION_NAME} (created)    Post-16 statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME} (created)
     ...    post16.statistics@education.gov.uk
-    user checks testid element contains    Contact name for ${PUBLICATION_NAME} (created)    Suzanne Wallace
+    user checks testid element contains    Contact name for ${PUBLICATION_NAME} (created)    UI Tests Contact Name
     user checks testid element contains    Contact phone number for ${PUBLICATION_NAME} (created)    0123456789
     user checks testid element contains    Releases for ${PUBLICATION_NAME} (created)    No releases created
 
@@ -67,7 +67,7 @@ Update publication
     user chooses select option    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
     user enters text into element    id:publicationForm-teamName    Special educational needs statistics team
     user enters text into element    id:publicationForm-teamEmail    sen.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Sean Gibson
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0987654321
     user clicks button    Save publication
     user waits until h1 is visible    Confirm publication changes
@@ -82,7 +82,7 @@ Verify publication has been updated
     user checks testid element contains    Team name for ${PUBLICATION_NAME}
     ...    Special educational needs statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME}    sen.statistics@education.gov.uk
-    user checks testid element contains    Contact name for ${PUBLICATION_NAME}    Sean Gibson
+    user checks testid element contains    Contact name for ${PUBLICATION_NAME}    UI Tests Contact Name
     user checks testid element contains    Contact phone number for ${PUBLICATION_NAME}    0987654321
     user checks testid element contains    Methodology for ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     user checks testid element contains    Releases for ${PUBLICATION_NAME}    No releases created
@@ -101,7 +101,7 @@ Create new release
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    Sean Gibson
+    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    UI Tests Contact Name
     ...    National Statistics
 
 Edit release summary
@@ -116,7 +116,7 @@ Edit release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    Sean Gibson
+    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    UI Tests Contact Name
     ...    Official Statistics
 
 *** Keywords ***

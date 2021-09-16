@@ -134,7 +134,7 @@ user creates publication
     user enters text into element    id:publicationForm-title    ${title}
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
     user enters text into element    id:publicationForm-teamEmail    Attainment.STATISTICS@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Tingting Shu
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard    60
