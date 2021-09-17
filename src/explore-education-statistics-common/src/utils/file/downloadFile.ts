@@ -10,8 +10,7 @@
  * response's `Content-Disposition` header is used instead.
  */
 export default function downloadFile(file: Blob | string, fileName?: string) {
-  const url =
-    typeof file === 'string' ? file : typeof URL.createObjectURL(file);
+  const url = typeof file === 'string' ? file : URL.createObjectURL(file);
   const link = document.createElement('a');
 
   link.href = url;
