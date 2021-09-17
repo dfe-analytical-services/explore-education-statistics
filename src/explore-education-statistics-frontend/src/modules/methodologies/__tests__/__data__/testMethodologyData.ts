@@ -10,17 +10,17 @@ export const testMethodology: Methodology = {
   notes: [
     {
       id: '274d624c-2a60-4239-b9a3-a948df66e990',
-      displayDate: new Date('2021-09-14T23:00:00Z'),
+      displayDate: new Date('2021-09-15T00:00:00'),
       content: 'Latest note',
     },
     {
       id: '30a2457e-910c-438e-806e-781adde29769',
-      displayDate: new Date('2021-04-18T23:00:00Z'),
+      displayDate: new Date('2021-04-19T00:00:00'),
       content: 'Other note',
     },
     {
       id: 'aa571c68-00d7-48ed-8f53-b783f5b10638',
-      displayDate: new Date('2021-03-01T00:00:00Z'),
+      displayDate: new Date('2021-03-01T00:00:00'),
       content: 'Earliest note',
     },
   ],
