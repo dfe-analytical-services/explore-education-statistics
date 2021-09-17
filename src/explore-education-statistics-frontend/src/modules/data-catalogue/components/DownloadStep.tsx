@@ -137,6 +137,7 @@ const DownloadStep = ({
                   legend="Choose files from the list below"
                   legendHidden
                   disabled={form.isSubmitting}
+                  selectAll
                   options={checkboxOptions}
                 />
               )}
