@@ -40,7 +40,11 @@ const MethodologyStatusPage = () => {
 
   const [isEditing, toggleForm] = useToggle(false);
 
-  const { value: permissions, isLoading } = useAsyncRetry(async () => {
+  const {
+    value: permissions,
+    setState: setPermissions,
+    isLoading,
+  } = useAsyncRetry(async () => {
     const [canApprove, canMarkAsDraft] = await Promise.all([
       permissionService.canApproveMethodology(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
@@ -75,6 +79,15 @@ const MethodologyStatusPage = () => {
     );
 
     onMethodologyChange(nextSummary);
+
+    const [nextCanApprove, nextCanMarkAsDraft] = await Promise.all([
+      permissionService.canApproveMethodology(methodologyId),
+      permissionService.canMarkMethodologyAsDraft(methodologyId),
+    ]);
+
+    setPermissions({
+      value: { canApprove: nextCanApprove, canMarkAsDraft: nextCanMarkAsDraft },
+    });
 
     toggleForm.off();
   };
