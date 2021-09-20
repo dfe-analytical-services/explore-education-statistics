@@ -95,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Observation
                 .Where(observation => observation.SubjectId == subjectId)
                 .Select(observation => new {observation.Year, observation.TimeIdentifier})
+                .ToList()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier);
 
@@ -103,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new TimePeriodLabels();
             }
 
-            var first = await orderedTimePeriods.FirstAsync();
-            var last = await orderedTimePeriods.LastAsync();
+            var first = orderedTimePeriods.First();
+            var last = orderedTimePeriods.Last();
 
             return new TimePeriodLabels(
                 TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
