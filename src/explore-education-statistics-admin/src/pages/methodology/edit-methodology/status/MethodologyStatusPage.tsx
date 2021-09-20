@@ -36,7 +36,7 @@ const MethodologyStatusPage = () => {
     onMethodologyChange,
   } = useMethodologyContext();
 
-  const config = useConfig();
+  const { PublicAppUrl } = useConfig();
 
   const [isEditing, toggleForm] = useToggle(false);
 
@@ -97,7 +97,7 @@ const MethodologyStatusPage = () => {
                 <p>
                   <UrlContainer
                     data-testid="public-methodology-url"
-                    url={`${config.PublicAppUrl}/methodology/${currentMethodology.slug}`}
+                    url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
                   />
                 </p>
 
