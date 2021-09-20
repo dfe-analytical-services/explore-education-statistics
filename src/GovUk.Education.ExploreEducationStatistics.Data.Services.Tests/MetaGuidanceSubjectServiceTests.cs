@@ -945,6 +945,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
+        public async Task GetTimePeriods_CorrectlyOrderWeeks()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var subjectObservation1 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week9,
+            };
+
+            var subjectObservation2 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week37,
+            };
+
+            var subjectObservation3 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week8,
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.AddRangeAsync(
+                    subjectObservation1,
+                    subjectObservation2,
+                    subjectObservation3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+
+                var result = await service.GetTimePeriods(subject.Id);
+
+                Assert.Equal("2020 Week 8", result.From);
+                Assert.Equal("2020 Week 37", result.To);
+            }
+        }
+
+        [Fact]
         public async Task GetTimePeriods_NoObservations()
         {
             var release = new Release();
