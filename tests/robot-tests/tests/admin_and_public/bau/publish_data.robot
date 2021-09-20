@@ -429,7 +429,7 @@ Check latest release is correct
     user checks page contains    See other releases (1)
 
     user opens details dropdown    See other releases (1)
-    user checks page contains other release    ${RELEASE_1_NAME}
+    user waits until page contains other release    ${RELEASE_1_NAME}
     user checks page does not contain other release    ${RELEASE_2_NAME}
 
     user clicks link    ${RELEASE_1_NAME}
@@ -439,7 +439,7 @@ Check other release is correct
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
     user checks page contains    See other releases (1)
-    user checks page contains other release    ${RELEASE_2_NAME}
+    user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
 Go to Table Tool page

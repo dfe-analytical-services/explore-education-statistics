@@ -719,10 +719,10 @@ user checks nth breadcrumb contains
     [Arguments]    ${num}    ${text}
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(${num})    ${text}
 
-user checks page contains other release
-    [Arguments]    ${other_release_title}
-    user checks page contains element
-    ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+user waits until page contains other release
+    [Arguments]    ${other_release_title}    ${wait}=${timeout}
+    user waits until page contains element
+    ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]    ${wait}
 
 user checks page does not contain other release
     [Arguments]    ${other_release_title}
@@ -773,13 +773,9 @@ user closes Set Page View box
     user waits until element is not visible    id:editingMode
 
 user checks page for details section
-    [Arguments]    ${heading}
-    user checks page contains element    testid:Expand Details Section ${heading}
-
-user expands details section
-    [Arguments]    ${heading}
-    user clicks element    testid:Expand Details Section ${heading}
+    [Arguments]    ${heading}    ${wait}=${timeout}
+    user waits until page contains element    testid:Expand Details Section ${heading}    ${wait}
 
 user checks page for details dropdown
-    [Arguments]    ${text}
-    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}

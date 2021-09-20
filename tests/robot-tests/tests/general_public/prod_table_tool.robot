@@ -40,7 +40,7 @@ check publications have correct number of releases
     user checks element count is x    //*[@name="publicationId"]    56
 
 check 'Children's social care' contains correct topics
-    user expands details section    Children's social care
+    user opens details dropdown    Children's social care
     user checks page for details dropdown    Children in need and child protection
     user checks page for details dropdown    Children looked after
     user checks page for details dropdown    Children's social work workforce
@@ -49,40 +49,40 @@ check 'Children's social care' contains correct topics
     user checks page for details dropdown    Serious incident notifications
 
 check 'COVID-19' contains correct topics
-    user expands details section    COVID-19
+    user opens details dropdown    COVID-19
     user checks page for details dropdown    Attendance
     user checks page for details dropdown    Confirmed cases reported by Higher Education providers
     user checks page for details dropdown    Devices
     user checks page for details dropdown    Testing
 
 check 'Destination of pupils and students' contains correct topics
-    user expands details section    Destination of pupils and students
+    user opens details dropdown    Destination of pupils and students
     user checks page for details dropdown    Destinations of key stage 4 and 16-18 pupils
     user checks page for details dropdown    NEET and participation
 
 check 'Early years' contains correct topics
-    user expands details section    Early years
+    user opens details dropdown    Early years
     user checks page for details dropdown    Childcare and early years
     user checks page for details dropdown    Early years foundation stage profile
 
 check 'Finance and funding' contains correct topics
-    user expands details section    Finance and funding
+    user opens details dropdown    Finance and funding
     user checks page for details dropdown    Local authority and school finance
     user checks page for details dropdown    Student loan forecasts
 
 check 'Further education' contains correct topics
-    user expands details section    Further education
+    user opens details dropdown    Further education
     user checks page for details dropdown    Further education and skills
     user checks page for details dropdown    Further education: outcome-based success measures
 
 check 'Higher education' contains correct topics
-    user expands details section    Higher education
+    user opens details dropdown    Higher education
     user checks page for details dropdown    Higher education graduate employment and earnings
     user checks page for details dropdown    Participation measures in higher education
     user checks page for details dropdown    Widening participation in higher education
 
 check 'Pupils and schools' contains correct topics
-    user expands details section    Pupils and schools
+    user opens details dropdown    Pupils and schools
     user checks page for details dropdown    Academy transfers
     user checks page for details dropdown    Admission appeals
     user checks page for details dropdown    Exclusions
@@ -95,16 +95,16 @@ check 'Pupils and schools' contains correct topics
     user checks page for details dropdown    Special educational needs (SEN)
 
 check 'School and college outcomes and performance' contains correct topics
-    user expands details section    School and college outcomes and performance
+    user opens details dropdown    School and college outcomes and performance
     user checks page for details dropdown    16 to 19 attainment
     user checks page for details dropdown    GCSEs (key stage 4)
     user checks page for details dropdown    Key stage 2
 
 check 'Teachers and school workforce' contains correct topics
-    user expands details section    Teachers and school workforce
+    user opens details dropdown    Teachers and school workforce
     user checks page for details dropdown    Initial teacher training (ITT)
     user checks page for details dropdown    School workforce
 
 check 'UK education and training statistics' contains correct topics
-    user expands details section    UK education and training statistics
+    user opens details dropdown    UK education and training statistics
     user checks page for details dropdown    UK education and training statistics
