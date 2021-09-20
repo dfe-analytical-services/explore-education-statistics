@@ -772,10 +772,10 @@ user closes Set Page View box
     user clicks element    id:pageViewToggleButton
     user waits until element is not visible    id:editingMode
 
-user checks page for details section
+user waits until page contains details section
     [Arguments]    ${heading}    ${wait}=${timeout}
     user waits until page contains element    testid:Expand Details Section ${heading}    ${wait}
 
-user checks page for details dropdown
+user waits until page contains details dropdown
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}
