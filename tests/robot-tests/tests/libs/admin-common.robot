@@ -337,6 +337,39 @@ user cancels methodology amendment for publication
     user waits until modal is visible    Confirm you want to cancel this amended methodology
     user clicks button    Confirm
 
+user adds note to methodology
+    [Arguments]
+    ...    ${note}
+    user clicks button    Add note
+    user enters text into element    label:New methodology note    ${note}
+    user clicks button    Save note
+    ${date}=    get current datetime    %-d %B %Y
+    user waits until element contains    css:#methodologyNotes time    ${date}
+    user waits until element contains    css:#methodologyNotes p    ${note}
+
+user removes methodology note
+    [Arguments]
+    ...    ${note}
+    ...    ${parent}
+    user clicks button     Remove note    ${parent}
+    user clicks button     Confirm
+    user waits until page does not contain    ${note}
+
+user edits methodology note
+    [Arguments]
+    ...    ${updated_note}
+    ...    ${day}
+    ...    ${month}
+    ...    ${year}
+    ...    ${parent}
+    user clicks button     Edit note    ${parent}
+    user enters text into element    label:Day    ${day}
+    user enters text into element    label:Month    ${month}
+    user enters text into element    label:Year    ${year}
+    user enters text into element    label:Edit methodology note    ${updated_note}
+    user clicks button     Update note
+    user waits until page contains    ${updated_note}
+
 user links publication to external methodology
     [Arguments]
     ...    ${publication}
