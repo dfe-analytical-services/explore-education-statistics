@@ -1,4 +1,5 @@
 import StatusBlock from '@admin/components/StatusBlock';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
   MethodologyStatus,
 } from '@admin/services/methodologyService';
@@ -14,6 +15,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
 import React from 'react';
+import UrlContainer from '@common/components/UrlContainer';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -33,6 +35,8 @@ const MethodologyStatusPage = () => {
     methodology: currentMethodology,
     onMethodologyChange,
   } = useMethodologyContext();
+
+  const { PublicAppUrl } = useConfig();
 
   const [isEditing, toggleForm] = useToggle(false);
 
@@ -85,6 +89,17 @@ const MethodologyStatusPage = () => {
             {!isEditing ? (
               <>
                 <h2>Sign off</h2>
+
+                <p>
+                  The <strong>public methodology</strong> will be accessible at:
+                </p>
+
+                <p>
+                  <UrlContainer
+                    data-testid="public-methodology-url"
+                    url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
+                  />
+                </p>
 
                 <SummaryList>
                   <SummaryListItem term="Status">

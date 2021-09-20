@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public TitleAndIdViewModel? ScheduledWithRelease { get; set; }
 
+        public string Slug { get; set; } = string.Empty;
+
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
 
