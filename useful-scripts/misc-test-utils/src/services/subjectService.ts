@@ -13,6 +13,8 @@ import { importStages } from '../modules/subject/uploadSubject';
 
 const cwd = projectRoot;
 
+const { SUBJECT_POLL_TIME } = process.env;
+
 const subjectService = {
   addSubject: async (releaseId: string): Promise<string> => {
     const finalZipFileGlob = await globby(
@@ -30,9 +32,11 @@ const subjectService = {
         headers: {
           ...form.getHeaders(),
         },
+        maxContentLength: 1024 ** 1000000,
+        maxBodyLength: 1024 ** 1000000,
       },
     );
-    console.log(res.data);
+    console.log(res.data.status);
     return res.data.id;
   },
 
@@ -61,7 +65,7 @@ const subjectService = {
           'No import status available. Waiting 3 seconds before polling the API',
         ),
       );
-      await sleep(3000);
+      await sleep(parseInt(SUBJECT_POLL_TIME, 12));
     }
     return res.data.status;
   },

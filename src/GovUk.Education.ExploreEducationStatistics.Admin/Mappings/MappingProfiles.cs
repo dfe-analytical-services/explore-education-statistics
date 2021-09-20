@@ -219,13 +219,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ContentSection, ContentSectionViewModel>()
                 .ForMember(dest => dest.Content,
-                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
+                m => m.MapFrom(section =>
+                    section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<MethodologyVersion, ManageMethodologyContentViewModel>()
                 .ForMember(dest => dest.Content,
-                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Annexes,
-                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Annexes.OrderBy(annexSection => annexSection.Order)))
+                .ForMember(dest => dest.Notes,
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Release, ReleasePublicationStatusViewModel>();
         }

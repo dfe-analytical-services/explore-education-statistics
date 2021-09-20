@@ -18,7 +18,7 @@ Create publicly accessible Publication
     user create test release via api    ${PUBLICATION_ID}    AY    2021
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2021/22 (not Live)
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Create Methodology with some content and images
     user creates methodology for publication    ${PUBLICATION_NAME}

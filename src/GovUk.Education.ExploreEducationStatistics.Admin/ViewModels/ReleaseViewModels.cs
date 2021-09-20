@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -57,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
+
+        public bool NotifySubscribers { get; set; }
 
         public string LatestInternalReleaseNote { get; set; }
 
@@ -136,6 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public string LatestInternalReleaseNote { get; set; }
+
+        public bool? NotifySubscribers { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PublishMethod? PublishMethod { get; set; }

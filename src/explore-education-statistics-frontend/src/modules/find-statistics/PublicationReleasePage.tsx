@@ -386,7 +386,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               </Link>
             );
           }}
-          renderMetaGuidanceLink={
+          renderDataGuidanceLink={
             <Link
               to={
                 release.latestRelease

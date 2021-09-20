@@ -134,7 +134,7 @@ user creates publication
     user enters text into element    id:publicationForm-title    ${title}
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
     user enters text into element    id:publicationForm-teamEmail    Attainment.STATISTICS@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Tingting Shu
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard    60
@@ -466,19 +466,19 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
-user gets meta guidance data file content editor
+user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
-    user waits until page contains element    id:metaGuidance-dataFiles
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    user waits until page contains element    id:dataGuidance-dataFiles
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
     user waits until parent contains element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     ${editor}=    get child element    ${accordion}    xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     [Return]    ${editor}
 
-user enters text into meta guidance data file content editor
+user enters text into data guidance data file content editor
     [Arguments]    ${accordion_heading}    ${text}
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:metaGuidance-dataFiles
+    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
     user checks element does not contain child element    ${accordion}    testid:fileGuidanceContent-focused
-    ${editor}=    user gets meta guidance data file content editor    ${accordion_heading}
+    ${editor}=    user gets data guidance data file content editor    ${accordion_heading}
     user clicks element    ${editor}
     user checks element contains child element    ${accordion}    testid:fileGuidanceContent-focused
     user enters text into element    ${editor}    ${text}
@@ -503,14 +503,25 @@ user deletes subject file
     user clicks element    ${button}
     user clicks button    Confirm
 
+user approves original release for immediate publication
+    user approves release for immediate publication    original
+
+user approves amended release for immediate publication
+    user approves release for immediate publication    amendment
+
 user approves release for immediate publication
+    [Arguments]    ${release_type}=original
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off
     user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
+    user checks page does not contain    Notify subscribers by email
     user clicks radio    Approved for publication
+    IF    '${release_type}' == 'amendment'
+        user waits until page contains    Notify subscribers by email
+    END
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
     user clicks button    Update status

@@ -1,9 +1,12 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -14,11 +17,260 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
     public class MethodologyContentServiceTests
     {
+        [Fact]
+        public async Task GetContent()
+        {
+            var methodology = new Methodology
+            {
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        PreviousVersionId = null,
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                        Published = DateTime.UtcNow,
+                        AlternativeTitle = "Alternative title"
+                    }
+                }
+            };
+            var methodologyVersion = methodology.Versions[0];
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyContentService(contentDbContext);
+
+                var result = (await service.GetContent(methodologyVersion.Id)).AssertRight();
+
+                Assert.Equal(methodologyVersion.Id, result.Id);
+                Assert.Equal(methodology.Slug, result.Slug);
+                Assert.Equal(methodologyVersion.Title, result.Title);
+                Assert.Equal(methodologyVersion.Status, result.Status);
+                Assert.Equal(methodologyVersion.Published, result.Published);
+                Assert.Empty(result.Annexes);
+                Assert.Empty(result.Content);
+                Assert.Empty(result.Notes);
+            }
+        }
+
+        [Fact]
+        public async Task GetContent_TestContentSections()
+        {
+            var methodology = new Methodology
+            {
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Annexes = new List<ContentSection>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 2,
+                                Heading = "Annex 3 heading",
+                                Caption = "Annex 3 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 0,
+                                Heading = "Annex 1 heading",
+                                Caption = "Annex 1 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 1,
+                                Heading = "Annex 2 heading",
+                                Caption = "Annex 2 caption"
+                            }
+                        },
+                        Content = new List<ContentSection>
+                        {
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 2,
+                                Heading = "Section 3 heading",
+                                Caption = "Section 3 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 0,
+                                Heading = "Section 1 heading",
+                                Caption = "Section 1 caption"
+                            },
+                            new()
+                            {
+                                Id = Guid.NewGuid(),
+                                Order = 1,
+                                Heading = "Section 2 heading",
+                                Caption = "Section 2 caption"
+                            }
+                        },
+                        PreviousVersionId = null,
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                        AlternativeTitle = "Alternative title"
+                    }
+                }
+            };
+            var methodologyVersion = methodology.Versions[0];
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyContentService(contentDbContext);
+
+                var result = (await service.GetContent(methodologyVersion.Id)).AssertRight();
+
+                Assert.Equal(3, result.Annexes.Count);
+                Assert.Equal(3, result.Content.Count);
+
+                var expectedAnnex1 = methodologyVersion.Annexes.Single(section => section.Order == 0);
+                var expectedAnnex2 = methodologyVersion.Annexes.Single(section => section.Order == 1);
+                var expectedAnnex3 = methodologyVersion.Annexes.Single(section => section.Order == 2);
+
+                AssertContentSectionAndViewModelEqual(expectedAnnex1, result.Annexes[0]);
+                AssertContentSectionAndViewModelEqual(expectedAnnex2, result.Annexes[1]);
+                AssertContentSectionAndViewModelEqual(expectedAnnex3, result.Annexes[2]);
+
+                var expectedContent1 = methodologyVersion.Content.Single(section => section.Order == 0);
+                var expectedContent2 = methodologyVersion.Content.Single(section => section.Order == 1);
+                var expectedContent3 = methodologyVersion.Content.Single(section => section.Order == 2);
+
+                AssertContentSectionAndViewModelEqual(expectedContent1, result.Content[0]);
+                AssertContentSectionAndViewModelEqual(expectedContent2, result.Content[1]);
+                AssertContentSectionAndViewModelEqual(expectedContent3, result.Content[2]);
+            }
+        }
+
+        private static void AssertContentSectionAndViewModelEqual(
+            ContentSection expected,
+            ContentSectionViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Caption, actual.Caption);
+            Assert.Equal(expected.Heading, actual.Heading);
+            Assert.Equal(expected.Order, actual.Order);
+        }
+
+        [Fact]
+        public async Task GetContent_TestNotes()
+        {
+            var methodology = new Methodology
+            {
+                Slug = "methodology-slug",
+                OwningPublicationTitle = "Methodology title",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        PreviousVersionId = null,
+                        PublishingStrategy = Immediately,
+                        Status = Approved,
+                        AlternativeTitle = "Alternative title"
+                    }
+                }
+            };
+            var methodologyVersion = methodology.Versions[0];
+
+            var otherNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-2).ToUniversalTime(),
+                Content = "Other note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var earliestNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-3).ToUniversalTime(),
+                Content = "Earliest note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var latestNote = new MethodologyNote
+            {
+                DisplayDate = DateTime.Today.AddDays(-1).ToUniversalTime(),
+                Content = "Latest note",
+                MethodologyVersion = methodologyVersion
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyNotes.AddRangeAsync(otherNote, earliestNote, latestNote);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyContentService(contentDbContext);
+
+                var result = (await service.GetContent(methodologyVersion.Id)).AssertRight();
+
+                Assert.Equal(3, result.Notes.Count);
+
+                AssertMethodologyNoteAndViewModelEqual(latestNote, result.Notes[0]);
+                AssertMethodologyNoteAndViewModelEqual(otherNote, result.Notes[1]);
+                AssertMethodologyNoteAndViewModelEqual(earliestNote, result.Notes[2]);
+            }
+        }
+
+        private static void AssertMethodologyNoteAndViewModelEqual(
+            MethodologyNote expected,
+            MethodologyNoteViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Content, actual.Content);
+            Assert.Equal(expected.DisplayDate, actual.DisplayDate);
+        }
+
+        [Fact]
+        public async Task GetContent_MethodologyVersionNotFound()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = SetupMethodologyContentService(contentDbContext: contentDbContext);
+
+            var result = await service.GetContent(Guid.NewGuid());
+                
+            result.AssertNotFound();
+        }
+
         [Fact]
         public async Task GetContentBlocks_NoContentSections()
         {
@@ -209,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Status = MethodologyStatus.Draft,
+                Status = Draft,
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -237,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Status = MethodologyStatus.Approved,
+                Status = Approved,
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

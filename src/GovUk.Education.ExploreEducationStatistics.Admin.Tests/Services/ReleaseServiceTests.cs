@@ -909,6 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
                     viewModel.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, viewModel.NextReleaseDate);
+                Assert.False(viewModel.NotifySubscribers);
                 Assert.Equal(adHocReleaseType, viewModel.Type);
                 Assert.Equal("2030", viewModel.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
@@ -1181,6 +1182,234 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task CreateReleaseStatus_Approved_NotifySubscribers()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType {Title = "Ad Hoc"},
+                Publication = new Publication {Title = "Old publication"},
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                releaseChecklistService
+                    .Setup(s =>
+                        s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    .ReturnsAsync(
+                        new List<ReleaseChecklistIssue>()
+                    );
+
+                contentService.Setup(mock =>
+                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            // No need to include NotifySubscribers - should default to true for original releases
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                MockUtils.VerifyAllMocks(releaseChecklistService, contentService);
+
+                var viewModel = result.AssertRight();
+
+                Assert.True(viewModel.NotifySubscribers);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Amendment_NotifySubscribers_False()
+        {
+            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+
+            var publication = new Publication();
+
+            var initialReleaseId = Guid.NewGuid();
+            var initialRelease = new Release
+            {
+                Id = initialReleaseId,
+                Type = releaseType,
+                TimePeriodCoverage = TimeIdentifier.TaxYear,
+                Publication = publication,
+                ReleaseName = "2035",
+                Slug = "2035",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+                PreviousVersionId = initialReleaseId
+            };
+
+            var amendedRelease = new Release
+            {
+                Type = releaseType,
+                TimePeriodCoverage = TimeIdentifier.TaxYear,
+                Publication = publication,
+                ReleaseName = "2035",
+                Slug = "2035",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 1,
+                PreviousVersionId = initialReleaseId
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(releaseType);
+                await context.AddRangeAsync(amendedRelease, initialRelease);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            releaseChecklistService
+                .Setup(s =>
+                    s.GetErrors(It.Is<Release>(r => r.Id == amendedRelease.Id)))
+                .ReturnsAsync(
+                    new List<ReleaseChecklistIssue>()
+                );
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        amendedRelease.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            PublishScheduled = "2051-06-30",
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            NotifySubscribers = false,
+                        }
+                    );
+
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
+                var viewModel = result.AssertRight();
+
+                Assert.False(viewModel.NotifySubscribers);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Amendment_NotifySubscribers_True()
+        {
+            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+
+            var publication = new Publication();
+
+            var initialReleaseId = Guid.NewGuid();
+            var initialRelease = new Release
+            {
+                Id = initialReleaseId,
+                Type = releaseType,
+                TimePeriodCoverage = TimeIdentifier.TaxYear,
+                Publication = publication,
+                ReleaseName = "2035",
+                Slug = "2035",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+                PreviousVersionId = initialReleaseId
+            };
+
+            var amendedRelease = new Release
+            {
+                Type = releaseType,
+                TimePeriodCoverage = TimeIdentifier.TaxYear,
+                Publication = publication,
+                ReleaseName = "2035",
+                Slug = "2035",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 1,
+                PreviousVersionId = initialReleaseId
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(releaseType);
+                await context.AddRangeAsync(amendedRelease, initialRelease);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            releaseChecklistService
+                .Setup(s =>
+                    s.GetErrors(It.Is<Release>(r => r.Id == amendedRelease.Id)))
+                .ReturnsAsync(
+                    new List<ReleaseChecklistIssue>()
+                );
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        amendedRelease.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            PublishScheduled = "2051-06-30",
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            NotifySubscribers = true,
+                        }
+                    );
+
+                MockUtils.VerifyAllMocks(contentService, releaseFileService);
+
+                var viewModel = result.AssertRight();
+
+                Assert.True(viewModel.NotifySubscribers);
+            }
+        }
+
+        [Fact]
         public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
         {
             var release = new Release
@@ -1321,6 +1550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     viewModel.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, viewModel.NextReleaseDate);
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, viewModel.ApprovalStatus);
+                Assert.False(viewModel.NotifySubscribers);
 
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(release.Type, viewModel.Type);
@@ -1455,6 +1685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
                     viewModel.PublishScheduled);
+                Assert.False(viewModel.NotifySubscribers);
                 Assert.Equal(nextReleaseDateEdited, viewModel.NextReleaseDate);
                 Assert.Equal("2030", viewModel.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
@@ -1479,6 +1710,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var savedStatus = saved.ReleaseStatuses[0];
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
+                Assert.False(savedStatus.NotifySubscribers);
                 Assert.NotNull(savedStatus.Created);
                 Assert.InRange(DateTime.UtcNow
                     .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);

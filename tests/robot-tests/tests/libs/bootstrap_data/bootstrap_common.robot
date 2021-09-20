@@ -62,7 +62,7 @@ user creates a fully populated published release
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 user creates a fully populated draft release
     [Arguments]
@@ -85,13 +85,13 @@ user creates a fully populated draft release
     user waits until page does not contain loading spinner
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
-    # add meta guidance
-    user clicks link    Metadata guidance
+    # add data guidance
+    user clicks link    Data guidance
     user waits until page does not contain loading spinner
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
     user clicks button    Save guidance
 
     # add footnote

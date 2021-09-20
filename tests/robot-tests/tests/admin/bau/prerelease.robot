@@ -35,10 +35,10 @@ Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Add metadata guidance
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until page contains element    id:metaGuidance-dataFiles
+    user waits until page contains element    id:dataGuidance-dataFiles
 
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels
@@ -50,11 +50,11 @@ Add metadata guidance
     user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
     user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    1    1    admission_numbers    id:metaGuidance-dataFiles
-    user checks results table cell contains    1    2    Admission Numbers    id:metaGuidance-dataFiles
+    user checks results table cell contains    1    1    admission_numbers    id:dataGuidance-dataFiles
+    user checks results table cell contains    1    2    Admission Numbers    id:dataGuidance-dataFiles
 
-    user enters text into element    id:metaGuidanceForm-content    Test metadata guidance content
-    user enters text into element    id:metaGuidanceForm-subjects-0-content    Test file guidance content
+    user enters text into element    id:dataGuidanceForm-content    Test metadata guidance content
+    user enters text into element    id:dataGuidanceForm-subjects-0-content    Test file guidance content
 
     user clicks button    Save guidance
 
@@ -227,7 +227,7 @@ Validate metadata guidance page
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
-    user waits until h2 is visible    Metadata guidance document    60
+    user waits until h2 is visible    Data guidance    60
     user waits until page contains    Test metadata guidance content    60
 
     user waits until page contains accordion section    UI test subject    60
@@ -324,7 +324,7 @@ Validate public metdata guidance for Analyst user
     user waits until page contains title caption    Calendar Year 2000    60
     user waits until h1 is visible    ${PUBLICATION_NAME}    60
 
-    user waits until h2 is visible    Metadata guidance document    60
+    user waits until h2 is visible    Data guidance    60
     user waits until page contains    Test metadata guidance content    60
 
     user waits until page contains accordion section    UI test subject    60

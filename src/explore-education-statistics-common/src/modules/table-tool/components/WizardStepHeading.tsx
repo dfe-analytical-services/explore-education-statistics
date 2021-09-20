@@ -19,7 +19,7 @@ const WizardStepHeading = ({
   return (
     <h2
       className={classNames({
-        'govuk-heading-l dfe-flex dfe-align-items--center govuk-!-margin-top-6': isActive,
+        'govuk-heading-l dfe-flex dfe-align-items--center': isActive,
         'govuk-fieldset__heading': fieldsetHeading && isActive,
         [styles.stepEnabled]: stepEnabled && !isActive,
       })}

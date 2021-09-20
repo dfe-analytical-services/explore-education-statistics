@@ -2,19 +2,21 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import ContentHtml from '@common/components/ContentHtml';
-import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
-import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
-import React from 'react';
+import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
+import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
+import React, { ReactNode } from 'react';
 
 interface Props {
   published?: string;
-  metaGuidance: string;
-  subjects: SubjectMetaGuidance[];
+  dataGuidance: string;
+  renderDataCatalogueLink?: ReactNode;
+  subjects: SubjectDataGuidance[];
 }
 
-const ReleaseMetaGuidancePageContent = ({
+const ReleaseDataGuidancePageContent = ({
   published,
-  metaGuidance,
+  dataGuidance,
+  renderDataCatalogueLink,
   subjects,
 }: Props) => {
   return (
@@ -27,18 +29,26 @@ const ReleaseMetaGuidancePageContent = ({
         </p>
       )}
 
-      {metaGuidance && (
-        <ContentHtml html={metaGuidance} testId="metaGuidance-content" />
+      {dataGuidance && (
+        <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
       )}
 
       {subjects.length > 0 && (
         <>
           <h3 className="govuk-!-margin-top-6">Data files</h3>
 
+          {renderDataCatalogueLink && (
+            <p>
+              All data files associated with this releases are listed below with
+              guidance on their content. To download any of these files, please
+              visit our {renderDataCatalogueLink}.
+            </p>
+          )}
+
           <Accordion id="dataFiles">
             {subjects.map(subject => (
               <AccordionSection heading={subject.name} key={subject.id}>
-                <ReleaseMetaGuidanceDataFile
+                <ReleaseDataGuidanceDataFile
                   key={subject.id}
                   subject={subject}
                 />
@@ -51,4 +61,4 @@ const ReleaseMetaGuidancePageContent = ({
   );
 };
 
-export default ReleaseMetaGuidancePageContent;
+export default ReleaseDataGuidancePageContent;

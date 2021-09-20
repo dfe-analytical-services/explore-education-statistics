@@ -1,18 +1,21 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import chalk from 'chalk';
 import { v4 } from 'uuid';
 import { projectRoot } from '../../config';
 import commonService from '../../services/commonService';
 import ZipDirectory from '../../utils/zipDirectory';
-import sleep from '../../utils/sleep';
 import subjectService from '../../services/subjectService';
 import releaseService from '../../services/releaseService';
+import sleep from '../../utils/sleep';
 
 const cwd = projectRoot;
+const { SUBJECT_POLL_TIME } = process.env;
+
 export type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
 
-const uploadSingleSubject = async (releaseId: string) => {
-  if (releaseId === '') {
+const uploadSingleSubject = async (releaseId: string, fast: boolean) => {
+  if (!releaseId) {
     throw new Error(chalk.red('Release ID is required!'));
   }
   await commonService.validateArchives();
@@ -28,35 +31,32 @@ const uploadSingleSubject = async (releaseId: string) => {
   );
 
   const subjectId = await subjectService.addSubject(releaseId);
-  await sleep(3000);
 
   console.time('import subject upload');
-  await sleep(900);
 
   const subjectArray = await subjectService.getSubjectIdArr(releaseId);
 
-  await releaseService.addMetaGuidance(
+  await releaseService.addDataGuidance(
     subjectArray as { id: string; content: string }[],
     releaseId,
   );
 
-  if (!importStatus) {
-    console.log(
-      'No importStatus just yet, waiting 4 seconds before polling again',
-    );
-    await sleep(4000);
-  }
-
-  while (importStatus !== 'COMPLETE') {
-    console.log(chalk.blue('importStatus', chalk.green(importStatus)));
-    // eslint-disable-next-line no-await-in-loop
-    await sleep(1000);
-
-    // eslint-disable-next-line no-await-in-loop
+  while (importStatus !== 'QUEUED') {
     importStatus = await subjectService.getSubjectProgress(
       releaseId,
       subjectId as string,
     );
+  }
+
+  if (!fast) {
+    while (importStatus !== 'COMPLETE') {
+      console.log(chalk.blue('importStatus', chalk.green(importStatus)));
+      importStatus = await subjectService.getSubjectProgress(
+        releaseId,
+        subjectId as string,
+      );
+      await sleep(parseInt(SUBJECT_POLL_TIME, 10));
+    }
   }
   console.timeEnd('import subject upload');
 };

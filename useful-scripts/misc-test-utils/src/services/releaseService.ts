@@ -1,5 +1,8 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import chalk from 'chalk';
+import faker from 'faker';
+import { ReleaseProgressResponse } from '../types/ReleaseProgressResponse';
 import sleep from '../utils/sleep';
 import { ReleaseData } from '../types/ReleaseData';
 import adminApi from '../utils/adminApi';
@@ -20,7 +23,6 @@ const releaseService = {
     );
     console.timeEnd('createRelease');
     const releaseId = res.data.id;
-
     console.log(
       chalk.green(
         `Release URL: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/data`,
@@ -28,33 +30,34 @@ const releaseService = {
     );
     return releaseId;
   },
-  addMetaGuidance: async (
+  addDataGuidance: async (
     subjArr: { id: string; content: string }[],
     releaseId: string,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     await adminApi.patch(`/api/release/${releaseId}/meta-guidance`, {
       content: '<p>testing</p>',
       subjects: subjArr,
     });
-    return true;
   },
-  getReleaseProgress: async (releaseId: string) => {
+
+  getReleaseProgress: async (
+    releaseId: string,
+    url?: string,
+  ): Promise<ReleaseProgressResponse> => {
     const res = await adminApi.get(`/api/releases/${releaseId}/stage-status`, {
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
     });
-
     // eslint-disable-next-line no-constant-condition
-    while (res.data.overallStage !== 'Complete') {
+    if (res.data.publishingStage !== 'Complete') {
       console.log(
-        chalk.blue('overall stage'),
-        chalk.green(res.data.overallStage),
+        'Overall stage of publication:',
+        chalk.blue(res.data.overallStage),
       );
-      // eslint-disable-next-line no-await-in-loop
-      await sleep(3000);
-      // eslint-disable-next-line no-await-in-loop
+      await sleep(1500);
       await releaseService.getReleaseProgress(releaseId);
     }
+    console.log(chalk.green(`Published release: ${url}`));
     return res.data;
   },
   publishRelease: async (obj: ReleaseData, releaseId: string) => {
@@ -71,6 +74,42 @@ const releaseService = {
       latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
+  },
+
+  addContentSection: async (releaseId: string): Promise<string> => {
+    const res = await adminApi.post(
+      `/api/release/${releaseId}/content/sections/add`,
+      {
+        order: 0,
+      },
+    );
+    return res.data.id;
+  },
+  addTextBlock: async (
+    releaseId: string,
+    sectionId: string,
+  ): Promise<string> => {
+    const res = await adminApi.post(
+      `/api/release/${releaseId}/content/section/${sectionId}/blocks/add`,
+      {
+        body: '',
+        order: 0,
+        type: 'HtmlBlock',
+      },
+    );
+    return res.data.id;
+  },
+  addTextContent: async (
+    releaseId: string,
+    sectionId: string,
+    blockId: string,
+  ): Promise<void> => {
+    await adminApi.put(
+      `/api/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
+      {
+        body: `<p>${faker.lorem.lines(100)}</p>`,
+      },
+    );
   },
 };
 export default releaseService;

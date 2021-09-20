@@ -690,6 +690,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("NotifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("NotifySubscribers")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
 
