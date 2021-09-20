@@ -97,7 +97,7 @@ const MethodologyStatusPage = () => {
                 <p>
                   <UrlContainer
                     data-testid="public-methodology-url"
-                    url={`${config.PublicAppUrl}/methodologies/${currentMethodology.slug}`}
+                    url={`${config.PublicAppUrl}/methodology/${currentMethodology.slug}`}
                   />
                 </p>
 

@@ -31,6 +31,13 @@ Approve a methodology for publishing immediately
 
     user approves methodology for publication    ${PUBLICATION_NAME}
 
+Verify the expected public URL of the methodology on the Sign off tab
+    user views methodology for publication    ${PUBLICATION_NAME}
+    user clicks link    Sign off
+    user waits until page contains testid    public-methodology-url
+    ${ACCESSIBLE_METHODOLOGY_URL}=    Get Value    xpath://*[@data-testid="public-methodology-url"]
+    should be equal    ${PUBLIC_METHODOLOGY_URL}    ${ACCESSIBLE_METHODOLOGY_URL}
+
 Verify that the publication is not visible on the public methodologies page without a published release
     user navigates to public methodologies page
     user checks page does not contain    ${PUBLICATION_NAME}
