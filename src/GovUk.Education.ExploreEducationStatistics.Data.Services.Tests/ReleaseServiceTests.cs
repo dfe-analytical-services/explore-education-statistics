@@ -108,12 +108,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var timePeriodService = new Mock<ITimePeriodService>();
 
                 timePeriodService
-                    .Setup(s => s.GetTimePeriodRangeLabels(releaseSubject1.SubjectId))
-                    .Returns(new TimePeriodRangeLabels("2020/21", "2021/22"));
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
+                    .Returns(new TimePeriodLabels("2020/21", "2021/22"));
 
                 timePeriodService
-                    .Setup(s => s.GetTimePeriodRangeLabels(releaseSubject2.SubjectId))
-                    .Returns(new TimePeriodRangeLabels("2030", "2031"));
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
+                    .Returns(new TimePeriodLabels("2030", "2031"));
 
                 metaGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
@@ -180,8 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(releaseSubject1.MetaGuidance, subjects[0].Content);
 
-                Assert.Equal("2020/21", subjects[0].TimePeriodRange.From);
-                Assert.Equal("2021/22", subjects[0].TimePeriodRange.To);
+                Assert.Equal("2020/21", subjects[0].TimePeriods.From);
+                Assert.Equal("2021/22", subjects[0].TimePeriods.To);
 
                 Assert.Equal(2, subjects[0].GeographicLevels.Count);
                 Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
@@ -195,8 +195,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseSubject2.MetaGuidance, subjects[1].Content);
                 Assert.Equal("csv", subjects[1].File.Extension);
 
-                Assert.Equal("2030", subjects[1].TimePeriodRange.From);
-                Assert.Equal("2031", subjects[1].TimePeriodRange.To);
+                Assert.Equal("2030", subjects[1].TimePeriods.From);
+                Assert.Equal("2031", subjects[1].TimePeriods.To);
 
                 Assert.Single(subjects[1].GeographicLevels);
                 Assert.Equal("National", subjects[1].GeographicLevels[0]);

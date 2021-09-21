@@ -4,16 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class TimePeriodRangeLabels
+    public class TimePeriodLabels
     {
         public string From { get; } = string.Empty;
         public string To { get; } = string.Empty;
 
-        public TimePeriodRangeLabels()
+        public TimePeriodLabels()
         {
         }
 
-        public TimePeriodRangeLabels(string from, string to)
+        public TimePeriodLabels(string from, string to)
         {
             From = from;
             To = to;

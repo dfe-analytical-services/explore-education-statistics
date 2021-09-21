@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return TimePeriodUtil.GetTimePeriodRange(start, end);
         }
 
-        public TimePeriodRangeLabels GetTimePeriodRangeLabels(Guid subjectId)
+        public TimePeriodLabels GetTimePeriodLabels(Guid subjectId)
         {
             var observationsQuery = _context
                 .Observation
@@ -59,13 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (!orderedTimePeriods.Any())
             {
-                return new TimePeriodRangeLabels();
+                return new TimePeriodLabels();
             }
 
             var first = orderedTimePeriods.First();
             var last = orderedTimePeriods.Last();
 
-            return new TimePeriodRangeLabels(
+            return new TimePeriodLabels(
                 TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
                 TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }

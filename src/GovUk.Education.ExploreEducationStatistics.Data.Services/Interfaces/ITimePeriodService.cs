@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 
         IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IQueryable<Observation> observations);
 
-        TimePeriodRangeLabels GetTimePeriodRangeLabels(Guid subjectId);
+        TimePeriodLabels GetTimePeriodLabels(Guid subjectId);
     }
 }

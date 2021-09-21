@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         await file.WriteLineAsync("Geographic levels: " + string.Join("; ", subject.GeographicLevels));
                     }
 
-                    var timePeriodsLabel = subject.TimePeriodsRange.ToLabel();
+                    var timePeriodsLabel = subject.TimePeriods.ToLabel();
 
                     if (!timePeriodsLabel.IsNullOrWhitespace())
                     {
