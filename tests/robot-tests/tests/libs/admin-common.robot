@@ -357,18 +357,17 @@ user removes methodology note
 
 user edits methodology note
     [Arguments]
-    ...    ${updated_note}
+    ...    ${note}
     ...    ${day}
     ...    ${month}
     ...    ${year}
-    ...    ${parent}
-    user clicks button     Edit note    ${parent}
+    user clicks button     Edit note    xpath://p[text()="${note}"]/ancestor::li
     user enters text into element    label:Day    ${day}
     user enters text into element    label:Month    ${month}
     user enters text into element    label:Year    ${year}
-    user enters text into element    label:Edit methodology note    ${updated_note}
+    user enters text into element    label:Edit methodology note    ${note} - edited
     user clicks button     Update note
-    user waits until page contains    ${updated_note}
+    user waits until page contains    ${note} - edited
 
 user links publication to external methodology
     [Arguments]

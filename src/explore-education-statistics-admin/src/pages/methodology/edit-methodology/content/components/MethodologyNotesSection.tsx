@@ -242,7 +242,7 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
       )}
 
       <ModalConfirm
-        open={deletedMethodologyNoteId.length > 0}
+        open={deletedMethodologyNoteId !== ''}
         title="Confirm deletion of methodology note"
         onExit={() => setDeletedMethodologyNoteId('')}
         onCancel={() => setDeletedMethodologyNoteId('')}

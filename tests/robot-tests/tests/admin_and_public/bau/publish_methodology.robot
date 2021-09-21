@@ -125,11 +125,10 @@ Add and update another note describing the amendment
     user adds note to methodology
     ...    Note which should be updated
     user edits methodology note
-    ...    Earliest note
+    ...    Note which should be updated
     ...    01
     ...    03
     ...    2021
-    ...    css:#methodologyNotes li:nth-of-type(1)
 
 Approve the amendment for publishing immediately
     user approves methodology amendment for publication
@@ -170,7 +169,7 @@ Verify the list of notes
     user opens details dropdown    See all notes (2)
     user waits until page contains element    css:[data-testid="notes"] li    limit=2
     user checks methodology note    1    ${date}    Latest note
-    user checks methodology note    2    1 March 2021    Earliest note
+    user checks methodology note    2    1 March 2021    Note which should be updated - edited
     user closes details dropdown    See all notes (2)
 
 Schedule a methodology amendment to be published with a release amendment
