@@ -301,6 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Methodology = new Methodology
                     {
                         Id = Guid.NewGuid(),
+                        Slug = "test-publication",
                         OwningPublicationTitle = publication.Title,
                         Publications = new List<PublicationMethodology>
                         {
@@ -324,6 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(repository);
 
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
+                Assert.Equal("test-publication", viewModel.Slug);
                 Assert.False(viewModel.Amendment);
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Equal(createdMethodology.Methodology.Id, viewModel.MethodologyId);
@@ -524,7 +526,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetAdoptableMethodologies()
         {
-            var methodology = new Methodology();
+            var methodology = new Methodology
+            {
+                Slug = "test-publication"
+            };
 
             var publication = new Publication
             {
@@ -587,6 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = result[0];
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("test-publication", viewModel.Slug);
                 Assert.False(viewModel.Amendment);
                 Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(methodologyVersion.MethodologyId, viewModel.MethodologyId);
@@ -637,7 +643,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetSummary()
         {
-            var methodology = new Methodology();
+            var methodology = new Methodology
+            {
+                Slug = "test-publication"
+            };
 
             var owningPublication = new Publication
             {
@@ -709,6 +718,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.GetSummary(methodologyVersion.Id)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("test-publication", viewModel.Slug);
                 Assert.False(viewModel.Amendment);
                 Assert.Equal("Test approval", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(methodologyVersion.MethodologyId, viewModel.MethodologyId);
@@ -1047,6 +1057,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("updated-methodology-title", viewModel.Slug);
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
@@ -1126,6 +1137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("test-publication", viewModel.Slug);
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
@@ -1205,6 +1217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("test-publication", viewModel.Slug);
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
@@ -1288,6 +1301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                Assert.Equal("alternative-methodology-title", viewModel.Slug);
                 Assert.Null(viewModel.LatestInternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);

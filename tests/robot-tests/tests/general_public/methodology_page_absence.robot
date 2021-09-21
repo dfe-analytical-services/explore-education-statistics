@@ -25,8 +25,11 @@ User navigates to absence methodology page
     user waits until h1 is visible    Pupil absence statistics: methodology
     user waits until page contains title caption    Methodology
 
-Validate Published date, Last updated date
-    user checks testid element contains    published-date    22 March 2018
+Validate Published date
+    user checks summary list contains    Published    22 March 2018
+
+Validate Last updated is not visible
+    user checks page does not contain testid    Last updated
 
 Validate accordion sections order
     user checks accordion is in position    1. Overview of absence statistics    1    id:content
@@ -44,6 +47,17 @@ Validate accordion sections order
     user checks accordion is in position    Annex D - Standard breakdowns    4    id:annexes
     user checks accordion is in position    Annex E - Timeline    5    id:annexes
     user checks accordion is in position    Annex F - Absence rates over time    6    id:annexes
+
+Validate Related information section and links exist
+    user checks page contains element    xpath://h2[text()="Related information"]
+
+    user checks page contains link with text and url
+    ...    Find statistics and data
+    ...    /find-statistics
+
+    user checks page contains link with text and url
+    ...    Education statistics: glossary
+    ...    /glossary
 
 Validate page has Print this page link
     user waits until page contains button    Print this page

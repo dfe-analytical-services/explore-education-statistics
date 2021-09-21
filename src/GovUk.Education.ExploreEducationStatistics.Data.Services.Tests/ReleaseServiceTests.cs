@@ -105,14 +105,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+                var timePeriodService = new Mock<ITimePeriodService>();
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject1.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
+                    .Returns(new TimePeriodLabels("2020/21", "2021/22"));
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject2.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
+                    .Returns(new TimePeriodLabels("2030", "2031"));
 
                 metaGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
@@ -158,6 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    timePeriodService: timePeriodService.Object,
                     fileSizeGetter: fileInfoGetter.Object
                 );
 
@@ -939,6 +941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
             IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            ITimePeriodService? timePeriodService = null,
             IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
@@ -947,6 +950,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(),
                 fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }

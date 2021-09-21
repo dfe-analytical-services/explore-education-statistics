@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -113,5 +115,166 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal((2001, Week1), result[4]);
             }
         }
+
+        [Fact]
+        public async Task GetTimePeriodLabels()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var subjectObservation1 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2030,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ3
+            };
+
+            var subjectObservation2 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ4
+            };
+
+            var subjectObservation3 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+                Subject = subject,
+                Year = 2021,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ1
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.AddRangeAsync(
+                    subjectObservation1,
+                    subjectObservation2,
+                    subjectObservation3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = new TimePeriodService(statisticsDbContext);
+
+                var result = service.GetTimePeriodLabels(subject.Id);
+
+                Assert.Equal("2020/21 Q4", result.From);
+                Assert.Equal("2030/31 Q3", result.To);
+            }
+        }
+
+        [Fact]
+        public async Task GetTimePeriodLabels_CorrectlyOrderWeeks()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var subjectObservation1 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week9,
+            };
+
+            var subjectObservation2 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week37,
+            };
+
+            var subjectObservation3 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.Week8,
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.AddRangeAsync(
+                    subjectObservation1,
+                    subjectObservation2,
+                    subjectObservation3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = new TimePeriodService(statisticsDbContext);
+
+                var result = service.GetTimePeriodLabels(subject.Id);
+
+                Assert.Equal("2020 Week 8", result.From);
+                Assert.Equal("2020 Week 37", result.To);
+            }
+        }
+
+        [Fact]
+        public async Task GetTimePeriodLabels_NoObservations()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = new TimePeriodService(statisticsDbContext);
+
+                var result = service.GetTimePeriodLabels(subject.Id);
+
+                Assert.Empty(result.From);
+                Assert.Empty(result.To);
+            }
+        }
+
     }
 }

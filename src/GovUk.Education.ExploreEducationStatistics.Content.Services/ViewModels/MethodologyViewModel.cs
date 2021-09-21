@@ -15,8 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public DateTime? Published { get; set; }
 
-        public DateTime? Updated { get; set; }
-
         public List<ContentSectionViewModel> Content { get; set; } = new();
 
         public List<ContentSectionViewModel> Annexes { get; set; } = new();

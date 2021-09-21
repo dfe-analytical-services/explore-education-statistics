@@ -1,4 +1,3 @@
-import { Publication } from '@common/services/publicationService';
 import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
 
@@ -6,10 +5,7 @@ export interface Methodology {
   id: string;
   title: string;
   published: string;
-  lastUpdated: string;
   slug: string;
-  publicationId: string;
-  publication: Publication;
   content: {
     order: number;
     heading: string;
@@ -21,6 +17,11 @@ export interface Methodology {
     heading: string;
     caption: string;
     content: ContentBlock[];
+  }[];
+  notes: {
+    id: string;
+    content: string;
+    displayDate: Date;
   }[];
 }
 

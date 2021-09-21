@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -882,104 +883,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetTimePeriods()
-        {
-            var release = new Release();
-
-            var subject = new Subject();
-
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
-            };
-
-            var subjectObservation1 = new Observation
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Subject = subject,
-                Year = 2030,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ3
-            };
-
-            var subjectObservation2 = new Observation
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Subject = subject,
-                Year = 2020,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ4
-            };
-
-            var subjectObservation3 = new Observation
-            {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
-                Subject = subject,
-                Year = 2021,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ1
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.AddRangeAsync(
-                    subjectObservation1,
-                    subjectObservation2,
-                    subjectObservation3);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.GetTimePeriods(subject.Id);
-
-                Assert.Equal("2020/21 Q4", result.From);
-                Assert.Equal("2030/31 Q3", result.To);
-            }
-        }
-
-        [Fact]
-        public async Task GetTimePeriods_NoObservations()
-        {
-            var release = new Release();
-
-            var subject = new Subject();
-
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject1);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.GetTimePeriods(subject.Id);
-
-                Assert.Empty(result.From);
-                Assert.Empty(result.To);
-            }
-        }
-
-        [Fact]
         public async Task GetGeographicLevels()
         {
             var release = new Release();
@@ -1084,9 +987,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IIndicatorRepository? indicatorRepository = null,
             IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
             ContentDbContext? contentDbContext = null,
-            IFootnoteRepository? footnoteRepository = null)
+            IFootnoteRepository? footnoteRepository = null,
+            ITimePeriodService? timePeriodService = null)
         {
-            return new MetaGuidanceSubjectService(
+            return new (
                 filterRepository ?? new FilterRepository(statisticsDbContext),
                 indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
                 statisticsDbContext,
@@ -1094,7 +998,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 contentDbContext != null
                     ? new ReleaseDataFileRepository(contentDbContext)
                     : Mock.Of<IReleaseDataFileRepository>(),
-                footnoteRepository ?? new FootnoteRepository(statisticsDbContext)
+                footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
+                timePeriodService ?? new TimePeriodService(statisticsDbContext)
             );
         }
     }

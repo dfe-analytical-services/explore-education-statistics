@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly ITimePeriodService _timePeriodService;
         private readonly IReleaseService.IBlobInfoGetter _blobInfoGetter;
 
         public ReleaseService(
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
             IMetaGuidanceSubjectService metaGuidanceSubjectService,
+            ITimePeriodService timePeriodService,
             IReleaseService.IBlobInfoGetter blobInfoGetter)
         {
             _contentDbContext = contentDbContext;
@@ -44,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _timePeriodService = timePeriodService;
             _blobInfoGetter = blobInfoGetter;
         }
 
@@ -87,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
-                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
+                            timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                             geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
                             file: blobInfo is null
                                 ? releaseFile.ToPublicFileInfoNotFound()

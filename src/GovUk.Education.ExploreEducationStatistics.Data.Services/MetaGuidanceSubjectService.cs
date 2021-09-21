@@ -26,13 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
+        private readonly ITimePeriodService _timePeriodService;
 
         public MetaGuidanceSubjectService(IFilterRepository filterRepository,
             IIndicatorRepository indicatorRepository,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IReleaseDataFileRepository releaseDataFileRepository,
-            IFootnoteRepository footnoteRepository)
+            IFootnoteRepository footnoteRepository,
+            ITimePeriodService timePeriodService)
         {
             _filterRepository = filterRepository;
             _indicatorRepository = indicatorRepository;
@@ -40,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _releaseDataFileRepository = releaseDataFileRepository;
             _footnoteRepository = footnoteRepository;
+            _timePeriodService = timePeriodService;
         }
 
         public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
@@ -89,28 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
         }
 
-        public async Task<TimePeriodLabels> GetTimePeriods(Guid subjectId)
-        {
-            var orderedTimePeriods = _context
-                .Observation
-                .Where(observation => observation.SubjectId == subjectId)
-                .Select(observation => new {observation.Year, observation.TimeIdentifier})
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier);
-
-            if (!orderedTimePeriods.Any())
-            {
-                return new TimePeriodLabels();
-            }
-
-            var first = await orderedTimePeriods.FirstAsync();
-            var last = await orderedTimePeriods.LastAsync();
-
-            return new TimePeriodLabels(
-                TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
-                TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
-        }
-
         public async Task<List<string>> GetGeographicLevels(Guid subjectId)
         {
             return await _context
@@ -155,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     releaseSubject.SubjectId);
 
             var geographicLevels = await GetGeographicLevels(subject.Id);
-            var timePeriods = await GetTimePeriods(subject.Id);
+            var timePeriods = _timePeriodService.GetTimePeriodLabels(subject.Id);
             var variables = GetVariables(subject.Id);
             var footnotes = GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 

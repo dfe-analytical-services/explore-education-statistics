@@ -13,6 +13,7 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import userEvent from '@testing-library/user-event';
 import { Route } from 'react-router-dom';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/permissionService');
@@ -259,6 +260,16 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
+  test('renders the publicly accessible url of the methodology', async () => {
+    renderPage(testMethodology);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('public-methodology-url')).toHaveValue(
+        'http://localhost/methodology/test-methodology',
+      );
+    });
+  });
+
   function renderPage(methodology: BasicMethodology) {
     render(
       <MemoryRouter
@@ -268,12 +279,14 @@ describe('MethodologyStatusPage', () => {
           }),
         ]}
       >
-        <MethodologyContextProvider methodology={methodology}>
-          <Route
-            path={methodologyStatusRoute.path}
-            component={MethodologyStatusPage}
-          />
-        </MethodologyContextProvider>
+        <TestConfigContextProvider>
+          <MethodologyContextProvider methodology={methodology}>
+            <Route
+              path={methodologyStatusRoute.path}
+              component={MethodologyStatusPage}
+            />
+          </MethodologyContextProvider>
+        </TestConfigContextProvider>
       </MemoryRouter>,
     );
   }

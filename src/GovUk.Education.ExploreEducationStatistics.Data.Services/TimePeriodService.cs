@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -46,6 +48,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var end = timePeriods.Last();
 
             return TimePeriodUtil.GetTimePeriodRange(start, end);
+        }
+
+        public TimePeriodLabels GetTimePeriodLabels(Guid subjectId)
+        {
+            var observationsQuery = _context
+                .Observation
+                .Where(observation => observation.SubjectId == subjectId);
+            var orderedTimePeriods = GetDistinctObservationTimePeriods(observationsQuery).ToList();
+
+            if (!orderedTimePeriods.Any())
+            {
+                return new TimePeriodLabels();
+            }
+
+            var first = orderedTimePeriods.First();
+            var last = orderedTimePeriods.Last();
+
+            return new TimePeriodLabels(
+                TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
+                TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }
 
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
