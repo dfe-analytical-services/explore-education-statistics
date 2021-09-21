@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                 id: id,
                                 name: $"Subject {id}",
                                 content: "Test content",
-                                timePeriods: new TimePeriodLabels(),
+                                timePeriodRange: new TimePeriodRangeLabels(),
                                 geographicLevels: new List<string>(),
                                 file: new FileInfo
                                 {

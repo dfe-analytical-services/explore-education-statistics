@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public string Content { get; set; } = string.Empty;
 
-        public TimePeriodLabels TimePeriods { get; set; } = new TimePeriodLabels();
+        public TimePeriodRangeLabels TimePeriodsRange { get; set; } = new TimePeriodRangeLabels();
 
         public List<string> GeographicLevels { get; set; } = new List<string>();
 
