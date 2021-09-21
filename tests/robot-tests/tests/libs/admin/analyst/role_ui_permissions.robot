@@ -57,3 +57,13 @@ user cannot see the edit status controls for methodology
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user checks page does not contain    Edit status
+
+user cannot see the remove controls for methodology
+    [Arguments]    ${DETAILS_SECTION}
+    user checks element contains link    ${DETAILS_SECTION}    View this methodology
+    user checks element does not contain button    ${DETAILS_SECTION}    Remove
+
+user cannot see the cancel amendment controls for methodology
+    [Arguments]    ${DETAILS_SECTION}
+    user checks element contains link    ${DETAILS_SECTION}    View this amendment
+    user checks element does not contain button    ${DETAILS_SECTION}    Cancel amendment
