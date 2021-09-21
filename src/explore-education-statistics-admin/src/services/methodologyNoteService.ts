@@ -7,8 +7,14 @@ export interface MethodologyNote {
 }
 
 const methodologyNoteService = {
-  create(methodologyId: string, methodologyNote: Omit<MethodologyNote, 'id'>): Promise<MethodologyNote> {
-    return client.post(`/methodologies/${methodologyId}/notes`, methodologyNote);
+  create(
+    methodologyId: string,
+    methodologyNote: Omit<MethodologyNote, 'id'>,
+  ): Promise<MethodologyNote> {
+    return client.post(
+      `/methodologies/${methodologyId}/notes`,
+      methodologyNote,
+    );
   },
 
   edit(
@@ -16,13 +22,13 @@ const methodologyNoteService = {
     methodologyId: string,
     methodologyNote: Omit<MethodologyNote, 'id'>,
   ): Promise<MethodologyNote> {
-    return client.put(`/methodologies/${methodologyId}/notes/${noteId}`, methodologyNote);
+    return client.put(
+      `/methodologies/${methodologyId}/notes/${noteId}`,
+      methodologyNote,
+    );
   },
 
-  delete(
-    noteId: string,
-    methodologyId: string,
-  ): Promise<MethodologyNote[]> {
+  delete(noteId: string, methodologyId: string): Promise<MethodologyNote[]> {
     return client.delete(`/methodologies/${methodologyId}/notes/${noteId}`);
   },
 };
