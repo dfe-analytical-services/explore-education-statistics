@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
-                            timePeriodRange: _timePeriodService.GetTimePeriodRangeLabels(rs.SubjectId),
+                            timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                             geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
                             file: blobInfo is null
                                 ? releaseFile.ToPublicFileInfoNotFound()

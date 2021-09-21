@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public string Content { get; }
 
-        public TimePeriodRangeLabels TimePeriodRange { get; }
+        public TimePeriodLabels TimePeriods { get; }
 
         public List<string> GeographicLevels { get; }
 
@@ -23,14 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
             Guid id,
             string name,
             string content,
-            TimePeriodRangeLabels timePeriodRange,
+            TimePeriodLabels timePeriods,
             List<string> geographicLevels,
             FileInfo file)
         {
             Id = id;
             Name = name;
             Content = content;
-            TimePeriodRange = timePeriodRange;
+            TimePeriods = timePeriods;
             GeographicLevels = geographicLevels;
             File = file;
         }

@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetTimePeriodRangeLabels()
+        public async Task GetTimePeriodLabels()
         {
             var release = new Release();
 
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodRangeLabels(subject.Id);
+                var result = service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Equal("2020/21 Q4", result.From);
                 Assert.Equal("2030/31 Q3", result.To);
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetTimePeriodRangeLabels_CorrectlyOrderWeeks()
+        public async Task GetTimePeriodLabels_CorrectlyOrderWeeks()
         {
             var release = new Release();
 
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodRangeLabels(subject.Id);
+                var result = service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Equal("2020 Week 8", result.From);
                 Assert.Equal("2020 Week 37", result.To);
@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetTimePeriodRangeLabels_NoObservations()
+        public async Task GetTimePeriodLabels_NoObservations()
         {
             var release = new Release();
 
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodRangeLabels(subject.Id);
+                var result = service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Empty(result.From);
                 Assert.Empty(result.To);

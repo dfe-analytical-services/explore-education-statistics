@@ -293,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file1.csv", result[0].Filename);
                 Assert.Equal("Subject 1", result[0].Name);
 
-                Assert.Equal("2020/21 Q3", result[0].TimePeriodsRange.From);
-                Assert.Equal("2021/22 Q1", result[0].TimePeriodsRange.To);
+                Assert.Equal("2020/21 Q3", result[0].TimePeriods.From);
+                Assert.Equal("2021/22 Q1", result[0].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National",
@@ -321,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
-                Assert.Equal("2020/21 Summer Term", result[1].TimePeriodsRange.From);
-                Assert.Equal("2021/22 Spring Term", result[1].TimePeriodsRange.To);
+                Assert.Equal("2020/21 Summer Term", result[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring Term", result[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National",
@@ -549,8 +549,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
                 Assert.Equal("file1.csv", result.Right[0].Filename);
                 Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Empty(result.Right[0].TimePeriodsRange.From);
-                Assert.Empty(result.Right[0].TimePeriodsRange.To);
+                Assert.Empty(result.Right[0].TimePeriods.From);
+                Assert.Empty(result.Right[0].TimePeriods.To);
                 Assert.Empty(result.Right[0].GeographicLevels);
                 Assert.Empty(result.Right[0].Variables);
 
@@ -558,8 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 3 Meta Guidance", result.Right[1].Content);
                 Assert.Equal("file3.csv", result.Right[1].Filename);
                 Assert.Equal("Subject 3", result.Right[1].Name);
-                Assert.Empty(result.Right[1].TimePeriodsRange.From);
-                Assert.Empty(result.Right[1].TimePeriodsRange.To);
+                Assert.Empty(result.Right[1].TimePeriods.From);
+                Assert.Empty(result.Right[1].TimePeriods.To);
                 Assert.Empty(result.Right[1].GeographicLevels);
                 Assert.Empty(result.Right[1].Variables);
             }
@@ -732,8 +732,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right[0].Name);
-                Assert.Empty(version1Result.Right[0].TimePeriodsRange.From);
-                Assert.Empty(version1Result.Right[0].TimePeriodsRange.To);
+                Assert.Empty(version1Result.Right[0].TimePeriods.From);
+                Assert.Empty(version1Result.Right[0].TimePeriods.To);
                 Assert.Empty(version1Result.Right[0].GeographicLevels);
                 Assert.Empty(version1Result.Right[0].Variables);
 
@@ -748,16 +748,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 2 Subject 1 Meta Guidance", version2Result.Right[0].Content);
                 Assert.Equal("file1.csv", version2Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version2Result.Right[0].Name);
-                Assert.Empty(version2Result.Right[0].TimePeriodsRange.From);
-                Assert.Empty(version2Result.Right[0].TimePeriodsRange.To);
+                Assert.Empty(version2Result.Right[0].TimePeriods.From);
+                Assert.Empty(version2Result.Right[0].TimePeriods.To);
                 Assert.Empty(version2Result.Right[0].GeographicLevels);
 
                 Assert.Equal(subject2.Id, version2Result.Right[1].Id);
                 Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right[1].Content);
                 Assert.Equal("file2.csv", version2Result.Right[1].Filename);
                 Assert.Equal("Subject 2", version2Result.Right[1].Name);
-                Assert.Empty(version2Result.Right[1].TimePeriodsRange.From);
-                Assert.Empty(version2Result.Right[1].TimePeriodsRange.To);
+                Assert.Empty(version2Result.Right[1].TimePeriods.From);
+                Assert.Empty(version2Result.Right[1].TimePeriods.To);
                 Assert.Empty(version2Result.Right[1].GeographicLevels);
                 Assert.Empty(version2Result.Right[1].Variables);
             }

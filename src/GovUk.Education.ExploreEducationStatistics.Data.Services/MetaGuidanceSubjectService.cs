@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     releaseSubject.SubjectId);
 
             var geographicLevels = await GetGeographicLevels(subject.Id);
-            var timePeriods = _timePeriodService.GetTimePeriodRangeLabels(subject.Id);
+            var timePeriods = _timePeriodService.GetTimePeriodLabels(subject.Id);
             var variables = GetVariables(subject.Id);
             var footnotes = GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Filename = releaseFile.File.Filename,
                 Name = releaseFile.Name ?? "",
                 GeographicLevels = geographicLevels,
-                TimePeriodsRange = timePeriods,
+                TimePeriods = timePeriods,
                 Variables = variables,
                 Footnotes = footnotes
             };
