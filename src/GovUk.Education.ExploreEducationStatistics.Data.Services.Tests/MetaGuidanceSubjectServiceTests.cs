@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -292,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file1.csv", result[0].Filename);
                 Assert.Equal("Subject 1", result[0].Name);
 
-                Assert.Equal("2020/21 Q3", result[0].TimePeriods.From);
-                Assert.Equal("2021/22 Q1", result[0].TimePeriods.To);
+                Assert.Equal("2020/21 Q3", result[0].TimePeriodsRange.From);
+                Assert.Equal("2021/22 Q1", result[0].TimePeriodsRange.To);
                 Assert.Equal(new List<string>
                 {
                     "National",
@@ -320,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
-                Assert.Equal("2020/21 Summer Term", result[1].TimePeriods.From);
-                Assert.Equal("2021/22 Spring Term", result[1].TimePeriods.To);
+                Assert.Equal("2020/21 Summer Term", result[1].TimePeriodsRange.From);
+                Assert.Equal("2021/22 Spring Term", result[1].TimePeriodsRange.To);
                 Assert.Equal(new List<string>
                 {
                     "National",
@@ -548,8 +549,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
                 Assert.Equal("file1.csv", result.Right[0].Filename);
                 Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Empty(result.Right[0].TimePeriods.From);
-                Assert.Empty(result.Right[0].TimePeriods.To);
+                Assert.Empty(result.Right[0].TimePeriodsRange.From);
+                Assert.Empty(result.Right[0].TimePeriodsRange.To);
                 Assert.Empty(result.Right[0].GeographicLevels);
                 Assert.Empty(result.Right[0].Variables);
 
@@ -557,8 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 3 Meta Guidance", result.Right[1].Content);
                 Assert.Equal("file3.csv", result.Right[1].Filename);
                 Assert.Equal("Subject 3", result.Right[1].Name);
-                Assert.Empty(result.Right[1].TimePeriods.From);
-                Assert.Empty(result.Right[1].TimePeriods.To);
+                Assert.Empty(result.Right[1].TimePeriodsRange.From);
+                Assert.Empty(result.Right[1].TimePeriodsRange.To);
                 Assert.Empty(result.Right[1].GeographicLevels);
                 Assert.Empty(result.Right[1].Variables);
             }
@@ -731,8 +732,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right[0].Name);
-                Assert.Empty(version1Result.Right[0].TimePeriods.From);
-                Assert.Empty(version1Result.Right[0].TimePeriods.To);
+                Assert.Empty(version1Result.Right[0].TimePeriodsRange.From);
+                Assert.Empty(version1Result.Right[0].TimePeriodsRange.To);
                 Assert.Empty(version1Result.Right[0].GeographicLevels);
                 Assert.Empty(version1Result.Right[0].Variables);
 
@@ -747,16 +748,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Version 2 Subject 1 Meta Guidance", version2Result.Right[0].Content);
                 Assert.Equal("file1.csv", version2Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version2Result.Right[0].Name);
-                Assert.Empty(version2Result.Right[0].TimePeriods.From);
-                Assert.Empty(version2Result.Right[0].TimePeriods.To);
+                Assert.Empty(version2Result.Right[0].TimePeriodsRange.From);
+                Assert.Empty(version2Result.Right[0].TimePeriodsRange.To);
                 Assert.Empty(version2Result.Right[0].GeographicLevels);
 
                 Assert.Equal(subject2.Id, version2Result.Right[1].Id);
                 Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right[1].Content);
                 Assert.Equal("file2.csv", version2Result.Right[1].Filename);
                 Assert.Equal("Subject 2", version2Result.Right[1].Name);
-                Assert.Empty(version2Result.Right[1].TimePeriods.From);
-                Assert.Empty(version2Result.Right[1].TimePeriods.To);
+                Assert.Empty(version2Result.Right[1].TimePeriodsRange.From);
+                Assert.Empty(version2Result.Right[1].TimePeriodsRange.To);
                 Assert.Empty(version2Result.Right[1].GeographicLevels);
                 Assert.Empty(version2Result.Right[1].Variables);
             }
@@ -882,104 +883,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetTimePeriods()
-        {
-            var release = new Release();
-
-            var subject = new Subject();
-
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
-            };
-
-            var subjectObservation1 = new Observation
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Subject = subject,
-                Year = 2030,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ3
-            };
-
-            var subjectObservation2 = new Observation
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Subject = subject,
-                Year = 2020,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ4
-            };
-
-            var subjectObservation3 = new Observation
-            {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
-                Subject = subject,
-                Year = 2021,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ1
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.AddRangeAsync(
-                    subjectObservation1,
-                    subjectObservation2,
-                    subjectObservation3);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.GetTimePeriods(subject.Id);
-
-                Assert.Equal("2020/21 Q4", result.From);
-                Assert.Equal("2030/31 Q3", result.To);
-            }
-        }
-
-        [Fact]
-        public async Task GetTimePeriods_NoObservations()
-        {
-            var release = new Release();
-
-            var subject = new Subject();
-
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject1);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.GetTimePeriods(subject.Id);
-
-                Assert.Empty(result.From);
-                Assert.Empty(result.To);
-            }
-        }
-
-        [Fact]
         public async Task GetGeographicLevels()
         {
             var release = new Release();
@@ -1084,9 +987,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IIndicatorRepository? indicatorRepository = null,
             IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
             ContentDbContext? contentDbContext = null,
-            IFootnoteRepository? footnoteRepository = null)
+            IFootnoteRepository? footnoteRepository = null,
+            ITimePeriodService? timePeriodService = null)
         {
-            return new MetaGuidanceSubjectService(
+            return new (
                 filterRepository ?? new FilterRepository(statisticsDbContext),
                 indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
                 statisticsDbContext,
@@ -1094,7 +998,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 contentDbContext != null
                     ? new ReleaseDataFileRepository(contentDbContext)
                     : Mock.Of<IReleaseDataFileRepository>(),
-                footnoteRepository ?? new FootnoteRepository(statisticsDbContext)
+                footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
+                timePeriodService ?? new TimePeriodService(statisticsDbContext)
             );
         }
     }

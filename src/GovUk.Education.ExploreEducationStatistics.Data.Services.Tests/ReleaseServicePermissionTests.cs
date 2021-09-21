@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
             IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            ITimePeriodService? timePeriodService = null,
             IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? Mock.Of<IUserService>(),
                 metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(),
                 fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }

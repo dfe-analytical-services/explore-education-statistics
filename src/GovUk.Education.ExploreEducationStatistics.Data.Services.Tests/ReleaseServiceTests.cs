@@ -105,14 +105,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+                var timePeriodService = new Mock<ITimePeriodService>();
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject1.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodRangeLabels(releaseSubject1.SubjectId))
+                    .Returns(new TimePeriodRangeLabels("2020/21", "2021/22"));
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject2.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodRangeLabels(releaseSubject2.SubjectId))
+                    .Returns(new TimePeriodRangeLabels("2030", "2031"));
 
                 metaGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
@@ -158,6 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    timePeriodService: timePeriodService.Object,
                     fileSizeGetter: fileInfoGetter.Object
                 );
 
@@ -178,8 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(releaseSubject1.MetaGuidance, subjects[0].Content);
 
-                Assert.Equal("2020/21", subjects[0].TimePeriods.From);
-                Assert.Equal("2021/22", subjects[0].TimePeriods.To);
+                Assert.Equal("2020/21", subjects[0].TimePeriodRange.From);
+                Assert.Equal("2021/22", subjects[0].TimePeriodRange.To);
 
                 Assert.Equal(2, subjects[0].GeographicLevels.Count);
                 Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
@@ -193,8 +195,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseSubject2.MetaGuidance, subjects[1].Content);
                 Assert.Equal("csv", subjects[1].File.Extension);
 
-                Assert.Equal("2030", subjects[1].TimePeriods.From);
-                Assert.Equal("2031", subjects[1].TimePeriods.To);
+                Assert.Equal("2030", subjects[1].TimePeriodRange.From);
+                Assert.Equal("2031", subjects[1].TimePeriodRange.To);
 
                 Assert.Single(subjects[1].GeographicLevels);
                 Assert.Equal("National", subjects[1].GeographicLevels[0]);
@@ -939,6 +941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
             IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            ITimePeriodService? timePeriodService = null,
             IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
@@ -947,6 +950,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(),
                 fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }

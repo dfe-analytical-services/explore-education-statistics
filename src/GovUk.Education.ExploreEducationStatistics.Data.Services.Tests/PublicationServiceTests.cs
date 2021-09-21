@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     id: Guid.NewGuid(),
                     name: "Subject 1",
                     content: "Subject 1 content",
-                    timePeriods: new TimePeriodLabels("2018", "2021"),
+                    timePeriodRange: new TimePeriodRangeLabels("2018", "2021"),
                     geographicLevels: ListOf("National", "Local Authority"),
                     file: new FileInfo
                     {
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     id: Guid.NewGuid(),
                     name: "Subject 2",
                     content: "Subject 2 content",
-                    timePeriods: new TimePeriodLabels("2015", "2020"),
+                    timePeriodRange: new TimePeriodRangeLabels("2015", "2020"),
                     geographicLevels: ListOf("Local Authority District"),
                     file: new FileInfo
                     {

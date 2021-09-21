@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         "National", "Local Authority", "Local Authority District"
                     },
-                    TimePeriods = new TimePeriodLabels("2020/21 Q3", "2021/22 Q1"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2020/21 Q3", "2021/22 Q1"),
                     Variables = new List<LabelValue>
                     {
                         new LabelValue("Filter label", "test_filter"),

@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         "National",
                         "Regional"
                     },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", "2020"),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         "National",
                     },
-                    TimePeriods = new TimePeriodLabels("2018", "2018"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", "2018"),
                     Variables = new List<LabelValue>
                     {
                         new("Academic age", "age"),
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         "National",
                         "Regional"
                     },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", "2020"),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
@@ -330,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         "National",
                         "Regional"
                     },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", "2020"),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         "Local Authority",
                     },
-                    TimePeriods = new TimePeriodLabels("2018", "2018"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", "2018"),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Name = "Test data 1",
                     Content = "",
                     GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("", "2019"),
+                    TimePeriodsRange = new TimePeriodRangeLabels("", "2019"),
                     Variables = new List<LabelValue>()
                 }
             };
@@ -628,7 +628,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Filename = "test-1.csv",
                     Name = "Test data 1",
-                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", ""),
                 }
             };
 
@@ -685,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Filename = "test-1.csv",
                     Name = "Test data 1",
-                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", ""),
                     Variables = new List<LabelValue>
                     {
                         new("", "")
@@ -748,7 +748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Name = "Test data 1",
                     Content = "",
                     GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", ""),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
@@ -831,7 +831,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Name = "Test data 1",
                     Content = "",
                     GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    TimePeriodsRange = new TimePeriodRangeLabels("2018", ""),
                     Variables = new List<LabelValue>
                     {
                         new("Accommodation type", "accommodation_type"),
