@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCanManageExternalMethodologyForPublicationWithPublicationOwnerRole()
             {
-                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                await using var context = InMemoryApplicationDbContext();
                 context.Attach(Publication);
 
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies();
