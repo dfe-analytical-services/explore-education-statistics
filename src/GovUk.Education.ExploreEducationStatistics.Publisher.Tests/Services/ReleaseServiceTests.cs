@@ -628,11 +628,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync(true);
 
                 publicBlobStorageService.Setup(s =>
-                        s.CheckBlobExists(PublicReleaseFiles,
-                            PublicationARelease2.AllFilesZipPath()))
-                    .ReturnsAsync(true);
-
-                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -660,18 +655,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         created: null
                     ));
 
-                publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                        PublicationARelease2.AllFilesZipPath()))
-                    .ReturnsAsync(new BlobInfo
-                    (
-                        path: PublicationARelease2.AllFilesZipPath(),
-                        size: "3 Mb",
-                        contentType: "application/x-zip-compressed",
-                        contentLength: 0L,
-                        meta: GetMetaValuesReleaseDateTime(
-                            releaseDateTime: DateTime.Now),
-                        created: null
-                    ));
 
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
@@ -680,25 +663,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
 
-                Assert.Equal(3, result.Count);
-                Assert.False(result[0].Id.HasValue);
-                Assert.Equal("zip", result[0].Extension);
-                Assert.Equal("publication-a_2018-19-q2.zip", result[0].FileName);
-                Assert.Equal("All files", result[0].Name);
-                Assert.Equal("3 Mb", result[0].Size);
+                Assert.Equal(2, result.Count);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[0].Id);
+                Assert.Equal("pdf", result[0].Extension);
+                Assert.Equal("ancillary.pdf", result[0].FileName);
+                Assert.Equal("Ancillary Test File", result[0].Name);
+                Assert.Equal("15 Kb", result[0].Size);
                 Assert.Equal(Ancillary, result[0].Type);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[1].Id);
-                Assert.Equal("pdf", result[1].Extension);
-                Assert.Equal("ancillary.pdf", result[1].FileName);
-                Assert.Equal("Ancillary Test File", result[1].Name);
-                Assert.Equal("15 Kb", result[1].Size);
-                Assert.Equal(Ancillary, result[1].Type);
-                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result[2].Id);
-                Assert.Equal("csv", result[2].Extension);
-                Assert.Equal("data.csv", result[2].FileName);
-                Assert.Equal("Data Test File", result[2].Name);
-                Assert.Equal("10 Mb", result[2].Size);
-                Assert.Equal(FileType.Data, result[2].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result[1].Id);
+                Assert.Equal("csv", result[1].Extension);
+                Assert.Equal("data.csv", result[1].FileName);
+                Assert.Equal("Data Test File", result[1].Name);
+                Assert.Equal("10 Mb", result[1].Size);
+                Assert.Equal(FileType.Data, result[1].Type);
             }
         }
 
@@ -783,11 +760,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync(true);
 
                 publicBlobStorageService.Setup(s =>
-                        s.CheckBlobExists(PublicReleaseFiles,
-                            PublicationARelease2.AllFilesZipPath()))
-                    .ReturnsAsync(true);
-
-                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -812,19 +784,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         meta: GetDataFileMetaValues(
                             metaFileName: "data.meta.csv",
                             numberOfRows: 200),
-                        created: null
-                    ));
-
-                publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                        PublicationARelease2.AllFilesZipPath()))
-                    .ReturnsAsync(new BlobInfo
-                    (
-                        path: PublicationARelease2.AllFilesZipPath(),
-                        size: "3 Mb",
-                        contentType: "application/x-zip-compressed",
-                        contentLength: 0L,
-                        meta: GetMetaValuesReleaseDateTime(
-                            releaseDateTime: DateTime.Now),
                         created: null
                     ));
 
@@ -887,25 +846,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release2Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 2 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
-                Assert.Equal(3, result.DownloadFiles.Count);
-                Assert.False(result.DownloadFiles[0].Id.HasValue);
-                Assert.Equal("zip", result.DownloadFiles[0].Extension);
-                Assert.Equal("publication-a_2018-19-q2.zip", result.DownloadFiles[0].FileName);
-                Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal("3 Mb", result.DownloadFiles[0].Size);
+                Assert.Equal(2, result.DownloadFiles.Count);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result.DownloadFiles[0].Id);
+                Assert.Equal("pdf", result.DownloadFiles[0].Extension);
+                Assert.Equal("ancillary.pdf", result.DownloadFiles[0].FileName);
+                Assert.Equal("Ancillary Test File", result.DownloadFiles[0].Name);
+                Assert.Equal("15 Kb", result.DownloadFiles[0].Size);
                 Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result.DownloadFiles[1].Id);
-                Assert.Equal("pdf", result.DownloadFiles[1].Extension);
-                Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
-                Assert.Equal("Ancillary Test File", result.DownloadFiles[1].Name);
-                Assert.Equal("15 Kb", result.DownloadFiles[1].Size);
-                Assert.Equal(Ancillary, result.DownloadFiles[1].Type);
-                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result.DownloadFiles[2].Id);
-                Assert.Equal("csv", result.DownloadFiles[2].Extension);
-                Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
-                Assert.Equal("Data Test File", result.DownloadFiles[2].Name);
-                Assert.Equal("10 Mb", result.DownloadFiles[2].Size);
-                Assert.Equal(FileType.Data, result.DownloadFiles[2].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result.DownloadFiles[1].Id);
+                Assert.Equal("csv", result.DownloadFiles[1].Extension);
+                Assert.Equal("data.csv", result.DownloadFiles[1].FileName);
+                Assert.Equal("Data Test File", result.DownloadFiles[1].Name);
+                Assert.Equal("10 Mb", result.DownloadFiles[1].Size);
+                Assert.Equal(FileType.Data, result.DownloadFiles[1].Type);
 
                 Assert.Equal("Release 2 Guidance", result.MetaGuidance);
 
@@ -931,24 +884,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles,
-                        PublicationARelease1V1.AllFilesZipPath()))
-                .ReturnsAsync(true);
-
-            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                    PublicationARelease1V1.AllFilesZipPath()))
-                .ReturnsAsync(new BlobInfo
-                (
-                    path: PublicationARelease1V1.AllFilesZipPath(),
-                    size: "0 b",
-                    contentType: "application/x-zip-compressed",
-                    contentLength: 0L,
-                    meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
-                    created: null
-                ));
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1012,13 +947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(new DateTime(2020, 1, 1), result.Updates[0].On);
                 Assert.Equal("First update", result.Updates[0].Reason);
 
-                Assert.Single(result.DownloadFiles);
-                Assert.False(result.DownloadFiles[0].Id.HasValue);
-                Assert.Equal("zip", result.DownloadFiles[0].Extension);
-                Assert.Equal("publication-a_2018-19-q1.zip", result.DownloadFiles[0].FileName);
-                Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal("0 b", result.DownloadFiles[0].Size);
-                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+                Assert.Empty(result.DownloadFiles);
 
                 Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
 
@@ -1045,24 +974,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles,
-                        PublicationARelease3.AllFilesZipPath()))
-                .ReturnsAsync(true);
-
-            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                    PublicationARelease3.AllFilesZipPath()))
-                .ReturnsAsync(new BlobInfo
-                (
-                    path: PublicationARelease3.AllFilesZipPath(),
-                    size: "0 b",
-                    contentType: "application/x-zip-compressed",
-                    contentLength: 0L,
-                    meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
-                    created: null
-                ));
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
@@ -1081,13 +992,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
 
-                Assert.Single(result.DownloadFiles);
-                Assert.False(result.DownloadFiles[0].Id.HasValue);
-                Assert.Equal("zip", result.DownloadFiles[0].Extension);
-                Assert.Equal("publication-a_2018-19-q3.zip", result.DownloadFiles[0].FileName);
-                Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal("0 b", result.DownloadFiles[0].Size);
-                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+                Assert.Empty(result.DownloadFiles);
 
                 Assert.Equal("Release 3 Guidance", result.MetaGuidance);
 
@@ -1113,24 +1018,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles,
-                        PublicationARelease1V3NotPublished.AllFilesZipPath()))
-                .ReturnsAsync(true);
-
-            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                    PublicationARelease1V3NotPublished.AllFilesZipPath()))
-                .ReturnsAsync(new BlobInfo
-                (
-                    path: PublicationARelease3.AllFilesZipPath(),
-                    size: "0 b",
-                    contentType: "application/x-zip-compressed",
-                    contentLength: 0L,
-                    meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
-                    created: null
-                ));
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
@@ -1149,13 +1036,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
 
-                Assert.Single(result.DownloadFiles);
-                Assert.False(result.DownloadFiles[0].Id.HasValue);
-                Assert.Equal("zip", result.DownloadFiles[0].Extension);
-                Assert.Equal("publication-a_2018-19-q3.zip", result.DownloadFiles[0].FileName);
-                Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal("0 b", result.DownloadFiles[0].Size);
-                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+                Assert.Empty(result.DownloadFiles);
 
                 Assert.Equal("Release 1 v3 Guidance", result.MetaGuidance);
 
@@ -1180,24 +1061,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles,
-                        PublicationARelease1V3NotPublished.AllFilesZipPath()))
-                .ReturnsAsync(true);
-
-            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
-                    PublicationARelease1V3NotPublished.AllFilesZipPath()))
-                .ReturnsAsync(new BlobInfo
-                (
-                    path: PublicationARelease3.AllFilesZipPath(),
-                    size: "0 b",
-                    contentType: "application/x-zip-compressed",
-                    contentLength: 0L,
-                    meta: GetMetaValuesReleaseDateTime(
-                        releaseDateTime: DateTime.Now),
-                    created: null
-                ));
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
