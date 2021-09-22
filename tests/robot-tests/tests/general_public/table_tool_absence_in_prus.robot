@@ -54,7 +54,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    60
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing Number of schools for 'Absence in prus' in England between 2013/14 and 2016/17"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in prus' in England between 2013/14 and 2016/17"]
 
 Validate results table column headings
     user checks table column heading contains    1    1    2013/14
@@ -124,7 +124,7 @@ Create table again
     user clicks element    id:filtersForm-submit
     user waits until results table appears    60
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Table showing 'Absence in prus' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in prus' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 
 Validate new table column headings
     user checks table column heading contains    1    1    2014/15
