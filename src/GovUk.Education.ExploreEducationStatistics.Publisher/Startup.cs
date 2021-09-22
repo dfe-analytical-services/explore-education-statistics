@@ -118,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
                 .AddScoped<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>()
+                .AddScoped<ITimePeriodService, TimePeriodService>()
                 .AddScoped<IDataGuidanceFileWriter, DataGuidanceFileWriter>()
                 .AddScoped<IDataGuidanceFileService, DataGuidanceFileService>(provider =>
                     new DataGuidanceFileService(
