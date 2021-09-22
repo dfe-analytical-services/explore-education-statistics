@@ -34,7 +34,7 @@ describe('MethodologyPage', () => {
   test('renders the methodology content', () => {
     render(<MethodologyPage data={testMethodology} />);
     const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections = within(contentAccordion).queryAllByTestId(
+    const contentAccordionSections = within(contentAccordion).getAllByTestId(
       'accordionSection',
     );
 
@@ -68,7 +68,7 @@ describe('MethodologyPage', () => {
   test('renders the methodology annexes', () => {
     render(<MethodologyPage data={testMethodology} />);
     const annexAccordion = screen.getAllByTestId('accordion')[1];
-    const annexAccordionSections = within(annexAccordion).queryAllByTestId(
+    const annexAccordionSections = within(annexAccordion).getAllByTestId(
       'accordionSection',
     );
 

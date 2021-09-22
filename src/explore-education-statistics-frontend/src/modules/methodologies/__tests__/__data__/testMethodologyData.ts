@@ -3,7 +3,7 @@ import { Methodology } from '@common/services/methodologyService';
 export const testMethodology: Methodology = {
   id: 'methodology-1',
   title: 'Pupil absence statistics: methodology',
-  published: '2021-02-16T15:32:01.2216362',
+  published: '2021-02-16T15:32:01',
   slug: 'pupil-absence-in-schools-in-england',
   content: [
     {
