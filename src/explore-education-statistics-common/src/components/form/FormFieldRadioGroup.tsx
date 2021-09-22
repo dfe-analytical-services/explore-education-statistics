@@ -15,7 +15,7 @@ function FormFieldRadioGroup<FormValues, Value extends string = string>(
   return (
     <FormField<Value> {...props}>
       {({ id, field }) => (
-        <FormRadioGroup
+        <FormRadioGroup<Value>
           {...props}
           {...field}
           id={id}
