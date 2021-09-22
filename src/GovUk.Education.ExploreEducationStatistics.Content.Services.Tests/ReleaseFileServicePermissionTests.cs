@@ -52,20 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task StreamAllFilesZip()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseFileService(userService: userService.Object);
-                        return service.StreamAllFilesZip(Release.Id);
-                    }
-                );
-        }
-
-        [Fact]
         public async Task ZipFilesToStream()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
@@ -76,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         var service = BuildReleaseFileService(userService: userService.Object);
                         return service.ZipFilesToStream(
                             releaseId: Release.Id,
-                            fileIds: ListOf(Guid.NewGuid()),
-                            outputStream: Stream.Null
+                            outputStream: Stream.Null,
+                            fileIds: ListOf(Guid.NewGuid())
                         );
                     }
                 );

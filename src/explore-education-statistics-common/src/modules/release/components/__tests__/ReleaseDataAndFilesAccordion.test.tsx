@@ -155,6 +155,51 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('does not render all files button if there are no files', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          downloadFiles: [],
+        }}
+        renderAllFilesButton={<a href="/">Download all files</a>}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'Download all files' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render all files button if there is only an all files zip', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          downloadFiles: [
+            {
+              id: 'file-1',
+              name: 'All files',
+              fileName: 'all-files.zip',
+              type: 'Ancillary',
+              size: '0 KB',
+              extension: 'zip',
+            },
+          ],
+        }}
+        renderAllFilesButton={<a href="/">Download all files</a>}
+        renderDownloadLink={file => <a href="/">{file.name}</a>}
+        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'Download all files' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders data catalogue link', () => {
     render(
       <ReleaseDataAndFilesAccordion

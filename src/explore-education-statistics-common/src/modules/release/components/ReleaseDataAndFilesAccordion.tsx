@@ -29,25 +29,20 @@ const ReleaseDataAndFilesAccordion = ({
   renderPreReleaseAccessLink,
   onSectionOpen,
 }: Props) => {
-  const allFilesZip = release.downloadFiles.find(
-    file => file.name === 'All files' && file.type === 'Ancillary',
-  );
-
-  const files = orderBy(
-    release.downloadFiles.filter(
-      file => file.type !== 'Ancillary' && file.name !== 'All files',
-    ),
+  const dataFiles = orderBy(
+    release.downloadFiles.filter(file => file.type === 'Data'),
     ['name'],
   );
 
-  const otherFiles = orderBy(
+  const ancillaryFiles = orderBy(
     release.downloadFiles.filter(
       file => file.type === 'Ancillary' && file.name !== 'All files',
     ),
     ['name'],
   );
 
-  const hasAllFilesButton = allFilesZip && renderAllFilesButton;
+  const hasAllFilesButton =
+    (dataFiles.length > 0 || ancillaryFiles.length > 0) && renderAllFilesButton;
 
   return (
     <div className={styles.container}>
@@ -108,9 +103,9 @@ const ReleaseDataAndFilesAccordion = ({
                 machine readable format.
               </p>
 
-              {!renderDataCatalogueLink && files.length > 0 && (
+              {!renderDataCatalogueLink && dataFiles.length > 0 && (
                 <ul className="govuk-list" data-testid="download-files">
-                  {files.map(file => (
+                  {dataFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}
                       {` (${file.extension}, ${file.size})`}
@@ -135,14 +130,14 @@ const ReleaseDataAndFilesAccordion = ({
             </div>
           </div>
 
-          {otherFiles.length > 0 && (
+          {ancillaryFiles.length > 0 && (
             <>
               <h3>Other files</h3>
               <p>All other files available for download are listed below:</p>
 
               <Details summary="List of other files">
                 <ul className="govuk-list" data-testid="other-download-files">
-                  {otherFiles.map(file => (
+                  {ancillaryFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}
                       {` (${file.extension}, ${file.size})`}

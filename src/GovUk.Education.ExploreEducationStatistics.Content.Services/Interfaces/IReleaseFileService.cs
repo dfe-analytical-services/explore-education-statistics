@@ -17,16 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
         /// Pipe a zip file containing some release files to a stream.
         /// </summary>
         /// <param name="releaseId">The release to fetch files from</param>
-        /// <param name="fileIds">The IDs of the files to fetch</param>
         /// <param name="outputStream">The stream to output the zip file to</param>
+        /// <param name="fileIds">Files to include in the zip file. Set to null to include all files.</param>
         /// <param name="cancellationToken">To cancel the appending of any further files to the stream</param>
         /// <returns>An Either returning nothing if successful</returns>
         Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,
-            IEnumerable<Guid> fileIds,
             Stream outputStream,
+            IEnumerable<Guid>? fileIds = null,
             CancellationToken? cancellationToken = null);
-
-        Task<Either<ActionResult, FileStreamResult>> StreamAllFilesZip(Guid releaseId);
     }
 }
