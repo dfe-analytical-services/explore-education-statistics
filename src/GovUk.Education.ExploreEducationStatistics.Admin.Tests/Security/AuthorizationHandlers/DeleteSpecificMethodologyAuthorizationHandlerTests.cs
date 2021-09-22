@@ -14,7 +14,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -73,9 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     var expectClaimToSucceed = claim == DeleteAllMethodologies;
-
-                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(DraftFirstVersion);
 
                     var (
                         handler,
@@ -174,9 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     var expectClaimToSucceed = claim == DeleteAllMethodologies;
-
-                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-                    context.Attach(DraftAmendmentVersion);
 
                     var (
                         handler,
