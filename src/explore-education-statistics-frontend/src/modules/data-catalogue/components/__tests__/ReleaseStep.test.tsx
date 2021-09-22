@@ -2,7 +2,7 @@ import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/compo
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { ReleaseSummary } from '@common/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
@@ -47,22 +47,15 @@ describe('ReleaseStep', () => {
 
     expect(screen.getByText('Choose a release')).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Search releases')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Search/)).toBeInTheDocument();
 
-    const releasesGroup = within(
-      screen.getByRole('group', {
-        name: 'Choose a release from the list below',
-      }),
-    );
-    const releases = releasesGroup.getAllByRole('radio');
+    const releases = screen.getAllByRole('radio');
 
     expect(releases.length).toBe(3);
     expect(releases[0]).toHaveAttribute('value', 'release-3');
     expect(releases[0]).toBeEnabled();
     expect(releases[0]).not.toBeChecked();
-    expect(releases[0]).toEqual(
-      releasesGroup.getByLabelText('Academic Year 2021/22'),
-    );
+    expect(releases[0]).toEqual(screen.getByLabelText('Academic Year 2021/22'));
     expect(
       screen.getByTestId('Radio item for Academic Year 2021/22'),
     ).toHaveTextContent('This is the latest data');
@@ -70,16 +63,12 @@ describe('ReleaseStep', () => {
     expect(releases[1]).toHaveAttribute('value', 'release-2');
     expect(releases[1]).toBeEnabled();
     expect(releases[1]).not.toBeChecked();
-    expect(releases[1]).toEqual(
-      releasesGroup.getByLabelText('Academic Year 2020/21'),
-    );
+    expect(releases[1]).toEqual(screen.getByLabelText('Academic Year 2020/21'));
 
     expect(releases[2]).toHaveAttribute('value', 'release-1');
     expect(releases[2]).toBeEnabled();
     expect(releases[2]).not.toBeChecked();
-    expect(releases[2]).toEqual(
-      releasesGroup.getByLabelText('Academic Year 2019/20'),
-    );
+    expect(releases[2]).toEqual(screen.getByLabelText('Academic Year 2019/20'));
 
     expect(
       screen.getByRole('button', { name: 'Next step' }),
@@ -93,7 +82,7 @@ describe('ReleaseStep', () => {
 
     expect(screen.getAllByRole('radio')).toHaveLength(3);
 
-    await userEvent.type(screen.getByLabelText('Search releases'), '2020/21');
+    await userEvent.type(screen.getByLabelText(/Search/), '2020/21');
 
     await waitFor(() => {
       expect(screen.getAllByRole('radio')).toHaveLength(1);
@@ -113,14 +102,9 @@ describe('ReleaseStep', () => {
       />,
     );
 
-    expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Search/)).not.toBeInTheDocument();
 
-    const releasesGroup = within(
-      screen.getByRole('group', {
-        name: 'Choose a release from the list below',
-      }),
-    );
-    const releases = releasesGroup.getAllByRole('radio');
+    const releases = screen.getAllByRole('radio');
 
     expect(releases.length).toBe(1);
     expect(releases[0]).toHaveAttribute('value', 'release-3');
@@ -131,7 +115,7 @@ describe('ReleaseStep', () => {
   test('renders a message when there are no releases', () => {
     render(<ReleaseStep {...wizardProps} releases={[]} onSubmit={noop} />);
 
-    expect(screen.queryByLabelText('Search releases')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Search/)).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('group', {

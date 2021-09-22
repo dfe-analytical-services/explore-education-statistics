@@ -1,9 +1,11 @@
+import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
+import { FormFieldset } from '@common/components/form/index';
 import useMounted from '@common/hooks/useMounted';
 import FormRadioGroup, {
+  BaseFormRadioGroup,
   FormRadioGroupProps,
 } from '@common/components/form/FormRadioGroup';
-import styles from '@common/components/form/FormFieldRadioSearchGroup.module.scss';
 import React, { useState } from 'react';
 
 export interface FormRadioSearchGroupProps extends FormRadioGroupProps {
@@ -14,11 +16,35 @@ const FormRadioSearchGroup = ({
   searchLabel = 'Search',
   ...props
 }: FormRadioSearchGroupProps) => {
-  const { id, legend, name, options } = props;
   const { isMounted } = useMounted();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
+
+  const {
+    id,
+    hint,
+    legend,
+    legendHidden,
+    legendSize = 'm',
+    error,
+    name,
+    onFieldsetFocus,
+    onFieldsetBlur,
+    options = [],
+    ...groupProps
+  } = props;
+
+  const fieldsetProps: FormFieldsetProps = {
+    id,
+    legend,
+    legendHidden,
+    legendSize,
+    hint,
+    error,
+    onFocus: onFieldsetFocus,
+    onBlur: onFieldsetBlur,
+  };
 
   if (!isMounted) {
     return (
@@ -44,25 +70,28 @@ const FormRadioSearchGroup = ({
   }
 
   return (
-    <>
-      <FormTextSearchInput
-        id={`${id}-search`}
-        name={`${name}-search`}
-        label={searchLabel}
-        width={20}
-        onChange={event => setSearchTerm(event.target.value)}
-        onKeyPress={event => {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-          }
-        }}
-      />
-      <div aria-live="assertive" className={styles.optionsContainer}>
+    <FormFieldset {...fieldsetProps} useFormId={false}>
+      {options.length > 1 && (
+        <FormTextSearchInput
+          id={`${id}-search`}
+          className="govuk-!-margin-bottom-4"
+          name={`${name}-search`}
+          label={searchLabel}
+          width={20}
+          onChange={event => setSearchTerm(event.target.value)}
+          onKeyPress={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+            }
+          }}
+        />
+      )}
+
+      <div aria-live="assertive">
         {filteredOptions.length > 0 ? (
-          <FormRadioGroup
-            {...props}
+          <BaseFormRadioGroup
+            {...groupProps}
             name={name}
-            legend={legend}
             id={id}
             options={filteredOptions}
             onChange={(event, option) => {
@@ -76,7 +105,7 @@ const FormRadioSearchGroup = ({
           <p>No results found</p>
         )}
       </div>
-    </>
+    </FormFieldset>
   );
 };
 

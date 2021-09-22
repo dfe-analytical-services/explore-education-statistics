@@ -18,8 +18,9 @@ export type RadioOption<Value extends string = string> = PartialBy<
   value: Value;
 };
 
-export type FormRadioGroupProps<Value extends string = string> = {
+export type BaseFormRadioGroupProps<Value extends string = string> = {
   disabled?: boolean;
+  id: string;
   inline?: boolean;
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -29,27 +30,60 @@ export type FormRadioGroupProps<Value extends string = string> = {
   order?: OrderKeys<RadioOption<Value>>;
   orderDirection?: OrderDirection | OrderDirection[];
   value?: string;
-} & OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
-    useFieldsetFormId?: boolean;
+};
+
+/**
+ * Base radio group without wrapping fieldset.
+ */
+export const BaseFormRadioGroup = <Value extends string = string>({
+  id,
+  inline = false,
+  small = false,
+  order = ['label'],
+  orderDirection = ['asc'],
+  options,
+  value = '',
+  ...props
+}: BaseFormRadioGroupProps<Value>) => {
+  return (
+    <div
+      className={classNames('govuk-radios', {
+        'govuk-radios--inline': inline,
+        'govuk-radios--small': small,
+      })}
+    >
+      {naturalOrderBy(options, order, orderDirection).map(option => (
+        <FormRadio
+          {...props}
+          {...option}
+          id={
+            option.id
+              ? `${id}-${option.id}`
+              : `${id}-${option.value.replace(/\s/g, '-')}`
+          }
+          checked={value === option.value}
+          key={option.value}
+        />
+      ))}
+    </div>
+  );
+};
+
+export type FormRadioGroupProps<
+  Value extends string = string
+> = BaseFormRadioGroupProps<Value> &
+  OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
     onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
     onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
 
 const FormRadioGroup = <Value extends string = string>({
   hint,
-  inline = false,
   legendSize = 'm',
-  small = false,
-  order = ['label'],
-  orderDirection = ['asc'],
-  options,
-  value = '',
   onFieldsetBlur,
   onFieldsetFocus,
   ...props
 }: FormRadioGroupProps<Value>) => {
-  const { id } = props;
-
   return (
     <FormFieldset
       {...props}
@@ -59,26 +93,7 @@ const FormRadioGroup = <Value extends string = string>({
       onBlur={onFieldsetBlur}
       onFocus={onFieldsetFocus}
     >
-      <div
-        className={classNames('govuk-radios', {
-          'govuk-radios--inline': inline,
-          'govuk-radios--small': small,
-        })}
-      >
-        {naturalOrderBy(options, order, orderDirection).map(option => (
-          <FormRadio
-            {...props}
-            {...option}
-            id={
-              option.id
-                ? `${id}-${option.id}`
-                : `${id}-${option.value.replace(/\s/g, '-')}`
-            }
-            checked={value === option.value}
-            key={option.value}
-          />
-        ))}
-      </div>
+      <BaseFormRadioGroup {...props} />
     </FormFieldset>
   );
 };
