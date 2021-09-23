@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import Modal from '@common/components/Modal';
+import styles from './ContentHtml.module.scss';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -46,6 +47,7 @@ const ContentHtml = ({
           <>
             <a href={node.attribs.href}>{domToReact(node.children)}</a>{' '}
             <a
+              className={styles.infoIcon}
               href="#"
               onClick={async event => {
                 event.preventDefault();
