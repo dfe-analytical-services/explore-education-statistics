@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -71,20 +72,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetAllGlossaryEntries_NoEntries()
         {
+            await using var context = InMemoryContentDbContext();
+            var glossaryService = new GlossaryService(context);
+
+            var result = await glossaryService.GetAllGlossaryEntries();
+
+            Assert.Equal(26, result.Count);
+
+            result.ForEach(category => { Assert.Empty(category.Entries); });
+        }
+
+        [Fact]
+        public async Task GetGlossaryEntry()
+        {
             var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new GlossaryEntry
+                    {
+                        Title = "Exclusion",
+                        Slug = "exclusion",
+                        Body = "Exclusion body",
+                    }
+                );
+                await context.SaveChangesAsync();
+            }
+
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var glossaryService = new GlossaryService(context);
 
-                var result = await glossaryService.GetAllGlossaryEntries();
+                var result = await glossaryService.GetGlossaryEntry("exclusion");
 
-                Assert.Equal(26, result.Count);
+                var viewModel = result.AssertRight();
 
-                result.ForEach(category =>
-                {
-                    Assert.Empty(category.Entries);
-                });
+                Assert.Equal("Exclusion", viewModel.Title);
+                Assert.Equal("exclusion", viewModel.Slug);
+                Assert.Equal("Exclusion body", viewModel.Body);
             }
+        }
+
+        [Fact]
+        public async Task GetGlossaryEntry_NotFound()
+        {
+            await using var context = InMemoryContentDbContext();
+            var glossaryService = new GlossaryService(context);
+
+            var result = await glossaryService.GetGlossaryEntry("absence");
+
+            result.AssertNotFound();
         }
     }
 }

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -52,6 +54,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Values
                 .OrderBy(c => c.Heading)
                 .ToList();
+        }
+
+        public async Task<Either<ActionResult, GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
+        {
+            var glossaryEntry = await _contentDbContext.GlossaryEntries
+                .ToAsyncEnumerable()
+                .Where(e => e.Slug == slug)
+                .SingleOrDefaultAsync();
+
+            if (glossaryEntry == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new GlossaryEntryViewModel
+            {
+                Title = glossaryEntry!.Title,
+                Slug = glossaryEntry.Slug,
+                Body = glossaryEntry.Body,
+            };
         }
     }
 }
