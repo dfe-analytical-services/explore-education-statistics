@@ -47,49 +47,6 @@ class AdminClient:
 
 admin_client = AdminClient()
 
-# TODO EES-2302 / EES-2305 - Remove me when methodology notes can be added via content page
-def user_creates_methodology_note_via_api(methodologyVersion_id: str, content: str, displayDate: str = '') -> str:
-    assert methodologyVersion_id
-    assert content
-    assert displayDate
-
-    resp = admin_client.post(f'/api/methodologies/{methodologyVersion_id}/notes', {
-        'content': content,
-        'displayDate': displayDate
-    })
-
-    assert resp.status_code == 201, \
-        f'Could not create methodology note! Responded with {resp.status_code} and {resp.text}'
-
-    return resp.json()['id']
-
-# TODO EES-2302 / EES-2305 - Remove me when methodology notes can be removed via content page
-def user_removes_methodology_note_via_api(methodologyVersion_id: str, methodologyNote_id: str = ''):
-    assert methodologyVersion_id
-    assert methodologyNote_id
-
-    resp = admin_client.delete(f'/api/methodologies/{methodologyVersion_id}/notes/{methodologyNote_id}')
-
-    assert resp.status_code == 204, \
-        f'Could not delete methodology note! Responded with {resp.status_code} and {resp.text}'
-
-# TODO EES-2302 / EES-2305 - Remove me when methodology notes can be updated via content page
-def user_updates_methodology_note_via_api(methodologyVersion_id: str, methodologyNote_id: str, content: str, displayDate: str = '') -> str:
-    assert methodologyVersion_id
-    assert methodologyNote_id
-    assert content
-    assert displayDate
-
-    resp = admin_client.put(f'/api/methodologies/{methodologyVersion_id}/notes/{methodologyNote_id}', {
-        'content': content,
-        'displayDate': displayDate
-    })
-
-    assert resp.status_code == 200, \
-        f'Could not update methodology note! Responded with {resp.status_code} and {resp.text}'
-
-    return resp.json()['id']
-
 def user_creates_theme_via_api(title: str, summary: str = '') -> str:
     assert title
 

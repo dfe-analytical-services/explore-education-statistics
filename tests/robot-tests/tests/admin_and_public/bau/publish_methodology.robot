@@ -120,35 +120,24 @@ Update the methodology amendment's content
     user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
 Add a note describing the amendment
-    # TODO EES-2302 / EES-2305 - Replace me when methodology notes can be created via content page
-    ${methodologyVersionId}=    get methodology version id from url
-    set suite variable    ${AMENDMENT_METHODOLOGY_VERSION_ID}    ${methodologyVersionId}
-    user creates methodology note via api
-    ...    ${AMENDMENT_METHODOLOGY_VERSION_ID}
+    user adds note to methodology
     ...    Latest note
-    ...    2021-09-16T23:00:00Z
 
 Add and remove another note describing the amendment
-    # TODO EES-2302 / EES-2305 - Replace me when methodology notes can be created via content page
-    ${noteIdToRemove}=    user creates methodology note via api
-    ...    ${AMENDMENT_METHODOLOGY_VERSION_ID}
+    user adds note to methodology
     ...    Note which should be deleted
-    ...    2021-09-16T23:00:00Z
-    user removes methodology note via api
-    ...    ${AMENDMENT_METHODOLOGY_VERSION_ID}
-    ...    ${noteIdToRemove}
+    user removes methodology note
+    ...    Note which should be deleted
+    ...    css:#methodologyNotes li:nth-of-type(1)
 
 Add and update another note describing the amendment
-    # TODO EES-2302 / EES-2305 - Replace me when methodology notes can be created via content page
-    ${noteIdToUpdate}=    user creates methodology note via api
-    ...    ${AMENDMENT_METHODOLOGY_VERSION_ID}
+    user adds note to methodology
     ...    Note which should be updated
-    ...    2021-09-16T23:00:00Z
-    user updates methodology note via api
-    ...    ${AMENDMENT_METHODOLOGY_VERSION_ID}
-    ...    ${noteIdToUpdate}
-    ...    Earliest note
-    ...    2021-03-01T00:00:00Z
+    user edits methodology note
+    ...    Note which should be updated
+    ...    01
+    ...    03
+    ...    2021
 
 Approve the amendment for publishing immediately
     user approves methodology amendment for publication
@@ -182,7 +171,7 @@ Verify that the amended methodology is publicly accessible immediately
 Verify that the amended methodology content is correct
     ${date}=    get current datetime    %-d %B %Y
     user checks summary list contains    Published    ${date}
-    user checks summary list contains    Last updated    17 September 2021
+    user checks summary list contains    Last updated    ${date}
     user waits until page contains accordion section    New and Updated Title
     user opens accordion section    New and Updated Title
     ${content}=    user gets accordion section content element    New and Updated Title
@@ -190,10 +179,11 @@ Verify that the amended methodology content is correct
     user checks element contains    ${content}    New & Updated content
 
 Verify the list of notes
+    ${date}=    get current datetime    %-d %B %Y
     user opens details dropdown    See all notes (2)
     user waits until page contains element    css:[data-testid="notes"] li    limit=2
-    user checks methodology note    1    17 September 2021    Latest note
-    user checks methodology note    2    1 March 2021    Earliest note
+    user checks methodology note    1    ${date}    Latest note
+    user checks methodology note    2    1 March 2021    Note which should be updated - edited
     user closes details dropdown    See all notes (2)
 
 Schedule a methodology amendment to be published with a release amendment

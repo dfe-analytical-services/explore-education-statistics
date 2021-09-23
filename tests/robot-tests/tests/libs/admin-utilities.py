@@ -35,14 +35,6 @@ def user_signs_in_as(user: str):
     except Exception as e:
         raise_assertion_error(e)
 
-# TODO EES-2302 / EES-2305 - Remove me when methodology notes can be added via content page
-def get_methodology_version_id_from_url():
-    url = sl.get_location()
-    assert '/methodology/' in url, 'URL does not contain /methodology'
-    result = url[len(os.getenv('ADMIN_URL')):].lstrip('/').split('/')
-    assert result[0] == 'methodology', 'String "methodology" should be 1st element in list'
-    return result[1]
-
 def get_theme_id_from_url():
     url = sl.get_location()
     assert '/themes/' in url, 'URL does not contain /themes'
