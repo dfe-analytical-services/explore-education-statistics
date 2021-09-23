@@ -1,4 +1,5 @@
 import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
+import htmlParser from 'html-react-parser';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
@@ -19,13 +20,12 @@ const ContentHtml = ({
     return sanitizeHtml(html, sanitizeOptions);
   }, [html, sanitizeOptions]);
 
+  const parsedContent = htmlParser(cleanHtml, {});
+
   return (
-    <div
-      className={classNames('dfe-content', className)}
-      data-testid={testId}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: cleanHtml }}
-    />
+    <div className={classNames('dfe-content', className)} data-testid={testId}>
+      {parsedContent}
+    </div>
   );
 };
 
