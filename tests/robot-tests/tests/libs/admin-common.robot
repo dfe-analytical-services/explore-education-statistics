@@ -157,6 +157,10 @@ user opens publication on the admin dashboard
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
+    user navigates to admin dashboard
+    user waits until page contains link    Explore education statistics    10
+    user waits until page does not contain loading spinner
+    user waits for page to finish loading
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
@@ -347,8 +351,8 @@ user removes methodology note
     [Arguments]
     ...    ${note}
     ...    ${parent}
-    user clicks button     Remove note    ${parent}
-    user clicks button     Confirm
+    user clicks button    Remove note    ${parent}
+    user clicks button    Confirm
     user waits until page does not contain    ${note}
 
 user edits methodology note
@@ -357,12 +361,12 @@ user edits methodology note
     ...    ${day}
     ...    ${month}
     ...    ${year}
-    user clicks button     Edit note    xpath://p[text()="${note}"]/ancestor::li
+    user clicks button    Edit note    xpath://p[text()="${note}"]/ancestor::li
     user enters text into element    label:Day    ${day}
     user enters text into element    label:Month    ${month}
     user enters text into element    label:Year    ${year}
     user enters text into element    label:Edit methodology note    ${note} - edited
-    user clicks button     Update note
+    user clicks button    Update note
     user waits until page contains    ${note} - edited
 
 user links publication to external methodology
