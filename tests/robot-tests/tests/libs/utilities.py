@@ -317,8 +317,6 @@ def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
     if user_is_on_admin_dashboard(admin_url):
         return
 
-    sl.wait_until_page_contains_element('id:publicationsReleases-themeTopic-topicId')
-
     home_button = element_finder.find("xpath://a[@href='/dashboard']", required=False, first_only=True)
     
     if home_button is not None:
