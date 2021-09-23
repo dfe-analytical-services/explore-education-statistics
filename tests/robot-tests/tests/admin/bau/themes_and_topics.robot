@@ -1,5 +1,4 @@
 *** Settings ***
-Library             ../../libs/admin_utilities.py
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 
