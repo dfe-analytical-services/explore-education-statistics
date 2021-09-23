@@ -1,19 +1,15 @@
 import { contentApi } from '@common/services/api';
-
-export interface GlossaryEntry {
-  title: string;
-  slug: string;
-  body: string;
-}
-
-export interface GlossaryCategory {
-  heading: string;
-  entries: GlossaryEntry[];
-}
+import {
+  GlossaryCategory,
+  GlossaryEntry,
+} from '@common/services/types/glossary';
 
 const glossaryService = {
   listGlossaryEntries(): Promise<GlossaryCategory[]> {
     return contentApi.get('/glossary', {});
+  },
+  getGlossaryEntry(slug: string): Promise<GlossaryEntry> {
+    return contentApi.get(`glossary/${slug}`, {});
   },
 };
 
