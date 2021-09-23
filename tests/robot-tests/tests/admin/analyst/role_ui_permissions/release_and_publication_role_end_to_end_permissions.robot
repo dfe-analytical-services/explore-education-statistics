@@ -126,7 +126,7 @@ Check release approver can approve methodology for publication
 
 Swap the release approver role for publication owner to test removing the approved methodology
     user changes to bau1
-    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner cannot remove approved methodology
@@ -185,7 +185,7 @@ Check release approver can publish a release
 
 Swap the release approver role for publication owner now that the publication is live
     user changes to bau1
-    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner can create and cancel methodology amendments on a live publication
@@ -205,7 +205,7 @@ Check release approver can approve methodology amendments on a live publication
 
 Swap the release approver role for publication owner to test creating a new release amendment
     user changes to bau1
-    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner can create a new release amendment
@@ -229,7 +229,7 @@ Check release approver can approve the methodology amendment for publishing with
 
 Swap the release approver role for publication owner to test that an approved methodology amendment cannot be cancelled
     user changes to bau1
-    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner cannot cancel approved methodology amendment
