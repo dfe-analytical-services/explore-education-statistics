@@ -83,7 +83,7 @@ const PublicationAccessForm = ({
                 </div>
               </div>
             </FormFieldset>
-            <table className="govuk-table">
+            <table className="govuk-table" data-testid="publicationAccessTable">
               <thead className="govuk-table__head">
                 <tr className="govuk-table__row">
                   <th scope="col" className="govuk-table__header">
@@ -114,7 +114,6 @@ const PublicationAccessForm = ({
                       <td className="govuk-table__cell">
                         <ButtonText
                           onClick={() => onRemove(userPublicationRole)}
-                          testId={`remove-publication-role-${userPublicationRole.publication}`}
                         >
                           Remove
                         </ButtonText>

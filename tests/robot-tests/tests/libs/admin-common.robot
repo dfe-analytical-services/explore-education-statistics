@@ -660,21 +660,19 @@ user gives release access to analyst
 user removes publication owner access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user scrolls to element    css:[name="selectedPublicationId"]
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
-    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
-    Sleep    1
-    user clicks element    testid:remove-publication-role-${PUBLICATION_NAME}
+    ${table}=    user gets testid element    publicationAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="Owner"]]
+    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user removes release access from analyst
-    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user scrolls to element    css:[name="selectedReleaseId"]
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
-    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
-    Sleep    1
-    user clicks element    testid:remove-release-role-${ROLE}
+    ${table}=    user gets testid element    releaseAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user goes to manage user
