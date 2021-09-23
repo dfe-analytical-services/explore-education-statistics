@@ -30,7 +30,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       caption="Methodology"
     >
-      <div className="govuk-grid-row">
+      <div className="govuk-grid-row govuk-!-margin-bottom-3">
         <div className="govuk-grid-column-two-thirds">
           <SummaryList>
             <SummaryListItem term="Published">
@@ -89,6 +89,34 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
+            {data.publications && data.publications.length > 0 && (
+              <>
+                <h3
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="publications"
+                >
+                  Publications
+                </h3>
+
+                <ul className="govuk-list govuk-list--spaced">
+                  {data.publications.map(publication => (
+                    <li key={publication.id}>
+                      <Link
+                        to="/find-statistics/[publication]"
+                        as={`/find-statistics/${publication.slug}`}
+                      >
+                        {publication.title}
+                      </Link>{' '}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <h3 className="govuk-heading-s" id="related-pages">
+              Related pages
+            </h3>
+
             <ul className="govuk-list">
               <li>
                 <Link to="/find-statistics">Find statistics and data</Link>

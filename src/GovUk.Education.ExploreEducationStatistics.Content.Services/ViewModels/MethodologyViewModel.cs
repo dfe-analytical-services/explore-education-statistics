@@ -20,5 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public List<ContentSectionViewModel> Annexes { get; set; } = new();
 
         public List<MethodologyNoteViewModel> Notes { get; set; } = new();
+
+        public List<PublicationSummaryViewModel> Publications { get; set; } = new();
     }
 }

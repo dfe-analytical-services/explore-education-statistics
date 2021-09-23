@@ -1,4 +1,5 @@
 import { Methodology } from '@common/services/methodologyService';
+import { PublicationSummary } from '@common/services/publicationService';
 
 export const testMethodology: Methodology = {
   id: 'methodology-1',
@@ -91,6 +92,18 @@ export const testMethodology: Methodology = {
       content: 'Earliest note',
     },
   ],
+  publications: [
+    {
+      id: 'publication-1',
+      title: 'Publication 1',
+      slug: 'publication-1-slug',
+    },
+    {
+      id: 'publication-2',
+      title: 'Publication 2',
+      slug: 'publication-2-slug',
+    },
+  ] as PublicationSummary[],
 };
 
 export default testMethodology;

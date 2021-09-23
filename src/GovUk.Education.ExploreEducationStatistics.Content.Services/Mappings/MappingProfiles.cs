@@ -35,6 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                 .ForMember(dest => dest.Notes,
                     m => m.MapFrom(methodologyVersion =>
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
+
+            CreateMap<Publication, PublicationSummaryViewModel>();
         }
 
         private void CreateContentBlockMap()
