@@ -48,6 +48,7 @@ const ContentHtml = ({
             <a href={node.attribs.href}>{domToReact(node.children)}</a>{' '}
             <a
               className={styles.infoIcon}
+              data-testid="glossary-info-icon"
               href="#"
               onClick={async event => {
                 event.preventDefault();
