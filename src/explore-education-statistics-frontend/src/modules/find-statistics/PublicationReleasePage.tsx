@@ -25,6 +25,7 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
@@ -162,7 +163,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           </SummaryList>
 
           {release.summarySection.content.map(block => (
-            <ContentBlockRenderer key={block.id} block={block} />
+            <ContentBlockRenderer
+              key={block.id}
+              block={block}
+              getGlossaryEntry={glossaryService.getGlossaryEntry}
+            />
           ))}
 
           <PageSearchFormWithAnalytics
