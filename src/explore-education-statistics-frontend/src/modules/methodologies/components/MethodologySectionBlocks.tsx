@@ -1,3 +1,4 @@
+import glossaryService from '@frontend/services/glossaryService';
 import InsetText from '@common/components/InsetText';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { ContentBlock } from '@common/services/types/blocks';
@@ -21,6 +22,7 @@ const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
           key={block.id}
           block={block}
           transformImageAttributes={transformImageAttributes}
+          getGlossaryEntry={glossaryService.getGlossaryEntry}
         />
       ))}
     </>
