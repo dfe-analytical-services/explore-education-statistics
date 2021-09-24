@@ -1,3 +1,4 @@
+import glossaryService from '@admin/services/glossaryService';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
@@ -44,7 +45,10 @@ const PreReleaseAccessListPage = ({
               </p>
             )}
 
-            <ContentHtml html={release?.preReleaseAccessList} />
+            <ContentHtml
+              html={release?.preReleaseAccessList}
+              getGlossaryEntry={glossaryService.getGlossaryEntry}
+            />
           </>
         )}
       </LoadingSpinner>
