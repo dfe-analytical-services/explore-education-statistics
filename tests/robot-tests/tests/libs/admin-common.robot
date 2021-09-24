@@ -320,8 +320,10 @@ user creates methodology amendment for publication
     ...    ${topic}=%{TEST_TOPIC_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user opens details dropdown    ${methodology_title}    ${accordion}
+    user waits until button is enabled    Amend methodology
     user clicks button    Amend methodology    ${accordion}
     user waits until modal is visible    Confirm you want to amend this live methodology
+    user waits until button is enabled    Confirm
     user clicks button    Confirm
     user waits until h2 is visible    Methodology summary
 
@@ -391,16 +393,18 @@ user edits an external methodology
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user clicks link    Edit external methodology    ${accordion}
-    user waits until page contains title    Edit external methodology link
+    user waits until page contains title    Edit external methodology link    10
     user checks input field contains    label:Link title    ${original_title}
     user checks input field contains    label:URL    ${original_link}
     user enters text into element    label:Link title    ${new_title}
     user enters text into element    label:URL    ${new_link}
+    user waits until button is enabled    Save
     user clicks button    Save
 
 user removes an external methodology from publication
     [Arguments]    ${publication}
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user waits until button is enabled    Remove external methodology
     user clicks button    Remove external methodology    ${accordion}
 
 user adds basic release content
@@ -569,7 +573,7 @@ user navigates to admin dashboard
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""
-        user waits until page contains title caption    Welcome ${USER}
+        user waits until page contains title caption    Welcome ${USER}    10
     END
     user waits until page contains element
     ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']

@@ -597,6 +597,7 @@ user opens details dropdown
     user waits until element is visible    ${summary}    60
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
     IF    '${is_expanded}' != 'true'
+        user waits until element is enabled    ${summary}
         user clicks element    ${summary}
     END
     user checks element attribute value should be    ${summary}    aria-expanded    true
