@@ -9,7 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -17,12 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class DataFactoryPipelineStatusFunction
     {
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        public DataFactoryPipelineStatusFunction(IQueueService queueService, IReleaseStatusService releaseStatusService)
+        public DataFactoryPipelineStatusFunction(IQueueService queueService, IReleasePublishingStatusService releasePublishingStatusService)
         {
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -51,10 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (response.Status == "Complete")
             {
-                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
+                await _releasePublishingStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
                     Complete);
 
-                if (await _releaseStatusService.IsImmediate(response.ReleaseId, response.ReleaseStatusId))
+                if (await _releasePublishingStatusService.IsImmediate(response.ReleaseId, response.ReleaseStatusId))
                 {
                     await _queueService.QueuePublishReleaseContentMessageAsync(response.ReleaseId,
                         response.ReleaseStatusId);
@@ -63,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             else
             {
                 logger.LogError("ADF pipeline failed: {0}", response);
-                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId, Failed,
-                    new ReleaseStatusLogMessage(
+                await _releasePublishingStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId, Failed,
+                    new ReleasePublishingStatusLogMessage(
                         $"Exception in data stage (ADF pipeline triggered: {response.PipelineTriggerTime}): {response.ErrorMessage}"));
             }
 

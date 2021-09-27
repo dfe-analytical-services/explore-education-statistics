@@ -14,19 +14,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class RetryStageFunction
     {
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        private static readonly ReleaseStatusOverallStage[] ValidStates =
+        private static readonly ReleasePublishingStatusOverallStage[] ValidStates =
         {
-            ReleaseStatusOverallStage.Complete, ReleaseStatusOverallStage.Failed
+            ReleasePublishingStatusOverallStage.Complete, ReleasePublishingStatusOverallStage.Failed
         };
 
         public RetryStageFunction(
             IQueueService queueService,
-            IReleaseStatusService releaseStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            var releaseStatus = await _releaseStatusService.GetLatestAsync(message.ReleaseId);
+            var releaseStatus = await _releasePublishingStatusService.GetLatestAsync(message.ReleaseId);
 
             if (releaseStatus == null)
             {

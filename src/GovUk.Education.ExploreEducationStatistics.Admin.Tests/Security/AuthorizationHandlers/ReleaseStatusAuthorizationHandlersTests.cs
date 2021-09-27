@@ -16,7 +16,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -71,11 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
@@ -144,11 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
@@ -258,11 +257,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
@@ -333,11 +332,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
@@ -447,11 +446,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Approver" role on a
                         // Release can update its status if it is Approved
@@ -552,14 +551,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
                         .ReturnsAsync(
-                            new List<PublisherReleaseStatus>
+                            new List<ReleasePublishingStatus>
                             {
-                                new PublisherReleaseStatus()
+                                new ReleasePublishingStatus()
                             }
                         );
 
@@ -602,11 +601,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<PublisherReleaseStatus>());
+                        .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                     // Assert that no users can update a Release status once it has been published
                     await AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(context =>
@@ -646,14 +645,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
                         .ReturnsAsync(
-                            new List<PublisherReleaseStatus>
+                            new List<ReleasePublishingStatus>
                             {
-                                new PublisherReleaseStatus()
+                                new ReleasePublishingStatus()
                             }
                         );
 
@@ -709,11 +708,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<PublisherReleaseStatus>());
+                        .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                     // Assert that no user release roles allow updating a Release status once it has been published
                     await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>

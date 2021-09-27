@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly IReleaseService _releaseService;
         private readonly IReleaseDataFileService _releaseDataFileService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataImportService _dataImportService;
@@ -30,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public ReleasesController(
             IReleaseService releaseService,
             IReleaseDataFileService releaseDataFileService,
-            IReleaseStatusService releaseStatusService,
+            IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
             IDataImportService dataImportService)
         {
             _releaseService = releaseService;
             _releaseDataFileService = releaseDataFileService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
             _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
             _dataImportService = dataImportService;
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/stage-status")]
         public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
         {
-            return await _releaseStatusService
+            return await _releasePublishingStatusService
                 .GetReleaseStatusAsync(releaseId)
                 .HandleFailuresOrOk();
         }

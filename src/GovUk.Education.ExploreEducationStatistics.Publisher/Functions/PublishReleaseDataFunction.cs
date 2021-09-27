@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -20,15 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IConfiguration _configuration;
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseDataFunction(IConfiguration configuration,
             IQueueService queueService,
-            IReleaseStatusService releaseStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _configuration = configuration;
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 // Skip the ADF Pipeline if running locally
                 // If the Release is immediate then trigger publishing the content
                 // This usually happens when the ADF Pipeline is complete
-                if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
+                if (await _releasePublishingStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
                 {
                     await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
                         message.ReleaseStatusId);
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     logger.LogError(e, "Exception occured while executing {0}",
                         executionContext.FunctionName);
                     await UpdateStage(message, Failed,
-                        new ReleaseStatusLogMessage($"Exception in data stage: {e.Message}"));
+                        new ReleasePublishingStatusLogMessage($"Exception in data stage: {e.Message}"));
                 }
             }
 
@@ -86,10 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(PublishReleaseDataMessage message, ReleaseStatusDataStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(PublishReleaseDataMessage message, ReleasePublishingStatusDataStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
-            await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
+            await _releasePublishingStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
                 logMessage);
         }
 

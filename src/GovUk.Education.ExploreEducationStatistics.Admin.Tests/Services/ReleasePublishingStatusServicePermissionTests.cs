@@ -15,7 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.Permi
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ReleaseStatusServicePermissionTests
+    public class ReleasePublishingStatusServicePermissionTests
     {
         private readonly Release _release = new Release
         {
@@ -37,13 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private ReleaseStatusService BuildReleaseStatusService(
+        private ReleasePublishingStatusService BuildReleaseStatusService(
             IMapper mapper = null,
             IUserService userService = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             ITableStorageService publisherTableStorageService = null)
         {
-            return new ReleaseStatusService(
+            return new ReleasePublishingStatusService(
                 mapper ?? MapperUtils.AdminMapper(),
                 userService ?? new Mock<IUserService>().Object,
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release)

@@ -2,12 +2,12 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class ReleaseStatusLogMessage
+    public class ReleasePublishingStatusLogMessage
     {
         public string Message { get; set; }
         public DateTime On { get; set; }
 
-        public ReleaseStatusLogMessage(string message)
+        public ReleasePublishingStatusLogMessage(string message)
         {
             Message = message;
             On = DateTime.UtcNow;

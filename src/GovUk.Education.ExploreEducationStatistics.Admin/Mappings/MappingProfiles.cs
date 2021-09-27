@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
-            CreateMap<ReleaseStatus, ReleasePublishingStatusViewModel>()
+            CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
             CreateMap<MethodologyNote, MethodologyNoteViewModel>();

@@ -244,8 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
-            services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s =>
-                new ReleaseStatusService(
+            services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>(s =>
+                new ReleasePublishingStatusService(
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),

@@ -13,18 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
-    public class ReleaseStatusService : IReleaseStatusService
+    public class ReleasePublishingStatusService : IReleasePublishingStatusService
     {
         private readonly ContentDbContext _context;
-        private readonly ILogger<ReleaseStatusService> _logger;
+        private readonly ILogger<ReleasePublishingStatusService> _logger;
         private readonly ITableStorageService _tableStorageService;
 
-        public ReleaseStatusService(ContentDbContext context,
-            ILogger<ReleaseStatusService> logger,
+        public ReleasePublishingStatusService(ContentDbContext context,
+            ILogger<ReleasePublishingStatusService> logger,
             ITableStorageService tableStorageService)
         {
             _context = context;
@@ -32,55 +31,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task<ReleaseStatus> CreateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state, bool immediate,
-            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
+        public async Task<ReleasePublishingStatus> CreateAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusState state, bool immediate,
+            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
             var publish = immediate ? null : release.PublishScheduled;
-            var releaseStatus = new ReleaseStatus(release.Publication.Slug, publish, release.Id,
+            var releaseStatus = new ReleasePublishingStatus(release.Publication.Slug, publish, release.Id,
                 releaseStatusId, release.Slug, state, immediate, logMessages);
             var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
-            return tableResult.Result as ReleaseStatus;
+            return tableResult.Result as ReleasePublishingStatus;
         }
 
-        public async Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId)
+        public async Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId)
         {
             var table = await GetTableAsync();
             var tableResult = await table.ExecuteAsync(
-                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString(),
+                TableOperation.Retrieve<ReleasePublishingStatus>(releaseId.ToString(), releaseStatusId.ToString(),
                     new List<string>
                     {
-                        nameof(ReleaseStatus.Created),
-                        nameof(ReleaseStatus.PublicationSlug),
-                        nameof(ReleaseStatus.Publish),
-                        nameof(ReleaseStatus.ReleaseSlug),
-                        nameof(ReleaseStatus.ContentStage),
-                        nameof(ReleaseStatus.DataStage),
-                        nameof(ReleaseStatus.FilesStage),
-                        nameof(ReleaseStatus.PublishingStage),
-                        nameof(ReleaseStatus.OverallStage),
-                        nameof(ReleaseStatus.Immediate),
-                        nameof(ReleaseStatus.Messages)
+                        nameof(ReleasePublishingStatus.Created),
+                        nameof(ReleasePublishingStatus.PublicationSlug),
+                        nameof(ReleasePublishingStatus.Publish),
+                        nameof(ReleasePublishingStatus.ReleaseSlug),
+                        nameof(ReleasePublishingStatus.ContentStage),
+                        nameof(ReleasePublishingStatus.DataStage),
+                        nameof(ReleasePublishingStatus.FilesStage),
+                        nameof(ReleasePublishingStatus.PublishingStage),
+                        nameof(ReleasePublishingStatus.OverallStage),
+                        nameof(ReleasePublishingStatus.Immediate),
+                        nameof(ReleasePublishingStatus.Messages)
                     }));
 
-            return tableResult.Result as ReleaseStatus;
+            return tableResult.Result as ReleasePublishingStatus;
         }
 
-        public async Task<IEnumerable<ReleaseStatus>> GetWherePublishingDueTodayWithStages(
-            ReleaseStatusContentStage? content = null,
-            ReleaseStatusDataStage? data = null,
-            ReleaseStatusFilesStage? files = null,
-            ReleaseStatusPublishingStage? publishing = null,
-            ReleaseStatusOverallStage? overall = null)
+        public async Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusDataStage? data = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null)
         {
             var query = QueryPublishLessThanEndOfTodayWithStages(content, data, files, publishing, overall);
             return await ExecuteQueryAsync(query);
         }
 
-        public async Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
+        public async Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId, params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+            var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString());
 
             if (overallStages.Any())
@@ -88,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) =>
                 {
                     var stageFilter = TableQuery.GenerateFilterCondition(
-                        nameof(ReleaseStatus.OverallStage),
+                        nameof(ReleasePublishingStatus.OverallStage),
                         QueryComparisons.Equal,
                         stage.ToString()
                     );
@@ -104,14 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
             }
 
-            var query = new TableQuery<ReleaseStatus>().Where(filter);
+            var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
             return await ExecuteQueryAsync(query);
         }
 
-        public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
+        public async Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseId)
         {
-            var query = new TableQuery<ReleaseStatus>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+            var query = new TableQuery<ReleasePublishingStatus>()
+                .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString()));
 
             var result = await ExecuteQueryAsync(query);
@@ -124,12 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseStatus.Immediate;
         }
 
-        private Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
+        private Task<IEnumerable<ReleasePublishingStatus>> ExecuteQueryAsync(TableQuery<ReleasePublishingStatus> query)
         {
             return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
 
-        public async Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state)
+        public async Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusState state)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -138,10 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage? content = null,
-            ReleaseStatusDataStage? data = null, ReleaseStatusFilesStage? files = null,
-            ReleaseStatusPublishingStage? publishing = null, ReleaseStatusOverallStage? overall = null,
-            ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusDataStage? data = null, ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null, ReleasePublishingStatusOverallStage? overall = null,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -175,8 +174,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusContentStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -186,14 +185,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusDataStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusDataStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Data = stage;
 
-                if (stage == ReleaseStatusDataStage.Complete)
+                if (stage == ReleasePublishingStatusDataStage.Complete)
                 {
                     // In case this was a retry, reinstate publishing if possible
                     var (publishing, overall) = GetStatesForReinstatingAfterPossibleRetry(row);
@@ -205,20 +204,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 return row;
             });
 
-            if (stage == ReleaseStatusDataStage.Failed)
+            if (stage == ReleasePublishingStatusDataStage.Failed)
             {
                 await CancelReleasesWithContentDependency(releaseId, releaseStatusId);
             }
 
-            if (stage == ReleaseStatusDataStage.Complete)
+            if (stage == ReleasePublishingStatusDataStage.Complete)
             {
                 // In case this was a retry, reinstate publishing of any other releases that were cancelled if possible
                 await ReinstateReleasesWithContentDependency(releaseId, releaseStatusId);
             }
         }
 
-        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -229,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId,
-            ReleaseStatusPublishingStage stage, ReleaseStatusLogMessage logMessage = null)
+            ReleasePublishingStatusPublishingStage stage, ReleasePublishingStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -240,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private async Task UpdateRowAsync(Guid releaseId, Guid releaseStatusId,
-            Func<ReleaseStatus, ReleaseStatus> updateFunction, int retry = 0)
+            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction, int retry = 0)
         {
             var table = await GetTableAsync();
             var releaseStatus = await GetAsync(releaseId, releaseStatusId);
@@ -300,16 +299,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
             
             var scheduled = await GetWherePublishingDueTodayWithStages(
-                publishing: ReleaseStatusPublishingStage.Scheduled);
+                publishing: ReleasePublishingStatusPublishingStage.Scheduled);
             var scheduledExceptFailing = scheduled
                 .Where(status => status.Id != failingReleaseStatusId);
 
             foreach (var releaseStatus in scheduledExceptFailing)
             {
                 await UpdateStagesAsync(releaseStatus.ReleaseId, releaseStatus.Id,
-                    publishing: ReleaseStatusPublishingStage.Cancelled, 
-                    overall: ReleaseStatusOverallStage.Failed,
-                    logMessage: new ReleaseStatusLogMessage(
+                    publishing: ReleasePublishingStatusPublishingStage.Cancelled, 
+                    overall: ReleasePublishingStatusOverallStage.Failed,
+                    logMessage: new ReleasePublishingStatusLogMessage(
                         $"Publishing cancelled due to dependency with failed Release: {failingReleaseId}, ReleaseStatusId: {failingReleaseStatusId}"));
             }
         }
@@ -330,11 +329,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var scheduled = await GetWherePublishingDueTodayWithStages(
-                content: ReleaseStatusContentStage.Complete,
-                data: ReleaseStatusDataStage.Complete,
-                files: ReleaseStatusFilesStage.Complete,
-                publishing: ReleaseStatusPublishingStage.Cancelled,
-                overall: ReleaseStatusOverallStage.Failed);
+                content: ReleasePublishingStatusContentStage.Complete,
+                data: ReleasePublishingStatusDataStage.Complete,
+                files: ReleasePublishingStatusFilesStage.Complete,
+                publishing: ReleasePublishingStatusPublishingStage.Cancelled,
+                overall: ReleasePublishingStatusOverallStage.Failed);
 
             var scheduledExceptSucceeding = scheduled
                 .Where(status => status.Id != succeedingReleaseStatusId);
@@ -346,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await UpdateStagesAsync(releaseStatus.ReleaseId, releaseStatus.Id,
                     publishing: publishing,
                     overall: overall,
-                    logMessage: new ReleaseStatusLogMessage(
+                    logMessage: new ReleasePublishingStatusLogMessage(
                         $"Publishing reinstated after Release succeeded: {succeedingReleaseId}, ReleaseStatusId: {succeedingReleaseStatusId}"));
             }
         }
@@ -357,24 +356,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         /// <remarks>
         /// Checks that all the states are as expected and if not, leaves them untouched.
         /// </remarks>
-        /// <param name="releaseStatus"></param>
+        /// <param name="releasePublishingStatus"></param>
         /// <returns>Returns the original starting states for stages before they were cancelled, if reinstating is possible.</returns>
-        private static (ReleaseStatusPublishingStage Publishing, ReleaseStatusOverallStage Overall) 
-            GetStatesForReinstatingAfterPossibleRetry(ReleaseStatus releaseStatus)
+        private static (ReleasePublishingStatusPublishingStage Publishing, ReleasePublishingStatusOverallStage Overall) 
+            GetStatesForReinstatingAfterPossibleRetry(ReleasePublishingStatus releasePublishingStatus)
         {
-            var startingState = releaseStatus.Immediate
+            var startingState = releasePublishingStatus.Immediate
                 ? ReleaseStatusStates.ImmediateReleaseStartedState
                 : ReleaseStatusStates.ScheduledReleaseStartedState;
 
-            var existingState = releaseStatus.State;
+            var existingState = releasePublishingStatus.State;
 
-            var publishingCancelled = existingState.Publishing == ReleaseStatusPublishingStage.Cancelled;
-            var overallFailed = existingState.Overall == ReleaseStatusOverallStage.Failed;
+            var publishingCancelled = existingState.Publishing == ReleasePublishingStatusPublishingStage.Cancelled;
+            var overallFailed = existingState.Overall == ReleasePublishingStatusOverallStage.Failed;
 
-            var contentOk = existingState.Content == ReleaseStatusContentStage.Complete 
-                            || releaseStatus.Immediate && existingState.Content == startingState.Content;
-            var filesOk = existingState.Files == ReleaseStatusFilesStage.Complete;
-            var dataOk = existingState.Data == ReleaseStatusDataStage.Complete;
+            var contentOk = existingState.Content == ReleasePublishingStatusContentStage.Complete 
+                            || releasePublishingStatus.Immediate && existingState.Content == startingState.Content;
+            var filesOk = existingState.Files == ReleasePublishingStatusFilesStage.Complete;
+            var dataOk = existingState.Data == ReleasePublishingStatusDataStage.Complete;
 
             var reinstate = publishingCancelled
                             && overallFailed

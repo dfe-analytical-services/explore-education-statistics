@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class ReleaseStatus : TableEntity
+    public class ReleasePublishingStatus : TableEntity
     {
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
@@ -20,20 +20,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string OverallStage { get; set; }
         public bool Immediate { get; set; }
         public string Messages { get; set; }
-        private ReleaseStatusState _state;
+        private ReleasePublishingStatusState _state;
 
-        public ReleaseStatus()
+        public ReleasePublishingStatus()
         {
         }
 
-        public ReleaseStatus(string publicationSlug,
+        public ReleasePublishingStatus(string publicationSlug,
             DateTime? publish,
             Guid releaseId,
             Guid releaseStatusId,
             string releaseSlug,
-            ReleaseStatusState state,
+            ReleasePublishingStatusState state,
             bool immediate,
-            IEnumerable<ReleaseStatusLogMessage> logMessages = null)
+            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
             RowKey = releaseStatusId.ToString();
             PartitionKey = releaseId.ToString();
@@ -49,13 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public Guid Id => Guid.Parse(RowKey);
         public Guid ReleaseId => Guid.Parse(PartitionKey);
 
-        public ReleaseStatusState State
+        public ReleasePublishingStatusState State
         {
             get
             {
                 if (_state == null)
                 {
-                    _state = new ReleaseStatusState(ContentStage, FilesStage, DataStage, PublishingStage, OverallStage);
+                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, DataStage, PublishingStage, OverallStage);
                     _state.PropertyChanged += StateChangedCallback;
                 }
 
@@ -69,17 +69,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 PublishingStage = value.Publishing.ToString();
                 OverallStage = value.Overall.ToString();
 
-                _state = new ReleaseStatusState(value.Content, value.Files, value.Data, value.Publishing,
+                _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Data, value.Publishing,
                     value.Overall);
                 _state.PropertyChanged += StateChangedCallback;
             }
         }
 
-        public IEnumerable<ReleaseStatusLogMessage> LogMessages => Messages == null
-            ? new List<ReleaseStatusLogMessage>()
-            : JsonConvert.DeserializeObject<IEnumerable<ReleaseStatusLogMessage>>(Messages);
+        public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages => Messages == null
+            ? new List<ReleasePublishingStatusLogMessage>()
+            : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
 
-        public void AppendLogMessage(ReleaseStatusLogMessage logMessage)
+        public void AppendLogMessage(ReleasePublishingStatusLogMessage logMessage)
         {
             if (logMessage != null)
             {
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
         }
 
-        public void AppendLogMessages(IEnumerable<ReleaseStatusLogMessage> logMessages)
+        public void AppendLogMessages(IEnumerable<ReleasePublishingStatusLogMessage> logMessages)
         {
             if (logMessages != null)
             {
@@ -99,16 +99,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         {
             switch (e.PropertyName)
             {
-                case nameof(ReleaseStatusState.Content):
+                case nameof(ReleasePublishingStatusState.Content):
                     ContentStage = _state.Content.ToString();
                     break;
-                case nameof(ReleaseStatusState.Data):
+                case nameof(ReleasePublishingStatusState.Data):
                     DataStage = _state.Data.ToString();
                     break;
-                case nameof(ReleaseStatusState.Files):
+                case nameof(ReleasePublishingStatusState.Files):
                     FilesStage = _state.Files.ToString();
                     break;
-                case nameof(ReleaseStatusState.Publishing):
+                case nameof(ReleasePublishingStatusState.Publishing):
                     PublishingStage = _state.Publishing.ToString();
                     break;
             }

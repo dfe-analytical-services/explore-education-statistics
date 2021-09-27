@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             var statuses = await _releaseStatusRepository.GetAllByOverallStage(
                 release.Id,
-                ReleaseStatusOverallStage.Started,
-                ReleaseStatusOverallStage.Complete
+                ReleasePublishingStatusOverallStage.Started,
+                ReleasePublishingStatusOverallStage.Complete
             );
 
             if (statuses.Any() || release.Published != null)

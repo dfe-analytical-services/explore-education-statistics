@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -16,17 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IValidationService _validationService;
 
         public NotifyChangeFunction(IFileStorageService fileStorageService,
             IQueueService queueService,
-            IReleaseStatusService releaseStatusService,
+            IReleasePublishingStatusService releasePublishingStatusService,
             IValidationService validationService)
         {
             _fileStorageService = fileStorageService;
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
             _validationService = validationService;
         }
 
@@ -88,10 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName);
         }
 
-        private async Task<ReleaseStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
-            ReleaseStatusState state, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
+        private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
+            ReleasePublishingStatusState state, IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
-            return await _releaseStatusService.CreateAsync(message.ReleaseId, message.ReleaseStatusId, state,
+            return await _releasePublishingStatusService.CreateAsync(message.ReleaseId, message.ReleaseStatusId, state,
                 message.Immediate, logMessages);
         }
 
@@ -99,10 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             // There may be an existing scheduled ReleaseStatus entry if this release has been validated before
             // If so, mark it as superseded
-            var scheduled = await _releaseStatusService.GetAllByOverallStage(message.ReleaseId, Scheduled);
+            var scheduled = await _releasePublishingStatusService.GetAllByOverallStage(message.ReleaseId, Scheduled);
             foreach (var releaseStatus in scheduled)
             {
-                await _releaseStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);
+                await _releasePublishingStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);
             }
         }
     }
