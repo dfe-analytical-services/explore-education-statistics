@@ -41,7 +41,7 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
       {release.preReleaseAccessList && (
         <ContentHtml
           html={release.preReleaseAccessList}
-          getGlossaryEntry={glossaryService.getGlossaryEntry}
+          getGlossaryEntry={glossaryService.getEntry}
         />
       )}
     </Page>

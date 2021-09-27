@@ -48,7 +48,7 @@ const PublicationReleaseHeadlinesSection = ({
         <ContentBlockRenderer
           key={block.id}
           block={block}
-          getGlossaryEntry={glossaryService.getGlossaryEntry}
+          getGlossaryEntry={glossaryService.getEntry}
         />
       ))}
     </TabsSection>

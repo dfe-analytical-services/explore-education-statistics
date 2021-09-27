@@ -30,7 +30,6 @@ Add an accordion section to release content
 
 Add text block with link to absence glossary entry to accordion section
     user adds text block to editable accordion section    Test section    css:#releaseMainContent
-    #user adds content to accordion section text block    Test section    1    Test. <a href=%{PUBLIC_URL}/glossary#absence>Absence</a>. Test.    css:#releaseMainContent
     ${block}=    user edits accordion section text block    Test section    1    css:#releaseMainContent
     user presses keys    Absence
     user presses keys    CTRL+a

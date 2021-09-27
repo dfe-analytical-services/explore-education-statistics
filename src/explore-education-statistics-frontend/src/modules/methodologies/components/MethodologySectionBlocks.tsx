@@ -22,7 +22,7 @@ const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
           key={block.id}
           block={block}
           transformImageAttributes={transformImageAttributes}
-          getGlossaryEntry={glossaryService.getGlossaryEntry}
+          getGlossaryEntry={glossaryService.getEntry}
         />
       ))}
     </>

@@ -16,7 +16,7 @@ const PreviewHtml = ({ className, html, testId }: Props) => {
       html={html}
       className={classNames(styles.preview, className)}
       testId={testId}
-      getGlossaryEntry={glossaryService.getGlossaryEntry}
+      getGlossaryEntry={glossaryService.getEntry}
     />
   );
 };

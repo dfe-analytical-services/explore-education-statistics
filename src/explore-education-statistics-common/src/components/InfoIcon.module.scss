@@ -3,7 +3,7 @@
 .infoIcon {
   background-color: $govuk-link-colour;
   border-radius: 10px;
-  color: govuk-colour('white') !important;
+  color: govuk-colour('white');
   display: inline-block;
   font-size: 18px;
   font-weight: bold;
@@ -13,13 +13,8 @@
   text-decoration: none;
   width: 20px;
 
-  &:focus {
-    box-shadow: 0 -1px $govuk-focus-colour, 0 2px $govuk-focus-text-colour;
-    color: $govuk-text-colour !important;
-  }
-
   &:hover {
     background-color: $govuk-link-hover-colour;
-    color: govuk-colour('white') !important;
+    color: govuk-colour('white');
   }
 }

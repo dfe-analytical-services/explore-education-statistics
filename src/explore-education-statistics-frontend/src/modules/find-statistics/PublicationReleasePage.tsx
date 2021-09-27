@@ -166,7 +166,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <ContentBlockRenderer
               key={block.id}
               block={block}
-              getGlossaryEntry={glossaryService.getGlossaryEntry}
+              getGlossaryEntry={glossaryService.getEntry}
             />
           ))}
 

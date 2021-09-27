@@ -5,11 +5,11 @@ import {
 } from '@common/services/types/glossary';
 
 const glossaryService = {
-  listGlossaryEntries(): Promise<GlossaryCategory[]> {
-    return contentApi.get('/glossary', {});
+  listEntries(): Promise<GlossaryCategory[]> {
+    return contentApi.get('/glossary-entries');
   },
-  getGlossaryEntry(slug: string): Promise<GlossaryEntry> {
-    return contentApi.get(`glossary/${slug}`, {});
+  getEntry(slug: string): Promise<GlossaryEntry> {
+    return contentApi.get(`/glossary-entries/${slug}`);
   },
 };
 

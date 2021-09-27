@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             Assert.Equal(26, result.Count);
 
-            result.ForEach(category => { Assert.Empty(category.Entries); });
+            result.ForEach(category => Assert.Empty(category.Entries));
         }
 
         [Fact]

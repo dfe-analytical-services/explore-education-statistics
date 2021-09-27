@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _glossaryService = glossaryService;
         }
 
-        [HttpGet("glossary/{slug}")]
+        [HttpGet("glossary-entries/{slug}")]
         public async Task<ActionResult<GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
         {
             return await _glossaryService.GetGlossaryEntry(slug)

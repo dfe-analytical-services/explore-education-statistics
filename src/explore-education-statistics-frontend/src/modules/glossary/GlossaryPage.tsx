@@ -102,7 +102,7 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const categories = await glossaryService.listGlossaryEntries();
+  const categories = await glossaryService.listEntries();
 
   return {
     props: {

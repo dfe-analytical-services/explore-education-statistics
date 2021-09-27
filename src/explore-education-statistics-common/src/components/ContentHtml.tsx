@@ -5,7 +5,10 @@ import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import Modal from '@common/components/Modal';
-import styles from './ContentHtml.module.scss';
+import InfoIcon from '@common/components/InfoIcon';
+import useMounted from '@common/hooks/useMounted';
+import ButtonText from '@common/components/ButtonText';
+import Button from '@common/components/Button';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -22,13 +25,11 @@ const ContentHtml = ({
   testId,
   getGlossaryEntry,
 }: ContentHtmlProps) => {
-  const [displayGlossaryEntry, setDisplayGlossaryEntry] = useState(false);
-  const [glossaryEntry, setGlossaryEntry] = useState({
-    title: 'Glossary entry not retrieved',
-    slug: '',
-    body: '',
-    link: '',
-  });
+  const { isMounted } = useMounted();
+
+  const [glossaryEntry, setGlossaryEntry] = useState<GlossaryEntry | undefined>(
+    undefined,
+  );
 
   const cleanHtml = useMemo(() => {
     return sanitizeHtml(html, sanitizeOptions);
@@ -43,31 +44,24 @@ const ContentHtml = ({
         node.attribs &&
         Object.keys(node.attribs).includes('data-glossary')
       ) {
-        return (
+        const linkText = domToReact(node.children);
+        const glossaryEntrySlug = node.attribs.href.split('#')[1];
+        return isMounted ? (
           <>
-            <a href={node.attribs.href}>{domToReact(node.children)}</a>{' '}
-            <a
-              className={styles.infoIcon}
-              data-testid="glossary-info-icon"
-              href="#"
-              onClick={async event => {
-                event.preventDefault();
-                const glossaryEntrySlug = node.attribs.href.split('#')[1];
+            <ButtonText
+              onClick={async () => {
                 const newGlossaryEntry = await getGlossaryEntry(
                   glossaryEntrySlug,
                 );
-                setGlossaryEntry({
-                  title: newGlossaryEntry.title,
-                  slug: newGlossaryEntry.slug,
-                  body: newGlossaryEntry.body,
-                  link: node.attribs.href,
-                });
-                setDisplayGlossaryEntry(true);
+                setGlossaryEntry(newGlossaryEntry);
               }}
             >
-              ?
-            </a>
+              {linkText}{' '}
+              <InfoIcon description="(show glossary term definition)" />
+            </ButtonText>
           </>
+        ) : (
+          <a href={node.attribs.href}>{linkText}</a>
         );
       }
       return undefined;
@@ -82,23 +76,19 @@ const ContentHtml = ({
       >
         {parsedContent}
       </div>
-      {displayGlossaryEntry && (
+      {glossaryEntry && (
         <Modal
           title={glossaryEntry.title}
-          onExit={() => setDisplayGlossaryEntry(false)}
+          onExit={() => setGlossaryEntry(undefined)}
         >
-          {parseHtmlString(sanitizeHtml(glossaryEntry.body))}
-          <p>
-            <a
-              href="#"
-              onClick={event => {
-                event.preventDefault();
-                setDisplayGlossaryEntry(false);
-              }}
-            >
-              Close
-            </a>
-          </p>
+          {parseHtmlString(sanitizeHtml(glossaryEntry.body, sanitizeOptions))}
+          <Button
+            onClick={event => {
+              setGlossaryEntry(undefined);
+            }}
+          >
+            Close
+          </Button>
         </Modal>
       )}
     </>
