@@ -46,14 +46,26 @@ const DownloadStep = ({
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading stepEnabled={stepEnabled}>
-      <span className="dfe-flex dfe-align-items--center">
+      <span
+        className="dfe-flex dfe-align-items--center"
+        data-testid="choose-files"
+      >
         Choose files to download{' '}
         {release && release.latestRelease ? (
-          <Tag strong className="govuk-!-margin-left-4">
+          <Tag
+            strong
+            className="govuk-!-margin-left-4"
+            data-testid="latest-data-tag"
+          >
             This is the latest data
           </Tag>
         ) : (
-          <Tag strong colour="orange" className="govuk-!-margin-left-4">
+          <Tag
+            strong
+            colour="orange"
+            className="govuk-!-margin-left-4"
+            data-testid="not-latest-data-tag"
+          >
             This is not the latest data
           </Tag>
         )}
