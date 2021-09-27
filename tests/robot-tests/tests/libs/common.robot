@@ -623,6 +623,10 @@ user gets details content element
     ${content}=    get child element    ${parent}    id:${content_id}
     [Return]    ${content}
 
+user checks page for details dropdown
+    [Arguments]    ${text}
+    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
+
 user waits until details contains element
     [Arguments]    ${text}    ${element}    ${parent}=css:body    ${wait}=${timeout}
     ${details}=    user gets details content element    ${text}    ${parent}
@@ -771,11 +775,3 @@ lookup or return webelement
 user closes Set Page View box
     user clicks element    id:pageViewToggleButton
     user waits until element is not visible    id:editingMode
-
-user waits until page contains details section
-    [Arguments]    ${heading}    ${wait}=${timeout}
-    user waits until page contains element    testid:Expand Details Section ${heading}    ${wait}
-
-user waits until page contains details dropdown
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}

@@ -28,6 +28,9 @@ yarn-error.log*
 ## Tests
 
 junit.xml
+src/explore-education-statistics-admin/*.xml 
+src/explore-education-statistics-common/*.xml
+src/explore-education-statistics-frontend/*.xml
 **/test-results/
 .pabotsuitenames
 /tests/robot-tests/backup-data
