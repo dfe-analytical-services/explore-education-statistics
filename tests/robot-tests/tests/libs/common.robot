@@ -14,7 +14,7 @@ ${headless}=                            1
 ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
 
 ${timeout}=                             30
-${implicit_wait}=                       3
+${implicit_wait}=                       15
 ${release_complete_wait}=               900
 ${prompt_to_continue_on_failure}=       0
 
@@ -25,7 +25,7 @@ do this on failure
         prompt to continue
     END
     IF    ${prompt_to_continue_on_failure} == 0
-        set selenium timeout    3
+        set selenium timeout    15
     END
 
 user opens the browser

@@ -559,7 +559,7 @@ user approves release for immediate publication
     user clicks button    Update status
     user waits until h2 is visible    Sign off    %{WAIT_MEDIUM}
     user checks summary list contains    Current status    Approved
-    user waits for release process status to be    Complete    ${release_complete_wait}
+    user waits for release process status to be    Complete    %{RELEASE_COMPLETE_WAIT}
     user reloads page    # EES-1448
     user checks page does not contain button    Edit release status
 
