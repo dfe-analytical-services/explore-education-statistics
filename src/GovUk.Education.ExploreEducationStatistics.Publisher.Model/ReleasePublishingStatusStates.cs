@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public static class ReleaseStatusStates
+    public static class ReleasePublishingStatusStates
     {
         /**
          * State used when a Release fails validation

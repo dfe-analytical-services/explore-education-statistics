@@ -362,8 +362,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             GetStatesForReinstatingAfterPossibleRetry(ReleasePublishingStatus releasePublishingStatus)
         {
             var startingState = releasePublishingStatus.Immediate
-                ? ReleaseStatusStates.ImmediateReleaseStartedState
-                : ReleaseStatusStates.ScheduledReleaseStartedState;
+                ? ReleasePublishingStatusStates.ImmediateReleaseStartedState
+                : ReleasePublishingStatusStates.ScheduledReleaseStartedState;
 
             var existingState = releasePublishingStatus.State;
 
