@@ -311,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static (
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseDataFileService> ReleaseDataFilesService,
-            Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleasePublishingStatusService> ReleaseStatusService,
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataImportService> ImportService) Mocks()
@@ -324,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             return (new Mock<IReleaseService>(),
                     new Mock<IReleaseDataFileService>(),
-                    new Mock<IReleaseStatusService>(),
+                    new Mock<IReleasePublishingStatusService>(),
                     new Mock<IReleaseChecklistService>(),
                     MockUserManager(user),
                     new Mock<IDataImportService>()
@@ -334,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseDataFileService> ReleaseDataFileService,
-            Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleasePublishingStatusService> ReleaseStatusService,
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataImportService> ImportService

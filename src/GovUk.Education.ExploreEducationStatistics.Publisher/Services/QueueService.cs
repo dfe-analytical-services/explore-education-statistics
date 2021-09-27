@@ -13,15 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class QueueService : IQueueService
     {
         private readonly IStorageQueueService _storageQueueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly ILogger<QueueService> _logger;
 
         public QueueService(IStorageQueueService storageQueueService,
-            IReleaseStatusService releaseStatusService,
+            IReleasePublishingStatusService releasePublishingStatusService,
             ILogger<QueueService> logger)
         {
             _storageQueueService = storageQueueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
             _logger = logger;
         }
 
@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 GenerateReleaseContentQueue, new GenerateReleaseContentMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
-                await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
-                    ReleaseStatusContentStage.Queued);
+                await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
+                    ReleasePublishingStatusContentStage.Queued);
             }
         }
 
@@ -46,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger.LogInformation("Queuing publish content message for release: {0}", releaseId);
             await _storageQueueService.AddMessageAsync(
                 PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
-            await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
-                ReleaseStatusContentStage.Queued);
+            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
+                ReleasePublishingStatusContentStage.Queued);
         }
 
         public Task QueuePublishReleaseDataMessageAsync(Guid releaseId, Guid releaseStatusId)
@@ -63,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 _logger.LogInformation("Queuing data message for release: {0}", releaseId);
                 await _storageQueueService.AddMessageAsync(
                     PublishReleaseDataQueue, new PublishReleaseDataMessage(releaseId, releaseStatusId));
-                await _releaseStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
-                    ReleaseStatusDataStage.Queued);
+                await _releasePublishingStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
+                    ReleasePublishingStatusDataStage.Queued);
             }
         }
 
@@ -84,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublishReleaseFilesQueue, new PublishReleaseFilesMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
-                await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId,
-                    ReleaseStatusFilesStage.Queued);
+                await _releasePublishingStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId,
+                    ReleasePublishingStatusFilesStage.Queued);
             }
         }
     }

@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusFilesStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusFilesStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IPublishingService _publishingService;
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
             IQueueService queueService,
-            IReleaseStatusService releaseStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _publishingService = publishingService;
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     logger.LogError("{StackTrace}", e.StackTrace);
 
                     await UpdateStage(releaseId, releaseStatusId, Failed,
-                        new ReleaseStatusLogMessage($"Exception in files stage: {e.Message}"));
+                        new ReleasePublishingStatusLogMessage($"Exception in files stage: {e.Message}"));
                 }
             }
 
@@ -109,13 +109,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
 
             var (releaseId, releaseStatusId) = message.Releases.Single();
-            return await _releaseStatusService.IsImmediate(releaseId, releaseStatusId);
+            return await _releasePublishingStatusService.IsImmediate(releaseId, releaseStatusId);
         }
 
-        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
-            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
+            await _releasePublishingStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
         }
     }
 }

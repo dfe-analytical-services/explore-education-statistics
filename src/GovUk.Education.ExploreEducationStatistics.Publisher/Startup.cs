@@ -104,9 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new QueueService(
                         storageQueueService: new StorageQueueService(
                             storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")),
-                            releaseStatusService: provider.GetService<IReleaseStatusService>(),
+                            releasePublishingStatusService: provider.GetService<IReleasePublishingStatusService>(),
                             logger: provider.GetRequiredService<ILogger<QueueService>>()))
-                .AddScoped<IReleaseStatusService, ReleaseStatusService>()
+                .AddScoped<IReleasePublishingStatusService, ReleasePublishingStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
                     new ReleaseSubjectRepository(

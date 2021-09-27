@@ -5,8 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IReleaseStatusRepository
+    public interface IReleasePublishingStatusRepository
     {
-        Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages);
+        Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId, params ReleasePublishingStatusOverallStage[] overallStages);
     }
 }

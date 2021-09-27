@@ -9,12 +9,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public static class ReleaseStatusTableQueryUtil
     {
-        public static TableQuery<ReleaseStatus> QueryPublishLessThanEndOfTodayWithStages(
-            ReleaseStatusContentStage? content = null,
-            ReleaseStatusDataStage? data = null,
-            ReleaseStatusFilesStage? files = null,
-            ReleaseStatusPublishingStage? publishing = null,
-            ReleaseStatusOverallStage? overall = null)
+        public static TableQuery<ReleasePublishingStatus> QueryPublishLessThanEndOfTodayWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusDataStage? data = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null)
         {
             var filter = FilterPublishLessThanEndOfToday();
 
@@ -43,25 +43,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 filter = CombineFilters(filter, And, FilterOverallStageEquals(overall.Value));
             }
 
-            return new TableQuery<ReleaseStatus>().Where(filter);
+            return new TableQuery<ReleasePublishingStatus>().Where(filter);
         }
 
         private static string FilterPublishLessThanEndOfToday() =>
-            GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish), LessThan, DateTime.Today.AddDays(1));
+            GenerateFilterConditionForDate(nameof(ReleasePublishingStatus.Publish), LessThan, DateTime.Today.AddDays(1));
 
-        private static string FilterContentStageEquals(ReleaseStatusContentStage stage) =>
-            GenerateFilterCondition(nameof(ReleaseStatus.ContentStage), Equal, stage.ToString());
+        private static string FilterContentStageEquals(ReleasePublishingStatusContentStage stage) =>
+            GenerateFilterCondition(nameof(ReleasePublishingStatus.ContentStage), Equal, stage.ToString());
 
-        private static string FilterDataStageEquals(ReleaseStatusDataStage stage) =>
-            GenerateFilterCondition(nameof(ReleaseStatus.DataStage), Equal, stage.ToString());
+        private static string FilterDataStageEquals(ReleasePublishingStatusDataStage stage) =>
+            GenerateFilterCondition(nameof(ReleasePublishingStatus.DataStage), Equal, stage.ToString());
 
-        private static string FilterFilesStageEquals(ReleaseStatusFilesStage stage) =>
-            GenerateFilterCondition(nameof(ReleaseStatus.FilesStage), Equal, stage.ToString());
+        private static string FilterFilesStageEquals(ReleasePublishingStatusFilesStage stage) =>
+            GenerateFilterCondition(nameof(ReleasePublishingStatus.FilesStage), Equal, stage.ToString());
 
-        private static string FilterPublishingStageEquals(ReleaseStatusPublishingStage stage) =>
-            GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage), Equal, stage.ToString());
+        private static string FilterPublishingStageEquals(ReleasePublishingStatusPublishingStage stage) =>
+            GenerateFilterCondition(nameof(ReleasePublishingStatus.PublishingStage), Equal, stage.ToString());
 
-        private static string FilterOverallStageEquals(ReleaseStatusOverallStage stage) =>
-            GenerateFilterCondition(nameof(ReleaseStatus.OverallStage), Equal, stage.ToString());
+        private static string FilterOverallStageEquals(ReleasePublishingStatusOverallStage stage) =>
+            GenerateFilterCondition(nameof(ReleasePublishingStatus.OverallStage), Equal, stage.ToString());
     }
 }

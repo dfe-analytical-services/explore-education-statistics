@@ -9,15 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid ReleaseId { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatusDataStage DataStage { get; set; }
+        public ReleasePublishingStatusDataStage DataStage { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatusContentStage ContentStage { get; set; }
+        public ReleasePublishingStatusContentStage ContentStage { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatusFilesStage FilesStage { get; set; }
+        public ReleasePublishingStatusFilesStage FilesStage { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatusPublishingStage PublishingStage { get; set; }
+        public ReleasePublishingStatusPublishingStage PublishingStage { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatusOverallStage OverallStage { get; set; }
+        public ReleasePublishingStatusOverallStage OverallStage { get; set; }
         public DateTimeOffset LastUpdated { get; set; }
     }
 }
