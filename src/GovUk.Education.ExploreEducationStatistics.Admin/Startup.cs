@@ -250,8 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
-            services.AddTransient<IReleaseStatusRepository, ReleaseStatusRepository>(s =>
-                new ReleaseStatusRepository(
+            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
+                new ReleasePublishingStatusRepository(
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))
                 )
             );

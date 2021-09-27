@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Release release,
             List<ReleasePublishingStatus>? publishingStatuses = null)
         {
-            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
             releaseStatusRepository.Setup(
                     s => s.GetAllByOverallStage(

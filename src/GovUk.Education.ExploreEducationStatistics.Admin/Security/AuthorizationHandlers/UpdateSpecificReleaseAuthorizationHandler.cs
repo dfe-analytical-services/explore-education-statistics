@@ -16,15 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
-        private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IUserPublicationRoleRepository _publicationRoleRepository;
         private readonly IUserReleaseRoleRepository _releaseRoleRepository;
 
-        public UpdateSpecificReleaseAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+        public UpdateSpecificReleaseAuthorizationHandler(IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository publicationRoleRepository,
             IUserReleaseRoleRepository releaseRoleRepository)
         {
-            _releaseStatusRepository = releaseStatusRepository;
+            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _publicationRoleRepository = publicationRoleRepository;
             _releaseRoleRepository = releaseRoleRepository;
         }
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             UpdateSpecificReleaseRequirement requirement,
             Release release)
         {
-            var statuses = await _releaseStatusRepository.GetAllByOverallStage(
+            var statuses = await _releasePublishingStatusRepository.GetAllByOverallStage(
                 release.Id,
                 ReleasePublishingStatusOverallStage.Started,
                 ReleasePublishingStatusOverallStage.Complete

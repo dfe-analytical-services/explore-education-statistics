@@ -10,11 +10,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseStatusRepository : IReleaseStatusRepository
+    public class ReleasePublishingStatusRepository : IReleasePublishingStatusRepository
     {
         private readonly ITableStorageService _publisherTableStorageService;
 
-        public ReleaseStatusRepository(ITableStorageService publisherTableStorageService)
+        public ReleasePublishingStatusRepository(ITableStorageService publisherTableStorageService)
         {
             _publisherTableStorageService = publisherTableStorageService;
         }

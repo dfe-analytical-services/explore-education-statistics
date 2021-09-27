@@ -13,15 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public abstract class ReleaseStatusAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, Release>
         where TRequirement : IAuthorizationRequirement
     {
-        private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
-        protected ReleaseStatusAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+        protected ReleaseStatusAuthorizationHandler(IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            _releaseStatusRepository = releaseStatusRepository;
+            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
         }
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             TRequirement requirement,
             Release release)
         {
-            var statuses = await _releaseStatusRepository.GetAllByOverallStage(
+            var statuses = await _releasePublishingStatusRepository.GetAllByOverallStage(
                 release.Id,
                 ReleasePublishingStatusOverallStage.Started,
                 ReleasePublishingStatusOverallStage.Complete
@@ -133,9 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class MarkReleaseAsDraftAuthorizationHandler
         : ReleaseStatusAuthorizationHandler<MarkReleaseAsDraftRequirement>
     {
-        public MarkReleaseAsDraftAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+        public MarkReleaseAsDraftAuthorizationHandler(IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releasePublishingStatusRepository,
             userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
@@ -151,9 +151,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class MarkReleaseAsHigherLevelReviewAuthorizationHandler
         : ReleaseStatusAuthorizationHandler<MarkReleaseAsHigherLevelReviewRequirement>
     {
-        public MarkReleaseAsHigherLevelReviewAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository,
+        public MarkReleaseAsHigherLevelReviewAuthorizationHandler(IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releasePublishingStatusRepository,
             userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
@@ -170,9 +170,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : ReleaseStatusAuthorizationHandler<MarkReleaseAsApprovedRequirement>
     {
         public MarkReleaseAsApprovedAuthorizationHandler(
-            IReleaseStatusRepository releaseStatusRepository,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releaseStatusRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository) : base(releasePublishingStatusRepository,
             userPublicationRoleRepository,
             userReleaseRoleRepository)
         {
