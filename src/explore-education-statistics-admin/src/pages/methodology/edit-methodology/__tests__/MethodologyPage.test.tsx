@@ -57,6 +57,7 @@ describe('MethodologyPage', () => {
     status: 'Draft',
     content: [],
     annexes: [],
+    notes: [],
   };
 
   test('renders the page with the summary tab', async () => {

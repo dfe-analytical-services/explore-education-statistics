@@ -337,6 +337,38 @@ user cancels methodology amendment for publication
     user waits until modal is visible    Confirm you want to cancel this amended methodology
     user clicks button    Confirm
 
+user adds note to methodology
+    [Arguments]
+    ...    ${note}
+    user clicks button    Add note
+    user enters text into element    label:New methodology note    ${note}
+    user clicks button    Save note
+    ${date}=    get current datetime    %-d %B %Y
+    user waits until element contains    css:#methodologyNotes time    ${date}
+    user waits until element contains    css:#methodologyNotes p    ${note}
+
+user removes methodology note
+    [Arguments]
+    ...    ${note}
+    ...    ${parent}
+    user clicks button    Remove note    ${parent}
+    user clicks button    Confirm
+    user waits until page does not contain    ${note}
+
+user edits methodology note
+    [Arguments]
+    ...    ${note}
+    ...    ${day}
+    ...    ${month}
+    ...    ${year}
+    user clicks button    Edit note    xpath://p[text()="${note}"]/ancestor::li
+    user enters text into element    label:Day    ${day}
+    user enters text into element    label:Month    ${month}
+    user enters text into element    label:Year    ${year}
+    user enters text into element    label:Edit methodology note    ${note} - edited
+    user clicks button    Update note
+    user waits until page contains    ${note} - edited
+
 user links publication to external methodology
     [Arguments]
     ...    ${publication}
@@ -660,21 +692,19 @@ user gives release access to analyst
 user removes publication owner access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user scrolls to element    css:[name="selectedPublicationId"]
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
-    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
-    Sleep    1
-    user clicks element    testid:remove-publication-role-${PUBLICATION_NAME}
+    ${table}=    user gets testid element    publicationAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="Owner"]]
+    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user removes release access from analyst
-    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user scrolls to element    css:[name="selectedReleaseId"]
-    # NOTE: The below wait is to prevent a transient failure that occurs on the UI test pipeline due to the DOM not being fully rendered which
-    # causes issues with getting the 'selectedPublicationId' selector (staleElementException)
-    Sleep    1
-    user clicks element    testid:remove-release-role-${ROLE}
+    ${table}=    user gets testid element    releaseAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user goes to manage user

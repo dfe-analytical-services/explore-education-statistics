@@ -114,7 +114,7 @@ Check publication owner can add data guidance to ${SUBJECT_NAME} on new release
     ...    data guidance content
     user clicks button    Save guidance
 
-Navigate to administration as bau1 and swap publication owner role for release approver
+Swap the publication owner role for release approver to test approving the methodology
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
     user gives release access to analyst    ${RELEASE_NAME}    Approver
@@ -124,7 +124,26 @@ Check release approver can approve methodology for publication
     user views methodology for publication    ${PUBLICATION_NAME}
     approve methodology from methodology view
 
+Swap the release approver role for publication owner to test removing the approved methodology
+    user changes to bau1
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+
+Check publication owner cannot remove approved methodology
+    user changes to analyst1
+    ${accordion}    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
+    user cannot see the remove controls for methodology    ${details}
+
+Swap the publication owner role for release approver to test unapproving the methodology
+    user changes to bau1
+    user removes publication owner access from analyst    ${PUBLICATION_NAME}
+    user gives release access to analyst    ${RELEASE_NAME}    Approver
+
 Check release approver can unapprove methodology
+    user changes to analyst1
+    user views methodology for publication    ${PUBLICATION_NAME}
+    user clicks link    Sign off
     user changes methodology status to Draft
 
 Check release approver can approve methodology for publishing with the release
@@ -164,17 +183,18 @@ Check release approver can publish a release
     user clicks link    Sign off
     user approves original release for immediate publication
 
-Navigate to administration as bau1 and swap release approver role for publication owner now that the publication is live
+Swap the release approver role for publication owner now that the publication is live
     user changes to bau1
-    user removes release access from analyst    ${RELEASE_NAME}    Approver
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Check publication owner can create and cancel methodology amendments on a live publication
+    user changes to analyst1
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
 
-Navigate to administration as bau1 and swap publication owner role for release approver
+Swap the publication owner role for release approver to test approving methodology amendments
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
     user gives release access to analyst    ${RELEASE_NAME}    Approver
@@ -182,3 +202,38 @@ Navigate to administration as bau1 and swap publication owner role for release a
 Check release approver can approve methodology amendments on a live publication
     user changes to analyst1
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
+
+Swap the release approver role for publication owner to test creating a new release amendment
+    user changes to bau1
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+
+Check publication owner can create a new release amendment
+    user changes to analyst1
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    (Live - Latest release)
+
+Create a new methodology amendment
+    user creates methodology amendment for publication    ${PUBLICATION_NAME}
+
+Swap the publication owner role for release approver to test approving the methodology amendment
+    user changes to bau1
+    user removes publication owner access from analyst    ${PUBLICATION_NAME}
+    user gives release access to analyst    ${RELEASE_NAME}    Approver
+
+Check release approver can approve the methodology amendment for publishing with the release amendment
+    user changes to analyst1
+    user approves methodology amendment for publication
+    ...    publication=${PUBLICATION_NAME}
+    ...    publishing_strategy=WithRelease
+    ...    with_release=${RELEASE_NAME}
+
+Swap the release approver role for publication owner to test that an approved methodology amendment cannot be cancelled
+    user changes to bau1
+    user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+
+Check publication owner cannot cancel approved methodology amendment
+    user changes to analyst1
+    ${accordion}    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
+    user cannot see the cancel amendment controls for methodology    ${details}
