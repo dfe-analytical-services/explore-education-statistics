@@ -15,7 +15,7 @@ ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
 
 ${timeout}=                             30
 ${implicit_wait}=                       15
-${release_complete_wait}=               900
+${RELEASE_COMPLETE_WAIT}=               900
 ${prompt_to_continue_on_failure}=       0
 
 *** Keywords ***
@@ -23,9 +23,6 @@ do this on failure
     capture large screenshot and html
     IF    ${prompt_to_continue_on_failure} == 1
         prompt to continue
-    END
-    IF    ${prompt_to_continue_on_failure} == 0
-        set selenium timeout    15
     END
 
 user opens the browser
