@@ -262,6 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
