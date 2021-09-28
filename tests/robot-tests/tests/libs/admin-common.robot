@@ -393,7 +393,7 @@ user edits an external methodology
 
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user clicks link    Edit external methodology    ${accordion}
-    user waits until page contains title    Edit external methodology link    10
+    user waits until page contains title    Edit external methodology link
     user checks input field contains    label:Link title    ${original_title}
     user checks input field contains    label:URL    ${original_link}
     user enters text into element    label:Link title    ${new_title}
@@ -573,7 +573,7 @@ user navigates to admin dashboard
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""
-        user waits until page contains title caption    Welcome ${USER}    10
+        user waits until page contains title caption    Welcome ${USER}
     END
     user waits until page contains element
     ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
