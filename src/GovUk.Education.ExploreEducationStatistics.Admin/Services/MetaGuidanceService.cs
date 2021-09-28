@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var subjectIds = subjects.Select(s => s.Id);
 
             var matchingSubjects = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(
                     releaseSubject => releaseSubject.ReleaseId == releaseId
                                       && subjectIds.Contains(releaseSubject.SubjectId)

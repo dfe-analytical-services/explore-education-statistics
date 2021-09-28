@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         /**
-         * Add any bootstrapping BAU users that we have specified on startup. 
+         * Add any bootstrapping BAU users that we have specified on startup.
          */
         public void AddBootstrapUsers()
         {
@@ -42,11 +42,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var existingEmailInvites = _usersAndRolesDbContext
                 .UserInvites
+                .AsQueryable()
                 .Select(i => i.Email.ToLower())
                 .ToList();
 
             var existingUserEmails = _contentDbContext
                 .Users
+                .AsQueryable()
                 .Select(u => u.Email.ToLower())
                 .ToList();
 

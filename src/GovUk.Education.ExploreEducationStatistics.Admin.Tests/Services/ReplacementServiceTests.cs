@@ -3094,6 +3094,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Check the original Meta Guidance has been retained on the replacement
                 var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .AsQueryable()
                     .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id
                                  && rs.SubjectId == replacementSubject.Id)
                     .FirstAsync();

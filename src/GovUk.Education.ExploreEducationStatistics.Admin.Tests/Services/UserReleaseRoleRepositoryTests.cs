@@ -49,7 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Single(userReleaseRoles);
 
                 Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);

@@ -75,7 +75,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+                var publicationMethodologies = await context.PublicationMethodologies
+                    .AsQueryable()
+                    .ToListAsync();
 
                 // Check the existing and new relationships between publications and methodologies
                 Assert.Equal(2, publicationMethodologies.Count);
@@ -136,7 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+                var publicationMethodologies = await context.PublicationMethodologies
+                    .AsQueryable()
+                    .ToListAsync();
 
                 // Check the relationships between publications and methodologies are not altered
                 Assert.Equal(2, publicationMethodologies.Count);
@@ -192,7 +196,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+                var publicationMethodologies = await context.PublicationMethodologies
+                    .AsQueryable()
+                    .ToListAsync();
 
                 // Check the relationships between publications and methodologies are not altered
                 Assert.Single(publicationMethodologies);
@@ -385,7 +391,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+                var publicationMethodologies = await context.PublicationMethodologies
+                    .AsQueryable()
+                    .ToListAsync();
 
                 // Check the adopting relationship is removed
                 Assert.Single(publicationMethodologies);
@@ -441,7 +449,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var publicationMethodologies = await context.PublicationMethodologies.ToListAsync();
+                var publicationMethodologies = await context.PublicationMethodologies
+                    .AsQueryable()
+                    .ToListAsync();
 
                 // Check the relationships between publications and methodologies are not altered
                 Assert.Equal(2, publicationMethodologies.Count);
@@ -1416,7 +1426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.False(notUpdatedMethodology.Updated.HasValue);
             }
         }
-        
+
         [Fact]
         public async Task UpdateMethodology_StatusUpdate()
         {
@@ -1463,17 +1473,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var methodologyApprovalService = new Mock<IMethodologyApprovalService>();
-                
+
                 methodologyApprovalService
                     .Setup(s => s.UpdateApprovalStatus(methodologyVersion.Id, request))
                     .ReturnsAsync(methodologyVersion);
-                    
+
                 var service = SetupMethodologyService(
                     context,
                     methodologyApprovalService: methodologyApprovalService.Object);
 
                 await service.UpdateMethodology(methodologyVersion.Id, request);
-                
+
                 // Verify that the call to update the approval status happened.
                 VerifyAllMocks(methodologyApprovalService);
             }
@@ -1482,6 +1492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var updatedMethodology = await context
                     .MethodologyVersions
+                    .AsQueryable()
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
@@ -1548,7 +1559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             // Since the MethodologyVersions should be deleted in sequence, expect a call to delete images for each of the
             // versions in the same sequence
-            
+
             var deleteSequence = new MockSequence();
 
             methodologyImageService
@@ -1625,10 +1636,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 // Sanity check that a Methodology, a MethodologyVersion and a PublicationMethodology row were
                 // created.
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyId));
-                Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyVersion.Id));
-                Assert.NotNull(await context.PublicationMethodologies.SingleAsync(
-                    m => m.MethodologyId == methodologyId));
+                Assert.NotNull(await context.Methodologies.AsQueryable()
+                    .SingleAsync(m => m.Id == methodologyId));
+                Assert.NotNull(await context.MethodologyVersions.AsQueryable()
+                    .SingleAsync(m => m.Id == methodologyVersion.Id));
+                Assert.NotNull(await context.PublicationMethodologies.AsQueryable()
+                    .SingleAsync(m => m.MethodologyId == methodologyId));
             }
 
             var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
@@ -1697,9 +1710,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // Sanity check that there is a methodology with two versions.
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyId));
-                Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodology.Versions[0].Id));
-                Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodology.Versions[1].Id));
+                Assert.NotNull(await context.Methodologies.AsQueryable()
+                    .SingleAsync(m => m.Id == methodologyId));
+                Assert.NotNull(await context.MethodologyVersions.AsQueryable()
+                    .SingleAsync(m => m.Id == methodology.Versions[0].Id));
+                Assert.NotNull(await context.MethodologyVersions.AsQueryable()
+                    .SingleAsync(m => m.Id == methodology.Versions[1].Id));
             }
 
             var methodologyImageService = new Mock<IMethodologyImageService>(Strict);
@@ -1726,8 +1742,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Assert that the version has successfully been deleted and as there was another version attached
                 // to the methodology, the methodology itself is not deleted, or the other version.
                 Assert.False(context.MethodologyVersions.Any(m => m.Id == methodology.Versions[1].Id));
-                Assert.NotNull(await context.MethodologyVersions.SingleAsync(m => m.Id == methodology.Versions[0].Id));
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == methodologyId));
+                Assert.NotNull(await context.MethodologyVersions.AsQueryable()
+                    .SingleAsync(m => m.Id == methodology.Versions[0].Id));
+                Assert.NotNull(await context.Methodologies.AsQueryable()
+                    .SingleAsync(m => m.Id == methodologyId));
             }
         }
 
@@ -1797,8 +1815,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.False(context.Methodologies.Any(m => m.Id == methodologyId));
 
                 Assert.NotNull(
-                    await context.MethodologyVersions.SingleAsync(m => m.Id == unrelatedMethodology.Versions[0].Id));
-                Assert.NotNull(await context.Methodologies.SingleAsync(m => m.Id == unrelatedMethodologyId));
+                    await context.MethodologyVersions.AsQueryable()
+                        .SingleAsync(m => m.Id == unrelatedMethodology.Versions[0].Id));
+                Assert.NotNull(
+                    await context.Methodologies.AsQueryable()
+                        .SingleAsync(m => m.Id == unrelatedMethodologyId));
             }
         }
 

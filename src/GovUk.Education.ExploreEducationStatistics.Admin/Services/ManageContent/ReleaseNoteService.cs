@@ -26,9 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IUserService _userService;
 
         public ReleaseNoteService(
-            IMapper mapper, 
-            ContentDbContext context, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IMapper mapper,
+            ContentDbContext context,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService)
         {
             _mapper = mapper;
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         return NotFound<List<ReleaseNoteViewModel>>();
                     }
-                    
+
                     _context.Update.Remove(releaseNote);
                     await _context.SaveChangesAsync();
                     return GetReleaseNoteViewModels(release.Id);
@@ -111,11 +111,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private List<ReleaseNoteViewModel> GetReleaseNoteViewModels(Guid releaseId)
         {
             var releaseNotes = _context.Update
+                .AsQueryable()
                 .Where(update => update.ReleaseId == releaseId)
                 .OrderByDescending(update => update.On);
             return _mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
         }
-        
+
         private static IQueryable<Release> HydrateReleaseForUpdates(IQueryable<Release> values)
         {
             return values.Include(r => r.Updates);

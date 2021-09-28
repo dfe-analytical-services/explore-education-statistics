@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         var invitedPrereleaseContacts = await _context
                             .UserReleaseInvites
+                            .AsQueryable()
                             .Where(
                                 r => r.Role == ReleaseRole.PrereleaseViewer && !r.Accepted && r.ReleaseId == releaseId
                             )
@@ -123,6 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var existingUser = await _context
                             .Users
+                            .AsQueryable()
                             .Where(u => u.Email.ToLower() == email.ToLower())
                             .FirstOrDefaultAsync();
                         var isExistingUser = existingUser != null;
@@ -185,6 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         _context.RemoveRange(
                             _context
                                 .UserReleaseInvites
+                                .AsQueryable()
                                 .Where(
                                     i =>
                                         i.ReleaseId == releaseId
@@ -199,6 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // UserInvites if they no longer have any PrereleaseView roles.
                         var remainingReleaseInvites = await _context
                             .UserReleaseInvites
+                            .AsQueryable()
                             .Where(
                                 i =>
                                     i.Email.ToLower() == email.ToLower()
@@ -212,6 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             _usersAndRolesDbContext.UserInvites.RemoveRange(
                                 _usersAndRolesDbContext.UserInvites
+                                    .AsQueryable()
                                     .Where(
                                         i =>
                                             i.Email.ToLower() == email.ToLower()
@@ -229,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(Release release)
         {
             var userReleaseInvites = await _context.UserReleaseInvites
+                .AsQueryable()
                 .Where(i =>
                     i.ReleaseId == release.Id
                     && i.Role == ReleaseRole.PrereleaseViewer
@@ -238,6 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await userReleaseInvites.ForEachAsync(async invite =>
             {
                 var user = await _context.Users
+                    .AsQueryable()
                     .SingleOrDefaultAsync(u => u.Email.ToLower() == invite.Email.ToLower());
                 var isNewUser = user == null;
                 SendPreReleaseInviteEmail(release, invite.Email.ToLower(), isNewUser);
@@ -269,6 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var hasExistingReleaseInvite = await _context
                 .UserReleaseInvites
+                .AsQueryable()
                 .Where(
                     i =>
                         i.ReleaseId == releaseId
@@ -289,6 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var hasExistingInvite = await _context
                 .UserReleaseInvites
+                .AsQueryable()
                 .Where(
                     i =>
                         i.ReleaseId == releaseId
@@ -318,6 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var hasExistingSystemInvite = await _usersAndRolesDbContext
                 .UserInvites
+                .AsQueryable()
                 .Where(i => i.Email.ToLower() == email.ToLower())
                 .AnyAsync();
 
@@ -384,6 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // TODO represent Roles with an Enum
             return await _usersAndRolesDbContext
                 .Roles
+                .AsQueryable()
                 .Where(r => r.Name == "Prerelease User")
                 .FirstAsync();
         }

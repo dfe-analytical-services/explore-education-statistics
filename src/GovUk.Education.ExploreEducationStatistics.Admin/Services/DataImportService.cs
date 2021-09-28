@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<bool> HasIncompleteImports(Guid releaseId)
         {
             return await _contentDbContext.ReleaseFiles
+                .AsQueryable()
                 .Where(rf => rf.ReleaseId == releaseId)
                 .Join(_contentDbContext.DataImports,
                     rf => rf.FileId,

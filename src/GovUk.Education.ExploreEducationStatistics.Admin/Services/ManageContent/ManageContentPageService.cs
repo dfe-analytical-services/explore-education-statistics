@@ -86,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<Release> HydrateReleaseForReleaseViewModel(Release release)
         {
             release.Updates = await _contentDbContext.Update
+                .AsQueryable()
                 .Where(u => u.ReleaseId == release.Id)
                 .ToListAsync();
 
@@ -105,6 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .LoadAsync();
 
             var content = await _contentDbContext.ReleaseContentSections
+                .AsQueryable()
                 .Where(rcs => rcs.ReleaseId == release.Id)
                 .Include(rcs => rcs.ContentSection)
                 .ThenInclude(cs => cs.Content)
@@ -116,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 await rcs.ContentSection.Content.ForEachAsync(async cb =>
                 {
                     cb.Comments = await _contentDbContext.Comment
+                        .AsQueryable()
                         .Where(c => c.ContentBlockId == cb.Id)
                         .Include(c => c.CreatedBy)
                         .Include(c => c.ResolvedBy)

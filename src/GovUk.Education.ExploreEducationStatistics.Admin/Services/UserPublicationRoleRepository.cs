@@ -41,7 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<PublicationRole>> GetAllRolesByUser(Guid userId, Guid publicationId)
         {
-            return await _contentDbContext.UserPublicationRoles.Where(r =>
+            return await _contentDbContext.UserPublicationRoles
+                .AsQueryable()
+                .Where(r =>
                     r.UserId == userId &&
                     r.PublicationId == publicationId)
                 .Select(role => role.Role)
@@ -55,10 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
         {
-            return await _contentDbContext.UserPublicationRoles.AnyAsync(r =>
-                r.UserId == userId &&
-                r.PublicationId == publicationId &&
-                r.Role == role);
+            return await _contentDbContext.UserPublicationRoles
+                .AsQueryable()
+                .AnyAsync(r =>
+                    r.UserId == userId &&
+                    r.PublicationId == publicationId &&
+                    r.Role == role);
         }
     }
 }
