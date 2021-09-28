@@ -336,7 +336,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderAllFilesButton={
             <ButtonLink
               className="govuk-!-width-full"
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/all`}
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',

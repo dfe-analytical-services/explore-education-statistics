@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -220,15 +219,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var files = await GetFiles(release.Id, Ancillary, FileType.Data);
 
-            var filesWithInfo = await files
-                .SelectAsync(async file => await GetPublicFileInfo(release, file));
-
-            var orderedFiles = filesWithInfo
-                .OrderBy(file => file.Name);
-
-            // Prepend the "All files" zip
-            var allFilesZip = await GetAllFilesZip(release);
-            return orderedFiles.Prepend(allFilesZip).ToList();
+            return await files.ToAsyncEnumerable()
+                .SelectAwait(async file => await GetPublicFileInfo(release, file))
+                .OrderBy(file => file.Name)
+                .ToListAsync();
         }
 
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
@@ -248,44 +242,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await RemoveStatisticalReleases(previousVersions);
 
             await _publicStatisticsDbContext.SaveChangesAsync();
-        }
-
-        private async Task<FileInfo> GetAllFilesZip(Release release)
-        {
-            var path = release.AllFilesZipPath();
-
-            var exists = await _publicBlobStorageService.CheckBlobExists(
-                containerName: PublicReleaseFiles,
-                path: path);
-
-            // EES-1755 we should throw an exception here and not be as lenient.
-            // Temporarily to collect a list of missing files and not halt publishing while regenerating
-            // content for all releases, we log an error and continue.
-            if (!exists)
-            {
-                _logger.LogError("Public blob not found for 'All files' zip at: {0}", path);
-                return new FileInfo
-                {
-                    Id = null,
-                    FileName = release.AllFilesZipFileName(),
-                    Name = "Unknown",
-                    Size = "0.00 B",
-                    Type = Ancillary
-                };
-            }
-
-            var blob = await _publicBlobStorageService.GetBlob(
-                containerName: PublicReleaseFiles,
-                path: path);
-
-            return new FileInfo
-            {
-                Id = null,
-                FileName = blob.FileName,
-                Name = "All files",
-                Size = blob.Size,
-                Type = Ancillary
-            };
         }
 
         private async Task<FileInfo> GetPublicFileInfo(Release release, File file)

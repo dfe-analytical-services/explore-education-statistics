@@ -20,13 +20,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public readonly DateTimeOffset? Created;
 
+        public readonly DateTimeOffset? Updated;
+
         public BlobInfo(
             string path,
             string size,
             string contentType,
             long contentLength,
             IDictionary<string, string>? meta = null,
-            DateTimeOffset? created = null)
+            DateTimeOffset? created = null,
+            DateTimeOffset? updated = null)
         {
             Path = path;
             Size = size;
@@ -34,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             ContentLength = contentLength;
             Meta = meta ?? new Dictionary<string, string>();
             Created = created;
+            Updated = updated;
         }
 
         public string FileName => Path.Substring(Path.LastIndexOf('/') + 1);

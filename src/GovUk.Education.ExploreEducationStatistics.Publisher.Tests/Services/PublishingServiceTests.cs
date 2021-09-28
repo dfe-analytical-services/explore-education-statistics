@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
     public class PublishingServiceTests
     {
         private const string? PublicStorageConnectionString = "public-storage-conn";
-        
+
         [Fact]
         public async Task PublishMethodologyFiles()
         {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
                 .ReturnsAsync(new List<File>());
-            
+
             publicBlobStorageService.Setup(mock => mock.DeleteBlobs(
                     PublicMethodologyFiles,
                     $"{methodologyVersion.Id}/",
@@ -417,20 +417,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublicationService? publicationService = null,
             IReleaseService? releaseService = null,
-            IZipFileService? zipFileService = null,
-            IDataGuidanceFileService? dataGuidanceFileService = null,
             ILogger<PublishingService>? logger = null)
         {
             return new PublishingService(
                 publicStorageConnectionString ?? "",
-                privateBlobStorageService ?? new Mock<IBlobStorageService>().Object,
-                publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
-                methodologyService ?? new Mock<IMethodologyService>().Object,
-                publicationService ?? new Mock<IPublicationService>().Object,
-                releaseService ?? new Mock<IReleaseService>().Object,
-                zipFileService ?? new Mock<IZipFileService>().Object,
-                dataGuidanceFileService ?? new Mock<IDataGuidanceFileService>().Object,
-                logger ?? new Mock<ILogger<PublishingService>>().Object
+                privateBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                publicBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
+                publicationService ?? Mock.Of<IPublicationService>(MockBehavior.Strict),
+                releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
+                logger ?? Mock.Of<ILogger<PublishingService>>(MockBehavior.Strict)
             );
         }
     }

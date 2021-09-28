@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         public void IsLatestPublishedVersionOfRelease_PublicationHasMultipleReleases()
         {
             var publication = new Publication();
-            
+
             // (Release 1) Published but superseded by another published Release
             var release1Version1 = new Release
             {
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            Assert.Equal($"{release.Id}/ancillary/{publicationSlug}_{releaseSlug}.zip", release.AllFilesZipPath());
+            Assert.Equal($"{release.Id}/zip/{publicationSlug}_{releaseSlug}.zip", release.AllFilesZipPath());
         }
     }
 }

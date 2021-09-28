@@ -19,7 +19,6 @@
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.6" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="SharpZipLib" Version="1.2.0" />
 
     <!-- EES-1009 Temporarily adding dependency on Microsoft.Azure.Storage.Files 11.1.7
     Which can be removed when newer Microsoft.Azure.Storage.DataMovement is released.

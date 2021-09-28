@@ -77,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                                 contentType: blob.Properties.ContentType,
                                 contentLength: blob.Properties.ContentLength ?? 0,
                                 meta: blob.Metadata,
-                                created: blob.Properties.CreatedOn
+                                created: blob.Properties.CreatedOn,
+                                updated: blob.Properties.LastModified
                             )
                         );
                     }
@@ -106,7 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 contentType: properties.ContentType,
                 contentLength: properties.ContentLength,
                 meta: properties.Metadata,
-                created: properties.CreatedOn
+                created: properties.CreatedOn,
+                updated: properties.LastModified
             );
         }
 
@@ -572,7 +574,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     contentType: source.Properties.ContentType,
                     contentLength: source.Properties.Length,
                     meta: source.Metadata,
-                    created: source.Properties.Created
+                    created: source.Properties.Created,
+                    updated: source.Properties.LastModified
                 )
             );
 

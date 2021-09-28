@@ -14,9 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{rootPath}/ancillary/", FilesPath(rootPath, Ancillary));
             Assert.Equal($"{rootPath}/chart/", FilesPath(rootPath, Chart));
             Assert.Equal($"{rootPath}/data/", FilesPath(rootPath, Data));
-            Assert.Equal($"{rootPath}/zip/", FilesPath(rootPath, DataZip));
+            Assert.Equal($"{rootPath}/data-zip/", FilesPath(rootPath, DataZip));
             Assert.Equal($"{rootPath}/image/", FilesPath(rootPath, Image));
             Assert.Equal($"{rootPath}/data/", FilesPath(rootPath, Metadata));
+            Assert.Equal($"{rootPath}/zip/", FilesPath(rootPath, AllFilesZip));
         }
     }
 }
