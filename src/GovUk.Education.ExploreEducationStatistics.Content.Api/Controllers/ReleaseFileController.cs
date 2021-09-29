@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                             filename = $"{release.Publication.Slug}_{release.Slug}.zip";
                         }
 
-                        Response.Headers.Add(HeaderNames.ContentDisposition, $"attachment; filename={filename}");
+                        Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
                         // We start the response immediately, before all of the files have
