@@ -37,7 +37,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               <FormattedDate>{data.published}</FormattedDate>
             </SummaryListItem>
 
-            {data.notes.length > 0 && (
+            {data.notes?.length > 0 && (
               <SummaryListItem term="Last updated">
                 <FormattedDate>{data.notes[0].displayDate}</FormattedDate>
 
@@ -89,7 +89,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
-            {data.publications && data.publications.length > 0 && (
+            {data.publications?.length > 0 && (
               <>
                 <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
@@ -162,7 +162,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </Accordion>
       )}
 
-      {data.annexes && data.annexes.length > 0 && (
+      {data.annexes?.length > 0 && (
         <>
           <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
