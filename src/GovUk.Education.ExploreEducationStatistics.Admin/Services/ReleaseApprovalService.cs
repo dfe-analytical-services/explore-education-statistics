@@ -62,7 +62,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenInclude(rs => rs.CreatedBy))
                 .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
                 .OnSuccess(release =>
-                    release.ReleaseStatuses
+                {
+                    var allReleaseVersionIds = _context.Releases
+                        .Where(r => r.PublicationId == release.PublicationId
+                                    && r.ReleaseName == release.ReleaseName
+                                    && r.TimePeriodCoverage == release.TimePeriodCoverage)
+                        .Select(r => r.Id)
+                        .ToList();
+                    return _context.ReleaseStatus
+                        .Include(rs => rs.Release)
+                        .Include(rs => rs.CreatedBy)
+                        .Where(rs => allReleaseVersionIds.Contains(rs.ReleaseId))
+                        .ToList()
                         .Select(rs =>
                             new ReleaseStatusViewModel
                             {
@@ -70,11 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 InternalReleaseNote = rs.InternalReleaseNote,
                                 ApprovalStatus = rs.ApprovalStatus,
                                 Created = rs.Created,
-                                CreatedByEmail = rs.CreatedBy?.Email
+                                CreatedByEmail = rs.CreatedBy?.Email,
+                                ReleaseVersion = rs.Release.Version,
                             })
                         .OrderByDescending(vm => vm.Created)
-                        .ToList()
-                );
+                        .ToList();
+                });
         }
 
         public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(

@@ -169,6 +169,7 @@ export interface ReleaseStatus {
   notifySubscribers: boolean;
   created: string;
   createdByEmail: string;
+  releaseVersion: number;
 }
 
 export interface DeleteReleasePlan {

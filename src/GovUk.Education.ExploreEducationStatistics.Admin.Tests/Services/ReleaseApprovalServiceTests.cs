@@ -951,6 +951,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
+                PublicationId = Guid.NewGuid(),
+                Version = 0,
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
                     new()
@@ -978,6 +980,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var ignoredRelease = new Release
             {
+                PublicationId = Guid.NewGuid(),
+                Version = 3,
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
                     new()
@@ -991,38 +995,147 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(release, ignoredRelease);
-                await context.SaveChangesAsync();
+                await contentDbContext.AddRangeAsync(release, ignoredRelease);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildService(context);
+                var releaseService = BuildService(contentDbContext);
                 var result = await releaseService.GetReleaseStatuses(release.Id);
 
                 var resultStatuses = result.AssertRight();
                 Assert.Equal(3, resultStatuses.Count);
 
-                var releaseStatuses = release.ReleaseStatuses
+                var orderedReleaseStatuses = release.ReleaseStatuses
                     .OrderByDescending(rs => rs.Created)
                     .ToList();
 
-                Assert.Equal(releaseStatuses[0].InternalReleaseNote, resultStatuses[0].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[0].ApprovalStatus,resultStatuses[0].ApprovalStatus);
-                Assert.Equal(releaseStatuses[0].Created, resultStatuses[0].Created);
-                Assert.Equal(releaseStatuses[0].CreatedBy?.Email, resultStatuses[0].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[0].InternalReleaseNote, resultStatuses[0].InternalReleaseNote);
+                Assert.Equal(orderedReleaseStatuses[0].ApprovalStatus,resultStatuses[0].ApprovalStatus);
+                Assert.Equal(orderedReleaseStatuses[0].Created, resultStatuses[0].Created);
+                Assert.Equal(orderedReleaseStatuses[0].CreatedBy?.Email, resultStatuses[0].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[0].Release.Version, resultStatuses[0].ReleaseVersion);
 
-                Assert.Equal(releaseStatuses[1].InternalReleaseNote, resultStatuses[1].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[1].ApprovalStatus,resultStatuses[1].ApprovalStatus);
-                Assert.Equal(releaseStatuses[1].Created, resultStatuses[1].Created);
-                Assert.Equal(releaseStatuses[1].CreatedBy?.Email, resultStatuses[1].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[1].InternalReleaseNote, resultStatuses[1].InternalReleaseNote);
+                Assert.Equal(orderedReleaseStatuses[1].ApprovalStatus,resultStatuses[1].ApprovalStatus);
+                Assert.Equal(orderedReleaseStatuses[1].Created, resultStatuses[1].Created);
+                Assert.Equal(orderedReleaseStatuses[1].CreatedBy?.Email, resultStatuses[1].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[1].Release.Version, resultStatuses[1].ReleaseVersion);
 
-                Assert.Equal(releaseStatuses[2].InternalReleaseNote, resultStatuses[2].InternalReleaseNote);
-                Assert.Equal(releaseStatuses[2].ApprovalStatus,resultStatuses[2].ApprovalStatus);
-                Assert.Equal(releaseStatuses[2].Created, resultStatuses[2].Created);
-                Assert.Equal(releaseStatuses[2].CreatedBy?.Email, resultStatuses[2].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[2].InternalReleaseNote, resultStatuses[2].InternalReleaseNote);
+                Assert.Equal(orderedReleaseStatuses[2].ApprovalStatus,resultStatuses[2].ApprovalStatus);
+                Assert.Equal(orderedReleaseStatuses[2].Created, resultStatuses[2].Created);
+                Assert.Equal(orderedReleaseStatuses[2].CreatedBy?.Email, resultStatuses[2].CreatedByEmail);
+                Assert.Equal(orderedReleaseStatuses[2].Release.Version, resultStatuses[2].ReleaseVersion);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleasesStatuses_PreviousReleaseVersions()
+        {
+            var publicationId = Guid.NewGuid();
+            var originalRelease = new Release
+            {
+                PublicationId = publicationId,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2000",
+                Version = 0,
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "First",
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
+                        Created = new DateTime(2000, 12, 12),
+                        CreatedBy = new User {Email = "first@test.com"}
+                    }
+                }
+            };
+            var amendedRelease = new Release
+            {
+                PublicationId = publicationId,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2000",
+                Version = 1,
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "Second",
+                        ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                        Created = new DateTime(2000, 11, 11),
+                        CreatedBy = new User {Email = "second@test.com"}
+                    }
+                }
+            };
+
+            var ignoredRelease1 = new Release
+            {
+                PublicationId = publicationId,
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2001", // Ignored because different year
+                Version = 0,
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "Third",
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        Created = new DateTime(2000, 10, 10),
+                        CreatedBy = new User {Email = "third@test.com"}
+                    }
+                }
+            };
+
+            var ignoredRelease2 = new Release
+            {
+                PublicationId = publicationId,
+                TimePeriodCoverage = TimeIdentifier.CalendarYearQ1, // Ignored because different TimeIdentifier
+                ReleaseName = "2000",
+                Version = 0,
+                ReleaseStatuses = new List<ReleaseStatus>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "Fourth",
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
+                        Created = new DateTime(2000, 9, 9),
+                        CreatedBy = new User {Email = "fourth@test.com"}
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    originalRelease, amendedRelease, ignoredRelease1, ignoredRelease2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(contentDbContext);
+                var result = await releaseService.GetReleaseStatuses(amendedRelease.Id);
+
+                var resultStatuses = result.AssertRight();
+                Assert.Equal(2, resultStatuses.Count);
+
+                // originalRelease's ReleaseStatus appears first due the ReleaseStatus's Created date
+                Assert.Equal(originalRelease.ReleaseStatuses[0].InternalReleaseNote, resultStatuses[0].InternalReleaseNote);
+                Assert.Equal(originalRelease.ReleaseStatuses[0].ApprovalStatus, resultStatuses[0].ApprovalStatus);
+                Assert.Equal(originalRelease.ReleaseStatuses[0].Created, resultStatuses[0].Created);
+                Assert.Equal(originalRelease.ReleaseStatuses[0].CreatedBy?.Email, resultStatuses[0].CreatedByEmail);
+                Assert.Equal(originalRelease.Version, resultStatuses[0].ReleaseVersion);
+
+                Assert.Equal(amendedRelease.ReleaseStatuses[0].InternalReleaseNote, resultStatuses[1].InternalReleaseNote);
+                Assert.Equal(amendedRelease.ReleaseStatuses[0].ApprovalStatus, resultStatuses[1].ApprovalStatus);
+                Assert.Equal(amendedRelease.ReleaseStatuses[0].Created, resultStatuses[1].Created);
+                Assert.Equal(amendedRelease.ReleaseStatuses[0].CreatedBy?.Email, resultStatuses[1].CreatedByEmail);
+                Assert.Equal(amendedRelease.Version, resultStatuses[1].ReleaseVersion);
             }
         }
 
