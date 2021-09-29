@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         /// cached in blob storage, in seconds.
         private const int AllFilesZipTtl = 60 * 60;
 
-        private static readonly FileType[] AllowedFileTypes = {
+        private static readonly FileType[] AllowedZipFileTypes = {
             FileType.Ancillary,
             FileType.Data,
         };
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(r => r.Publication)
                 .Include(f => f.File)
                 .Where(releaseFile => releaseFile.ReleaseId == releaseId
-                                      && AllowedFileTypes.Contains(releaseFile.File.Type));
+                                      && AllowedZipFileTypes.Contains(releaseFile.File.Type));
         }
     }
 }
