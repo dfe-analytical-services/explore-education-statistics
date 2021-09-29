@@ -16,7 +16,7 @@ Select Exclusions publication
     user opens details dropdown    Exclusions
     user clicks radio    Permanent and fixed-period exclusions in England
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication
     ...    Permanent and fixed-period exclusions in England
 
@@ -30,7 +30,7 @@ Validate "Exclusions by geographic level" subject details
 Select subject "Exclusions by geographic level"
     user clicks radio    Exclusions by geographic level
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    Exclusions by geographic level
 
 Select Locations LA, Bury, Sheffield, York
@@ -39,7 +39,7 @@ Select Locations LA, Bury, Sheffield, York
     user clicks checkbox    Sheffield
     user clicks checkbox    York
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
     user checks previous table tool step contains    3    Local Authority    Bury
     user checks previous table tool step contains    3    Local Authority    Sheffield
     user checks previous table tool step contains    3    Local Authority    York
@@ -48,7 +48,7 @@ Select Start date and End date
     user chooses select option    id:timePeriodForm-start    2006/07
     user chooses select option    id:timePeriodForm-end    2008/09
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
 

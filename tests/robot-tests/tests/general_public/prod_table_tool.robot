@@ -12,33 +12,33 @@ Go to 'data-tables' page
     user navigates to data tables page on public frontend
 
 Check page contains correct themes
-    user waits until page contains details section    Children's social care
+    user waits until page contains details dropdown    Children's social care
 
-    user waits until page contains details section    COVID-19
+    user waits until page contains details dropdown    COVID-19
 
-    user waits until page contains details section    Destination of pupils and students
+    user waits until page contains details dropdown    Destination of pupils and students
 
-    user waits until page contains details section    Early years
+    user waits until page contains details dropdown    Early years
 
-    user waits until page contains details section    Finance and funding
+    user waits until page contains details dropdown    Finance and funding
 
-    user waits until page contains details section    Further education
+    user waits until page contains details dropdown    Further education
 
-    user waits until page contains details section    Higher education
+    user waits until page contains details dropdown    Higher education
 
-    user waits until page contains details section    Pupils and schools
+    user waits until page contains details dropdown    Pupils and schools
 
-    user waits until page contains details section    School and college outcomes and performance
+    user waits until page contains details dropdown    School and college outcomes and performance
 
-    user waits until page contains details section    Teachers and school workforce
+    user waits until page contains details dropdown    Teachers and school workforce
 
-    user waits until page contains details section    UK education and training statistics
+    user waits until page contains details dropdown    UK education and training statistics
 
 check publications have correct number of releases
-    # There are 56 publications that have a live release with a subject on prod
+    # There are this number of publications that have a live release with a subject on prod
     # this selector gets each input field present on the data-tables page
     # if the number goes down then we know there is a problem with a given release
-    user checks element count is x    //*[@name="publicationId"]    56
+    user checks element count is x    //*[@name="publicationId"]    57
 
 check 'Children's social care' contains correct topics
     user opens details dropdown    Children's social care

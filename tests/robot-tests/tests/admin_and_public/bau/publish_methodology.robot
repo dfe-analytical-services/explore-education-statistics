@@ -11,9 +11,9 @@ Test Setup          fail test fast if required
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${PUBLICATION_NAME}=            UI tests - publish methodology %{RUN_IDENTIFIER}
-${PUBLIC_METHODOLOGY_URL}=      %{PUBLIC_URL}/methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
-${RELEASE_NAME}=                Academic Year 2021/22
+${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
+${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+${RELEASE_NAME}=                        Academic Year 2021/22
 
 *** Test Cases ***
 Create a draft release
@@ -37,14 +37,15 @@ Verify the expected public URL of the methodology on the Sign off tab
     user clicks link    Sign off
     user waits until page contains testid    public-methodology-url
     ${ACCESSIBLE_METHODOLOGY_URL}=    Get Value    xpath://*[@data-testid="public-methodology-url"]
-    should be equal    ${PUBLIC_METHODOLOGY_URL}    ${ACCESSIBLE_METHODOLOGY_URL}
+    should end with    ${ACCESSIBLE_METHODOLOGY_URL}    ${PUBLIC_METHODOLOGY_URL_ENDING}
+    set suite variable    ${ACCESSIBLE_METHODOLOGY_URL}
 
 Verify that the publication is not visible on the public methodologies page without a published release
     user navigates to public methodologies page
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is not publicly accessible by URL without a published release
-    user goes to url    ${PUBLIC_METHODOLOGY_URL}
+    user goes to url    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
 Alter the approval to publish the methodology with the release
@@ -58,7 +59,7 @@ Verify that the publication is still not visible on the public methodologies pag
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is still not publicly accessible by URL without publishing the release
-    user goes to url    ${PUBLIC_METHODOLOGY_URL}
+    user goes to url    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
 Approve the release
@@ -84,7 +85,7 @@ Verify that the methodology is visible on the public methodologies page with the
     ...    %{TEST_TOPIC_NAME}
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
-    ...    ${PUBLIC_METHODOLOGY_URL}
+    ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 
 Verify that the methodology is publicly accessible
     user clicks methodology link
@@ -159,23 +160,10 @@ Verify that the user cannot edit the status of the amended methodology
     user waits until h2 is visible    Sign off
     user checks page does not contain    Edit status
 
-Verify that the amended methodology is visible on the public methodologies page immediately
-    user navigates to public methodologies page
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user checks page contains methodology link
-    ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - Amended methodology
-    ...    ${PUBLIC_METHODOLOGY_URL}
-
-Verify that the amended methodology is publicly accessible immediately
-    user clicks methodology link
-    ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - Amended methodology
-    user waits until h1 is visible    ${PUBLICATION_NAME} - Amended methodology
+Go to methodology amendment's public page
+    ${METHODOLOGY_URL}=    get element attribute    css:#public-methodology-url    value
+    user goes to url    ${METHODOLOGY_URL}
+    user waits until page contains title    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
 
 Verify that the amended methodology displays a link to the publication
@@ -205,8 +193,19 @@ Verify the list of notes
     user checks methodology note    2    1 March 2021    Note which should be updated - edited
     user closes details dropdown    See all notes (2)
 
+Verify that the amended methodology is visible on the public methodologies page
+    user navigates to public methodologies page
+    user waits until page contains accordion section    %{TEST_THEME_NAME}
+    user opens accordion section    %{TEST_THEME_NAME}
+    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user scrolls down    400    # @MarkFix
+    user checks page contains methodology link
+    ...    %{TEST_TOPIC_NAME}
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Amended methodology
+    ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
+
 Schedule a methodology amendment to be published with a release amendment
-    user navigates to admin dashboard
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user approves methodology amendment for publication

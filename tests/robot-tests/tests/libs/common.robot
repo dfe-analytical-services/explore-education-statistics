@@ -190,7 +190,7 @@ user waits until page does not contain loading spinner
     # Also, we're only interested in loading spinners that aren't lazy loaders that are waiting for user interaction
     # prior to loading their content.
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
-    ...    60
+    ...    %{WAIT_MEDIUM}
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
@@ -554,6 +554,7 @@ user checks selected option label
 user chooses select option
     [Arguments]    ${locator}    ${label}
     user waits until page contains element    ${locator}
+    user waits until parent contains element    ${locator}    xpath:.//option
     select from list by label    ${locator}    ${label}
 
 user chooses file
@@ -636,6 +637,10 @@ user gets details content element
     ${content_id}=    get element attribute    ${summary}    aria-controls
     ${content}=    get child element    ${parent}    id:${content_id}
     [Return]    ${content}
+
+user waits until page contains details dropdown
+    [Arguments]    ${text}
+    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]
 
 user checks page for details dropdown
     [Arguments]    ${text}
@@ -769,8 +774,13 @@ check that variable is not empty
     END
 
 user waits until table tool wizard step is available
-    [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
+    [Arguments]    ${step_number}    ${table_tool_step_title}    ${wait}=${timeout}
+    user waits until page contains element    xpath://*[@data-testid="wizardStep-${step_number}"]    ${wait}
+    user waits until page does not contain element    xpath://*[@data-testid="wizardStep-${step_number}" and @hidden]
+    ...    ${wait}
+    # this visible check passes when it should fail?!
+    user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
+    user waits until page does not contain loading spinner
 
 lookup or return webelement
     [Arguments]

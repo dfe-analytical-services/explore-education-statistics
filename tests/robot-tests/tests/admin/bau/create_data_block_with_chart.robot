@@ -34,13 +34,13 @@ Start creating a data block
     user waits until page contains    No data blocks have been created.
 
     user clicks link    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "UI test subject"
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations    90
+    user waits until table tool wizard step is available    2    Choose locations    90
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
@@ -53,7 +53,7 @@ Select locations
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period    90
+    user waits until table tool wizard step is available    3    Choose time period    90
 
 Select time period
     user waits until page contains element    id:timePeriodForm-start
@@ -67,8 +67,8 @@ Select time period
     user chooses select option    id:timePeriodForm-start    2005
     user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
-    user checks previous table tool step contains    3    Time period    2005 to 2020
+    user waits until table tool wizard step is available    4    Choose your filters
+    user checks previous table tool step contains    3    Time period    2005 to 2020    %{WAIT_MEDIUM}
 
 Select indicators
     user clicks indicator checkbox    Admission Numbers
@@ -177,8 +177,8 @@ Embed data block into release content
     user chooses select option    css:select[name="selectedDataBlock"]    ${DATABLOCK_NAME}
     user waits until element is visible    css:table
     user clicks button    Embed
-    # Wait for table to update
-    sleep    0.3s
+    user waits until page does not contain button    Embed
+    user waits until page does not contain loading spinner
 
 Validate embedded table rows
     ${table}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
@@ -269,7 +269,7 @@ Navigate to Chart tab
     set suite variable    ${DATABLOCK_URL}    ${url}
 
     user clicks link    Chart
-    user waits until table tool wizard step is available    Choose chart type
+    user waits until h3 is visible    Choose chart type
 
 Configure basic line chart
     user clicks button    Line
@@ -610,6 +610,7 @@ Save and validate geographic chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user waits until page does not contain loading spinner
 
     ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element does not contain bar chart    ${datablock}
@@ -641,7 +642,7 @@ Configure basic infographic chart
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
-    user waits until table tool wizard step is available    Choose chart type
+    user waits until h3 is visible    Choose chart type
     user clicks button    Choose an infographic as alternative
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
 

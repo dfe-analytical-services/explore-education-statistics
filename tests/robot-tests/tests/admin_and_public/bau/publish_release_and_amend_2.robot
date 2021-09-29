@@ -113,13 +113,13 @@ Select "Test Topic" publication
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location
@@ -128,13 +128,13 @@ Select National location
 
 Click next step button
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select start date and end date
     user chooses select option    id:timePeriodForm-start    2012/13
     user chooses select option    id:timePeriodForm-end    2012/13
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2012/13
 
@@ -274,8 +274,8 @@ Confirm data replacement
     user clicks button    Confirm data replacement
 
 Delete second subject file
-    user clicks link    Footnotes    # to avoid focus issues
     user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
     user deletes subject file    ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for release amendment
@@ -375,7 +375,7 @@ Check amended release doesn't contain deleted subject
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
     user checks page does not contain    ${SECOND_SUBJECT}
 
@@ -437,14 +437,14 @@ Select publication
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
     #user checks page does not contain    ${SECOND_SUBJECT}    # EES-1360
 
 Select subject again
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location filter
@@ -453,13 +453,13 @@ Select National location filter
 
 Click the next step button
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select start date + end date
     user chooses select option    id:timePeriodForm-start    2020 Week 13
     user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
 
 Select four indicators

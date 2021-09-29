@@ -37,6 +37,7 @@ Remove the Methodology
     user clicks button    Remove    ${details}
     user waits until modal is visible    Confirm you want to remove this methodology
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology

@@ -41,7 +41,7 @@ user clicks select all for category
     user clicks element    xpath://legend[text()="${category_label}"]/..//button[contains(text(), "Select")]
 
 user checks previous table tool step contains
-    [Arguments]    ${step}    ${key}    ${value}    ${wait}=10
+    [Arguments]    ${step}    ${key}    ${value}    ${wait}=${timeout}
     wait until page contains element    id:tableToolWizard-step-${step}
     ...    timeout=${wait}
     ...    error=Previous step wasn't found!

@@ -22,11 +22,6 @@ Go to release sign off page and verify initial release checklist
     user navigates to this release
     user edits release status
 
-    # EES-1807 May be re-instated as error pending further decisions on release types
-#    user waits until page contains testid    releaseChecklist-errors
-#    user checks checklist errors contains    1 issue that must be resolved before this release can be published
-#    user checks checklist errors contains link    Public pre-release access list is required
-
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
@@ -52,16 +47,10 @@ Verify release status is Higher Review
 Verify release checklist has not been updated by status
     user edits release status
 
-    # EES-1807 May be re-instated as error pending further decisions on release types
-#    user waits until page contains testid    releaseChecklist-errors
-#    user checks checklist errors contains    1 issue that must be resolved before this release can be published
-#    user checks checklist errors contains link    Public pre-release access list is required
-
     user checks checklist warnings contains
     ...    3 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
-    # EES-1807 May be re-instated as error pending further decisions on release types
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks page does not contain testid    releaseChecklist-errors

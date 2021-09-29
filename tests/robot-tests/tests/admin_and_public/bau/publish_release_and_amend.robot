@@ -77,23 +77,23 @@ Create data block table
 
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
 
+    user waits until table tool wizard step is available    1    Choose a subject
     user waits until page contains    Dates test subject
     user clicks radio    Dates test subject
     user clicks element    id:publicationSubjectForm-submit
 
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    National
     user clicks checkbox    England
     user clicks element    id:locationFiltersForm-submit
 
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2020 Week 13
     user chooses select option    id:timePeriodForm-end    2020 Week 16
     user clicks element    id:timePeriodForm-submit
 
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    4    Choose your filters
     user clicks subheaded indicator checkbox    Open settings    Number of open settings
     user checks subheaded indicator checkbox is checked    Open settings    Number of open settings
     user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
