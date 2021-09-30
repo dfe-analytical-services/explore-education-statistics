@@ -127,15 +127,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
-
-        public void SetToDraft()
-        {
-            PublishingStrategy = Immediately;
-            Status = Draft;
-            ScheduledWithRelease = null;
-            ScheduledWithReleaseId = null;
-            InternalReleaseNote = null;
-            Updated = DateTime.UtcNow;
-        }
     }
 }
