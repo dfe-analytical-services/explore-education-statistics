@@ -186,15 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-2687 - as part of a ReleaseService refactor to extract Release Status update logic into
                     // its own Service, this should be looked at to see how best to reuse similar "set to draft" logic
                     // in MethodologyService.
-                    methodologiesScheduledWithRelease.ForEach(m =>
-                    {
-                        m.PublishingStrategy = Immediately;
-                        m.Status = Draft;
-                        m.ScheduledWithRelease = null;
-                        m.ScheduledWithReleaseId = null;
-                        m.InternalReleaseNote = null;
-                        m.Updated = DateTime.UtcNow;
-                    });
+                    methodologiesScheduledWithRelease.ForEach(methodologyVersion => methodologyVersion.SetToDraft());
+                    
                     _context.UpdateRange(methodologiesScheduledWithRelease);
                     
                     await _context.SaveChangesAsync();
