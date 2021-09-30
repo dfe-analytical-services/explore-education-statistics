@@ -7,13 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -33,7 +29,6 @@ using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
-
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
     public class Startup : FunctionsStartup
@@ -63,8 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        zipFileService: provider.GetRequiredService<IZipFileService>(),
-                        dataGuidanceFileService: provider.GetRequiredService<IDataGuidanceFileService>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
@@ -104,9 +97,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new QueueService(
                         storageQueueService: new StorageQueueService(
                             storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")),
-                            releaseStatusService: provider.GetService<IReleaseStatusService>(),
+                            releasePublishingStatusService: provider.GetService<IReleasePublishingStatusService>(),
                             logger: provider.GetRequiredService<ILogger<QueueService>>()))
-                .AddScoped<IReleaseStatusService, ReleaseStatusService>()
+                .AddScoped<IReleasePublishingStatusService, ReleasePublishingStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
                     new ReleaseSubjectRepository(
@@ -115,21 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>()
-                .AddScoped<IReleaseDataFileRepository, ReleaseDataFileRepository>()
-                .AddScoped<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>()
-                .AddScoped<ITimePeriodService, TimePeriodService>()
-                .AddScoped<IDataGuidanceFileWriter, DataGuidanceFileWriter>()
-                .AddScoped<IDataGuidanceFileService, DataGuidanceFileService>(provider =>
-                    new DataGuidanceFileService(
-                        contentDbContext: provider.GetService<ContentDbContext>(),
-                        dataGuidanceFileWriter: provider.GetService<IDataGuidanceFileWriter>(),
-                        blobStorageService: GetBlobStorageService(provider, "CoreStorage")
-                    ))
-                .AddScoped<IZipFileService, ZipFileService>(provider =>
-                    new ZipFileService(
-                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
-                    ));
+                .AddScoped<IIndicatorRepository, IndicatorRepository>();
 
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
             AddPersistenceHelper<PublicStatisticsDbContext>(builder.Services);

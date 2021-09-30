@@ -1,27 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`] = `
-<label class="govuk-label"
-       for="test-radios-search"
->
-  Search
-</label>
-<input name="testRadios-search"
-       class="govuk-input searchInput govuk-input--width-20"
-       id="test-radios-search"
-       type="text"
-       value
->
-<div aria-live="assertive"
-     class="optionsContainer"
->
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset"
-              id="test-radios"
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Choose options
+    </legend>
+    <label class="govuk-label"
+           for="test-radios-search"
     >
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        Choose options
-      </legend>
+      Search
+    </label>
+    <input name="testRadios-search"
+           class="govuk-input govuk-!-margin-bottom-4 searchInput govuk-input--width-20"
+           id="test-radios-search"
+           type="text"
+           value
+    >
+    <div aria-live="assertive">
       <div class="govuk-radios">
         <div class="govuk-radios__item"
              data-testid="Radio item for Test radio 1"
@@ -69,7 +67,7 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
           </label>
         </div>
       </div>
-    </fieldset>
-  </div>
+    </div>
+  </fieldset>
 </div>
 `;

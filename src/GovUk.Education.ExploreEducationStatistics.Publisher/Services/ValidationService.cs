@@ -9,26 +9,26 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ValidationService : IValidationService
     {
         private readonly ContentDbContext _context;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly ILogger _logger;
 
         public ValidationService(ContentDbContext context,
-            IReleaseStatusService releaseStatusService,
+            IReleasePublishingStatusService releasePublishingStatusService,
             ILogger<ValidationService> logger)
         {
             _context = context;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
             _logger = logger;
         }
 
-        public async Task<Either<IEnumerable<ReleaseStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId)
+        public async Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId)
         {
             _logger.LogTrace("Validating release: {0}", releaseId);
 
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger.LogTrace("Validating publishing state: {0}", releaseId);
 
             var releaseStatuses =
-                (await _releaseStatusService.GetAllByOverallStage(releaseId, Scheduled, Started)).ToList();
+                (await _releasePublishingStatusService.GetAllByOverallStage(releaseId, Scheduled, Started)).ToList();
 
             // Should never happen as we mark scheduled releases as superseded prior to validation
             var scheduled = releaseStatuses.FirstOrDefault(status => status.State.Overall == Scheduled);
@@ -79,14 +79,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return true;
         }
 
-        private static Either<IEnumerable<ReleaseStatusLogMessage>, Unit> ValidateApproval(Release release)
+        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateApproval(Release release)
         {
             return release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? Unit.Instance
                 : Failure(ValidationStage.ReleaseMustBeApproved, $"Release approval status is {release.ApprovalStatus}");
         }
 
-        private static Either<IEnumerable<ReleaseStatusLogMessage>, Unit> ValidateScheduledPublishDate(
+        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateScheduledPublishDate(
             Release release)
         {
             return release.PublishScheduled.HasValue
@@ -102,18 +102,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleAsync(release => release.Id == releaseId);
         }
 
-        private static Either<IEnumerable<ReleaseStatusLogMessage>, Unit> Failure(ValidationStage stage, string message)
+        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> Failure(ValidationStage stage, string message)
         {
-            return new List<ReleaseStatusLogMessage>
+            return new List<ReleasePublishingStatusLogMessage>
             {
-                new ReleaseStatusLogMessage($"Validating {stage.ToString()}: {message}")
+                new ReleasePublishingStatusLogMessage($"Validating {stage.ToString()}: {message}")
             };
         }
 
-        private static IEnumerable<ReleaseStatusLogMessage> CollateMessages(
-            params Either<IEnumerable<ReleaseStatusLogMessage>, Unit>[] results)
+        private static IEnumerable<ReleasePublishingStatusLogMessage> CollateMessages(
+            params Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>[] results)
         {
-            return results.SelectMany(either => either.IsLeft ? either.Left : new ReleaseStatusLogMessage[] { });
+            return results.SelectMany(either => either.IsLeft ? either.Left : new ReleasePublishingStatusLogMessage[] { });
         }
 
         private enum ValidationStage

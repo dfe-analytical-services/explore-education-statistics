@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusContentStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -16,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class GenerateReleaseContentFunction
     {
         private readonly IContentService _contentService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public GenerateReleaseContentFunction(IContentService contentService,
-            IReleaseStatusService releaseStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentService = contentService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -58,19 +58,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     executionContext.FunctionName);
                 logger.LogError("{0}", e.StackTrace);
                 await UpdateStage(message, Failed,
-                    new ReleaseStatusLogMessage($"Exception in content stage: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 
             logger.LogInformation("{0} completed",
                 executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(GenerateReleaseContentMessage message, ReleaseStatusContentStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(GenerateReleaseContentMessage message, ReleasePublishingStatusContentStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
         {
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
-                await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage, logMessage);
+                await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage, logMessage);
             }
         }
     }

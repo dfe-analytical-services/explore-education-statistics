@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleasesFunction
     {
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        public PublishReleasesFunction(IQueueService queueService, IReleaseStatusService releaseStatusService)
+        public PublishReleasesFunction(IQueueService queueService, IReleasePublishingStatusService releasePublishingStatusService)
         {
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 foreach (var (releaseId, releaseStatusId) in scheduled)
                 {
-                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId,
+                    await _releasePublishingStatusService.UpdateStateAsync(releaseId, releaseStatusId,
                         ScheduledReleaseStartedState);
                 }
 
@@ -66,10 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
         }
 
-        private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
+        private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleases()
         {
-            return await _releaseStatusService.GetWherePublishingDueTodayWithStages(
-                overall: ReleaseStatusOverallStage.Scheduled);
+            return await _releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+                overall: ReleasePublishingStatusOverallStage.Scheduled);
         }
     }
 }

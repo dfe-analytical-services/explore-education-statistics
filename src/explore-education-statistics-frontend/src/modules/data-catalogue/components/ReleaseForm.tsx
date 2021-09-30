@@ -1,22 +1,16 @@
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormGroup,
-  FormTextSearchInput,
-  FormFieldset,
-} from '@common/components/form';
+import { Form } from '@common/components/form';
+import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
-import Yup from '@common/validation/yup';
-import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
-import createErrorHelper from '@common/validation/createErrorHelper';
-import { ReleaseSummary } from '@common/services/publicationService';
 import Tag from '@common/components/Tag';
 import useFormSubmit from '@common/hooks/useFormSubmit';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
+import { ReleaseSummary } from '@common/services/publicationService';
+import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 export interface ReleaseFormValues {
   releaseId: string;
@@ -40,8 +34,6 @@ interface Props {
 const ReleaseForm = ({
   goToNextStep,
   legend,
-  legendSize = 'l',
-  legendHint,
   initialValues = {
     releaseId: '',
   },
@@ -49,32 +41,21 @@ const ReleaseForm = ({
   options,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const { isActive, currentStep, stepNumber } = stepProps;
 
   const radioOptions = useMemo<RadioOption[]>(
     () =>
-      options
-        .filter(option => {
-          if (!searchTerm) {
-            return option;
-          }
-          if (option.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-            return option;
-          }
-          return null;
-        })
-        .map(option => {
-          return {
-            label: option.title,
-            hint: option.latestRelease ? (
-              <Tag strong>This is the latest data</Tag>
-            ) : undefined,
-            inlineHint: true,
-            value: option.id,
-          };
-        }),
-    [options, searchTerm],
+      options.map(option => {
+        return {
+          label: option.title,
+          hint: option.latestRelease ? (
+            <Tag strong>This is the latest data</Tag>
+          ) : undefined,
+          inlineHint: true,
+          value: option.id,
+        };
+      }),
+    [options],
   );
 
   const handleSubmit = useFormSubmit(
@@ -106,44 +87,15 @@ const ReleaseForm = ({
       onSubmit={handleSubmit}
     >
       {form => {
-        const { getError } = createErrorHelper(form);
         return isActive ? (
           <Form id={formId} showSubmitError>
-            <FormFieldset
-              error={getError('release')}
-              id="release"
+            <FormFieldRadioSearchGroup<ReleaseFormValues>
+              name="releaseId"
               legend={legend}
-              legendSize={legendSize}
-              hint={legendHint}
-            >
-              {options.length > 1 && (
-                <FormGroup>
-                  <FormTextSearchInput
-                    id={`${formId}-releaseIdSearch`}
-                    label="Search releases"
-                    name="releaseSearch"
-                    onChange={event => setSearchTerm(event.target.value)}
-                    onKeyPress={event => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                      }
-                    }}
-                    width={20}
-                  />
-                </FormGroup>
-              )}
-              {options.length > 0 && (
-                <FormFieldRadioGroup<ReleaseFormValues>
-                  name="releaseId"
-                  legendSize={legendSize}
-                  legend="Choose a release from the list below"
-                  legendHidden
-                  disabled={form.isSubmitting}
-                  options={radioOptions}
-                  order={[]}
-                />
-              )}
-            </FormFieldset>
+              disabled={form.isSubmitting}
+              options={radioOptions}
+              order={[]}
+            />
 
             {options.length > 0 ? (
               <WizardStepFormActions {...stepProps} />

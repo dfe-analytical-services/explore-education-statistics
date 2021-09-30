@@ -16,7 +16,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -66,16 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
@@ -139,16 +138,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
@@ -253,16 +252,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Contributor", "Lead" or "Approver"
                         // role on a Release can update its status if it is not Approved
@@ -328,16 +327,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a User who has the Publication Owner role on a
                         // Release can update its status if it is not Approved
@@ -442,16 +441,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                        var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
                                     release.Id,
-                                    ReleaseStatusOverallStage.Started,
-                                    ReleaseStatusOverallStage.Complete
+                                    ReleasePublishingStatusOverallStage.Started,
+                                    ReleasePublishingStatusOverallStage.Complete
                                 )
                             )
-                            .ReturnsAsync(new List<PublisherReleaseStatus>());
+                            .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that a user who has the "Approver" role on a
                         // Release can update its status if it is Approved
@@ -492,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertClaimSucceedsWhenReleaseUnpublished<TRequirement>(
-            Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
                 IAuthorizationHandler> authorizationHandler,
             params SecurityClaimTypes[] claims)
             where TRequirement : IAuthorizationRequirement
@@ -510,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ApprovalStatus = status
                     };
 
-                    var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                     // Assert that users with the specified claims can update the
                     // Release status if it has not started publishing
@@ -531,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllClaimsFailWhenReleasePublishing<TRequirement>(
-            Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
@@ -547,19 +546,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ApprovalStatus = status
                     };
 
-                    var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
                         .ReturnsAsync(
-                            new List<PublisherReleaseStatus>
+                            new List<ReleasePublishingStatus>
                             {
-                                new PublisherReleaseStatus()
+                                new ReleasePublishingStatus()
                             }
                         );
 
@@ -580,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllClaimsFailWhenReleasePublished<TRequirement>(
-            Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
@@ -597,16 +596,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Published = DateTime.Now
                     };
 
-                    var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<PublisherReleaseStatus>());
+                        .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                     // Assert that no users can update a Release status once it has been published
                     await AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(context =>
@@ -625,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublishing<TRequirement>(
-            Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
@@ -641,19 +640,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ApprovalStatus = status
                     };
 
-                    var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
                         .ReturnsAsync(
-                            new List<PublisherReleaseStatus>
+                            new List<ReleasePublishingStatus>
                             {
-                                new PublisherReleaseStatus()
+                                new ReleasePublishingStatus()
                             }
                         );
 
@@ -687,7 +686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublished<TRequirement>(
-            Func<IReleaseStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>().ForEachAsync(
@@ -704,16 +703,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Published = DateTime.Now,
                     };
 
-                    var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
                     releaseStatusRepository.Setup(
                             s => s.GetAllByOverallStage(
                                 release.Id,
-                                ReleaseStatusOverallStage.Started,
-                                ReleaseStatusOverallStage.Complete
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<PublisherReleaseStatus>());
+                        .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                     // Assert that no user release roles allow updating a Release status once it has been published
                     await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
@@ -745,29 +744,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static MarkReleaseAsDraftAuthorizationHandler BuildMarkReleaseAsDraftHandler(
-            IReleaseStatusRepository releaseStatusRepository,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsDraftAuthorizationHandler(releaseStatusRepository, userPublicationRoleRepository,
+            return new MarkReleaseAsDraftAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
                 userReleaseRoleRepository);
         }
         
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
-            IReleaseStatusRepository releaseStatusRepository,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(releaseStatusRepository, userPublicationRoleRepository,
+            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
                 userReleaseRoleRepository);
         }
 
         private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
-            IReleaseStatusRepository releaseStatusRepository,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsApprovedAuthorizationHandler(releaseStatusRepository, userPublicationRoleRepository,
+            return new MarkReleaseAsApprovedAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
                 userReleaseRoleRepository);
         }
     }

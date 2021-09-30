@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IValidationService
     {
         Task<bool> ValidatePublishingState(Guid releaseId);
-        Task<Either<IEnumerable<ReleaseStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId);
+        Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId);
     }
 }

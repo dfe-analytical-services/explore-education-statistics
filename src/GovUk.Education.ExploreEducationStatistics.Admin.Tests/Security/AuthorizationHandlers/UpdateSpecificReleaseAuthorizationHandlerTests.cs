@@ -9,14 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 using Xunit;
-using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplierWhenPublishing(
             Release release)
         { 
-            var statusListWhenPublishing = new List<PublisherReleaseStatus>
+            var statusListWhenPublishing = new List<ReleasePublishingStatus>
             {
                 new()
             };
@@ -301,9 +301,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
             Release release,
-            List<PublisherReleaseStatus>? publishingStatuses = null)
+            List<ReleasePublishingStatus>? publishingStatuses = null)
         {
-            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
             releaseStatusRepository.Setup(
                     s => s.GetAllByOverallStage(
@@ -312,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Complete
                     )
                 )
-                .ReturnsAsync(publishingStatuses ?? new List<PublisherReleaseStatus>());
+                .ReturnsAsync(publishingStatuses ?? new List<ReleasePublishingStatus>());
 
             return contentDbContext =>
             {

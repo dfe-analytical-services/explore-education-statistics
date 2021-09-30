@@ -11,21 +11,21 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseStatusService : IReleaseStatusService
+    public class ReleasePublishingStatusService : IReleasePublishingStatusService
     {
         private readonly IMapper _mapper;
         private readonly ITableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-        public ReleaseStatusService(
+        public ReleasePublishingStatusService(
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -44,8 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var query = new TableQuery<ReleaseStatus>()
-                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                    var query = new TableQuery<ReleasePublishingStatus>()
+                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                             QueryComparisons.Equal, releaseId.ToString()));
 
                     var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);

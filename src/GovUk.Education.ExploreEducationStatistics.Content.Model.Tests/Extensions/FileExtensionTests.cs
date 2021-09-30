@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Type = Metadata
             };
 
-            var zipFile = new File
+            var dataZipFile = new File
             {
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal($"{dataFile.RootPath}/data/{dataFile.Id}", dataFile.Path());
             Assert.Equal($"{imageFile.RootPath}/image/{imageFile.Id}", imageFile.Path());
             Assert.Equal($"{metaFile.RootPath}/data/{metaFile.Id}", metaFile.Path());
-            Assert.Equal($"{zipFile.RootPath}/zip/{zipFile.Id}", zipFile.Path());
+            Assert.Equal($"{dataZipFile.RootPath}/data-zip/{dataZipFile.Id}", dataZipFile.Path());
         }
 
         [Fact]

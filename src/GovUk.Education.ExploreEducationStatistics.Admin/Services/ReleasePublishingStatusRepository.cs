@@ -10,18 +10,18 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseStatusRepository : IReleaseStatusRepository
+    public class ReleasePublishingStatusRepository : IReleasePublishingStatusRepository
     {
         private readonly ITableStorageService _publisherTableStorageService;
 
-        public ReleaseStatusRepository(ITableStorageService publisherTableStorageService)
+        public ReleasePublishingStatusRepository(ITableStorageService publisherTableStorageService)
         {
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
+        public Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId, params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+            var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString());
 
             if (overallStages.Any())
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) => 
                 {
                    var stageFilter = TableQuery.GenerateFilterCondition(
-                       nameof(ReleaseStatus.OverallStage),
+                       nameof(ReleasePublishingStatus.OverallStage),
                        QueryComparisons.Equal,
                        stage.ToString()
                     );
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
             }
 
-            var query = new TableQuery<ReleaseStatus>().Where(filter);
+            var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
             return _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
     }
