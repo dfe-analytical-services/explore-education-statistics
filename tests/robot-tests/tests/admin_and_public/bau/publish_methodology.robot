@@ -93,6 +93,15 @@ Verify that the methodology is publicly accessible
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology
 
+Verify that the methodology displays a link to the publication
+    user checks element contains child element
+    ...    css:[aria-labelledby="related-information"]
+    ...    xpath://h3[text()="Publications"]
+    user checks page contains link with text and url
+    ...    ${PUBLICATION_NAME}
+    ...    /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+    ...    css:[aria-labelledby="related-information"]
+
 Verify that the methodology content is correct
     ${date}=    get current datetime    %-d %B %Y
     user checks summary list contains    Published    ${date}
@@ -167,6 +176,15 @@ Verify that the amended methodology is publicly accessible immediately
     ...    ${PUBLICATION_NAME} - Amended methodology
     user waits until h1 is visible    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
+
+Verify that the amended methodology displays a link to the publication
+    user checks element contains child element
+    ...    css:[aria-labelledby="related-information"]
+    ...    xpath://h3[text()="Publications"]
+    user checks page contains link with text and url
+    ...    ${PUBLICATION_NAME}
+    ...    /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+    ...    css:[aria-labelledby="related-information"]
 
 Verify that the amended methodology content is correct
     ${date}=    get current datetime    %-d %B %Y
