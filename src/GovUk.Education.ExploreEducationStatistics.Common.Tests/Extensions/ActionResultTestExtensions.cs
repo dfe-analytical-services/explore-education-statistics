@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public static class ActionResultTestUtils
     {
-        public static T AssertOkResult<T>(this ActionResult<T> result) where T : class
+        public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
         {
             Assert.IsAssignableFrom<ActionResult<T>>(result);
             Assert.IsAssignableFrom<T>(result.Value);
+
+            if (expectedValue != null)
+            {
+                Assert.Equal(expectedValue, result.Value);
+            }
+            
             return result.Value;
         }
         
