@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                     var viewModel = _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
                     viewModel.Publications =
-                        await GetVisiblePublicationsForMethodology(latestPublishedVersion.MethodologyId);
+                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
 
                     return viewModel;
                 });
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ToList();
         }
 
-        private async Task<List<PublicationSummaryViewModel>> GetVisiblePublicationsForMethodology(Guid methodologyId)
+        private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
         {
             var publications = await _contentDbContext.PublicationMethodologies
                 .Include(pm => pm.Publication)

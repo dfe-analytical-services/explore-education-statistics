@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetLatestMethodologyBySlug_FiltersPublicationsWithNoVisibleReleases()
+        public async Task GetLatestMethodologyBySlug_FiltersPublicationsWithNoPublishedReleases()
         {
             var methodology = new Methodology
             {
