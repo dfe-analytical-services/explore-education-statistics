@@ -5,6 +5,7 @@ Library     Collections
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
+Library     fail_fast.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
@@ -17,10 +18,26 @@ ${timeout}=                             30
 ${implicit_wait}=                       15
 ${RELEASE_COMPLETE_WAIT}=               900
 ${prompt_to_continue_on_failure}=       0
+${FAIL_TEST_SUITES_FAST}=               1
 
 *** Keywords ***
 do this on failure
-    capture large screenshot and html
+    # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
+    # failing page.
+    ${currently_failing_fast}=    current test suite failing fast
+
+    IF    "${currently_failing_fast}" == "${FALSE}"
+
+        capture large screenshot and html
+
+        # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
+        # this will cause subsequent tests within this same Test Suite to fail immediately (by virtue of their "Test
+        # Setup" steps checking to see if their owning Test Suite is currently failing fast).
+        IF    ${FAIL_TEST_SUITES_FAST} == 1
+            record failing test suite
+        END
+    END
+
     IF    ${prompt_to_continue_on_failure} == 1
         prompt to continue
     END

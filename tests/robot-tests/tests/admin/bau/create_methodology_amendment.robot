@@ -8,6 +8,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - create methodology amendment publication %{RUN_IDENTIFIER}
