@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -48,12 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             Id = Guid.NewGuid(),
             AlternativeTitle = "Title",
             Status = Draft
-        };
-
-        private readonly MethodologyVersion _approvedMethodologyVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            Status = Approved
         };
 
         [Fact]
@@ -168,61 +160,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task UpdateMethodologyDetails()
+        public async Task UpdateMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_methodologyVersion, CanUpdateSpecificMethodology)
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                                _methodologyVersion.Id, _methodologyVersion).Object,
-                            userService: userService.Object);
+                        var service = SetupMethodologyService(userService: userService.Object);
                         return service.UpdateMethodology(_methodologyVersion.Id, new MethodologyUpdateRequest
                         {
-                            Status = Draft,
                             Title = "Updated Title"
-                        });
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateMethodologyStatus_Approve()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodologyVersion, CanApproveSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                                _methodologyVersion.Id, _methodologyVersion).Object,
-                            userService: userService.Object);
-                        return service.UpdateMethodology(_methodologyVersion.Id, new MethodologyUpdateRequest
-                        {
-                            Status = Approved
-                        });
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateMethodologyStatus_MarkAsDraft()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_approvedMethodologyVersion, CanMarkSpecificMethodologyAsDraft)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyService(
-                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                                _approvedMethodologyVersion.Id, _approvedMethodologyVersion).Object,
-                            userService: userService.Object);
-                        return service.UpdateMethodology(_approvedMethodologyVersion.Id, new MethodologyUpdateRequest
-                        {
-                            Status = Draft
                         });
                     }
                 );
@@ -265,26 +213,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyService SetupMethodologyService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobCacheService? blobCacheService = null,
-            IMethodologyContentService? methodologyContentService = null,
-            IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IMethodologyRepository? methodologyRepository = null,
             IMethodologyImageService? methodologyImageService = null,
-            IPublishingService? publishingService = null,
+            IMethodologyApprovalService? methodologyApprovalService = null,
             IUserService? userService = null)
         {
             return new(
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 AdminMapper(),
-                blobCacheService ?? Mock.Of<IBlobCacheService>(),
-                methodologyContentService ?? Mock.Of<IMethodologyContentService>(),
-                methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(),
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
-                publishingService ?? Mock.Of<IPublishingService>(),
+                methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
                 userService ?? Mock.Of<IUserService>()
             );
         }

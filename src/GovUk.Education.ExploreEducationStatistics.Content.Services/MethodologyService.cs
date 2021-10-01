@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -55,7 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Collection(m => m.Notes)
                         .LoadAsync();
 
-                    return _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
+                    var viewModel = _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
+                    viewModel.Publications =
+                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+
+                    return viewModel;
                 });
         }
 
@@ -102,6 +107,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return themes.Where(theme => theme.Topics.Any())
                 .OrderBy(theme => theme.Title)
                 .ToList();
+        }
+
+        private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
+        {
+            var publications = await _contentDbContext.PublicationMethodologies
+                .Include(pm => pm.Publication)
+                .ThenInclude(p => p.Releases)
+                .Where(pm => pm.MethodologyId == methodologyId)
+                .Select(pm => pm.Publication)
+                .ToListAsync();
+
+            var publicationsWithPublishedReleases = publications
+                .Where(p => p.Releases.Any(r => r.IsLatestPublishedVersionOfRelease()))
+                .OrderBy(p => p.Title)
+                .ToList();
+
+            return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
         }
 
         private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)

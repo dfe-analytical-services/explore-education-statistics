@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -24,7 +23,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
-using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -634,7 +632,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IPublishingService? publishingService = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IReleaseRepository? repository = null,
@@ -646,15 +643,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteService? footnoteService = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IContentService? contentService = null,
-            IReleaseChecklistService? releaseChecklistService = null,
-            IGuidGenerator? guidGenerator = null,
-            IPreReleaseUserService? preReleaseUserService = null)
+            IGuidGenerator? guidGenerator = null)
         {
             return new(
                 contentDbContext,
                 AdminMapper(),
-                publishingService ?? Mock.Of<IPublishingService>(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? UserServiceMock().Object,
                 repository ?? Mock.Of<IReleaseRepository>(),
@@ -666,11 +659,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteService ?? Mock.Of<IFootnoteService>(),
                 statisticsDbContext,
                 dataBlockService ?? Mock.Of<IDataBlockService>(),
-                releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(),
-                contentService ?? Mock.Of<IContentService>(),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
-                guidGenerator ?? new SequentialGuidGenerator(),
-                preReleaseUserService ?? Mock.Of<IPreReleaseUserService>()
+                guidGenerator ?? new SequentialGuidGenerator()
             );
         }
     }

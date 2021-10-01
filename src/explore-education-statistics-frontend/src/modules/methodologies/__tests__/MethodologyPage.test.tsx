@@ -31,6 +31,33 @@ describe('MethodologyPage', () => {
     ).toHaveLength(2);
   });
 
+  test('renders related information links', async () => {
+    render(<MethodologyPage data={testMethodology} />);
+
+    expect(
+      screen.getByRole('navigation', { name: 'Related information' }),
+    ).toBeInTheDocument();
+
+    const relatedInformationNav = screen.getByRole('navigation', {
+      name: 'Related information',
+    });
+
+    const relatedInformationLinks = within(relatedInformationNav).getAllByRole(
+      'link',
+    );
+
+    expect(relatedInformationLinks).toHaveLength(4);
+
+    expect(relatedInformationLinks[0]).toHaveTextContent('Publication 1');
+    expect(relatedInformationLinks[1]).toHaveTextContent('Publication 2');
+    expect(relatedInformationLinks[2]).toHaveTextContent(
+      'Find statistics and data',
+    );
+    expect(relatedInformationLinks[3]).toHaveTextContent(
+      'Education statistics: glossary',
+    );
+  });
+
   test('renders the methodology content', () => {
     render(<MethodologyPage data={testMethodology} />);
     const contentAccordion = screen.getAllByTestId('accordion')[0];

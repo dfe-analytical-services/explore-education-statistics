@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -24,19 +22,18 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServicePermissionTests
     {
-        private static readonly Publication Publication = new Publication
+        private static readonly Publication Publication = new()
         {
             Id = Guid.NewGuid()
         };
 
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
             PublicationId = Publication.Id,
@@ -54,22 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return service.GetRelease(_release.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task GetReleaseStatuses()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanViewReleaseStatusHistory)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.GetReleaseStatuses(_release.Id);
                     }
                 );
         }
@@ -82,91 +65,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return service.CreateRelease(
                             new ReleaseCreateViewModel
                             {
                                 PublicationId = Publication.Id,
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateRelease()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.UpdateRelease(
-                            _release.Id,
-                            new ReleaseUpdateViewModel()
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateReleaseStatus_Draft()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseStatus(
-                            _release.Id,
-                            new ReleaseStatusCreateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.Draft
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateReleaseStatus_HigherLevelReview()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseStatus(
-                            _release.Id,
-                            new ReleaseStatusCreateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UpdateReleaseStatus_Approve()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
-                .SetupResourceCheckToFail(_release, CanApproveSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.CreateReleaseStatus(
-                            _release.Id,
-                            new ReleaseStatusCreateViewModel
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.Approved
                             }
                         );
                     }
@@ -181,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return service.GetLatestPublishedRelease(Publication.Id);
                     }
                 );
@@ -197,8 +100,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         using var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync");
                         contentDbContext.Attach(_release);
-                        var service = BuildReleaseService(contentDbContext,
-                            userService: userService.Object);
+                        var service = BuildReleaseService(
+                            userService.Object,
+                            contentDbContext);
                         return service.CreateReleaseAmendment(_release.Id);
                     }
                 );
@@ -212,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return service.GetDeleteReleasePlan(_release.Id);
                     }
                 );
@@ -226,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return service.DeleteRelease(_release.Id);
                     }
                 );
@@ -239,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var list = new List<MyReleaseViewModel>
             {
-                new MyReleaseViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
@@ -256,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(
-                            userService: userService.Object,
+                            userService.Object,
                             releaseRepository: repository.Object
                         );
                         var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
@@ -278,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var list = new List<MyReleaseViewModel>
             {
-                new MyReleaseViewModel
+                new()
                 {
                     Id = Guid.NewGuid()
                 }
@@ -299,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .Returns(_userId);
 
                         var service = BuildReleaseService(
-                            userService: userService.Object,
+                            userService.Object,
                             releaseRepository: repository.Object
                         );
                         var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
@@ -336,52 +240,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     async userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildReleaseService(userService.Object);
                         return await service.RemoveDataFiles(_release.Id, Guid.NewGuid());
                     }
                 );
         }
 
         private ReleaseService BuildReleaseService(
+            IUserService userService,
             ContentDbContext? context = null,
-            IMapper? mapper = null,
-            IPublishingService? publishingService = null,
-            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IUserService? userService = null,
-            IReleaseRepository? releaseRepository = null,
-            IReleaseFileRepository? releaseFileRepository = null,
-            ISubjectRepository? subjectRepository = null,
-            IReleaseFileService? releaseFileService = null,
-            IReleaseDataFileService? releaseDataFileService = null,
-            IDataImportService? dataImportService = null,
-            IFootnoteService? footnoteService = null,
-            StatisticsDbContext? statisticsDbContext = null,
-            IDataBlockService? dataBlockService = null,
-            IReleaseChecklistService? releaseChecklistService = null,
-            IContentService? contentService = null,
-            IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IPreReleaseUserService? preReleaseUserService = null)
+            IReleaseRepository? releaseRepository = null)
         {
-            return new(
-                context ?? new Mock<ContentDbContext>().Object,
-                mapper ?? AdminMapper(),
-                publishingService ?? new Mock<IPublishingService>().Object,
-                persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                userService ?? new Mock<IUserService>().Object,
-                releaseRepository ?? new Mock<IReleaseRepository>().Object,
-                releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
-                subjectRepository ?? new Mock<ISubjectRepository>().Object,
-                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                dataImportService ?? new Mock<IDataImportService>().Object,
-                footnoteService ?? new Mock<IFootnoteService>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object,
-                releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
-                contentService ?? new Mock<IContentService>().Object,
-                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                new SequentialGuidGenerator(),
-                preReleaseUserService ?? new Mock<IPreReleaseUserService>().Object
+            return new ReleaseService(
+                context ?? Mock.Of<ContentDbContext>(),
+                AdminMapper(),
+                DefaultPersistenceHelperMock().Object,
+                userService,
+                releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                Mock.Of<IReleaseFileRepository>(),
+                Mock.Of<ISubjectRepository>(),
+                Mock.Of<IReleaseDataFileService>(),
+                Mock.Of<IReleaseFileService>(),
+                Mock.Of<IDataImportService>(),
+                Mock.Of<IFootnoteService>(),
+                Mock.Of<StatisticsDbContext>(),
+                Mock.Of<IDataBlockService>(),
+                Mock.Of<IReleaseSubjectRepository>(),
+                new SequentialGuidGenerator()
             );
         }
 

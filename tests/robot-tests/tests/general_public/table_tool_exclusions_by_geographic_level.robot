@@ -3,6 +3,7 @@ Resource            ../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev
 

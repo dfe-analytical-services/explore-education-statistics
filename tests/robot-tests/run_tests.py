@@ -355,6 +355,9 @@ else:
 if os.getenv('RELEASE_COMPLETE_WAIT'):
     robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
 
+if os.getenv('FAIL_TEST_SUITES_FAST'):
+    robotArgs += ["-v", f"FAIL_TEST_SUITES_FAST:{os.getenv('FAIL_TEST_SUITES_FAST')}"]
+
 if args.prompt_to_continue:
     robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
 

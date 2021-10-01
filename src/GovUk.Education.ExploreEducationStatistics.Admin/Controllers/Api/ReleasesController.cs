@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ReleasesController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
+        private readonly IReleaseApprovalService _releaseApprovalService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
@@ -29,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         public ReleasesController(
             IReleaseService releaseService,
+            IReleaseApprovalService releaseApprovalService,
             IReleaseDataFileService releaseDataFileService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
@@ -41,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
             _dataImportService = dataImportService;
+            _releaseApprovalService = releaseApprovalService;
         }
 
         [HttpPost("publications/{publicationId}/releases")]
@@ -150,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/status")]
         public async Task<ActionResult<List<ReleaseStatusViewModel>>> GetReleaseStatuses(Guid releaseId)
         {
-            return await _releaseService
+            return await _releaseApprovalService
                 .GetReleaseStatuses(releaseId)
                 .HandleFailuresOrOk();
         }
@@ -177,8 +181,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseStatus(ReleaseStatusCreateViewModel request,
             Guid releaseId)
         {
-            return await _releaseService
+            return await _releaseApprovalService
                 .CreateReleaseStatus(releaseId, request)
+                .OnSuccess(_ => _releaseService.GetRelease(releaseId))
                 .HandleFailuresOrOk();
         }
 

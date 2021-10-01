@@ -4,6 +4,7 @@ Force Tags          GeneralPublic    Prod
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to /methodology page
