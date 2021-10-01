@@ -2,6 +2,8 @@
 Resource        ../libs/public-common.robot
 Library         ../libs/no_javascript.py
 
+Test Setup      fail test fast if required
+
 Force Tags      GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
