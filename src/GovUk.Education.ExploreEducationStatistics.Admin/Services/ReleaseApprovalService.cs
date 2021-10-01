@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseFileService _releaseFileService;
 
-        public ReleaseApprovalService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, IUserService userService, IPublishingService publishingService, IReleaseChecklistService releaseChecklistService, IContentService contentService, IPreReleaseUserService preReleaseUserService, IReleaseFileRepository releaseFileRepository, IReleaseFileService releaseFileService)
+        public ReleaseApprovalService(
+            ContentDbContext context,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IUserService userService,
+            IPublishingService publishingService,
+            IReleaseChecklistService releaseChecklistService,
+            IContentService contentService,
+            IPreReleaseUserService preReleaseUserService,
+            IReleaseFileRepository releaseFileRepository,
+            IReleaseFileService releaseFileService)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
@@ -100,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // NOTE: Subscribers should be notified if the release is approved and isn't amended,
                     //       OR if the release is an amendment, is approved, and NotifySubscribers is true
                     var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
-                        (!release.Amendment || (request.NotifySubscribers.HasValue && request.NotifySubscribers.Value));
+                        (!release.Amendment || request.NotifySubscribers.HasValue && request.NotifySubscribers.Value);
 
                     var releaseStatus = new ReleaseStatus
                     {
@@ -121,7 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _context.SaveChangesAsync();
 
                             // Only need to inform Publisher if changing release approval status to or from Approved
-                            if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                            if (oldStatus == ReleaseApprovalStatus.Approved ||
+                                request.ApprovalStatus == ReleaseApprovalStatus.Approved)
                             {
                                 await _publishingService.ReleaseChanged(
                                     releaseId,
