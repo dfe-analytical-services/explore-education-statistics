@@ -393,6 +393,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetAllReleaseVersionIds()
+        {
+            var originalRelease = new Release();
+
+            var amendedRelease1 = new Release
+            {
+                PreviousVersion = originalRelease,
+            };
+
+            var amendedRelease2 = new Release
+            {
+                PreviousVersion = amendedRelease1,
+            };
+
+            var ignoredRelease = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    originalRelease, amendedRelease1, amendedRelease2, ignoredRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var result = await releaseRepository.GetAllReleaseVersionIds(amendedRelease2);
+                Assert.Equal(3, result.Count);
+
+                Assert.Contains(originalRelease.Id, result);
+                Assert.Contains(amendedRelease1.Id, result);
+                Assert.Contains(amendedRelease2.Id, result);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllReleaseVersionIds_SingleResult()
+        {
+            var originalRelease = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(originalRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var result = await releaseRepository.GetAllReleaseVersionIds(originalRelease);
+                Assert.Single(result);
+
+                Assert.Contains(originalRelease.Id, result);
+            }
+        }
+
         private ReleaseRepository BuildReleaseRepository(
             ContentDbContext? contentDbContext = null,
             StatisticsDbContext? statisticsDbContext = null

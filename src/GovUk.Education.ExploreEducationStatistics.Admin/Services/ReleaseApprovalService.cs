@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPreReleaseUserService _preReleaseUserService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseFileService _releaseFileService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public ReleaseApprovalService(
             ContentDbContext context,
@@ -40,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IContentService contentService,
             IPreReleaseUserService preReleaseUserService,
             IReleaseFileRepository releaseFileRepository,
-            IReleaseFileService releaseFileService)
+            IReleaseFileService releaseFileService,
+            IReleaseRepository releaseRepository)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
@@ -51,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _preReleaseUserService = preReleaseUserService;
             _releaseFileRepository = releaseFileRepository;
             _releaseFileService = releaseFileService;
+            _releaseRepository = releaseRepository;
         }
 
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
@@ -61,14 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Include(r => r.ReleaseStatuses)
                         .ThenInclude(rs => rs.CreatedBy))
                 .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
-                .OnSuccess(release =>
+                .OnSuccess(async release =>
                 {
-                    var allReleaseVersionIds = _context.Releases
-                        .Where(r => r.PublicationId == release.PublicationId
-                                    && r.ReleaseName == release.ReleaseName
-                                    && r.TimePeriodCoverage == release.TimePeriodCoverage)
-                        .Select(r => r.Id)
-                        .ToList();
+                    var allReleaseVersionIds = await _releaseRepository.GetAllReleaseVersionIds(release);
                     return _context.ReleaseStatus
                         .Include(rs => rs.Release)
                         .Include(rs => rs.CreatedBy)
