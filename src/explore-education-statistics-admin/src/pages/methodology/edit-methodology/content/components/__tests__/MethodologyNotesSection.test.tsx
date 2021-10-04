@@ -1,7 +1,9 @@
 import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
-import _methodologyNoteService from '@admin/services/methodologyNoteService';
+import _methodologyNoteService, {
+  MethodologyNote,
+} from '@admin/services/methodologyNoteService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -124,12 +126,12 @@ describe('MethodologyNotesSection', () => {
     });
 
     test('shows the most recent date for Last Updated', () => {
-      const oldNote = {
+      const oldNote: MethodologyNote = {
         id: 'note-old',
         content: 'Note Old',
         displayDate: new Date('2020-01-01T00:00:00'),
       };
-      const testMethodologyContentWithOldNote = {
+      const testMethodologyContentWithOldNote: MethodologyContent = {
         ...testMethodologyContentWithNotes,
         notes: [oldNote, ...testMethodologyContentWithNotes.notes],
       };
