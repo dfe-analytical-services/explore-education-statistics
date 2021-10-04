@@ -67,7 +67,7 @@ describe('MethodologyNotesSection', () => {
         </EditingContextProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
-      expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
+      expect(screen.getByTestId('Last updated date')).toHaveTextContent(
         '10 September 2021',
       );
 
@@ -106,6 +106,44 @@ describe('MethodologyNotesSection', () => {
       expect(
         screen.getByRole('button', { name: 'Add note' }),
       ).toBeInTheDocument();
+    });
+
+    test('renders correctly when there are no notes', () => {
+      render(
+        <EditingContextProvider initialEditingMode="edit">
+          <MethodologyNotesSection
+            methodology={testMethodologyContentWithoutNotes}
+          />
+        </EditingContextProvider>,
+      );
+      expect(screen.getByText('Last updated')).toBeInTheDocument();
+      expect(screen.getByTestId('Last updated-value')).toHaveTextContent('TBA');
+      expect(
+        screen.getByRole('button', { name: 'Add note' }),
+      ).toBeInTheDocument();
+    });
+
+    test('shows the most recent date for Last Updated', () => {
+      const oldNote = {
+        id: 'note-old',
+        content: 'Note Old',
+        displayDate: new Date('2020-01-01T00:00:00'),
+      };
+      const testMethodologyContentWithOldNote = {
+        ...testMethodologyContentWithNotes,
+        notes: [oldNote, ...testMethodologyContentWithNotes.notes],
+      };
+      render(
+        <EditingContextProvider initialEditingMode="edit">
+          <MethodologyNotesSection
+            methodology={testMethodologyContentWithOldNote}
+          />
+        </EditingContextProvider>,
+      );
+      expect(screen.getByText('Last updated')).toBeInTheDocument();
+      expect(screen.getByTestId('Last updated date')).toHaveTextContent(
+        '10 September 2021',
+      );
     });
   });
 
