@@ -825,6 +825,102 @@ describe('MethodologySummary', () => {
     );
   });
 
+  describe('Removing an external methodology', () => {
+    test('shows the confirm modal when clicking the Remove button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithExternalMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section Ext methodolology title (External)',
+        ),
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Remove external methodology' }),
+      ).toBeInTheDocument();
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove external methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: 'Remove external methodology' }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            'Are you sure you want to remove this external methodology?',
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByRole('button', { name: 'Confirm' }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByRole('button', { name: 'Cancel' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('calls the service to remove the Methodology when the confirm button is clicked', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithExternalMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section Ext methodolology title (External)',
+        ),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove external methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: 'Remove external methodology' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      const updatedPublication = {
+        title: testPublicationWithExternalMethodology.title,
+        contact: {
+          contactName: testContact.contactName,
+          contactTelNo: testContact.contactTelNo,
+          teamEmail: testContact.teamEmail,
+          teamName: testContact.teamName,
+        },
+        topicId: testTopicId,
+      };
+
+      await waitFor(() => {
+        expect(publicationService.updatePublication).toHaveBeenCalledWith(
+          testPublicationWithExternalMethodology.id,
+          updatedPublication,
+        );
+      });
+    });
+  });
+
   describe('Removing a non-amendment methodology', () => {
     test('the remove methodology button is shown if user has permission', async () => {
       render(

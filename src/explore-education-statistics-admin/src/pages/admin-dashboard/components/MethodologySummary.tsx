@@ -43,6 +43,9 @@ const MethodologySummary = ({
     amendment: boolean;
   }>();
   const [dropMethodologyId, setDropMethodologyId] = useState<string>();
+  const [removeExternalMethodology, setRemoveExternalMethodology] = useState<
+    boolean
+  >(false);
 
   const {
     contact,
@@ -235,7 +238,7 @@ const MethodologySummary = ({
                 <Button
                   type="button"
                   variant="warning"
-                  onClick={handleRemoveExternalMethodology}
+                  onClick={() => setRemoveExternalMethodology(true)}
                 >
                   Remove external methodology
                 </Button>
@@ -375,6 +378,18 @@ const MethodologySummary = ({
           <p>Are you sure you want to remove this adopted methodology?</p>
         </ModalConfirm>
       )}
+      <ModalConfirm
+        open={removeExternalMethodology}
+        title="Remove external methodology"
+        onConfirm={async () => {
+          await handleRemoveExternalMethodology();
+          setRemoveExternalMethodology(false);
+        }}
+        onCancel={() => setRemoveExternalMethodology(false)}
+        onExit={() => setRemoveExternalMethodology(false)}
+      >
+        <p>Are you sure you want to remove this external methodology?</p>
+      </ModalConfirm>
     </>
   );
 };
