@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return new ForbidResult();
             }
-                        
+
             // For now we only want to delete test themes as we
             // don't really have a mechanism to clean things up
             // properly across the entire application.
@@ -181,17 +181,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var userId = _userService.GetUserId();
 
             var topics = await (
-                    from userReleaseRole in _context.UserReleaseRoles
-                    where userReleaseRole.UserId == userId 
+                    from userReleaseRole in _context.UserReleaseRoles.AsQueryable()
+                    where userReleaseRole.UserId == userId
                           && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
                     select userReleaseRole.Release.Publication
                 ).Concat(
-                    from userPublicationRole in _context.UserPublicationRoles
-                    where userPublicationRole.UserId == userId 
+                    from userPublicationRole in _context.UserPublicationRoles.AsQueryable()
+                    where userPublicationRole.UserId == userId
                           && userPublicationRole.Role == Owner
                     select userPublicationRole.Publication
                 ).Include(publication => publication.Topic)
-                .ThenInclude(topic => topic.Theme).Select(publication => publication.Topic)
+                .ThenInclude(topic => topic.Theme)
+                .Select(publication => publication.Topic)
                 .Distinct()
                 .ToListAsync();
 

@@ -125,19 +125,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var originalTitle = publication.Title;
                     var originalSlug = publication.Slug;
-                    
+
                     if (!publication.Live) {
-                        
+
                         var slugValidation = await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug);
-                        
+
                         if (slugValidation.IsLeft)
                         {
                             return new Either<ActionResult, PublicationViewModel>(slugValidation.Left);
-                        }    
-                            
+                        }
+
                         publication.Slug = updatedPublication.Slug;
                     }
-                    
+
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Publications.Update(publication);
 
                     await _context.SaveChangesAsync();
-                    
+
                     if (originalTitle != publication.Title)
                     {
                         await _methodologyVersionRepository.PublicationTitleChanged(publicationId, originalSlug, publication.Title, publication.Slug);
@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidatePublicationSlugUniqueForUpdate(Guid id, string slug)
         {
-            if (await _context.Publications.AnyAsync(publication => publication.Slug == slug && publication.Id != id))
+            if (await _context.Publications.AsQueryable().AnyAsync(publication => publication.Slug == slug && publication.Id != id))
             {
                 return ValidationActionResult(SlugNotUnique);
             }

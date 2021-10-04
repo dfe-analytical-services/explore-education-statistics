@@ -505,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = releaseVersion3Id,
                 PublicationId = publicationId
             });
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -889,10 +889,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 result.AssertRight();
 
-                Assert.Equal(otherPublicationId, contentContext.Publications.Select(p => p.Id).Single());
-                Assert.Equal(otherTopicId, contentContext.Topics.Select(t => t.Id).Single());
-                Assert.Equal(otherReleaseId, contentContext.Releases.Select(r => r.Id).Single());
-                Assert.Equal(otherReleaseId, statisticsContext.Release.Select(r => r.Id).Single());
+                Assert.Equal(otherPublicationId, contentContext.Publications.AsQueryable().Select(p => p.Id).Single());
+                Assert.Equal(otherTopicId, contentContext.Topics.AsQueryable().Select(t => t.Id).Single());
+                Assert.Equal(otherReleaseId, contentContext.Releases.AsQueryable().Select(r => r.Id).Single());
+                Assert.Equal(otherReleaseId, statisticsContext.Release.AsQueryable().Select(r => r.Id).Single());
             }
         }
 
@@ -911,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var configuration =
                 CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
-            
+
             return new TopicService(
                 configuration.Object,
                 contentContext,

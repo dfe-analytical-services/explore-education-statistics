@@ -1829,9 +1829,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
-                    rf.ReleaseId == releaseFile.ReleaseId
-                    && rf.FileId == releaseFile.FileId);
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles
+                    .AsQueryable()
+                    .FirstAsync(rf =>
+                        rf.ReleaseId == releaseFile.ReleaseId
+                        && rf.FileId == releaseFile.FileId);
 
                 Assert.Equal("New file title", updatedReleaseFile.Name);
                 Assert.Equal("New file summary", updatedReleaseFile.Summary);
@@ -1885,9 +1887,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
-                    rf.ReleaseId == releaseFile.ReleaseId
-                    && rf.FileId == releaseFile.FileId);
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles
+                    .AsQueryable()
+                    .FirstAsync(rf =>
+                        rf.ReleaseId == releaseFile.ReleaseId
+                        && rf.FileId == releaseFile.FileId);
 
                 Assert.Equal("New file title", updatedReleaseFile.Name);
                 Assert.Equal("Old file summary", updatedReleaseFile.Summary);
@@ -1941,9 +1945,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
-                    rf.ReleaseId == releaseFile.ReleaseId
-                    && rf.FileId == releaseFile.FileId);
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles
+                    .AsQueryable()
+                    .FirstAsync(rf =>
+                        rf.ReleaseId == releaseFile.ReleaseId
+                        && rf.FileId == releaseFile.FileId);
 
                 Assert.Equal("Old file title", updatedReleaseFile.Name);
                 Assert.Equal("New file summary", updatedReleaseFile.Summary);

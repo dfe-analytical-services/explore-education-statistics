@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -487,12 +486,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Assert only one Subject has been updated
                 Assert.Equal("Subject 1 Meta Guidance Updated",
                     (await statisticsDbContext.ReleaseSubject
+                        .AsQueryable()
                         .Where(rs => rs.ReleaseId == statsRelease.Id
                                      && rs.SubjectId == releaseSubject1.Subject.Id)
                         .FirstAsync()).MetaGuidance);
 
                 Assert.Equal("Subject 2 Meta Guidance",
                     (await statisticsDbContext.ReleaseSubject
+                        .AsQueryable()
                         .Where(rs => rs.ReleaseId == statsRelease.Id
                                      && rs.SubjectId == releaseSubject2.Subject.Id)
                         .FirstAsync()).MetaGuidance);
@@ -673,17 +674,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Assert the same Subject on version 1 hasn't been affected
                 Assert.Equal("Version 1 Subject 1 Meta Guidance",
                     (await statisticsDbContext.ReleaseSubject
+                        .AsQueryable()
                         .Where(rs => rs.ReleaseId == statsReleaseVersion1.Id && rs.SubjectId == subject1.Id)
                         .FirstAsync()).MetaGuidance);
 
                 // Assert only one Subject on version 2 has been updated
                 Assert.Equal("Version 2 Subject 1 Meta Guidance Updated",
                     (await statisticsDbContext.ReleaseSubject
+                        .AsQueryable()
                         .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id && rs.SubjectId == subject1.Id)
                         .FirstAsync()).MetaGuidance);
 
                 Assert.Equal("Version 2 Subject 2 Meta Guidance",
                     (await statisticsDbContext.ReleaseSubject
+                        .AsQueryable()
                         .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id && rs.SubjectId == subject2.Id)
                         .FirstAsync()).MetaGuidance);
             }

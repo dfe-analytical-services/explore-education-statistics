@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanDeleteRelease)
                 .OnSuccess(release =>
                 {
-                    var methodologiesScheduledWithRelease = 
+                    var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseId)
                         .Select(m => new TitleAndIdViewModel(m.Id, m.Title))
                         .ToList();
@@ -165,22 +165,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     release.SoftDeleted = true;
                     _context.Update(release);
-                    
+
                     var roles = await _context
                         .UserReleaseRoles
+                        .AsQueryable()
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
                     roles.ForEach(r => r.SoftDeleted = true);
                     _context.UpdateRange(roles);
-                    
+
                     var invites = await _context
                         .UserReleaseInvites
+                        .AsQueryable()
                         .Where(r => r.ReleaseId == releaseId)
                         .ToListAsync();
                     invites.ForEach(r => r.SoftDeleted = true);
                     _context.UpdateRange(invites);
 
-                    var methodologiesScheduledWithRelease = 
+                    var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseId);
 
                     // TODO EES-2747 - this should be looked at to see how best to reuse similar "set to draft" logic
@@ -194,9 +196,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         m.InternalReleaseNote = null;
                         m.Updated = DateTime.UtcNow;
                     });
-                    
+
                     _context.UpdateRange(methodologiesScheduledWithRelease);
-                    
+
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(releaseId);
@@ -232,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 var statsAmendmentSubjectLinks = _statisticsDbContext
                     .ReleaseSubject
+                    .AsQueryable()
                     .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
                     .Select(rs => rs.CopyForRelease(statsAmendment));
 
@@ -248,6 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var newRoles = _context
                 .UserReleaseRoles
+                .AsQueryable()
                 .Where(r => r.ReleaseId == originalReleaseId)
                 .Select(r => r.CreateReleaseAmendment(amendment));
 
@@ -299,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.ReleaseName = request.ReleaseName;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     release.PreReleaseAccessList = request.PreReleaseAccessList;
-                    
+
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
                     return await GetRelease(releaseId);
@@ -372,7 +376,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
-            var releases = await _context.Releases.Where(r => r.PublicationId == publicationId).ToListAsync();
+            var releases = await _context.Releases
+                .AsQueryable()
+                .Where(r => r.PublicationId == publicationId).ToListAsync();
 
             if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
             {

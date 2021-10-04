@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
-                // unlikely scenario, it's entirely possible. 
+                // unlikely scenario, it's entirely possible.
                 .OnSuccessDo(methodologyVersion =>
                     ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
                 .OnSuccess(async methodologyVersion =>
@@ -347,12 +347,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var methodologyId = await _context
                 .MethodologyVersions
+                .AsQueryable()
                 .Where(m => m.Id == methodologyVersionId)
                 .Select(m => m.MethodologyId)
                 .SingleAsync();
 
             if (await _context
                 .Methodologies
+                .AsQueryable()
                 .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
             {
                 return ValidationActionResult(SlugNotUnique);

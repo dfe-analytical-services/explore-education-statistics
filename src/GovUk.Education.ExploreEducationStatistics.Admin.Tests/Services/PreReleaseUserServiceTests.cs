@@ -395,6 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var savedUserReleaseRole = await context.UserReleaseRoles
+                    .AsQueryable()
                     .Where(userReleaseRole => userReleaseRole.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -403,6 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
                 var releaseInvite = await context.UserReleaseInvites
+                    .AsQueryable()
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -415,6 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var systemInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .Where(userInvite => userInvite.Email == "test@test.com")
                     .SingleAsync();
 
@@ -492,6 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var savedUserReleaseRole = await context.UserReleaseRoles
+                    .AsQueryable()
                     .Where(userReleaseRole => userReleaseRole.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -500,6 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
                 var releaseInvite = await context.UserReleaseInvites
+                    .AsQueryable()
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -512,6 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var systemInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .Where(userInvite => userInvite.Email == "test@test.com")
                     .SingleAsync();
 
@@ -615,6 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var releaseInvite = await context.UserReleaseInvites
+                    .AsQueryable()
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -627,6 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var systemInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .Where(userInvite => userInvite.Email == "test@test.com")
                     .SingleAsync();
 
@@ -695,6 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var releaseInvite = await context.UserReleaseInvites
+                    .AsQueryable()
                     .Where(userReleaseInvite => userReleaseInvite.ReleaseId == release.Id)
                     .SingleAsync();
 
@@ -707,6 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var systemInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .Where(userInvite => userInvite.Email == "test@test.com")
                     .SingleAsync();
 
@@ -797,6 +807,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var savedUserReleaseRoles = await context.UserReleaseRoles
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Empty(savedUserReleaseRoles);
@@ -884,6 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var savedUserReleaseRoles = await context.UserReleaseRoles
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Equal(2, savedUserReleaseRoles.Count);
@@ -953,12 +965,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var savedUserReleaseInvites = await context.UserReleaseInvites
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Empty(savedUserReleaseInvites);
 
                 // Removes system invite as there are no release invites left
                 var savedUserInvites = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Empty(savedUserInvites);
@@ -1037,6 +1051,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var savedUserReleaseInvites = await context.UserReleaseInvites
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Equal(2, savedUserReleaseInvites.Count);
@@ -1049,6 +1064,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test@test.com", savedUserReleaseInvites[1].Email);
 
                 var savedUserInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .SingleAsync();
 
                 Assert.Equal("test@test.com", savedUserInvite.Email);
@@ -1112,11 +1128,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = DbUtils.InMemoryUserAndRolesDbContext(contextId))
             {
                 var savedUserReleaseInvites = await context.UserReleaseInvites
+                    .AsQueryable()
                     .ToListAsync();
 
                 Assert.Empty(savedUserReleaseInvites);
 
                 var savedUserInvite = await userAndRolesDbContext.UserInvites
+                    .AsQueryable()
                     .SingleAsync();
 
                 Assert.Equal("test@test.com", savedUserInvite.Email);

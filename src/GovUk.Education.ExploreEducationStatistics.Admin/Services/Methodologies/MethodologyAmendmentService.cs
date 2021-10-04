@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var originalFiles = await _context
                 .MethodologyFiles
+                .AsQueryable()
                 .Where(f => f.MethodologyVersionId == methodologyVersion.PreviousVersionId)
                 .ToListAsync();
 
