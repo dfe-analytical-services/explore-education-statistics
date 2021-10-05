@@ -8,31 +8,31 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api")]
-    public class MetaGuidanceController
+    public class DataGuidanceController
     {
-        private readonly IMetaGuidanceService _metaGuidanceService;
+        private readonly IDataGuidanceService _dataGuidanceService;
 
-        public MetaGuidanceController(IMetaGuidanceService metaGuidanceService)
+        public DataGuidanceController(IDataGuidanceService dataGuidanceService)
         {
-            _metaGuidanceService = metaGuidanceService;
+            _dataGuidanceService = dataGuidanceService;
         }
 
-        [HttpGet("publications/{publicationSlug}/releases/latest/meta-guidance")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> GetLatest(string publicationSlug)
+        [HttpGet("publications/{publicationSlug}/releases/latest/data-guidance")]
+        public async Task<ActionResult<DataGuidanceViewModel>> GetLatest(string publicationSlug)
         {
-            return await _metaGuidanceService.Get(
+            return await _dataGuidanceService.Get(
                     publicationPath: PublicContentPublicationPath(publicationSlug),
                     releasePath: PublicContentLatestReleasePath(publicationSlug)
                 )
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/meta-guidance")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> Get(
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/data-guidance")]
+        public async Task<ActionResult<DataGuidanceViewModel>> Get(
             string publicationSlug,
             string releaseSlug)
         {
-            return await _metaGuidanceService.Get(
+            return await _dataGuidanceService.Get(
                     publicationPath: PublicContentPublicationPath(publicationSlug),
                     releasePath: PublicContentReleasePath(publicationSlug, releaseSlug)
                 )

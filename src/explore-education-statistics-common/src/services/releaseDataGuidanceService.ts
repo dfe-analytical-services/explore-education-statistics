@@ -26,7 +26,7 @@ export interface SubjectDataGuidance {
 
 export interface ReleaseDataGuidanceSummary extends ReleaseSummary {
   publication: PublicationSummary;
-  metaGuidance: string;
+  dataGuidance: string;
   subjects: SubjectDataGuidance[];
 }
 
@@ -35,7 +35,7 @@ const releaseDataGuidanceService = {
     publicationSlug: string,
   ): Promise<ReleaseDataGuidanceSummary> {
     return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/meta-guidance`,
+      `/publications/${publicationSlug}/releases/latest/data-guidance`,
     );
   },
   getReleaseDataGuidance(
@@ -43,7 +43,7 @@ const releaseDataGuidanceService = {
     releaseSlug: string,
   ): Promise<ReleaseDataGuidanceSummary> {
     return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/meta-guidance`,
+      `/publications/${publicationSlug}/releases/${releaseSlug}/data-guidance`,
     );
   },
 };

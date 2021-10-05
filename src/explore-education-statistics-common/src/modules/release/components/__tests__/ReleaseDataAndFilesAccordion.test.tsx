@@ -47,7 +47,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
         extension: 'txt',
       },
     ],
-    hasMetaGuidance: true,
+    hasDataGuidance: true,
     hasPreReleaseAccessList: true,
     publication: {
       slug: 'publication-1',
@@ -125,7 +125,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
       <ReleaseDataAndFilesAccordion
         release={{
           ...testRelease,
-          hasMetaGuidance: false,
+          hasDataGuidance: false,
         }}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderDataGuidanceLink={<a href="#">mock data guidance link</a>}

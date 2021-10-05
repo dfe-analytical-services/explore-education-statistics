@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var subjectObservation1 = new Observation
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var subjectObservation1 = new Observation
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();

@@ -19,7 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.Permi
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class MetaGuidanceServicePermissionTests
+    public class DataGuidanceServicePermissionTests
     {
         private readonly Release _release = new Release
         {
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = SetupMetaGuidanceService(userService: userService.Object);
+                        var service = SetupService(userService: userService.Object);
                         return service.Get(_release.Id);
                     }
                 );
@@ -48,25 +48,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = SetupMetaGuidanceService(userService: userService.Object);
-                        return service.Update(_release.Id, new MetaGuidanceUpdateViewModel());
+                        var service = SetupService(userService: userService.Object);
+                        return service.Update(_release.Id, new DataGuidanceUpdateViewModel());
                     }
                 );
         }
 
 
-        private MetaGuidanceService SetupMetaGuidanceService(
+        private DataGuidanceService SetupService(
             ContentDbContext contentDbContext = null,
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
+            IDataGuidanceSubjectService dataGuidanceSubjectService = null,
             IUserService userService = null,
             IReleaseDataFileRepository releaseDataFileRepository = null)
         {
-            return new MetaGuidanceService(
+            return new DataGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
+                dataGuidanceSubjectService ?? new Mock<IDataGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext)

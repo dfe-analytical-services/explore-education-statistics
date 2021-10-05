@@ -124,7 +124,7 @@ export type ReleaseChecklistError = {
   code:
     | 'DataFileImportsMustBeCompleted'
     | 'DataFileReplacementsMustBeCompleted'
-    | 'PublicMetaGuidanceRequired'
+    | 'PublicDataGuidanceRequired'
     | 'ReleaseNoteRequired'
     | 'EmptyContentSectionExists'
     | 'GenericSectionsContainEmptyHtmlBlock';

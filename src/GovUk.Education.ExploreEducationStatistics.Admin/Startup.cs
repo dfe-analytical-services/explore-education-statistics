@@ -322,8 +322,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();
-            services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
-            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+            services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             // TODO: EES-2343 Remove when file sizes are stored in database

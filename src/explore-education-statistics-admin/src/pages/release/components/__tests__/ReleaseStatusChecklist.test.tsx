@@ -43,7 +43,7 @@ describe('ReleaseStatusChecklist', () => {
             errors: [
               { code: 'DataFileImportsMustBeCompleted' },
               { code: 'DataFileReplacementsMustBeCompleted' },
-              { code: 'PublicMetaGuidanceRequired' },
+              { code: 'PublicDataGuidanceRequired' },
               { code: 'ReleaseNoteRequired' },
             ],
           }}
@@ -211,7 +211,7 @@ describe('ReleaseStatusChecklist', () => {
           checklist={{
             valid: true,
             warnings: [{ code: 'NoMethodology' }],
-            errors: [{ code: 'PublicMetaGuidanceRequired' }],
+            errors: [{ code: 'PublicDataGuidanceRequired' }],
           }}
           release={testRelease}
         />

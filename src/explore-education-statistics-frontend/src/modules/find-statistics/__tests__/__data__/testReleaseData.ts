@@ -69,7 +69,7 @@ export const testRelease: Release = {
   published: '2018-04-25T09:30:00',
   slug: '2016-17',
   dataLastPublished: '',
-  hasMetaGuidance: true,
+  hasDataGuidance: true,
   hasPreReleaseAccessList: true,
   type: {
     id: 'national-stats-1',

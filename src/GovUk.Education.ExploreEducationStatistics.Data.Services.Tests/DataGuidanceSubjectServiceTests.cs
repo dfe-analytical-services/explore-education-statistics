@@ -23,7 +23,7 @@ using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class MetaGuidanceSubjectServiceTests
+    public class DataGuidanceSubjectServiceTests
     {
         [Fact]
         public async Task Get()
@@ -80,14 +80,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject1,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
                 Subject = subject2,
-                MetaGuidance = "Subject 2 Meta Guidance"
+                DataGuidance = "Subject 2 Guidance"
             };
 
             var subject1Observation1 = new Observation
@@ -278,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(
+                var service = SetupService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, result.Count);
 
                 Assert.Equal(subject1.Id, result[0].Id);
-                Assert.Equal("Subject 1 Meta Guidance", result[0].Content);
+                Assert.Equal("Subject 1 Guidance", result[0].Content);
                 Assert.Equal("file1.csv", result[0].Filename);
                 Assert.Equal("Subject 1", result[0].Name);
 
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(subject1Footnote3.FootnoteId, result[0].Footnotes[2].Id);
 
                 Assert.Equal(subject2.Id, result[1].Id);
-                Assert.Equal("Subject 2 Meta Guidance", result[1].Content);
+                Assert.Equal("Subject 2 Guidance", result[1].Content);
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
@@ -352,19 +352,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 2 Meta Guidance"
+                DataGuidance = "Subject 2 Guidance"
             };
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 3 Meta Guidance"
+                DataGuidance = "Subject 3 Guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -428,7 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(
+                var service = SetupService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
@@ -453,21 +453,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 2 Meta Guidance"
+                DataGuidance = "Subject 2 Guidance"
             };
 
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                MetaGuidance = "Subject 3 Meta Guidance"
+                DataGuidance = "Subject 3 Guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -531,7 +531,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(
+                var service = SetupService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
@@ -546,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, result.Right.Count);
 
                 Assert.Equal(releaseSubject1.SubjectId, result.Right[0].Id);
-                Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
+                Assert.Equal("Subject 1 Guidance", result.Right[0].Content);
                 Assert.Equal("file1.csv", result.Right[0].Filename);
                 Assert.Equal("Subject 1", result.Right[0].Name);
                 Assert.Empty(result.Right[0].TimePeriods.From);
@@ -555,7 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(result.Right[0].Variables);
 
                 Assert.Equal(releaseSubject3.SubjectId, result.Right[1].Id);
-                Assert.Equal("Subject 3 Meta Guidance", result.Right[1].Content);
+                Assert.Equal("Subject 3 Guidance", result.Right[1].Content);
                 Assert.Equal("file3.csv", result.Right[1].Filename);
                 Assert.Equal("Subject 3", result.Right[1].Name);
                 Assert.Empty(result.Right[1].TimePeriods.From);
@@ -572,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.GetSubjects(Guid.NewGuid());
 
@@ -596,7 +596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.GetSubjects(release.Id);
 
@@ -629,21 +629,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = releaseVersion1,
                 Subject = subject1,
-                MetaGuidance = "Version 1 Subject 1 Meta Guidance"
+                DataGuidance = "Version 1 Subject 1 Guidance"
             };
 
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion2,
                 Subject = subject1,
-                MetaGuidance = "Version 2 Subject 1 Meta Guidance"
+                DataGuidance = "Version 2 Subject 1 Guidance"
             };
 
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = releaseVersion2,
                 Subject = subject2,
-                MetaGuidance = "Version 2 Subject 2 Meta Guidance"
+                DataGuidance = "Version 2 Subject 2 Guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -717,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(
+                var service = SetupService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
@@ -729,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(version1Result.Right);
 
                 Assert.Equal(subject1.Id, version1Result.Right[0].Id);
-                Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right[0].Content);
+                Assert.Equal("Version 1 Subject 1 Guidance", version1Result.Right[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right[0].Name);
                 Assert.Empty(version1Result.Right[0].TimePeriods.From);
@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, version2Result.Right.Count);
 
                 Assert.Equal(subject1.Id, version2Result.Right[0].Id);
-                Assert.Equal("Version 2 Subject 1 Meta Guidance", version2Result.Right[0].Content);
+                Assert.Equal("Version 2 Subject 1 Guidance", version2Result.Right[0].Content);
                 Assert.Equal("file1.csv", version2Result.Right[0].Filename);
                 Assert.Equal("Subject 1", version2Result.Right[0].Name);
                 Assert.Empty(version2Result.Right[0].TimePeriods.From);
@@ -753,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(version2Result.Right[0].GeographicLevels);
 
                 Assert.Equal(subject2.Id, version2Result.Right[1].Id);
-                Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right[1].Content);
+                Assert.Equal("Version 2 Subject 2 Guidance", version2Result.Right[1].Content);
                 Assert.Equal("file2.csv", version2Result.Right[1].Filename);
                 Assert.Equal("Subject 2", version2Result.Right[1].Name);
                 Assert.Empty(version2Result.Right[1].TimePeriods.From);
@@ -770,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.Validate(Guid.NewGuid());
 
@@ -794,7 +794,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.Validate(release.Id);
 
@@ -804,20 +804,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task Validate_MetaGuidancePopulated()
+        public async Task Validate_DataGuidancePopulated()
         {
             var release = new Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                MetaGuidance = "Subject 1 Meta Guidance",
+                DataGuidance = "Subject 1 Guidance",
                 Release = release,
                 Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                MetaGuidance = "Subject 2 Meta Guidance",
+                DataGuidance = "Subject 2 Guidance",
                 Release = release,
                 Subject = new Subject()
             };
@@ -833,7 +833,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.Validate(release.Id);
 
@@ -843,21 +843,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task Validate_MetaGuidanceNotPopulated()
+        public async Task Validate_DataGuidanceNotPopulated()
         {
             var release = new Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                MetaGuidance = "Subject 1 Meta Guidance",
+                DataGuidance = "Subject 1 Guidance",
                 Release = release,
                 Subject = new Subject()
             };
 
-            // Meta guidance is not populated for Subject 2
+            // Guidance is not populated for Subject 2
             var releaseSubject2 = new ReleaseSubject
             {
-                MetaGuidance = null,
+                DataGuidance = null,
                 Release = release,
                 Subject = new Subject()
             };
@@ -873,7 +873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.Validate(release.Id);
 
@@ -893,7 +893,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var subjectObservation1 = new Observation
@@ -936,7 +936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.GetGeographicLevels(subject.Id);
 
@@ -958,7 +958,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject,
-                MetaGuidance = "Subject 1 Meta Guidance"
+                DataGuidance = "Subject 1 Guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -973,7 +973,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = SetupMetaGuidanceSubjectService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(statisticsDbContext: statisticsDbContext);
 
                 var result = await service.GetGeographicLevels(subject.Id);
 
@@ -981,7 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static MetaGuidanceSubjectService SetupMetaGuidanceSubjectService(
+        private static DataGuidanceSubjectService SetupService(
             StatisticsDbContext statisticsDbContext,
             IFilterRepository? filterRepository = null,
             IIndicatorRepository? indicatorRepository = null,
