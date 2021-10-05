@@ -58,7 +58,7 @@ const SubjectStep = ({
       <SubjectForm
         {...stepProps}
         initialValues={{
-          subjectId,
+          subjectId: subjects.length === 1 ? subjects[0].id : subjectId,
         }}
         options={subjects}
         onSubmit={onSubmit}

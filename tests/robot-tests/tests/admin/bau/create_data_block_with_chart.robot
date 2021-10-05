@@ -71,7 +71,7 @@ Select time period
     user checks previous table tool step contains    3    Time period    2005 to 2020
 
 Select indicators
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
 Create table
     [Documentation]    EES-615

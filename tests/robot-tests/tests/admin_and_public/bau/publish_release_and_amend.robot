@@ -84,8 +84,7 @@ Create data block table
     user clicks element    id:publicationSubjectForm-submit
 
     user waits until table tool wizard step is available    Choose locations
-    user opens details dropdown    National
-    user clicks checkbox    England
+    user checks location checkbox is checked    England
     user clicks element    id:locationFiltersForm-submit
 
     user waits until table tool wizard step is available    Choose time period

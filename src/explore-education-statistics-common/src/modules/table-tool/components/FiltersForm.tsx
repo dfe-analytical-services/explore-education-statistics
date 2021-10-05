@@ -52,6 +52,14 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   } = props;
 
   const initialFormValues = useMemo(() => {
+    const indicators = Object.entries(subjectMeta.indicators);
+
+    // Automatically select indicator when no filters and one indicator group with one option
+    const autoSelectIndicator =
+      !Object.keys(subjectMeta.filters).length &&
+      indicators.length === 1 &&
+      indicators[0][1].options.length === 1;
+
     return {
       filters: mapValues(subjectMeta.filters, filter => {
         if (initialValues?.filters) {
@@ -73,7 +81,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
         return [];
       }),
-      indicators: initialValues?.indicators ?? [],
+      indicators: autoSelectIndicator
+        ? [indicators[0][1].options[0].value]
+        : initialValues?.indicators ?? [],
     };
   }, [initialValues, subjectMeta]);
 

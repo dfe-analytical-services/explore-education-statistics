@@ -123,8 +123,7 @@ Select subject
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location
-    user opens details dropdown    National
-    user clicks checkbox    England
+    user checks location checkbox is checked    England
 
 Click next step button
     user clicks element    id:locationFiltersForm-submit
@@ -448,8 +447,7 @@ Select subject again
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location filter
-    user opens details dropdown    National
-    user clicks checkbox    England
+    user checks location checkbox is checked    England
 
 Click the next step button
     user clicks element    id:locationFiltersForm-submit

@@ -19,7 +19,7 @@ import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 import WizardStepEditButton from './WizardStepEditButton';
 
-interface FormValues {
+export interface LocationFormValues {
   locations: Dictionary<string[]>;
 }
 
@@ -57,22 +57,32 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     [props, stepEnabled],
   );
 
-  return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={{
-        locations: mapValues(options, (levelOptions, level) => {
-          const initialLevel = initialValues[level] ?? [];
+  // Automatically select and expand group if only one location available
+  const autoSelectLocation =
+    Object.entries(formOptions).length === 1 &&
+    Object.entries(formOptions)[0][1].options.length === 1;
 
-          return initialLevel.filter(
-            initialId =>
-              levelOptions.options.find(({ value }) => value === initialId) !==
-              undefined,
-          );
-        }),
-      }}
+  const initialFormValues = useMemo(() => {
+    return {
+      locations: mapValues(options, (levelOptions, level) => {
+        const initialLevel = autoSelectLocation
+          ? [levelOptions.options[0].value]
+          : initialValues[level] ?? [];
+        return initialLevel.filter(
+          initialId =>
+            levelOptions.options.find(({ value }) => value === initialId) !==
+            undefined,
+        );
+      }),
+    };
+  }, [autoSelectLocation, initialValues, options]);
+
+  return (
+    <Formik<LocationFormValues>
+      enableReinitialize
+      initialValues={initialFormValues}
       validateOnBlur={false}
-      validationSchema={Yup.object<FormValues>({
+      validationSchema={Yup.object<LocationFormValues>({
         locations: Yup.mixed().test(
           'required',
           'Select at least one location',
@@ -120,6 +130,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           legend={level.legend}
                           legendHidden
                           disabled={form.isSubmitting}
+                          openGroup={autoSelectLocation}
                         />
                       );
                     })}

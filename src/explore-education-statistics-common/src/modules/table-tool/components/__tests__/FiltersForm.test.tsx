@@ -129,6 +129,29 @@ describe('FiltersForm', () => {
     },
   };
 
+  const testSubjectMetaNoFiltersOneIndicator: SubjectMeta = {
+    filters: {},
+    indicators: {
+      AbsenceByReason: {
+        label: 'Absence by reason',
+        options: [
+          {
+            label: 'Number of excluded sessions',
+            unit: '',
+            value: 'number-excluded-sessions',
+            name: 'sess_auth_excluded',
+          },
+        ],
+      },
+    },
+    locations: {},
+    timePeriod: {
+      hint: '',
+      legend: '',
+      options: [],
+    },
+  };
+
   const testWizardStepProps: InjectedWizardProps = {
     currentStep: 1,
     isActive: true,
@@ -374,6 +397,28 @@ describe('FiltersForm', () => {
     expect(
       screen.getByLabelText('Number of overall absence sessions'),
     ).not.toHaveAttribute('checked');
+  });
+
+  test('automatically selects checkbox when there is only one indicator and no filters', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subjectMeta={testSubjectMetaNoFiltersOneIndicator}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      within(
+        screen.getByRole('group', {
+          name: 'Indicators - 1 selected',
+        }),
+      ).getAllByRole('checkbox'),
+    ).toHaveLength(1);
+
+    expect(
+      screen.getByLabelText('Number of excluded sessions'),
+    ).toHaveAttribute('checked');
   });
 
   test('upon submit automatically selects Total checkbox if no other options in that group are checked', async () => {
