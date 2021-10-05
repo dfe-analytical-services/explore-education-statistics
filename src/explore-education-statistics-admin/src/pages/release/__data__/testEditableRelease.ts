@@ -292,7 +292,7 @@ export const testEditableRelease: EditableRelease = {
     },
   ],
   hasPreReleaseAccessList: false,
-  hasMetaGuidance: true,
+  hasDataGuidance: true,
   publishScheduled: '2020-03-03T00:00:00',
   nextReleaseDate: { year: 2020, month: 3, day: 4 },
   relatedInformation: [],

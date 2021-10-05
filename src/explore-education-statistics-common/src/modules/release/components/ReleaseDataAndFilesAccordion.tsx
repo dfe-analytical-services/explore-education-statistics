@@ -114,7 +114,7 @@ const ReleaseDataAndFilesAccordion = ({
                 </ul>
               )}
 
-              {release.hasMetaGuidance && (
+              {release.hasDataGuidance && (
                 <p>
                   Learn more about the data files used in this release using our{' '}
                   {renderDataGuidanceLink}.

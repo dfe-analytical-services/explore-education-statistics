@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IMetaGuidanceService
+    public interface IDataGuidanceService
     {
-        public Task<Either<ActionResult, MetaGuidanceViewModel>> Get(Guid releaseId);
+        public Task<Either<ActionResult, DataGuidanceViewModel>> Get(Guid releaseId);
 
-        public Task<Either<ActionResult, MetaGuidanceViewModel>> Update(Guid releaseId,
-            MetaGuidanceUpdateViewModel request);
+        public Task<Either<ActionResult, DataGuidanceViewModel>> Update(Guid releaseId,
+            DataGuidanceUpdateViewModel request);
 
         public Task<Either<ActionResult, Unit>> Validate(Guid releaseId);
     }

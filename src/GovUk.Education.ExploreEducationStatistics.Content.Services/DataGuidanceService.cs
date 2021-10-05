@@ -8,20 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
-    public class MetaGuidanceService : IMetaGuidanceService
+    public class DataGuidanceService : IDataGuidanceService
     {
         private readonly IFileStorageService _fileStorageService;
-        private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
 
-        public MetaGuidanceService(
+        public DataGuidanceService(
             IFileStorageService fileStorageService,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService)
+            IDataGuidanceSubjectService dataGuidanceSubjectService)
         {
             _fileStorageService = fileStorageService;
-            _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _dataGuidanceSubjectService = dataGuidanceSubjectService;
         }
 
-        public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string publicationPath, string releasePath)
+        public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationPath, string releasePath)
         {
             var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
             var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
@@ -30,10 +30,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
             {
-                return await _metaGuidanceSubjectService.GetSubjects(releaseTask.Result.Right.Id)
+                return await _dataGuidanceSubjectService.GetSubjects(releaseTask.Result.Right.Id)
                     .OnSuccess(
                         subjects =>
-                            new MetaGuidanceViewModel(
+                            new DataGuidanceViewModel(
                                 releaseTask.Result.Right,
                                 publicationTask.Result.Right,
                                 subjects
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     );
             }
 
-            return new Either<ActionResult, MetaGuidanceViewModel>(new NotFoundResult());
+            return new Either<ActionResult, DataGuidanceViewModel>(new NotFoundResult());
         }
     }
 }

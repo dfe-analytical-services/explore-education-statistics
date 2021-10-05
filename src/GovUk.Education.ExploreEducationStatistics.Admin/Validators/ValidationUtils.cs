@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileImportsMustBeCompleted,
         DataFileReplacementsMustBeCompleted,
         ReleaseNoteRequired,
-        PublicMetaGuidanceRequired,
+        PublicDataGuidanceRequired,
 
         // Release checklist warnings
         NoMethodology,

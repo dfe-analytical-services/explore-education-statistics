@@ -121,7 +121,7 @@ export interface Release<
   downloadFiles: FileInfo[];
   dataLastPublished: string;
   hasPreReleaseAccessList: boolean;
-  hasMetaGuidance: boolean;
+  hasDataGuidance: boolean;
 }
 
 export interface ReleaseSummary {

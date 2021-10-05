@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public bool HasPreReleaseAccessList { get; }
 
-        public bool HasMetaGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
+        public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
 
         public List<LinkViewModel> RelatedInformation { get; }
 

@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
                         ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
                             replacementPlan.ReplacementSubjectId));
-                    await ReplaceMetaGuidance(releaseId, replacementPlan.OriginalSubjectId,
+                    await ReplaceDataGuidance(releaseId, replacementPlan.OriginalSubjectId,
                         replacementPlan.ReplacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
@@ -886,7 +886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceMetaGuidance(
+        private async Task ReplaceDataGuidance(
             Guid releaseId,
             Guid originalSubject,
             Guid replacementSubject)
@@ -904,7 +904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstAsync();
 
             _statisticsDbContext.Update(replacementReleaseSubject);
-            replacementReleaseSubject.MetaGuidance = originalReleaseSubject.MetaGuidance;
+            replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(

@@ -307,5 +307,5 @@ export const testPublicationRelease: Release = {
   downloadFiles: [],
   dataLastPublished: '',
   hasPreReleaseAccessList: true,
-  hasMetaGuidance: true,
+  hasDataGuidance: true,
 };
