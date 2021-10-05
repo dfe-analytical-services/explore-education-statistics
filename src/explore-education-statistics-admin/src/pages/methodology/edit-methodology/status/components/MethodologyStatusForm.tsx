@@ -1,5 +1,5 @@
 import {
-  BasicMethodology,
+  BasicMethodologyVersion,
   MethodologyPublishingStrategy,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
@@ -25,7 +25,7 @@ export interface FormValues {
 
 interface Props {
   isPublished?: string;
-  methodologySummary: BasicMethodology;
+  methodologySummary: BasicMethodologyVersion;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
