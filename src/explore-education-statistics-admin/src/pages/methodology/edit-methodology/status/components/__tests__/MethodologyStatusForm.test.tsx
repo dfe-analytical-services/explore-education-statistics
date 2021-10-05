@@ -6,7 +6,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
-import { BasicMethodology } from 'src/services/methodologyService';
+import { BasicMethodologyVersion } from 'src/services/methodologyService';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -26,7 +26,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Draft',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -64,7 +64,7 @@ describe('MethodologyStatusForm', () => {
           {
             status: 'Approved',
             latestInternalReleaseNote: 'The latest note',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -94,7 +94,7 @@ describe('MethodologyStatusForm', () => {
             scheduledWithRelease: {
               id: 'test-release-2',
             },
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -140,7 +140,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Draft',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -168,7 +168,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Approved',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -196,7 +196,7 @@ describe('MethodologyStatusForm', () => {
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -228,7 +228,7 @@ describe('MethodologyStatusForm', () => {
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodology
+          } as BasicMethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}

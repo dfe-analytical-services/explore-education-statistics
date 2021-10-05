@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _methodologyService, {
-  BasicMethodology,
+  BasicMethodologyVersion,
 } from '@admin/services/methodologyService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
@@ -26,7 +26,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyStatusPage', () => {
-  const testMethodology: BasicMethodology = {
+  const testMethodology: BasicMethodologyVersion = {
     id: 'm1',
     amendment: false,
     title: 'Test methodology',
@@ -35,7 +35,7 @@ describe('MethodologyStatusPage', () => {
       id: 'p1',
       title: 'Owning publication title',
     },
-  } as BasicMethodology;
+  } as BasicMethodologyVersion;
 
   const testMethodologyWithOtherPublications = {
     ...testMethodology,
@@ -270,7 +270,7 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
-  function renderPage(methodology: BasicMethodology) {
+  function renderPage(methodology: BasicMethodologyVersion) {
     render(
       <MemoryRouter
         initialEntries={[

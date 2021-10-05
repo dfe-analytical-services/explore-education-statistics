@@ -1,12 +1,12 @@
 import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/components/AdoptMethodologyForm';
-import { BasicMethodology } from '@admin/services/methodologyService';
+import { BasicMethodologyVersion } from '@admin/services/methodologyService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
 describe('AdoptMethodologyForm', () => {
-  const testMethodologies: BasicMethodology[] = [
+  const testMethodologies: BasicMethodologyVersion[] = [
     {
       id: 'methodology-v1',
       methodologyId: 'methodology-1',
@@ -16,7 +16,7 @@ describe('AdoptMethodologyForm', () => {
       },
       status: 'Draft',
       title: 'Methodology 1',
-    } as BasicMethodology,
+    } as BasicMethodologyVersion,
     {
       id: 'methodology-v2',
       methodologyId: 'methodology-2',
@@ -27,7 +27,7 @@ describe('AdoptMethodologyForm', () => {
       published: '2021-06-08T09:04:17.9805585',
       status: 'Approved',
       title: 'Methodology 2',
-    } as BasicMethodology,
+    } as BasicMethodologyVersion,
     {
       id: 'methodology-v3',
       methodologyId: 'methodology-3',
@@ -37,7 +37,7 @@ describe('AdoptMethodologyForm', () => {
       },
       status: 'Draft',
       title: 'Methodology 3',
-    } as BasicMethodology,
+    } as BasicMethodologyVersion,
     {
       id: 'methodology-v4',
       methodologyId: 'methodology-4',
@@ -47,7 +47,7 @@ describe('AdoptMethodologyForm', () => {
       published: '2021-06-10T09:04:17.9805585',
       status: 'Approved',
       title: 'Methodology 4',
-    } as BasicMethodology,
+    } as BasicMethodologyVersion,
   ];
 
   test('renders the form', () => {

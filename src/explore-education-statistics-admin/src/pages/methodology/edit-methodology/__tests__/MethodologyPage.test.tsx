@@ -5,7 +5,7 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import { methodologyRoute } from '@admin/routes/routes';
 import _methodologyService, {
-  BasicMethodology,
+  BasicMethodologyVersion,
 } from '@admin/services/methodologyService';
 import _methodologyContentService, {
   MethodologyContent,
@@ -33,7 +33,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyPage', () => {
-  const testMethodology: BasicMethodology = {
+  const testMethodology: BasicMethodologyVersion = {
     id: 'm1',
     amendment: false,
     methodologyId: 'm-1',

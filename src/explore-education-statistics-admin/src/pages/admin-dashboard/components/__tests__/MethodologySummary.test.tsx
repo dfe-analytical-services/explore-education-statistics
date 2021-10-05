@@ -1,7 +1,7 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
 import _methodologyService, {
-  BasicMethodology,
-  MyMethodology,
+  BasicMethodologyVersion,
+  MyMethodologyVersion,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -34,7 +34,7 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testMethodology: MyMethodology = {
+const testMethodology: MyMethodologyVersion = {
   amendment: false,
   id: 'methodology-v1',
   latestInternalReleaseNote: 'this is the release note',
@@ -56,7 +56,7 @@ const testMethodology: MyMethodology = {
     canMarkMethodologyAsDraft: false,
   },
 };
-const testMethodology2: MyMethodology = {
+const testMethodology2: MyMethodologyVersion = {
   amendment: false,
   id: 'methodology-v2',
   latestInternalReleaseNote: 'this is another release note',
@@ -989,7 +989,7 @@ describe('MethodologySummary', () => {
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
       const history = createMemoryHistory();
 
-      const mockMethodology: BasicMethodology = {
+      const mockMethodology: BasicMethodologyVersion = {
         amendment: true,
         id: 'methodology-v1',
         latestInternalReleaseNote: 'this is the release note',
