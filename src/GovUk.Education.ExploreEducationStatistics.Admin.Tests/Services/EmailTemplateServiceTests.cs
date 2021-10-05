@@ -1,6 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -9,6 +12,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -24,18 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {"url", "https://admin-uri"}
             };
 
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+            var emailService = new Mock<IEmailService>(Strict);
 
             emailService.Setup(mock =>
-                mock.SendEmail(
-                    "test@test.com",
-                    expectedTemplateId,
-                    expectedValues
-                ));
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Returns(Unit.Instance);
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            service.SendInviteEmail("test@test.com");
+            var result = service.SendInviteEmail("test@test.com");
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -46,6 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
 
             VerifyAllMocks(emailService);
+
+            result.AssertRight();
         }
 
         [Fact]
@@ -66,18 +73,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {"publication", "Test Publication"},
             };
 
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+            var emailService = new Mock<IEmailService>(Strict);
 
             emailService.Setup(mock =>
-                mock.SendEmail(
-                    "test@test.com",
-                    expectedTemplateId,
-                    expectedValues
-                ));
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Returns(Unit.Instance);
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            service.SendPublicationRoleEmail("test@test.com", publication, Owner);
+            var result = service.SendPublicationRoleEmail("test@test.com", publication, Owner);
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -88,6 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
 
             VerifyAllMocks(emailService);
+
+            result.AssertRight();
         }
 
         [Fact]
@@ -115,18 +125,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {"release", "December 2020"}
             };
 
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+            var emailService = new Mock<IEmailService>(Strict);
 
             emailService.Setup(mock =>
-                mock.SendEmail(
-                    "test@test.com",
-                    expectedTemplateId,
-                    expectedValues
-                ));
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Returns(Unit.Instance);
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            service.SendReleaseRoleEmail("test@test.com", release, Contributor);
+            var result = service.SendReleaseRoleEmail("test@test.com", release, Contributor);
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -137,6 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
 
             VerifyAllMocks(emailService);
+
+            result.AssertRight();
         }
 
         private static Mock<IConfiguration> ConfigurationMock()
@@ -149,11 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static EmailTemplateService SetupEmailTemplateService(
-            IEmailService emailService = null,
-            IConfiguration configuration = null)
+            IEmailService? emailService = null,
+            IConfiguration? configuration = null)
         {
-            return new EmailTemplateService(
-                emailService ?? new Mock<IEmailService>().Object,
+            return new(
+                emailService ?? Mock.Of<IEmailService>(Strict),
                 configuration ?? ConfigurationMock().Object);
         }
     }

@@ -2,8 +2,7 @@ import preReleaseUserService from '@admin/services/preReleaseUserService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import Form from '@common/components/form/Form';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import { Form, FormFieldTextArea } from '@common/components/form';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -17,14 +16,15 @@ import { Formik } from 'formik';
 import React from 'react';
 
 interface FormValues {
-  email: string;
+  emails: string;
 }
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'email',
+    target: 'emails',
     messages: {
-      USER_ALREADY_EXISTS: 'User with this email already exists',
+      INVALID_EMAIL_ADDRESS:
+        'Please enter valid @education.gov.uk email addresses',
     },
   }),
 ];
@@ -35,6 +35,7 @@ interface Props {
 }
 
 const formId = 'preReleaseUserAccessForm';
+const inviteLimit = 50;
 
 const PreReleaseUserAccessForm = ({
   releaseId,
@@ -52,13 +53,13 @@ const PreReleaseUserAccessForm = ({
   ]);
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    const newUser = await preReleaseUserService.inviteUser(
+    const newUsers = await preReleaseUserService.inviteUsers(
       releaseId,
-      values.email,
+      values.emails,
     );
 
     setUsers({
-      value: [...users, newUser],
+      value: [...users, ...newUsers],
     });
 
     actions.resetForm();
@@ -81,15 +82,26 @@ const PreReleaseUserAccessForm = ({
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            email: '',
+            emails: '',
           }}
           validationSchema={Yup.object<FormValues>({
-            email: Yup.string()
-              .required('Enter an email address')
-              .email('Enter a valid @education.gov.uk email address')
+            emails: Yup.string()
+              .trim()
+              .required('Please enter 1 or more email addresses')
+              .test({
+                name: 'number of lines',
+                message: `Please enter between 1 and ${inviteLimit} lines`,
+                test: (value: string) => {
+                  if (value) {
+                    const numOfLines = (value.match(/\n/g) || '').length + 1;
+                    return numOfLines <= inviteLimit;
+                  }
+                  return true;
+                },
+              })
               .test({
                 name: 'email format',
-                message: 'Enter a valid @education.gov.uk email address',
+                message: 'Please enter valid @education.gov.uk email addresses',
                 test: (value: string) => {
                   if (value) {
                     if (
@@ -98,11 +110,14 @@ const PreReleaseUserAccessForm = ({
                     ) {
                       return true;
                     }
-                    const emailSegments = value.split('@');
-                    return (
-                      emailSegments.length === 2 &&
-                      emailSegments[1] === 'education.gov.uk'
-                    );
+                    const emails = value.split(/\r\n|\r|\n/);
+                    return emails.every(email => {
+                      const emailSegments = email.split('@');
+                      return (
+                        emailSegments.length === 2 &&
+                        emailSegments[1] === 'education.gov.uk'
+                      );
+                    });
                   }
                   return false;
                 },
@@ -112,10 +127,12 @@ const PreReleaseUserAccessForm = ({
         >
           {form => (
             <Form id={formId}>
-              <FormFieldTextInput<FormValues>
-                label="Invite new user by email"
-                name="email"
+              <FormFieldTextArea<FormValues>
+                label="Invite new users by email"
+                name="emails"
                 className="govuk-!-width-one-third"
+                hint={`Invite up to ${inviteLimit} email addresses at a time. Enter each email address on a new line.`}
+                rows={15}
               />
 
               <ButtonGroup>
@@ -123,7 +140,9 @@ const PreReleaseUserAccessForm = ({
                   type="submit"
                   disabled={form.isSubmitting || isRemoving}
                 >
-                  {form.isSubmitting ? 'Inviting new user' : 'Invite new user'}
+                  {form.isSubmitting
+                    ? 'Inviting new users'
+                    : 'Invite new users'}
                 </Button>
               </ButtonGroup>
             </Form>

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -16,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _configuration = configuration;
         }
 
-        public void SendInviteEmail(string email)
+        public Either<ActionResult, Unit> SendInviteEmail(string email)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyInviteTemplateId");
@@ -26,10 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"url", $"https://{uri}"}
             };
 
-            _emailService.SendEmail(email, template, emailValues);
+            return _emailService.SendEmail(email, template, emailValues);
         }
 
-        public void SendPublicationRoleEmail(string email, Publication publication, PublicationRole role)
+        public Either<ActionResult, Unit> SendPublicationRoleEmail(
+            string email,
+            Publication publication,
+            PublicationRole role)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyPublicationRoleTemplateId");
@@ -41,10 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"publication", publication.Title}
             };
 
-            _emailService.SendEmail(email, template, emailValues);
+            return _emailService.SendEmail(email, template, emailValues);
         }
 
-        public void SendReleaseRoleEmail(string email, Release release, ReleaseRole role)
+        public Either<ActionResult, Unit> SendReleaseRoleEmail(
+            string email,
+            Release release,
+            ReleaseRole role)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
@@ -58,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"release", release.Title}
             };
 
-            _emailService.SendEmail(email, template, emailValues);
+            return _emailService.SendEmail(email, template, emailValues);
         }
     }
 }

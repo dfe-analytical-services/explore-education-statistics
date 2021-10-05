@@ -158,8 +158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 
         public static Mock<IConfiguration> CreateMockConfiguration(params Tuple<string, string>[] keysAndValues)
         {
-            var configuration = new Mock<IConfiguration>();
-            
+            var configuration = new Mock<IConfiguration>(MockBehavior.Strict);
+
             foreach (var keyValue in keysAndValues)
             {
                 var (key, value) = keyValue;

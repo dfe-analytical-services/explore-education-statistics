@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 preReleaseUserService.Setup(mock =>
-                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                        mock.SendPreReleaseUserInviteEmails(release.Id))
                     .ReturnsAsync(Unit.Instance);
 
             var releaseService = BuildService(contentDbContext: context,
