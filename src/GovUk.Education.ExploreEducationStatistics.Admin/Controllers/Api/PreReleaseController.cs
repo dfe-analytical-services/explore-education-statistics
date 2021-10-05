@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _preReleaseSummaryService = preReleaseSummaryService;
         }
 
-        [HttpGet("release/{releaseId}/prerelease-users")]
+        [HttpGet("release/{releaseId:guid}/prerelease-users")]
         public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseId)
         {
             return await _preReleaseUserService
@@ -33,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/prerelease")]
+        [HttpGet("release/{releaseId:guid}/prerelease")]
         public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseId)
         {
             return await _preReleaseSummaryService
@@ -41,18 +43,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/prerelease-users")]
-        public async Task<ActionResult<PreReleaseUserViewModel>> InvitePreReleaseUser(
-            Guid releaseId, [FromBody] PreReleaseAccessRequest request)
+        [HttpPost("release/{releaseId:guid}/prerelease-users-plan")]
+        public async Task<ActionResult<PreReleaseInvitePlan>> GetPreReleaseUsersInvitePlan(
+            Guid releaseId, [FromBody] PreReleaseUserInviteRequest request)
         {
             return await _preReleaseUserService
-                .AddPreReleaseUser(releaseId, request.Email)
+                .GetPreReleaseUsersInvitePlan(releaseId, request.Emails)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/prerelease-users")]
+        [HttpPost("release/{releaseId:guid}/prerelease-users")]
+        public async Task<ActionResult<List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
+            Guid releaseId, [FromBody] PreReleaseUserInviteRequest request)
+        {
+            return await _preReleaseUserService
+                .InvitePreReleaseUsers(releaseId, request.Emails)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("release/{releaseId:guid}/prerelease-users")]
         public async Task<ActionResult> RemovePreReleaseUser(
-            Guid releaseId, [FromBody] PreReleaseAccessRequest request)
+            Guid releaseId, [FromBody] PreReleaseUserRemoveRequest request)
         {
             return await _preReleaseUserService
                 .RemovePreReleaseUser(releaseId, request.Email)
@@ -60,8 +71,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
     }
 
-    public class PreReleaseAccessRequest
+    public class PreReleaseUserInviteRequest
     {
-        public string Email { get; set; }
+        /// <summary>
+        /// String of email addresses, one per line
+        /// </summary>
+        [Required]
+        public string Emails { get; set; } = string.Empty;
+    }
+
+    public class PreReleaseUserRemoveRequest
+    {
+        [Required] public string Email { get; set; } = string.Empty;
     }
 }

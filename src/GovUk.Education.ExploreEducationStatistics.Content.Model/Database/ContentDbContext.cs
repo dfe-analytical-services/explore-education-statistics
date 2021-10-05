@@ -394,6 +394,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserReleaseInvite>()
                 .HasQueryFilter(r => !r.SoftDeleted);
 
+            modelBuilder.Entity<UserReleaseInvite>()
+                .Property(invite => invite.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
                 {

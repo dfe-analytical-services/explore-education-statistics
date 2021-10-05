@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserRoleServiceTests
     {
-        private readonly User _user = new User
+        private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@test.com"
@@ -177,9 +178,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             emailTemplateService.Setup(mock =>
-                mock.SendPublicationRoleEmail(user.Email,
-                    It.Is<Publication>(p => p.Id == publication.Id),
-                    Owner));
+                    mock.SendPublicationRoleEmail(user.Email,
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        Owner))
+                .Returns(Unit.Instance);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -190,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddPublicationRole(userId, publication.Id, Owner);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 emailTemplateService.Verify(mock =>
                         mock.SendPublicationRoleEmail(user.Email,
@@ -250,14 +252,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddPublicationRole(userId, publication.Id, Owner);
 
@@ -273,8 +272,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(userPublicationRole.Id, userPublicationRoles[0].Id);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -291,14 +288,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddPublicationRole(Guid.NewGuid(), publication.Id, Owner);
 
@@ -312,8 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
                 Assert.Empty(userPublicationRoles);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -335,14 +327,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddPublicationRole(userId, Guid.NewGuid(), Owner);
 
@@ -356,8 +345,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
                 Assert.Empty(userPublicationRoles);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -391,9 +378,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             emailTemplateService.Setup(mock =>
-                mock.SendReleaseRoleEmail(user.Email,
-                    It.Is<Release>(r => r.Id == release.Id),
-                    Contributor));
+                    mock.SendReleaseRoleEmail(user.Email,
+                        It.Is<Release>(r => r.Id == release.Id),
+                        Contributor))
+                .Returns(Unit.Instance);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -404,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddReleaseRole(userId, release.Id, Contributor);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 emailTemplateService.Verify(mock =>
                         mock.SendReleaseRoleEmail(user.Email,
@@ -465,14 +453,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddReleaseRole(userId, release.Id, Contributor);
 
@@ -488,8 +473,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(userReleaseRole.Id, userReleaseRoles[0].Id);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -509,14 +492,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddReleaseRole(Guid.NewGuid(), release.Id, Contributor);
 
@@ -530,8 +510,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
                 Assert.Empty(userReleaseRoles);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -553,14 +531,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    contentDbContext: contentDbContext);
 
                 var result = await service.AddReleaseRole(userId, Guid.NewGuid(), Contributor);
 
@@ -574,8 +549,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
                 Assert.Empty(userReleaseRoles);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -1139,7 +1112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
+                emailTemplateService ?? new Mock<IEmailTemplateService>(MockBehavior.Strict).Object,
                 userService ?? AlwaysTrueUserService(_user.Id).Object,
                 userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
