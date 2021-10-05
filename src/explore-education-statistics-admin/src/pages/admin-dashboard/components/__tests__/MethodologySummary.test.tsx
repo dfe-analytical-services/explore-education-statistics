@@ -7,8 +7,9 @@ import _publicationService, {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
+  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
@@ -823,6 +824,97 @@ describe('MethodologySummary', () => {
         ).not.toBeInTheDocument();
       },
     );
+  });
+
+  describe('Removing an external methodology', () => {
+    test('shows the confirm modal when clicking the Remove button', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithExternalMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section Ext methodolology title (External)',
+        ),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove external methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Remove external methodology', { selector: 'h1' }),
+        ).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText(
+          'Are you sure you want to remove this external methodology?',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    test('calls the service to remove the Methodology when the confirm button is clicked', async () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationWithExternalMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      userEvent.click(
+        screen.getByTestId(
+          'Expand Details Section Ext methodolology title (External)',
+        ),
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove external methodology' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Remove external methodology', { selector: 'h1' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      const updatedPublication: UpdatePublicationRequest = {
+        title: testPublicationWithExternalMethodology.title,
+        contact: {
+          contactName: testContact.contactName,
+          contactTelNo: testContact.contactTelNo,
+          teamEmail: testContact.teamEmail,
+          teamName: testContact.teamName,
+        },
+        topicId: testTopicId,
+      };
+
+      await waitFor(() => {
+        expect(publicationService.updatePublication).toHaveBeenCalledWith<
+          Parameters<typeof publicationService.updatePublication>
+        >(testPublicationWithExternalMethodology.id, updatedPublication);
+      });
+    });
   });
 
   describe('Removing a non-amendment methodology', () => {
