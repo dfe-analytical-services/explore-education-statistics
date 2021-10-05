@@ -133,7 +133,7 @@ export function convertServerFieldErrors<FormValues>(
 }
 
 export function isServerValidationError(
-  error: Error,
+  error: unknown,
   errorMessage?: string,
 ): error is AxiosError<ServerValidationErrorResponse> {
   if (!isAxiosError(error) || !error.response?.data) {

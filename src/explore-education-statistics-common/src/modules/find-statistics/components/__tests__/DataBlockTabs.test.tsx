@@ -165,6 +165,7 @@ describe('DataBlockTabs', () => {
 
   test('renders nothing if table response is 403', async () => {
     tableBuilderService.getDataBlockTableData.mockRejectedValue({
+      name: 'Error',
       isAxiosError: true,
       message: 'Forbidden',
       response: {

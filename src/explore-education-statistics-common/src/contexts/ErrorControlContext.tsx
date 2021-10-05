@@ -6,7 +6,7 @@ export interface ErrorPages {
 }
 
 export interface ErrorControlState {
-  handleError: (error: Error) => void;
+  handleError: (error: unknown) => void;
   errorPages: ErrorPages;
 }
 

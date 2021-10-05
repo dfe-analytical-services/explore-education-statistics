@@ -3,7 +3,6 @@
 const DotEnv = require('dotenv');
 const fs = require('fs');
 const flowRight = require('lodash/fp/flowRight');
-const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
@@ -89,6 +88,7 @@ const nextConfig = {
       },
     ];
   },
+  webpack5: false,
   webpack(config, options) {
     const { dev, isServer } = options;
 
@@ -143,7 +143,6 @@ const nextConfig = {
 // Next config from left to right
 module.exports = flowRight(
   withESLint,
-  withImages,
   withFonts,
   withTranspileModules([
     'explore-education-statistics-common',
