@@ -7,8 +7,9 @@ import _publicationService, {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
+  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
@@ -843,33 +844,29 @@ describe('MethodologySummary', () => {
         ),
       );
 
-      expect(
-        screen.getByRole('button', { name: 'Remove external methodology' }),
-      ).toBeInTheDocument();
-
       userEvent.click(
         screen.getByRole('button', { name: 'Remove external methodology' }),
       );
 
       await waitFor(() => {
         expect(
-          screen.getByRole('heading', { name: 'Remove external methodology' }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            'Are you sure you want to remove this external methodology?',
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Cancel' }),
+          screen.getByText('Remove external methodology', { selector: 'h1' }),
         ).toBeInTheDocument();
       });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText(
+          'Are you sure you want to remove this external methodology?',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     test('calls the service to remove the Methodology when the confirm button is clicked', async () => {
@@ -895,13 +892,13 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole('heading', { name: 'Remove external methodology' }),
+          screen.getByText('Remove external methodology', { selector: 'h1' }),
         ).toBeInTheDocument();
       });
 
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      const updatedPublication = {
+      const updatedPublication: UpdatePublicationRequest = {
         title: testPublicationWithExternalMethodology.title,
         contact: {
           contactName: testContact.contactName,
@@ -913,10 +910,9 @@ describe('MethodologySummary', () => {
       };
 
       await waitFor(() => {
-        expect(publicationService.updatePublication).toHaveBeenCalledWith(
-          testPublicationWithExternalMethodology.id,
-          updatedPublication,
-        );
+        expect(publicationService.updatePublication).toHaveBeenCalledWith<
+          Parameters<typeof publicationService.updatePublication>
+        >(testPublicationWithExternalMethodology.id, updatedPublication);
       });
     });
   });
