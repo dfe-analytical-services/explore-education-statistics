@@ -132,12 +132,12 @@ export function appendFootnotes(
   return sheet;
 }
 
-export const downloadOdsFile = (
+export default function downloadTableOdsFile(
   fileName: string,
   subjectMeta: FullTableMeta,
   tableRef: RefObject<HTMLElement>,
   title: string,
-) => {
+): void {
   const { footnotes } = subjectMeta;
 
   let tableEl: HTMLTableElement | null = null;
@@ -167,4 +167,4 @@ export const downloadOdsFile = (
     type: 'binary',
     bookType: 'ods',
   });
-};
+}

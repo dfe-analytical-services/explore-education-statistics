@@ -2,16 +2,14 @@ import { Form, FormFieldRadioGroup } from '@common/components/form';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { downloadCsvFile } from '@common/modules/table-tool/components/utils/downloadCsv';
-import { downloadOdsFile } from '@common/modules/table-tool/components/utils/downloadOds';
+import downloadTableCsvFile from '@common/modules/table-tool/components/utils/downloadTableCsvFile';
+import downloadTableOdsFile from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Formik } from 'formik';
 import React, { createElement, RefObject } from 'react';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import DownloadTableWorker from 'worker-loader?name=static/[hash].worker.js!@common/modules/table-tool/components/workers/downloadTable.worker';
 
 export type FileFormat = 'ods' | 'csv' | undefined;
 
@@ -38,19 +36,14 @@ const DownloadTable = ({
 }: Props) => {
   const [processingData, toggleProcessingData] = useToggle(false);
 
-  const handleCsvDownload = () => {
-    const worker = new DownloadTableWorker();
-    worker.postMessage({ fileName, fullTable });
-    worker.onmessage = (event: MessageEvent) => {
-      downloadCsvFile(event.data.csvData, event.data.fileName);
-      toggleProcessingData();
-      worker.terminate();
-    };
+  const handleCsvDownload = async () => {
+    await downloadTableCsvFile(fileName, fullTable);
+    toggleProcessingData();
   };
 
   const handleOdsDownload = () => {
     const title = generateTableTitle(fullTable.subjectMeta);
-    downloadOdsFile(fileName, fullTable.subjectMeta, tableRef, title);
+    downloadTableOdsFile(fileName, fullTable.subjectMeta, tableRef, title);
     toggleProcessingData();
   };
 

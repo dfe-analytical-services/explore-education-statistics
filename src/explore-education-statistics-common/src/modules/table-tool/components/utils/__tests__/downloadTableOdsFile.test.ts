@@ -2,10 +2,10 @@ import {
   appendColumnWidths,
   appendFootnotes,
   appendTitle,
-} from '@common/modules/table-tool/components/utils/downloadOds';
+} from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import { utils } from 'xlsx';
 
-describe('Download ODS utils', () => {
+describe('downloadTableOdsFile', () => {
   describe('appendColumnWidths', () => {
     test('sets column widths using the cells with the longest string content', () => {
       const sheet = utils.aoa_to_sheet([
