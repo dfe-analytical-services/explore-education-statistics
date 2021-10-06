@@ -2012,11 +2012,11 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "MetaGuidance",
+                                            "name": "DataGuidance",
                                             "type": "String"
                                         },
                                         "sink": {
-                                            "name": "MetaGuidance",
+                                            "name": "DataGuidance",
                                             "type": "String"
                                         }
                                     }
