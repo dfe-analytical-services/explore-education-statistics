@@ -291,8 +291,21 @@ Add release note to release amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Go to "Sign off" page and approve release amendment
+Go to "Sign off" page
     user clicks link    Sign off
+    user waits until h3 is visible    Release status history
+
+Validate Release status table row is correct
+    user waits until page contains element    css:table
+    user checks element count is x    xpath://table/tbody/tr    1
+    ${datetime}    get current datetime    %-d %B %Y
+    table cell should contain    css:table    2    1    ${datetime}    # Date
+    table cell should contain    css:table    2    2    Approved    # Status
+    table cell should contain    css:table    2    3    Approved by UI tests    # Internal note
+    table cell should contain    css:table    2    4    1    # Release version
+    table cell should contain    css:table    2    5    ees-bau1@education.gov.uk    # By user
+
+Approve release amendment
     user approves amended release for immediate publication
 
 Go to permalink page & check for error element to be present

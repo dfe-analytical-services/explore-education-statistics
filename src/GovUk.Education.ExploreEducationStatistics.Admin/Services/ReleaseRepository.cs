@@ -103,5 +103,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _statisticsDbContext.SaveChangesAsync();
             return releaseSubject.Subject.Id;
         }
+
+        public async Task<List<Guid>> GetAllReleaseVersionIds(Content.Model.Release release)
+        {
+            var releaseIdList = new List<Guid> { release.Id };
+            var currentRelease = release;
+
+            while (currentRelease.PreviousVersionId != null)
+            {
+                currentRelease = await _contentDbContext.Releases
+                    .AsQueryable()
+                    .SingleAsync(r => r.Id == currentRelease.PreviousVersionId);
+                releaseIdList.Add(currentRelease.Id);
+            }
+
+            return releaseIdList;
+        }
     }
 }

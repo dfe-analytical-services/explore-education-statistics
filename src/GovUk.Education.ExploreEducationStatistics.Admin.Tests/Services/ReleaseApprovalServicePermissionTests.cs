@@ -122,7 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IContentService>(),
                 Mock.Of<IPreReleaseUserService>(),
                 Mock.Of<IReleaseFileRepository>(),
-                Mock.Of<IReleaseFileService>());
+                Mock.Of<IReleaseFileService>(),
+                Mock.Of<IReleaseRepository>());
         }
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
