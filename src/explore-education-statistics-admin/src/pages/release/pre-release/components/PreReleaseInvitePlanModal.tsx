@@ -45,7 +45,10 @@ const PreReleaseInvitePlanModel = ({
               : 'when the release is approved for publication.'}
           </WarningMessage>
           <div className={styles.invitesOverflow}>
-            <ul className="govuk-list govuk-list--bullet govuk-!-margin-2">
+            <ul
+              className="govuk-list govuk-list--bullet govuk-!-margin-2"
+              data-testid="invitableList"
+            >
               {invitePlan.invitable.map(email => (
                 <li key={email}>
                   <p>{email}</p>
@@ -69,7 +72,10 @@ const PreReleaseInvitePlanModel = ({
             accepted to access the pre-release:
           </p>
           <div className={styles.invitesOverflow}>
-            <ul className="govuk-list govuk-list--bullet govuk-!-margin-2">
+            <ul
+              className="govuk-list govuk-list--bullet govuk-!-margin-2"
+              data-testid="acceptedList"
+            >
               {invitePlan.alreadyAccepted.map(email => (
                 <li key={email}>
                   <p>{email}</p>
@@ -88,7 +94,10 @@ const PreReleaseInvitePlanModel = ({
             invited to access the pre-release:
           </p>
           <div className={styles.invitesOverflow}>
-            <ul className="govuk-list govuk-list--bullet govuk-!-margin-2">
+            <ul
+              className="govuk-list govuk-list--bullet govuk-!-margin-2"
+              data-testid="invitedList"
+            >
               {invitePlan.alreadyInvited.map(email => (
                 <li key={email}>
                   <p>{email}</p>

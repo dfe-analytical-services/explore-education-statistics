@@ -1,4 +1,7 @@
-import preReleaseUserService from '@admin/services/preReleaseUserService';
+import PreReleaseInvitePlanModal from '@admin/pages/release/pre-release/components/PreReleaseInvitePlanModal';
+import preReleaseUserService, {
+  PreReleaseInvitePlan,
+} from '@admin/services/preReleaseUserService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -13,7 +16,7 @@ import useToggle from '@common/hooks/useToggle';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface FormValues {
   emails: string;
@@ -25,12 +28,15 @@ const errorMappings = [
     messages: {
       INVALID_EMAIL_ADDRESS:
         'Please enter valid @education.gov.uk email addresses',
+      NO_INVITABLE_EMAILS:
+        'All of the email addresses are already invited or accepted users of the pre-release',
     },
   }),
 ];
 
 interface Props {
   releaseId: string;
+  isReleaseApproved?: boolean;
   isReleaseLive?: boolean;
 }
 
@@ -39,6 +45,7 @@ const inviteLimit = 50;
 
 const PreReleaseUserAccessForm = ({
   releaseId,
+  isReleaseApproved = false,
   isReleaseLive = false,
 }: Props) => {
   const [isRemoving, toggleRemoving] = useToggle(false);
@@ -52,18 +59,31 @@ const PreReleaseUserAccessForm = ({
     releaseId,
   ]);
 
+  const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
+
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    const newUsers = await preReleaseUserService.inviteUsers(
-      releaseId,
-      values.emails,
+    setInvitePlan(
+      await preReleaseUserService.getInvitePlan(releaseId, values.emails),
     );
-
-    setUsers({
-      value: [...users, ...newUsers],
-    });
-
-    actions.resetForm();
   }, errorMappings);
+
+  const handleModalSubmit = useFormSubmit<FormValues>(
+    async (values, actions) => {
+      await preReleaseUserService
+        .inviteUsers(releaseId, values.emails)
+        .then(newUsers => {
+          setUsers({
+            value: [...users, ...newUsers],
+          });
+          actions.resetForm();
+        });
+    },
+    errorMappings,
+  );
+
+  const handleModalCancel = useCallback(() => {
+    setInvitePlan(undefined);
+  }, []);
 
   if (error) {
     return <WarningMessage>Could not load pre-release users</WarningMessage>;
@@ -104,14 +124,15 @@ const PreReleaseUserAccessForm = ({
                 message: 'Please enter valid @education.gov.uk email addresses',
                 test: (value: string) => {
                   if (value) {
-                    if (
-                      value ===
-                      'simulate-delivered@notifications.service.gov.uk'
-                    ) {
-                      return true;
-                    }
                     const emails = value.split(/\r\n|\r|\n/);
                     return emails.every(email => {
+                      if (
+                        /^simulate-delivered(?:-[1-3])?@notifications.service.gov.uk$/i.test(
+                          email,
+                        )
+                      ) {
+                        return true;
+                      }
                       const emailSegments = email.split('@');
                       return (
                         emailSegments.length === 2 &&
@@ -131,7 +152,7 @@ const PreReleaseUserAccessForm = ({
                 label="Invite new users by email"
                 name="emails"
                 className="govuk-!-width-one-third"
-                hint={`Invite up to ${inviteLimit} email addresses at a time. Enter each email address on a new line.`}
+                hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
                 rows={15}
               />
 
@@ -145,6 +166,19 @@ const PreReleaseUserAccessForm = ({
                     : 'Invite new users'}
                 </Button>
               </ButtonGroup>
+
+              {invitePlan && (
+                <PreReleaseInvitePlanModal
+                  isReleaseApproved={isReleaseApproved}
+                  invitePlan={invitePlan}
+                  onConfirm={() => {
+                    handleModalSubmit(form.values, form);
+                    setInvitePlan(undefined);
+                  }}
+                  onCancel={handleModalCancel}
+                  onExit={handleModalCancel}
+                />
+              )}
             </Form>
           )}
         </Formik>
