@@ -1,3 +1,4 @@
+import glossaryService from '@admin/services/glossaryService';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
@@ -33,6 +34,7 @@ const ReleaseBlock = ({ block, releaseId }: Props) => {
       key={block.id}
       block={block}
       transformImageAttributes={transformImageAttributes}
+      getGlossaryEntry={glossaryService.getEntry}
     />
   );
 };

@@ -1,3 +1,4 @@
+import glossaryService from '@frontend/services/glossaryService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
@@ -44,7 +45,11 @@ const PublicationReleaseHeadlinesSection = ({
       </KeyStatContainer>
 
       {orderBy(headlinesSection.content, 'order').map(block => (
-        <ContentBlockRenderer key={block.id} block={block} />
+        <ContentBlockRenderer
+          key={block.id}
+          block={block}
+          getGlossaryEntry={glossaryService.getEntry}
+        />
       ))}
     </TabsSection>
   );

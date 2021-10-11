@@ -319,6 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IGlossaryService, GlossaryService>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();

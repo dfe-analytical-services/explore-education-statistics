@@ -1,3 +1,4 @@
+import glossaryService from '@admin/services/glossaryService';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
 import { ContentBlock } from '@common/services/types/blocks';
@@ -18,6 +19,7 @@ const MethodologyBlock = ({ block, methodologyId }: Props) => {
       key={block.id}
       block={block}
       transformImageAttributes={transformImageAttributes}
+      getGlossaryEntry={glossaryService.getEntry}
     />
   );
 };
