@@ -129,8 +129,31 @@ describe('FiltersForm', () => {
     },
   };
 
-  const testSubjectMetaNoFiltersOneIndicator: SubjectMeta = {
-    filters: {},
+  const testSubjectMetaOneFilter: SubjectMeta = {
+    ...testSubjectMeta,
+    filters: {
+      Characteristic: {
+        totalValue: '',
+        hint: 'Filter by pupil characteristic',
+        legend: 'Characteristic',
+        options: {
+          EthnicGroupMajor: {
+            label: 'Ethnic group major',
+            options: [
+              {
+                label: 'Ethnicity Major Black Total',
+                value: 'ethnicity-major-black-total',
+              },
+            ],
+          },
+        },
+        name: 'characteristic',
+      },
+    },
+  };
+
+  const testSubjectMetaOneIndicator: SubjectMeta = {
+    ...testSubjectMeta,
     indicators: {
       AbsenceByReason: {
         label: 'Absence by reason',
@@ -143,12 +166,6 @@ describe('FiltersForm', () => {
           },
         ],
       },
-    },
-    locations: {},
-    timePeriod: {
-      hint: '',
-      legend: '',
-      options: [],
     },
   };
 
@@ -269,15 +286,45 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getAllByRole('checkbox', {
-        hidden: true,
-        name: (_, element) => (element as HTMLInputElement).checked,
-      }),
+      within(
+        screen.getByRole('group', {
+          name: 'School type',
+          hidden: true,
+        }),
+      ).getAllByRole('checkbox', { hidden: true }),
     ).toHaveLength(1);
 
     expect(screen.getByLabelText('State-funded secondary')).toHaveAttribute(
       'checked',
     );
+  });
+
+  test('automatically select filter when there is only one', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subjectMeta={testSubjectMetaOneFilter}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Characteristic - 1 selected',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(
+        screen.getByRole('group', {
+          name: 'Characteristic',
+        }),
+      ).getAllByRole('checkbox'),
+    ).toHaveLength(1);
+
+    expect(
+      screen.getByLabelText('Ethnicity Major Black Total'),
+    ).toHaveAttribute('checked');
   });
 
   test('selecting options shows the number of selected options for each filter group', () => {
@@ -399,11 +446,11 @@ describe('FiltersForm', () => {
     ).not.toHaveAttribute('checked');
   });
 
-  test('automatically selects checkbox when there is only one indicator and no filters', () => {
+  test('automatically selects checkbox when there is only one indicator group with one option', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
-        subjectMeta={testSubjectMetaNoFiltersOneIndicator}
+        subjectMeta={testSubjectMetaOneIndicator}
         onSubmit={noop}
       />,
     );

@@ -51,41 +51,57 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     isActive,
   } = props;
 
-  const initialFormValues = useMemo(() => {
-    const indicators = Object.entries(subjectMeta.indicators);
+  // Automatically select filter when one filter group with one option
+  const filterEntries = Object.entries(subjectMeta.filters);
+  const autoSelectFilter =
+    filterEntries.length === 1 &&
+    Object.entries(filterEntries[0][1].options).length === 1 &&
+    Object.entries(filterEntries[0][1].options)[0][1].options.length === 1;
 
-    // Automatically select indicator when no filters and one indicator group with one option
-    const autoSelectIndicator =
-      !Object.keys(subjectMeta.filters).length &&
-      indicators.length === 1 &&
-      indicators[0][1].options.length === 1;
+  const initialFormValues = useMemo(() => {
+    // Automatically select indicator when one indicator group with one option
+    const indicatorEntries = Object.entries(subjectMeta.indicators);
+    const indicators =
+      indicatorEntries.length === 1 &&
+      indicatorEntries[0][1].options.length === 1
+        ? [indicatorEntries[0][1].options[0].value]
+        : initialValues?.indicators ?? [];
+
+    const filters = mapValues(subjectMeta.filters, filter => {
+      // Automatically select filter when one filter group with one option
+      if (autoSelectFilter) {
+        return [
+          Object.entries(
+            Object.entries(subjectMeta.filters)[0][1].options,
+          )[0][1].options[0].value,
+        ];
+      }
+
+      if (initialValues?.filters) {
+        const filterValues = Object.values(filter.options)
+          .flatMap(group => group.options)
+          .map(option => option.value);
+
+        return filterValues.filter(filterValue =>
+          initialValues.filters.includes(filterValue),
+        );
+      }
+
+      if (filter.options.Default) {
+        // Automatically select filter option when there is only one and the filter is default
+        return filter.options.Default.options.length === 1
+          ? [filter.options.Default.options[0].value]
+          : [];
+      }
+
+      return [];
+    });
 
     return {
-      filters: mapValues(subjectMeta.filters, filter => {
-        if (initialValues?.filters) {
-          const filterValues = Object.values(filter.options)
-            .flatMap(group => group.options)
-            .map(option => option.value);
-
-          return filterValues.filter(filterValue =>
-            initialValues.filters.includes(filterValue),
-          );
-        }
-
-        if (filter.options.Default) {
-          // Automatically select filter option when there is only one
-          return filter.options.Default.options.length === 1
-            ? [filter.options.Default.options[0].value]
-            : [];
-        }
-
-        return [];
-      }),
-      indicators: autoSelectIndicator
-        ? [indicators[0][1].options[0].value]
-        : initialValues?.indicators ?? [],
+      filters,
+      indicators,
     };
-  }, [initialValues, subjectMeta]);
+  }, [autoSelectFilter, initialValues, subjectMeta]);
 
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
@@ -176,6 +192,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                     options: group.options,
                                   }),
                                 )}
+                                openGroup={autoSelectFilter}
                               />
                             );
                           },

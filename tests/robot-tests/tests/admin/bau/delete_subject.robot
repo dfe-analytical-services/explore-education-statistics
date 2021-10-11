@@ -114,7 +114,7 @@ Select time period
     user waits until table tool wizard step is available    Choose your filters
 
 Select indicators
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
 Create table
     [Documentation]    EES-615
