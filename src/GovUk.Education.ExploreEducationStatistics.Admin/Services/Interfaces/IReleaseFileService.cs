@@ -1,11 +1,14 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -28,6 +31,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId);
 
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
+
+        Task<Either<ActionResult, Unit>> ZipFilesToStream(
+            Guid releaseId,
+            Stream outputStream,
+            IEnumerable<Guid>? fileIds = null,
+            CancellationToken? cancellationToken = null);
 
         Task<Either<ActionResult, Unit>> Update(Guid releaseId, Guid fileId, ReleaseFileUpdateViewModel update);
 
