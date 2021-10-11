@@ -52,29 +52,29 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   } = props;
 
   // Automatically select filter when one filter group with one option
-  const filterEntries = Object.entries(subjectMeta.filters);
+  const filterObjectValues = Object.values(subjectMeta.filters);
+  const filterGroupOptions = useMemo(() => {
+    return filterObjectValues.length
+      ? Object.values(filterObjectValues[0].options)
+      : [];
+  }, [filterObjectValues]);
   const autoSelectFilter =
-    filterEntries.length === 1 &&
-    Object.entries(filterEntries[0][1].options).length === 1 &&
-    Object.entries(filterEntries[0][1].options)[0][1].options.length === 1;
+    filterObjectValues.length === 1 &&
+    filterGroupOptions.length === 1 &&
+    filterGroupOptions[0].options.length === 1;
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
-    const indicatorEntries = Object.entries(subjectMeta.indicators);
+    const indicatorValues = Object.values(subjectMeta.indicators);
     const indicators =
-      indicatorEntries.length === 1 &&
-      indicatorEntries[0][1].options.length === 1
-        ? [indicatorEntries[0][1].options[0].value]
+      indicatorValues.length === 1 && indicatorValues[0].options.length === 1
+        ? [indicatorValues[0].options[0].value]
         : initialValues?.indicators ?? [];
 
     const filters = mapValues(subjectMeta.filters, filter => {
       // Automatically select filter when one filter group with one option
       if (autoSelectFilter) {
-        return [
-          Object.entries(
-            Object.entries(subjectMeta.filters)[0][1].options,
-          )[0][1].options[0].value,
-        ];
+        return [filterGroupOptions[0].options[0].value];
       }
 
       if (initialValues?.filters) {
@@ -101,7 +101,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       filters,
       indicators,
     };
-  }, [autoSelectFilter, initialValues, subjectMeta]);
+  }, [autoSelectFilter, filterGroupOptions, initialValues, subjectMeta]);
 
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
@@ -192,7 +192,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                     options: group.options,
                                   }),
                                 )}
-                                openGroup={autoSelectFilter}
+                                open={autoSelectFilter}
                               />
                             );
                           },

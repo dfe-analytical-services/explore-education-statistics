@@ -68,10 +68,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         const initialLevel = autoSelectLocation
           ? [levelOptions.options[0].value]
           : initialValues[level] ?? [];
-        return initialLevel.filter(
-          initialId =>
-            levelOptions.options.find(({ value }) => value === initialId) !==
-            undefined,
+        return initialLevel.filter(locationId =>
+          levelOptions.options.some(({ value }) => value === locationId),
         );
       }),
     };
@@ -130,7 +128,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           legend={level.legend}
                           legendHidden
                           disabled={form.isSubmitting}
-                          openGroup={autoSelectLocation}
+                          open={autoSelectLocation}
                         />
                       );
                     })}

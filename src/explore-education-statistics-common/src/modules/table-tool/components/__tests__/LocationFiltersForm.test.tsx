@@ -88,38 +88,74 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Country',
-          hidden: true,
-        }),
-      ).getAllByRole('checkbox', {
-        hidden: true,
-      }),
-    ).toHaveLength(1);
+    const countryGroup = screen.getByRole('group', {
+      name: 'Country',
+      hidden: true,
+    });
+    const countryCheckboxes = within(countryGroup).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(countryCheckboxes).toHaveLength(1);
+    expect(countryCheckboxes[0]).toHaveAttribute('value', 'country-1');
+    expect(countryCheckboxes[0]).toEqual(
+      within(countryGroup).getByLabelText('Country 1'),
+    );
+    expect(countryCheckboxes[0]).not.toBeChecked();
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Local authority',
-          hidden: true,
-        }),
-      ).getAllByRole('checkbox', {
+    const localAuthorityGroup = screen.getByRole('group', {
+      name: 'Local authority',
+      hidden: true,
+    });
+    const localAuthorityCheckboxes = within(localAuthorityGroup).getAllByRole(
+      'checkbox',
+      {
         hidden: true,
-      }),
-    ).toHaveLength(3);
+      },
+    );
+    expect(localAuthorityCheckboxes).toHaveLength(3);
+    expect(localAuthorityCheckboxes[0]).toHaveAttribute(
+      'value',
+      'local-authority-1',
+    );
+    expect(localAuthorityCheckboxes[0]).toEqual(
+      within(localAuthorityGroup).getByLabelText('Local authority 1'),
+    );
+    expect(localAuthorityCheckboxes[0]).not.toBeChecked();
+    expect(localAuthorityCheckboxes[1]).toHaveAttribute(
+      'value',
+      'local-authority-2',
+    );
+    expect(localAuthorityCheckboxes[1]).toEqual(
+      within(localAuthorityGroup).getByLabelText('Local authority 2'),
+    );
+    expect(localAuthorityCheckboxes[1]).not.toBeChecked();
+    expect(localAuthorityCheckboxes[2]).toHaveAttribute(
+      'value',
+      'local-authority-3',
+    );
+    expect(localAuthorityCheckboxes[2]).toEqual(
+      within(localAuthorityGroup).getByLabelText('Local authority 3'),
+    );
+    expect(localAuthorityCheckboxes[2]).not.toBeChecked();
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Region',
-          hidden: true,
-        }),
-      ).getAllByRole('checkbox', {
-        hidden: true,
-      }),
-    ).toHaveLength(2);
+    const regionGroup = screen.getByRole('group', {
+      name: 'Region',
+      hidden: true,
+    });
+    const regionCheckboxes = within(regionGroup).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(regionCheckboxes).toHaveLength(2);
+    expect(regionCheckboxes[0]).toHaveAttribute('value', 'region-1');
+    expect(regionCheckboxes[0]).toEqual(
+      within(regionGroup).getByLabelText('Region 1'),
+    );
+    expect(regionCheckboxes[0]).not.toBeChecked();
+    expect(regionCheckboxes[1]).toHaveAttribute('value', 'region-2');
+    expect(regionCheckboxes[1]).toEqual(
+      within(regionGroup).getByLabelText('Region 2'),
+    );
+    expect(regionCheckboxes[1]).not.toBeChecked();
   });
 
   test('selecting options shows the number of selected options for each location group', () => {
@@ -199,19 +235,13 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Local authority 1')).toHaveAttribute(
-      'checked',
-    );
-    expect(screen.getByLabelText('Local authority 3')).toHaveAttribute(
-      'checked',
-    );
-    expect(screen.getByLabelText('Region 2')).toHaveAttribute('checked');
+    expect(screen.getByLabelText('Local authority 1')).toBeChecked();
+    expect(screen.getByLabelText('Local authority 3')).toBeChecked();
+    expect(screen.getByLabelText('Region 2')).toBeChecked();
 
-    expect(screen.getByLabelText('Country 1')).not.toHaveAttribute('checked');
-    expect(screen.getByLabelText('Local authority 2')).not.toHaveAttribute(
-      'checked',
-    );
-    expect(screen.getByLabelText('Region 1')).not.toHaveAttribute('checked');
+    expect(screen.getByLabelText('Country 1')).not.toBeChecked();
+    expect(screen.getByLabelText('Local authority 2')).not.toBeChecked();
+    expect(screen.getByLabelText('Region 1')).not.toBeChecked();
   });
 
   test('automatically selects the option and expands the group if only one location available', () => {
@@ -239,7 +269,7 @@ describe('LocationFiltersForm', () => {
 
     expect(screen.getByLabelText('Country 1')).toBeVisible();
 
-    expect(screen.getByLabelText('Country 1')).toHaveAttribute('checked');
+    expect(screen.getByLabelText('Country 1')).toBeChecked();
   });
 
   test('renders a read-only view of selected options when no longer the current step', async () => {

@@ -294,9 +294,7 @@ describe('FiltersForm', () => {
       ).getAllByRole('checkbox', { hidden: true }),
     ).toHaveLength(1);
 
-    expect(screen.getByLabelText('State-funded secondary')).toHaveAttribute(
-      'checked',
-    );
+    expect(screen.getByLabelText('State-funded secondary')).toBeChecked();
   });
 
   test('automatically select filter when there is only one', () => {
@@ -314,17 +312,15 @@ describe('FiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Characteristic',
-        }),
-      ).getAllByRole('checkbox'),
-    ).toHaveLength(1);
+    const filterGroup = screen.getByRole('group', {
+      name: 'Characteristic',
+    });
+    const filterCheckboxes = within(filterGroup).getAllByRole('checkbox');
+    expect(filterCheckboxes).toHaveLength(1);
 
-    expect(
-      screen.getByLabelText('Ethnicity Major Black Total'),
-    ).toHaveAttribute('checked');
+    expect(filterCheckboxes[0]).toEqual(
+      within(filterGroup).getByLabelText('Ethnicity Major Black Total'),
+    );
   });
 
   test('selecting options shows the number of selected options for each filter group', () => {
@@ -413,15 +409,9 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('State-funded secondary')).toHaveAttribute(
-      'checked',
-    );
-    expect(
-      screen.getByLabelText('Ethnicity Major Asian Total'),
-    ).toHaveAttribute('checked');
-    expect(screen.getByLabelText('Unauthorised absence rate')).toHaveAttribute(
-      'checked',
-    );
+    expect(screen.getByLabelText('State-funded secondary')).toBeChecked();
+    expect(screen.getByLabelText('Ethnicity Major Asian Total')).toBeChecked();
+    expect(screen.getByLabelText('Unauthorised absence rate')).toBeChecked();
   });
 
   test('other checkboxes are not selected from initial values', () => {
@@ -437,13 +427,13 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Special')).not.toHaveAttribute('checked');
+    expect(screen.getByLabelText('Special')).not.toBeChecked();
     expect(
       screen.getByLabelText('Ethnicity Major Mixed Total'),
-    ).not.toHaveAttribute('checked');
+    ).not.toBeChecked();
     expect(
       screen.getByLabelText('Number of overall absence sessions'),
-    ).not.toHaveAttribute('checked');
+    ).not.toBeChecked();
   });
 
   test('automatically selects checkbox when there is only one indicator group with one option', () => {
@@ -455,17 +445,15 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Indicators - 1 selected',
-        }),
-      ).getAllByRole('checkbox'),
-    ).toHaveLength(1);
+    const filterGroup = screen.getByRole('group', {
+      name: 'Indicators - 1 selected',
+    });
+
+    expect(within(filterGroup).getAllByRole('checkbox')).toHaveLength(1);
 
     expect(
-      screen.getByLabelText('Number of excluded sessions'),
-    ).toHaveAttribute('checked');
+      within(filterGroup).getByLabelText('Number of excluded sessions'),
+    ).toBeChecked();
   });
 
   test('upon submit automatically selects Total checkbox if no other options in that group are checked', async () => {
