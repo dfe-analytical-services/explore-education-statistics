@@ -61,7 +61,7 @@ const PreReleaseUserAccessForm = ({
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
 
-  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
     setInvitePlan(
       await preReleaseUserService.getInvitePlan(releaseId, values.emails),
     );
