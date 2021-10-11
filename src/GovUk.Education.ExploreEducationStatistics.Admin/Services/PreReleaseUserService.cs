@@ -105,29 +105,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
                 .OnSuccess(release => ValidateEmailsAddresses(emails))
-                .OnSuccess(async validEmails =>
+                .OnSuccess<ActionResult, List<string>, PreReleaseInvitePlan>(async validEmails =>
                 {
                     var plan = new PreReleaseInvitePlan();
                     await validEmails
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(async email =>
-                    {
-                        if (await UserHasPreReleaseRole(releaseId, email))
                         {
-                            plan.AlreadyAccepted.Add(email);
-                        }
-                        else
-                        {
-                            if (await UserHasPreReleaseInvite(releaseId, email))
+                            if (await UserHasPreReleaseRole(releaseId, email))
                             {
-                                plan.AlreadyInvited.Add(email);
+                                plan.AlreadyAccepted.Add(email);
                             }
                             else
                             {
-                                plan.Invitable.Add(email);
+                                if (await UserHasPreReleaseInvite(releaseId, email))
+                                {
+                                    plan.AlreadyInvited.Add(email);
+                                }
+                                else
+                                {
+                                    plan.Invitable.Add(email);
+                                }
                             }
-                        }
-                    });
+                        });
+
+                    if (plan.Invitable.Count == 0)
+                    {
+                        return ValidationActionResult(NoInvitableEmails);
+                    }
+
                     return plan;
                 });
         }
@@ -142,11 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async releaseAndPlan =>
                 {
                     var (release, plan) = releaseAndPlan;
-
-                    if (plan.Invitable.Count == 0)
-                    {
-                        return ValidationActionResult(NoInvitableEmails);
-                    }
 
                     var results = await plan.Invitable
                         .ToAsyncEnumerable()

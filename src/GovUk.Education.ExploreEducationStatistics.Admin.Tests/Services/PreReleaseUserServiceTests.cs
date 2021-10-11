@@ -231,6 +231,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetPreReleaseUsersInvitePlan_Fails_NoInvitableEmails()
+        {
+            var release = new Release();
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.UserReleaseInvites.AddAsync(
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        Email = "invited.prerelease@test.com"
+                    }
+                );
+
+                await context.UserReleaseRoles.AddAsync(
+                    new UserReleaseRole
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        User = new User
+                        {
+                            Email = "existing.prerelease.user@test.com"
+                        }
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
+            {
+                var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
+                var result = await service.GetPreReleaseUsersInvitePlan(
+                    release.Id,
+                    @"invited.prerelease@test.com
+                           existing.prerelease.user@test.com");
+
+                result.AssertBadRequest(NoInvitableEmails);
+            }
+        }
+
+        [Fact]
         public async Task GetPreReleaseUsersInvitePlan()
         {
             var release = new Release();
@@ -374,21 +419,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task InvitePreReleaseUsers_Fails_ExistingReleaseRole()
+        public async Task InvitePreReleaseUsers_Fails_NoInvitableEmails()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
+                await context.UserReleaseInvites.AddAsync(
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        Email = "invited.prerelease@test.com"
+                    }
+                );
+
+                await context.UserReleaseRoles.AddAsync(
                     new UserReleaseRole
                     {
                         Release = release,
                         Role = ReleaseRole.PrereleaseViewer,
                         User = new User
                         {
-                            Email = "test@test.com",
+                            Email = "existing.prerelease.user@test.com"
                         }
                     }
                 );
@@ -400,37 +454,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
             {
                 var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
-                var result = await service.InvitePreReleaseUsers(release.Id, "test@test.com");
-
-                result.AssertBadRequest(NoInvitableEmails);
-            }
-        }
-
-        [Fact]
-        public async Task InvitePreReleaseUsers_Fails_ExistingReleaseInvite()
-        {
-            var release = new Release();
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(
-                    new UserReleaseInvite
-                    {
-                        Release = release,
-                        Role = ReleaseRole.PrereleaseViewer,
-                        Email = "test@test.com",
-                    }
-                );
-
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
-            {
-                var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
-                var result = await service.InvitePreReleaseUsers(release.Id, "test@test.com");
+                var result = await service.InvitePreReleaseUsers(
+                    release.Id,
+                    @"invited.prerelease@test.com
+                           existing.prerelease.user@test.com");
 
                 result.AssertBadRequest(NoInvitableEmails);
             }
