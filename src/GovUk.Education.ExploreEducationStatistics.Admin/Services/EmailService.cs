@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -10,10 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class EmailService : IEmailService
     {
         private readonly INotificationClient _client;
+        private readonly ILogger<IEmailService> _logger;
 
-        public EmailService(INotificationClient client)
+        public EmailService(INotificationClient client,
+            ILogger<IEmailService> logger)
         {
             _client = client;
+            _logger = logger;
         }
 
         public Either<ActionResult, Unit> SendEmail(
@@ -28,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 // if we decide to retrieve and display the delivery status of emails
                 return Unit.Instance;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // TODO EES-2462 Handle this error
-                return new NotFoundResult();
+                _logger.LogError(e, "Exception occured while sending email");
+                return new BadRequestResult();
             }
         }
     }
