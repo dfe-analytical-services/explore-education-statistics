@@ -5,9 +5,9 @@ export interface PreReleaseUser {
 }
 
 export interface PreReleaseInvitePlan {
-  alreadyAccepted: string[];
-  alreadyInvited: string[];
-  invitable: string[];
+  alreadyAccepted?: string[];
+  alreadyInvited?: string[];
+  invitable?: string[];
 }
 
 const preReleaseUserService = {
