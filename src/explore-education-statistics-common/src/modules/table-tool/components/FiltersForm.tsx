@@ -51,18 +51,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     isActive,
   } = props;
 
-  // Automatically select filter when one filter group with one option
-  const filterObjectValues = Object.values(subjectMeta.filters);
-  const filterGroupOptions = useMemo(() => {
-    return filterObjectValues.length
-      ? Object.values(filterObjectValues[0].options)
-      : [];
-  }, [filterObjectValues]);
-  const autoSelectFilter =
-    filterObjectValues.length === 1 &&
-    filterGroupOptions.length === 1 &&
-    filterGroupOptions[0].options.length === 1;
-
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
     const indicatorValues = Object.values(subjectMeta.indicators);
@@ -72,26 +60,21 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         : initialValues?.indicators ?? [];
 
     const filters = mapValues(subjectMeta.filters, filter => {
-      // Automatically select filter when one filter group with one option
-      if (autoSelectFilter) {
-        return [filterGroupOptions[0].options[0].value];
+      const filterGroups = Object.values(filter.options);
+
+      // Automatically select when only one group in filter, with only one option in it.
+      if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
+        return [filterGroups[0].options[0].value];
       }
 
       if (initialValues?.filters) {
-        const filterValues = Object.values(filter.options)
+        const filterValues = filterGroups
           .flatMap(group => group.options)
           .map(option => option.value);
 
         return filterValues.filter(filterValue =>
           initialValues.filters.includes(filterValue),
         );
-      }
-
-      if (filter.options.Default) {
-        // Automatically select filter option when there is only one and the filter is default
-        return filter.options.Default.options.length === 1
-          ? [filter.options.Default.options[0].value]
-          : [];
       }
 
       return [];
@@ -101,7 +84,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       filters,
       indicators,
     };
-  }, [autoSelectFilter, filterGroupOptions, initialValues, subjectMeta]);
+  }, [initialValues, subjectMeta]);
 
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
@@ -177,6 +160,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                         {Object.entries(subjectMeta.filters).map(
                           ([filterKey, filterGroup]) => {
                             const filterName = `filters.${filterKey}`;
+                            const filterGroupOptions = Object.values(
+                              filterGroup.options,
+                            );
 
                             return (
                               <FormFieldCheckboxGroupsMenu
@@ -186,13 +172,11 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
                                 order={[]}
-                                options={Object.values(filterGroup.options).map(
-                                  group => ({
-                                    legend: group.label,
-                                    options: group.options,
-                                  }),
-                                )}
-                                open={autoSelectFilter}
+                                options={filterGroupOptions.map(group => ({
+                                  legend: group.label,
+                                  options: group.options,
+                                }))}
+                                open={filterGroupOptions.length === 1}
                               />
                             );
                           },
