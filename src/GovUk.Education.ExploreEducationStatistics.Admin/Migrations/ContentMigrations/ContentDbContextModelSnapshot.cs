@@ -552,11 +552,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DataGuidance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DataLastPublished")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("MetaGuidance")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");

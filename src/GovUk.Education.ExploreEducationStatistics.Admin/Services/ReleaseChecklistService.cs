@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
-        private readonly IMetaGuidanceService _metaGuidanceService;
+        private readonly IDataGuidanceService _dataGuidanceService;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IDataImportService dataImportService,
             IUserService userService,
-            IMetaGuidanceService metaGuidanceService,
+            IDataGuidanceService dataGuidanceService,
             IReleaseDataFileRepository fileRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IFootnoteRepository footnoteRepository,
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _dataImportService = dataImportService;
             _userService = userService;
-            _metaGuidanceService = metaGuidanceService;
+            _dataGuidanceService = dataGuidanceService;
             _fileRepository = fileRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
             _footnoteRepository = footnoteRepository;
@@ -90,11 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            var isMetaGuidanceValid = await _metaGuidanceService.Validate(release.Id);
+            var isDataGuidanceValid = await _dataGuidanceService.Validate(release.Id);
 
-            if (isMetaGuidanceValid.IsLeft)
+            if (isDataGuidanceValid.IsLeft)
             {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicMetaGuidanceRequired));
+                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicDataGuidanceRequired));
             }
 
             if (release.Amendment
@@ -137,8 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && rcs.ContentSection.Type == ContentSectionType.Generic)
                 .SelectMany(rcs => rcs.ContentSection.Content)
                 .ToListAsync();
-                
-            return releaseGenericContentBlocks 
+
+            return releaseGenericContentBlocks
                 .Any(block =>
                 {
                     if (block is HtmlBlock htmlBlock)
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));
             }
-            
+
             var methodologiesNotApproved = methodologies
                 .Where(m => m.Status != MethodologyStatus.Approved)
                 .ToList();

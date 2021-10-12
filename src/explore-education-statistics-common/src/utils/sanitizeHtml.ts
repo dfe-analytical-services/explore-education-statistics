@@ -42,7 +42,7 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   },
   allowedAttributes: {
     figure: ['class', 'style'],
-    a: ['href'],
+    a: ['href', 'data-glossary'],
     img: ['alt', 'src', 'srcset', 'sizes', 'width'],
     th: ['colspan', 'rowspan'],
     td: ['colspan', 'rowspan'],

@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public Guid ReleaseId { get; set; }
 
-        public string MetaGuidance { get; set; }
+        public string DataGuidance { get; set; }
 
         public ReleaseSubject CopyForRelease(Release release)
         {

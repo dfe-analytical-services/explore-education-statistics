@@ -201,7 +201,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Single(userPublicationRoles);
 
                 Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
@@ -264,7 +266,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Single(userPublicationRoles);
 
                 Assert.Equal(userPublicationRole.Id, userPublicationRoles[0].Id);
@@ -303,7 +307,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userPublicationRoles);
             }
 
@@ -345,7 +351,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userPublicationRoles);
             }
 
@@ -407,7 +415,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Single(userReleaseRoles);
 
                 Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
@@ -471,7 +481,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Single(userReleaseRoles);
 
                 Assert.Equal(userReleaseRole.Id, userReleaseRoles[0].Id);
@@ -513,7 +525,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userReleaseRoles);
             }
 
@@ -555,7 +569,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userReleaseRoles);
             }
 
@@ -827,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Approver
             };
 
-            // Role assignment for a different user 
+            // Role assignment for a different user
             var userReleaseRole3 = new UserReleaseRole
             {
                 User = new User(),
@@ -1032,7 +1048,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userPublicationRoles);
             }
         }
@@ -1079,7 +1097,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
                 Assert.Empty(userReleaseRoles);
             }
         }

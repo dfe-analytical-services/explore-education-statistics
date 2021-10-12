@@ -494,6 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
+                    .AsQueryable()
                     .Where(r => r.ReleaseId == amendment.Id)
                     .ToList();
 
@@ -530,6 +531,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseSubjectLinks = statisticsDbContext
                     .ReleaseSubject
+                    .AsQueryable()
                     .Where(r => r.ReleaseId == newReleaseId)
                     .ToList();
 

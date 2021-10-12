@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
                         ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
                             replacementPlan.ReplacementSubjectId));
-                    await ReplaceMetaGuidance(releaseId, replacementPlan.OriginalSubjectId,
+                    await ReplaceDataGuidance(releaseId, replacementPlan.OriginalSubjectId,
                         replacementPlan.ReplacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
@@ -313,12 +313,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var existingFilterNames = _statisticsDbContext
                 .FilterItem
+                .AsQueryable()
                 .Where(fi => existingFilterItemIds.Contains(fi.Id))
                 .Select(fi => fi.FilterGroup.Filter)
                 .Select(f => f.Name)
                 .Distinct()
                 .ToList();
-            
+
             return replacementSubjectMeta
                 .Filters
                 .Select(d => d.Value)
@@ -337,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
                 )
                 .ToDictionary(f => f.Id);
-            
+
             return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name, filterGroupReplacementViewModels);
         }
 
@@ -346,6 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _statisticsDbContext.FilterItem
+                .AsQueryable()
                 .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
                 .Include(filterItem => filterItem.FilterGroup)
                 .ThenInclude(filterGroup => filterGroup.Filter)
@@ -567,6 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid replacementSubjectId)
         {
             var dataBlock = await _contentDbContext.ContentBlocks
+                .AsQueryable()
                 .OfType<DataBlock>()
                 .SingleAsync(block => block.Id == replacementPlan.Id);
 
@@ -803,8 +806,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
         {
-            var subjectFootnote = await _statisticsDbContext.SubjectFootnote.Where(f =>
-                f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
+            var subjectFootnote = await _statisticsDbContext.SubjectFootnote
+                .AsQueryable()
+                .Where(f =>
+                    f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
 
             if (subjectFootnote != null)
             {
@@ -819,9 +824,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterFootnote = await _statisticsDbContext.FilterFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterId == plan.Id
-            );
+            var filterFootnote = await _statisticsDbContext.FilterFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterFootnote);
             await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
@@ -833,9 +840,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
-            );
+            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterGroupFootnote);
             await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
@@ -847,9 +856,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
-            );
+            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterItemFootnote);
             await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
@@ -861,9 +872,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
-            );
+            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
+                );
 
             _statisticsDbContext.Remove(indicatorFootnote);
             await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
@@ -873,23 +886,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceMetaGuidance(
+        private async Task ReplaceDataGuidance(
             Guid releaseId,
             Guid originalSubject,
             Guid replacementSubject)
         {
             var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId &&
                              rs.SubjectId == originalSubject)
                 .FirstAsync();
 
             var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId &&
                              rs.SubjectId == replacementSubject)
                 .FirstAsync();
 
             _statisticsDbContext.Update(replacementReleaseSubject);
-            replacementReleaseSubject.MetaGuidance = originalReleaseSubject.MetaGuidance;
+            replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(

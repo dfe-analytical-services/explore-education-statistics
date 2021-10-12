@@ -21,15 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
-            
+
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description",
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 var result = await legacyReleaseService.GetLegacyRelease(id);
 
@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateLegacyRelease()
         {
             var publicationId = Guid.NewGuid();
-            
+
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                 });
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
                     new LegacyReleaseCreateViewModel()
@@ -109,12 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = Guid.NewGuid(),
                                 Description = "Test description 1",
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
                     new LegacyReleaseCreateViewModel()
@@ -160,12 +160,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description",
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
                     id,
@@ -217,24 +217,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Description = "Test description 1",
                                 Url = "http://test1.com",
                                 Order = 1,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Description = "Test description 2",
                                 Url = "http://test2.com",
                                 Order = 2,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description 3",
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
                     id,
@@ -265,6 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 var legacyReleases = context.LegacyReleases
+                    .AsQueryable()
                     .OrderBy(release => release.Order)
                     .ToList();
 
@@ -280,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         /// Test that we do not leave gaps in the order values when
-        /// updating a legacy release with an `Order` larger than 
+        /// updating a legacy release with an `Order` larger than
         /// the number of legacy releases.
         [Fact]
         public async Task UpdateLegacyRelease_ReordersWithoutGaps()
@@ -290,25 +291,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description 1",
                                 Url = "http://test1.com",
                                 Order = 1,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Description = "Test description 2",
                                 Url = "http://test2.com",
                                 Order = 2,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Description = "Test description 3",
                                 Url = "http://test3.com",
@@ -325,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
                     id,
@@ -338,6 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 var legacyReleases = context.LegacyReleases
+                    .AsQueryable()
                     .OrderBy(release => release.Order)
                     .ToList();
 
@@ -360,12 +362,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description",
@@ -383,7 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
@@ -404,26 +406,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext())
             {
-                context.Add(new Publication 
+                context.Add(new Publication
                 {
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = id,
                                 Description = "Test description 1",
                                 Url = "http://test1.com",
                                 Order = 1,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = Guid.NewGuid(),
                                 Description = "Test description 2",
                                 Url = "http://test2.com",
                                 Order = 2,
                             },
-                            new LegacyRelease 
+                            new LegacyRelease
                             {
                                 Id = Guid.NewGuid(),
                                 Description = "Test description 3",
@@ -441,11 +443,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     MockUtils.AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context)
                 );
-                
+
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
                 var legacyReleases = context.LegacyReleases
+                    .AsQueryable()
                     .OrderBy(release => release.Order)
                     .ToList();
 

@@ -104,7 +104,7 @@ const ReleaseDataAndFilesAccordion = ({
               </p>
 
               {!renderDataCatalogueLink && dataFiles.length > 0 && (
-                <ul className="govuk-list" data-testid="download-files">
+                <ul className="govuk-list" data-testid="data-files">
                   {dataFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}
@@ -114,7 +114,7 @@ const ReleaseDataAndFilesAccordion = ({
                 </ul>
               )}
 
-              {release.hasMetaGuidance && (
+              {release.hasDataGuidance && (
                 <p>
                   Learn more about the data files used in this release using our{' '}
                   {renderDataGuidanceLink}.
@@ -136,7 +136,7 @@ const ReleaseDataAndFilesAccordion = ({
               <p>All other files available for download are listed below:</p>
 
               <Details summary="List of other files">
-                <ul className="govuk-list" data-testid="other-download-files">
+                <ul className="govuk-list" data-testid="other-files">
                   {ancillaryFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}

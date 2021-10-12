@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
-            MetaGuidance = "Release 1 v0 Guidance",
+            DataGuidance = "Release 1 v0 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
-            MetaGuidance = "Release 1 v1 Guidance",
+            DataGuidance = "Release 1 v1 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
-            MetaGuidance = "Release 1 v2 Guidance",
+            DataGuidance = "Release 1 v2 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
-            MetaGuidance = "Release 1 v3 Guidance",
+            DataGuidance = "Release 1 v3 Guidance",
             RelatedInformation = new List<Link>(),
             Slug = "2018-19-q1",
             Published = null,
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ2,
-            MetaGuidance = "Release 2 Guidance",
+            DataGuidance = "Release 2 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ3,
-            MetaGuidance = "Release 3 Guidance",
+            DataGuidance = "Release 3 Guidance",
             RelatedInformation = new List<Link>(),
             Slug = "2018-19-q3",
             Published = null,
@@ -860,7 +860,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("10 Mb", result.DownloadFiles[1].Size);
                 Assert.Equal(FileType.Data, result.DownloadFiles[1].Type);
 
-                Assert.Equal("Release 2 Guidance", result.MetaGuidance);
+                Assert.Equal("Release 2 Guidance", result.DataGuidance);
 
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"), result.RelatedInformation[0].Id);
@@ -949,7 +949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Empty(result.DownloadFiles);
 
-                Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
+                Assert.Equal("Release 1 v1 Guidance", result.DataGuidance);
 
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"), result.RelatedInformation[0].Id);
@@ -994,7 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Empty(result.DownloadFiles);
 
-                Assert.Equal("Release 3 Guidance", result.MetaGuidance);
+                Assert.Equal("Release 3 Guidance", result.DataGuidance);
 
                 Assert.Empty(result.RelatedInformation);
             }
@@ -1038,7 +1038,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Empty(result.DownloadFiles);
 
-                Assert.Equal("Release 1 v3 Guidance", result.MetaGuidance);
+                Assert.Equal("Release 1 v3 Guidance", result.DataGuidance);
 
                 Assert.Empty(result.RelatedInformation);
             }

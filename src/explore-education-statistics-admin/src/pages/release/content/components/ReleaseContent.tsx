@@ -19,14 +19,15 @@ import {
   releaseDataGuidanceRoute,
 } from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import releaseFileService from '@admin/services/releaseFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 
 interface MethodologyLink {
   key: string;
@@ -281,6 +282,15 @@ const ReleaseContent = () => {
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
         <ReleaseDataAndFilesAccordion
           release={release}
+          renderAllFilesButton={
+            <Button
+              className="govuk-!-width-full"
+              disableDoubleClick
+              onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
+            >
+              Download all files
+            </Button>
+          }
           renderDownloadLink={file => (
             <ButtonText
               onClick={() =>

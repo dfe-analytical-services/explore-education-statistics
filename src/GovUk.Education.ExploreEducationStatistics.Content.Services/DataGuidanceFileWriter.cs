@@ -21,14 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private const string VariableSeparator = "  |  ";
 
         private readonly ContentDbContext _contentDbContext;
-        private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
 
         public DataGuidanceFileWriter(
             ContentDbContext contentDbContext,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService)
+            IDataGuidanceSubjectService dataGuidanceSubjectService)
         {
             _contentDbContext = contentDbContext;
-            _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _dataGuidanceSubjectService = dataGuidanceSubjectService;
         }
 
         public async Task<Stream> WriteToStream(Stream stream, Release release, IEnumerable<Guid>? subjectIds = null)
@@ -54,11 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return stream;
         }
 
-        private async Task<List<MetaGuidanceSubjectViewModel>> ListSubjects(
+        private async Task<List<DataGuidanceSubjectViewModel>> ListSubjects(
             Release release,
             IEnumerable<Guid>? subjectIds = null)
         {
-            var subjects = await _metaGuidanceSubjectService.GetSubjects(release.Id, subjectIds);
+            var subjects = await _dataGuidanceSubjectService.GetSubjects(release.Id, subjectIds);
 
             if (subjects.IsLeft)
             {
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private static async Task DoWrite(
             TextWriter file,
             Release release,
-            IList<MetaGuidanceSubjectViewModel> subjects)
+            IList<DataGuidanceSubjectViewModel> subjects)
         {
             // Add header information including publication/release title
             await file.WriteLineAsync(release.Publication.Title);
@@ -83,12 +83,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 )
             );
 
-            if (!release.MetaGuidance.IsNullOrWhitespace())
+            if (!release.DataGuidance.IsNullOrWhitespace())
             {
                 await file.WriteLineAsync();
 
                 // Add the release's guidance content
-                var guidance = await HtmlToTextUtils.HtmlToText(release.MetaGuidance);
+                var guidance = await HtmlToTextUtils.HtmlToText(release.DataGuidance);
                 await file.WriteAsync(guidance);
                 await file.WriteLineAsync();
             }
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             await WriteDataFiles(file, subjects);
         }
 
-        private static async Task WriteDataFiles(TextWriter file, IList<MetaGuidanceSubjectViewModel> subjects)
+        private static async Task WriteDataFiles(TextWriter file, IList<DataGuidanceSubjectViewModel> subjects)
         {
             if (subjects.Count == 0)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,15 +14,15 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    public class MetaGuidanceServiceTests
+    public class DataGuidanceServiceTests
     {
-        private static readonly List<MetaGuidanceSubjectViewModel> SubjectMetaGuidance =
-            new List<MetaGuidanceSubjectViewModel>
+        private static readonly List<DataGuidanceSubjectViewModel> DataGuidanceSubjects =
+            new()
             {
-                new MetaGuidanceSubjectViewModel
+                new DataGuidanceSubjectViewModel
                 {
                     Id = Guid.NewGuid(),
-                    Content = "Subject Meta Guidance",
+                    Content = "Subject Guidance",
                     Filename = "data.csv",
                     Name = "Subject",
                     GeographicLevels = new List<string>
@@ -31,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     TimePeriods = new TimePeriodLabels("2020_AYQ3", "2021_AYQ1"),
                     Variables = new List<LabelValue>
                     {
-                        new LabelValue("Filter label", "test_filter"),
-                        new LabelValue("Indicator label", "test_indicator")
+                        new("Filter label", "test_filter"),
+                        new("Indicator label", "test_indicator")
                     }
                 }
             };
@@ -47,11 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releasePath = "2016-17";
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
-            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
 
-            var service = SetupMetaGuidanceService(
+            var service = SetupService(
                 fileStorageService: fileStorageService.Object,
-                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
             );
 
             fileStorageService.Setup(
@@ -76,14 +77,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Id = releaseId,
                         Title = "2016-17",
                         Slug = "2016-17",
-                        MetaGuidance = "Release Meta guidance"
+                        DataGuidance = "Release Guidance"
                     }
                 );
 
-            metaGuidanceSubjectService.Setup(
+            dataGuidanceSubjectService.Setup(
                     mock => mock.GetSubjects(releaseId, null)
                 )
-                .ReturnsAsync(SubjectMetaGuidance);
+                .ReturnsAsync(DataGuidanceSubjects);
 
             var result = await service.Get(publicationPath, releasePath);
 
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            metaGuidanceSubjectService.Verify(
+            dataGuidanceSubjectService.Verify(
                 mock => mock.GetSubjects(releaseId, null),
                 Times.Once
             );
@@ -106,10 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Assert.Equal(releaseId, result.Right.Id);
             Assert.Equal("2016-17", result.Right.Title);
             Assert.Equal("2016-17", result.Right.Slug);
-            Assert.Equal("Release Meta guidance", result.Right.MetaGuidance);
-            Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
+            Assert.Equal("Release Guidance", result.Right.DataGuidance);
+            Assert.Equal(DataGuidanceSubjects, result.Right.Subjects);
 
-            Assert.Equal(publicationId, result.Right.Publication.Id);
+            Assert.Equal(publicationId, result.Right.Publication!.Id);
             Assert.Equal("Test publication", result.Right.Publication.Title);
             Assert.Equal("test-publication", result.Right.Publication.Slug);
         }
@@ -121,11 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releasePath = "2016-17";
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
-            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
 
-            var service = SetupMetaGuidanceService(
+            var service = SetupService(
                 fileStorageService: fileStorageService.Object,
-                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
             );
 
             fileStorageService.Setup(
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "2016-17",
                     Slug = "2016-17",
-                    MetaGuidance = "Release Meta guidance"
+                    DataGuidance = "Release Guidance"
                 });
 
             var result = await service.Get(publicationPath, releasePath);
@@ -165,11 +166,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releasePath = "incorrect-release-path";
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
-            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
 
-            var service = SetupMetaGuidanceService(
+            var service = SetupService(
                 fileStorageService: fileStorageService.Object,
-                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
             );
 
             fileStorageService.Setup(
@@ -204,13 +205,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             result.AssertNotFound();
         }
 
-        private static MetaGuidanceService SetupMetaGuidanceService(
-            IFileStorageService fileStorageService = null,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
+        private static DataGuidanceService SetupService(
+            IFileStorageService? fileStorageService = null,
+            IDataGuidanceSubjectService? dataGuidanceSubjectService = null)
         {
-            return new MetaGuidanceService(
-                fileStorageService ?? new Mock<IFileStorageService>().Object,
-                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
+            return new DataGuidanceService(
+                fileStorageService ?? Mock.Of<IFileStorageService>(),
+                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>()
             );
         }
     }

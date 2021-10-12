@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             ContentSectionViewModel keyStatisticsSection,
             ContentSectionViewModel keyStatisticsSecondarySection,
             List<FileInfo> downloadFiles,
-            string metaGuidance,
+            string dataGuidance,
             string preReleaseAccessList,
             List<LinkViewModel> relatedInformation,
             DateTime? dataLastPublished)
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             KeyStatisticsSection = keyStatisticsSection;
             KeyStatisticsSecondarySection = keyStatisticsSecondarySection;
             DownloadFiles = downloadFiles;
-            MetaGuidance = metaGuidance;
+            DataGuidance = dataGuidance;
             PreReleaseAccessList = preReleaseAccessList;
             RelatedInformation = relatedInformation;
             DataLastPublished = dataLastPublished;
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public List<FileInfo> DownloadFiles { get; set; } = new List<FileInfo>();
 
-        public string MetaGuidance { get; set; }
+        public string DataGuidance { get; set; }
 
         public string PreReleaseAccessList { get; set; }
 

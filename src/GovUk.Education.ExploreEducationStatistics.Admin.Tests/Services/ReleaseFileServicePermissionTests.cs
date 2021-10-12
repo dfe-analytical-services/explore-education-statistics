@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -197,22 +199,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseFileService SetupReleaseFileService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
-            IFileRepository fileRepository = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IBlobStorageService? blobStorageService = null,
+            IFileRepository? fileRepository = null,
+            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
+            IUserService? userService = null)
         {
             return new ReleaseFileService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
+                blobStorageService ?? Mock.Of<IBlobStorageService>(),
                 fileRepository ?? new FileRepository(contentDbContext),
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
+                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                userService ?? new Mock<IUserService>().Object
+                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
+                userService ?? Mock.Of<IUserService>()
             );
         }
 

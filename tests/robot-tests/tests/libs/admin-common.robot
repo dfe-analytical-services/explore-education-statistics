@@ -402,6 +402,8 @@ user removes an external methodology from publication
     [Arguments]    ${publication}
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
     user clicks button    Remove external methodology    ${accordion}
+    user waits until modal is visible    Remove external methodology
+    user clicks button    Confirm
 
 user adds basic release content
     [Arguments]    ${publication}

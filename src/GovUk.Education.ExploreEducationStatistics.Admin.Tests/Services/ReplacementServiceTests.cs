@@ -2583,21 +2583,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = statsReleaseVersion1,
                 Subject = originalSubject,
-                MetaGuidance = "Original meta guidance version 1"
+                DataGuidance = "Original guidance version 1"
             };
 
             var originalReleaseSubject2 = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
                 Subject = originalSubject,
-                MetaGuidance = "Original meta guidance version 2"
+                DataGuidance = "Original guidance version 2"
             };
 
             var replacementReleaseSubject = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
                 Subject = replacementSubject,
-                MetaGuidance = null
+                DataGuidance = null
             };
 
             var originalFilterItem1 = new FilterItem
@@ -3092,13 +3092,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
 
-                // Check the original Meta Guidance has been retained on the replacement
+                // Check the original guidance has been retained on the replacement
                 var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .AsQueryable()
                     .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id
                                  && rs.SubjectId == replacementSubject.Id)
                     .FirstAsync();
 
-                Assert.Equal("Original meta guidance version 2", replacedReleaseSubject.MetaGuidance);
+                Assert.Equal("Original guidance version 2", replacedReleaseSubject.DataGuidance);
             }
         }
 

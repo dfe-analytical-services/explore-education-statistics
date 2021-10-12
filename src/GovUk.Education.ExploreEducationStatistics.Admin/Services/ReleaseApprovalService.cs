@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPreReleaseUserService _preReleaseUserService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseFileService _releaseFileService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public ReleaseApprovalService(
             ContentDbContext context,
@@ -40,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IContentService contentService,
             IPreReleaseUserService preReleaseUserService,
             IReleaseFileRepository releaseFileRepository,
-            IReleaseFileService releaseFileService)
+            IReleaseFileService releaseFileService,
+            IReleaseRepository releaseRepository)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
@@ -51,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _preReleaseUserService = preReleaseUserService;
             _releaseFileRepository = releaseFileRepository;
             _releaseFileService = releaseFileService;
+            _releaseRepository = releaseRepository;
         }
 
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
@@ -61,8 +64,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Include(r => r.ReleaseStatuses)
                         .ThenInclude(rs => rs.CreatedBy))
                 .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
-                .OnSuccess(release =>
-                    release.ReleaseStatuses
+                .OnSuccess(async release =>
+                {
+                    var allReleaseVersionIds = await _releaseRepository.GetAllReleaseVersionIds(release);
+                    return _context.ReleaseStatus
+                        .Include(rs => rs.Release)
+                        .Include(rs => rs.CreatedBy)
+                        .Where(rs => allReleaseVersionIds.Contains(rs.ReleaseId))
+                        .ToList()
                         .Select(rs =>
                             new ReleaseStatusViewModel
                             {
@@ -70,11 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 InternalReleaseNote = rs.InternalReleaseNote,
                                 ApprovalStatus = rs.ApprovalStatus,
                                 Created = rs.Created,
-                                CreatedByEmail = rs.CreatedBy?.Email
+                                CreatedByEmail = rs.CreatedBy?.Email,
+                                ReleaseVersion = rs.Release.Version,
                             })
                         .OrderByDescending(vm => vm.Created)
-                        .ToList()
-                );
+                        .ToList();
+                });
         }
 
         public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(

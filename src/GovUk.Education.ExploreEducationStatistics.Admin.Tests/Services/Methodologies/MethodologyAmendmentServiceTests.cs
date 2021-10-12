@@ -194,6 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var amendmentMethodologyFiles = await context
                     .MethodologyFiles
+                    .AsQueryable()
                     .Where(f => f.MethodologyVersionId == amendmentId)
                     .ToListAsync();
 

@@ -4,20 +4,20 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class MetaGuidanceViewModel
+    public class DataGuidanceViewModel
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public List<MetaGuidanceSubjectViewModel> Subjects { get; set; }
+        public List<DataGuidanceSubjectViewModel> Subjects { get; set; }
     }
 
-    public class MetaGuidanceUpdateViewModel
+    public class DataGuidanceUpdateViewModel
     {
         public string Content { get; set; }
-        public List<MetaGuidanceUpdateSubjectViewModel> Subjects { get; set; }
+        public List<DataGuidanceUpdateSubjectViewModel> Subjects { get; set; }
     }
 
-    public class MetaGuidanceUpdateSubjectViewModel
+    public class DataGuidanceUpdateSubjectViewModel
     {
         public Guid Id { get; set; }
         public string Content { get; set; }

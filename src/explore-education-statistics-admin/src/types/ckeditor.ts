@@ -2,6 +2,8 @@
 // exposed by any of the packages that we consume.
 
 // https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html
+import { Dictionary } from '@common/types';
+
 export interface EditorClass {
   new (config: EditorConfig): Editor;
 }
@@ -30,6 +32,9 @@ export interface EditorConfig {
   heading?: {
     options: HeadingOption[];
   };
+  link?: {
+    decorators: Dictionary<LinkDecoratorAutomatic | LinkDecoratorManual>;
+  };
 }
 
 export interface PluginCollection {
@@ -38,6 +43,23 @@ export interface PluginCollection {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Plugin {}
+
+export interface LinkDecoratorAutomatic {
+  mode: 'automatic';
+  callback: (url: string) => boolean | RegExpMatchArray | null;
+  attributes: Dictionary<string>;
+  styles?: Dictionary<string>;
+  classes?: string | string[];
+}
+
+export interface LinkDecoratorManual {
+  mode: 'manual';
+  defaultValue: boolean;
+  label: string;
+  attributes: Dictionary<string>;
+  styles?: Dictionary<string>;
+  classes?: string | string[];
+}
 
 export interface HeadingOption {
   model:

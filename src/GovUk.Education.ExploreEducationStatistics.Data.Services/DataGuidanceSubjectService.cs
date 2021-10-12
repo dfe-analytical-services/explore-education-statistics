@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class MetaGuidanceSubjectService : IMetaGuidanceSubjectService
+    public class DataGuidanceSubjectService : IDataGuidanceSubjectService
     {
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly ITimePeriodService _timePeriodService;
 
-        public MetaGuidanceSubjectService(IFilterRepository filterRepository,
+        public DataGuidanceSubjectService(IFilterRepository filterRepository,
             IIndicatorRepository indicatorRepository,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
         }
 
-        public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
+        public async Task<Either<ActionResult, List<DataGuidanceSubjectViewModel>>> GetSubjects(
             Guid releaseId,
             IEnumerable<Guid>? subjectIds = null)
         {
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var releaseSubjects = await releaseSubjectsQueryable
                         .ToListAsync();
 
-                    var result = new List<MetaGuidanceSubjectViewModel>();
+                    var result = new List<DataGuidanceSubjectViewModel>();
                     await releaseSubjects.ForEachAsync(async releaseSubject =>
                     {
                         result.Add(await BuildSubjectViewModel(releaseSubject));
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 // Currently we expect a failure checking the Release exists and succeed with an empty list.
                 // StatisticsDb Releases are not always in sync with ContentDb Releases.
                 // Until the first Subject is imported, no StatisticsDb Release exists.
-                .OnFailureSucceedWith(result => Task.FromResult(new List<MetaGuidanceSubjectViewModel>()));
+                .OnFailureSucceedWith(result => Task.FromResult(new List<DataGuidanceSubjectViewModel>()));
         }
 
         public async Task<Either<ActionResult, bool>> Validate(Guid releaseId)
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(rs => rs.ReleaseId == releaseId);
 
             return !await releaseSubjects.AnyAsync() || !await releaseSubjects.AnyAsync(
-                rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
+                rs => string.IsNullOrWhiteSpace(rs.DataGuidance));
         }
 
         public async Task<List<string>> GetGeographicLevels(Guid subjectId)
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private async Task<MetaGuidanceSubjectViewModel> BuildSubjectViewModel(ReleaseSubject releaseSubject)
+        private async Task<DataGuidanceSubjectViewModel> BuildSubjectViewModel(ReleaseSubject releaseSubject)
         {
             var subject = releaseSubject.Subject;
 
@@ -139,10 +139,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var variables = GetVariables(subject.Id);
             var footnotes = GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 
-            return new MetaGuidanceSubjectViewModel
+            return new DataGuidanceSubjectViewModel
             {
                 Id = subject.Id,
-                Content = releaseSubject.MetaGuidance ?? "",
+                Content = releaseSubject.DataGuidance ?? "",
                 Filename = releaseFile.File.Filename,
                 Name = releaseFile.Name ?? "",
                 GeographicLevels = geographicLevels,

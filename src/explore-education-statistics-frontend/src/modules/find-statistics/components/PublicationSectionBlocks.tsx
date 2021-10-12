@@ -5,6 +5,7 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
+import glossaryService from '@frontend/services/glossaryService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
@@ -74,6 +75,7 @@ const PublicationSectionBlocks = ({
             key={block.id}
             block={block}
             transformImageAttributes={transformImageAttributes}
+            getGlossaryEntry={glossaryService.getEntry}
           />
         );
       })}

@@ -124,7 +124,7 @@ export type ReleaseChecklistError = {
   code:
     | 'DataFileImportsMustBeCompleted'
     | 'DataFileReplacementsMustBeCompleted'
-    | 'PublicMetaGuidanceRequired'
+    | 'PublicDataGuidanceRequired'
     | 'ReleaseNoteRequired'
     | 'EmptyContentSectionExists'
     | 'GenericSectionsContainEmptyHtmlBlock';
@@ -169,6 +169,7 @@ export interface ReleaseStatus {
   notifySubscribers: boolean;
   created: string;
   createdByEmail: string;
+  releaseVersion: number;
 }
 
 export interface DeleteReleasePlan {

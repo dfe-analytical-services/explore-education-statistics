@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId)
                         .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
-                        .OnSuccessVoid(async tuple => 
+                        .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
                             await _userManager.AddToRoleAsync(user, role.Name);
@@ -124,7 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel
+                    return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .Select(r => new RoleViewModel
                         {
                             Id = r.Id,
                             Name = r.Name,
@@ -167,11 +169,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var roleIds = await _usersAndRolesDbContext.UserRoles
+                        .AsQueryable()
                         .Where(r => r.UserId == userId)
                         .Select(r => r.RoleId)
                         .ToListAsync();
 
                     return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
                         .Where(r => roleIds.Contains(r.Id))
                         .OrderBy(r => r.Name)
                         .Select(r => new RoleViewModel
@@ -225,8 +229,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenBy(userReleaseRole => userReleaseRole.Release.Year)
                         .ThenBy(userReleaseRole => userReleaseRole.Release.TimePeriodCoverage)
                         .ToList();
-                        
-                    return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel 
+
+                    return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
                         {
                             Id = userReleaseRole.Id,
                             Publication = userReleaseRole.Release.Publication.Title,
@@ -247,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId)
                         .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
-                        .OnSuccessVoid(async tuple => 
+                        .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
                             await _userManager.RemoveFromRoleAsync(user, role.Name);
@@ -278,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _contentDbContext.SaveChangesAsync();
                 });
         }
-        
+
         private async Task<Either<ActionResult, Unit>> ValidatePublicationRoleCanBeAdded(Guid userId,
             Guid publicationId,
             PublicationRole role)

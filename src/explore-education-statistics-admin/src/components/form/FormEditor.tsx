@@ -204,6 +204,17 @@ const FormEditor = ({
       table: {
         contentToolbar: tableContentToolbar,
       },
+      link: {
+        decorators: {
+          addDataGlossaryAttributeToGlossaryLinks: {
+            mode: 'automatic',
+            callback: (url: string) =>
+              url.startsWith(process.env.PUBLIC_URL) &&
+              url.match(/\/glossary#[a-zA-Z-0-9-]+$/),
+            attributes: { 'data-glossary': '' },
+          },
+        },
+      },
       extraPlugins:
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]

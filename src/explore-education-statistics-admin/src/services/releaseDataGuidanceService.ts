@@ -9,7 +9,7 @@ export interface ReleaseDataGuidance {
 
 const releaseDataGuidanceService = {
   getDataGuidance(releaseId: string): Promise<ReleaseDataGuidance> {
-    return client.get(`/release/${releaseId}/meta-guidance`);
+    return client.get(`/release/${releaseId}/data-guidance`);
   },
   updateDataGuidance(
     releaseId: string,
@@ -21,7 +21,7 @@ const releaseDataGuidanceService = {
       }[];
     },
   ): Promise<ReleaseDataGuidance> {
-    return client.patch(`/release/${releaseId}/meta-guidance`, data);
+    return client.patch(`/release/${releaseId}/data-guidance`, data);
   },
 };
 

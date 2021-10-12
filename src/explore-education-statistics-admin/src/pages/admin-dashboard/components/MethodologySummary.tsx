@@ -21,6 +21,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
+import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import classNames from 'classnames';
@@ -43,6 +44,10 @@ const MethodologySummary = ({
     amendment: boolean;
   }>();
   const [dropMethodologyId, setDropMethodologyId] = useState<string>();
+  const [
+    removingExternalMethodology,
+    toggleRemovingExternalMethodology,
+  ] = useToggle(false);
 
   const {
     contact,
@@ -68,6 +73,7 @@ const MethodologySummary = ({
       publicationId,
       updatedPublication,
     );
+    toggleRemovingExternalMethodology.off();
     onChangePublication();
   };
 
@@ -235,7 +241,7 @@ const MethodologySummary = ({
                 <Button
                   type="button"
                   variant="warning"
-                  onClick={handleRemoveExternalMethodology}
+                  onClick={toggleRemovingExternalMethodology.on}
                 >
                   Remove external methodology
                 </Button>
@@ -375,6 +381,17 @@ const MethodologySummary = ({
           <p>Are you sure you want to remove this adopted methodology?</p>
         </ModalConfirm>
       )}
+      <ModalConfirm
+        open={removingExternalMethodology}
+        title="Remove external methodology"
+        onConfirm={async () => {
+          await handleRemoveExternalMethodology();
+        }}
+        onCancel={toggleRemovingExternalMethodology.off}
+        onExit={toggleRemovingExternalMethodology.off}
+      >
+        <p>Are you sure you want to remove this external methodology?</p>
+      </ModalConfirm>
     </>
   );
 };

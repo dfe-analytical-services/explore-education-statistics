@@ -197,6 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var files = await _context.Files
+                .AsQueryable()
                 .Where(f => fileIds.Contains(f.Id))
                 .ToListAsync();
 
@@ -271,6 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var dependentDataBlocks = _context
                 .DataBlocks
+                .AsQueryable()
                 .Where(block => blockIdsToDelete.Contains(block.Id));
 
             _context.ContentBlocks.RemoveRange(dependentDataBlocks);

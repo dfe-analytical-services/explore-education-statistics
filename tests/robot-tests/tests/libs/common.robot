@@ -722,11 +722,16 @@ user checks list has x items
     ${items}=    get child elements    ${list}    css:li
     length should be    ${items}    ${num}
 
-user checks list item contains
-    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+user gets list item element
+    [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
     ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    [Return]    ${item}
+
+user checks list item contains
+    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+    ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
 
 user checks breadcrumb count should be

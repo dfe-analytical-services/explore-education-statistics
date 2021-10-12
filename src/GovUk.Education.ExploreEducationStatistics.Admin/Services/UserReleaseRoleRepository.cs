@@ -36,7 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)
         {
-            return await _contentDbContext.UserReleaseRoles.Where(r =>
+            return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .Where(r =>
                     r.UserId == userId &&
                     r.ReleaseId == releaseId)
                 .Select(r => r.Role)
@@ -61,10 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<bool> UserHasRoleOnRelease(Guid userId, Guid releaseId, ReleaseRole role)
         {
-            return await _contentDbContext.UserReleaseRoles.AnyAsync(r =>
-                r.UserId == userId &&
-                r.ReleaseId == releaseId &&
-                r.Role == role);
+            return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .AnyAsync(r =>
+                    r.UserId == userId &&
+                    r.ReleaseId == releaseId &&
+                    r.Role == role);
         }
 
         public async Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,
@@ -84,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
                 .AnyAsync(r =>
                     r.UserId == userId &&
                     r.ReleaseId == latestRelease.Id &&

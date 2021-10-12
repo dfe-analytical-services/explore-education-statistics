@@ -186,18 +186,22 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
     );
   };
 
+  const orderedNotes = orderBy(methodologyNotes, 'displayDate', 'desc');
+
   return (
     <SummaryListItem term="Last updated">
       {methodologyNotes.length > 0 ? (
         <>
-          <FormattedDate>{methodologyNotes[0].displayDate}</FormattedDate>
+          <FormattedDate testId="Last updated date">
+            {orderedNotes[0].displayDate}
+          </FormattedDate>
           <Details
             summary={`See all notes (${methodologyNotes.length})`}
             id="methodologyNotes"
             open={editingMode === 'edit'}
           >
             <ol className="govuk-list">
-              {orderBy(methodologyNotes, 'displayDate', 'desc').map(note => (
+              {orderedNotes.map(note => (
                 <li key={note.id}>
                   {editingMode === 'edit' &&
                   editFormOpen &&

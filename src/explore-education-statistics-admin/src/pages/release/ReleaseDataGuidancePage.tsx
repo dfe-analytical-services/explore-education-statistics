@@ -18,7 +18,7 @@ interface LocationState {
 }
 
 interface Model {
-  metaGuidance: ReleaseDataGuidance;
+  dataGuidance: ReleaseDataGuidance;
   release: Release;
 }
 
@@ -29,13 +29,13 @@ const ReleaseDataGuidancePage = ({
   const { releaseId } = match.params;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [metaGuidance, release] = await Promise.all([
+    const [dataGuidance, release] = await Promise.all([
       releaseDataGuidanceService.getDataGuidance(releaseId),
       releaseService.getRelease(releaseId),
     ]);
 
     return {
-      metaGuidance,
+      dataGuidance,
       release,
     };
   }, [releaseId]);
@@ -56,7 +56,7 @@ const ReleaseDataGuidancePage = ({
 
             <ReleaseDataGuidancePageContent
               published={model.release.published}
-              dataGuidance={model.metaGuidance.content}
+              dataGuidance={model.dataGuidance.content}
               renderDataCatalogueLink={
                 model.release.published ? (
                   <Link
@@ -71,7 +71,7 @@ const ReleaseDataGuidancePage = ({
                   </Link>
                 )
               }
-              subjects={model.metaGuidance.subjects}
+              subjects={model.dataGuidance.subjects}
             />
           </>
         )}

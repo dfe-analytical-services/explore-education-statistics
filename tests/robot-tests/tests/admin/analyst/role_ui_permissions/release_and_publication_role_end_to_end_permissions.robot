@@ -88,6 +88,16 @@ Check publication owner can edit release status to "Ready for higher review"
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
 
+Validates Release status table is correct
+    user waits until page contains element    css:table
+    user checks element count is x    xpath://table/tbody/tr    1
+    ${datetime}    get current datetime    %-d %B %Y
+    table cell should contain    css:table    2    1    ${datetime}    # Date
+    table cell should contain    css:table    2    2    HigherLevelReview    # Status
+    table cell should contain    css:table    2    3    ready for higher review (publication owner)    # Internal note
+    table cell should contain    css:table    2    4    1    # Release version
+    table cell should contain    css:table    2    5    ees-analyst1@education.gov.uk    # By user
+
 Check publication owner can edit release status to "In draft"
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    30
@@ -95,6 +105,26 @@ Check publication owner can edit release status to "In draft"
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    Moving back to Draft state (publication owner)
     user clicks button    Update status
+
+Validates Release status table is correct again
+    user waits until page contains element    css:table
+    user checks element count is x    xpath://table/tbody/tr    2
+    ${datetime}    get current datetime    %-d %B %Y
+
+    # New In draft row
+    table cell should contain    css:table    2    1    ${datetime}    # Date
+    table cell should contain    css:table    2    2    Draft    # Status
+    # Internal note
+    table cell should contain    css:table    2    3    Moving back to Draft state (publication owner)
+    table cell should contain    css:table    2    4    1    # Release version
+    table cell should contain    css:table    2    5    ees-analyst1@education.gov.uk    # By user
+
+    # Higher review row
+    table cell should contain    css:table    3    1    ${datetime}    # Date
+    table cell should contain    css:table    3    2    HigherLevelReview    # Status
+    table cell should contain    css:table    3    3    ready for higher review (publication owner)    # Internal note
+    table cell should contain    css:table    3    4    1    # Release version
+    table cell should contain    css:table    3    5    ees-analyst1@education.gov.uk    # By user
 
 Check that a publication owner can make a new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}

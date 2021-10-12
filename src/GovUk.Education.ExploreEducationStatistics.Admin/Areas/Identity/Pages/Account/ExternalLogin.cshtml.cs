@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{0} logged in with {1} provider", 
+                _logger.LogInformation("{0} logged in with {1} provider",
                     info.Principal.Identity.Name,
                     info.LoginProvider);
                 return LocalRedirect(returnUrl);
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
             var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email) != null 
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email) != null
                 ? info.Principal.FindFirstValue(ClaimTypes.Email)
                 : info.Principal.FindFirstValue(ClaimTypes.Name);
 
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     firstName = "";
                     lastName = "";
                 }
-                else 
+                else
                 {
                     if (nameClaim.IndexOf(' ') > 0)
                     {
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     {
                         firstName = nameClaim;
                         lastName = "";
-                    }    
+                    }
                 }
             }
 
@@ -144,8 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     && i.Accepted == false);
 
             // If the newly logging in User has an unaccepted invite with a matching email address to the User logging
-            // in, register them with the Identity Framework and also create any "internal" User records too if they 
-            // don't already exist.  If they *do* exist already, link the new Identity Framework user with the existing 
+            // in, register them with the Identity Framework and also create any "internal" User records too if they
+            // don't already exist.  If they *do* exist already, link the new Identity Framework user with the existing
             // "internal" User via the same id (more below).
             if (inviteToSystem != null)
             {
@@ -155,10 +155,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 // See if we have an "internal" User record in existence yet that has a matching email address to the
                 // new user logging in.  If we do, create this new AspNetUser record with a matching one-to-one id.
-                // Otherwise, later on we'll create a new "internal" Users record with an id matching this AspNetUser's 
+                // Otherwise, later on we'll create a new "internal" Users record with an id matching this AspNetUser's
                 // id, continuing to establish the one-to-one relationship.
                 var existingInternalUser = await _contentDbContext
                     .Users
+                    .AsQueryable()
                     .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
                 // Create a new set of AspNetUser records for the Identity Framework.
@@ -170,17 +171,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     FirstName = firstName,
                     LastName = lastName
                 };
-                
+
                 var createdIdentityUserResult = await _userManager.CreateAsync(identityUser);
                 var addedIdentityUserRoles = await _userManager.AddToRoleAsync(identityUser, inviteToSystem.Role.Name);
                 var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(identityUser, info);
 
-                // If adding the new Identity Framework user records succeeded, continue on to create internal User 
+                // If adding the new Identity Framework user records succeeded, continue on to create internal User
                 // and Role records for the application itself and sign the user in.
                 if (createdIdentityUserResult.Succeeded && addedIdentityUserRoles.Succeeded && recordIdpLoginDetailsResult.Succeeded)
                 {
                     // If we didn't yet have an existing "internal" User record matching this new login in the Users
-                    // table, create one now, being sure to establish the one-to-one id relationship between the  
+                    // table, create one now, being sure to establish the one-to-one id relationship between the
                     // AspNetUsers record and the Users record.
                     if (existingInternalUser == null)
                     {
@@ -191,11 +192,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                             LastName = identityUser.LastName,
                             Email = identityUser.Email
                         };
-                    
+
                         await _contentDbContext.Users.AddAsync(newInternalUser);
 
                         var releaseInvites = _contentDbContext
                             .UserReleaseInvites
+                            .AsQueryable()
                             .Where(i => i.Email.ToLower() == identityUser.Email.ToLower());
 
                         await releaseInvites.ForEachAsync(invite =>
@@ -213,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                     await _contentDbContext.SaveChangesAsync();
                     await _usersAndRolesDbContext.SaveChangesAsync();
-                    
+
                     await _signInManager.SignInAsync(identityUser, isPersistent: false);
                     _logger.LogInformation("User created an account using {0} provider", info.LoginProvider);
                     return LocalRedirect(returnUrl);
@@ -228,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                
+
                 foreach (var error in recordIdpLoginDetailsResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);

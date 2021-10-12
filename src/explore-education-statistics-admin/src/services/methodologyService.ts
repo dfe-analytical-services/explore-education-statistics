@@ -17,7 +17,7 @@ interface MethodologyPublication {
   title: string;
 }
 
-export interface BasicMethodology {
+export interface BasicMethodologyVersion {
   amendment: boolean;
   id: string;
   latestInternalReleaseNote?: string;
@@ -33,7 +33,7 @@ export interface BasicMethodology {
   methodologyId: string;
 }
 
-export interface MyMethodology extends BasicMethodology {
+export interface MyMethodologyVersion extends BasicMethodologyVersion {
   permissions: {
     canApproveMethodology: boolean;
     canUpdateMethodology: boolean;
@@ -44,19 +44,19 @@ export interface MyMethodology extends BasicMethodology {
 }
 
 const methodologyService = {
-  createMethodology(publicationId: string): Promise<BasicMethodology> {
+  createMethodology(publicationId: string): Promise<BasicMethodologyVersion> {
     return client.post(`/publication/${publicationId}/methodology`);
   },
 
   updateMethodology(
     methodologyId: string,
     data: UpdateMethodology,
-  ): Promise<BasicMethodology> {
+  ): Promise<BasicMethodologyVersion> {
     return client.put(`/methodology/${methodologyId}`, data);
   },
 
-  getMethodology(methodologyId: string): Promise<BasicMethodology> {
-    return client.get<BasicMethodology>(
+  getMethodology(methodologyId: string): Promise<BasicMethodologyVersion> {
+    return client.get<BasicMethodologyVersion>(
       `/methodology/${methodologyId}/summary`,
     );
   },
@@ -67,7 +67,9 @@ const methodologyService = {
     );
   },
 
-  createMethodologyAmendment(methodologyId: string): Promise<BasicMethodology> {
+  createMethodologyAmendment(
+    methodologyId: string,
+  ): Promise<BasicMethodologyVersion> {
     return client.post(`/methodology/${methodologyId}/amendment`);
   },
 

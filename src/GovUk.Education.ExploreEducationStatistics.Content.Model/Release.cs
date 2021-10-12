@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
-        public string MetaGuidance { get; set; } = string.Empty;
+        public string DataGuidance { get; set; } = string.Empty;
 
         public Release? PreviousVersion { get; set; }
 

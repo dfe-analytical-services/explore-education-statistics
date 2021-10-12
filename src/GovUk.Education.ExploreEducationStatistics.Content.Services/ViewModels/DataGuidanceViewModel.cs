@@ -5,18 +5,18 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record MetaGuidanceViewModel : ReleaseSummaryViewModel
+    public record DataGuidanceViewModel : ReleaseSummaryViewModel
     {
-        public string MetaGuidance { get;  }
+        public string DataGuidance { get;  }
 
-        public List<MetaGuidanceSubjectViewModel> Subjects { get; }
+        public List<DataGuidanceSubjectViewModel> Subjects { get; }
 
-        public MetaGuidanceViewModel(
+        public DataGuidanceViewModel(
             CachedReleaseViewModel release,
             CachedPublicationViewModel publication,
-            List<MetaGuidanceSubjectViewModel> subjects) : base(release, publication)
+            List<DataGuidanceSubjectViewModel> subjects) : base(release, publication)
         {
-            MetaGuidance = release.MetaGuidance;
+            DataGuidance = release.DataGuidance;
             Subjects = subjects;
         }
     }

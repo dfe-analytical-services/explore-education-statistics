@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
-    public interface IMetaGuidanceSubjectService
+    public interface IDataGuidanceSubjectService
     {
-        Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(
+        Task<Either<ActionResult, List<DataGuidanceSubjectViewModel>>> GetSubjects(
             Guid releaseId,
             IEnumerable<Guid>? subjectIds = null);
 

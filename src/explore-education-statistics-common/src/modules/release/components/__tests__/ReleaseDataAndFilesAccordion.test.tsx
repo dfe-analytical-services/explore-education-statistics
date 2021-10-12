@@ -47,7 +47,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
         extension: 'txt',
       },
     ],
-    hasMetaGuidance: true,
+    hasDataGuidance: true,
     hasPreReleaseAccessList: true,
     publication: {
       slug: 'publication-1',
@@ -79,9 +79,9 @@ describe('ReleaseDataAndFilesAccordion', () => {
     userEvent.click(screen.getByText('List of other files'));
 
     // Files should be ordered alphabetically
-    const otherFiles = within(
-      screen.getByTestId('other-download-files'),
-    ).getAllByRole('listitem');
+    const otherFiles = within(screen.getByTestId('other-files')).getAllByRole(
+      'listitem',
+    );
 
     // File 1
     expect(
@@ -125,7 +125,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
       <ReleaseDataAndFilesAccordion
         release={{
           ...testRelease,
-          hasMetaGuidance: false,
+          hasDataGuidance: false,
         }}
         renderDownloadLink={file => <a href="/">{file.name}</a>}
         renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
@@ -149,10 +149,8 @@ describe('ReleaseDataAndFilesAccordion', () => {
       />,
     );
 
-    expect(screen.queryByTestId('download-files')).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('other-download-files'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('data-files')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('other-files')).not.toBeInTheDocument();
   });
 
   test('does not render all files button if there are no files', () => {
@@ -230,9 +228,9 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     // Files should be ordered alphabetically, with the
     // 'All files' zip always being at the top
-    const downloadFiles = within(
-      screen.getByTestId('download-files'),
-    ).getAllByRole('listitem');
+    const downloadFiles = within(screen.getByTestId('data-files')).getAllByRole(
+      'listitem',
+    );
 
     // File 1
     expect(

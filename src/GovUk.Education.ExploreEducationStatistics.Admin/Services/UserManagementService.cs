@@ -50,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() =>
                 {
                     return _usersAndRolesDbContext.Users
+                        .AsQueryable()
                         .Join(
                             _usersAndRolesDbContext.UserRoles,
                             user => user.Id,
@@ -85,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ =>
                 {
                     return _contentDbContext.Publications
+                        .AsQueryable()
                         .Select(p => new TitleAndIdViewModel
                         {
                             Id = p.Id,
@@ -119,7 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel
+                    return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .Select(r => new RoleViewModel
                         {
                             Id = r.Id,
                             Name = r.Name,
@@ -133,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
         {
             return await _usersAndRolesDbContext.Users
+                .AsQueryable()
                 .Join(
                     _usersAndRolesDbContext.UserRoles,
                     user => user.Id,
@@ -200,6 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                     await _usersAndRolesDbContext.UserInvites
+                        .AsQueryable()
                         .Where(ui => !ui.Accepted)
                         .OrderBy(ui => ui.Email)
                         .Include(ui => ui.Role)
@@ -228,7 +234,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(UserAlreadyExists);
                     }
 
-                    var role = await _usersAndRolesDbContext.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+                    var role = await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .FirstOrDefaultAsync(r => r.Id == roleId);
+
                     if (role == null)
                     {
                         return ValidationActionResult(InvalidUserRole);
@@ -254,7 +263,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess<ActionResult, Unit, Unit>(async () =>
                 {
-                    var invite = await _usersAndRolesDbContext.UserInvites.FirstOrDefaultAsync(i => i.Email == email);
+                    var invite = await _usersAndRolesDbContext.UserInvites
+                        .AsQueryable()
+                        .FirstOrDefaultAsync(i => i.Email == email);
+
                     if (invite == null)
                     {
                         return ValidationActionResult(InviteNotFound);
@@ -275,8 +287,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // Currently we only allow a user to have a maximum of one global role
                     var existingRole =
-                        await _usersAndRolesDbContext.UserRoles.FirstOrDefaultAsync(userRole =>
-                            userRole.UserId == userId);
+                        await _usersAndRolesDbContext.UserRoles
+                            .AsQueryable()
+                            .FirstOrDefaultAsync(userRole => userRole.UserId == userId);
+
                     if (existingRole == null)
                     {
                         return await _userRoleService.AddGlobalRole(userId, roleId);

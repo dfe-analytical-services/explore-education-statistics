@@ -120,6 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
+                .AsQueryable()
                 .AnyAsync(releaseFile =>
                     releaseFile.ReleaseId != releaseId
                     && releaseFile.FileId == fileId);

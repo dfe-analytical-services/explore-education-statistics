@@ -188,6 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var methodologyIdsToDelete = await _contentContext
                 .PublicationMethodologies
+                .AsQueryable()
                 .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
                 .Select(pm => pm.MethodologyId)
                 .ToListAsync();
@@ -220,8 +221,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var contentRelease = await _contentContext
                 .Releases
+                .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == releaseId);
-            
+
             if (contentRelease == null)
             {
                 // The Content Db Release may already be soft-deleted and therefore not visible.
@@ -259,6 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var statsRelease = await _statisticsContext
                 .Release
+                .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == releaseId);
 
             if (statsRelease != null)

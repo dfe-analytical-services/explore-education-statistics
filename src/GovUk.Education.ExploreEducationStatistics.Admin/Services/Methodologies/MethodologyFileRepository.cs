@@ -109,6 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _contentDbContext
                 .MethodologyFiles
+                .AsQueryable()
                 .Where(f => f.FileId == fileId)
                 .ToListAsync();
         }

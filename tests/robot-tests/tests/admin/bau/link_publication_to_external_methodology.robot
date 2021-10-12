@@ -29,6 +29,7 @@ Link Publication to External Methodology
 
 Edit the External Methodology of the Publication
     user edits an external methodology    ${PUBLICATION_NAME}
+    user waits until page contains title    Dashboard
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    External methodology updated (External)    ${accordion}
     user checks page contains link with text and url    https://example.com/updated
