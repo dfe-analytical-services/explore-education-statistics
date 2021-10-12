@@ -36,7 +36,7 @@ const PreReleaseInvitePlanModel = ({
         pre-release?
       </p>
 
-      {invitePlan.invitable.length > 0 ? (
+      {invitePlan.invitable && invitePlan.invitable.length > 0 ? (
         <>
           <WarningMessage>
             Email notifications will be sent{' '}
@@ -49,7 +49,7 @@ const PreReleaseInvitePlanModel = ({
               className="govuk-list govuk-list--bullet govuk-!-margin-2"
               data-testid="invitableList"
             >
-              {invitePlan.invitable.map(email => (
+              {invitePlan.invitable?.map(email => (
                 <li key={email}>
                   <p>{email}</p>
                 </li>
@@ -64,15 +64,18 @@ const PreReleaseInvitePlanModel = ({
         </WarningMessage>
       )}
 
-      {invitePlan.alreadyAccepted.length > 0 && (
+      {invitePlan.alreadyAccepted && invitePlan.alreadyAccepted?.length > 0 && (
         <>
-          <h2 className="govuk-heading-m">Already accepted</h2>
+          <h2 id="already-accepted-heading" className="govuk-heading-m">
+            Already accepted
+          </h2>
           <p>
             The following email addresses will be ignored as they are already
             accepted to access the pre-release:
           </p>
           <div className={styles.invitesOverflow}>
             <ul
+              aria-labelledby="already-accepted-heading"
               className="govuk-list govuk-list--bullet govuk-!-margin-2"
               data-testid="acceptedList"
             >
@@ -86,15 +89,18 @@ const PreReleaseInvitePlanModel = ({
         </>
       )}
 
-      {invitePlan.alreadyInvited.length > 0 && (
+      {invitePlan.alreadyInvited && invitePlan.alreadyInvited.length > 0 && (
         <>
-          <h2 className="govuk-heading-m">Already invited</h2>
+          <h2 id="already-invited-heading" className="govuk-heading-m">
+            Already invited
+          </h2>
           <p>
             The following email addresses will be ignored as they are already
             invited to access the pre-release:
           </p>
           <div className={styles.invitesOverflow}>
             <ul
+              aria-labelledby="already-invited-heading"
               className="govuk-list govuk-list--bullet govuk-!-margin-2"
               data-testid="invitedList"
             >
