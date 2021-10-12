@@ -49,6 +49,27 @@ describe('SubjectStep', () => {
     },
   ];
 
+  const testSingleSubject: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Subject 1',
+      content: '<p>Test content 1</p>',
+      timePeriods: {
+        from: '2018/19',
+        to: '2020/21',
+      },
+      geographicLevels: ['Local Authority District', 'Ward'],
+      file: {
+        id: 'file-1',
+        name: 'Subject 1',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
+      },
+    },
+  ];
+
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'highlight-1',
@@ -249,6 +270,22 @@ describe('SubjectStep', () => {
 
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
     expect(screen.getByText(/No subjects available/)).toBeInTheDocument();
+  });
+
+  test('automatically selects the subject if only one is available', () => {
+    render(
+      <SubjectStep
+        {...wizardProps}
+        subjects={testSingleSubject}
+        onSubmit={noop}
+      />,
+    );
+
+    const radios = screen.getAllByLabelText(/Subject/);
+
+    expect(radios).toHaveLength(1);
+    expect(radios[0]).toHaveAttribute('value', 'subject-1');
+    expect(radios[0]).toBeChecked();
   });
 
   test('renders read-only view with initial `subjectId` when step is not active', () => {

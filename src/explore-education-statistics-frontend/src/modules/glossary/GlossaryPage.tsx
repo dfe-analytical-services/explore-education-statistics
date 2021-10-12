@@ -11,9 +11,8 @@ import sanitizeHtml, {
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
 } from '@common/utils/sanitizeHtml';
-import glossaryService, {
-  GlossaryCategory,
-} from '@common/services/glossaryService';
+import { GlossaryCategory } from '@common/services/types/glossary';
+import glossaryService from '@frontend/services/glossaryService';
 
 export interface Props {
   categories: GlossaryCategory[];
@@ -103,7 +102,7 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const categories = await glossaryService.listGlossaryEntries();
+  const categories = await glossaryService.listEntries();
 
   return {
     props: {

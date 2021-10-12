@@ -1,14 +1,21 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -17,12 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleaseFileController : ControllerBase
     {
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseFileService _releaseFileService;
 
-        public ReleaseFileController(IDataBlockService dataBlockService,
+        public ReleaseFileController(
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IDataBlockService dataBlockService,
             IReleaseFileService releaseFileService)
         {
+            _persistenceHelper = persistenceHelper;
             _dataBlockService = dataBlockService;
             _releaseFileService = releaseFileService;
         }
@@ -42,6 +53,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _dataBlockService.RemoveChartFile(releaseId, id)
                 .HandleFailuresOrNoContent();
+        }
+
+        [HttpGet("release/{releaseId:guid}/files")]
+        [Produces(MediaTypeNames.Application.Octet)]
+        public async Task StreamFilesToZip(
+            Guid releaseId,
+            [FromQuery] IList<Guid>? fileIds = null)
+        {
+            await _persistenceHelper.CheckEntityExists<Release>(
+                    releaseId,
+                    q => q.Include(r => r.Publication)
+                )
+                .OnSuccess(
+                    async release =>
+                    {
+                        string filename;
+
+                        if (fileIds != null)
+                        {
+                            // Create a hash just so that we have some uniqueness
+                            // to attach to the end of the file name.
+                            var fileIdsHash = GetFileIdsHash(fileIds);
+                            filename = $"{release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip";
+                        }
+                        else
+                        {
+                            filename = $"{release.Publication.Slug}_{release.Slug}.zip";
+                        }
+
+                        Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
+                        Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
+
+                        // We start the response immediately, before all of the files have
+                        // even downloaded from blob storage. As we download them, they are
+                        // appended in-flight to the user's download.
+                        // This is more efficient and means the user doesn't have
+                        // to spend time waiting for the download to initiate.
+                        return await _releaseFileService.ZipFilesToStream(
+                            releaseId: releaseId,
+                            outputStream: Response.BodyWriter.AsStream(),
+                            fileIds: fileIds,
+                            cancellationToken: HttpContext.RequestAborted
+                        );
+                    }
+                )
+                .OnFailureVoid(
+                    result =>
+                    {
+                        if (result is StatusCodeResult statusCodeResult)
+                        {
+                            Response.StatusCode = statusCodeResult.StatusCode;
+                        }
+                        else
+                        {
+                            Response.StatusCode = 500;
+                        }
+                    }
+                );
+        }
+
+        private static string GetFileIdsHash(IList<Guid> fileIds)
+        {
+            return fileIds.Select(id => id.ToString())
+                .OrderBy(id => id)
+                .JoinToString(',')
+                .ToMd5Hash();
         }
 
         [HttpGet("release/{releaseId}/file/{fileId}")]

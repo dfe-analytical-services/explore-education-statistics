@@ -121,17 +121,27 @@ Upload multiple ancillary files
 
     user checks there are x accordion sections    2    id:file-uploads
 
-Validate ancillary files on release page
+Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
+Validate 'Explore data and files' accordion
     user opens accordion section    Explore data and files
-    ${downloads}=    user gets accordion section content element    Explore data and files
+    ${section}=    user gets accordion section content element    Explore data and files
 
+    # All files zip
+    user checks element contains button    ${section}    Download all files
+
+    # Data files
+    user waits until h3 is visible    Open data
+    user checks list has x items    testid:data-files    1    ${section}
+    ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
+    user checks element contains button    ${data_files_1}    Updated Absence in PRUs
+
+    # Ancillary files
     user waits until h3 is visible    Other files
-
     user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    ${other_files}=    user gets details content element    List of other files    ${section}
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user checks element contains button    ${other_files_1}    Test 1

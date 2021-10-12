@@ -129,6 +129,93 @@ describe('FiltersForm', () => {
     },
   };
 
+  const testSubjectMetaSingleFilters: SubjectMeta = {
+    ...testSubjectMeta,
+    filters: {
+      Characteristic: {
+        totalValue: '',
+        hint: 'Filter by pupil characteristic',
+        legend: 'Characteristic',
+        options: {
+          EthnicGroupMajor: {
+            label: 'Ethnic group major',
+            options: [
+              {
+                label: 'Ethnicity Major Black Total',
+                value: 'ethnicity-major-black-total',
+              },
+            ],
+          },
+        },
+        name: 'characteristic',
+      },
+      SchoolType: {
+        totalValue: '',
+        hint: 'Filter by school type',
+        legend: 'School type',
+        options: {
+          Default: {
+            label: 'Default',
+            options: [
+              {
+                label: 'State-funded secondary',
+                value: 'state-funded-secondary',
+              },
+            ],
+          },
+        },
+        name: 'school_type',
+      },
+      FilterWithMultipleOptions: {
+        totalValue: '',
+        hint: 'Filter by Filter With Multiple Options',
+        legend: 'Filter With Multiple Options',
+        options: {
+          OptionGroup1: {
+            label: 'Option group 1',
+            options: [
+              {
+                label: 'Option group 1 option 1',
+                value: 'option-group-1-option-1',
+              },
+            ],
+          },
+          OptionGroup2: {
+            label: 'Option group 2',
+            options: [
+              {
+                label: 'Option group 2 option 1',
+                value: 'option-group-2-option-1',
+              },
+              {
+                label: 'Option group 2 option 2',
+                value: 'option-group-2-option-2',
+              },
+            ],
+          },
+        },
+        name: 'characteristic',
+      },
+    },
+  };
+
+  const testSubjectMetaOneIndicator: SubjectMeta = {
+    ...testSubjectMeta,
+    indicators: {
+      AbsenceByReason: {
+        label: 'Absence by reason',
+        options: [
+          {
+            label: 'Number of excluded sessions',
+            unit: '',
+            value: 'number-excluded-sessions',
+            name: 'sess_auth_excluded',
+          },
+        ],
+      },
+    },
+  };
+
   const testWizardStepProps: InjectedWizardProps = {
     currentStep: 1,
     isActive: true,
@@ -140,7 +227,7 @@ describe('FiltersForm', () => {
     shouldScroll: false,
   };
 
-  test('renders filter group options correctly', () => {
+  test('renders indicators and filter group options correctly', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
@@ -210,31 +297,11 @@ describe('FiltersForm', () => {
     ).toHaveLength(3);
   });
 
-  test('automatically selects checkbox for a `Default` filter group with a single option', () => {
+  test('automatically selects checkbox when a filter has one group with one option', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
-        subjectMeta={{
-          ...testSubjectMeta,
-          filters: {
-            ...testSubjectMeta.filters,
-            SchoolType: {
-              ...testSubjectMeta.filters.SchoolType,
-              totalValue: 'total',
-              options: {
-                Default: {
-                  label: 'Default',
-                  options: [
-                    {
-                      label: 'State-funded secondary',
-                      value: 'state-funded-secondary',
-                    },
-                  ],
-                },
-              },
-            },
-          },
-        }}
+        subjectMeta={testSubjectMetaSingleFilters}
         onSubmit={noop}
       />,
     );
@@ -244,20 +311,78 @@ describe('FiltersForm', () => {
         name: 'School type - 1 selected',
       }),
     ).toBeInTheDocument();
+    const filterGroup1 = screen.getByRole('group', {
+      name: 'School type',
+    });
+    const filterCheckboxes1 = within(filterGroup1).getAllByRole('checkbox');
+    expect(filterCheckboxes1).toHaveLength(1);
+    expect(filterCheckboxes1[0]).toEqual(
+      within(filterGroup1).getByLabelText('State-funded secondary'),
+    );
+    expect(filterCheckboxes1[0]).toBeChecked();
 
     expect(
-      screen.getAllByRole('checkbox', {
-        hidden: true,
-        name: (_, element) => (element as HTMLInputElement).checked,
+      screen.getByRole('button', {
+        name: 'Characteristic - 1 selected',
       }),
-    ).toHaveLength(1);
-
-    expect(screen.getByLabelText('State-funded secondary')).toHaveAttribute(
-      'checked',
+    ).toBeInTheDocument();
+    const filterGroup2 = screen.getByRole('group', {
+      name: 'Characteristic',
+    });
+    const filterCheckboxes2 = within(filterGroup2).getAllByRole('checkbox');
+    expect(filterCheckboxes2).toHaveLength(1);
+    expect(filterCheckboxes2[0]).toEqual(
+      within(filterGroup2).getByLabelText('Ethnicity Major Black Total'),
     );
+    expect(filterCheckboxes2[0]).toBeChecked();
   });
 
-  test('selecting options shows the number of selected options for each filter group', () => {
+  test('does not automatically select checkbox when filter has multiple groups', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subjectMeta={testSubjectMetaSingleFilters}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Filter With Multiple Options',
+      }),
+    ).toBeInTheDocument();
+    const filterGroup1 = screen.getByRole('group', {
+      name: 'Option group 1',
+      hidden: true,
+    });
+    const filterCheckboxes1 = within(filterGroup1).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(filterCheckboxes1).toHaveLength(1);
+    expect(filterCheckboxes1[0]).toEqual(
+      within(filterGroup1).getByLabelText('Option group 1 option 1'),
+    );
+    expect(filterCheckboxes1[0]).not.toBeChecked();
+
+    const filterGroup2 = screen.getByRole('group', {
+      name: 'Option group 2',
+      hidden: true,
+    });
+    const filterCheckboxes2 = within(filterGroup2).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(filterCheckboxes2).toHaveLength(2);
+    expect(filterCheckboxes2[0]).toEqual(
+      within(filterGroup2).getByLabelText('Option group 2 option 1'),
+    );
+    expect(filterCheckboxes2[0]).not.toBeChecked();
+    expect(filterCheckboxes2[1]).toEqual(
+      within(filterGroup2).getByLabelText('Option group 2 option 2'),
+    );
+    expect(filterCheckboxes2[1]).not.toBeChecked();
+  });
+
+  test('selecting options shows the number of selected options for each filter and indicator group', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
@@ -294,7 +419,7 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows validation errors if no options are selected from the filter groups', async () => {
+  test('shows validation errors if no options are selected from the filter and indicator groups', async () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
@@ -343,15 +468,9 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('State-funded secondary')).toHaveAttribute(
-      'checked',
-    );
-    expect(
-      screen.getByLabelText('Ethnicity Major Asian Total'),
-    ).toHaveAttribute('checked');
-    expect(screen.getByLabelText('Unauthorised absence rate')).toHaveAttribute(
-      'checked',
-    );
+    expect(screen.getByLabelText('State-funded secondary')).toBeChecked();
+    expect(screen.getByLabelText('Ethnicity Major Asian Total')).toBeChecked();
+    expect(screen.getByLabelText('Unauthorised absence rate')).toBeChecked();
   });
 
   test('other checkboxes are not selected from initial values', () => {
@@ -367,16 +486,36 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Special')).not.toHaveAttribute('checked');
+    expect(screen.getByLabelText('Special')).not.toBeChecked();
     expect(
       screen.getByLabelText('Ethnicity Major Mixed Total'),
-    ).not.toHaveAttribute('checked');
+    ).not.toBeChecked();
     expect(
       screen.getByLabelText('Number of overall absence sessions'),
-    ).not.toHaveAttribute('checked');
+    ).not.toBeChecked();
   });
 
-  test('upon submit automatically selects Total checkbox if no other options in that group are checked', async () => {
+  test('automatically selects checkbox when there is only one indicator group with one option', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subjectMeta={testSubjectMetaOneIndicator}
+        onSubmit={noop}
+      />,
+    );
+
+    const filterGroup = screen.getByRole('group', {
+      name: 'Indicators - 1 selected',
+    });
+
+    expect(within(filterGroup).getAllByRole('checkbox')).toHaveLength(1);
+
+    expect(
+      within(filterGroup).getByLabelText('Number of excluded sessions'),
+    ).toBeChecked();
+  });
+
+  test('upon submit automatically selects Total checkbox if no other options in that filter group are checked', async () => {
     render(
       <FiltersForm
         {...testWizardStepProps}

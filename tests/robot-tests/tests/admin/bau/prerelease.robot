@@ -431,7 +431,7 @@ user chooses location, time period and filters
     user waits until table tool wizard step is available    4    Choose your filters
     user checks previous table tool step contains    3    Time period    2005 to 2017
 
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
     user clicks element    id:filtersForm-submit
 
