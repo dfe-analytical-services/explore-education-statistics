@@ -52,28 +52,37 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   } = props;
 
   const initialFormValues = useMemo(() => {
+    // Automatically select indicator when one indicator group with one option
+    const indicatorValues = Object.values(subjectMeta.indicators);
+    const indicators =
+      indicatorValues.length === 1 && indicatorValues[0].options.length === 1
+        ? [indicatorValues[0].options[0].value]
+        : initialValues?.indicators ?? [];
+
+    const filters = mapValues(subjectMeta.filters, filter => {
+      const filterGroups = Object.values(filter.options);
+
+      // Automatically select when only one group in filter, with only one option in it.
+      if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
+        return [filterGroups[0].options[0].value];
+      }
+
+      if (initialValues?.filters) {
+        const filterValues = filterGroups
+          .flatMap(group => group.options)
+          .map(option => option.value);
+
+        return filterValues.filter(filterValue =>
+          initialValues.filters.includes(filterValue),
+        );
+      }
+
+      return [];
+    });
+
     return {
-      filters: mapValues(subjectMeta.filters, filter => {
-        if (initialValues?.filters) {
-          const filterValues = Object.values(filter.options)
-            .flatMap(group => group.options)
-            .map(option => option.value);
-
-          return filterValues.filter(filterValue =>
-            initialValues.filters.includes(filterValue),
-          );
-        }
-
-        if (filter.options.Default) {
-          // Automatically select filter option when there is only one
-          return filter.options.Default.options.length === 1
-            ? [filter.options.Default.options[0].value]
-            : [];
-        }
-
-        return [];
-      }),
-      indicators: initialValues?.indicators ?? [],
+      filters,
+      indicators,
     };
   }, [initialValues, subjectMeta]);
 
@@ -151,6 +160,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                         {Object.entries(subjectMeta.filters).map(
                           ([filterKey, filterGroup]) => {
                             const filterName = `filters.${filterKey}`;
+                            const filterGroupOptions = Object.values(
+                              filterGroup.options,
+                            );
 
                             return (
                               <FormFieldCheckboxGroupsMenu
@@ -160,12 +172,11 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
                                 order={[]}
-                                options={Object.values(filterGroup.options).map(
-                                  group => ({
-                                    legend: group.label,
-                                    options: group.options,
-                                  }),
-                                )}
+                                options={filterGroupOptions.map(group => ({
+                                  legend: group.label,
+                                  options: group.options,
+                                }))}
+                                open={filterGroupOptions.length === 1}
                               />
                             );
                           },

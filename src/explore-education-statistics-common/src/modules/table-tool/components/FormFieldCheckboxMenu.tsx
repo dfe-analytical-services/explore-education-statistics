@@ -11,11 +11,12 @@ import FormCheckboxSelectionCount from './FormCheckboxSelectedCount';
 interface Props<FormValues>
   extends FormFieldCheckboxSearchGroupProps<FormValues> {
   legend: string;
+  open?: boolean;
 }
 
 function FormFieldCheckboxMenu<FormValues>(props: Props<FormValues>) {
-  const { name, options, legend } = props;
-  const [open, setOpen] = useState(false);
+  const { name, open: defaultOpen = false, options, legend } = props;
+  const [open, setOpen] = useState(defaultOpen);
 
   const [, meta] = useField(name);
 

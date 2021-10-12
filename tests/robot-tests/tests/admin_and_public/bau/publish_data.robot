@@ -347,10 +347,9 @@ Select time period
 
 Select indicators and filters
     user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user checks category checkbox is checked    Random Filter    Not specified
 
 Create table
     user clicks element    id:filtersForm-submit
@@ -479,10 +478,9 @@ Select time period in table tool
 
 Select indicators and filters in table tool
     user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user checks category checkbox is checked    Random Filter    Not specified
     user clicks element    id:filtersForm-submit
 
 Validate table
