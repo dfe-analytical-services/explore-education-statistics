@@ -8,33 +8,33 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MyMethodologyViewModel;
+using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MyMethodologyVersionViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
-    public class MyMethodologyPermissionSetPropertyResolver : IMyMethodologyPermissionSetPropertyResolver
+    public class MyMethodologyVersionPermissionsResolver : IMyMethodologyVersionPermissionsResolver
     {
         private readonly IUserService _userService;
 
-        public MyMethodologyPermissionSetPropertyResolver(IUserService userService)
+        public MyMethodologyVersionPermissionsResolver(IUserService userService)
         {
             _userService = userService;
         }
 
         public PermissionsSet Resolve(
-            MethodologyVersion methodologyVersion,
-            MyMethodologyViewModel destination,
+            MethodologyVersion source,
+            MyMethodologyVersionViewModel destination,
             PermissionsSet destMember,
             ResolutionContext context)
         {
             return new PermissionsSet
             {
-                CanApproveMethodology = CheckResult(_userService.CheckCanApproveMethodology(methodologyVersion)),
-                CanUpdateMethodology = CheckResult(_userService.CheckCanUpdateMethodology(methodologyVersion)),
-                CanDeleteMethodology = CheckResult(_userService.CheckCanDeleteMethodology(methodologyVersion)),
+                CanApproveMethodology = CheckResult(_userService.CheckCanApproveMethodology(source)),
+                CanUpdateMethodology = CheckResult(_userService.CheckCanUpdateMethodology(source)),
+                CanDeleteMethodology = CheckResult(_userService.CheckCanDeleteMethodology(source)),
                 CanMakeAmendmentOfMethodology =
-                    CheckResult(_userService.CheckCanMakeAmendmentOfMethodology(methodologyVersion)),
-                CanMarkMethodologyAsDraft = CheckResult(_userService.CheckCanMarkMethodologyAsDraft(methodologyVersion))
+                    CheckResult(_userService.CheckCanMakeAmendmentOfMethodology(source)),
+                CanMarkMethodologyAsDraft = CheckResult(_userService.CheckCanMarkMethodologyAsDraft(source))
             };
         }
 

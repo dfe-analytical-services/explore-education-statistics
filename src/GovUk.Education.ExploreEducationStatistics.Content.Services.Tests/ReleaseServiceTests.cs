@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationPath = "publications/publication-a/publication.json";
             const string releasePath = "publications/publication-a/releases/2016.json";
 
-            var methodology = new MethodologySummaryViewModel
+            var methodology = new MethodologyVersionSummaryViewModel
             {
                     Id = Guid.NewGuid(),
                     Slug = "methodology-slug",

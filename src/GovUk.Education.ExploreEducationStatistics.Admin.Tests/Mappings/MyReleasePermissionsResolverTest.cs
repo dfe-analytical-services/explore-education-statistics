@@ -9,16 +9,16 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
 {
-    public class MyReleasePermissionsPropertyResolverTest
+    public class MyReleasePermissionsResolverTest
     {
         [Fact]
         public void ResolvePermissions()
         {
             var release = new Release();
-            
+
             var userService = new Mock<IUserService>(Strict);
-            var resolver = new MyReleasePermissionSetPropertyResolver(userService.Object);
-            
+            var resolver = new MyReleasePermissionsResolver(userService.Object);
+
             userService.Setup(s => s.MatchesPolicy(release, SecurityPolicies.CanUpdateSpecificRelease)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(release, SecurityPolicies.CanDeleteSpecificRelease)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(release, SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease)).ReturnsAsync(false);
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
 
             var permissionsSet = resolver.Resolve(release, null, null, null);
             VerifyAllMocks(userService);
-            
+
             Assert.True(permissionsSet.CanUpdateRelease);
             Assert.True(permissionsSet.CanDeleteRelease);
             Assert.False(permissionsSet.CanAddPrereleaseUsers);

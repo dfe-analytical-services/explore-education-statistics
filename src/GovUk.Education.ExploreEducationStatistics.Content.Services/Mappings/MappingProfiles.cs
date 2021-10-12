@@ -23,9 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateMap<MethodologyNote, MethodologyNoteViewModel>();
 
-            CreateMap<MethodologyVersion, MethodologySummaryViewModel>();
+            CreateMap<MethodologyVersion, MethodologyVersionSummaryViewModel>();
 
-            CreateMap<MethodologyVersion, MethodologyViewModel>()
+            CreateMap<MethodologyVersion, MethodologyVersionViewModel>()
                 .ForMember(dest => dest.Annexes,
                     m => m.MapFrom(methodologyVersion =>
                         methodologyVersion.Annexes.OrderBy(annexSection => annexSection.Order)))

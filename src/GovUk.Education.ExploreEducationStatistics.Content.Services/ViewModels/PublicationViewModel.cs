@@ -58,6 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ExternalMethodologyViewModel ExternalMethodology { get; }
 
-        public List<MethodologySummaryViewModel> Methodologies { get; set; }
+        public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; }
     }
 }

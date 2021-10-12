@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                                     Id = Guid.NewGuid(),
                                     Title = "Publication title",
                                     Methodologies = AsList(
-                                        new MethodologySummaryViewModel
+                                        new MethodologyVersionSummaryViewModel
                                         {
                                             Id = Guid.NewGuid(),
                                             Slug = "methodology-slug",

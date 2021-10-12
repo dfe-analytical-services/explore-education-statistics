@@ -7,11 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
-    public class MyPublicationPermissionSetPropertyResolver : IMyPublicationPermissionSetPropertyResolver
+    public class MyPublicationPermissionsResolver : IMyPublicationPermissionsResolver
     {
         private readonly IUserService _userService;
  
-        public MyPublicationPermissionSetPropertyResolver(IUserService userService)
+        public MyPublicationPermissionsResolver(IUserService userService)
         {
             _userService = userService;
         }

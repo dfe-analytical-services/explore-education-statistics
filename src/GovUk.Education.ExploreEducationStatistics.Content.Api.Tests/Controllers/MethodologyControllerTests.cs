@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
-                .ReturnsAsync(new MethodologyViewModel
+                .ReturnsAsync(new MethodologyVersionViewModel
                 {
                     Id = methodologyId
                 });
