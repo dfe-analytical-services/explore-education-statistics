@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -38,6 +39,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
@@ -45,6 +47,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
     [ExcludeFromCodeCoverage]
     public class Startup
     {
+        private static readonly string[] LocalClientDomains =
+        {
+            "localhost",
+            "ees.local"
+        };        
+        
+        private static readonly string[] LocalClientPorts = { "3000", "3001" };
+        
+        private static readonly string[] LocalClientAddresses = 
+            AsArray("http", "https")
+            .SelectMany(scheme => LocalClientDomains
+            .SelectMany(domain => LocalClientPorts
+            .Select(port => $"{scheme}://{domain}:{port}")))
+            .ToArray();
+        
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
@@ -210,7 +227,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
 
-            app.UseCors(options => options.WithOrigins("http://localhost:3000","http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
+            app
+                .UseCors(options => options
+                .WithOrigins(LocalClientAddresses)
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+            
             app.UseMvc();
         }
 
