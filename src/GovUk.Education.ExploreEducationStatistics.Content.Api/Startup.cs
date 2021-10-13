@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -33,33 +32,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
+using ThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
     [ExcludeFromCodeCoverage]
     public class Startup
     {
-        private static readonly string[] LocalClientDomains =
-        {
-            "localhost",
-            "ees.local"
-        };        
-        
-        private static readonly string[] LocalClientPorts = { "3000", "3001" };
-        
-        private static readonly string[] LocalClientAddresses = 
-            AsArray("http", "https")
-            .SelectMany(scheme => LocalClientDomains
-            .SelectMany(domain => LocalClientPorts
-            .Select(port => $"{scheme}://{domain}:{port}")))
-            .ToArray();
-        
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
@@ -137,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
             services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IThemeService, ThemeService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
@@ -183,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
+            if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
@@ -196,10 +179,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 option.AddRedirect("^$", "docs");
                 app.UseRewriter(option);
             }
-            
-            app
-                .UseCors(options => options
-                .WithOrigins(LocalClientAddresses)
+
+            app.UseCors(options => options
+                .WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "https://localhost:3000",
+                    "https://localhost:3001")
                 .AllowAnyMethod()
                 .AllowAnyHeader());
             
