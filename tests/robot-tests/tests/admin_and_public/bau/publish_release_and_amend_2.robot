@@ -274,7 +274,7 @@ Confirm data replacement
 
 Delete second subject file
     user clicks link    Data and files
-    user waits until h2 is visible    Add data file to release
+    user waits until h2 is visible    Add data file to release    %{WAIT_MEDIUM}
     user deletes subject file    ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for release amendment
