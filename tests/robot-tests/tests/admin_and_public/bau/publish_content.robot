@@ -43,14 +43,13 @@ Add text block with link to absence glossary entry to accordion section
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
     user opens accordion section    Test section    css:#releaseMainContent
-    user waits until page contains link    Absence
-    user waits until page contains testid    glossary-info-icon
+    user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
-    user clicks element    testid:glossary-info-icon
+    user clicks button    Absence
     user waits until h1 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
-    user clicks link    Close
+    user clicks button    Close
     user waits until page does not contain element    xpath://h1[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 
@@ -80,13 +79,12 @@ Check latest release contains glossary info icon
     user waits until page contains title caption    ${RELEASE_NAME}
     user checks page contains    This is the latest data
     user opens accordion section    Test section    css:#content
-    user waits until page contains link    Absence
-    user waits until page contains element    testid:glossary-info-icon
+    user waits until page contains button    Absence
 
 Click glossary info icon and verify entry is correct
-    user clicks element    testid:glossary-info-icon
+    user clicks button    Absence
     user waits until h1 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
-    user clicks link    Close
+    user clicks button    Close
     user waits until page does not contain element    xpath://h1[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
