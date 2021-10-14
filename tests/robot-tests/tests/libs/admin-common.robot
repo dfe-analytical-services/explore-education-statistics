@@ -10,7 +10,7 @@ user signs in as bau1
     END
     environment variable should be set    ADMIN_URL
     user goes to url    %{ADMIN_URL}
-    user waits until h1 is visible    Sign in
+    user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
     user signs in as    ADMIN
     user navigates to admin dashboard    Bau1
     user checks breadcrumb count should be    2
@@ -51,11 +51,15 @@ user selects theme and topic from admin dashboard
     ...    ${theme}    ${topic}
     IF    ${correct_theme_and_topic_selected} is ${FALSE}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
-        user waits until page contains element    id:publicationsReleases-themeTopic-topicId    60
+        user waits until page contains element    id:publicationsReleases-themeTopic-topicId    %{WAIT_MEDIUM}
         user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
-        user waits until h2 is visible    ${theme}    60
-        user waits until h3 is visible    ${topic}    60
     END
+    user waits until h2 is visible    ${theme}    %{WAIT_MEDIUM}
+    user waits until h3 is visible    ${topic}
+    user waits until page does not contain loading spinner
+    user waits until page contains element
+    ...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
+    ...    %{WAIT_MEDIUM}
 
 user navigates to editable release summary from admin dashboard
     [Arguments]
@@ -137,7 +141,7 @@ user creates publication
     user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
     user clicks button    Save publication
-    user waits until h1 is visible    Dashboard    60
+    user waits until h1 is visible    Dashboard    %{WAIT_MEDIUM}
 
 user creates release for publication
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
@@ -149,6 +153,7 @@ user creates release for publication
     user clicks radio    National Statistics
     user clicks radio if exists    Create new template
     user clicks button    Create new release
+
     user waits until page contains element    xpath://a[text()="Edit release summary"]    60
     user waits until h2 is visible    Release summary    60
 
@@ -157,10 +162,6 @@ user opens publication on the admin dashboard
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to admin dashboard
-    user waits until page contains link    Explore education statistics    10
-    user waits until page does not contain loading spinner
-    user waits for page to finish loading
     user selects theme and topic from admin dashboard    ${theme}    ${topic}
     user waits until page contains accordion section    ${publication}    %{WAIT_MEDIUM}
     ${accordion}=    user opens accordion section    ${publication}
@@ -323,6 +324,7 @@ user creates methodology amendment for publication
     user clicks button    Amend methodology    ${accordion}
     user waits until modal is visible    Confirm you want to amend this live methodology
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
     user waits until h2 is visible    Methodology summary
 
 user cancels methodology amendment for publication
@@ -336,6 +338,7 @@ user cancels methodology amendment for publication
     user clicks button    Cancel amendment    ${accordion}
     user waits until modal is visible    Confirm you want to cancel this amended methodology
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
 user adds note to methodology
     [Arguments]
@@ -375,11 +378,14 @@ user links publication to external methodology
     ...    ${title}=External methodology
     ...    ${link}=https://example.com
     ${accordion}=    user opens publication on the admin dashboard    ${publication}
-    user clicks link    Link to an externally hosted methodology
+    user clicks link    Link to an externally hosted methodology    ${accordion}
     user waits until page contains title    Link to an externally hosted methodology
     user enters text into element    label:Link title    ${title}
     user enters text into element    label:URL    ${link}
     user clicks button    Save
+    user waits until page does not contain button    Save
+    ${accordion}=    user opens publication on the admin dashboard    ${publication}
+    user waits until parent contains element    ${accordion}    //*[text()="External methodology (External)"]
 
 user edits an external methodology
     [Arguments]
@@ -526,6 +532,9 @@ user creates amendment for release
     user waits until parent contains element    ${details}    xpath:.//a[text()="View this release"]
     user clicks button    Amend this release    ${details}
     user clicks button    Confirm
+    user waits until page contains title    ${PUBLICATION_NAME}
+    user waits until page contains title caption    Amend release for ${RELEASE_NAME}
+    user checks page contains tag    Amendment
 
 user deletes subject file
     [Arguments]    ${SUBJECT_NAME}
@@ -567,7 +576,6 @@ user approves release for immediate publication
 
 user navigates to admin dashboard
     [Arguments]    ${USER}=
-    user waits until page does not contain loading spinner
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
     IF    "${USER}" != ""
@@ -575,6 +583,7 @@ user navigates to admin dashboard
     END
     user waits until page contains element
     ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
+    ...    %{WAIT_LONG}
 
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}

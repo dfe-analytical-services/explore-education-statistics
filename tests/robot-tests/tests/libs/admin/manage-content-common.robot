@@ -87,6 +87,7 @@ user adds data block to editable accordion section
     user chooses select option    ${block_list}    Dates data block name
     user waits until parent contains element    ${section}    css:table
     user clicks button    Embed    ${section}
+    user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
 
 user edits accordion section text block
     [Arguments]
@@ -201,6 +202,10 @@ user deletes editable accordion section content block
     ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
     user clicks button    Remove block    ${block}
     user clicks button    Confirm
+    # avoid blocks being lazy loaded
+    user waits until page does not contain loading spinner
+    Sleep    0.5
+    user scrolls down    1
 
 user deletes editable accordion section
     [Arguments]

@@ -15,6 +15,7 @@ Navigate to glossary page
 
     user clicks link    Glossary
     user waits until h1 is visible    Glossary
+    user waits until page contains element    id:glossary    # Glossary accordion
     user checks url contains    %{PUBLIC_URL}/glossary
 
 Validate glossary accordion sections

@@ -40,7 +40,7 @@ Upload a ZIP file subject
     ${section}=    user gets accordion section content element    Absence in PRUs
 
     # To ensure "Data file size" and "Number of rows" will be filled
-    user waits until page does not contain    Queued    60
+    user waits until page does not contain    Queued    %{WAIT_MEDIUM}
 
     user checks headed table body row contains    Subject title    Absence in PRUs    ${section}
     user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
@@ -73,7 +73,7 @@ Check subject appears in 'Data blocks' page
 
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
     user waits until page contains    Updated Absence in PRUs
 
