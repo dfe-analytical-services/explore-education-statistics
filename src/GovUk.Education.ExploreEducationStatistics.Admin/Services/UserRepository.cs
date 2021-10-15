@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.Users
                 .AsQueryable()
-                .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+                .SingleOrDefaultAsync(u => u.Email.ToLower().Equals(email.ToLower()));
         }
     }
 }

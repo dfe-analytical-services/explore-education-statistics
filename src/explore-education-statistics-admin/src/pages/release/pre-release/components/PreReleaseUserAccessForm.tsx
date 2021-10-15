@@ -26,10 +26,9 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'emails',
     messages: {
-      INVALID_EMAIL_ADDRESS:
-        'Please enter valid @education.gov.uk email addresses',
+      INVALID_EMAIL_ADDRESS: 'Enter only @education.gov.uk email addresses',
       NO_INVITABLE_EMAILS:
-        'All of the email addresses are already invited or accepted users of the pre-release',
+        'All of the email addresses have already been invited or accepted',
     },
   }),
 ];
@@ -61,22 +60,33 @@ const PreReleaseUserAccessForm = ({
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
 
+  const splitAndTrimLines = (input: string) =>
+    input
+      .split(/\r\n|\r|\n/)
+      .map(line => line.trim())
+      .filter(line => line);
+
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     setInvitePlan(
-      await preReleaseUserService.getInvitePlan(releaseId, values.emails),
+      await preReleaseUserService.getInvitePlan(
+        releaseId,
+        splitAndTrimLines(values.emails),
+      ),
     );
   }, errorMappings);
 
   const handleModalSubmit = useFormSubmit<FormValues>(
     async (values, actions) => {
-      await preReleaseUserService
-        .inviteUsers(releaseId, values.emails)
-        .then(newUsers => {
-          setUsers({
-            value: [...users, ...newUsers],
-          });
-          actions.resetForm();
-        });
+      const newUsers = await preReleaseUserService.inviteUsers(
+        releaseId,
+        splitAndTrimLines(values.emails),
+      );
+
+      setUsers({
+        value: [...users, ...newUsers],
+      });
+
+      actions.resetForm();
     },
     errorMappings,
   );
@@ -107,13 +117,13 @@ const PreReleaseUserAccessForm = ({
           validationSchema={Yup.object<FormValues>({
             emails: Yup.string()
               .trim()
-              .required('Please enter 1 or more email addresses')
+              .required('Enter 1 or more email addresses')
               .test({
                 name: 'number of lines',
-                message: `Please enter between 1 and ${inviteLimit} lines`,
+                message: `Enter between 1 and ${inviteLimit} lines of email addresses`,
                 test: (value: string) => {
                   if (value) {
-                    const numOfLines = (value.match(/\n/g) || '').length + 1;
+                    const numOfLines = (value.match(/^\s*\S/gm) || '').length;
                     return numOfLines <= inviteLimit;
                   }
                   return true;
@@ -121,10 +131,10 @@ const PreReleaseUserAccessForm = ({
               })
               .test({
                 name: 'email format',
-                message: 'Please enter valid @education.gov.uk email addresses',
+                message: 'Enter only @education.gov.uk email addresses',
                 test: (value: string) => {
                   if (value) {
-                    const emails = value.split(/\r\n|\r|\n/);
+                    const emails = splitAndTrimLines(value);
                     return emails.every(email => {
                       if (
                         /^simulate-delivered(?:-[1-3])?@notifications.service.gov.uk$/i.test(

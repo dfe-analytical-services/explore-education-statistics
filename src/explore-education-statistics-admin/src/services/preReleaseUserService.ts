@@ -5,9 +5,9 @@ export interface PreReleaseUser {
 }
 
 export interface PreReleaseInvitePlan {
-  alreadyAccepted?: string[];
-  alreadyInvited?: string[];
-  invitable?: string[];
+  alreadyAccepted: string[];
+  alreadyInvited: string[];
+  invitable: string[];
 }
 
 const preReleaseUserService = {
@@ -16,13 +16,13 @@ const preReleaseUserService = {
   },
   getInvitePlan(
     releaseId: string,
-    emails: string,
+    emails: string[],
   ): Promise<PreReleaseInvitePlan> {
     return client.post(`/release/${releaseId}/prerelease-users-plan`, {
       emails,
     });
   },
-  inviteUsers(releaseId: string, emails: string): Promise<PreReleaseUser[]> {
+  inviteUsers(releaseId: string, emails: string[]): Promise<PreReleaseUser[]> {
     return client.post(`/release/${releaseId}/prerelease-users`, {
       emails,
     });

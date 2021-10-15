@@ -15,6 +15,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
@@ -52,7 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
-                        return service.GetPreReleaseUsersInvitePlan(_release.Id, "test@test.com");
+                        return service.GetPreReleaseUsersInvitePlan(
+                            _release.Id,
+                            ListOf("test@test.com")
+                        );
                     }
                 );
         }
@@ -67,7 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
-                        return service.InvitePreReleaseUsers(_release.Id, "test@test.com");
+                        return service.InvitePreReleaseUsers(
+                            _release.Id,
+                            ListOf("test@test.com")
+                        );
                     }
                 );
         }

@@ -19,10 +19,6 @@ const PreReleaseInvitePlanModel = ({
   onCancel,
   onExit,
 }: Props) => {
-  if (!invitePlan) {
-    return null;
-  }
-
   return (
     <ModalConfirm
       title="Confirm pre-release invitations"
@@ -36,23 +32,19 @@ const PreReleaseInvitePlanModel = ({
         pre-release?
       </p>
 
-      {invitePlan.invitable && invitePlan.invitable.length > 0 ? (
+      {invitePlan.invitable.length > 0 ? (
         <>
           <WarningMessage>
-            Email notifications will be sent{' '}
-            {isReleaseApproved
-              ? 'immediately.'
-              : 'when the release is approved for publication.'}
+            {`Email notifications will be sent ${
+              isReleaseApproved
+                ? 'immediately.'
+                : 'when the release is approved for publication.'
+            }`}
           </WarningMessage>
           <div className={styles.invitesOverflow}>
-            <ul
-              className="govuk-list govuk-list--bullet govuk-!-margin-2"
-              data-testid="invitableList"
-            >
+            <ul className="govuk-!-margin-2" data-testid="invitableList">
               {invitePlan.invitable?.map(email => (
-                <li key={email}>
-                  <p>{email}</p>
-                </li>
+                <li key={email}>{email}</li>
               ))}
             </ul>
           </div>
@@ -64,7 +56,7 @@ const PreReleaseInvitePlanModel = ({
         </WarningMessage>
       )}
 
-      {invitePlan.alreadyAccepted && invitePlan.alreadyAccepted?.length > 0 && (
+      {invitePlan.alreadyAccepted.length > 0 && (
         <>
           <h2 id="already-accepted-heading" className="govuk-heading-m">
             Already accepted
@@ -76,20 +68,18 @@ const PreReleaseInvitePlanModel = ({
           <div className={styles.invitesOverflow}>
             <ul
               aria-labelledby="already-accepted-heading"
-              className="govuk-list govuk-list--bullet govuk-!-margin-2"
+              className="govuk-!-margin-2"
               data-testid="acceptedList"
             >
               {invitePlan.alreadyAccepted.map(email => (
-                <li key={email}>
-                  <p>{email}</p>
-                </li>
+                <li key={email}>{email}</li>
               ))}
             </ul>
           </div>
         </>
       )}
 
-      {invitePlan.alreadyInvited && invitePlan.alreadyInvited.length > 0 && (
+      {invitePlan.alreadyInvited.length > 0 && (
         <>
           <h2 id="already-invited-heading" className="govuk-heading-m">
             Already invited
@@ -101,13 +91,11 @@ const PreReleaseInvitePlanModel = ({
           <div className={styles.invitesOverflow}>
             <ul
               aria-labelledby="already-invited-heading"
-              className="govuk-list govuk-list--bullet govuk-!-margin-2"
+              className="govuk-!-margin-2"
               data-testid="invitedList"
             >
               {invitePlan.alreadyInvited.map(email => (
-                <li key={email}>
-                  <p>{email}</p>
-                </li>
+                <li key={email}>{email}</li>
               ))}
             </ul>
           </div>

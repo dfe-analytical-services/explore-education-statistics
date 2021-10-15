@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Model
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -98,16 +99,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, PreReleaseInvitePlan>> GetPreReleaseUsersInvitePlan(
+        public async Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
             Guid releaseId,
-            string emails)
+            List<string> emails)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccess(release => ValidateEmailsAddresses(emails))
-                .OnSuccess<ActionResult, List<string>, PreReleaseInvitePlan>(async validEmails =>
+                .OnSuccess(release => ValidateEmailAddresses(emails))
+                .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
                 {
-                    var plan = new PreReleaseInvitePlan();
+                    var plan = new PreReleaseUserInvitePlan();
                     await validEmails
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(async email =>
@@ -140,29 +141,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
             Guid releaseId,
-            string emails)
+            List<string> emails)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
                 .OnSuccessCombineWith(release => GetPreReleaseUsersInvitePlan(releaseId, emails))
-                .OnSuccess(async releaseAndPlan =>
-                {
-                    var (release, plan) = releaseAndPlan;
+                .OnSuccess<ActionResult, Tuple<Release, PreReleaseUserInvitePlan>, List<PreReleaseUserViewModel>>(
+                    async releaseAndPlan =>
+                    {
+                        var (release, plan) = releaseAndPlan;
 
-                    var results = await plan.Invitable
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async email => await InvitePreReleaseUser(release, email))
-                        .ToListAsync();
+                        var results = await plan.Invitable
+                            .ToAsyncEnumerable()
+                            .SelectAwait(async email => await InvitePreReleaseUser(release, email))
+                            .ToListAsync();
 
-                    var failure = results.FirstOrDefault(sendResult => sendResult.IsLeft)?.Left;
-                    var successes = results.Where(sendResult => sendResult.IsRight)
-                        .Select(sendResult => sendResult.Right)
-                        .ToList();
+                        var failure = results.FirstOrDefault(sendResult => sendResult.IsLeft)?.Left;
+                        if (failure != null)
+                        {
+                            return failure;
+                        }
 
-                    return failure != null
-                        ? new Either<ActionResult, List<PreReleaseUserViewModel>>(failure)
-                        : successes;
-                });
+                        return results
+                            .Select(sendResult => sendResult.Right)
+                            .ToList();
+                    });
         }
 
         public async Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseId, string email)
@@ -185,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .Where(
                                     r =>
                                         r.ReleaseId == releaseId
-                                        && r.User.Email.ToLower() == email.ToLower()
+                                        && r.User.Email.ToLower().Equals(email.ToLower())
                                         && r.Role == ReleaseRole.PrereleaseViewer
                                 )
                         );
@@ -196,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .Where(
                                     i =>
                                         i.ReleaseId == releaseId
-                                        && i.Email.ToLower() == email.ToLower()
+                                        && i.Email.ToLower().Equals(email.ToLower())
                                         && i.Role == ReleaseRole.PrereleaseViewer
                                 )
                         );
@@ -210,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .AsQueryable()
                             .Where(
                                 i =>
-                                    i.Email.ToLower() == email.ToLower()
+                                    i.Email.ToLower().Equals(email.ToLower())
                                     && i.Role == ReleaseRole.PrereleaseViewer
                             )
                             .CountAsync();
@@ -222,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     .AsQueryable()
                                     .Where(
                                         i =>
-                                            i.Email.ToLower() == email.ToLower()
+                                            i.Email.ToLower().Equals(email.ToLower())
                                             && i.RoleId == Role.PrereleaseUser.GetEnumValue()
                                             && !i.Accepted
                                     )
@@ -278,12 +281,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (user == null)
             {
-                await CreateUserInvite(email);
                 return await CreateUserReleaseInvite(release, email)
+                    .OnSuccessDo(() => CreateUserInvite(email))
                     .OnSuccess(_ => new PreReleaseUserViewModel(email));
             }
 
-            return await CreateAcceptedUserReleaseInvite(release, email, user)
+            return await CreateExistingUserReleaseInvite(release, email, user)
                 .OnSuccess(_ => new PreReleaseUserViewModel(email));
         }
 
@@ -303,26 +306,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         CreatedById = _userService.GetUserId()
                     }
                 );
-                await _context.SaveChangesAsync();
 
-                if (sendEmail)
-                {
-                    return await SendPreReleaseInviteEmail(release, email, isNewUser: true);
-                }
+                return await (
+                        sendEmail
+                            ? SendPreReleaseInviteEmail(release, email, isNewUser: true)
+                            : Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance))
+                    )
+                    .OnSuccessVoid(async () => { await _context.SaveChangesAsync(); });
             }
 
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateAcceptedUserReleaseInvite(Release release, string email,
+        private async Task<Either<ActionResult, Unit>> CreateExistingUserReleaseInvite(Release release, string email,
             User user)
         {
             if (!await UserHasPreReleaseInvite(release.Id, email))
             {
                 var sendEmail = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
 
-                // Create a new release invite
-                // The invite is already accepted if the user exists
+                // The invite is already accepted as the user exists
                 await _context.AddAsync(
                     new UserReleaseInvite
                     {
@@ -336,17 +339,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                 );
 
-                await _userReleaseRoleRepository.Create(
-                    userId: user.Id,
-                    releaseId: release.Id,
-                    role: ReleaseRole.PrereleaseViewer);
+                return await (
+                        sendEmail
+                            ? SendPreReleaseInviteEmail(release, email, isNewUser: false)
+                            : Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance))
+                    )
+                    .OnSuccessVoid(async () =>
+                    {
+                        await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync();
-
-                if (sendEmail)
-                {
-                    return await SendPreReleaseInviteEmail(release, email, isNewUser: false);
-                }
+                        await _userReleaseRoleRepository.Create(
+                            userId: user.Id,
+                            releaseId: release.Id,
+                            role: ReleaseRole.PrereleaseViewer);
+                    });
             }
 
             return Unit.Instance;
@@ -366,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AsQueryable()
                 .AnyAsync(i =>
                     i.ReleaseId == releaseId
-                    && i.Email.ToLower() == email.ToLower()
+                    && i.Email.ToLower().Equals(email.ToLower())
                     && i.Role == ReleaseRole.PrereleaseViewer);
         }
 
@@ -377,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.User)
                 .AnyAsync(r =>
                     r.ReleaseId == releaseId
-                    && r.User.Email.ToLower() == email.ToLower()
+                    && r.User.Email.ToLower().Equals(email.ToLower())
                     && r.Role == ReleaseRole.PrereleaseViewer);
         }
 
@@ -386,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var hasExistingSystemInvite = await _usersAndRolesDbContext
                 .UserInvites
                 .AsQueryable()
-                .AnyAsync(i => i.Email.ToLower() == email.ToLower());
+                .AnyAsync(i => i.Email.ToLower().Equals(email.ToLower()));
 
             if (!hasExistingSystemInvite)
             {
@@ -462,9 +468,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return dateTime?.ToString("dddd dd MMMM yyyy");
         }
 
-        private static Either<ActionResult, List<string>> ValidateEmailsAddresses(string input)
+        private static Either<ActionResult, List<string>> ValidateEmailAddresses(IEnumerable<string> input)
         {
-            var emails = input.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            var emails = input
+                .Where(email => !email.IsNullOrWhitespace())
                 .Select(line => line.Trim())
                 .Distinct()
                 .ToList();
@@ -477,24 +484,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return emails;
         }
-    }
-
-    public class PreReleaseInvitePlan
-    {
-        public List<string> AlreadyInvited { get; } = new List<string>();
-
-        public List<string> AlreadyAccepted { get; } = new List<string>();
-
-        public List<string> Invitable { get; } = new List<string>();
-    }
-
-    public class PreReleaseUserViewModel
-    {
-        public PreReleaseUserViewModel(string email)
-        {
-            Email = email;
-        }
-
-        public string Email { get; }
     }
 }

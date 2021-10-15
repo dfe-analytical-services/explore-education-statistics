@@ -158,7 +158,7 @@ Go to prerelease access page
 Validate the invite emails field is required
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
-    ...    Please enter 1 or more email addresses
+    ...    Enter 1 or more email addresses
 
 Validate the invite emails field only accepts @education.gov.uk email addresses
     ${emails}=    Catenate    SEPARATOR=\n
@@ -167,7 +167,7 @@ Validate the invite emails field only accepts @education.gov.uk email addresses
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
-    ...    Please enter valid @education.gov.uk email addresses
+    ...    Enter only @education.gov.uk email addresses
 
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
@@ -178,11 +178,10 @@ Invite users to the prerelease
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
     user waits until element contains    ${modal}    Email notifications will be sent immediately
 
-    user waits until page contains element    css:[data-testid="invitableList"] li    limit=2
-    user waits until element contains    css:[data-testid="invitableList"] li:nth-of-type(1) p
-    ...    simulate-delivered@notifications.service.gov.uk
-    user waits until element contains    css:[data-testid="invitableList"] li:nth-of-type(2) p
-    ...    ees-analyst1@education.gov.uk
+    user checks list has x items    testid:invitableList    2    ${modal}
+    user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
+    ...    ${modal}
+    user checks list item contains    testid:invitableList    2    ees-analyst1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
@@ -195,7 +194,7 @@ Validate the invite emails field is invalid for addresses that are all already i
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
-    ...    All of the email addresses are already invited or accepted users of the pre-release
+    ...    All of the email addresses have already been invited or accepted
 
 Invite a further list of new users but mixed with existing invitees and accepted users
     ${emails}=    Catenate    SEPARATOR=\n
@@ -208,19 +207,18 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
     user waits until element contains    ${modal}    Email notifications will be sent immediately
 
-    user waits until page contains element    css:[data-testid="invitableList"] li    limit=2
-    user waits until element contains    css:[data-testid="invitableList"] li:nth-of-type(1) p
-    ...    simulate-delivered-2@notifications.service.gov.uk
-    user waits until element contains    css:[data-testid="invitableList"] li:nth-of-type(2) p
-    ...    simulate-delivered-3@notifications.service.gov.uk
+    user checks list has x items    testid:invitableList    2    ${modal}
+    user checks list item contains    testid:invitableList    1    simulate-delivered-2@notifications.service.gov.uk
+    ...    ${modal}
+    user checks list item contains    testid:invitableList    2    simulate-delivered-3@notifications.service.gov.uk
+    ...    ${modal}
 
-    user waits until page contains element    css:[data-testid="acceptedList"] li    limit=1
-    user waits until element contains    css:[data-testid="acceptedList"] li:nth-of-type(1) p
-    ...    ees-analyst1@education.gov.uk
+    user checks list has x items    testid:acceptedList    1    ${modal}
+    user checks list item contains    testid:acceptedList    1    ees-analyst1@education.gov.uk    ${modal}
 
-    user waits until page contains element    css:[data-testid="invitedList"] li    limit=1
-    user waits until element contains    css:[data-testid="invitedList"] li:nth-of-type(1) p
-    ...    simulate-delivered@notifications.service.gov.uk
+    user checks list has x items    testid:invitedList    1    ${modal}
+    user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
+    ...    ${modal}
 
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
