@@ -216,6 +216,7 @@ user deletes editable accordion section
     user clicks button    Remove this section    ${section}
     user waits until modal is visible    Are you sure?
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
 get accordion section text block
     [Arguments]
