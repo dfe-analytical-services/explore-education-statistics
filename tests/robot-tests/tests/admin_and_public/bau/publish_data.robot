@@ -453,7 +453,6 @@ Select publication in table tool
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_2_NAME}" in table tool
-    prompt to continue
     user clicks link    Create your own table
     user waits until table tool wizard step is available    2    Choose a subject
     user waits until page contains    ${SUBJECT_2_NAME}
