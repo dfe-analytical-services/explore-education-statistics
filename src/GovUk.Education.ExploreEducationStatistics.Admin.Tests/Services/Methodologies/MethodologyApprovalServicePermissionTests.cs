@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyApprovalService SetupService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IBlobCacheService? blobCacheService = null,
+            IBlobCacheService? publicBlobCacheService = null,
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
-                blobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(Strict),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),

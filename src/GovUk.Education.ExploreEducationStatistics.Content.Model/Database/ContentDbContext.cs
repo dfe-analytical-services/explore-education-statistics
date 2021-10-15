@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .Property(n => n.Updated)
                 .HasConversion(
-                    v => v, 
+                    v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<MethodologyNote>()
@@ -179,6 +179,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Publication>()
                 .OwnsOne(p => p.ExternalMethodology)
                 .ToTable("ExternalMethodology");
+
+            modelBuilder.Entity<Publication>()
+                .Property(n => n.Published)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<Publication>()
+                .Property(n => n.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});

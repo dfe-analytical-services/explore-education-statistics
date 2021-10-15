@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
-        private readonly IBlobCacheService _blobCacheService;
+        private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
-            IBlobCacheService blobCacheService,
+            IBlobCacheService publicBlobCacheService,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
-            _blobCacheService = blobCacheService;
+            _publicBlobCacheService = publicBlobCacheService;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
 
                         // Invalidate the 'All Methodologies' cache item
-                        await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                        await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                     }
 
                     _context.MethodologyVersions.Update(methodology);
