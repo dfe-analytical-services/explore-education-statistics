@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
                 var amendmentIdCapture = new List<Guid>();
-                var summaryViewModel = new MethodologySummaryViewModel();
+                var summaryViewModel = new MethodologyVersionSummaryViewModel();
 
                 methodologyService
                     .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
                 var amendmentIdCapture = new List<Guid>();
-                var summaryViewModel = new MethodologySummaryViewModel();
+                var summaryViewModel = new MethodologyVersionSummaryViewModel();
 
                 methodologyService
                     .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))

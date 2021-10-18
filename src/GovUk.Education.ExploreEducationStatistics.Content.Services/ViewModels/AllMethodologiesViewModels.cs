@@ -40,8 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Title { get; set; } = string.Empty;
 
-        public List<AllMethodologiesPublicationViewModel> Publications { get; set; } =
-            new List<AllMethodologiesPublicationViewModel>();
+        public List<AllMethodologiesPublicationViewModel> Publications { get; set; } = new();
 
         public void RemovePublicationNodesWithoutMethodologiesAndSort()
         {
@@ -67,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Title { get; set; } = string.Empty;
 
-        public List<MethodologySummaryViewModel> Methodologies { get; set; } = new();
+        public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; } = new();
 
 
         public int CompareTo(AllMethodologiesPublicationViewModel? other)

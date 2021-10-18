@@ -10,7 +10,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
 {
-    public class MyPublicationMethodologyPermissionsPropertyResolverTest
+    public class MyPublicationMethodologyPermissionsResolverTest
     {
         [Fact]
         public void ResolvePermissions()
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             var publicationMethodology = new PublicationMethodology();
 
             var userService = new Mock<IUserService>(Strict);
-            var resolver = new MyPublicationMethodologyPermissionsPropertyResolver(userService.Object);
+            var resolver = new MyPublicationMethodologyVersionPermissionsResolver(userService.Object);
 
             userService.Setup(s =>
                     s.MatchesPolicy(publicationMethodology, CanDropMethodologyLink))

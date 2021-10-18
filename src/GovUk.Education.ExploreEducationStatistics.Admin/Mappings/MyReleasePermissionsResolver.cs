@@ -10,19 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
-    public class MyReleasePermissionSetPropertyResolver : IMyReleasePermissionSetPropertyResolver
+    public class MyReleasePermissionsResolver : IMyReleasePermissionsResolver
     {
         private readonly IUserService _userService;
- 
-        public MyReleasePermissionSetPropertyResolver(IUserService userService)
+
+        public MyReleasePermissionsResolver(IUserService userService)
         {
             _userService = userService;
         }
- 
+
         public MyReleaseViewModel.PermissionsSet Resolve(
-            Release release, 
-            MyReleaseViewModel destination, 
-            MyReleaseViewModel.PermissionsSet destMember, 
+            Release release,
+            MyReleaseViewModel destination,
+            MyReleaseViewModel.PermissionsSet destMember,
             ResolutionContext context)
         {
             return new MyReleaseViewModel.PermissionsSet

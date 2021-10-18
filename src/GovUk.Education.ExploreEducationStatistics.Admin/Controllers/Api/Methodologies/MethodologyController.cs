@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpPost("publication/{publicationId}/methodology")]
-        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodology(Guid publicationId)
+        public Task<ActionResult<MethodologyVersionSummaryViewModel>> CreateMethodology(Guid publicationId)
         {
             return _methodologyService
                 .CreateMethodology(publicationId)
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("publication/{publicationId}/adoptable-methodologies")]
-        public async Task<ActionResult<List<MethodologySummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId)
         {
             return await _methodologyService
                 .GetAdoptableMethodologies(publicationId)
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("methodology/{methodologyVersionId}/summary")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummary(Guid methodologyVersionId)
+        public async Task<ActionResult<MethodologyVersionSummaryViewModel>> GetMethodologySummary(Guid methodologyVersionId)
         {
             return await _methodologyService
                 .GetSummary(methodologyVersionId)
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpPut("methodology/{methodologyVersionId}")]
-        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodology(
+        public async Task<ActionResult<MethodologyVersionSummaryViewModel>> UpdateMethodology(
             Guid methodologyVersionId,
             MethodologyUpdateRequest request)
         {
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpPost("methodology/{originalMethodologyVersionId}/amendment")]
-        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAmendment(
+        public Task<ActionResult<MethodologyVersionSummaryViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyVersionId)
         {
             return _methodologyAmendmentService

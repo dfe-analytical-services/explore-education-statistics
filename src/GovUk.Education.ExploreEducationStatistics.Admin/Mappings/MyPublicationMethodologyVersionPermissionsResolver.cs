@@ -5,23 +5,23 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MyPublicationMethodologyViewModel;
+using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MyPublicationMethodologyVersionViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
-    public class MyPublicationMethodologyPermissionsPropertyResolver
-        : IMyPublicationMethodologyPermissionsPropertyResolver
+    public class MyPublicationMethodologyVersionPermissionsResolver
+        : IMyPublicationMethodologyVersionPermissionsResolver
     {
         private readonly IUserService _userService;
 
-        public MyPublicationMethodologyPermissionsPropertyResolver(IUserService userService)
+        public MyPublicationMethodologyVersionPermissionsResolver(IUserService userService)
         {
             _userService = userService;
         }
 
         public PermissionsSet Resolve(
             PublicationMethodology source,
-            MyPublicationMethodologyViewModel destination,
+            MyPublicationMethodologyVersionViewModel destination,
             PermissionsSet destMember,
             ResolutionContext context)
         {

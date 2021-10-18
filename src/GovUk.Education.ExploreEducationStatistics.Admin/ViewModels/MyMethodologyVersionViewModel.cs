@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class MyMethodologyViewModel
+    public class MyMethodologyVersionViewModel
     {
         public Guid Id { get; set; }
 

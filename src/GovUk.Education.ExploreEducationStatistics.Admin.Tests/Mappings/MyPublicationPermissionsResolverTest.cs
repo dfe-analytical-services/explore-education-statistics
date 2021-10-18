@@ -10,7 +10,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
 {
-    public class MyPublicationPermissionsPropertyResolverTest
+    public class MyPublicationPermissionsResolverTest
     {
         [Fact]
         public void ResolvePermissions()
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             var publication = new Publication();
 
             var userService = new Mock<IUserService>(Strict);
-            var resolver = new MyPublicationPermissionSetPropertyResolver(userService.Object);
+            var resolver = new MyPublicationPermissionsResolver(userService.Object);
 
             userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication))
                 .ReturnsAsync(true);
