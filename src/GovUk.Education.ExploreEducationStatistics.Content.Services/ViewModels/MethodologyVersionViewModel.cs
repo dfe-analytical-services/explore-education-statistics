@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record MethodologyViewModel
+    public record MethodologyVersionViewModel
     {
         public Guid Id { get; set; }
 

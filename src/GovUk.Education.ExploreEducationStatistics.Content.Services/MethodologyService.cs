@@ -37,13 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _methodologyVersionRepository = methodologyVersionRepository;
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(
                     query => query
                         .Where(mp => mp.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async methodology =>
+                .OnSuccess<ActionResult, Methodology, MethodologyVersionViewModel>(async methodology =>
                 {
                     var latestPublishedVersion =
                         await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Collection(m => m.Notes)
                         .LoadAsync();
 
-                    var viewModel = _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
+                    var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
                     viewModel.Publications =
                         await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
 
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(
+        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
             Guid publicationId)
         {
             return await _persistenceHelper
@@ -126,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
         }
 
-        private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
+        private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
         {
             var latestPublishedMethodologies =
                 await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
-            return _mapper.Map<List<MethodologySummaryViewModel>>(latestPublishedMethodologies);
+            return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
     }
 }

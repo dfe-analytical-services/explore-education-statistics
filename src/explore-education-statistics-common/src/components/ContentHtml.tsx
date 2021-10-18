@@ -83,7 +83,7 @@ const ContentHtml = ({
         >
           {parseHtmlString(sanitizeHtml(glossaryEntry.body, sanitizeOptions))}
           <Button
-            onClick={event => {
+            onClick={() => {
               setGlossaryEntry(undefined);
             }}
           >

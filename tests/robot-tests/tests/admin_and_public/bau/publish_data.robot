@@ -315,12 +315,12 @@ Save data guidance
 
 Navigate to Data blocks page
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
 
 Create new data block
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "${SUBJECT_2_NAME}"
     user waits until page contains    ${SUBJECT_2_NAME}
@@ -328,7 +328,7 @@ Select subject "${SUBJECT_2_NAME}"
     user clicks element    id:publicationSubjectForm-submit
 
 Select locations
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    Opportunity Area
     user clicks checkbox    Bolton 001 (E02000984)
     user clicks checkbox    Bolton 001 (E05000364)
@@ -340,17 +340,15 @@ Select locations
     user clicks element    id:locationFiltersForm-submit
 
 Select time period
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2005
     user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
 
 Select indicators and filters
-    user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
-
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user waits until table tool wizard step is available    4    Choose your filters
+    user checks indicator checkbox is checked    Admission Numbers
+    user checks category checkbox is checked    Random Filter    Not specified
 
 Create table
     user clicks element    id:filtersForm-submit
@@ -451,16 +449,17 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_2_NAME}" in table tool
+    prompt to continue
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
@@ -468,7 +467,7 @@ Select locations in table tool
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
     user checks previous table tool step contains    3    Local Authority    Barnsley
     user checks previous table tool step contains    3    Local Authority    Birmingham
 
@@ -478,11 +477,9 @@ Select time period in table tool
     user clicks element    id:timePeriodForm-submit
 
 Select indicators and filters in table tool
-    user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
-
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user waits until table tool wizard step is available    5    Choose your filters
+    user checks indicator checkbox is checked    Admission Numbers
+    user checks category checkbox is checked    Random Filter    Not specified
     user clicks element    id:filtersForm-submit
 
 Validate table
@@ -517,11 +514,12 @@ Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
     user waits until h1 is visible    Go back to previous step
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
 
     user clicks link    Featured tables
-    user waits until table tool wizard step is available    Choose a table
+    user waits until table tool wizard step is available    2    Choose a table
 
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    Test highlight name

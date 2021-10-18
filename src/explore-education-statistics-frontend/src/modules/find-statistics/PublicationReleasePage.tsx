@@ -346,7 +346,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 logEvent({
                   category: 'Downloads',
                   action: 'Release page all files downloaded',
-                  label: `Publication: ${release.title}, File: All files`,
+                  label: `Publication: ${release.publication.title}, Release: ${release.title}, File: All files`,
                 });
               }}
             >
@@ -383,7 +383,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   logEvent({
                     category: 'Downloads',
                     action: 'Release page file downloaded',
-                    label: `Publication: ${release.title}, File: ${file.fileName}`,
+                    label: `Publication: ${release.publication.title}, Release: ${release.title}, File: ${file.fileName}`,
                   });
                 }}
               >

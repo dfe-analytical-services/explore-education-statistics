@@ -61,10 +61,10 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
 
 
 # Methodology
-def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url):
+def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url_ending):
     link = get_methodology_link(topic, publication, methodology)
 
-    if link.get_attribute('href') != link_url:
+    if not link.get_attribute('href').endswith(link_url_ending):
         raise_assertion_error(
             f'Methodology link with title "{methodology}" should be linking to "{link_url}", but is '
             f'linking to "{link.get_attribute("href")}" instead!')

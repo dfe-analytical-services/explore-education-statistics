@@ -215,14 +215,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddTransient<IMyReleasePermissionSetPropertyResolver,
-                MyReleasePermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationPermissionSetPropertyResolver,
-                MyPublicationPermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationMethodologyPermissionsPropertyResolver,
-                MyPublicationMethodologyPermissionsPropertyResolver>();
-            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver,
-                MyMethodologyPermissionSetPropertyResolver>();
+            services.AddTransient<IMyReleasePermissionsResolver,
+                MyReleasePermissionsResolver>();
+            services.AddTransient<IMyPublicationPermissionsResolver,
+                MyPublicationPermissionsResolver>();
+            services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
+                MyPublicationMethodologyVersionPermissionsResolver>();
+            services.AddTransient<IMyMethodologyVersionPermissionsResolver,
+                MyMethodologyVersionPermissionsResolver>();
 
             services.AddMvc(options =>
                 {
@@ -289,7 +289,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
-            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>();
+            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>(provider =>
+                new MethodologyApprovalService(
+                    context: provider.GetService<ContentDbContext>(),
+                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    methodologyContentService: provider.GetRequiredService<IMethodologyContentService>(),
+                    methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
+                    methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
+                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
+                    publicBlobCacheService: new BlobCacheService(
+                        GetBlobStorageService(provider, "PublicStorage"),
+                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
+                    publishingService: provider.GetRequiredService<IPublishingService>(),
+                    userService: provider.GetRequiredService<IUserService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -324,7 +336,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterRepository, FilterRepository>();
@@ -355,17 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
-            services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
-                {
-                    var connectionString = Configuration.GetValue<string>("CoreStorage");
-
-                    return new BlobStorageService(
-                        connectionString,
-                        new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()
-                    );
-                }
-            );
+            services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
@@ -435,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
             }
 
-            if(Configuration.GetValue<bool>("enableSwagger"))
+            if (Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
@@ -543,6 +544,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
+        }
+
+        private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
+        {
+            var connectionString = Configuration.GetValue<string>(connectionStringKey);
+            return new BlobStorageService(
+                connectionString,
+                new BlobServiceClient(connectionString),
+                provider.GetRequiredService<ILogger<BlobStorageService>>());
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

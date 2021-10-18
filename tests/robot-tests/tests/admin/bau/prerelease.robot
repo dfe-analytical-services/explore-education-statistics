@@ -66,7 +66,7 @@ Add featured table
     user waits until h2 is visible    Data blocks
 
     user clicks link    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
@@ -275,7 +275,7 @@ Go back to prerelease content page again
 Go to prerelease table tool page
     user clicks link    Table tool
     user waits until h1 is visible    Create your own tables    60
-    user waits until table tool wizard step is available    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    60
 
 Validate featured tables
     user waits until page contains element    id:featuredTables
@@ -294,7 +294,7 @@ Create and validate custom table
     user waits until h1 is visible    Create your own tables    60
 
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    60
 
     user waits until page contains    UI test subject    60
     user clicks radio    UI test subject
@@ -378,7 +378,7 @@ Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
 
     user waits until h1 is visible    Create your own tables    60
-    user waits until table tool wizard step is available    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    60
 
 Validate featured tables as Analyst user
     user waits until page contains element    id:featuredTables    60
@@ -397,7 +397,7 @@ Create and validate custom table as Analyst user
     user waits until h1 is visible    Create your own tables    60
 
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    60
 
     user waits until page contains    UI test subject    60
     user clicks radio    UI test subject
@@ -408,14 +408,14 @@ Create and validate custom table as Analyst user
 
 *** Keywords ***
 user chooses location, time period and filters
-    user waits until table tool wizard step is available    Choose locations    90
+    user waits until table tool wizard step is available    2    Choose locations    90
 
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
 
-    user waits until table tool wizard step is available    Choose time period    90
+    user waits until table tool wizard step is available    3    Choose time period    90
 
     user waits until page contains element    id:timePeriodForm-start
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start
@@ -428,10 +428,10 @@ user chooses location, time period and filters
     user chooses select option    id:timePeriodForm-end    2017
     user clicks element    id:timePeriodForm-submit
 
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    4    Choose your filters
     user checks previous table tool step contains    3    Time period    2005 to 2017
 
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
     user clicks element    id:filtersForm-submit
 

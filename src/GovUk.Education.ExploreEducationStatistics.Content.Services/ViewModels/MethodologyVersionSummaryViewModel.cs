@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record MethodologySummaryViewModel
+    public record MethodologyVersionSummaryViewModel
     {
         public Guid Id { get; set; }
 

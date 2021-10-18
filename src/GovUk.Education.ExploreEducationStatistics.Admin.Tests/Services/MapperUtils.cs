@@ -15,20 +15,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var serviceLookupByType = new Dictionary<Type, object>
             {
                 {
-                    typeof(IMyPublicationPermissionSetPropertyResolver),
-                    new Mock<IMyPublicationPermissionSetPropertyResolver>().Object
+                    typeof(IMyPublicationPermissionsResolver),
+                    new Mock<IMyPublicationPermissionsResolver>().Object
                 },
                 {
-                    typeof(IMyReleasePermissionSetPropertyResolver),
-                    new Mock<IMyReleasePermissionSetPropertyResolver>().Object
+                    typeof(IMyReleasePermissionsResolver),
+                    new Mock<IMyReleasePermissionsResolver>().Object
                 },
                 {
-                    typeof(IMyPublicationMethodologyPermissionsPropertyResolver),
-                    new Mock<IMyPublicationMethodologyPermissionsPropertyResolver>().Object
+                    typeof(IMyPublicationMethodologyVersionPermissionsResolver),
+                    new Mock<IMyPublicationMethodologyVersionPermissionsResolver>().Object
                 },
                 {
-                    typeof(IMyMethodologyPermissionSetPropertyResolver),
-                    new Mock<IMyMethodologyPermissionSetPropertyResolver>().Object
+                    typeof(IMyMethodologyVersionPermissionsResolver),
+                    new Mock<IMyMethodologyVersionPermissionsResolver>().Object
                 }
             };
 

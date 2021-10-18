@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "PublicationWithNoMethodologies",
-                                Methodologies = new List<MethodologySummaryViewModel>()
+                                Methodologies = new List<MethodologyVersionSummaryViewModel>()
                             }
                         )
                     },
@@ -40,13 +40,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                             {
                                 Title = "PublicationWithMethodologies",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "PublicationWithoutMethodologies",
-                                Methodologies = new List<MethodologySummaryViewModel>()
+                                Methodologies = new List<MethodologyVersionSummaryViewModel>()
                             }
                         )
                     }
@@ -76,21 +76,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                             {
                                 Title = "Topic C Publication C",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic C Publication A",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic C Publication B",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             }
                         )
@@ -103,21 +103,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                             {
                                 Title = "Topic A Publication C",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic A Publication A",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic A Publication B",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             }
                         )
@@ -130,21 +130,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                             {
                                 Title = "Topic B Publication C",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic B Publication A",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             },
                             new AllMethodologiesPublicationViewModel
                             {
                                 Title = "Topic B Publication B",
                                 Methodologies = AsList(
-                                    new MethodologySummaryViewModel()
+                                    new MethodologyVersionSummaryViewModel()
                                 )
                             }
                         )

@@ -22,7 +22,7 @@ Create Publications and a Methodology to adopt
 Adopt a Methodology
     ${accordion}=    user opens publication on the admin dashboard    ${ADOPTING_PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Adopt a methodology
-    user clicks link    Adopt a methodology
+    user clicks link    Adopt a methodology    ${accordion}
     user waits until page contains title    Adopt a methodology
     user clicks radio    ${OWNING_PUBLICATION_NAME}
     user opens details dropdown    More details    css:[data-testid="Radio item for ${OWNING_PUBLICATION_NAME}"]
@@ -43,9 +43,10 @@ Validate methodology adopted
 Drop adopted Methodology
     ${accordion}=    user opens publication on the admin dashboard    ${ADOPTING_PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${OWNING_PUBLICATION_NAME} (Adopted)    ${accordion}
-    user clicks button    Remove methodology
+    user clicks button    Remove methodology    ${accordion}
     user waits until modal is visible    Remove methodology
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
 Validate adopted methodology is dropped
     ${accordion}=    user opens publication on the admin dashboard    ${ADOPTING_PUBLICATION_NAME}

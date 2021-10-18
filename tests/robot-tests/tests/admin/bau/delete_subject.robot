@@ -89,13 +89,13 @@ Navigate to 'Data blocks' page
 Create new data block
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "UI test subject"
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    2    Choose locations
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
@@ -105,16 +105,16 @@ Select locations
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    3    Choose time period
 
 Select time period
     user chooses select option    id:timePeriodForm-start    2019
     user chooses select option    id:timePeriodForm-end    2019
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    4    Choose your filters
 
 Select indicators
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
 Create table
     [Documentation]    EES-615

@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
     public interface IMethodologyService
     {
-        public Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug);
+        public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
-        public Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
+        public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
 
         public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree();
     }
