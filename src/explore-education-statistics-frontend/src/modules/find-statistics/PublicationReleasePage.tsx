@@ -47,6 +47,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   // have the updates in the correct order.
   const updates = orderBy(release.updates, 'on', 'desc');
 
+  const showAllFilesButton = release.downloadFiles.some(
+    file =>
+      file.type === 'Data' ||
+      (file.type === 'Ancillary' && file.name !== 'All files'),
+  );
+
   return (
     <Page
       title={release.publication.title}
@@ -183,10 +189,26 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </h2>
             <nav role="navigation" aria-labelledby="useful-information">
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                {showAllFilesButton && (
+                  <li>
+                    <ButtonLink
+                      className="govuk-button govuk-!-margin-bottom-3"
+                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+                      onClick={() => {
+                        logEvent({
+                          category: `${release.publication.title} release page - Useful information`,
+                          action: 'Download all data button clicked',
+                          label: `Publication: ${release.publication.title}, Release: ${release.title}, File: All files`,
+                        });
+                      }}
+                    >
+                      Download all data
+                    </ButtonLink>
+                  </li>
+                )}
                 <li>
                   <a
                     href="#dataDownloads-1"
-                    className="govuk-button govuk-!-margin-bottom-3"
                     onClick={() => {
                       logEvent({
                         category: `${release.publication.title} release page`,
@@ -360,20 +382,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             />
           }
           renderDataCatalogueLink={
-            <Link
-              to={
-                release.latestRelease
-                  ? '/data-catalogue/[publication]'
-                  : '/data-catalogue/[publication]/[release]'
-              }
-              as={
-                release.latestRelease
-                  ? `/data-catalogue/${release.publication.slug}`
-                  : `/data-catalogue/${release.publication.slug}/${release.slug}`
-              }
+            <ButtonLink
+              className="govuk-!-width-full"
+              to="/data-catalogue/[publication]/[release]"
+              as={`/data-catalogue/${release.publication.slug}/${release.slug}`}
             >
-              data catalogue
-            </Link>
+              Browse data files
+            </ButtonLink>
           }
           renderDownloadLink={file => {
             return (
@@ -439,12 +454,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         publicationContact={release.publication.contact}
         releaseType={release.type.title}
       />
-
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Create your own tables
-      </h2>
-      <p>Explore our range of data and build your own tables from it.</p>
-      <CreateTablesButton release={release} />
 
       <PrintThisPage
         onClick={() => {

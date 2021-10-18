@@ -222,7 +222,7 @@ Verify release associated files
     user checks element should contain    ${downloads}
     ...    All data used to create this release is published as open data and is available for download.
     user checks element should contain    ${downloads}
-    ...    You can create your own tables from this data using our table tool, or view featured tables that we have built for you.
+    ...    You can view featured tables that we have built for you, or create your own tables from the open data using our table tool.
 
     user checks element should contain    ${downloads}
     ...    The open data files contain all data used in this release in a machine readable format.
