@@ -480,6 +480,10 @@ user waits until h1 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
 
+user waits until h1 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
+
 user waits until h2 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2[text()="${text}"]    ${wait}
@@ -800,7 +804,3 @@ lookup or return webelement
         ${element}=    get child element    ${parent}    ${selector_or_webelement}
     END
     [Return]    ${element}
-
-user closes Set Page View box
-    user clicks element    id:pageViewToggleButton
-    user waits until element is not visible    id:editingMode

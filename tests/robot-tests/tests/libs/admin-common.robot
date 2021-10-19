@@ -324,7 +324,7 @@ user creates methodology amendment for publication
     user clicks button    Amend methodology    ${accordion}
     user waits until modal is visible    Confirm you want to amend this live methodology
     user clicks button    Confirm
-    user waits until page does not contain button    Confirm
+    user waits until modal is not visible    Confirm you want to amend this live methodology
     user waits until h2 is visible    Methodology summary
 
 user cancels methodology amendment for publication
@@ -338,7 +338,7 @@ user cancels methodology amendment for publication
     user clicks button    Cancel amendment    ${accordion}
     user waits until modal is visible    Confirm you want to cancel this amended methodology
     user clicks button    Confirm
-    user waits until page does not contain button    Confirm
+    user waits until modal is not visible    Confirm you want to cancel this amended methodology
 
 user adds note to methodology
     [Arguments]
@@ -410,6 +410,7 @@ user removes an external methodology from publication
     user clicks button    Remove external methodology    ${accordion}
     user waits until modal is visible    Remove external methodology
     user clicks button    Confirm
+    user waits until modal is not visible    Remove external methodology
 
 user adds basic release content
     [Arguments]    ${publication}
@@ -739,7 +740,16 @@ user waits until modal is visible
     ${modal_element}=    get webelement    css:.ReactModal__Content
     [Return]    ${modal_element}
 
+user waits until modal is not visible
+    [Arguments]    ${MODAL_TITLE}
+    user waits until page does not contain element    css:.ReactModal__Content
+    user waits until h1 is not visible    ${MODAL_TITLE}
+
 user gets comment
     [Arguments]    ${comment_text}
     ${result}=    get webelement    xpath://*[li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]]
     [Return]    ${result}
+
+user closes Set Page View box
+    user clicks element    id:pageViewToggleButton
+    user waits until element is not visible    id:editingMode
