@@ -54,7 +54,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
 
       {themes.length > 0 ? (
         <Accordion
-          id="publications"
+          id="themes"
           onSectionOpen={accordionSection => {
             logEvent({
               category: 'Find statistics and data',
