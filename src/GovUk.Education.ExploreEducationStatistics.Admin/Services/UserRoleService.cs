@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
                         .OnSuccessDo(release => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
-                        .OnSuccessVoid(async tuple =>
+                        .OnSuccess(async tuple =>
                         {
                             var (user, publication) = tuple;
                             await _userPublicationRoleRepository.Create(
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 publicationId: publication.Id,
                                 role: role,
                                 createdById: _userService.GetUserId());
-                            _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
+                            return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
                 });
         }
@@ -106,14 +106,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
                             q => q.Include(r => r.Publication)))
                         .OnSuccessDo(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
-                        .OnSuccessVoid(async tuple =>
+                        .OnSuccess(async tuple =>
                         {
                             var (user, release) = tuple;
                             await _userReleaseRoleRepository.Create(
                                 userId: userId,
                                 releaseId: release.Id,
                                 role: role);
-                            _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
+                            return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                         });
                 });
         }
