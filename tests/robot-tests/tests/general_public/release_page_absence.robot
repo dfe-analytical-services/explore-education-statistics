@@ -63,7 +63,7 @@ Validate "About these statistics" -- "Last updated"
     user closes details dropdown    See all updates (2)
 
 Validate "Useful information"
-     user checks page contains element    link:Download all data
+    user checks page contains element    link:Download all data
     user checks page contains link with text and url    Pupil absence statistics: methodology
     ...    /methodology/pupil-absence-in-schools-in-england
 
