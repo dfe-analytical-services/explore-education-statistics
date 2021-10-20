@@ -41,7 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .Select(elem => elem.LocationId)
                 .Distinct()
                 .ToArray();
-            var locationsDict = Find(locationIds)
+            
+            var locationsDict = _context
+                .Location
+                .Where(location => locationIds.Contains(location.Id))
                 .AsNoTracking()
                 .ToList()
                 .ToDictionary(location => location.Id);

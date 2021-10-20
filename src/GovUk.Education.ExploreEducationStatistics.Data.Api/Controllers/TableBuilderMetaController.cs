@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("subject/{subjectId}")]
+        [BlobCache(typeof(SubjectMetaCacheKey))]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(Guid subjectId)
         {
             return _subjectMetaService.GetSubjectMeta(subjectId).HandleFailuresOrOk();

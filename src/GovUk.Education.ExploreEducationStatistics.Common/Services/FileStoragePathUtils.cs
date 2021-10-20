@@ -12,11 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return "staging";
         }
 
-        private static string PublicContentDownloadPath(string prefix = null)
-        {
-            return $"{AppendPathSeparator(prefix)}download";
-        }
-
         private static string PublicContentFastTrackPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}fast-track";
@@ -27,11 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{AppendPathSeparator(prefix)}publications";
         }
 
-        public static string PublicContentDownloadTreePath(string prefix = null)
-        {
-            return $"{PublicContentDownloadPath(prefix)}/tree.json";
-        }
-
         public static string PublicContentReleaseFastTrackPath(string releaseId, string prefix = null)
         {
             return $"{PublicContentFastTrackPath(prefix)}/{releaseId}";
@@ -40,11 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicContentFastTrackPath(string releaseId, string id, string prefix = null)
         {
             return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
-        }
-
-        public static string PublicContentPublicationsTreePath(string prefix = null)
-        {
-            return $"{PublicContentPublicationsPath(prefix)}/tree.json";
         }
 
         public static string PublicContentPublicationParentPath(string slug, string prefix = null)
@@ -81,6 +66,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug, prefix)}/data-blocks/{dataBlockId}.json";
         }
 
+        public static string PublicContentSubjectMetaPath(
+            Guid subjectId)
+        {
+            return $"subject-meta/{subjectId}.json";
+        }
+
+        public static string PublicContentFastTrackResultsPath(
+            Guid fastTrackId)
+        {
+            return $"fast-track-results/{fastTrackId}.json";
+        }
+        
         public static string FilesPath(Guid rootPath, FileType type)
         {
             var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
