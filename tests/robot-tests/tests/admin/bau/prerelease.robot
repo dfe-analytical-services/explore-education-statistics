@@ -465,6 +465,15 @@ Create and validate custom table as Analyst user
     user chooses location, time period and filters
     user validates table rows
 
+Unschedule release    # To prevents odd AppInsight errors after test topic teardown
+    user changes to bau1
+    user goes to url    ${RELEASE_URL}/status
+    user clicks button    Edit release status
+    user clicks radio    In draft
+    user clicks button    Update status
+
+    user checks summary list contains    Current status    In Draft
+
 *** Keywords ***
 user chooses location, time period and filters
     user waits until table tool wizard step is available    2    Choose locations    90
