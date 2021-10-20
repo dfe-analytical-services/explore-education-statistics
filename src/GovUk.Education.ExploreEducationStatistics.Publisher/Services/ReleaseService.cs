@@ -272,6 +272,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             // Remove Statistical Releases for each of the Content Releases
+            // TODO EES-2817 There's a missing foreign key on PreviousVersionId back to Release
+            // so this removes the previous versions successfully but leaves PreviousVersionId's that won't exist
             await RemoveStatisticalReleases(previousVersions);
 
             await _publicStatisticsDbContext.SaveChangesAsync();

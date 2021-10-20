@@ -146,10 +146,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task SimulateDataFactoryReleasePipeline(PublishReleaseDataMessage message)
         {
-            // Copy the Statistics Release to the Public Statistics database if it exists.
+            // Create the Public Statistics Release if a Statistics Release exists.
             // This copying would have happened in the ADF Pipeline in procedure DropAndCreateRelease.
             // The Statistics Release will exist if Subjects have been imported previously
             // (to either to this Release or a previous version), despite there being no Subjects now.
+
+            // TODO EES-2819 We should call the DropAndCreateRelease procedure here or replicate its behaviour instead
+            // of just creating the Release. Reason:
+            // If this stage is ever forcefully retried then it's possible the Release already exists, that it's
+            // attributes may now be different, and that it may have had Subjects and Footnotes that should be deleted.
+            // The DropAndCreateRelease procedure covers these scenarios by deleting the Release and its related data.
             await _releaseService.CreatePublicStatisticsRelease(message.ReleaseId);
 
             // If the Release is immediate then trigger publishing the content.
