@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 try
                 {
-                    if (!PublisherUtils.IsDevelopment())
+                    if (!EnvironmentUtils.IsLocalEnvironment())
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
@@ -122,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateStage(IEnumerable<ReleasePublishingStatus> releaseStatuses, ReleasePublishingStatusPublishingStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             foreach (var releaseStatus in releaseStatuses)
             {
@@ -131,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateStage(ReleasePublishingStatus releasePublishingStatus, ReleasePublishingStatusPublishingStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await _releasePublishingStatusService.UpdatePublishingStageAsync(releasePublishingStatus.ReleaseId, releasePublishingStatus.Id, stage,
                 logMessage);

@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
@@ -33,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
             PublicStatisticsDbContext publicStatisticsDbContext,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
@@ -41,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
+            _statisticsDbContext = statisticsDbContext;
             _publicStatisticsDbContext = publicStatisticsDbContext;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
@@ -195,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await _contentDbContext.SaveChangesAsync();
 
-            // The Release in the statistics database can be absent if no Subjects were created
+            // The Release in the statistics database can be absent if no data files were ever created
             if (statisticsRelease != null)
             {
                 _publicStatisticsDbContext.Release.Update(statisticsRelease);
@@ -225,6 +229,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
+        public async Task CreatePublicStatisticsRelease(Guid releaseId)
+        {
+            if (!EnvironmentUtils.IsLocalEnvironment())
+            {
+                var statisticsRelease = await _statisticsDbContext.Release
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(r => r.Id == releaseId);
+
+                var publicStatisticsRelease = await _publicStatisticsDbContext.Release
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(r => r.Id == releaseId);
+
+                if (statisticsRelease != null && publicStatisticsRelease == null)
+                {
+                    await _publicStatisticsDbContext.Release.AddAsync(new Data.Model.Release
+                    {
+                        Id = statisticsRelease.Id,
+                        PublicationId = statisticsRelease.PublicationId,
+                        Year = statisticsRelease.Year,
+                        TimeIdentifier = statisticsRelease.TimeIdentifier,
+                        Slug = statisticsRelease.Slug,
+                        PreviousVersionId = statisticsRelease.PreviousVersionId
+                        // Published date is omitted here as it will be set when publishing completes
+                    });
+                    await _publicStatisticsDbContext.SaveChangesAsync();
+                }
+            }
+        }
+
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
         {
             var releases = await GetAmendedReleases(releaseIds);
@@ -239,6 +272,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             // Remove Statistical Releases for each of the Content Releases
+            // TODO EES-2817 There's a missing foreign key on PreviousVersionId back to Release
+            // so this removes the previous versions successfully but leaves PreviousVersionId's that won't exist
             await RemoveStatisticalReleases(previousVersions);
 
             await _publicStatisticsDbContext.SaveChangesAsync();

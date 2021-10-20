@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.UpdateContent(context, message.ReleaseId);
                 await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
-                if (!PublisherUtils.IsDevelopment())
+                if (!EnvironmentUtils.IsLocalEnvironment())
                 {
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             switch (state)
             {
