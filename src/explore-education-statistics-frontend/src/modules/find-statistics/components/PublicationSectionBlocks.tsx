@@ -7,7 +7,10 @@ import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
 import ButtonLink from '@frontend/components/ButtonLink';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
+import {
+  logEvent,
+  logOutboundLink,
+} from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
 export interface PublicationSectionBlocksProps {
@@ -76,6 +79,16 @@ const PublicationSectionBlocks = ({
             block={block}
             transformImageAttributes={transformImageAttributes}
             getGlossaryEntry={glossaryService.getEntry}
+            trackContentLinks={url =>
+              logOutboundLink(`Publication release content link: ${url}`, url)
+            }
+            trackGlossaryLinks={glossaryEntrySlug =>
+              logEvent({
+                category: `Publication Release Content Glossary Link`,
+                action: `Glossary link clicked`,
+                label: glossaryEntrySlug,
+              })
+            }
           />
         );
       })}

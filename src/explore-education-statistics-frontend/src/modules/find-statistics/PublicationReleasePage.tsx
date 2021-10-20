@@ -24,7 +24,10 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
+import {
+  logEvent,
+  logOutboundLink,
+} from '@frontend/services/googleAnalyticsService';
 import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
@@ -167,6 +170,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               key={block.id}
               block={block}
               getGlossaryEntry={glossaryService.getEntry}
+              trackContentLinks={url =>
+                logOutboundLink(`Publication release summary link: ${url}`, url)
+              }
+              trackGlossaryLinks={glossaryEntrySlug =>
+                logEvent({
+                  category: `Publication Release Summary Glossary Link`,
+                  action: `Glossary link clicked`,
+                  label: glossaryEntrySlug,
+                })
+              }
             />
           ))}
 
@@ -310,7 +323,18 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     {release.relatedInformation &&
                       release.relatedInformation.map(link => (
                         <li key={link.id}>
-                          <a href={link.url}>{link.description}</a>
+                          <a
+                            href={link.url}
+                            onClick={e => {
+                              e.preventDefault();
+                              logOutboundLink(
+                                `Publication release related page link: ${link.url}`,
+                                link.url,
+                              );
+                            }}
+                          >
+                            {link.description}
+                          </a>
                         </li>
                       ))}
                   </ul>
