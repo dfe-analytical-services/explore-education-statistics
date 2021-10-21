@@ -514,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestPublishedVersion_MethodologyParentNotFoundThrowsException()
+        public async Task GetLatestPublishedVersion_MethodologyNotFoundThrowsException()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1214,6 +1214,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
                 Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
                 Assert.False(await service.IsPubliclyAccessible(latestDraftVersion.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsPubliclyAccessible_ApprovedAndScheduledWithNonLiveReleaseHasCorrectLatestVersionAccessible()
+        {
+            var liveRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow
+            };
+
+            var nonLiveRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var previousVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                PublishingStrategy = Immediately,
+                Status = Approved,
+                Version = 0
+            };
+
+            var latestPublishedVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = previousVersion.Id,
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = liveRelease,
+                ScheduledWithReleaseId = liveRelease.Id,
+                Status = Approved,
+                Version = 1
+            };
+
+            var latestApprovedVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = latestPublishedVersion.Id,
+                PublishingStrategy = WithRelease,
+                ScheduledWithRelease = nonLiveRelease,
+                ScheduledWithReleaseId = nonLiveRelease.Id,
+                Status = Approved,
+                Version = 2
+            };
+
+            var publicationMethodology = new PublicationMethodology
+            {
+                Publication = new Publication
+                {
+                    Published = DateTime.UtcNow
+                },
+                Methodology = new Methodology
+                {
+                    Versions = ListOf(previousVersion, latestPublishedVersion, latestApprovedVersion)
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyVersionRepository(contentDbContext);
+
+                Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
+                //TODO EES-2818 bug here
+                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
+                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion.Id));
             }
         }
 
