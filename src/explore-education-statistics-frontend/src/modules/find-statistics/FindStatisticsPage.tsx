@@ -81,7 +81,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
                       key={topicId}
                       summary={topicTitle}
                       id={`topic-${topicId}`}
-                      headingId="topic-heading"
+                      detailsId="topic"
                     >
                       <PublicationList publications={publications} />
                     </Details>

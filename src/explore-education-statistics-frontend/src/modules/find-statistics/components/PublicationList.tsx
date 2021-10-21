@@ -12,7 +12,7 @@ function PublicationList({ publications }: Props) {
       {publications.map(({ id, legacyPublicationUrl, slug, title }) => (
         <li key={id} className="govuk-!-margin-bottom-0">
           <h3
-            id="publication-heading"
+            id={`publication-heading-${id}}`}
             className="govuk-heading-s govuk-!-margin-bottom-0"
           >
             {title}

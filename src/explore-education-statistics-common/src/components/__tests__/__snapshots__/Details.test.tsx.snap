@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Details renders correctly 1`] = `
-<details id="details"
+<details id="details-tag-test-details"
          class="govuk-details"
          role="group"
 >
@@ -11,7 +11,7 @@ exports[`Details renders correctly 1`] = `
            role="button"
            tabindex="0"
   >
-    <span id="details-heading"
+    <span id="details-heading-test-details"
           class="summaryText govuk-details__summary-text"
           data-testid="Expand Details Section Test summary"
     >
@@ -28,7 +28,7 @@ exports[`Details renders correctly 1`] = `
 `;
 
 exports[`Details renders correctly with \`open\` prop set to true 1`] = `
-<details id="details"
+<details id="details-tag-test-details"
          class="govuk-details"
          open
          role="group"
@@ -39,7 +39,7 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
            role="button"
            tabindex="0"
   >
-    <span id="details-heading"
+    <span id="details-heading-test-details"
           class="summaryText govuk-details__summary-text"
           data-testid="Expand Details Section Test summary"
     >

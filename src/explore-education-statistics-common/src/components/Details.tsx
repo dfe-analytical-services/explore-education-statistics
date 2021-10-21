@@ -25,7 +25,6 @@ export interface DetailsProps {
   children: ReactNode;
   id?: string;
   detailsId?: string;
-  headingId?: string;
   /**
    * When `jsRequired` is true, we assume that the browser has
    * JS and will skip waiting for the component to mount.
@@ -48,8 +47,7 @@ const Details = ({
   className,
   children,
   id: propId = `details-content-${(idCounter += 1)}`,
-  detailsId = 'details',
-  headingId = 'details-heading',
+  detailsId,
   jsRequired = false,
   open = false,
   onToggle,
@@ -91,7 +89,7 @@ const Details = ({
 
   return (
     <details
-      id={detailsId}
+      id={detailsId ? `${detailsId}-details-${id}` : `details-tag-${id}`}
       className={classNames('govuk-details', className)}
       open={open}
       ref={ref}
@@ -130,7 +128,9 @@ const Details = ({
         }}
       >
         <span
-          id={headingId}
+          id={
+            detailsId ? `${detailsId}-heading-${id}` : `details-heading-${id}`
+          }
           className={classNames(
             styles.summaryText,
             'govuk-details__summary-text',
