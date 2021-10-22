@@ -161,4 +161,88 @@ describe('PublicationReleasePage', () => {
       'First update',
     );
   });
+
+  test('renders link to a methodology', () => {
+    render(<PublicationReleasePage release={testRelease} />);
+    const usefulInfo = screen.getByRole('complementary');
+
+    expect(
+      within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(usefulInfo).getByRole('link', {
+        name: 'Pupil absence statistics: methodology',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/methodology/pupil-absence-in-schools-in-england',
+    );
+  });
+
+  test('renders link to an external methodology', () => {
+    const testReleaseWithExternalMethodology = {
+      ...testRelease,
+      publication: {
+        ...testRelease.publication,
+        methodologies: [],
+        externalMethodology: {
+          title: 'External methodology title',
+          url: 'http://gov.uk',
+        },
+      },
+    };
+    render(
+      <PublicationReleasePage release={testReleaseWithExternalMethodology} />,
+    );
+    const usefulInfo = screen.getByRole('complementary');
+
+    expect(
+      within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(usefulInfo).getByRole('link', {
+        name: 'External methodology title',
+      }),
+    ).toHaveAttribute('href', 'http://gov.uk');
+  });
+
+  test('renders links to internal and external methodologies', () => {
+    const testReleaseWithInternalAndExternalMethodologies = {
+      ...testRelease,
+      publication: {
+        ...testRelease.publication,
+        externalMethodology: {
+          title: 'External methodology title',
+          url: 'http://gov.uk',
+        },
+      },
+    };
+    render(
+      <PublicationReleasePage
+        release={testReleaseWithInternalAndExternalMethodologies}
+      />,
+    );
+    const usefulInfo = screen.getByRole('complementary');
+
+    expect(
+      within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(usefulInfo).getByRole('link', {
+        name: 'Pupil absence statistics: methodology',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/methodology/pupil-absence-in-schools-in-england',
+    );
+
+    expect(
+      within(usefulInfo).getByRole('link', {
+        name: 'External methodology title',
+      }),
+    ).toHaveAttribute('href', 'http://gov.uk');
+  });
 });

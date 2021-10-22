@@ -299,7 +299,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 )}
               </ul>
             </nav>
-            {release.publication.methodologies.length > 0 && (
+            {(release.publication.methodologies.length > 0 ||
+              release.publication.externalMethodology) && (
               <>
                 <h3
                   className="govuk-heading-s govuk-!-margin-top-6"
