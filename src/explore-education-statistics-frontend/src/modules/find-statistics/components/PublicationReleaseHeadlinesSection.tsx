@@ -7,6 +7,10 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
+import {
+  logEvent,
+  logOutboundLink,
+} from '@frontend/services/googleAnalyticsService';
 import { Release } from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
@@ -49,6 +53,16 @@ const PublicationReleaseHeadlinesSection = ({
           key={block.id}
           block={block}
           getGlossaryEntry={glossaryService.getEntry}
+          trackContentLinks={url =>
+            logOutboundLink(`Publication release headlines link: ${url}`, url)
+          }
+          trackGlossaryLinks={glossaryEntrySlug =>
+            logEvent({
+              category: `Publication Release Headlines Glossary Link`,
+              action: `Glossary link clicked`,
+              label: glossaryEntrySlug,
+            })
+          }
         />
       ))}
     </TabsSection>

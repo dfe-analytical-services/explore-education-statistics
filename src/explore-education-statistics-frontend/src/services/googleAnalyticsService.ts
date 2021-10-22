@@ -55,6 +55,20 @@ export function logEvent({ category, action, label, value }: AnalyticsEvent) {
   });
 }
 
+export function logOutboundLink(label: string, url: string) {
+  if (!initialised) {
+    return;
+  }
+  ReactGA.outboundLink(
+    {
+      label,
+    },
+    function hitCallback() {
+      document.location.href = url;
+    },
+  );
+}
+
 export const logException = (description: string, fatal = false) => {
   if (initialised) {
     ReactGA.exception({ description, fatal });
