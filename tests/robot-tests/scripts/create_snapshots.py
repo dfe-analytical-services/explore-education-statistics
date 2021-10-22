@@ -1,11 +1,3 @@
-"""
-This script creates JSON strings for specific pages on the public frontend, containing data on such things like
-the themes/topics/publications that appear on the Find Statistics page. We do this to allow us to monitor these
-pages on production such that we're alerted to any changes and can validate that the changes are what we expect.
-The authoritative version os these snapshots is source-controlled and stored in `robot-tests/tests/snapshots`.
-These will then be compared with a newly generated snapshot when a relevant test is run, and then send a slack
-alert if there is a difference.
-"""
 import os
 import json
 import argparse
