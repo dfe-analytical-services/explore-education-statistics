@@ -465,6 +465,18 @@ Create and validate custom table as Analyst user
     user chooses location, time period and filters
     user validates table rows
 
+Unschedule release
+    [Documentation]    EES-2826
+    # EES-2826 Cancel scheduled publishing because ReleaseStatus row in table storage isn't removed
+    # by test topic teardown. Unscheduling prevents an error when the scheduled publishing begins.
+    user changes to bau1
+    user goes to url    ${RELEASE_URL}/status
+    user clicks button    Edit release status
+    user clicks radio    In draft
+    user clicks button    Update status
+
+    user checks summary list contains    Current status    In Draft
+
 *** Keywords ***
 user chooses location, time period and filters
     user waits until table tool wizard step is available    2    Choose locations    90
