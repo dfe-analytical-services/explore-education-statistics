@@ -151,6 +151,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                           summary={theme.title}
                           key={theme.id}
                           id={`${formId}-theme-${theme.id}`}
+                          detailsId="theme"
                           open={
                             searchTerm !== '' ||
                             theme.topics.some(topic =>
@@ -166,6 +167,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                               summary={topic.title}
                               key={topic.id}
                               id={`${formId}-topic-${topic.id}`}
+                              detailsId="topic"
                               open={
                                 searchTerm !== '' ||
                                 topic.publications.some(
