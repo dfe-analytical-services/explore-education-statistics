@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             try
             {
                 return await 
-                    GetFastTrack(fastTrackId)
+                    GetFastTrackWithResults(fastTrackId)
                     .OnSuccess(BuildViewModel);
             }
             catch (StorageException e)
@@ -57,6 +57,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 return new NotFoundResult();
             }
+        }
+
+        public async Task<Either<ActionResult, ReleaseFastTrack>> GetReleaseFastTrack(Guid fastTrackId)
+        {
+            // Assume that ReleaseFastTrack has a unique row key across all partitions
+            var query = new TableQuery<ReleaseFastTrack>()
+                .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.RowKey),
+                    QueryComparisons.Equal, fastTrackId.ToString()));
+
+            var tableResult = await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName, query);
+            var entity = tableResult.FirstOrDefault();
+
+            return entity == null
+                ? new NotFoundResult()
+                : new Either<ActionResult, ReleaseFastTrack>(entity);
         }
 
         private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(FastTrack fastTrack)
@@ -81,30 +96,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 });
         }
 
-        private async Task<Either<ActionResult, FastTrack>> GetFastTrack(Guid id)
+        private async Task<Either<ActionResult, FastTrack>> GetFastTrackWithResults(Guid fastTrackId)
         {
-            return await GetReleaseFastTrack(id)
+            return await 
+                GetReleaseFastTrack(fastTrackId)
                 .OnSuccess(async releaseFastTrack =>
                 {
                     var text = await _blobStorageService.DownloadBlobText(PublicContent,
-                        PublicContentFastTrackPath(releaseFastTrack.ReleaseId.ToString(), id.ToString()));
+                        PublicContentFastTrackPath(releaseFastTrack.ReleaseId.ToString(), fastTrackId.ToString()));
                     return JsonConvert.DeserializeObject<FastTrack>(text);
                 });
-        }
-
-        public async Task<Either<ActionResult, ReleaseFastTrack>> GetReleaseFastTrack(Guid fastTrackId)
-        {
-            // Assume that ReleaseFastTrack has a unique row key across all partitions
-            var query = new TableQuery<ReleaseFastTrack>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.RowKey),
-                    QueryComparisons.Equal, fastTrackId.ToString()));
-
-            var tableResult = await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName, query);
-            var entity = tableResult.FirstOrDefault();
-
-            return entity == null
-                ? new NotFoundResult()
-                : new Either<ActionResult, ReleaseFastTrack>(entity);
         }
     }
 }

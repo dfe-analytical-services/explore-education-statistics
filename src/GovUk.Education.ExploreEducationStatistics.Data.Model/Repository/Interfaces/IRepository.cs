@@ -14,7 +14,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         
         IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
             List<Expression<Func<TEntity, object>>> include = null);
-
-        Task<TEntity> RemoveAsync(TKey id);
     }
 }

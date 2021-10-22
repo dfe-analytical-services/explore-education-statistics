@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return queryable;
         }
 
-        public async Task<TEntity> RemoveAsync(TKey id)
+        protected async Task<TEntity> RemoveAsync(TKey id)
         {
             var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
             return DbSet().Remove(entity).Entity;

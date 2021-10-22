@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _fastTrackService.DeleteAllFastTracksByRelease(previousRelease.Id);
                 
                 // Delete any lazily-cached results that are owned by the previous Release
-                await DeleteReleaseResultsCache(previousRelease.Id);
+                await DeleteLazilyCachedReleaseResults(release.Publication.Slug, previousRelease.Slug);
 
                 // Delete content which hasn't been overwritten because the Slug has changed
                 if (release.Slug != previousRelease.Slug)
@@ -72,10 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task DeleteReleaseResultsCache(Guid releaseId)
+        private async Task DeleteLazilyCachedReleaseResults(string publicationSlug, string releaseSlug)
         {
-            await _blobCacheService.DeleteItem(new ReleaseFastTrackResultsCacheKey(releaseId));
-            await _blobCacheService.DeleteItem(new ReleaseSubjectMetasCacheKey(releaseId));
+            await _blobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteCacheFolder(new ReleaseFastTrackResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
@@ -119,7 +120,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
-            var releases = await _releaseService.List(releaseIds);
+            var releases = (await _releaseService
+                .List(releaseIds))
+                .ToList();
             
             var publications = releases
                 .Select(release => release.Publication)
@@ -213,31 +216,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobName = pathFunction.Invoke(pathPrefix);
             await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
         }
-
-        private record ReleaseFastTrackResultsCacheKey : IBlobCacheKey
+        
+        private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey
         {
-            private Guid ReleaseId { get; }
+            private string PublicationSlug { get; }
 
-            public ReleaseFastTrackResultsCacheKey(Guid releaseId)
+            private string ReleaseSlug { get; }
+
+            public ReleaseDataBlockResultsFolderCacheKey(string publicationSlug, string releaseSlug)
             {
-                ReleaseId = releaseId;
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
             }
 
-            public string Key => PublicContentFastTrackResultsPath(ReleaseId);
+            public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
+        }
+
+        private record ReleaseFastTrackResultsFolderCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseFastTrackResultsFolderCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentFastTrackResultsParentPath(PublicationSlug, ReleaseSlug);
 
             public IBlobContainer Container => PublicContent;
         }
         
-        private record ReleaseSubjectMetasCacheKey : IBlobCacheKey
+        private record ReleaseSubjectMetaFolderCacheKey : IBlobCacheKey
         {
-            private Guid ReleaseId { get; }
+            private string PublicationSlug { get; }
 
-            public ReleaseSubjectMetasCacheKey(Guid releaseId)
+            private string ReleaseSlug { get; }
+
+            public ReleaseSubjectMetaFolderCacheKey(string publicationSlug, string releaseSlug)
             {
-                ReleaseId = releaseId;
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
             }
 
-            public string Key => PublicContentSubjectMetaPath(ReleaseId);
+            public string Key => PublicContentSubjectMetaParentPath(PublicationSlug, ReleaseSlug);
 
             public IBlobContainer Container => PublicContent;
         }

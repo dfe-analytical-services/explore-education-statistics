@@ -112,7 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IReleaseService.IBlobInfoGetter, ReleaseService.DefaultBlobInfoGetter>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<IReleaseSubjectRepository,ReleaseSubjectRepository>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
                 {
                     var connectionString = Configuration.GetValue<string>("PublicStorage");
@@ -145,6 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             services
                 .AddAuthentication(options => {

@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -16,10 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class FastTrackController : ControllerBase
     {
         private readonly IFastTrackService _fastTrackService;
+        private readonly ICacheKeyService _cacheKeyService;
 
-        public FastTrackController(IFastTrackService fastTrackService)
+        public FastTrackController(
+            IFastTrackService fastTrackService, 
+            ICacheKeyService cacheKeyService)
         {
             _fastTrackService = fastTrackService;
+            _cacheKeyService = cacheKeyService;
         }
 
         [HttpGet("{id}")]
@@ -27,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             if (Guid.TryParse(id, out var idAsGuid))
             {
-                return await _fastTrackService
-                    .GetReleaseFastTrack(idAsGuid)
-                    .OnSuccess(Get)
+                return await _cacheKeyService
+                    .CreateCacheKeyForFastTrackResults(idAsGuid)
+                    .OnSuccess(GetAndCacheFastTrackAndResults)
                     .HandleFailuresOrOk();
             }
 
@@ -37,9 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
         
         [BlobCache(typeof(FastTrackResultsCacheKey))]
-        private async Task<Either<ActionResult, FastTrackViewModel>> Get(ReleaseFastTrack fastTrack)
+        private Task<Either<ActionResult, FastTrackViewModel>> GetAndCacheFastTrackAndResults(FastTrackResultsCacheKey cacheKey)
         {
-            return await _fastTrackService.GetFastTrackAndResults(fastTrack.FastTrackId);
+            return _fastTrackService.GetFastTrackAndResults(cacheKey.FastTrackId);
         }
     }
 }

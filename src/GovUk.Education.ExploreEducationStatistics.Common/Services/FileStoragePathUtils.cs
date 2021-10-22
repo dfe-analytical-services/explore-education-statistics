@@ -56,34 +56,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}.json";
         }
+        
+        public static string PublicContentDataBlockParentPath(
+            string publicationSlug,
+            string releaseSlug)
+        {
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/data-blocks";
+        }
 
         public static string PublicContentDataBlockPath(
             string publicationSlug,
             string releaseSlug,
-            Guid dataBlockId,
-            string prefix = null)
+            Guid dataBlockId)
         {
-            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug, prefix)}/data-blocks/{dataBlockId}.json";
+            return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}.json";
         }
 
-        public static string PublicContentSubjectMetaPath(Guid releaseId)
+        public static string PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"subject-meta/{releaseId}";
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subject-meta";
         }
         
-        public static string PublicContentSubjectMetaPath(Guid releaseId, Guid subjectId)
+        public static string PublicContentSubjectMetaPath(string publicationSlug, string releaseSlug, Guid subjectId)
         {
-            return $"{PublicContentSubjectMetaPath(releaseId)}/{subjectId}.json";
+            return $"{PublicContentSubjectMetaParentPath(publicationSlug, releaseSlug)}/{subjectId}.json";
         }
         
-        public static string PublicContentFastTrackResultsPath(Guid releaseId)
+        public static string PublicContentFastTrackResultsParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"fast-track-results/{releaseId}";
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/fast-track-results";
         }
 
-        public static string PublicContentFastTrackResultsPath(Guid releaseId, Guid fastTrackId)
+        public static string PublicContentFastTrackResultsPath(string publicationSlug, string releaseSlug, Guid fastTrackId)
         {
-            return $"{PublicContentFastTrackResultsPath(releaseId)}/{fastTrackId}.json";
+            return $"{PublicContentFastTrackResultsParentPath(publicationSlug, releaseSlug)}/{fastTrackId}.json";
         }
         
         public static string FilesPath(Guid rootPath, FileType type)
