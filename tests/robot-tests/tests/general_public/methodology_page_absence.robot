@@ -5,7 +5,7 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Test
+Force Tags          GeneralPublic    Local    Dev
 
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
@@ -27,6 +27,7 @@ Go to Pupil absence methodology page
     user waits until page contains title caption    Methodology
 
 Validate Published date
+    [Tags]    NotAgainstDev
     user checks summary list contains    Published    22 March 2018
 
 Validate Last updated is not visible
