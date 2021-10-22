@@ -12,7 +12,6 @@ import utilities_init
 import os
 import re
 from urllib.parse import urlparse
-from slack_sdk.webhook import WebhookClient
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = sl._element_finder
@@ -345,31 +344,4 @@ def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = N
         return parent_locator
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
-
-
-def send_slack_alert(err_msg):
-    assert os.getenv('SLACK_WEBHOOK_URL') is not None or not "", 'SLACK_WEBHOOK_URL env variable needs to be set'
-    url = os.getenv('SLACK_WEBHOOK_URL')
-    slack_webhook = WebhookClient(url)
-    response = slack_webhook.send(
-        text=err_msg,
-        blocks=[
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": "UI test error!",
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "plain_text",
-                    "text": err_msg,
-                },
-            },
-        ],
-    )
-    assert response.status_code == 200
-    assert response.body == "ok"
 

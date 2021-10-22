@@ -1,5 +1,6 @@
 *** Settings ***
 Resource        ../libs/common.robot
+Library         ../libs/alerts.py
 
 Test Setup      fail test fast if required
 
