@@ -123,13 +123,15 @@ parser.add_argument("--custom-env",
                     dest="custom_env",
                     default=None,
                     help="load a custom .env file (must be in ~/robot-tests directory)")
-
 """
-NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
-            as secret variables, which means they cannot be accessed like normal 
-            environment variables, and instead must be passed to this script as 
-            arguments.
+NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are 
+stored in the CI pipeline as secret variables, which means they cannot be accessed as normal 
+environment variables, and instead must be passed as an argument to this script.
 """
+parser.add_argument("--slack-webhook-url",
+                    dest="slack_webhook_url",
+                    default=None,
+                    help="URL for Slack webhook")
 parser.add_argument("--admin-pass",
                     dest="admin_pass",
                     default=None,
@@ -139,6 +141,9 @@ parser.add_argument("--analyst-pass",
                     default=None,
                     help="manually specify the analyst password")
 args = parser.parse_args()
+
+if args.slack_webhook_url:
+    os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url
 
 if args.admin_pass:
     os.environ['ADMIN_PASSWORD'] = args.admin_pass
