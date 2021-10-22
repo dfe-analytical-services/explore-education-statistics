@@ -221,7 +221,7 @@ Cancel the release amendment and validate that the appropriate warning modal is 
     ...    The following methodologies are scheduled to be published with this amended release
     user waits until element contains    ${modal}    ${PUBLICATION_NAME} - Amended methodology
     user clicks button    Confirm
-    user waits until page does not contain    Confirm you want to cancel this amended release
+    user waits until modal is not visible    Confirm you want to cancel this amended release
 
 Verify that the methodology that was scheduled with the cancelled release amendment is set back to Draft / Immediately
     user views methodology amendment for publication    ${PUBLICATION_NAME}

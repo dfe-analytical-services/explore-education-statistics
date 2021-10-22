@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 preReleaseUserService.Setup(mock =>
-                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                        mock.SendPreReleaseUserInviteEmails(release.Id))
                     .ReturnsAsync(Unit.Instance);
 
             var releaseService = BuildService(contentDbContext: context,
@@ -469,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 preReleaseUserService.Setup(mock =>
-                        mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == release.Id)))
+                        mock.SendPreReleaseUserInviteEmails(release.Id))
                     .ReturnsAsync(Unit.Instance);
 
                 var releaseService = BuildService(contentDbContext: context,
@@ -574,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<HtmlBlock>());
 
             preReleaseUserService.Setup(mock =>
-                    mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == amendedRelease.Id)))
+                    mock.SendPreReleaseUserInviteEmails(amendedRelease.Id))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -679,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<HtmlBlock>());
 
             preReleaseUserService.Setup(mock =>
-                    mock.SendPreReleaseUserInviteEmails(It.Is<Release>(r => r.Id == amendedRelease.Id)))
+                    mock.SendPreReleaseUserInviteEmails(amendedRelease.Id))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = InMemoryApplicationDbContext(contextId))

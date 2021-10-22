@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Role = role.Name
                             }
                         )
-                        .Where(uvm => uvm.Role != "Prerelease User")
+                        .Where(uvm => uvm.Role != Role.PrereleaseUser.GetEnumLabel())
                         .OrderBy(uvm => uvm.Name)
                         .ToListAsync();
                 });
@@ -161,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                 )
                 .OrderBy(x => x.Name)
-                .Where(u => u.Role == "Prerelease User")
+                .Where(u => u.Role == Role.PrereleaseUser.GetEnumLabel())
                 .ToListAsync();
         }
 
@@ -217,8 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string inviteCreatedByUser,
-            string roleId)
+        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -247,13 +247,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Email = email.ToLower(),
                         Created = DateTime.UtcNow,
-                        CreatedBy = inviteCreatedByUser,
+                        CreatedById = _userService.GetUserId().ToString(),
                         Role = role
                     };
                     await _usersAndRolesDbContext.UserInvites.AddAsync(invite);
                     await _usersAndRolesDbContext.SaveChangesAsync();
-                    _emailTemplateService.SendInviteEmail(email);
                     return invite;
+                })
+                .OnSuccess(invite =>
+                {
+                    return _emailTemplateService
+                        .SendInviteEmail(email)
+                        .OnSuccess(() => invite);
                 });
         }
 

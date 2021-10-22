@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (request.ApprovalStatus == ReleaseApprovalStatus.Approved)
                             {
-                                await _preReleaseUserService.SendPreReleaseUserInviteEmails(release);
+                                await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
                             }
                         });
                 });

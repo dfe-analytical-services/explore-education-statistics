@@ -46,7 +46,7 @@ Drop adopted Methodology
     user clicks button    Remove methodology    ${accordion}
     user waits until modal is visible    Remove methodology
     user clicks button    Confirm
-    user waits until page does not contain button    Confirm
+    user waits until modal is not visible    Remove methodology
 
 Validate adopted methodology is dropped
     ${accordion}=    user opens publication on the admin dashboard    ${ADOPTING_PUBLICATION_NAME}

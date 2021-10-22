@@ -63,6 +63,7 @@ Validate "About these statistics" -- "Last updated"
     user closes details dropdown    See all updates (2)
 
 Validate "Useful information"
+    user checks page contains element    link:Download all data
     user checks page contains link with text and url    Pupil absence statistics: methodology
     ...    /methodology/pupil-absence-in-schools-in-england
 
@@ -310,6 +311,8 @@ Validate Regional and local authority (LA) breakdown chart
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Create your own tables
     user clicks link    Create tables
     user waits until h1 is visible    Create your own tables    60
     user waits for page to finish loading

@@ -92,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Invite
         InviteNotFound,
         InvalidEmailAddress,
+        NoInvitableEmails,
         InvalidUserRole,
 
         // Methodology

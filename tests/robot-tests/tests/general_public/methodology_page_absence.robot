@@ -13,7 +13,7 @@ Navigate to Pupil absence in schools in England methodology page
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
 
-User navigates to absence methodology page
+Go to Pupil absence methodology page
     user checks page contains methodology link
     ...    Pupil absence
     ...    Pupil absence in schools in England

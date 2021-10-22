@@ -155,18 +155,77 @@ Go to prerelease access page
     user goes to url    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
-Invite users to prerelease for scheduled release
-    # This is GOV.UK Notify's test email address
-    user enters text into element    css:input[name="email"]    simulate-delivered@notifications.service.gov.uk
-    user clicks button    Invite new user
+Validate the invite emails field is required
+    user clicks button    Invite new users
+    user waits until element contains    id:preReleaseUserAccessForm-emails-error
+    ...    Enter 1 or more email addresses
 
+Validate the invite emails field only accepts @education.gov.uk email addresses
+    ${emails}=    Catenate    SEPARATOR=\n
+    ...    ees-analyst1@education.gov.uk
+    ...    test@test.com
+    user enters text into element    css:textarea[name="emails"]    ${emails}
+    user clicks button    Invite new users
+    user waits until element contains    id:preReleaseUserAccessForm-emails-error
+    ...    Enter only @education.gov.uk email addresses
+
+Invite users to the prerelease
+    ${emails}=    Catenate    SEPARATOR=\n
+    ...    simulate-delivered@notifications.service.gov.uk
+    ...    ees-analyst1@education.gov.uk
+    user enters text into element    css:textarea[name="emails"]    ${emails}
+    user clicks button    Invite new users
+    ${modal}=    user waits until modal is visible    Confirm pre-release invitations
+    user waits until element contains    ${modal}    Email notifications will be sent immediately
+
+    user checks list has x items    testid:invitableList    2    ${modal}
+    user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
+    ...    ${modal}
+    user checks list item contains    testid:invitableList    2    ees-analyst1@education.gov.uk    ${modal}
+    user clicks button    Confirm
     user checks table column heading contains    1    1    User email
-
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-
-    user enters text into element    css:input[name="email"]    ees-analyst1@education.gov.uk
-    user clicks button    Invite new user
     user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+
+Validate the invite emails field is invalid for addresses that are all already invited or accepted
+    ${emails}=    Catenate    SEPARATOR=\n
+    ...    simulate-delivered@notifications.service.gov.uk
+    ...    ees-analyst1@education.gov.uk
+    user enters text into element    css:textarea[name="emails"]    ${emails}
+    user clicks button    Invite new users
+    user waits until element contains    id:preReleaseUserAccessForm-emails-error
+    ...    All of the email addresses have already been invited or accepted
+
+Invite a further list of new users but mixed with existing invitees and accepted users
+    ${emails}=    Catenate    SEPARATOR=\n
+    ...    simulate-delivered@notifications.service.gov.uk
+    ...    simulate-delivered-2@notifications.service.gov.uk
+    ...    simulate-delivered-3@notifications.service.gov.uk
+    ...    ees-analyst1@education.gov.uk
+    user enters text into element    css:textarea[name="emails"]    ${emails}
+    user clicks button    Invite new users
+    ${modal}=    user waits until modal is visible    Confirm pre-release invitations
+    user waits until element contains    ${modal}    Email notifications will be sent immediately
+
+    user checks list has x items    testid:invitableList    2    ${modal}
+    user checks list item contains    testid:invitableList    1    simulate-delivered-2@notifications.service.gov.uk
+    ...    ${modal}
+    user checks list item contains    testid:invitableList    2    simulate-delivered-3@notifications.service.gov.uk
+    ...    ${modal}
+
+    user checks list has x items    testid:acceptedList    1    ${modal}
+    user checks list item contains    testid:acceptedList    1    ees-analyst1@education.gov.uk    ${modal}
+
+    user checks list has x items    testid:invitedList    1    ${modal}
+    user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
+    ...    ${modal}
+
+    user clicks button    Confirm
+    user checks table column heading contains    1    1    User email
+    user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
+    user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
+    user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 
 Validate prerelease has not started for Analyst user
     user changes to analyst1

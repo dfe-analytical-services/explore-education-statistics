@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -70,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetService<ContentDbContext>(),
+                        statisticsDbContext: provider.GetService<StatisticsDbContext>(),
                         publicStatisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetService<IMethodologyService>(),
