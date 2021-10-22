@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             var list = observations
                 // NOTE: Not including Location to avoid join for performance
                 .Select(o => new {o.GeographicLevel, o.LocationId})
+                .Distinct()
                 .AsNoTracking()
                 .ToList();
 
