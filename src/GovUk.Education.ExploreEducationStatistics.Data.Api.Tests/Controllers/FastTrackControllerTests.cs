@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var fastTrackService = new Mock<IFastTrackService>();
 
-            fastTrackService.Setup(s => s.Get(_validId)).ReturnsAsync(
+            fastTrackService.Setup(s => s.GetFastTrackAndResults(_validId)).ReturnsAsync(
                 new FastTrackViewModel
                 {
                     Id = _validId,
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             );
 
-            fastTrackService.Setup(s => s.Get(_notFoundId)).ReturnsAsync(new NotFoundResult());
+            fastTrackService.Setup(s => s.GetFastTrackAndResults(_notFoundId)).ReturnsAsync(new NotFoundResult());
 
             _controller = new FastTrackController(fastTrackService.Object);
         }

@@ -44,11 +44,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, FastTrackViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, FastTrackViewModel>> GetFastTrackAndResults(Guid fastTrackId)
         {
             try
             {
-                return await GetFastTrack(id)
+                return await 
+                    GetFastTrack(fastTrackId)
                     .OnSuccess(BuildViewModel);
             }
             catch (StorageException e)
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return _releaseRepository
                 .FindOrNotFoundAsync(fastTrack.ReleaseId)
-                .OnSuccessCombineWith(release => _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query))
+                .OnSuccessCombineWith(_ => _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query))
                 .OnSuccess(releaseAndResults =>
                 {
                     var (release, result) = releaseAndResults;
@@ -91,12 +92,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseFastTrack>> GetReleaseFastTrack(Guid id)
+        public async Task<Either<ActionResult, ReleaseFastTrack>> GetReleaseFastTrack(Guid fastTrackId)
         {
             // Assume that ReleaseFastTrack has a unique row key across all partitions
             var query = new TableQuery<ReleaseFastTrack>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.RowKey),
-                    QueryComparisons.Equal, id.ToString()));
+                    QueryComparisons.Equal, fastTrackId.ToString()));
 
             var tableResult = await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName, query);
             var entity = tableResult.FirstOrDefault();

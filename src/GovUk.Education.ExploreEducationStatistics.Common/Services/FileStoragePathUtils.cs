@@ -66,16 +66,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug, prefix)}/data-blocks/{dataBlockId}.json";
         }
 
-        public static string PublicContentSubjectMetaPath(
-            Guid subjectId)
+        public static string PublicContentSubjectMetaPath(Guid releaseId)
         {
-            return $"subject-meta/{subjectId}.json";
+            return $"subject-meta/{releaseId}";
+        }
+        
+        public static string PublicContentSubjectMetaPath(Guid releaseId, Guid subjectId)
+        {
+            return $"{PublicContentSubjectMetaPath(releaseId)}/{subjectId}.json";
+        }
+        
+        public static string PublicContentFastTrackResultsPath(Guid releaseId)
+        {
+            return $"fast-track-results/{releaseId}";
         }
 
-        public static string PublicContentFastTrackResultsPath(
-            Guid fastTrackId)
+        public static string PublicContentFastTrackResultsPath(Guid releaseId, Guid fastTrackId)
         {
-            return $"fast-track-results/{fastTrackId}.json";
+            return $"{PublicContentFastTrackResultsPath(releaseId)}/{fastTrackId}.json";
         }
         
         public static string FilesPath(Guid rootPath, FileType type)

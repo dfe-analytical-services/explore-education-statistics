@@ -2,8 +2,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
@@ -62,6 +64,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             {
                 await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
             }
+        }
+
+        public async Task<Either<ActionResult, ReleaseSubject>> GetLatestPublishedReleaseSubjectForSubject(Guid subjectId)
+        {
+            var publishedReleaseSubjects = await _statisticsDbContext
+                .ReleaseSubject
+                .Include(releaseSubject => releaseSubject.Release)
+                .Where(releaseSubject => releaseSubject.SubjectId == subjectId && releaseSubject.Release.Published.HasValue)
+                .ToListAsync();
+
+            var liveReleaseSubjects = publishedReleaseSubjects
+                .Where(releaseSubject => releaseSubject.Release.Live);
+
+            var previousReleaseVersionIds = liveReleaseSubjects
+                .Select(releaseSubject => releaseSubject.Release.PreviousVersionId);
+
+            var latestReleaseSubject = liveReleaseSubjects.SingleOrDefault(
+                releaseSubject => !previousReleaseVersionIds.Contains(releaseSubject.Release.Id));
+
+            if (latestReleaseSubject == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return latestReleaseSubject;
         }
 
         private async Task DeleteReleaseSubjectIfExists(ReleaseSubject? releaseSubject)
