@@ -2,8 +2,6 @@
 Resource        ../libs/common.robot
 Library         ../libs/snapshots.py
 
-Test Setup      fail test fast if required
-
 Force Tags      GeneralPublic    Snapshots    Prod
 
 *** Test Cases ***
