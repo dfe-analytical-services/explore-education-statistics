@@ -28,7 +28,7 @@ Appendix A: The MIT License
 
 The MIT License (MIT)
 
-Copyright (c) 2014-{YEAR}, CKSource - Frederico Knabben
+Copyright (c) 2014-2021, CKSource - Frederico Knabben
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
