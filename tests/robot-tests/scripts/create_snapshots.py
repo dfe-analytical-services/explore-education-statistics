@@ -1,0 +1,153 @@
+"""
+This script creates JSON strings for specific pages on the public frontend, containing data on such things like
+the themes/topics/publications that appear on the Find Statistics page. We do this to allow us to monitor these
+pages on production such that we're alerted to any changes and can validate that the changes are what we expect.
+The authoritative version os these snapshots is source-controlled and stored in `robot-tests/tests/snapshots`.
+These will then be compared with a newly generated snapshot when a relevant test is run, and then send a slack
+alert if there is a difference.
+"""
+import os
+import json
+import argparse
+import requests
+from bs4 import BeautifulSoup
+
+
+def _gets_parsed_html_from_page(url):
+    response = requests.get(url)
+    assert response.status_code == 200, f"Requests response wasn\'t 200!\nResponse: {response}"
+    return BeautifulSoup(response.text, "html.parser")
+
+
+def create_find_statistics_snapshot(public_url):
+    find_stats_url = f"{public_url.rstrip('/')}/find-statistics"
+    parsed_html = _gets_parsed_html_from_page(find_stats_url)
+
+    themes_accordion = parsed_html.find(id="themes")
+    if themes_accordion is None:
+        return []
+
+    theme_sections = themes_accordion.select('[data-testid="accordionSection"]') or []
+
+    result = []
+    for theme_index, theme_html in enumerate(theme_sections):
+        theme = {
+            'theme_heading': theme_html.select_one(f'#themes-{theme_index + 1}-heading').string,
+            'topics': [],
+        }
+
+        topics = theme_html.select('details') or []
+        for topic_html in topics:
+            topic = {
+                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
+                'publications': [],
+            }
+
+            publications = topic_html.select('li') or []
+            for publication_html in publications:
+                publication = {
+                    'publication_heading': publication_html.select_one('[id^="publication-heading-"]').string,
+                    'on_ees': publication_html.find(text="View statistics and data") is not None,
+                }
+
+                topic['publications'].append(publication)
+
+            theme['topics'].append(topic)
+
+        result.append(theme)
+
+    return result
+
+
+def create_table_tool_snapshot(public_url):
+    table_tool_url = f"{public_url.rstrip('/')}/data-tables"
+    parsed_html = _gets_parsed_html_from_page(table_tool_url)
+
+    themes = parsed_html.select('[id^="theme-details-"]') or []
+
+    result = []
+    for theme_html in themes:
+        theme = {
+            'theme_heading': theme_html.select_one('[id^="theme-heading-"]').string,
+            'topics': [],
+        }
+
+        topics = theme_html.select('[id^="topic-details-"]') or []
+        for topic_html in topics:
+            topic = {
+                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
+                'publications': [],
+            }
+
+            publications = topic_html.select('label') or []
+            for publication_label in publications:
+                topic['publications'].append(publication_label.string)
+
+            theme['topics'].append(topic)
+
+        result.append(theme)
+
+    return result
+
+
+def create_data_catalogue_snapshot(public_url):
+    data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
+    parsed_html = _gets_parsed_html_from_page(data_catalogue_url)
+
+    themes = parsed_html.select('[id^="theme-details-"]') or []
+
+    result = []
+    for theme_html in themes:
+        theme = {
+            'theme_heading': theme_html.select_one('[id^="theme-heading-"]').string,
+            'topics': [],
+        }
+
+        topics = theme_html.select('[id^="topic-details-"]') or []
+        for topic_html in topics:
+            topic = {
+                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
+                'publications': [],
+            }
+
+            publications = topic_html.select('label') or []
+            for publication_label in publications:
+                topic['publications'].append(publication_label.string)
+
+            theme['topics'].append(topic)
+
+        result.append(theme)
+
+    return result
+
+
+def _write_to_file(file_name, snapshot):
+    snapshots_path = 'tests/snapshots'
+    if not os.path.exists(snapshots_path):
+        os.makedirs(snapshots_path)
+
+    path_to_file = os.path.join(os.getcwd(), snapshots_path, file_name)
+    with open(path_to_file, 'w') as file:
+        pretty_json = json.dumps(snapshot, sort_keys=True, indent=2)
+        file.write(pretty_json)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog=f"python {os.path.basename(__file__)}",
+                                     description="To create snapshots of specific public frontend pages")
+    parser.add_argument(dest="public_url",
+                        default="https://explore-education-statistics.service.gov.uk",
+                        nargs='?',
+                        help="URL of public frontend you wish to create snapshots for")
+    args = parser.parse_args()
+
+    assert os.path.basename(os.getcwd()) == 'robot-tests', 'Must run from the robot-tests directory!'
+
+    find_stats_snapshot = create_find_statistics_snapshot(args.public_url)
+    _write_to_file('find_stats_snapshot.json', find_stats_snapshot)
+
+    table_tool_snapshot = create_table_tool_snapshot(args.public_url)
+    _write_to_file('table_tool_snapshot.json', table_tool_snapshot)
+
+    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url)
+    _write_to_file('data_catalogue_snapshot.json', data_catalogue_snapshot)

@@ -344,3 +344,4 @@ def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = N
         return parent_locator
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
+
