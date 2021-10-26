@@ -1,1 +1,306 @@
-[]
+[
+  {
+    "theme_heading": "Children's social care",
+    "topics": [
+      {
+        "publications": [
+          "Characteristics of children in need"
+        ],
+        "topic_heading": "Children in need and child protection"
+      },
+      {
+        "publications": [
+          "Children looked after in England including adoptions"
+        ],
+        "topic_heading": "Children looked after"
+      },
+      {
+        "publications": [
+          "Children's social work workforce"
+        ],
+        "topic_heading": "Children's social work workforce"
+      },
+      {
+        "publications": [
+          "Outcomes for children in need, including children looked after by local authorities in England",
+          "Outcomes of children in need, including looked after children"
+        ],
+        "topic_heading": "Outcomes for children in social care"
+      },
+      {
+        "publications": [
+          "Children accommodated in secure children's homes"
+        ],
+        "topic_heading": "Secure children's homes"
+      },
+      {
+        "publications": [
+          "Serious incident notifications"
+        ],
+        "topic_heading": "Serious incident notifications"
+      }
+    ]
+  },
+  {
+    "theme_heading": "COVID-19",
+    "topics": [
+      {
+        "publications": [
+          "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic"
+        ],
+        "topic_heading": "Attendance"
+      },
+      {
+        "publications": [
+          "Coronavirus (COVID-19) Reporting in Higher Education Providers"
+        ],
+        "topic_heading": "Confirmed cases reported by Higher Education providers"
+      },
+      {
+        "publications": [
+          "Laptops and tablets data"
+        ],
+        "topic_heading": "Devices"
+      },
+      {
+        "publications": [
+          "COVID mass testing data in education"
+        ],
+        "topic_heading": "Testing"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Destination of pupils and students",
+    "topics": [
+      {
+        "publications": [
+          "16-18 destination measures",
+          "Key stage 4 destination measures",
+          "Longer term destinations",
+          "Progression to higher education or training"
+        ],
+        "topic_heading": "Destinations of key stage 4 and 16-18 pupils"
+      },
+      {
+        "publications": [
+          "NEET annual brief",
+          "Participation in education and training and employment"
+        ],
+        "topic_heading": "NEET and participation"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Early years",
+    "topics": [
+      {
+        "publications": [
+          "Education provision: children under 5 years of age"
+        ],
+        "topic_heading": "Childcare and early years"
+      },
+      {
+        "publications": [
+          "Early years foundation stage profile results"
+        ],
+        "topic_heading": "Early years foundation stage profile"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Finance and funding",
+    "topics": [
+      {
+        "publications": [
+          "LA and school expenditure",
+          "Planned LA and school expenditure",
+          "School funding statistics"
+        ],
+        "topic_heading": "Local authority and school finance"
+      },
+      {
+        "publications": [
+          "Student loan forecasts for England"
+        ],
+        "topic_heading": "Student loan forecasts"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Further education",
+    "topics": [
+      {
+        "publications": [
+          "Apprenticeships and traineeships",
+          "Apprenticeships in England by industry characteristics ",
+          "Further education and skills"
+        ],
+        "topic_heading": "Further education and skills"
+      },
+      {
+        "publications": [
+          "FE learners going into employment and learning destinations by local authority district",
+          "Further education: outcome-based success measures"
+        ],
+        "topic_heading": "Further education: outcome-based success measures"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Higher education",
+    "topics": [
+      {
+        "publications": [
+          "Graduate labour market statistics",
+          "Graduate outcomes (LEO)",
+          "Graduate outcomes (LEO): postgraduate outcomes",
+          "Graduate outcomes (LEO): Provider level data"
+        ],
+        "topic_heading": "Higher education graduate employment and earnings"
+      },
+      {
+        "publications": [
+          "Participation measures in higher education"
+        ],
+        "topic_heading": "Participation measures in higher education"
+      },
+      {
+        "publications": [
+          "Higher Level Learners in England"
+        ],
+        "topic_heading": "Skills Bill: Higher level learners"
+      },
+      {
+        "publications": [
+          "Widening participation in higher education"
+        ],
+        "topic_heading": "Widening participation in higher education"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Pupils and schools",
+    "topics": [
+      {
+        "publications": [
+          "Academy transfers and funding"
+        ],
+        "topic_heading": "Academy transfers"
+      },
+      {
+        "publications": [
+          "Admission appeals in England"
+        ],
+        "topic_heading": "Admission appeals"
+      },
+      {
+        "publications": [
+          "Permanent exclusions and suspensions in England"
+        ],
+        "topic_heading": "Exclusions"
+      },
+      {
+        "publications": [
+          "Parental responsibility measures"
+        ],
+        "topic_heading": "Parental responsibility measures"
+      },
+      {
+        "publications": [
+          "Pupil absence in schools in England",
+          "Pupil absence in schools in England: autumn and spring terms",
+          "Pupil absence in schools in England: autumn term"
+        ],
+        "topic_heading": "Pupil absence"
+      },
+      {
+        "publications": [
+          "National pupil projections"
+        ],
+        "topic_heading": "Pupil projections"
+      },
+      {
+        "publications": [
+          "Free school meals: Autumn term",
+          "Schools, pupils and their characteristics"
+        ],
+        "topic_heading": "School and pupil numbers"
+      },
+      {
+        "publications": [
+          "Secondary and primary school applications and offers"
+        ],
+        "topic_heading": "School applications"
+      },
+      {
+        "publications": [
+          "Local authority school places scorecards",
+          "School capacity",
+          " School places sufficiency survey"
+        ],
+        "topic_heading": "School capacity"
+      },
+      {
+        "publications": [
+          "Education, health and care plans",
+          "Special educational needs in England"
+        ],
+        "topic_heading": "Special educational needs (SEN)"
+      }
+    ]
+  },
+  {
+    "theme_heading": "School and college outcomes and performance",
+    "topics": [
+      {
+        "publications": [
+          "A level and other 16 to 18 results",
+          "Level 2 and 3 attainment by young people aged 19"
+        ],
+        "topic_heading": "16 to 19 attainment"
+      },
+      {
+        "publications": [
+          "Key stage 4 performance"
+        ],
+        "topic_heading": "GCSEs (key stage 4)"
+      },
+      {
+        "publications": [
+          "Multi-academy trust performance measures at key stage 2"
+        ],
+        "topic_heading": "Key stage 2"
+      }
+    ]
+  },
+  {
+    "theme_heading": "Teachers and school workforce",
+    "topics": [
+      {
+        "publications": [
+          "Initial Teacher Training Census",
+          "Initial teacher training performance profiles"
+        ],
+        "topic_heading": "Initial teacher training (ITT)"
+      },
+      {
+        "publications": [
+          "School workforce in England"
+        ],
+        "topic_heading": "School workforce"
+      }
+    ]
+  },
+  {
+    "theme_heading": "UK education and training statistics",
+    "topics": [
+      {
+        "publications": [
+          "Education and training statistics for the UK"
+        ],
+        "topic_heading": "UK education and training statistics"
+      }
+    ]
+  }
+]
