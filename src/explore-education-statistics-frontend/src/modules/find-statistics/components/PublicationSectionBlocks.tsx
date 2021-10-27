@@ -1,4 +1,6 @@
 import InsetText from '@common/components/InsetText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useToggle from '@common/hooks/useToggle';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
@@ -29,6 +31,10 @@ const PublicationSectionBlocks = ({
     rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
   });
 
+  const [exploreDataButtonClicked, toggleExploreDataButtonClicked] = useToggle(
+    false,
+  );
+
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => {
@@ -57,7 +63,9 @@ const PublicationSectionBlocks = ({
                   <ButtonLink
                     to="/data-tables/fast-track/[fastTrackId]"
                     as={`/data-tables/fast-track/${block.id}`}
+                    disabled={exploreDataButtonClicked}
                     onClick={() => {
+                      toggleExploreDataButtonClicked.on();
                       logEvent({
                         category: `Publication Release Data Tabs`,
                         action: `Explore data button clicked`,
@@ -67,6 +75,15 @@ const PublicationSectionBlocks = ({
                   >
                     Explore data
                   </ButtonLink>
+                  <LoadingSpinner
+                    alert
+                    inline
+                    hideText
+                    loading={exploreDataButtonClicked}
+                    size="md"
+                    text="Loading data"
+                    className="govuk-!-margin-left-2"
+                  />
                 </div>
               }
             />
