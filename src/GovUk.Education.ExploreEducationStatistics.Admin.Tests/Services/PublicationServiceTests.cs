@@ -304,13 +304,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                
+
                 var publicationService = BuildPublicationService(context, methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 methodologyVersionRepository
                     .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "new-title"))
                     .Returns(Task.CompletedTask);
-                
+
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
