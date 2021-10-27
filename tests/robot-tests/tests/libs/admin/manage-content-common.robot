@@ -123,6 +123,10 @@ user adds image to accordion section text block
 
     ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
 
+    # If we don't do this, `Insert paragraph after block` circle button on image doesn't appear
+    user presses keys    ${\n}
+    user presses keys    ARROW_UP
+
     choose file
     ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
     ...    ${FILES_DIR}${filename}
