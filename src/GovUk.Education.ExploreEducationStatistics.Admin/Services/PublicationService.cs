@@ -119,6 +119,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return await ValidateSelectedTopic(updatedPublication.TopicId);
                     }
 
+                    if (publication.Title != updatedPublication.Title)
+                    {
+                        return await _userService.CheckCanUpdatePublicationTitle();
+                    }
+
                     return Unit.Instance;
                 })
                 .OnSuccess(async publication =>

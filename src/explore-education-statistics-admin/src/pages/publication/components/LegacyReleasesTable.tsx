@@ -8,7 +8,7 @@ import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
 import publicationService, {
-  BasicPublicationDetails,
+  MyPublication,
 } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -22,7 +22,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { generatePath } from 'react-router';
 
 interface Props {
-  publication: BasicPublicationDetails;
+  publication: MyPublication;
 }
 const LegacyReleasesTable = ({ publication }: Props) => {
   const [isReordering, toggleReordering] = useToggle(false);
