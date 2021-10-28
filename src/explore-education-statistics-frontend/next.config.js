@@ -1,15 +1,7 @@
 /* eslint-disable no-param-reassign */
-
-const DotEnv = require('dotenv');
-const fs = require('fs');
 const flowRight = require('lodash/fp/flowRight');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
-
-const envFilePath = fs.existsSync('.env.local') ? '.env.local' : '.env';
-const envConfig = DotEnv.config({
-  path: envFilePath,
-});
 
 const nextConfig = {
   publicRuntimeConfig: {
@@ -53,7 +45,7 @@ const nextConfig = {
 
       config.plugins.push(new CaseSensitivePathsPlugin());
 
-      if (envConfig.STYLELINT_DISABLE !== 'true') {
+      if (process.env.STYLELINT_DISABLE !== 'true') {
         const StylelintPlugin = require('stylelint-webpack-plugin');
 
         config.plugins.push(
@@ -65,7 +57,7 @@ const nextConfig = {
         );
       }
 
-      if (dev && envConfig.ESLINT_DISABLE !== 'true') {
+      if (dev && process.env.ESLINT_DISABLE !== 'true') {
         const ESLintPlugin = require('eslint-webpack-plugin');
 
         config.plugins.push(

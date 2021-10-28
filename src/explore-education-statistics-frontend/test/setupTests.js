@@ -3,6 +3,9 @@ import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
 import '@common-test/setupGlobals';
 import '@common-test/extend-expect';
+import { loadEnvConfig } from '@next/env';
+
+loadEnvConfig(process.cwd());
 
 jest.setTimeout(10000);
 
