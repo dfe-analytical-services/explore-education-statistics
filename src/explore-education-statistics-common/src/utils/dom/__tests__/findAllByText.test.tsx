@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import findAllByText from '../findAllByText';
 
@@ -59,7 +59,7 @@ describe('findAllByText', () => {
     expect(elements).toHaveLength(0);
   });
 
-  test('optionally matches lowercase text', () => {
+  test('can match on lowercase text', () => {
     render(
       <div>
         <p className="test-1">Test</p>
@@ -67,7 +67,35 @@ describe('findAllByText', () => {
       </div>,
     );
 
-    expect(findAllByText('test', 'p', false)).toHaveLength(0);
-    expect(findAllByText('test', 'p', true)).toHaveLength(2);
+    expect(
+      findAllByText('test', 'p', {
+        useLowerCase: false,
+      }),
+    ).toHaveLength(0);
+    expect(
+      findAllByText('test', 'p', {
+        useLowerCase: true,
+      }),
+    ).toHaveLength(2);
+  });
+
+  test('can match element within specific root element', () => {
+    render(
+      <div>
+        <div data-testid="container-1">
+          <p>Test 1</p>
+        </div>
+        <div data-testid="container-2">
+          <p>Test 2</p>
+        </div>
+      </div>,
+    );
+
+    const elements = findAllByText('Test', 'p', {
+      rootElement: screen.getByTestId('container-2'),
+    });
+
+    expect(elements).toHaveLength(1);
+    expect(elements[0]).toHaveTextContent('Test 2');
   });
 });
