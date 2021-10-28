@@ -2,11 +2,11 @@ import InsetText from '@common/components/InsetText';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
-import ButtonLink from '@frontend/components/ButtonLink';
 import {
   logEvent,
   logOutboundLink,
@@ -53,20 +53,7 @@ const PublicationSectionBlocks = ({
                   </h3>
 
                   <p>Use our table tool to explore this data.</p>
-
-                  <ButtonLink
-                    to="/data-tables/fast-track/[fastTrackId]"
-                    as={`/data-tables/fast-track/${block.id}`}
-                    onClick={() => {
-                      logEvent({
-                        category: `Publication Release Data Tabs`,
-                        action: `Explore data button clicked`,
-                        label: `Explore data block name: ${block.name}`,
-                      });
-                    }}
-                  >
-                    Explore data
-                  </ButtonLink>
+                  <ExploreDataButton block={block} />
                 </div>
               }
             />

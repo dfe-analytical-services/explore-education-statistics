@@ -1,11 +1,15 @@
 *** Settings ***
 Resource        ../libs/common.robot
-Library         ../libs/alerts.py
+Library         ../libs/snapshots.py
 
-Test Setup      fail test fast if required
-
-Force Tags      GeneralPublic    Local    Dev    Prod    UnderConstruction
+Force Tags      GeneralPublic    Snapshots    Prod
 
 *** Test Cases ***
-Send slack alert
-    send slack alert    TESTING!!!
+Compare current Find Statistics page with snapshot
+    validate find stats snapshot
+
+Compare current Table tool page with snapshot
+    validate table tool snapshot
+
+Compare current Data catalogue page with snapshot
+    validate data catalogue snapshot

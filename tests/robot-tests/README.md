@@ -1,16 +1,17 @@
 # Explore Education Statistics Robot Framework tests
 
-- [What is this?](#user-content-what-is-this)
-- [What do I need to install?](#user-content-what-do-i-need-to-install)
-- [How do I run the tests?](#user-content-how-do-i-run-the-tests)
-- [Running tests on the pipeline](#user-content-running-tests-on-the-pipeline)
+- [What is this?](#what-is-this)
+- [What do I need to install?](#what-do-i-need-to-install)
+- [How do I run the tests?](#how-do-i-run-the-tests)
+- [Running tests on the pipeline](#running-tests-on-the-pipeline)
 - [Webdriver](#webdriver)
 - [Authentication](#authentication)
-- [How do I backup and restore the test data on my local environment?](#user-content-how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
-- [Directory structure](#user-content-directory-structure)
-- [Guidelines for people writing UI tests](#user-content-guidelines-for-people-writing-ui-tests)
-- [Troubleshooting](#user-content-troubleshooting)
-- [Who should I talk to?](#user-content-who-should-i-talk-to)  
+- [How do I backup and restore the test data on my local environment?](#how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
+- [Directory structure](#directory-structure)
+- [Snapshots](#snapshots)
+- [Guidelines for people writing UI tests](#guidelines-for-people-writing-ui-tests)
+- [Troubleshooting](#troubleshooting)
+- [Who should I talk to?](#who-should-i-talk-to)
 
 
 ## **What is this?**
@@ -118,6 +119,18 @@ This holds the actual robot framework/selenium tests. The tests are themselves o
 ## webdriver
 This holds chromedriver, used by selenium to interact with the browser.
 
+## **Snapshots**
+To monitor changes to pages on Production, we use snapshots that are stored in `robot-tests/tests/snapshots`. These snapshots are created using the `create_snapshots.py` script in the `robot-tests/scripts` directory. 
+
+You can refresh the current snapshots by running:
+
+```
+cd robot-tests
+pipenv run python scripts/create_snapshots.py
+```
+
+These snapshot files are used by the test suite `tests/general_public/check_snapshots.robot`. If the snapshot doesn't match the current page, the test case fails, and an alert is sent to Slack.
+
 
 ## **Guidelines for people writing UI tests**
 
@@ -202,5 +215,5 @@ To fix this, you can manually download the correct chromedriver and put it in th
 
 # Who should I talk to?
 
-Luke Howsam
+Luke Howsam  
 Mark Youngman

@@ -1,11 +1,3 @@
-"""
-This script creates JSON strings for specific pages on the public frontend, containing data on such things like
-the themes/topics/publications that appear on the Find Statistics page. We do this to allow us to monitor these
-pages on production such that we're alerted to any changes and can validate that the changes are what we expect.
-The authoritative version os these snapshots is source-controlled and stored in `robot-tests/tests/snapshots`.
-These will then be compared with a newly generated snapshot when a relevant test is run, and then send a slack
-alert if there is a difference.
-"""
 import os
 import json
 import argparse
@@ -19,7 +11,7 @@ def _gets_parsed_html_from_page(url):
     return BeautifulSoup(response.text, "html.parser")
 
 
-def create_find_statistics_snapshot(public_url):
+def create_find_statistics_snapshot(public_url) -> str:
     find_stats_url = f"{public_url.rstrip('/')}/find-statistics"
     parsed_html = _gets_parsed_html_from_page(find_stats_url)
 
@@ -56,10 +48,10 @@ def create_find_statistics_snapshot(public_url):
 
         result.append(theme)
 
-    return result
+    return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_table_tool_snapshot(public_url):
+def create_table_tool_snapshot(public_url) -> str:
     table_tool_url = f"{public_url.rstrip('/')}/data-tables"
     parsed_html = _gets_parsed_html_from_page(table_tool_url)
 
@@ -87,10 +79,10 @@ def create_table_tool_snapshot(public_url):
 
         result.append(theme)
 
-    return result
+    return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_data_catalogue_snapshot(public_url):
+def create_data_catalogue_snapshot(public_url) -> str:
     data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
     parsed_html = _gets_parsed_html_from_page(data_catalogue_url)
 
@@ -118,7 +110,7 @@ def create_data_catalogue_snapshot(public_url):
 
         result.append(theme)
 
-    return result
+    return json.dumps(result, sort_keys=True, indent=2)
 
 
 def _write_to_file(file_name, snapshot):
@@ -128,8 +120,7 @@ def _write_to_file(file_name, snapshot):
 
     path_to_file = os.path.join(os.getcwd(), snapshots_path, file_name)
     with open(path_to_file, 'w') as file:
-        pretty_json = json.dumps(snapshot, sort_keys=True, indent=2)
-        file.write(pretty_json)
+        file.write(snapshot)
 
 
 if __name__ == "__main__":
