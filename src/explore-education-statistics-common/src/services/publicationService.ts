@@ -80,8 +80,10 @@ export interface ReleaseNote {
 // eslint-disable-next-line no-shadow
 export enum ReleaseType {
   AdHoc = 'Ad Hoc',
+  Experimental = 'Experimental',
   NationalStatistics = 'National Statistics',
   OfficialStatistics = 'Official Statistics',
+  TransparencyData = 'Transparency Data',
 }
 
 export interface ContentSection<BlockType> {
