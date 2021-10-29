@@ -29,11 +29,11 @@ Navigate to publication on admin dashboard
     user waits until page contains title    Manage publication
 
 Update publication details
-    user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME_UPDATED}
-    user enters text into element    id:publicationForm-teamName    Team name updated
-    user enters text into element    id:publicationForm-teamEmail    email_updated@test.com
-    user enters text into element    id:publicationForm-contactName    Contact name updated
-    user enters text into element    id:publicationForm-contactTelNo    4321 4321
+    user enters text into element    label:Publication title    ${PUBLICATION_NAME_UPDATED}
+    user enters text into element    label:Team name    Team name updated
+    user enters text into element    label:Team email address    email_updated@test.com
+    user enters text into element    label:Contact name    Contact name updated
+    user enters text into element    label:Contact telephone number    4321 4321
 
     user clicks button    Save publication
     user clicks button    Confirm

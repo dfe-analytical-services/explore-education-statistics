@@ -37,7 +37,7 @@ interface Props {
   initialValues?: FormValues;
   onSubmit: (values: FormValues) => void;
   confirmOnSubmit?: boolean;
-  showPublicationTitleInput?: boolean;
+  showTitleInput?: boolean;
 }
 
 const PublicationForm = ({
@@ -45,7 +45,7 @@ const PublicationForm = ({
   id = 'publicationForm',
   initialValues,
   confirmOnSubmit = false,
-  showPublicationTitleInput = true,
+  showTitleInput = true,
   onSubmit,
 }: Props) => {
   const {
@@ -103,7 +103,7 @@ const PublicationForm = ({
       {form => (
         <>
           <Form id={id}>
-            {showPublicationTitleInput && (
+            {showTitleInput && (
               <FormFieldTextInput<FormValues>
                 label="Publication title"
                 name="title"

@@ -82,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                    m =>
+                        m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order).ToList())
                 )
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
                     p.Methodologies

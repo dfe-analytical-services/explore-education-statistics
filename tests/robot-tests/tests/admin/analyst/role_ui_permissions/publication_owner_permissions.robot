@@ -34,13 +34,13 @@ Check Edit publication page inputs are correct
     user clicks link    Manage this publication    ${accordion}
     user waits until page contains title    Manage publication
 
-    user waits until page contains element    id:publicationForm-themeId
-    user waits until page contains element    id:publicationForm-topicId
-    user waits until page contains element    id:publicationForm-teamName
-    user waits until page contains element    id:publicationForm-teamEmail
-    user waits until page contains element    id:publicationForm-contactName
-    user waits until page contains element    id:publicationForm-contactTelNo
-    user checks page does not contain element    id:publicationForm-title    # Only BAU users should see this
+    user waits until page contains element    label:Select theme
+    user waits until page contains element    label:Select topic
+    user waits until page contains element    label:Team name
+    user waits until page contains element    label:Team email address
+    user waits until page contains element    label:Contact name
+    user waits until page contains element    label:Contact telephone number
+    user checks page does not contain element    label:Publication title    # Only BAU users should see this
 
     user clicks link    Cancel
     user waits until page does not contain link    Cancel

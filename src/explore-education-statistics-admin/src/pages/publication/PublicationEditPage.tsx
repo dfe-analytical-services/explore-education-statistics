@@ -44,9 +44,7 @@ const PublicationEditPage = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <PublicationForm
-            showPublicationTitleInput={
-              publication.permissions.canUpdatePublicationTitle
-            }
+            showTitleInput={publication.permissions.canUpdatePublicationTitle}
             cancelButton={
               <Link
                 unvisited
