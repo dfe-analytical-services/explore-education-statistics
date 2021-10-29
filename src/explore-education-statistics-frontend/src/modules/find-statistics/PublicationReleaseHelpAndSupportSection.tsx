@@ -14,6 +14,7 @@ import {
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { ReactNode } from 'react';
+import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
 import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
 
 interface Props {
@@ -81,6 +82,14 @@ const PublicationReleaseHelpAndSupportSection = ({
         {releaseType === ReleaseType.OfficialStatistics && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === ReleaseType.AdHoc && (
+          <AccordionSection
+            heading="Ad hoc Official Statistics"
+            headingTag="h3"
+          >
+            <AdHocOfficialStatisticsSection />
           </AccordionSection>
         )}
         {releaseType === ReleaseType.Experimental && (
