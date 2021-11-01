@@ -215,6 +215,13 @@ def admin_request(method, endpoint, body=None):
     if method == 'POST':
         assert body is not None, 'POST requests require a body'
 
+    requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+    )
+    session = requests.Session()
+
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
 
@@ -223,10 +230,11 @@ def admin_request(method, endpoint, body=None):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {jwt_token}',
     }
-    response = requests.request(
+    response = session.request(
         method,
         url=f'{os.getenv("ADMIN_URL")}{endpoint}',
         headers=headers,
+        stream=True,
         json=body,
         verify=False
     )
@@ -237,13 +245,14 @@ def admin_request(method, endpoint, body=None):
         # Delete identify files and re-attempt to fetch them
         setup_authentication(clear_existing=True)
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_ADMIN'])['access_token']
-        response = requests.request(
+        response = session.request(
             method,
             url=f'{os.getenv("ADMIN_URL")}{endpoint}',
             headers={
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {jwt_token}',
             },
+            stream=True,
             json=body,
             verify=False
         )

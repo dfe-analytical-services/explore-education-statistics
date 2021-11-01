@@ -32,18 +32,25 @@ def setup_auth_variables(user, email, password, clear_existing=False, driver=Non
         os.environ[local_storage_name] = local_storage_file.read_text()
         os.environ[cookie_name] = cookie_file.read_text()
 
+        requests.sessions.HTTPAdapter(
+            pool_connections=50,
+            pool_maxsize=50,
+            max_retries=3
+        )
+        session = requests.Session()
         requests.packages.urllib3.disable_warnings()
 
         # Checks that the stored authentication information is actually valid.
         # If not, we want to be able to try and authenticate again.
         jwt_token = json.loads(os.environ[local_storage_name])['access_token']
-        response = requests.request(
+        response = session.request(
             'GET',
             url=f'{os.getenv("ADMIN_URL")}/api/permissions/access',
             headers={
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {jwt_token}',
             },
+            stream=True,
             verify=False
         )
 

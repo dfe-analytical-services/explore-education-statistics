@@ -1,8 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 
+requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+    )
+session = requests.Session()
+
 def user_gets_parsed_html_from_page(url):
-    response = requests.get(url)
+    response = session.get(url, stream=True)
     return BeautifulSoup(response.text, "html.parser")
 
 

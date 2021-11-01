@@ -5,12 +5,18 @@ import os
 import requests
 import zipfile
 
+requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+    )
+session = requests.Session()
 
 def download_file(link_locator, file_name):
     if not os.path.exists('test-results/downloads'):
         os.makedirs('test-results/downloads')
     link_url = sl.get_element_attribute(link_locator, 'href')
-    r = requests.get(link_url, allow_redirects=True)
+    r = session.get(link_url, allow_redirects=True, stream=True)
     with open(f'test-results/downloads/{file_name}', 'wb') as f:
         f.write(r.content)
 
