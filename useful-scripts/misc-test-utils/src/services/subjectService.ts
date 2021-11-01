@@ -43,7 +43,7 @@ const subjectService = {
   getSubjectIdArr: async (
     releaseId: string,
   ): Promise<{ id: string; content: string }[]> => {
-    const res = await adminApi.get(`/api/release/${releaseId}/meta-guidance`);
+    const res = await adminApi.get(`/api/release/${releaseId}/data-guidance`);
     const subjects: SubjectData[] = res.data?.subjects;
     const subjArr: { id: string; content: string }[] = [];
     subjects.forEach(subject => {
