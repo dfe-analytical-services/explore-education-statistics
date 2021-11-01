@@ -34,7 +34,7 @@ const releaseService = {
     subjArr: { id: string; content: string }[],
     releaseId: string,
   ): Promise<void> => {
-    await adminApi.patch(`/api/release/${releaseId}/meta-guidance`, {
+    await adminApi.patch(`/api/release/${releaseId}/data-guidance`, {
       content: '<p>testing</p>',
       subjects: subjArr,
     });
