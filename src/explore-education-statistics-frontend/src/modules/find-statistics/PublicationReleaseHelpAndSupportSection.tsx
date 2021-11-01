@@ -14,6 +14,7 @@ import {
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { ReactNode } from 'react';
+import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -80,6 +81,11 @@ const PublicationReleaseHelpAndSupportSection = ({
         {releaseType === ReleaseType.OfficialStatistics && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === ReleaseType.Experimental && (
+          <AccordionSection heading="Experimental Statistics" headingTag="h3">
+            <ExperimentalStatisticsSection />
           </AccordionSection>
         )}
         <AccordionSection
