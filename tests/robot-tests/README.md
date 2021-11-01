@@ -24,6 +24,7 @@ Currently, these tests are being maintained so they can be run on Windows. They'
 Firstly, install Python 3.8 or greater
    * For Windows, you'll need to download Python3 from here: https://www.python.org/downloads/
    * For Linux, use the package manager (i.e. On Ubuntu, `sudo apt-get install python3.8`)
+   * For Mac, use the package manager: `brew install python@3.8`. You then need to change the default python symlink to the version you've just installed `ln -s -f /usr/local/bin/python3.8 /usr/local/bin/python` 
 
 Then ensure python and pip are included in your PATH environment variable
    * `python --version` should return a version >= 3.8. If it doesn't you can try using the commands `python3` or `python3.8`, if you have multiple versions of python installed on your machine.
@@ -210,7 +211,7 @@ This error typically occurs when the BAU user password has expired and `setup_au
 
 There is a known bug with pyderman which is responsible for downloading chromedriver whereby it defaults to downloading the ARM version of chrome if you're using an intel based mac. This means that if you are running the UI tests on an intel based mac the tests fail due to the wrong arch of Chrome being downloaded.
 
-To fix this, you can manually download the correct chromedriver and put it in the webdriver directory.
+To fix this, you can manually download the correct [chromedriver](https://chromedriver.chromium.org/downloads) and put it in the webdriver directory.
 
 
 # Who should I talk to?
