@@ -23,6 +23,7 @@ import {
   preReleaseContentRoute,
   preReleaseTableToolRoute,
 } from '@admin/routes/preReleaseRoutes';
+import PublicationManageTeamAccessPage from '@admin/pages/publication/PublicationManageTeamAccessPage';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -107,6 +108,13 @@ export const publicationEditRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const publicationManageTeamAccessRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/manage-team',
+  component: PublicationManageTeamAccessPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
 export const methodologyRoute: ProtectedRouteProps = {
   path: '/methodology/:methodologyId',
   component: MethodologyPage,
@@ -177,6 +185,7 @@ const routes = {
   topicEditRoute,
   publicationCreateRoute,
   publicationEditRoute,
+  publicationManageTeamAccessRoute,
   methodologyRoute,
   methodologyAdoptRoute,
   externalMethodologyEditRoute,

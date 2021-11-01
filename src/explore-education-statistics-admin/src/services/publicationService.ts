@@ -6,7 +6,7 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import { MyRelease } from '@admin/services/releaseService';
+import { MyRelease, Release } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
@@ -64,6 +64,7 @@ export interface BasicPublicationDetails {
   title: string;
   slug: string;
   contact?: PublicationContactDetails;
+  releases?: Release[];
   methodologies?: BasicMethodologyVersion[];
   externalMethodology?: ExternalMethodology;
   legacyReleases: LegacyRelease[];
