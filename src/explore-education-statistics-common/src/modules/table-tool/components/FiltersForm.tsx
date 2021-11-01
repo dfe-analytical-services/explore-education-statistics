@@ -5,12 +5,14 @@ import {
   FormFieldset,
   FormGroup,
 } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
 import { SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
@@ -50,6 +52,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     initialValues,
     isActive,
   } = props;
+
+  const errorMappings = [
+    mapFieldErrors<FormValues>({
+      target: 'indicators',
+      messages: {
+        QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE:
+          'A table cannot be returned as the filters chosen can exceed the maximum allowable table size',
+      },
+    }),
+  ];
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -93,6 +105,11 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const handleSubmit = useFormSubmit(async (values: FormValues) => {
+    await onSubmit(values);
+    goToNextStep();
+  }, errorMappings);
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -113,10 +130,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           ),
         ),
       })}
-      onSubmit={async submittedValues => {
-        await onSubmit(submittedValues);
-        goToNextStep();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => {
         const { getError } = createErrorHelper(form);

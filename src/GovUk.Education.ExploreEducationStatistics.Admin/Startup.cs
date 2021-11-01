@@ -208,6 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.Configure<PreReleaseOptions>(Configuration);
+            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             // here we configure our security policies
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
