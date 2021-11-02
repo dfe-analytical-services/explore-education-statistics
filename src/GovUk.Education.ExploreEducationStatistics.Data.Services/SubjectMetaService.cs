@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
-        private readonly ILogger<SubjectMetaService> _logger;
+        private readonly ILogger _logger;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
@@ -85,63 +86,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         
         private SubjectMetaViewModel GetSubjectMetaViewModel(Subject subject)
         {
-            var filters = _logger.TraceTime(
-                () => GetFilters(subject.Id), "Getting Filters");
-            
-            var indicators = _logger.TraceTime(
-                () => GetIndicators(subject.Id), "Getting Indicators");
-            
-            var observationalUnits = _logger.TraceTime(
-                () => GetObservationalUnits(subject.Id), "Getting Observational Units");
-            
-            var timePeriods = _logger.TraceTime(
-                () => GetTimePeriods(subject.Id), 
-                "Getting Time Periods");
-
             return new SubjectMetaViewModel
             {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = observationalUnits,
-                TimePeriod = timePeriods
+                Filters = GetFilters(subject.Id),
+                Indicators = GetIndicators(subject.Id),
+                Locations = GetObservationalUnits(subject.Id),
+                TimePeriod = GetTimePeriods(subject.Id)
             };
         }
 
         private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
         {
-            var observations = _observationService
-                .FindObservations(query)
-                .AsQueryable();
-            
+            var observations = _observationService.FindObservations(query).AsQueryable();
             var locations = new Dictionary<string, ObservationalUnitsMetaViewModel>();
             var timePeriods = new TimePeriodsMetaViewModel();
             var filters = new Dictionary<string, FilterMetaViewModel>();
             var indicators = new Dictionary<string, IndicatorsMetaViewModel>();
             
-            if (query.TimePeriod != null)
-            {
-                filters = _logger.TraceTime(
-                    () => GetFilters(query.SubjectId, observations, false), 
-                    "Getting Filters");
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
 
-                indicators = _logger.TraceTime(() => 
-                        GetIndicators(query.SubjectId), 
-                    "Getting Indicators");
-            }
-            
             if (query.Locations == null)
             {
-                locations = _logger.TraceTime(
-                    () => GetObservationalUnits(observations), 
-                        "Getting Observational Units");
+                locations = GetObservationalUnits(observations);
+                
+                _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
             }
             
             if (query.TimePeriod == null && query.Locations != null)
             {
-                timePeriods = _logger.TraceTime(
-                    () => GetTimePeriods(observations),
-                        "Getting Time Periods");
+                timePeriods = GetTimePeriods(observations);
+
+                _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
             }
+            
+            if (query.TimePeriod != null)
+            {
+                filters = GetFilters(query.SubjectId, observations, false);
+
+                _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
+
+                indicators = GetIndicators(query.SubjectId);
+
+                _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            }
+
+            stopwatch.Stop();
             
             // Only data relevant to the step being executed in the table tool needs to be returned hence the 
             // null checks above so only the minimum requisite DB calls for the task are performed.

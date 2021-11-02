@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -35,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ISubjectRepository _subjectRepository;
-        private readonly ILogger<ResultSubjectMetaService> _logger;
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
@@ -75,37 +74,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
                 {
-                    var filters = _logger.TraceTime(() => 
-                            GetFilters(query.SubjectId, observations, true),
-                        "Getting Filters");
+                    var stopwatch = Stopwatch.StartNew();
+                    stopwatch.Start();
 
-                    var indicators = _logger.TraceTime(
-                        () => GetIndicators(query),
-                        "Getting Indicators");
+                    var observationalUnits = _locationRepository.GetObservationalUnits(observations);
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-                    var observationalUnits = _logger.TraceTime(
-                        () => _locationRepository.GetObservationalUnits(observations),
-                        "Getting Observational Units");
+                    var filters = GetFilters(query.SubjectId, observations, true);
+                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-                    var timePeriodRange = _logger.TraceTime(
-                        () => GetTimePeriodRange(observations),
-                        "Getting Time Periods");
+                    var footnotes = GetFilteredFootnotes(releaseId, observations, query);
+                    _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-                    var footnotes = _logger.TraceTime(
-                        () => GetFilteredFootnotes(releaseId, observations, query),
-                        "Getting Footnotes");
+                    var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
+                    _logger.LogTrace("Got GeoJsonAvailable in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-                    var geoJsonAvailable = _logger.TraceTime(
-                        () => HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits),
-                        "Getting GeoJsonAvailable");
+                    var boundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys);
 
-                    var boundaryLevels = _logger.TraceTime(
-                        () => GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys),
-                        "Getting BoundaryLevels");
+                    var indicators = GetIndicators(query);
+                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
-                    var locations = _logger.TraceTime(() => 
-                        GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson ?? false, query.BoundaryLevel),
-                        "Getting GeoJson Observational Units");
+                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson ?? false,
+                        query.BoundaryLevel);
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var timePeriodRange = GetTimePeriodRange(observations);
+                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Stop();
 
                     var publicationId = await _subjectRepository.GetPublicationIdForSubject(subject.Id);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
