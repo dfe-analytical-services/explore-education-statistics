@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task DeleteLazilyCachedReleaseResults(string publicationSlug, string releaseSlug)
         {
             await _blobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteItem(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
             await _blobCacheService.DeleteCacheFolder(new ReleaseFastTrackResultsFolderCacheKey(publicationSlug, releaseSlug));
             await _blobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
@@ -230,6 +231,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
+        }
+        
+        private record ReleaseSubjectsCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentReleaseSubjectsPath(PublicationSlug, ReleaseSlug);
 
             public IBlobContainer Container => PublicContent;
         }

@@ -91,6 +91,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentFastTrackResultsParentPath(publicationSlug, releaseSlug)}/{fastTrackId}.json";
         }
+
+        public static string PublicContentReleaseSubjectsPath(string publicationSlug, string releaseSlug)
+        {
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subjects.json";
+        }
         
         public static string FilesPath(Guid rootPath, FileType type)
         {

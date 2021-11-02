@@ -70,5 +70,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new SubjectMetaCacheKey(publication.Slug, latestReleaseSubject.Release.Slug, subjectId);
         }
+        
+        public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(Guid releaseId)
+        {
+            var release = await _contentDbContext
+                .Releases
+                .Include(release => release.Publication)
+                .SingleAsync(release => release.Id == releaseId);
+
+            return new ReleaseSubjectsCacheKey(release.Publication.Slug, release.Slug, release.Id);
+        }
     }
 }
