@@ -25,6 +25,7 @@ describe('PublicationSummary', () => {
     canAdoptMethodologies: true,
     canCreateReleases: true,
     canUpdatePublication: true,
+    canUpdatePublicationTitle: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
   };
@@ -34,11 +35,15 @@ describe('PublicationSummary', () => {
     title: 'Publication 1',
     contact: undefined,
     releases: [],
+    legacyReleases: [],
     methodologies: [],
+    themeId: 'theme-1',
+    topicId: 'topic-1',
     permissions: {
       canAdoptMethodologies: false,
       canCreateReleases: false,
       canUpdatePublication: false,
+      canUpdatePublicationTitle: false,
       canCreateMethodologies: false,
       canManageExternalMethodology: false,
     },

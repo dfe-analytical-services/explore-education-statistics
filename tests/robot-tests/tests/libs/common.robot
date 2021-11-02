@@ -227,6 +227,10 @@ user waits until page contains link
     [Arguments]    ${link_text}    ${wait}=${timeout}
     wait until page contains element    xpath://a[.="${link_text}"]    timeout=${wait}
 
+user waits until page does not contain link
+    [Arguments]    ${link_text}    ${wait}=${timeout}
+    wait until page does not contain element    xpath://a[.="${link_text}"]    timeout=${wait}
+
 user waits until element contains link
     [Arguments]    ${element}    ${link_text}    ${wait}=${timeout}
     user waits until parent contains element    ${element}    link:${link_text}    timeout=${wait}
@@ -349,7 +353,7 @@ user checks element does not contain child element
 
 user checks element contains
     [Arguments]    ${element}    ${text}
-    user waits until parent contains element    ${element}    xpath://*[contains(text(),"${text}")]
+    user waits until parent contains element    ${element}    xpath://*[contains(.,"${text}")]
 
 user checks element contains button
     [Arguments]

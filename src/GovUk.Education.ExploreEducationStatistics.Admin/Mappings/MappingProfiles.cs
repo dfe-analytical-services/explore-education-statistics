@@ -82,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                    m =>
+                        m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order).ToList())
                 )
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
                     p.Methodologies
@@ -111,6 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
+                .ForMember(
+                    dest => dest.LegacyReleases,
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                )
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
                 .AfterMap((publication, model) => model.Methodologies = model.Methodologies.OrderBy(m => m.Methodology.Title).ToList());
 

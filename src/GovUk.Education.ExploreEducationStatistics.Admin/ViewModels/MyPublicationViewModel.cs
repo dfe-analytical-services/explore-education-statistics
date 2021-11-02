@@ -24,11 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Contact Contact { get; set; }
 
+        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
+
         public PermissionsSet Permissions { get; set; }
 
         public class PermissionsSet
         {
             public bool CanUpdatePublication { get; set; }
+            public bool CanUpdatePublicationTitle { get; set; }
             public bool CanCreateReleases { get; set; }
             public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }

@@ -130,6 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication);
         }
 
+        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublicationTitle(
+            this IUserService userService)
+        {
+            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
+        }
+
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
             this IUserService userService, Publication publication)
         {

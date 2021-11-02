@@ -28,6 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     .CheckCanUpdatePublication(source)
                     .Result
                     .IsRight,
+                CanUpdatePublicationTitle = _userService
+                    .CheckCanUpdatePublicationTitle()
+                    .Result
+                    .IsRight,
                 CanCreateReleases = _userService
                     .CheckCanCreateReleaseForPublication(source)
                     .Result
