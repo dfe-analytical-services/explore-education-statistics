@@ -13,7 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
             /*
              * 2011  Bury  cell1
              */
-            Assert.Equal(1, MaximumTableCellCount(1, 1, 1));
+            Assert.Equal(
+                1,
+                MaximumTableCellCount(
+                    countOfIndicators: 1,
+                    countOfLocations: 1,
+                    countOfTimePeriods: 1));
         }
 
         [Fact]
@@ -22,7 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
             /*
              * 2011  Bury  cell1  cell2  cell 3
              */
-            Assert.Equal(3, MaximumTableCellCount(3, 1, 1));
+            Assert.Equal(
+                3,
+                MaximumTableCellCount(
+                    countOfIndicators: 3,
+                    countOfLocations: 1,
+                    countOfTimePeriods: 1));
         }
 
         [Fact]
@@ -33,7 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2011  Kent  cell2
              * 2011  York  cell3
              */
-            Assert.Equal(3, MaximumTableCellCount(1, 3, 1));
+            Assert.Equal(
+                3,
+                MaximumTableCellCount(
+                    countOfIndicators: 1,
+                    countOfLocations: 3,
+                    countOfTimePeriods: 1));
         }
 
         [Fact]
@@ -44,7 +59,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2012  Bury  cell2
              * 2013  Bury  cell3
              */
-            Assert.Equal(3, MaximumTableCellCount(1, 1, 3));
+            Assert.Equal(
+                3,
+                MaximumTableCellCount(
+                    countOfIndicators: 1,
+                    countOfLocations: 1,
+                    countOfTimePeriods: 3));
         }
 
         [Fact]
@@ -58,7 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2013  Bury   cell9  cell10
              * 2013  York  cell11  cell12
              */
-            Assert.Equal(12, MaximumTableCellCount(2, 2, 3));
+            Assert.Equal(
+                12,
+                MaximumTableCellCount(
+                    countOfIndicators: 2,
+                    countOfLocations: 2,
+                    countOfTimePeriods: 3));
         }
 
         [Fact]
@@ -72,7 +97,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2013  Bury  Year1   cell9  cell10
              * 2013  York  Year1  cell11  cell12
              */
-            Assert.Equal(12, MaximumTableCellCount(2, 2, 3, ListOf(1)));
+            Assert.Equal(
+                12,
+                MaximumTableCellCount(
+                    countOfIndicators: 2,
+                    countOfLocations: 2,
+                    countOfTimePeriods: 3,
+                    countsOfFilterItemsByFilter: ListOf(1)));
         }
 
         [Fact]
@@ -86,7 +117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2013  Bury  Year1  Male   cell9  cell10
              * 2013  York  Year1  Male  cell11  cell12
              */
-            Assert.Equal(12, MaximumTableCellCount(2, 2, 3, ListOf(1, 1)));
+            Assert.Equal(
+                12,
+                MaximumTableCellCount(
+                    countOfIndicators: 2,
+                    countOfLocations: 2,
+                    countOfTimePeriods: 3,
+                    countsOfFilterItemsByFilter: ListOf(1, 1)));
         }
 
         [Fact]
@@ -112,7 +149,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2013  Bury  Year3  cell33  cell34
              * 2013  York  Year3  cell35  cell36
              */
-            Assert.Equal(36, MaximumTableCellCount(2, 2, 3, ListOf(3)));
+            Assert.Equal(
+                36,
+                MaximumTableCellCount(
+                    countOfIndicators: 2,
+                    countOfLocations: 2,
+                    countOfTimePeriods: 3,
+                    countsOfFilterItemsByFilter: ListOf(3)));
         }
 
         [Fact]
@@ -156,7 +199,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils
              * 2013  Bury  Year3  Female  cell69  cell70
              * 2013  York  Year3  Female  cell71  cell72
              */
-            Assert.Equal(72, MaximumTableCellCount(2, 2, 3, ListOf(3, 2)));
+            Assert.Equal(
+                72,
+                MaximumTableCellCount(
+                    countOfIndicators: 2,
+                    countOfLocations: 2,
+                    countOfTimePeriods: 3,
+                    countsOfFilterItemsByFilter: ListOf(3, 2)));
         }
     }
 }

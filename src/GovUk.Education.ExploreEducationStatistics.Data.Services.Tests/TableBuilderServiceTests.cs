@@ -160,6 +160,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
+                MockUtils.VerifyAllMocks(
+                    observationService,
+                    resultSubjectMetaService,
+                    subjectRepository,
+                    releaseRepository);
+
                 Assert.True(result.IsRight);
 
                 var observationResults = result.Right.Results.ToList();
@@ -176,12 +182,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("789", observationResults[1].Measures[indicator1Id.ToString()]);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
-
-                MockUtils.VerifyAllMocks(
-                    observationService,
-                    resultSubjectMetaService,
-                    subjectRepository,
-                    releaseRepository);
             }
         }
 
@@ -219,8 +219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                result.AssertNotFound();
                 MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
+
+                result.AssertNotFound();
             }
         }
 
@@ -263,8 +264,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                result.AssertNotFound();
                 MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
+
+                result.AssertNotFound();
             }
         }
 
@@ -371,9 +373,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
-
                 MockUtils.VerifyAllMocks(filterItemRepository, subjectRepository, releaseRepository);
+
+                result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
             }
         }
 
@@ -492,6 +494,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
+                MockUtils.VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository);
+
                 Assert.True(result.IsRight);
 
                 var observationResults = result.Right.Results.ToList();
@@ -508,8 +512,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("789", observationResults[1].Measures[indicator1Id.ToString()]);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
-
-                MockUtils.VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository);
             }
         }
 
@@ -661,9 +663,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
-
                 MockUtils.VerifyAllMocks(filterItemRepository, subjectRepository);
+
+                result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
             }
         }
 
@@ -688,7 +690,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
-                
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),

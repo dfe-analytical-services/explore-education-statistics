@@ -87,9 +87,9 @@ Validate the query could exceed the maximum allowable table size
     ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
 
 Go back to Locations step
-    user clicks element    xpath://button[contains(text(), "Edit locations")]
+    user clicks button    Edit locations
     user waits until page contains element    xpath://h1[text()="Go back to previous step"]
-    user clicks element    xpath://button[text()="Confirm"]
+    user clicks button    Confirm
 
 Unselect all LA Locations
     user opens details dropdown    Local Authority
