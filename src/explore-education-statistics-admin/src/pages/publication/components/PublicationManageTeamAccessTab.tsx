@@ -2,6 +2,7 @@ import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React from 'react';
 import Details from '@common/components/Details';
 import orderBy from 'lodash/orderBy';
+import ReleaseContributorPermissions from '@admin/pages/publication/components/ReleaseContributorPermissions';
 
 export interface Props {
   publication: BasicPublicationDetails;
@@ -32,6 +33,7 @@ const PublicationManageTeamAccessTab = ({ publication }: Props) => {
         also{' '}
         <a href="#previous-releases">control access to previous releases</a>.
       </p>
+      <ReleaseContributorPermissions releaseId={newestRelease.id} />
 
       {sortedReleases.length >= 0 && (
         <>
@@ -39,7 +41,7 @@ const PublicationManageTeamAccessTab = ({ publication }: Props) => {
           {sortedReleases.map(release => (
             <div key={release.id}>
               <Details summary={`${release.title}`}>
-                <p>Permissions for {release.title}</p>
+                <ReleaseContributorPermissions releaseId={release.id} />
               </Details>
             </div>
           ))}
