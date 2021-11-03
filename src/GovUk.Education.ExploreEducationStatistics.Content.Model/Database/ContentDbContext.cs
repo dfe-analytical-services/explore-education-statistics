@@ -397,7 +397,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+                .HasQueryFilter(r =>
+                    !r.SoftDeleted
+                    && r.Deleted == null);
 
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)

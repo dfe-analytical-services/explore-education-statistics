@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseAmendment)
-                    .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
+                    .OnSuccess(amendment => CopyReleaseRolePermissions(releaseId, amendment))
                     .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
@@ -247,13 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return amendment;
         }
 
-        private async Task<Either<ActionResult, Release>> CopyReleaseTeam(Guid originalReleaseId, Release amendment)
+        private async Task<Either<ActionResult, Release>> CopyReleaseRolePermissions(Guid originalReleaseId, Release amendment)
         {
             var newRoles = _context
                 .UserReleaseRoles
                 .AsQueryable()
-                .Where(r => r.ReleaseId == originalReleaseId)
-                .Select(r => r.CreateReleaseAmendment(amendment));
+                .IgnoreQueryFilters() // For auditing purposes, we also want to migrate release roles that have Deleted set
+                .Where(r =>
+                    !r.SoftDeleted
+                    && r.ReleaseId == originalReleaseId)
+                .Select(r => r.CopyForAmendment(amendment));
 
             await _context.AddRangeAsync(newRoles);
             await _context.SaveChangesAsync();
