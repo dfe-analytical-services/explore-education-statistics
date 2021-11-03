@@ -45,7 +45,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
     <PackageReference Include="JsonKnownTypes" Version="0.4.1" />
     <PackageReference Include="JWT" Version="7.3.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.WebApiCompatShim" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.18" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.18" />
