@@ -351,7 +351,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _userReleaseRoleRepository.Create(
                             userId: user.Id,
                             releaseId: release.Id,
-                            role: ReleaseRole.PrereleaseViewer);
+                            role: ReleaseRole.PrereleaseViewer,
+                            createdById: _userService.GetUserId());
                     });
             }
 

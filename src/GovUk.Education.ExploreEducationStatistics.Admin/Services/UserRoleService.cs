@@ -112,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _userReleaseRoleRepository.Create(
                                 userId: userId,
                                 releaseId: release.Id,
-                                role: role);
+                                role: role,
+                                createdById: _userService.GetUserId());
                             return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                         });
                 });
@@ -278,7 +279,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserReleaseRole>(id))
                 .OnSuccessVoid(async userReleaseRole =>
                 {
-                    _contentDbContext.Remove(userReleaseRole);
+                    userReleaseRole.Deleted = DateTime.UtcNow;
+                    userReleaseRole.DeletedById = _userService.GetUserId();
+                    _contentDbContext.Update(userReleaseRole);
                     await _contentDbContext.SaveChangesAsync();
                 });
         }

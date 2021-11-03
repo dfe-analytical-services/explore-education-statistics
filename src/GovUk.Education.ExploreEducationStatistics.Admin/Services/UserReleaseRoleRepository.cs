@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -20,16 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseId, ReleaseRole role, Guid createdById)
         {
             var userReleaseRole = new UserReleaseRole
             {
                 UserId = userId,
                 ReleaseId = releaseId,
-                Role = role
+                Role = role,
+                Created = DateTime.UtcNow,
+                CreatedById = createdById,
             };
 
-            var created = (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
+            var created =
+                (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
             await _contentDbContext.SaveChangesAsync();
             return created;
         }

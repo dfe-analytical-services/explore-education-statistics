@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<UserReleaseRole> Create(Guid userId,
             Guid releaseId,
-            ReleaseRole role);
+            ReleaseRole role,
+            Guid createdById);
 
         Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
             Guid releaseId);
