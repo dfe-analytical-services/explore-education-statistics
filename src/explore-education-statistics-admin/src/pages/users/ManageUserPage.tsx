@@ -114,9 +114,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   );
 
   const handleRemoveReleaseAccess = (userReleaseRole: UserReleaseRole) => {
-    userService
-      .removeUserReleaseRole(userId, userReleaseRole)
-      .then(() => getUser());
+    userService.removeUserReleaseRole(userReleaseRole.id).then(() => getUser());
   };
 
   const handleAddPublicationRole = useFormSubmit<AddPublicationRoleFormValues>(
