@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -74,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     if (contentBlock == null)
                     {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
+                        return ValidationResult<CommentViewModel>(ContentBlockNotFound);
                     }
 
                     var comment = new Comment
