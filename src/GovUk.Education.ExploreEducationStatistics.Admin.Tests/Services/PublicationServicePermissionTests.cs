@@ -168,6 +168,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdatePublication_CanUpdatePublicationTitles()
+        {
+            await using var context = DbUtils.InMemoryApplicationDbContext();
+
+            var mocks = Mocks();
+
+            context.Add(_topic);
+            context.Add(_publication);
+
+            await context.SaveChangesAsync();
+
+            PermissionTestUtil.AssertSecurityPoliciesChecked(
+                async service =>
+                    await service.UpdatePublication(_publication.Id, new PublicationSaveViewModel
+                    {
+                        TopicId = _topic.Id,
+                        Title = "Updated publication",
+                        Contact = new ContactSaveViewModel
+                        {
+                            TeamName = "Test team",
+                            TeamEmail = "team@test.com",
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789"
+                        }
+                    }),
+                _publication,
+                mocks.UserService,
+                BuildPublicationService(mocks),
+                SecurityPolicies.CanUpdatePublicationTitles);
+        }
+
+        [Fact]
         public async Task UpdatePublication_CanUpdatePublication()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();

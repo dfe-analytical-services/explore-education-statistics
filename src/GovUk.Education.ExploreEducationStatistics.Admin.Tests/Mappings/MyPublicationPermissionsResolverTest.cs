@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
 
             userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication))
                 .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles))
+                .ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(publication, CanCreateReleaseForSpecificPublication))
                 .ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(publication, CanAdoptMethodologyForSpecificPublication))
@@ -35,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Mappings
             VerifyAllMocks(userService);
 
             Assert.True(permissionsSet.CanUpdatePublication);
+            Assert.True(permissionsSet.CanUpdatePublicationTitle);
             Assert.True(permissionsSet.CanCreateReleases);
             Assert.True(permissionsSet.CanAdoptMethodologies);
             Assert.False(permissionsSet.CanCreateMethodologies);

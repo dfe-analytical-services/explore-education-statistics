@@ -857,6 +857,196 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetPublicationWithAllReleases()
+        {
+            var release1 = new Release
+            {
+                ReleaseName = "2000",
+                TimePeriodCoverage = AcademicYear,
+            };
+            var release2 = new Release
+            {
+                ReleaseName = "2001",
+                TimePeriodCoverage = AcademicYear,
+            };
+            var methodologyVersion = new MethodologyVersion
+            {
+                AlternativeTitle = "Methodology Alternative Title",
+                Version = 0,
+                Status = Draft
+            };
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Topic = new Topic(),
+                Contact = new Contact
+                {
+                    ContactName = "Contact name",
+                },
+                Releases = new List<Release>
+                {
+                    release1, release2,
+                },
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = new Methodology
+                        {
+                            Versions = new List<MethodologyVersion>
+                            {
+                                methodologyVersion,
+                            }
+                        }
+                    },
+                },
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release A",
+                        Url = "legacy-release-a-url",
+                        Order = 3,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release C",
+                        Url = "legacy-release-c-url",
+                        Order = 1,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release B",
+                        Url = "legacy-release-b-url",
+                        Order = 2,
+                    },
+                }
+            };
+
+            var otherUnseenPublication = new Publication
+            {
+                Topic = new Topic(),
+                Releases = new List<Release>
+                {
+                    new Release()
+                },
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = new Methodology
+                        {
+                            Versions = new List<MethodologyVersion>
+                            {
+                                new MethodologyVersion(),
+                            }
+                        }
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, otherUnseenPublication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var viewModel = await repository.GetPublicationWithAllReleases(publication.Id);
+
+                Assert.Equal(publication.Id, viewModel.Id);
+                Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.TopicId, viewModel.TopicId);
+                Assert.Equal(publication.Contact.ContactName, viewModel.Contact.ContactName);
+
+                Assert.Equal(2, viewModel.Releases.Count);
+                Assert.Equal(release1.Id, viewModel.Releases[1].Id);
+                Assert.Equal(release2.Id, viewModel.Releases[0].Id);
+
+                Assert.Single(viewModel.Methodologies);
+                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
+                Assert.Equal(methodologyVersion.AlternativeTitle, viewModel.Methodologies[0].Methodology.Title);
+
+                Assert.Equal(3, viewModel.LegacyReleases.Count);
+                Assert.Equal("Legacy Release A", viewModel.LegacyReleases[0].Description);
+                Assert.Equal("legacy-release-a-url", viewModel.LegacyReleases[0].Url);
+                Assert.Equal("Legacy Release B", viewModel.LegacyReleases[1].Description);
+                Assert.Equal("legacy-release-b-url", viewModel.LegacyReleases[1].Url);
+                Assert.Equal("Legacy Release C", viewModel.LegacyReleases[2].Description);
+                Assert.Equal("legacy-release-c-url", viewModel.LegacyReleases[2].Url);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationWithAllReleases_NoReleasesNoMethodologies()
+        {
+            var publication = new Publication
+            {
+                Topic = new Topic(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var viewModel = await repository.GetPublicationWithAllReleases(publication.Id);
+                Assert.Equal(publication.Id, viewModel.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationForUser_NoReleaseMethodologyLegacyRelease()
+        {
+            var userId = Guid.NewGuid();
+            var release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = AcademicYear,
+            };
+
+            var publication = new Publication
+            {
+                Topic = new Topic(),
+                Releases = new List<Release>
+                {
+                    release1,
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var repository = SetupPublicationRepository(context);
+                var viewModel = await repository.GetPublicationForUser(publication.Id, userId);
+
+                Assert.Equal(publication.Id, viewModel.Id);
+                Assert.Equal(publication.TopicId, viewModel.TopicId);
+
+                Assert.Empty(viewModel.Releases);
+                Assert.Empty(viewModel.Methodologies);
+                Assert.Empty(viewModel.LegacyReleases);
+            }
+        }
+
         private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
         {
             return new(contentDbContext, AdminMapper());

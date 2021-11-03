@@ -17,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          * Publication management
          */
         CanViewSpecificPublication,
+        CanUpdatePublicationTitles,
         CanUpdateSpecificPublication,
         CanCreatePublicationForSpecificTopic,
 

@@ -15,16 +15,24 @@ class AdminClient:
         assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
         assert os.getenv('ADMIN_URL') is not None
 
+        requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+        )
+        session = requests.Session()
+
         jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',
         }
 
-        return requests.request(
+        return session.request(
             method,
             url=f'{os.getenv("ADMIN_URL")}{url}',
             headers=headers,
+            stream=True,
             json=body,
             verify=False
         )

@@ -8,6 +8,8 @@ import NationalStatisticsSection from '@common/modules/find-statistics/component
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
 import { ReleaseType } from '@common/services/publicationService';
 import React from 'react';
+import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
+import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
 
 interface MethodologyLink {
   key: string;
@@ -78,6 +80,19 @@ const ReleaseHelpAndSupportSection = ({
         {release.type.title === ReleaseType.OfficialStatistics && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {release.type.title === ReleaseType.AdHoc && (
+          <AccordionSection
+            heading="Ad hoc Official Statistics"
+            headingTag="h3"
+          >
+            <AdHocOfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {release.type.title === ReleaseType.Experimental && (
+          <AccordionSection heading="Experimental Statistics" headingTag="h3">
+            <ExperimentalStatisticsSection />
           </AccordionSection>
         )}
         <AccordionSection

@@ -53,6 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new UpdatePublicationRequirement()));
 
+                // does this user have permission to update publication titles?
+                options.AddPolicy(SecurityPolicies.CanUpdatePublicationTitles.ToString(), policy =>
+                    policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
+
                 /**
                  * Release management
                  */

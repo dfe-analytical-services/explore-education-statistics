@@ -6,7 +6,13 @@ from bs4 import BeautifulSoup
 
 
 def _gets_parsed_html_from_page(url):
-    response = requests.get(url)
+    requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+    )
+    session = requests.Session()
+    response = session.get(url, stream=True)
     assert response.status_code == 200, f"Requests response wasn\'t 200!\nResponse: {response}"
     return BeautifulSoup(response.text, "html.parser")
 

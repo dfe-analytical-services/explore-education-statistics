@@ -64,11 +64,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userId = _userService.GetUserId();
 
-            return await _userService
-                .CheckCanAccessSystem()
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanAccessSystem)
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(() => _publicationRepository.GetPublicationWithAllReleases(publicationId))
-                    .OrElse(() => _publicationRepository.GetPublicationForUser(publicationId, userId)));
+                    .OnSuccess(_ => _publicationRepository.GetPublicationWithAllReleases(publicationId))
+                    .OrElse(async () =>
+                    {
+                        var publication = _context.Find<Publication>(publicationId);
+                        return await _userService.CheckCanViewPublication(publication)
+                            .OnSuccess(_ => _publicationRepository.GetPublicationForUser(publicationId, userId));
+                    }));
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
@@ -112,6 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(async publication =>
+                {
+                    if (publication.Title != updatedPublication.Title)
+                    {
+                        return await _userService.CheckCanUpdatePublicationTitle();
+                    }
+
+                    return Unit.Instance;
+                })
                 .OnSuccessDo(async publication =>
                 {
                     if (publication.TopicId != updatedPublication.TopicId)
