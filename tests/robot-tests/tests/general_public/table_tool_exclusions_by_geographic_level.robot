@@ -83,7 +83,7 @@ User clicks Create table button
     user clicks element    id:filtersForm-submit
 
 Validate the query could exceed the maximum allowable table size
-    user waits until element contains    id:filtersForm-indicators-error
+    user waits until element contains    id:filtersForm-tableSizeError
     ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
 
 Go back to Locations step

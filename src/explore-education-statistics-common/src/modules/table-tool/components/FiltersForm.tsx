@@ -1,22 +1,30 @@
+import Button from '@common/components/Button';
 import CollapsibleList from '@common/components/CollapsibleList';
+import ErrorPrefixPageTitle from '@common/components//ErrorPrefixPageTitle';
 import {
   Form,
   FormFieldCheckboxSearchSubGroups,
   FormFieldset,
   FormGroup,
 } from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useToggle from '@common/hooks/useToggle';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
-import { SubjectMeta } from '@common/services/tableBuilderService';
+import downloadService from '@common/services/downloadService';
+import {
+  SelectedPublication,
+  Subject,
+  SubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
-import { mapFieldErrors } from '@common/validation/serverValidations';
+import { isServerValidationError } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 import { InjectedWizardProps } from './Wizard';
@@ -36,7 +44,13 @@ interface Props {
     indicators: string[];
     filters: string[];
   };
+  selectedPublication?: SelectedPublication;
+  subject: Subject;
   subjectMeta: SubjectMeta;
+  tableSizeErrorLogEvent?: (
+    publicationTitle: string,
+    subjectName: string,
+  ) => void;
   onSubmit: FilterFormSubmitHandler;
 }
 
@@ -45,23 +59,20 @@ const formId = 'filtersForm';
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     onSubmit,
+    selectedPublication,
+    subject,
     subjectMeta,
     goToNextStep,
     currentStep,
     stepNumber,
     initialValues,
     isActive,
+    tableSizeErrorLogEvent,
   } = props;
 
-  const errorMappings = [
-    mapFieldErrors<FormValues>({
-      target: 'indicators',
-      messages: {
-        QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE:
-          'A table cannot be returned as the filters chosen can exceed the maximum allowable table size',
-      },
-    }),
-  ];
+  const [tableSizeError, toggleTableSizeError] = useToggle(false);
+  const [previousValues, setPreviousValues] = useState<FormValues>();
+  const tableSizeErrorRef = useRef<HTMLDivElement>(null);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -105,10 +116,41 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const handleSubmit = useFormSubmit(async (values: FormValues) => {
-    await onSubmit(values);
-    goToNextStep();
-  }, errorMappings);
+  const handleDownloadFile = async (fileId: string) => {
+    const releaseId = selectedPublication?.selectedRelease.id;
+    if (releaseId) {
+      await downloadService.downloadFiles(releaseId, [fileId]);
+    }
+  };
+
+  const handleSubmit = async (values: FormValues) => {
+    setPreviousValues(values);
+    try {
+      await onSubmit(values);
+      toggleTableSizeError.off();
+      goToNextStep();
+    } catch (error) {
+      if (isServerValidationError(error) && error.response?.data) {
+        const errorMessages = Object.entries(error.response.data.errors).reduce(
+          (acc, [, messages]) => {
+            messages.forEach(message => acc.push(message));
+            return acc;
+          },
+          [] as string[],
+        );
+        if (errorMessages.includes('QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')) {
+          if (tableSizeErrorLogEvent) {
+            tableSizeErrorLogEvent(
+              selectedPublication?.title || '',
+              subject?.name || '',
+            );
+          }
+          toggleTableSizeError.on();
+          tableSizeErrorRef.current?.focus();
+        }
+      }
+    }
+  };
 
   return (
     <Formik<FormValues>
@@ -135,9 +177,59 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       {form => {
         const { getError } = createErrorHelper(form);
 
+        // If form has changed at all don't show the error.
+        const showTableSizeError =
+          tableSizeError &&
+          form.submitCount > 0 &&
+          isEqual(form.values, previousValues);
+
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
+              {showTableSizeError && (
+                <div
+                  aria-labelledby="tableSizeError"
+                  className="govuk-error-summary"
+                  id="filtersForm-tableSizeError"
+                  ref={tableSizeErrorRef}
+                  role="alert"
+                  tabIndex={-1}
+                >
+                  <h2
+                    className="govuk-error-summary__title"
+                    id="tableSizeError"
+                  >
+                    There is a problem
+                  </h2>
+
+                  <ErrorPrefixPageTitle />
+
+                  <div className="govuk-error-summary__body">
+                    <p>
+                      A table cannot be returned as the filters chosen can
+                      exceed the maximum allowable table size.
+                    </p>
+                    <p>
+                      Select different filters or download the subject data.
+                    </p>
+                    {selectedPublication ? (
+                      <Button
+                        className="govuk-!-margin-bottom-0"
+                        onClick={() => handleDownloadFile(subject.file.id)}
+                      >
+                        Download{' '}
+                        {`${subject.name} (${subject.file.extension}, ${subject.file.size})`}
+                      </Button>
+                    ) : (
+                      <Button className="govuk-!-margin-bottom-0" disabled>
+                        Download subject file (available when the release is
+                        published)
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {stepHeading}
 
               <FormGroup>

@@ -68,11 +68,15 @@ export interface TableToolWizardProps {
   initialState?: Partial<InitialTableToolState>;
   hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
+  loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
+  tableSizeErrorLogEvent?: (
+    publicationTitle: string,
+    subjectName: string,
+  ) => void;
   onSubmit?: (table: FullTable) => void;
   onSubjectStepBack?: () => void;
-  loadingFastTrack?: boolean;
 }
 
 const TableToolWizard = ({
@@ -82,6 +86,7 @@ const TableToolWizard = ({
   hidePublicationSelectionStage,
   renderFeaturedTable,
   finalStep,
+  tableSizeErrorLogEvent,
   onSubmit,
   onSubjectStepBack,
   loadingFastTrack = false,
@@ -361,7 +366,14 @@ const TableToolWizard = ({
                     indicators: state.query.indicators,
                     filters: state.query.filters,
                   }}
+                  selectedPublication={state.selectedPublication}
+                  subject={
+                    state.subjects.filter(
+                      subject => subject.id === state.query.subjectId,
+                    )[0]
+                  }
                   subjectMeta={state.subjectMeta}
+                  tableSizeErrorLogEvent={tableSizeErrorLogEvent}
                   onSubmit={handleFiltersFormSubmit}
                 />
               )}
