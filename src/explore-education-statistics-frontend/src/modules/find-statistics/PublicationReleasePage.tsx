@@ -72,37 +72,38 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     >
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
         <div className="govuk-grid-column-two-thirds">
-          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
-            <div className="dfe-flex govuk-!-margin-bottom-3">
+          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
+            <div>
               {release.latestRelease ? (
-                <Tag strong className="govuk-!-margin-right-6">
+                <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
                   This is the latest data
                 </Tag>
               ) : (
-                <Link
-                  className="dfe-print-hidden"
-                  unvisited
-                  to="/find-statistics/[publication]"
-                  as={`/find-statistics/${release.publication.slug}`}
-                >
-                  View latest data:{' '}
-                  <span className="govuk-!-font-weight-bold">
-                    {release.publication.otherReleases[0].title}
-                  </span>
-                </Link>
+                <div className="govuk-!-margin-bottom-3">
+                  <Link
+                    className="dfe-print-hidden "
+                    unvisited
+                    to="/find-statistics/[publication]"
+                    as={`/find-statistics/${release.publication.slug}`}
+                  >
+                    View latest data:{' '}
+                    <span className="govuk-!-font-weight-bold">
+                      {release.publication.otherReleases[0].title}
+                    </span>
+                  </Link>
+                </div>
               )}
+              {release.type && <Tag>{release.type.title}</Tag>}
             </div>
-            <div className="dfe-flex">
-              {release.type &&
-                release.type.title === ReleaseType.NationalStatistics && (
-                  <img
-                    src="/assets/images/UKSA-quality-mark2.jpg"
-                    alt="UK statistics authority quality mark"
-                    height="60"
-                    width="60"
-                  />
-                )}
-            </div>
+            {release.type &&
+              release.type.title === ReleaseType.NationalStatistics && (
+                <img
+                  src="/assets/images/UKSA-quality-mark2.jpg"
+                  alt="UK statistics authority quality mark"
+                  height="60"
+                  width="60"
+                />
+              )}
           </div>
 
           <SummaryList>
