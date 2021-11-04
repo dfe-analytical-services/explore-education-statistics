@@ -71,11 +71,8 @@ export interface TableToolWizardProps {
   loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
-  tableSizeErrorDownloadAvailable?: boolean;
-  tableSizeErrorLogEvent?: (
-    publicationTitle: string,
-    subjectName: string,
-  ) => void;
+  showTableSizeErrorDownload?: boolean;
+  onTableSizeError?: (publicationTitle: string, subjectName: string) => void;
   onSubmit?: (table: FullTable) => void;
   onSubjectStepBack?: () => void;
 }
@@ -87,8 +84,8 @@ const TableToolWizard = ({
   hidePublicationSelectionStage,
   renderFeaturedTable,
   finalStep,
-  tableSizeErrorDownloadAvailable = true,
-  tableSizeErrorLogEvent,
+  showTableSizeErrorDownload = true,
+  onTableSizeError,
   onSubmit,
   onSubjectStepBack,
   loadingFastTrack = false,
@@ -375,10 +372,8 @@ const TableToolWizard = ({
                     )[0]
                   }
                   subjectMeta={state.subjectMeta}
-                  tableSizeErrorDownloadAvailable={
-                    tableSizeErrorDownloadAvailable
-                  }
-                  tableSizeErrorLogEvent={tableSizeErrorLogEvent}
+                  showTableSizeErrorDownload={showTableSizeErrorDownload}
+                  onTableSizeError={onTableSizeError}
                   onSubmit={handleFiltersFormSubmit}
                 />
               )}

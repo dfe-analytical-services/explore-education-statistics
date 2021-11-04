@@ -83,8 +83,8 @@ User clicks Create table button
     user clicks element    id:filtersForm-submit
 
 Validate the query could exceed the maximum allowable table size
-    user waits until element contains    id:filtersForm-tableSizeError
-    ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
+    user waits until page contains element    id:filtersForm-tableSizeError-title
+    user checks page contains    Could not create table as the filters chosen may exceed the maximum allowed table size
     user clicks button    Download Exclusions by geographic level (csv, 0.00 B)
 
 Go back to Locations step

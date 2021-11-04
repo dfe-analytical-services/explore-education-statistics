@@ -131,10 +131,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {highlight.name}
           </Link>
         )}
-        tableSizeErrorLogEvent={(
-          publicationTitle: string,
-          subjectName: string,
-        ) => {
+        onTableSizeError={(publicationTitle: string, subjectName: string) => {
           logEvent({
             category: 'Table tool size error',
             action: 'Table exceeeded maximum size',

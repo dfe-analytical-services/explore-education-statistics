@@ -45,11 +45,8 @@ interface Props {
   selectedPublication?: SelectedPublication;
   subject: Subject;
   subjectMeta: SubjectMeta;
-  tableSizeErrorDownloadAvailable?: boolean;
-  tableSizeErrorLogEvent?: (
-    publicationTitle: string,
-    subjectName: string,
-  ) => void;
+  showTableSizeErrorDownload?: boolean;
+  onTableSizeError?: (publicationTitle: string, subjectName: string) => void;
   onSubmit: FilterFormSubmitHandler;
 }
 
@@ -66,8 +63,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     stepNumber,
     initialValues,
     isActive,
-    tableSizeErrorDownloadAvailable = true,
-    tableSizeErrorLogEvent,
+    showTableSizeErrorDownload = true,
+    onTableSizeError,
   } = props;
 
   const [hasTableSizeError, toggleTableSizeError] = useToggle(false);
@@ -123,16 +120,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       goToNextStep();
     } catch (error) {
       if (isServerValidationError(error) && error.response?.data) {
-        const errorMessages = Object.entries(error.response.data.errors).reduce(
-          (acc, [, messages]) => {
-            messages.forEach(message => acc.push(message));
-            return acc;
-          },
-          [] as string[],
-        );
-        if (errorMessages.includes('QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')) {
-          if (tableSizeErrorLogEvent) {
-            tableSizeErrorLogEvent(
+        const errors = Object.values(error.response?.data.errors);
+        if (errors.flat().includes('QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')) {
+          if (onTableSizeError) {
+            onTableSizeError(
               selectedPublication?.title || '',
               subject?.name || '',
             );
@@ -175,10 +166,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 form.submitCount > 0 &&
                 isEqual(form.values, previousValues) && (
                   <TableSizeError
-                    focus
+                    id={`${formId}-tableSizeError`}
                     releaseId={selectedPublication?.selectedRelease.id}
                     subject={subject}
-                    showDownloadOption={tableSizeErrorDownloadAvailable}
+                    showDownloadOption={showTableSizeErrorDownload}
                   />
                 )}
 
