@@ -1,6 +1,6 @@
 import FiltersForm from '@common/modules/table-tool/components/FiltersForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { SubjectMeta } from '@common/services/tableBuilderService';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -227,10 +227,24 @@ describe('FiltersForm', () => {
     shouldScroll: false,
   };
 
+  const testSubject = {
+    id: 'subject-1',
+    name: 'Subject 1',
+    file: {
+      id: 'file-1',
+      fileName: 'File 1',
+      extension: 'csv',
+      name: 'File 1',
+      size: '100mb',
+      type: 'Data',
+    },
+  } as Subject;
+
   test('renders indicators and filter group options correctly', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -301,6 +315,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMetaSingleFilters}
         onSubmit={noop}
       />,
@@ -341,6 +356,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMetaSingleFilters}
         onSubmit={noop}
       />,
@@ -386,6 +402,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -423,6 +440,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -463,6 +481,7 @@ describe('FiltersForm', () => {
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
           indicators: ['unauthorised-absence-rate'],
         }}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -481,6 +500,7 @@ describe('FiltersForm', () => {
           filters: ['state-funded-secondary', 'ethnicity-major-asian-total'],
           indicators: ['unauthorised-absence-rate'],
         }}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -499,6 +519,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMetaOneIndicator}
         onSubmit={noop}
       />,
@@ -519,6 +540,7 @@ describe('FiltersForm', () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={{
           ...testSubjectMeta,
           filters: {
@@ -557,6 +579,7 @@ describe('FiltersForm', () => {
     const { container, rerender } = render(
       <FiltersForm
         {...testWizardStepProps}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
@@ -570,6 +593,7 @@ describe('FiltersForm', () => {
       <FiltersForm
         {...testWizardStepProps}
         isActive={false}
+        subject={testSubject}
         subjectMeta={testSubjectMeta}
         onSubmit={noop}
       />,
