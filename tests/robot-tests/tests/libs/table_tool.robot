@@ -40,6 +40,10 @@ user clicks select all for category
     [Arguments]    ${category_label}
     user clicks element    xpath://legend[text()="${category_label}"]/..//button[contains(text(), "Select")]
 
+user clicks unselect all for category
+    [Arguments]    ${category_label}
+    user clicks element    xpath://legend[text()="${category_label}"]/..//button[contains(text(), "Unselect")]
+
 user checks location checkbox is checked
     [Arguments]    ${location_label}
     user checks checkbox input is checked
