@@ -49,6 +49,8 @@ Add data guidance to second Subject
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
     user clicks button    Save guidance
+    user waits until page contains button    ${SUBJECT_NAME}
+    user waits until page contains button    ${SECOND_SUBJECT}
 
 Navigate to 'Footnotes' page
     user clicks link    Footnotes
@@ -274,6 +276,7 @@ Confirm data replacement
 
 Delete second subject file
     user clicks link    Data and files
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until h2 is visible    Add data file to release    %{WAIT_MEDIUM}
     user deletes subject file    ${SECOND_SUBJECT}
 
