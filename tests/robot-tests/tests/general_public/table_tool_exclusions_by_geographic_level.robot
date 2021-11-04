@@ -115,19 +115,19 @@ Select new start and end date
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
 
-Select Indicator - Number of pupils
+Select Indicator again - Number of pupils
     user clicks indicator checkbox    Number of pupils
     user checks indicator checkbox is checked    Number of pupils
 
-Select Indicator - Number of permanent exclusions
+Select Indicator again - Number of permanent exclusions
     user clicks indicator checkbox    Number of permanent exclusions
     user checks indicator checkbox is checked    Number of permanent exclusions
 
-Select Indicator - Number of fixed period exclusions
+Select Indicator again - Number of fixed period exclusions
     user clicks indicator checkbox    Number of fixed period exclusions
     user checks indicator checkbox is checked    Number of fixed period exclusions
 
-Select Characteristic School type State-funded secondary
+Select Characteristic School type - State-funded secondary
     user opens details dropdown    School type
     user clicks category checkbox    School type    State-funded secondary
 
