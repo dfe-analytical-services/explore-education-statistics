@@ -29,9 +29,6 @@
     "preReleaseMinutesBeforeEnd": {
       "value": 1
     },
-    "tableBuilderMaxTableCellsAllowed": {
-      "value": 25000
-    },
     "useSubnets": {
       "value": true
     },
