@@ -78,6 +78,15 @@
         "publications": [
           {
             "on_ees": true,
+            "publication_heading": "CO2 monitors: cumulative delivery statistics"
+          }
+        ],
+        "topic_heading": "CO2 monitors"
+      },
+      {
+        "publications": [
+          {
+            "on_ees": true,
             "publication_heading": "Coronavirus (COVID-19) Reporting in Higher Education Providers"
           }
         ],
