@@ -71,6 +71,7 @@ export interface TableToolWizardProps {
   loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
+  tableSizeErrorDownloadAvailable?: boolean;
   tableSizeErrorLogEvent?: (
     publicationTitle: string,
     subjectName: string,
@@ -86,6 +87,7 @@ const TableToolWizard = ({
   hidePublicationSelectionStage,
   renderFeaturedTable,
   finalStep,
+  tableSizeErrorDownloadAvailable = true,
   tableSizeErrorLogEvent,
   onSubmit,
   onSubjectStepBack,
@@ -373,6 +375,9 @@ const TableToolWizard = ({
                     )[0]
                   }
                   subjectMeta={state.subjectMeta}
+                  tableSizeErrorDownloadAvailable={
+                    tableSizeErrorDownloadAvailable
+                  }
                   tableSizeErrorLogEvent={tableSizeErrorLogEvent}
                   onSubmit={handleFiltersFormSubmit}
                 />

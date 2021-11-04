@@ -1,6 +1,4 @@
-import Button from '@common/components/Button';
 import CollapsibleList from '@common/components/CollapsibleList';
-import ErrorPrefixPageTitle from '@common/components//ErrorPrefixPageTitle';
 import {
   Form,
   FormFieldCheckboxSearchSubGroups,
@@ -11,7 +9,13 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useToggle from '@common/hooks/useToggle';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
-import downloadService from '@common/services/downloadService';
+import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import TableSizeError from '@common/modules/table-tool/components/TableSizeError';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import WizardStepEditButton from '@common/modules/table-tool/components/WizardStepEditButton';
 import {
   SelectedPublication,
   Subject,
@@ -24,13 +28,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
-import React, { useRef, useMemo, useState } from 'react';
-import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
-import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
-import { InjectedWizardProps } from './Wizard';
-import WizardStepFormActions from './WizardStepFormActions';
-import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
+import React, { useMemo, useState } from 'react';
 
 export interface FormValues {
   indicators: string[];
@@ -47,6 +45,7 @@ interface Props {
   selectedPublication?: SelectedPublication;
   subject: Subject;
   subjectMeta: SubjectMeta;
+  tableSizeErrorDownloadAvailable?: boolean;
   tableSizeErrorLogEvent?: (
     publicationTitle: string,
     subjectName: string,
@@ -67,12 +66,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     stepNumber,
     initialValues,
     isActive,
+    tableSizeErrorDownloadAvailable = true,
     tableSizeErrorLogEvent,
   } = props;
 
-  const [tableSizeError, toggleTableSizeError] = useToggle(false);
+  const [hasTableSizeError, toggleTableSizeError] = useToggle(false);
   const [previousValues, setPreviousValues] = useState<FormValues>();
-  const tableSizeErrorRef = useRef<HTMLDivElement>(null);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -116,13 +115,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const handleDownloadFile = async (fileId: string) => {
-    const releaseId = selectedPublication?.selectedRelease.id;
-    if (releaseId) {
-      await downloadService.downloadFiles(releaseId, [fileId]);
-    }
-  };
-
   const handleSubmit = async (values: FormValues) => {
     setPreviousValues(values);
     try {
@@ -146,7 +138,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
             );
           }
           toggleTableSizeError.on();
-          tableSizeErrorRef.current?.focus();
         }
       }
     }
@@ -177,58 +168,19 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       {form => {
         const { getError } = createErrorHelper(form);
 
-        // If form has changed at all don't show the error.
-        const showTableSizeError =
-          tableSizeError &&
-          form.submitCount > 0 &&
-          isEqual(form.values, previousValues);
-
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
-              {showTableSizeError && (
-                <div
-                  aria-labelledby="tableSizeError"
-                  className="govuk-error-summary"
-                  id="filtersForm-tableSizeError"
-                  ref={tableSizeErrorRef}
-                  role="alert"
-                  tabIndex={-1}
-                >
-                  <h2
-                    className="govuk-error-summary__title"
-                    id="tableSizeError"
-                  >
-                    There is a problem
-                  </h2>
-
-                  <ErrorPrefixPageTitle />
-
-                  <div className="govuk-error-summary__body">
-                    <p>
-                      A table cannot be returned as the filters chosen can
-                      exceed the maximum allowable table size.
-                    </p>
-                    <p>
-                      Select different filters or download the subject data.
-                    </p>
-                    {selectedPublication ? (
-                      <Button
-                        className="govuk-!-margin-bottom-0"
-                        onClick={() => handleDownloadFile(subject.file.id)}
-                      >
-                        Download{' '}
-                        {`${subject.name} (${subject.file.extension}, ${subject.file.size})`}
-                      </Button>
-                    ) : (
-                      <Button className="govuk-!-margin-bottom-0" disabled>
-                        Download subject file (available when the release is
-                        published)
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
+              {hasTableSizeError &&
+                form.submitCount > 0 &&
+                isEqual(form.values, previousValues) && (
+                  <TableSizeError
+                    focus
+                    releaseId={selectedPublication?.selectedRelease.id}
+                    subject={subject}
+                    showDownloadOption={tableSizeErrorDownloadAvailable}
+                  />
+                )}
 
               {stepHeading}
 
