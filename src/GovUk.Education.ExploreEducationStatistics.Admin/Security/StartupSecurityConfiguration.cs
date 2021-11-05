@@ -57,6 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanUpdatePublicationTitles.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
 
+                // does this user have permission to update a ReleaseRole on a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublicationReleaseRole.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateReleaseRoleRequirement()));
+
                 /**
                  * Release management
                  */
@@ -241,6 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();
 
             /**
              * Legacy release management
