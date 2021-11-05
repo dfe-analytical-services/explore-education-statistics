@@ -102,17 +102,17 @@ const PublicationSummary = ({
                   >
                     Manage this publication
                   </ButtonLink>
-                  <ButtonLink
-                    data-testid={`Manage team access for publication ${publication.title}`}
-                    to={generatePath<PublicationRouteParams>(
-                      publicationManageTeamAccessRoute.path,
-                      {
-                        publicationId: publication.id,
-                      },
-                    )}
-                  >
-                    Manage team access
-                  </ButtonLink>
+                  {/*<ButtonLink*/}
+                  {/*  data-testid={`Manage team access for publication ${publication.title}`}*/}
+                  {/*  to={generatePath<PublicationRouteParams>(*/}
+                  {/*    publicationManageTeamAccessRoute.path,*/}
+                  {/*    {*/}
+                  {/*      publicationId: publication.id,*/}
+                  {/*    },*/}
+                  {/*  )}*/}
+                  {/*>*/}
+                  {/*  Manage team access*/}
+                  {/*</ButtonLink>*/}
                 </ButtonGroup>
               </td>
             </tr>
