@@ -97,13 +97,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
+            var publication = _contentDbContext.Releases
+                .Include(r => r.Publication)
+                .Single(r => r.Id == releaseId)
+                .Publication;
+
             return await _userService
-                .CheckCanManageAllUsers()
+                .CheckCanUpdatePublicationReleaseRole(new Tuple<Publication, ReleaseRole>(publication, role))
                 .OnSuccess(async () =>
                 {
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                        .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
+                        .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(
+                            releaseId,
                             q => q.Include(r => r.Publication)))
                         .OnSuccessDo(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
                         .OnSuccess(async tuple =>
@@ -272,12 +278,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid roleId)
         {
+            var userReleaseRole = _contentDbContext.UserReleaseRoles
+                .Single(rr => rr.Id == roleId);
+            var publication = _contentDbContext.Releases
+                .Include(r => r.Publication)
+                .Single(r => r.Id == userReleaseRole.ReleaseId)
+                .Publication;
+
             return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserReleaseRole>(id))
-                .OnSuccessVoid(async userReleaseRole =>
+                .CheckCanUpdatePublicationReleaseRole(
+                    new Tuple<Publication, ReleaseRole>(publication, userReleaseRole.Role))
+                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserReleaseRole>(roleId))
+                .OnSuccessVoid(async releaseRole =>
                 {
                     userReleaseRole.Deleted = DateTime.UtcNow;
                     userReleaseRole.DeletedById = _userService.GetUserId();

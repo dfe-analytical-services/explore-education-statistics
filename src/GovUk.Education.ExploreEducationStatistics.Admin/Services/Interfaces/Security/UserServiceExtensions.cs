@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -134,6 +135,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
+        }
+
+        public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdatePublicationReleaseRole(
+            this IUserService userService, Tuple<Publication, ReleaseRole> tuple)
+        {
+            return userService.CheckPolicy(tuple, SecurityPolicies.CanUpdateSpecificPublicationReleaseRole);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(

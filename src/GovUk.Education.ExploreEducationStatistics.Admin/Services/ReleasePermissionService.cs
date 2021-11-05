@@ -38,7 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId,
                     query =>
                         query.Include(r => r.Publication))
-                .OnSuccessDo(release => _userService.CheckCanUpdatePublication(release.Publication)) // @MarkFix
+                .OnSuccessDo(release => _userService
+                    .CheckCanUpdatePublicationReleaseRole(
+                        new Tuple<Publication, ReleaseRole>(release.Publication, ReleaseRole.Contributor)))
                 .OnSuccess(async release =>
                 {
                     var allReleases = await _contentDbContext.Releases
