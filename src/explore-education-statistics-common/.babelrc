@@ -12,5 +12,10 @@
         }
       }
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["./babel-url-import-meta-plugin.js"]
+    }
+  }
 }
