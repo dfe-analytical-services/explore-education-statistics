@@ -86,13 +86,16 @@ const PrototypeMetaCreate = ({ publicView }: Props) => {
       `,
     },
     subject1: {
-      text: 'Absence information for all enrolments in state-funded primary, secondary and special schools including information on overall absence, persistent absence and reason for absence for pupils aged 5-15, based on all 5 half terms data from 2006/07 to 2011/12 inclusive and based on 6 half term data from 2012/13 onwards',
+      text:
+        'Absence information for all enrolments in state-funded primary, secondary and special schools including information on overall absence, persistent absence and reason for absence for pupils aged 5-15, based on all 5 half terms data from 2006/07 to 2011/12 inclusive and based on 6 half term data from 2012/13 onwards',
     },
     subject2: {
-      text: 'Absence information by pupil characteristics such as age, gender and ethnicity by local authority.',
+      text:
+        'Absence information by pupil characteristics such as age, gender and ethnicity by local authority.',
     },
     subject3: {
-      text: 'Absence information by pupil characteristics such as age, gender and ethnicity by local authority district',
+      text:
+        'Absence information by pupil characteristics such as age, gender and ethnicity by local authority district',
     },
   };
 

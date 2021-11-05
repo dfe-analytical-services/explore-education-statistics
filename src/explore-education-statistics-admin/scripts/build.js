@@ -26,8 +26,10 @@ const webpack = require('webpack');
 const configFactory = require('../config/webpack.config');
 const paths = require('../config/paths');
 
-const { measureFileSizesBeforeBuild, printFileSizesAfterBuild } =
-  FileSizeReporter;
+const {
+  measureFileSizesBeforeBuild,
+  printFileSizesAfterBuild,
+} = FileSizeReporter;
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 
