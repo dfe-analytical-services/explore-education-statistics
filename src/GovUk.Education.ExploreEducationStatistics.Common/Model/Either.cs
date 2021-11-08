@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
@@ -233,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         {
             return await task.OnSuccess(success =>
             {
-                return func(success).OnSuccess(combinator => new Tuple<TSuccess1, TSuccess2>(success, combinator));
+                return func(success).OnSuccess(combinator => AsTuple(success, combinator));
             });
         }
 

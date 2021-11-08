@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -910,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             bool enableThemeDeletion = true)
         {
             var configuration =
-                CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
+                CreateMockConfiguration(AsTuple("enableThemeDeletion", enableThemeDeletion.ToString()));
 
             return new TopicService(
                 configuration.Object,

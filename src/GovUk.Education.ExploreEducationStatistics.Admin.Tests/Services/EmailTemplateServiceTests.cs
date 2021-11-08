@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -155,10 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> ConfigurationMock()
         {
             return CreateMockConfiguration(
-                new Tuple<string, string>("NotifyInviteTemplateId", "invite-template-id"),
-                new Tuple<string, string>("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
-                new Tuple<string, string>("NotifyReleaseRoleTemplateId", "release-role-template-id"),
-                new Tuple<string, string>("AdminUri", "admin-uri"));
+                AsTuple("NotifyInviteTemplateId", "invite-template-id"),
+                AsTuple("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
+                AsTuple("NotifyReleaseRoleTemplateId", "release-role-template-id"),
+                AsTuple("AdminUri", "admin-uri"));
         }
 
         private static EmailTemplateService SetupEmailTemplateService(
