@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewSpecificPublication,
         CanUpdatePublicationTitles,
         CanUpdateSpecificPublication,
-        CanUpdateSpecificPublicationReleaseRole,
+        CanUpdateSpecificReleaseRole,
         CanCreatePublicationForSpecificTopic,
 
         /**

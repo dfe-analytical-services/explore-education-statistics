@@ -137,10 +137,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
         }
 
-        public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdatePublicationReleaseRole(
-            this IUserService userService, Tuple<Publication, ReleaseRole> tuple)
+        public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
+            this IUserService userService, Publication publication, ReleaseRole role)
         {
-            return userService.CheckPolicy(tuple, SecurityPolicies.CanUpdateSpecificPublicationReleaseRole);
+            var tuple = new Tuple<Publication, ReleaseRole>(publication, role);
+            return userService.CheckPolicy(tuple, SecurityPolicies.CanUpdateSpecificReleaseRole);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(

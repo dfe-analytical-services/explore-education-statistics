@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpPost("users/{userId:guid}/release-role")]
-        [AllowAnonymous]  // Ignore above "[Authorize(Policy = "CanManageUsersOnSystem")]"
+        [Authorize]
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, AddReleaseRoleViewModel request)
         {
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpDelete("users/release-role/{id:guid}")]
-        [AllowAnonymous]  // Ignore above "[Authorize(Policy = "CanManageUsersOnSystem")]"
+        [Authorize]
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid id)
         {
