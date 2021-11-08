@@ -27,8 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             UpdateReleaseRoleRequirement requirement,
             Tuple<Publication, ReleaseRole> tuple)
         {
-            var publication = tuple.Item1;
-            var releaseRole = tuple.Item2;
+            var (publication, releaseRole) = tuple;
 
             if (SecurityUtils.HasClaim(context.User, ManageAnyUser))
             {
@@ -36,11 +35,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
-
-            if (ContainPublicationOwnerRole(publicationRoles) && releaseRole == ReleaseRole.Contributor)
+            if (releaseRole == ReleaseRole.Contributor) // First, to avoid unnecessary DB call
             {
-                context.Succeed(requirement);
+                var publicationRoles =
+                    await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
+
+                if (ContainPublicationOwnerRole(publicationRoles))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

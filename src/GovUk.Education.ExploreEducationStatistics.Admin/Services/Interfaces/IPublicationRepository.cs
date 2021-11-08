@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<MyPublicationViewModel> GetPublicationWithAllReleases(Guid publicationId);
 
+        Task<List<Release>> GetLatestVersionsOfAllReleases(Guid publicationId);
+
         Task<Release?> GetLatestReleaseForPublication(Guid publicationId);
     }
 }

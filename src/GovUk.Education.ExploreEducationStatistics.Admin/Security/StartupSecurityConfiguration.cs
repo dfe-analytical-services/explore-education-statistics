@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
 
                 // does this user have permission to update a ReleaseRole on a specific Publication?
-                options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublicationReleaseRole.ToString(), policy =>
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(), policy =>
                     policy.Requirements.Add(new UpdateReleaseRoleRequirement()));
 
                 /**

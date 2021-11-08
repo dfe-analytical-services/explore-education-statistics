@@ -20,61 +20,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _contentDbContext;
+        private readonly IPublicationRepository _publicationRepository;
         private readonly IUserService _userService;
 
         public ReleasePermissionService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext contentDbContext,
+            IPublicationRepository publicationRepository,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
             _contentDbContext = contentDbContext;
+            _publicationRepository = publicationRepository;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, List<ReleaseContributorViewModel>>> GetReleaseContributors(Guid releaseId)
+        public async Task<Either<ActionResult, List<ManageAccessPageContributorViewModel>>> GetManageAccessPageContributorList(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
                         query.Include(r => r.Publication))
                 .OnSuccessDo(release => _userService
-                    .CheckCanUpdatePublicationReleaseRole(
-                        new Tuple<Publication, ReleaseRole>(release.Publication, ReleaseRole.Contributor)))
+                    .CheckCanUpdateReleaseRole(release.Publication, ReleaseRole.Contributor))
                 .OnSuccess(async release =>
                 {
-                    var allReleases = await _contentDbContext.Releases
-                        .Include(r => r.Publication)
-                        .AsAsyncEnumerable()
-                        .Where(r => r.PublicationId == release.PublicationId)
-                        .ToListAsync();
+                    var allLatestReleases = await _publicationRepository
+                        .GetLatestVersionsOfAllReleases(release.PublicationId);
 
-                    var allLatestReleaseIds = allReleases
-                        .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
+                    var allLatestReleaseIds = allLatestReleases
                         .Select(r => r.Id)
                         .ToList();
 
                     var allContributorReleaseRoles = await _contentDbContext.UserReleaseRoles
-                        .Include(usr => usr.User)
+                        .Include(releaseRole => releaseRole.User)
                         .AsAsyncEnumerable()
-                        .Where(rr =>
-                            allLatestReleaseIds.Contains(rr.ReleaseId)
-                            && rr.Role == ReleaseRole.Contributor)
+                        .Where(releaseRole =>
+                            allLatestReleaseIds.Contains(releaseRole.ReleaseId)
+                            && releaseRole.Role == ReleaseRole.Contributor)
                         .ToListAsync();
 
                     var allPublicationContributors = allContributorReleaseRoles
-                        .Select(rr => rr.User)
+                        .Select(releaseRole => releaseRole.User)
                         .Distinct()
                         .ToList();
 
                     return allPublicationContributors
                         .Select(user =>
                         {
-                            var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(rr =>
-                                rr.UserId == user.Id
-                                && rr.ReleaseId == releaseId);
+                            var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(releaseRole =>
+                                releaseRole.UserId == user.Id
+                                && releaseRole.ReleaseId == releaseId);
 
-                            return new ReleaseContributorViewModel
+                            return new ManageAccessPageContributorViewModel
                             {
                                 UserId = user.Id,
                                 UserFullName = $"{user.FirstName} {user.LastName}",

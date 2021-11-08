@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class ReleaseContributorViewModel
+    public class ManageAccessPageContributorViewModel
     {
         public Guid UserId { get; set; }
 

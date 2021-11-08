@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Publication;
 
             return await _userService
-                .CheckCanUpdatePublicationReleaseRole(new Tuple<Publication, ReleaseRole>(publication, role))
+                .CheckCanUpdateReleaseRole(publication, role)
                 .OnSuccess(async () =>
                 {
                     return await _usersAndRolesPersistenceHelper
@@ -278,20 +278,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid roleId)
+        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
         {
-            var userReleaseRole = _contentDbContext.UserReleaseRoles
-                .Single(rr => rr.Id == roleId);
-            var publication = _contentDbContext.Releases
+            var userReleaseRole = await _contentDbContext.UserReleaseRoles
+                .AsAsyncEnumerable()
+                .SingleAsync(releaseRole => releaseRole.Id == userReleaseRoleId);
+            var release = await _contentDbContext.Releases
                 .Include(r => r.Publication)
-                .Single(r => r.Id == userReleaseRole.ReleaseId)
-                .Publication;
+                .AsAsyncEnumerable()
+                .SingleAsync(r => r.Id == userReleaseRole.ReleaseId);
 
             return await _userService
-                .CheckCanUpdatePublicationReleaseRole(
-                    new Tuple<Publication, ReleaseRole>(publication, userReleaseRole.Role))
-                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserReleaseRole>(roleId))
-                .OnSuccessVoid(async releaseRole =>
+                .CheckCanUpdateReleaseRole(release.Publication, userReleaseRole.Role)
+                .OnSuccessVoid(async () =>
                 {
                     userReleaseRole.Deleted = DateTime.UtcNow;
                     userReleaseRole.DeletedById = _userService.GetUserId();
