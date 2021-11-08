@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -1828,7 +1829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> DefaultConfigurationMock()
         {
             return CreateMockConfiguration(
-                new Tuple<string, string>("NotifyPreReleaseTemplateId", PreReleaseTemplateId));
+                AsTuple("NotifyPreReleaseTemplateId", PreReleaseTemplateId));
         }
 
         private static Mock<IHttpContextAccessor> DefaultHttpContextAccessorMock()

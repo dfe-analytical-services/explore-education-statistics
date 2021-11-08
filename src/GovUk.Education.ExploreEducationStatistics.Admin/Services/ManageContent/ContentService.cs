@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -537,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        new Tuple<Release, ContentSection>(release, section));
+                        AsTuple(release, section));
                 });
         }
 
