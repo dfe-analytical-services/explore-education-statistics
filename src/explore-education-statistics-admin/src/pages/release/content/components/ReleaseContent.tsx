@@ -138,9 +138,7 @@ const ReleaseContent = () => {
     <>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <div className="govuk-grid-row">
-            <BasicReleaseSummary release={release} />
-          </div>
+          <BasicReleaseSummary release={release} />
 
           <div id="releaseSummary">
             {release.summarySection && (
