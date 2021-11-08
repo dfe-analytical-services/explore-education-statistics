@@ -79,31 +79,28 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   This is the latest data
                 </Tag>
               ) : (
-                <div className="govuk-!-margin-bottom-3">
-                  <Link
-                    className="dfe-print-hidden "
-                    unvisited
-                    to="/find-statistics/[publication]"
-                    as={`/find-statistics/${release.publication.slug}`}
-                  >
-                    View latest data:{' '}
-                    <span className="govuk-!-font-weight-bold">
-                      {release.publication.otherReleases[0].title}
-                    </span>
-                  </Link>
-                </div>
+                <Link
+                  className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
+                  unvisited
+                  to="/find-statistics/[publication]"
+                  as={`/find-statistics/${release.publication.slug}`}
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {release.publication.otherReleases[0].title}
+                  </span>
+                </Link>
               )}
               {release.type && <Tag>{release.type.title}</Tag>}
             </div>
-            {release.type &&
-              release.type.title === ReleaseType.NationalStatistics && (
-                <img
-                  src="/assets/images/UKSA-quality-mark2.jpg"
-                  alt="UK statistics authority quality mark"
-                  height="60"
-                  width="60"
-                />
-              )}
+            {release.type?.title === ReleaseType.NationalStatistics && (
+              <img
+                src="/assets/images/UKSA-quality-mark2.jpg"
+                alt="UK statistics authority quality mark"
+                height="60"
+                width="60"
+              />
+            )}
           </div>
 
           <SummaryList>
