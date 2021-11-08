@@ -253,10 +253,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .UserReleaseRoles
                 .AsQueryable()
                 .IgnoreQueryFilters() // For auditing purposes, we also want to migrate release roles that have Deleted set
-                .Where(r =>
-                    !r.SoftDeleted
-                    && r.ReleaseId == originalReleaseId)
-                .Select(r => r.CopyForAmendment(amendment));
+                .Where(releaseRole =>
+                    !releaseRole.SoftDeleted
+                    && releaseRole.ReleaseId == originalReleaseId)
+                .Select(releaseRole => releaseRole.CopyForAmendment(amendment));
 
             await _context.AddRangeAsync(newRoles);
             await _context.SaveChangesAsync();
