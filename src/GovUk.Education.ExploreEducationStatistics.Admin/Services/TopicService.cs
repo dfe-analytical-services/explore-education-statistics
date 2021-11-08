@@ -29,9 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
      */
     public class TopicService : ITopicService
     {
-        private static readonly VersionedEntityDeletionOrderComparer VersionedEntityComparer =
-            new VersionedEntityDeletionOrderComparer();
-
         private readonly ContentDbContext _contentContext;
         private readonly StatisticsDbContext _statisticsContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -207,12 +204,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Releases
                 .IgnoreQueryFilters()
                 .Where(r => publicationIds.Contains(r.PublicationId))
-                .ToList()
-                .OrderBy(release => new IdAndPreviousVersionIdPair(release.Id, release.PreviousVersionId),
-                    VersionedEntityComparer)
-                .Select(r => r.Id);
-
-            return await releasesIdsToDelete.Select(DeleteContentAndStatsRelease)
+                .Select(release => new IdAndPreviousVersionIdPair<string>(release.Id.ToString(), release.PreviousVersionId != null ? release.PreviousVersionId.ToString() : null))
+                .ToList();
+            
+            var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
+                .Sort(releasesIdsToDelete)
+                .Select(ids => Guid.Parse(ids.Id));
+                
+            return await releaseIdsInDeleteOrder
+                .Select(DeleteContentAndStatsRelease)
                 .OnSuccessAll()
                 .OnSuccessVoid();
         }
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task<Either<ActionResult, Topic>> CheckCanDeleteTopic(Topic topic)
+        private Either<ActionResult, Topic> CheckCanDeleteTopic(Topic topic)
         {
             if (!_topicDeletionAllowed)
             {
