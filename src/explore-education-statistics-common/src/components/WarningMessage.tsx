@@ -7,14 +7,22 @@ interface Props {
   className?: string;
   error?: boolean;
   icon?: string;
+  testId?: string;
 }
 
-const WarningMessage = ({ children, className, error, icon = '!' }: Props) => {
+const WarningMessage = ({
+  children,
+  className,
+  error,
+  icon = '!',
+  testId,
+}: Props) => {
   return (
     <div
       className={classNames('govuk-warning-text', styles.warning, className, {
         [styles.error]: error,
       })}
+      data-testid={testId}
     >
       <span
         className={classNames('govuk-warning-text__icon', styles.icon)}
