@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security
 {
@@ -140,8 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
             this IUserService userService, Publication publication, ReleaseRole role)
         {
-            var tuple = new Tuple<Publication, ReleaseRole>(publication, role);
-            return userService.CheckPolicy(tuple, SecurityPolicies.CanUpdateSpecificReleaseRole);
+            return userService.CheckPolicy(AsTuple(publication, role),
+                SecurityPolicies.CanUpdateSpecificReleaseRole);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
