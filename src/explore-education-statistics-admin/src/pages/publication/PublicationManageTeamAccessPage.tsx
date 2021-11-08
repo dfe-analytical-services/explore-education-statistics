@@ -20,29 +20,27 @@ const PublicationManageTeamAccessPage = ({
     [publicationId],
   );
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   if (!publication) {
     return null;
   }
 
   return (
-    <Page
-      title="Manage team access"
-      caption={publication.title}
-      breadcrumbs={[{ name: 'Manage team access' }]}
-    >
-      <Tabs id="manageTeamAccessTabs">
-        <TabsSection id="manageTeamAccessTab" title="Manage team access">
-          <PublicationManageTeamAccessTab publication={publication} />
-        </TabsSection>
-        <TabsSection id="inviteNewUsersTab" title="Invite new users">
-          <PublicationInviteNewUsersTab publication={publication} />
-        </TabsSection>
-      </Tabs>
-    </Page>
+    <LoadingSpinner loading={isLoading}>
+      <Page
+        title="Manage team access"
+        caption={publication.title}
+        breadcrumbs={[{ name: 'Manage team access' }]}
+      >
+        <Tabs id="manageTeamAccessTabs">
+          <TabsSection id="manage-access" title="Manage team access">
+            <PublicationManageTeamAccessTab publication={publication} />
+          </TabsSection>
+          <TabsSection id="invite-users" title="Invite new users">
+            <PublicationInviteNewUsersTab publication={publication} />
+          </TabsSection>
+        </Tabs>
+      </Page>
+    </LoadingSpinner>
   );
 };
 
