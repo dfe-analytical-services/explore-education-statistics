@@ -119,17 +119,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       toggleTableSizeError.off();
       goToNextStep();
     } catch (error) {
-      if (isServerValidationError(error) && error.response?.data) {
-        const errors = Object.values(error.response?.data.errors);
-        if (errors.flat().includes('QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')) {
-          if (onTableSizeError) {
-            onTableSizeError(
-              selectedPublication?.title || '',
-              subject?.name || '',
-            );
-          }
-          toggleTableSizeError.on();
+      if (
+        isServerValidationError(error, 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')
+      ) {
+        if (onTableSizeError) {
+          onTableSizeError(
+            selectedPublication?.title || '',
+            subject?.name || '',
+          );
         }
+        toggleTableSizeError.on();
       }
     }
   };
