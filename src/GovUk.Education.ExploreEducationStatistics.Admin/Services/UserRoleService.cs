@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(
                             releaseId,
                             q => q.Include(r => r.Publication)))
-                        .OnSuccessDo(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
+                        .OnSuccessDo(_ => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
                         .OnSuccess(async tuple =>
                         {
                             var (user, release) = tuple;
@@ -292,10 +292,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanUpdateReleaseRole(release.Publication, userReleaseRole.Role)
                 .OnSuccessVoid(async () =>
                 {
-                    userReleaseRole.Deleted = DateTime.UtcNow;
-                    userReleaseRole.DeletedById = _userService.GetUserId();
-                    _contentDbContext.Update(userReleaseRole);
-                    await _contentDbContext.SaveChangesAsync();
+                    await _userReleaseRoleRepository.Remove(userReleaseRole,
+                        deletedById: _userService.GetUserId());
                 });
         }
 

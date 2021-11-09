@@ -31,8 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public bool SoftDeleted { get; set; }
 
-
-
         public UserReleaseRole CopyForAmendment(Release amendment)
         {
             var copy = MemberwiseClone() as UserReleaseRole;
