@@ -119,6 +119,43 @@ def create_data_catalogue_snapshot(public_url) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
+def create_all_methodologies_snapshot(public_url) -> str:
+    all_methodologies_url = f"{public_url.rstrip('/')}/methodology"
+    parsed_html = _gets_parsed_html_from_page(all_methodologies_url)
+
+    methodologies_accordion = parsed_html.find(id="themes")
+    if methodologies_accordion is None:
+        return []
+    
+    theme_sections = methodologies_accordion.select('[data-testid="accordionSection"]') or []
+
+    result = []
+
+    for theme_index, theme_html in enumerate(theme_sections):
+        theme = {
+            'theme_heading': theme_html.select_one(f'#themes-{theme_index + 1}-heading').string,
+            'topics': []
+        }
+        topics = theme_html.select('details') or []
+
+        for topic_html in topics:
+            topic = {
+                'topic_heading': topic_html.select_one('[id^="details-heading-"]').string,
+                'methodologies': []
+            }
+
+            methodologies = topic_html.select('[id^="methodology-heading-"]') or []
+                
+            for methodology_heading in methodologies:
+                topic['methodologies'].append(methodology_heading.string)
+            
+            theme['topics'].append(topic)
+        
+        result.append(theme)
+    
+    return json.dumps(result, sort_keys=True, indent=2)
+
+        
 def _write_to_file(file_name, snapshot):
     snapshots_path = 'tests/snapshots'
     if not os.path.exists(snapshots_path):
@@ -148,3 +185,6 @@ if __name__ == "__main__":
 
     data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url)
     _write_to_file('data_catalogue_snapshot.json', data_catalogue_snapshot)
+
+    all_methodologies_snapshot = create_all_methodologies_snapshot(args.public_url)
+    _write_to_file('all_methodologies_snapshot.json', all_methodologies_snapshot)
