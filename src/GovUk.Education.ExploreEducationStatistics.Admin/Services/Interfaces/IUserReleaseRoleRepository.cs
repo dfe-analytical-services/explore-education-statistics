@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role,
             Guid createdById);
 
+        Task Remove(UserReleaseRole releaseRole, Guid deletedById);
+
         Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
             Guid releaseId);
 
