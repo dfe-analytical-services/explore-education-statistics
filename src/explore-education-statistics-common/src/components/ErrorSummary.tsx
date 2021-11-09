@@ -1,4 +1,10 @@
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, {
+  forwardRef,
+  MouseEventHandler,
+  ReactNode,
+  useEffect,
+  useRef,
+} from 'react';
 import ErrorPrefixPageTitle from './ErrorPrefixPageTitle';
 
 export interface ErrorSummaryMessage {
@@ -6,7 +12,40 @@ export interface ErrorSummaryMessage {
   message: string;
 }
 
-interface Props {
+interface BaseErrorSummaryProps {
+  id: string;
+  children: ReactNode;
+  title: string;
+}
+
+export const BaseErrorSummary = forwardRef<
+  HTMLDivElement,
+  BaseErrorSummaryProps
+>((props, ref) => {
+  const { id, children, title } = props;
+  const idTitle = `${id}-title`;
+
+  return (
+    <div
+      aria-labelledby={idTitle}
+      className="govuk-error-summary"
+      ref={ref}
+      role="alert"
+      tabIndex={-1}
+    >
+      <h2 className="govuk-error-summary__title" id={idTitle}>
+        {title}
+      </h2>
+
+      <ErrorPrefixPageTitle />
+
+      <div className="govuk-error-summary__body">{children}</div>
+    </div>
+  );
+});
+BaseErrorSummary.displayName = 'BaseErrorSummary';
+
+interface ErrorSummaryProps {
   errors: ErrorSummaryMessage[];
   id: string;
   focusOnError?: boolean;
@@ -22,7 +61,7 @@ const ErrorSummary = ({
   title = 'There is a problem',
   onFocus,
   onErrorClick,
-}: Props) => {
+}: ErrorSummaryProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,34 +90,18 @@ const ErrorSummary = ({
     }
   }, [errors, focusOnError, onFocus]);
 
-  const idTitle = `${id}-title`;
-
   return errors.length > 0 ? (
-    <div
-      aria-labelledby={idTitle}
-      className="govuk-error-summary"
-      ref={ref}
-      role="alert"
-      tabIndex={-1}
-    >
-      <h2 className="govuk-error-summary__title" id={idTitle}>
-        {title}
-      </h2>
-
-      <ErrorPrefixPageTitle />
-
-      <div className="govuk-error-summary__body">
-        <ul className="govuk-list govuk-error-summary__list">
-          {errors.map(error => (
-            <li key={error.id}>
-              <a href={`#${error.id}`} onClick={onErrorClick}>
-                {error.message}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <BaseErrorSummary id={id} title={title} ref={ref}>
+      <ul className="govuk-list govuk-error-summary__list">
+        {errors.map(error => (
+          <li key={error.id}>
+            <a href={`#${error.id}`} onClick={onErrorClick}>
+              {error.message}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </BaseErrorSummary>
   ) : null;
 };
 
