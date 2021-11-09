@@ -11,7 +11,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 Verify public page loads
     environment variable should be set    PUBLIC_URL
     user goes to url    %{PUBLIC_URL}
-    user waits until element contains    css:body    Explore education statistics
+    user waits until page contains    Explore education statistics
 
 Verify can accept cookie banner
     user checks page contains    We use some essential cookies to make this service work.
