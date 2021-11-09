@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return new ManageAccessPageContributorViewModel
                             {
                                 UserId = user.Id,
-                                UserFullName = $"{user.FirstName} {user.LastName}",
+                                UserFullName = user.DisplayName,
                                 ReleaseId = releaseId,
                                 // Some don't have a contributor release role for this release, as they are a
                                 // contributor on a different release on the same publication

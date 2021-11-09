@@ -11,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string LastName { get; set; }
         
         public string Email { get; set; }
+
+        public string DisplayName => $"{FirstName} {LastName}";
     }
 }
