@@ -97,10 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
-            var publication = _contentDbContext.Releases
+            var release = _contentDbContext.Releases
                 .Include(r => r.Publication)
-                .Single(r => r.Id == releaseId)
-                .Publication;
+                .SingleOrDefault(r => r.Id == releaseId);
+
+            if (release == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var publication = release.Publication;
 
             return await _userService
                 .CheckCanUpdateReleaseRole(publication, role)
@@ -282,7 +288,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userReleaseRole = await _contentDbContext.UserReleaseRoles
                 .AsAsyncEnumerable()
-                .SingleAsync(releaseRole => releaseRole.Id == userReleaseRoleId);
+                .SingleOrDefaultAsync(releaseRole => releaseRole.Id == userReleaseRoleId);
+            if (userReleaseRole == null)
+            {
+                return new NotFoundResult();
+            }
+
             var release = await _contentDbContext.Releases
                 .Include(r => r.Publication)
                 .AsAsyncEnumerable()

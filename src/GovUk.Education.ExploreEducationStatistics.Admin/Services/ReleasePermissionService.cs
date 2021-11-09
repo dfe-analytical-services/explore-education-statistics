@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var allLatestReleases = await _publicationRepository
-                        .GetLatestVersionsOfAllReleases(release.PublicationId);
+                        .GetLatestReleases(release.PublicationId);
 
                     var allLatestReleaseIds = allLatestReleases
                         .Select(r => r.Id)

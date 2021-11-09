@@ -24,14 +24,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var user = new User();
 
+            var createdByUser = new User();
+
             var release = new Release();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.AddRangeAsync(user, createdByUser, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -39,12 +40,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.Create(user.Id, release.Id, Contributor);
+                var result = await service.Create(user.Id, release.Id, Contributor, createdByUser.Id);
 
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(release.Id, result.ReleaseId);
                 Assert.Equal(Contributor, result.Role);
+                Assert.Equal(createdByUser.Id, result.CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -58,6 +61,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, userReleaseRoles[0].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
+                Assert.Equal(createdByUser.Id, userReleaseRoles[0].CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[0].Created!.Value).Milliseconds,
+                    0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task Remove()
+        {
+            var deletedById = Guid.NewGuid();
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = Guid.NewGuid(),
+                ReleaseId = Guid.NewGuid(),
+                Role = Lead,
+                Deleted = null,
+                DeletedById = null,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = new UserReleaseRoleRepository(contentDbContext);
+                await service.Remove(userReleaseRole, deletedById);
+
+                var updatedReleaseRole = contentDbContext.UserReleaseRoles
+                    .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.Null(updatedReleaseRole);
+            }
+        }
+
+        [Fact]
+        public async Task Remove_IgnoreQueryFilters()
+        {
+            var deletedById = Guid.NewGuid();
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = Guid.NewGuid(),
+                ReleaseId = Guid.NewGuid(),
+                Role = Lead,
+                Deleted = null,
+                DeletedById = null,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = new UserReleaseRoleRepository(contentDbContext);
+                await service.Remove(userReleaseRole, deletedById);
+
+                var updatedReleaseRole = contentDbContext.UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.NotNull(updatedReleaseRole);
+                Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole!.ReleaseId);
+                Assert.Equal(userReleaseRole.Role, updatedReleaseRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedReleaseRole.Deleted!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(deletedById, updatedReleaseRole.DeletedById);
             }
         }
 

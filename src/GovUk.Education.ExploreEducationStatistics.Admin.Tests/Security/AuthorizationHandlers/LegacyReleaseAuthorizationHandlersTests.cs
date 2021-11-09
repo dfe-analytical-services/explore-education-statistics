@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                    LegacyRelease>(
                    legacyRelease.PublicationId,
                    legacyRelease,
+                   contentDbContext => contentDbContext.Add(legacyRelease),
                    contentDbContext =>
                        new ViewLegacyReleaseAuthorizationHandler(
                            new UserPublicationRoleRepository(contentDbContext)),
@@ -99,6 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                    LegacyRelease>(
                    legacyRelease.PublicationId,
                    legacyRelease,
+                   contentDbContext => contentDbContext.Add(legacyRelease),
                    contentDbContext =>
                        new UpdateLegacyReleaseAuthorizationHandler(
                            new UserPublicationRoleRepository(contentDbContext)),
@@ -129,10 +131,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 AssertHandlerOnlySucceedsWithPublicationRole<
-                   DeleteLegacyReleaseRequirement,
-                   LegacyRelease>(
-                   legacyRelease.PublicationId,
-                   legacyRelease,
+                    DeleteLegacyReleaseRequirement,
+                    LegacyRelease>(
+                    legacyRelease.PublicationId,
+                    legacyRelease,
+                    contentDbContext => contentDbContext.Add(legacyRelease),
                    contentDbContext =>
                        new DeleteLegacyReleaseAuthorizationHandler(
                            new UserPublicationRoleRepository(contentDbContext)),

@@ -1047,6 +1047,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetLatestReleases()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var release2000OriginalId = Guid.NewGuid();
+            var release2000Original = new Release
+            {
+                Id = release2000OriginalId,
+                PublicationId = publicationId,
+                ReleaseName = "2000",
+                PreviousVersionId = release2000OriginalId,
+            };
+            var release2000Latest = new Release
+            {
+                PublicationId = publicationId,
+                ReleaseName = "2000",
+                PreviousVersionId = release2000OriginalId,
+            };
+
+            var release2001OriginalId = Guid.NewGuid();
+            var release2001Original = new Release
+            {
+                Id = release2001OriginalId,
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2000OriginalId,
+            };
+            var release2001Amendment = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2001OriginalId,
+            };
+            var release2001Latest = new Release
+            {
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2001Amendment.Id,
+            };
+            var release2002LatestId = Guid.NewGuid();
+            var release2002Latest = new Release
+            {
+                Id = release2002LatestId,
+                PublicationId = publicationId,
+                ReleaseName = "2002",
+                PreviousVersionId = release2002LatestId,
+            };
+            var publication = new Publication
+            {
+                Id = publicationId,
+                Releases =
+                {
+                    release2000Original,
+                    release2000Latest,
+                    release2001Original,
+                    release2001Amendment,
+                    release2001Latest,
+                    release2002Latest,
+                }
+
+            };
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = new PublicationRepository(context, AdminMapper());
+                var latestReleases = await service.GetLatestReleases(publicationId);
+
+                Assert.Equal(3, latestReleases.Count);
+
+                Assert.Equal(release2000Latest.Id, latestReleases[0].Id);
+                Assert.Equal(release2001Latest.Id, latestReleases[1].Id);
+                Assert.Equal(release2002Latest.Id, latestReleases[2].Id);
+            }
+        }
+
         private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
         {
             return new(contentDbContext, AdminMapper());
