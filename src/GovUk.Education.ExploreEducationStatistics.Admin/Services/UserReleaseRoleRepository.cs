@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
             await _contentDbContext.SaveChangesAsync();
             return created;
+        }
+
+        public async Task Remove(UserReleaseRole releaseRole, Guid deletedById)
+        {
+            releaseRole.Deleted = DateTime.UtcNow;
+            releaseRole.DeletedById = deletedById;
+            _contentDbContext.Update(releaseRole);
+            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)
