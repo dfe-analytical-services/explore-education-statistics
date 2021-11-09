@@ -1,0 +1,16 @@
+@import '~govuk-frontend/govuk/base';
+
+.comment {
+  background: govuk-colour('light-grey');
+  border: $govuk-border-width-form-element solid transparent;
+  margin-bottom: govuk-spacing(2);
+  padding: govuk-spacing(2);
+
+  &.active {
+    border-color: govuk-colour('orange');
+  }
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}

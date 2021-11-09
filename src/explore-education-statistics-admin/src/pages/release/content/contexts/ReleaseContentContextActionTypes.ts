@@ -38,8 +38,9 @@ export type RemoveBlockFromSection = {
 export type UpdateBlockFromSection = {
   type: 'UPDATE_BLOCK_FROM_SECTION';
   payload: {
-    block: EditableBlock;
+    block?: EditableBlock;
     meta: BlockMeta;
+    isSaving?: boolean;
   };
 };
 
@@ -73,6 +74,14 @@ export type SetReleaseContent = {
   };
 };
 
+export type SetCommentsPendingDeletion = {
+  type: 'SET_COMMENTS_PENDING_DELETION';
+  payload: {
+    meta: { blockId: string };
+    commentId?: string;
+  };
+};
+
 export type UpdateContentSection = {
   type: 'UPDATE_CONTENT_SECTION';
   payload: {
@@ -97,5 +106,6 @@ export type ReleaseDispatchAction =
   | UpdateSectionContent
   | AddContentSection
   | SetReleaseContent
+  | SetCommentsPendingDeletion
   | UpdateContentSection
   | UpdateBlockComments;

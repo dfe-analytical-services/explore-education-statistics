@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
+import { Comment } from '@admin/services/types/content';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -35,6 +35,8 @@ interface MethodologyLink {
   title: string;
   url: string;
 }
+
+type CommentsChangeHandler = (blockId: string, comments: Comment[]) => void;
 
 const ReleaseContent = () => {
   const config = useConfig();
@@ -107,6 +109,13 @@ const ReleaseContent = () => {
     [actions, release.summarySection.id],
   );
 
+  const updateCommentsPendingDeletion = useCallback(
+    async (blockId, commentId) => {
+      await actions.setCommentsPendingDeletion({ blockId, commentId });
+    },
+    [actions],
+  );
+
   if (!release) {
     return null;
   }
@@ -145,22 +154,27 @@ const ReleaseContent = () => {
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
-                  allowComments
                   blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
-                  onBlockCommentsChange={updateBlockComments}
                   renderBlock={block => (
                     <ReleaseBlock block={block} releaseId={release.id} />
                   )}
-                  renderEditableBlock={block => (
-                    <ReleaseEditableBlock
-                      block={block}
-                      releaseId={release.id}
-                      sectionId={release.summarySection.id}
-                      onSave={updateBlock}
-                      onDelete={removeBlock}
-                    />
-                  )}
+                  renderEditableBlock={block => {
+                    return (
+                      <ReleaseEditableBlock
+                        allowComments
+                        block={block}
+                        releaseId={release.id}
+                        sectionId={release.summarySection.id}
+                        onBlockCommentsChange={updateBlockComments}
+                        onCommentsPendingDeletionChange={
+                          updateCommentsPendingDeletion
+                        }
+                        onSave={updateBlock}
+                        onDelete={removeBlock}
+                      />
+                    );
+                  }}
                 />
                 {editingMode === 'edit' &&
                   release.summarySection.content?.length === 0 && (

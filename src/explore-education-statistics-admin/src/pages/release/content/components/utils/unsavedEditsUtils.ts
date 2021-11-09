@@ -1,4 +1,5 @@
 import { UnsavedEdit } from '@admin/contexts/EditingContext';
+import { CommentsPendingDeletion } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 
 export const addUnsavedEdit = (
   edits: UnsavedEdit[],
@@ -42,10 +43,25 @@ export const removeUnsavedEdit = (
     .filter(edit => edit.blockIds.length);
 };
 
-export const getNumberOfUnsavedBlocks = (edits: UnsavedEdit[]) => {
+export const getNumberOfUnsavedBlocks = (
+  edits: UnsavedEdit[],
+  commentsPendingDeletion?: CommentsPendingDeletion,
+) => {
   let count = 0;
   edits.forEach(edit => {
     count += edit.blockIds.length;
   });
+
+  if (commentsPendingDeletion) {
+    const blocksWithPendingComments = Object.keys(commentsPendingDeletion);
+    if (blocksWithPendingComments.length) {
+      blocksWithPendingComments.forEach(blockId => {
+        if (commentsPendingDeletion[blockId].length) {
+          count += 1;
+        }
+      });
+    }
+  }
+
   return count;
 };

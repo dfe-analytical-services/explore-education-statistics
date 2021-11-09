@@ -13,7 +13,6 @@
 
 .focused {
   @include focused-input;
-  border-width: $govuk-focus-width;
 }
 
 .readOnlyEditor {
@@ -25,4 +24,25 @@
   &:focus {
     @include focused-input;
   }
+}
+
+// Comments in the editor
+:global(.commentStyle) {
+  background: govuk-colour('yellow');
+
+  :global(.commentStyle) {
+    background: lighten(govuk-colour('yellow'), 20);
+  }
+  :global(.commentStyle--active) {
+    background: lighten(govuk-colour('orange'), 10);
+  }
+}
+
+:global(.commentStyle--active) {
+  background: lighten(govuk-colour('orange'), 10);
+}
+
+:global(.commentPlaceholderStyle) {
+  background: govuk-colour('blue');
+  color: govuk-colour('white');
 }

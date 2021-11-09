@@ -7,6 +7,8 @@ import React, {
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
+  useEffect,
+  useRef,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
@@ -14,6 +16,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
+  focus?: boolean;
   hint?: string;
   id: string;
   testId?: string;
@@ -32,6 +35,7 @@ const FormTextArea = ({
   disabled,
   error,
   hint,
+  focus,
   id,
   hideLabel,
   label,
@@ -44,6 +48,14 @@ const FormTextArea = ({
   onClick,
   onKeyPress,
 }: FormTextAreaProps) => {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (focus) {
+      ref.current?.focus();
+    }
+  }, [focus]);
+
   const textArea = (
     <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
@@ -72,6 +84,7 @@ const FormTextArea = ({
         disabled={disabled}
         id={id}
         name={name}
+        ref={ref}
         onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}

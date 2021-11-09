@@ -26,6 +26,7 @@ const ReleaseContentPageLoaded = () => {
     canUpdateRelease,
     unresolvedComments,
     release,
+    commentsPendingDeletion,
   } = useReleaseContentState();
 
   return (
@@ -33,7 +34,10 @@ const ReleaseContentPageLoaded = () => {
       initialEditingMode={canUpdateRelease ? 'edit' : 'preview'}
     >
       {({ editingMode, unsavedEdits }) => {
-        const numOfEdits = getNumberOfUnsavedBlocks(unsavedEdits);
+        const numOfEdits = getNumberOfUnsavedBlocks(
+          unsavedEdits,
+          commentsPendingDeletion,
+        );
         return (
           <>
             {editingMode === 'edit' && (
@@ -129,6 +133,7 @@ const ReleaseContentPage = ({
       availableDataBlocks,
       canUpdateRelease,
       unresolvedComments: getUnresolvedComments(release),
+      commentsPendingDeletion: {},
     };
   }, [releaseId]);
 

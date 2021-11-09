@@ -15,13 +15,13 @@ export const elementsFieldName = (name: string) => `__${name}`;
 type Props<FormValues> = {
   id?: string;
   name: keyof FormValues | string;
-  showError?: boolean;
   formGroupClass?: string;
+  handleBlur?: (isDirty: boolean) => void;
+  showError?: boolean;
   testId?: string;
   validateElements?: (
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
-  handleBlur?: (isDirty: boolean) => void;
 } & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange'>;
 
 function FormFieldEditor<T>({
@@ -84,5 +84,6 @@ function FormFieldEditor<T>({
     </Field>
   );
 }
+FormFieldEditor.displayName = 'FormFieldEditor';
 
 export default FormFieldEditor;

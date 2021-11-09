@@ -98,17 +98,27 @@ export default function useReleaseContentActions() {
       sectionKey: ContentSectionKeys;
       bodyContent: string;
     }) => {
+      dispatch({
+        type: 'UPDATE_BLOCK_FROM_SECTION',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          isSaving: true,
+        },
+      });
+
       const updateBlock = await releaseContentService.updateContentSectionBlock(
         releaseId,
         sectionId,
         blockId,
         { body: bodyContent },
       );
+
       dispatch({
         type: 'UPDATE_BLOCK_FROM_SECTION',
         payload: {
           meta: { sectionId, blockId, sectionKey },
           block: updateBlock,
+          isSaving: false,
         },
       });
     },
@@ -306,6 +316,19 @@ export default function useReleaseContentActions() {
     [dispatch],
   );
 
+  const setCommentsPendingDeletion = useCallback(
+    async ({ blockId, commentId }: { blockId: string; commentId?: string }) => {
+      dispatch({
+        type: 'SET_COMMENTS_PENDING_DELETION',
+        payload: {
+          meta: { blockId },
+          commentId,
+        },
+      });
+    },
+    [dispatch],
+  );
+
   return useMemo(
     () => ({
       updateAvailableDataBlocks,
@@ -319,6 +342,7 @@ export default function useReleaseContentActions() {
       updateContentSectionsOrder,
       removeContentSection,
       updateContentSectionHeading,
+      setCommentsPendingDeletion,
       updateBlockComments,
     }),
     [
@@ -334,6 +358,7 @@ export default function useReleaseContentActions() {
       updateContentSectionHeading,
       updateContentSectionsOrder,
       updateSectionBlockOrder,
+      setCommentsPendingDeletion,
     ],
   );
 }

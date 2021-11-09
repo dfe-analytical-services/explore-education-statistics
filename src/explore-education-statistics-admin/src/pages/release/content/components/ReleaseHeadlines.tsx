@@ -1,4 +1,3 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
@@ -7,6 +6,7 @@ import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
+import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -62,8 +62,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
     [actions, release.id, release.headlinesSection.id],
   );
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
+  const updateBlockComments = useCallback(
+    async (blockId: string, comments: Comment[]) => {
       await actions.updateBlockComments({
         sectionId: release.headlinesSection.id,
         blockId,
@@ -74,6 +74,13 @@ const ReleaseHeadlines = ({ release }: Props) => {
     [actions, release.headlinesSection.id],
   );
 
+  const updateCommentsPendingDeletion = useCallback(
+    async (blockId, commentId) => {
+      await actions.setCommentsPendingDeletion({ blockId, commentId });
+    },
+    [actions],
+  );
+
   const headlinesTab = (
     <TabsSection title="Headlines">
       <section id="releaseHeadlines-keyStatistics">
@@ -81,18 +88,19 @@ const ReleaseHeadlines = ({ release }: Props) => {
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
-          allowComments
           blocks={release.headlinesSection.content}
           sectionId={release.headlinesSection.id}
-          onBlockCommentsChange={updateBlockComments}
           renderBlock={block => (
             <ReleaseBlock block={block} releaseId={release.id} />
           )}
           renderEditableBlock={block => (
             <ReleaseEditableBlock
+              allowComments
               block={block}
               sectionId={release.headlinesSection.id}
               releaseId={release.id}
+              onBlockCommentsChange={updateBlockComments}
+              onCommentsPendingDeletionChange={updateCommentsPendingDeletion}
               onSave={updateBlock}
               onDelete={removeBlock}
             />

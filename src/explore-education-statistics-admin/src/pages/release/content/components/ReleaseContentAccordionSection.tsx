@@ -1,4 +1,3 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -6,8 +5,9 @@ import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlo
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { EditableBlock } from '@admin/services/types/content';
+import { Comment, EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import useToggle from '@common/hooks/useToggle';
@@ -27,6 +27,7 @@ const ReleaseContentAccordionSection = ({
   ...props
 }: ReleaseContentAccordionSectionProps) => {
   const { editingMode, unsavedEdits } = useEditingContext();
+  const { commentsPendingDeletion } = useReleaseContentState();
 
   const actions = useReleaseContentActions();
 
@@ -35,10 +36,24 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
-  const updatedHeading =
-    unsavedEdits.findIndex(edit => edit.sectionId === sectionId) === -1
-      ? heading
-      : `${heading} (Unsaved changes)`;
+  const updatedHeading = () => {
+    if (unsavedEdits.findIndex(edit => edit.sectionId === sectionId) !== -1) {
+      return `${heading} (Unsaved changes)`;
+    }
+
+    if (commentsPendingDeletion) {
+      const blocksWithCommentsPendingDeletions = blocks.filter(
+        block =>
+          commentsPendingDeletion[`block-${block.id}`] &&
+          commentsPendingDeletion[`block-${block.id}`].length,
+      );
+      if (blocksWithCommentsPendingDeletions.length) {
+        return `${heading} (Unsaved changes)`;
+      }
+    }
+
+    return heading;
+  };
 
   useEffect(() => {
     setBlocks(sectionContent);
@@ -129,8 +144,8 @@ const ReleaseContentAccordionSection = ({
     });
   }, [actions, sectionId, release.id]);
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
+  const updateBlockComments = useCallback(
+    async (blockId: string, comments: Comment[]) => {
       await actions.updateBlockComments({
         sectionId,
         blockId,
@@ -141,10 +156,17 @@ const ReleaseContentAccordionSection = ({
     [actions, sectionId],
   );
 
+  const updateCommentsPendingDeletion = useCallback(
+    async (blockId, commentId) => {
+      await actions.setCommentsPendingDeletion({ blockId, commentId });
+    },
+    [actions],
+  );
+
   return (
     <EditableAccordionSection
       {...props}
-      heading={updatedHeading || ''}
+      heading={updatedHeading()}
       caption={caption}
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
@@ -167,12 +189,10 @@ const ReleaseContentAccordionSection = ({
       {({ open }) => (
         <>
           <EditableSectionBlocks
-            allowComments
             blocks={blocks}
             isReordering={isReordering}
             sectionId={sectionId}
             onBlocksChange={setBlocks}
-            onBlockCommentsChange={updateBlockComments}
             renderBlock={block => (
               <ReleaseBlock
                 block={block}
@@ -182,12 +202,15 @@ const ReleaseContentAccordionSection = ({
             )}
             renderEditableBlock={block => (
               <ReleaseEditableBlock
+                allowComments
                 allowImages
                 block={block}
                 sectionId={sectionId}
                 editable={!isReordering}
                 releaseId={release.id}
                 visible={open}
+                onBlockCommentsChange={updateBlockComments}
+                onCommentsPendingDeletionChange={updateCommentsPendingDeletion}
                 onSave={updateBlock}
                 onDelete={removeBlock}
               />

@@ -10,12 +10,14 @@ import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
 
 export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+export type CommentsPendingDeletion = { [key: string]: string[] };
 
 export type ReleaseContextState = {
   release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: Comment[];
+  commentsPendingDeletion?: CommentsPendingDeletion;
 };
 const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
   undefined,
@@ -63,7 +65,7 @@ export const releaseReducer: Reducer<
       return draft;
     }
     case 'UPDATE_BLOCK_FROM_SECTION': {
-      const { block, meta } = action.payload;
+      const { block, meta, isSaving } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
 
       const matchingSection = draft.release[sectionKey] as
@@ -86,7 +88,10 @@ export const releaseReducer: Reducer<
             contentBlock => contentBlock.id === blockId,
           );
 
-          matchingContentSection.content[blockIndex] = block;
+          matchingContentSection.content[blockIndex] = block ?? {
+            ...matchingContentSection.content[blockIndex],
+            isSaving,
+          };
         }
       } else {
         const blockIndex = matchingSection.content.findIndex(
@@ -94,7 +99,10 @@ export const releaseReducer: Reducer<
         );
 
         if (blockIndex !== -1) {
-          matchingSection.content[blockIndex] = block;
+          matchingSection.content[blockIndex] = block ?? {
+            ...matchingSection.content[blockIndex],
+            isSaving,
+          };
         }
       }
 
@@ -182,6 +190,34 @@ export const releaseReducer: Reducer<
 
       return draft;
     }
+    case 'SET_COMMENTS_PENDING_DELETION': {
+      const { commentId, meta } = action.payload;
+      if (!draft.commentsPendingDeletion) {
+        return draft;
+      }
+      if (!commentId) {
+        draft.commentsPendingDeletion[meta.blockId] = [];
+        return draft;
+      }
+      if (draft.commentsPendingDeletion[meta.blockId]) {
+        if (draft.commentsPendingDeletion[meta.blockId].includes(commentId)) {
+          draft.commentsPendingDeletion[
+            meta.blockId
+          ] = draft.commentsPendingDeletion[meta.blockId].filter(
+            id => id !== commentId,
+          );
+        } else {
+          draft.commentsPendingDeletion[meta.blockId] = [
+            ...draft.commentsPendingDeletion[meta.blockId],
+            commentId,
+          ];
+        }
+      } else {
+        draft.commentsPendingDeletion[meta.blockId] = [commentId];
+      }
+
+      return draft;
+    }
     case 'UPDATE_CONTENT_SECTION': {
       const { section, meta } = action.payload;
       const { sectionId } = meta;
@@ -236,7 +272,10 @@ export const releaseReducer: Reducer<
         matchingBlock.comments = comments;
       }
 
-      draft.unresolvedComments = getUnresolvedComments(draft.release);
+      draft.unresolvedComments = getUnresolvedComments(
+        draft.release,
+        draft.commentsPendingDeletion,
+      );
       return draft;
     }
     default: {

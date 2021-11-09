@@ -2,9 +2,10 @@ import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrappe
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
-import { EditableBlock } from '@admin/services/types/content';
-import Gate from '@common/components/Gate';
+import { Comment, EditableBlock } from '@admin/services/types/content';
+import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import Gate from '@common/components/Gate';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -16,26 +17,36 @@ import {
 } from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 
 interface Props {
+  allowComments?: boolean;
   allowImages?: boolean;
-  releaseId: string;
   block: EditableBlock;
-  sectionId: string;
   editable?: boolean;
+  releaseId: string;
+  sectionId: string;
   visible?: boolean;
-  onSave: (blockId: string, content: string) => void;
+  onBlockCommentsChange: (blockId: string, comments: Comment[]) => void;
+  onCommentsPendingDeletionChange?: (
+    blockId: string,
+    commentId?: string,
+  ) => void;
   onDelete: (blockId: string) => void;
+  onSave: (blockId: string, content: string) => void;
 }
 
 const ReleaseEditableBlock = ({
+  allowComments = false,
   allowImages = false,
-  releaseId,
   block,
-  sectionId,
+  releaseId,
   editable = true,
+  sectionId,
   visible,
-  onSave,
+  onBlockCommentsChange,
+  onCommentsPendingDeletionChange,
   onDelete,
+  onSave,
 }: Props) => {
+  const { commentsPendingDeletion } = useReleaseContentState();
   const blockId = `block-${block.id}`;
 
   const getChartFile = useGetChartFile(releaseId);
@@ -93,14 +104,23 @@ const ReleaseEditableBlock = ({
     case 'MarkDownBlock':
       return (
         <EditableContentBlock
+          allowComments={allowComments}
+          autoSave
+          commentsPendingDeletion={commentsPendingDeletion}
           editable={editable && !isBrowser('IE')}
           id={blockId}
+          isSaving={block.isSaving}
+          releaseId={releaseId}
+          sectionId={sectionId}
+          comments={block.comments}
           label="Content block"
           hideLabel
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
           transformImageAttributes={transformImageAttributes}
           handleBlur={handleBlur}
+          onBlockCommentsChange={onBlockCommentsChange}
+          onCommentsPendingDeletionChange={onCommentsPendingDeletionChange}
           onCancel={handleCancel}
           onSave={handleSave}
           onDelete={handleDelete}

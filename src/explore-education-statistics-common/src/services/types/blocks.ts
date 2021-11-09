@@ -45,6 +45,7 @@ export interface BaseBlock {
   id: string;
   order: number;
   type: BlockType;
+  isSaving?: boolean;
 }
 
 /**

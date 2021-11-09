@@ -44,6 +44,23 @@ export interface PluginCollection {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Plugin {}
 
+export interface CommentsPlugin extends Plugin {
+  addCommentMarker(id: string): void;
+  removeCommentMarker(id: string): void;
+  resolveCommentMarker(id: string, resolved: boolean): void;
+  selectCommentMarker(id: string): void;
+}
+
+export type CommentUndoRedoActions =
+  | 'undoRemoveComment'
+  | 'undoAddComment'
+  | 'redoAddComment'
+  | 'undoResolveComment'
+  | 'redoUnresolveComment'
+  | 'undoUnresolveComment'
+  | 'redoResolveComment'
+  | 'redoRemoveComment';
+
 export interface LinkDecoratorAutomatic {
   mode: 'automatic';
   callback: (url: string) => boolean | RegExpMatchArray | null;
@@ -105,8 +122,22 @@ export interface ImageUploadResult {
   [size: string]: string;
 }
 
+// https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_position-Position.html
+interface Position {
+  readonly index: number;
+  isAfter(otherPosition: Position): boolean;
+  isBefore(otherPosition: Position): boolean;
+}
+
+// https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_markercollection-Marker.html
+export interface Marker {
+  readonly name: string;
+  getStart(): Position;
+}
+
 // https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_model-Model.html
 export interface Model {
+  readonly markers: Marker[];
   readonly document: Document;
 }
 

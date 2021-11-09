@@ -1,4 +1,4 @@
-import { toolbarConfigs } from '@admin/components/form/FormEditor';
+import { toolbarConfigs } from '@admin/utils/ckeditor/ckEditorConfig';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
 import Accordion from '@common/components/Accordion';

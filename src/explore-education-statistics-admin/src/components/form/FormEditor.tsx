@@ -1,10 +1,21 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
+import { SelectedComment } from '@admin/components/editable/EditableContentForm';
 import {
+  CommentsPlugin,
+  CommentUndoRedoActions,
+  Editor as EditorType,
   EditorConfig,
   Element,
-  HeadingOption,
-  ResizeOption,
+  Marker,
 } from '@admin/types/ckeditor';
+import {
+  defaultAllowedHeadings,
+  headingOptions,
+  imageToolbar,
+  resizeOptions,
+  tableContentToolbar,
+  toolbarConfigs,
+} from '@admin/utils/ckeditor/ckEditorConfig';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -26,151 +37,110 @@ import React, {
   useRef,
 } from 'react';
 
-export const toolbarConfigs = {
-  full: [
-    'heading',
-    '|',
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'blockQuote',
-    'insertTable',
-    'imageUpload',
-    '|',
-    'redo',
-    'undo',
-  ],
-  simple: [
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'redo',
-    'undo',
-  ],
-};
-
-const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
-
-const headingOptions: HeadingOption[] = [
-  {
-    model: 'heading1',
-    view: 'h1',
-    title: 'Heading 1',
-    class: 'ck-heading_heading1',
-  },
-  {
-    model: 'heading2',
-    view: 'h2',
-    title: 'Heading 2',
-    class: 'ck-heading_heading2',
-  },
-  {
-    model: 'heading3',
-    view: 'h3',
-    title: 'Heading 3',
-    class: 'ck-heading_heading3',
-  },
-  {
-    model: 'heading4',
-    view: 'h4',
-    title: 'Heading 4',
-    class: 'ck-heading_heading4',
-  },
-  {
-    model: 'heading5',
-    view: 'h5',
-    title: 'Heading 5',
-    class: 'ck-heading_heading5',
-  },
-];
-
-const imageToolbar: string[] = [
-  'imageTextAlternative',
-  '|',
-  'imageResize:50',
-  'imageResize:75',
-  'imageResize:original',
-];
-
-const resizeOptions: ResizeOption[] = [
-  {
-    name: 'imageResize:original',
-    value: null,
-    label: 'Original',
-    icon: 'original',
-  },
-  {
-    name: 'imageResize:50',
-    value: '50',
-    label: '50%',
-    icon: 'medium',
-  },
-  {
-    name: 'imageResize:75',
-    value: '75',
-    label: '75%',
-    icon: 'large',
-  },
-];
-
-const tableContentToolbar = ['tableColumn', 'tableRow', 'mergeTableCells'];
-
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
+export interface BlockCommentsState {
+  adding?: string;
+  removing?: string;
+  resolving?: string;
+  unresolving?: string;
+}
 
 export interface FormEditorProps {
+  allowComments?: boolean;
   allowedHeadings?: string[];
+  blockCommentsState?: BlockCommentsState;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
   hint?: string;
   id: string;
   label: string;
+  selectedComment?: SelectedComment;
+  testId?: string;
   toolbarConfig?: string[];
   value: string;
-  testId?: string;
+  onAddCommentClicked?: () => void;
+  onAutoSave?: (values: string) => void;
   onBlur?: () => void;
+  onCancelComment?: () => void;
+  onChange: EditorChangeHandler;
+  onCommentMarkerClicked?: (commentId: string) => void;
+  onCommentMarkerRemoved?: (commentId: string) => void;
   onElementsChange?: EditorElementsHandler;
   onElementsReady?: EditorElementsHandler;
-  onChange: EditorChangeHandler;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
+  onUndoRedo?: (type: CommentUndoRedoActions, commentId: string) => void;
+  onUpdateMarkersOrder?: (markerIds: string[]) => void;
 }
 
 const FormEditor = ({
+  allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
+  blockCommentsState,
   error,
   focusOnInit,
   hideLabel,
   hint,
   id,
   label,
+  selectedComment,
+  testId,
   toolbarConfig = toolbarConfigs.full,
   value,
-  testId,
+  onAutoSave,
+  onAddCommentClicked,
   onBlur,
+  onCancelComment,
   onChange,
+  onCommentMarkerClicked,
+  onCommentMarkerRemoved,
   onElementsChange,
   onElementsReady,
   onImageUpload,
   onImageUploadCancel,
+  onUndoRedo,
+  onUpdateMarkersOrder,
 }: FormEditorProps) => {
-  const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  const editorInstance = useRef<EditorType>();
+  const commentsPlugin = useRef<CommentsPlugin>();
 
+  const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const [isFocused, toggleFocused] = useToggle(false);
+
+  // Get the order of the markers based on their position in the editor.
+  // Used to order the comments list.
+  const getMarkersOrder = (markers: Marker[]) => {
+    const orderedMarkerIds: string[] = [];
+    markers.sort((a, b) => {
+      if (a.getStart().isAfter(b.getStart())) {
+        return 1;
+      }
+      if (a.getStart().isBefore(b.getStart())) {
+        return -1;
+      }
+      return 0;
+    });
+
+    markers.forEach(marker => {
+      const markerId = marker.name.startsWith('comment:')
+        ? marker.name.replace('comment:', '')
+        : marker.name.replace('resolvedcomment:', '');
+      orderedMarkerIds.push(markerId);
+    });
+
+    return orderedMarkerIds;
+  };
 
   const config = useMemo<EditorConfig>(() => {
     const toolbar = toolbarConfig?.filter(tool => {
       // Disable image upload if no callback provided
       if (tool === 'imageUpload' && !onImageUpload) {
+        return false;
+      }
+      // Disable comments if not allowed.
+      if (tool === 'comment' && !allowComments) {
         return false;
       }
 
@@ -219,8 +189,76 @@ const FormEditor = ({
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
           : undefined,
+      comments: allowComments
+        ? {
+            addComment() {
+              // Add comment button in editor clicked
+              if (onAddCommentClicked) {
+                onAddCommentClicked();
+              }
+            },
+            commentSelected(markerId?: string) {
+              // Comment marker selected in the editor
+              if (onCommentMarkerClicked) {
+                const commentId = markerId
+                  ? markerId.replace('comment:', '')
+                  : '';
+                onCommentMarkerClicked(commentId);
+              }
+            },
+            commentRemoved(markerId: string) {
+              // Comment marker removed in the editor
+              if (
+                onCommentMarkerRemoved &&
+                onAutoSave &&
+                editorInstance.current
+              ) {
+                onCommentMarkerRemoved(markerId.replace('comment:', ''));
+                onAutoSave(editorInstance.current.getData());
+              }
+            },
+            commentCancelled() {
+              // if adding a comment is cancelled from within the editor (by clicking outside the placeholder marker)
+              if (onCancelComment) {
+                onCancelComment();
+              }
+            },
+            undoRedoComment(type: CommentUndoRedoActions, markerId: string) {
+              if (onUndoRedo) {
+                const commentId = markerId.startsWith('comment:')
+                  ? markerId.replace('comment:', '')
+                  : markerId.replace('resolvedcomment:', '');
+                onUndoRedo(type, commentId);
+              }
+            },
+          }
+        : undefined,
+      autosave: onAutoSave
+        ? {
+            save() {
+              if (editorInstance.current) {
+                return onAutoSave(editorInstance.current.getData());
+              }
+              return false;
+            },
+            waitingTime: 5000,
+          }
+        : undefined,
     };
-  }, [allowedHeadings, onImageUpload, onImageUploadCancel, toolbarConfig]);
+  }, [
+    allowComments,
+    allowedHeadings,
+    editorInstance,
+    onAddCommentClicked,
+    onAutoSave,
+    onCancelComment,
+    onCommentMarkerClicked,
+    onCommentMarkerRemoved,
+    onImageUpload,
+    onImageUploadCancel,
+    onUndoRedo,
+    toolbarConfig,
+  ]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
@@ -294,9 +332,70 @@ const FormEditor = ({
           Array.from(editor.model.document.getRoot('main').getChildren()),
         );
       }
+      editorInstance.current = editor;
+      commentsPlugin.current = editor.plugins.get('Comments') as CommentsPlugin;
+
+      if (onUpdateMarkersOrder) {
+        onUpdateMarkersOrder(getMarkersOrder([...editor.model.markers]));
+      }
     },
-    [focusOnInit, onElementsReady],
+    [focusOnInit, onElementsReady, onUpdateMarkersOrder],
   );
+
+  useEffect(() => {
+    if (
+      !selectedComment?.fromEditor &&
+      selectedComment?.commentId &&
+      commentsPlugin.current
+    ) {
+      commentsPlugin.current.selectCommentMarker(selectedComment.commentId);
+    }
+  }, [selectedComment]);
+
+  useEffect(() => {
+    function updateMarker() {
+      if (!commentsPlugin.current || !blockCommentsState) {
+        return;
+      }
+      if (blockCommentsState.adding) {
+        commentsPlugin.current.addCommentMarker(blockCommentsState.adding);
+        if (onUpdateMarkersOrder && editorInstance.current) {
+          onUpdateMarkersOrder(
+            getMarkersOrder([...editorInstance.current.model.markers]),
+          );
+        }
+        return;
+      }
+      if (blockCommentsState.removing) {
+        commentsPlugin.current.removeCommentMarker(blockCommentsState.removing);
+        return;
+      }
+      if (blockCommentsState.resolving) {
+        commentsPlugin.current.resolveCommentMarker(
+          blockCommentsState.resolving,
+          false,
+        );
+        return;
+      }
+      if (blockCommentsState.unresolving) {
+        commentsPlugin.current.resolveCommentMarker(
+          blockCommentsState.unresolving,
+          true,
+        );
+      }
+    }
+
+    updateMarker();
+    if (onAutoSave && editorInstance.current) {
+      onAutoSave(editorInstance.current.getData());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    blockCommentsState?.adding,
+    blockCommentsState?.removing,
+    blockCommentsState?.resolving,
+    blockCommentsState?.unresolving,
+  ]);
 
   const isReadOnly = isBrowser('IE');
 
@@ -333,8 +432,8 @@ const FormEditor = ({
             [styles.focused]: isFocused,
           })}
           data-testid={isFocused ? `${testId}-focused` : testId}
-          ref={ref => {
-            const editorElement = ref?.querySelector<HTMLDivElement>(
+          ref={thisRef => {
+            const editorElement = thisRef?.querySelector<HTMLDivElement>(
               '[role="textbox"]',
             );
 
