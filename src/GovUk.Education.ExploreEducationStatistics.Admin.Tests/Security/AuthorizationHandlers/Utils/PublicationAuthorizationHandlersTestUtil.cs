@@ -129,6 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public static async void AssertHandlerOnlySucceedsWithPublicationRole<TRequirement, TEntity>(
             Guid publicationId,
             TEntity handleRequirementArgument,
+            Action<ContentDbContext> addToDbHandler,
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             params PublicationRole[] successfulRoles)
             where TRequirement : IAuthorizationRequirement
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var contentDbContextId = Guid.NewGuid().ToString();
                 using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    await contentDbContext.AddAsync(handleRequirementArgument!);
+                    addToDbHandler(contentDbContext);
                     await contentDbContext.AddAsync(new UserPublicationRole
                     {
                         UserId = userId,
@@ -174,8 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // NOTE: Permission should fail if user no publication role
             using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
             {
-                await contentDbContext.AddRangeAsync(
-                    handleRequirementArgument);
+                addToDbHandler(contentDbContext);
                 await contentDbContext.SaveChangesAsync();
             }
 
