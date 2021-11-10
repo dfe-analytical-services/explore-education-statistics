@@ -105,5 +105,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.ReleaseId == latestRelease.Id &&
                     roles.Contains(r.Role));
         }
+
+        public async Task<List<UserReleaseRole>> GetAllReleaseRoles(ReleaseRole role, params Guid[] releaseIds)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .Include(releaseRole => releaseRole.User)
+                .AsAsyncEnumerable()
+                .Where(releaseRole =>
+                    releaseIds.Contains(releaseRole.ReleaseId)
+                    && releaseRole.Role == role)
+                .ToListAsync();
+        }
     }
 }
