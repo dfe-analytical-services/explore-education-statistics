@@ -10,7 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
 
         Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
-
-        Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false);
     }
 }

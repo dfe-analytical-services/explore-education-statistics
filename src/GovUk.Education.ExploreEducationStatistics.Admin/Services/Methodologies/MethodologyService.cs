@@ -284,11 +284,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     query => query.Include(m => m.Versions))
                 .OnSuccess(async methodology =>
                 {
-                    return await methodology.Versions
-                        .OrderBy(methodologyVersion => new IdAndPreviousVersionIdPair(
-                                methodologyVersion.Id,
-                                methodologyVersion.PreviousVersionId),
-                            new VersionedEntityDeletionOrderComparer())
+                    var methodologyVersionIds= methodology
+                        .Versions
+                        .Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
+                                methodologyVersion.Id.ToString(),
+                                methodologyVersion.PreviousVersionId?.ToString()))
+                        .ToList();
+
+                    var methodologyVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
+                        .Sort(methodologyVersionIds)
+                        .Select(ids => Guid.Parse(ids.Id));
+                        
+                    return await methodologyVersionIdsInDeleteOrder    
+                        .Select(methodologyVersionId => methodology.Versions.Single(version => version.Id == methodologyVersionId))
                         .Select(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                         .OnSuccessAll()
                         .OnSuccessVoid(async () =>

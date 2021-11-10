@@ -13,3 +13,6 @@ Compare current Table tool page with snapshot
 
 Compare current Data catalogue page with snapshot
     validate data catalogue snapshot
+
+Compare current All methodologies page with snapshot
+    validate all methodologies snapshot

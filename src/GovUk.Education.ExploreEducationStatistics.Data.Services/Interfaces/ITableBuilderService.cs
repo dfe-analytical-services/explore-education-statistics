@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
     {
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext);
 
-        Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext);
+        Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
+            Guid releaseId,
+            ObservationQueryContext queryContext);
     }
 }

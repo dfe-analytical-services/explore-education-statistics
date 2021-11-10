@@ -33,24 +33,25 @@ Select subject "Exclusions by geographic level"
     user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    Exclusions by geographic level
 
-Select Locations LA, Bury, Sheffield, York
+Select all LA Locations
     user opens details dropdown    Local Authority
-    user clicks checkbox    Bury
-    user clicks checkbox    Sheffield
-    user clicks checkbox    York
+    user clicks button    Select all 156 options
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Bury
-    user checks previous table tool step contains    3    Local Authority    Sheffield
-    user checks previous table tool step contains    3    Local Authority    York
+    user checks previous table tool step contains    3    Local Authority    Barking and Dagenham
+    user checks previous table tool step contains    3    Local Authority    Barnet
+    user checks previous table tool step contains    3    Local Authority    Barnsley
+    user checks previous table tool step contains    3    Local Authority    Bath and North East Somerset
+    user checks previous table tool step contains    3    Local Authority    Bedford
+    user checks previous table tool step contains    3    Local Authority    Show 151 more items
 
-Select Start date and End date
+Select all available Time periods
     user chooses select option    id:timePeriodForm-start    2006/07
-    user chooses select option    id:timePeriodForm-end    2008/09
+    user chooses select option    id:timePeriodForm-end    2016/17
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
-    user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
+    user checks previous table tool step contains    4    Time period    2006/07 to 2016/17
 
 Select Indicator - Number of pupils
     user clicks indicator checkbox    Number of pupils
@@ -64,14 +65,75 @@ Select Indicator - Number of fixed period exclusions
     user clicks indicator checkbox    Number of fixed period exclusions
     user checks indicator checkbox is checked    Number of fixed period exclusions
 
-Select Characteristics
+Select Indicator - Number of schools
+    user clicks indicator checkbox    Number of schools
+    user checks indicator checkbox is checked    Number of schools
+
+Select Indicator - Permanent exclusion rate
+    user clicks indicator checkbox    Permanent exclusion rate
+    user checks indicator checkbox is checked    Permanent exclusion rate
+
+Select Characteristic School types
     user opens details dropdown    School type
+    user clicks category checkbox    School type    State-funded primary
     user clicks category checkbox    School type    State-funded secondary
+    user clicks category checkbox    School type    Special
 
 User clicks Create table button
     user clicks element    id:filtersForm-submit
 
-User waits for table to appear
+Validate the query could exceed the maximum allowable table size
+    user waits until page contains element    id:filtersForm-tableSizeError-title
+    user checks page contains    Could not create table as the filters chosen may exceed the maximum allowed table size
+    user clicks button    Download Exclusions by geographic level (csv, 0.00 B)
+
+Go back to Locations step
+    user clicks button    Edit locations
+    user waits until page contains element    xpath://h1[text()="Go back to previous step"]
+    user clicks button    Confirm
+
+Unselect all LA Locations
+    user opens details dropdown    Local Authority
+    user clicks button    Unselect all 156 options
+    user checks page contains element
+    ...    xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
+
+Select Locations LA, Bury, Sheffield, York
+    user clicks checkbox    Bury
+    user clicks checkbox    Sheffield
+    user clicks checkbox    York
+    user clicks element    id:locationFiltersForm-submit
+    user waits until table tool wizard step is available    4    Choose time period
+    user checks previous table tool step contains    3    Local Authority    Bury
+    user checks previous table tool step contains    3    Local Authority    Sheffield
+    user checks previous table tool step contains    3    Local Authority    York
+
+Select new start and end date
+    user chooses select option    id:timePeriodForm-start    2006/07
+    user chooses select option    id:timePeriodForm-end    2008/09
+    user clicks element    id:timePeriodForm-submit
+    user waits until table tool wizard step is available    5    Choose your filters
+    user waits until page contains element    id:filtersForm-indicators
+    user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
+
+Select Indicator again - Number of pupils
+    user clicks indicator checkbox    Number of pupils
+    user checks indicator checkbox is checked    Number of pupils
+
+Select Indicator again - Number of permanent exclusions
+    user clicks indicator checkbox    Number of permanent exclusions
+    user checks indicator checkbox is checked    Number of permanent exclusions
+
+Select Indicator again - Number of fixed period exclusions
+    user clicks indicator checkbox    Number of fixed period exclusions
+    user checks indicator checkbox is checked    Number of fixed period exclusions
+
+Select Characteristic School type - State-funded secondary
+    user opens details dropdown    School type
+    user clicks category checkbox    School type    State-funded secondary
+
+Create table again
+    user clicks element    id:filtersForm-submit
     # Extra timeout until EES-234
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -22,12 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private static readonly Guid SubjectId = Guid.NewGuid();
         private static readonly Guid ReleaseId = Guid.NewGuid();
 
-        private readonly Subject _subject = new Subject
+        private readonly Subject _subject = new()
         {
             Id = SubjectId,
         };
 
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = ReleaseId,
         };
@@ -123,22 +125,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         private TableBuilderService BuildTableBuilderService(
-            IObservationService observationService = null,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
-            IResultSubjectMetaService resultSubjectMetaService = null,
-            ISubjectRepository subjectRepository = null,
-            IUserService userService = null,
-            IResultBuilder<Observation, ObservationViewModel> resultBuilder = null,
-            IReleaseRepository releaseRepository = null)
+            IFilterItemRepository? filterItemRepository = null,
+            IObservationService? observationService = null,
+            IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+            IResultSubjectMetaService? resultSubjectMetaService = null,
+            ISubjectRepository? subjectRepository = null,
+            IUserService? userService = null,
+            IResultBuilder<Observation, ObservationViewModel>? resultBuilder = null,
+            IReleaseRepository? releaseRepository = null,
+            IOptions<TableBuilderOptions>? options = null)
         {
-            return new TableBuilderService(
-                observationService ?? new Mock<IObservationService>().Object,
+            return new(
+                filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
+                observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? StatisticsPersistenceHelperMock(_subject).Object,
-                resultSubjectMetaService ?? new Mock<IResultSubjectMetaService>().Object,
-                subjectRepository ?? new Mock<ISubjectRepository>().Object,
-                userService ?? new Mock<IUserService>().Object,
+                resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(MockBehavior.Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
                 resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
-                releaseRepository ?? new Mock<IReleaseRepository>().Object
+                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
+                options ?? Options.Create(new TableBuilderOptions())
             );
         }
 

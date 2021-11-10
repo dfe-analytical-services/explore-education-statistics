@@ -1,24 +1,31 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
+        private readonly IFilterItemRepository _filterItemRepository;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IResultSubjectMetaService _resultSubjectMetaService;
@@ -26,16 +33,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IUserService _userService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
         private readonly IReleaseRepository _releaseRepository;
+        private readonly TableBuilderOptions _options;
 
         public TableBuilderService(
+            IFilterItemRepository filterItemRepository,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IResultSubjectMetaService resultSubjectMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IResultBuilder<Observation, ObservationViewModel> resultBuilder,
-            IReleaseRepository releaseRepository)
+            IResultBuilder<Observation,
+                ObservationViewModel> resultBuilder,
+            IReleaseRepository releaseRepository,
+            IOptions<TableBuilderOptions> options)
         {
+            _filterItemRepository = filterItemRepository;
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _resultSubjectMetaService = resultSubjectMetaService;
@@ -43,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
             _resultBuilder = resultBuilder;
             _releaseRepository = releaseRepository;
+            _options = options.Value;
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
@@ -79,6 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccessDo(CheckCanViewSubjectData)
                 .OnSuccess(async () =>
                 {
+                    if (await GetMaximumTableCellCount(queryContext) > _options.MaxTableCellsAllowed)
+                    {
+                        return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
+                    }
+
                     var observations = _observationService.FindObservations(queryContext).AsQueryable();
 
                     if (!observations.Any())
@@ -87,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _resultSubjectMetaService
-                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
+                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
+                            observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
@@ -100,6 +119,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
+        private async Task<int> GetMaximumTableCellCount(ObservationQueryContext queryContext)
+        {
+            var filterItemIds = queryContext.Filters;
+            var countsOfFilterItemsByFilter = filterItemIds == null
+                ? new List<int>()
+                : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
+                .Select(pair =>
+                {
+                    var (_, count) = pair;
+                    return count;
+                })
+                .ToList();
+
+            // TODO Accessing time periods for the Subject by altering the Importer to store them would improve accuracy
+            // here rather than assuming the Subject has all time periods between the start and end range.
+
+            return TableBuilderUtils.MaximumTableCellCount(
+                countOfIndicators: queryContext.Indicators.Count(),
+                countOfLocations: queryContext.Locations.CountItems(),
+                countOfTimePeriods: TimePeriodUtil.Range(queryContext.TimePeriod).Count(),
+                countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
+            );
+        }
+
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
             if (await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id) ||
@@ -110,5 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return new ForbidResult();
         }
+    }
+
+    public class TableBuilderOptions
+    {
+        public const string TableBuilder = "TableBuilder";
+
+        public int MaxTableCellsAllowed { get; set; }
     }
 }

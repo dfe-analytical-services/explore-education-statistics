@@ -55,19 +55,20 @@ const BasicReleaseSummary = ({ release }: Props) => {
     <>
       {releaseTypeIdsToIcons && (
         <>
-          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
-            <div className="dfe-flex govuk-!-margin-bottom-3">
-              <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
+            <div>
+              <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
+                {getReleaseApprovalStatusLabel(release.approvalStatus)}
+              </Tag>
+              <Tag>{release.type.title}</Tag>
             </div>
             {releaseTypeIdsToIcons[release.type.id] && (
-              <div className="dfe-flex">
-                <img
-                  src={releaseTypeIdsToIcons[release.type.id].url}
-                  alt={releaseTypeIdsToIcons[release.type.id].altText}
-                  height="120"
-                  width="120"
-                />
-              </div>
+              <img
+                src={releaseTypeIdsToIcons[release.type.id].url}
+                alt={releaseTypeIdsToIcons[release.type.id].altText}
+                height="60"
+                width="60"
+              />
             )}
           </div>
 

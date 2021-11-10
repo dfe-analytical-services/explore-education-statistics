@@ -7,20 +7,28 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useToggle from '@common/hooks/useToggle';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
-import { SubjectMeta } from '@common/services/tableBuilderService';
+import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import TableSizeError from '@common/modules/table-tool/components/TableSizeError';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import WizardStepEditButton from '@common/modules/table-tool/components/WizardStepEditButton';
+import {
+  SelectedPublication,
+  Subject,
+  SubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
+import { isServerValidationError } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo } from 'react';
-import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
-import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
-import { InjectedWizardProps } from './Wizard';
-import WizardStepFormActions from './WizardStepFormActions';
-import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
+import React, { useMemo, useState } from 'react';
 
 export interface FormValues {
   indicators: string[];
@@ -34,7 +42,11 @@ interface Props {
     indicators: string[];
     filters: string[];
   };
+  selectedPublication?: SelectedPublication;
+  subject: Subject;
   subjectMeta: SubjectMeta;
+  showTableSizeErrorDownload?: boolean;
+  onTableSizeError?: (publicationTitle: string, subjectName: string) => void;
   onSubmit: FilterFormSubmitHandler;
 }
 
@@ -43,13 +55,20 @@ const formId = 'filtersForm';
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     onSubmit,
+    selectedPublication,
+    subject,
     subjectMeta,
     goToNextStep,
     currentStep,
     stepNumber,
     initialValues,
     isActive,
+    showTableSizeErrorDownload = true,
+    onTableSizeError,
   } = props;
+
+  const [hasTableSizeError, toggleTableSizeError] = useToggle(false);
+  const [previousValues, setPreviousValues] = useState<FormValues>();
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -93,6 +112,27 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const handleSubmit = async (values: FormValues) => {
+    setPreviousValues(values);
+    try {
+      await onSubmit(values);
+      toggleTableSizeError.off();
+      goToNextStep();
+    } catch (error) {
+      if (
+        isServerValidationError(error, 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')
+      ) {
+        if (onTableSizeError) {
+          onTableSizeError(
+            selectedPublication?.title || '',
+            subject?.name || '',
+          );
+        }
+        toggleTableSizeError.on();
+      }
+    }
+  };
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -113,10 +153,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           ),
         ),
       })}
-      onSubmit={async submittedValues => {
-        await onSubmit(submittedValues);
-        goToNextStep();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => {
         const { getError } = createErrorHelper(form);
@@ -124,6 +161,17 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
+              {hasTableSizeError &&
+                form.submitCount > 0 &&
+                isEqual(form.values, previousValues) && (
+                  <TableSizeError
+                    id={`${formId}-tableSizeError`}
+                    releaseId={selectedPublication?.selectedRelease.id}
+                    subject={subject}
+                    showDownloadOption={showTableSizeErrorDownload}
+                  />
+                )}
+
               {stepHeading}
 
               <FormGroup>

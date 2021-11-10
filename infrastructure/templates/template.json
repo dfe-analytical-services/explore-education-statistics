@@ -493,6 +493,13 @@
       "type": "bool",
       "defaultValue": false
     },
+    "tableBuilderMaxTableCellsAllowed": {
+      "type": "int",
+      "defaultValue": 25000,
+      "metadata": {
+        "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
+      }
+    },
     "timeZone": {
       "type": "string",
       "defaultValue": "GMT Standard Time"
@@ -1196,7 +1203,8 @@
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
-        "enableSwagger": "[parameters('enableSwagger')]"
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
     {
@@ -1659,7 +1667,8 @@
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]",
-        "enableThemeDeletion": "[parameters('enableThemeDeletion')]"
+        "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
     {

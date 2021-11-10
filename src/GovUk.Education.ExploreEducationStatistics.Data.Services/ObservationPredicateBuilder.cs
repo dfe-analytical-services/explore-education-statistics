@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -34,15 +35,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.AndAlso(subPredicate);
             }
 
-            if (query.Locations?.GeographicLevel != null)
+            if (query.Locations != null)
             {
-                predicate = predicate.AndAlso(observation =>
-                    observation.GeographicLevel == query.Locations.GeographicLevel);
-            }
+                if (query.Locations.GeographicLevel != null)
+                {
+                    predicate = predicate.AndAlso(observation =>
+                        observation.GeographicLevel == query.Locations.GeographicLevel);
+                }
 
-            if (ObservationalUnitExists(query.Locations))
-            {
-                predicate = predicate.AndAlso(ObservationalUnitsPredicate(query.Locations));
+                if (ObservationalUnitExists(query.Locations))
+                {
+                    predicate = predicate.AndAlso(ObservationalUnitsPredicate(query.Locations));
+                }
             }
 
             return predicate;
@@ -52,87 +56,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var predicate = PredicateBuilder.False<Observation>();
 
-            if (query.Country != null)
+            if (query.Country.Any())
             {
                 predicate = predicate.Or(CountryPredicate(query));
             }
 
-            if (query.EnglishDevolvedArea != null)
+            if (query.EnglishDevolvedArea.Any())
             {
                 predicate = predicate.Or(EnglishDevolvedAreaPredicate(query));
             }
 
-            if (query.Institution != null)
+            if (query.Institution.Any())
             {
                 predicate = predicate.Or(InstitutionPredicate(query));
             }
 
-            if (query.LocalAuthority != null)
+            if (query.LocalAuthority.Any())
             {
                 predicate = predicate.Or(LocalAuthorityPredicate(query));
             }
 
-            if (query.LocalAuthorityDistrict != null)
+            if (query.LocalAuthorityDistrict.Any())
             {
                 predicate = predicate.Or(LocalAuthorityDistrictPredicate(query));
             }
 
-            if (query.LocalEnterprisePartnership != null)
+            if (query.LocalEnterprisePartnership.Any())
             {
                 predicate = predicate.Or(LocalEnterprisePartnershipPredicate(query));
             }
 
-            if (query.MayoralCombinedAuthority != null)
+            if (query.MayoralCombinedAuthority.Any())
             {
                 predicate = predicate.Or(MayoralCombinedAuthorityPredicate(query));
             }
 
-            if (query.MultiAcademyTrust != null)
+            if (query.MultiAcademyTrust.Any())
             {
                 predicate = predicate.Or(MultiAcademyTrustPredicate(query));
             }
 
-            if (query.OpportunityArea != null)
+            if (query.OpportunityArea.Any())
             {
                 predicate = predicate.Or(OpportunityAreaPredicate(query));
             }
 
-            if (query.ParliamentaryConstituency != null)
+            if (query.ParliamentaryConstituency.Any())
             {
                 predicate = predicate.Or(ParliamentaryConstituencyPredicate(query));
             }
 
-            if (query.Provider != null)
+            if (query.Provider.Any())
             {
                 predicate = predicate.Or(ProviderPredicate(query));
             }
 
-            if (query.Region != null)
+            if (query.Region.Any())
             {
                 predicate = predicate.Or(RegionPredicate(query));
             }
 
-            if (query.RscRegion != null)
+            if (query.RscRegion.Any())
             {
                 predicate = predicate.Or(RscRegionPredicate(query));
             }
 
-            if (query.School != null)
+            if (query.School.Any())
             {
                 predicate = predicate.Or(SchoolPredicate(query));
             }
 
-            if (query.Sponsor != null)
+            if (query.Sponsor.Any())
             {
                 predicate = predicate.Or(SponsorPredicate(query));
             }
 
-            if (query.Ward != null)
+            if (query.Ward.Any())
             {
                 predicate = predicate.Or(WardPredicate(query));
             }
 
-            if (query.PlanningArea != null)
+            if (query.PlanningArea.Any())
             {
                 predicate = predicate.Or(PlanningAreaPredicate(query));
             }
@@ -142,22 +146,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static bool ObservationalUnitExists(LocationQuery query)
         {
-            return !(query == null ||
-                     query.Country == null &&
-                     query.EnglishDevolvedArea == null &&
-                     query.Institution == null &&
-                     query.LocalAuthority == null &&
-                     query.LocalAuthorityDistrict == null &&
-                     query.LocalEnterprisePartnership == null &&
-                     query.MultiAcademyTrust == null &&
-                     query.MayoralCombinedAuthority == null &&
-                     query.OpportunityArea == null &&
-                     query.ParliamentaryConstituency == null &&
-                     query.Region == null &&
-                     query.RscRegion == null &&
-                     query.Sponsor == null &&
-                     query.Ward == null &&
-                     query.PlanningArea == null);
+            return query.Country.Any() ||
+                   query.EnglishDevolvedArea.Any() ||
+                   query.Institution.Any() ||
+                   query.LocalAuthority.Any() ||
+                   query.LocalAuthorityDistrict.Any() ||
+                   query.LocalEnterprisePartnership.Any() ||
+                   query.MultiAcademyTrust.Any() ||
+                   query.MayoralCombinedAuthority.Any() ||
+                   query.OpportunityArea.Any() ||
+                   query.ParliamentaryConstituency.Any() ||
+                   query.Region.Any() ||
+                   query.RscRegion.Any() ||
+                   query.Sponsor.Any() ||
+                   query.Ward.Any() ||
+                   query.PlanningArea.Any();
         }
 
         private static Expression<Func<Observation, bool>> CountryPredicate(LocationQuery query)

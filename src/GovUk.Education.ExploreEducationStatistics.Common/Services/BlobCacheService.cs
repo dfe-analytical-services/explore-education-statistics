@@ -28,6 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
         }
 
+        public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
+        {
+            await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
+        }
+
+
         public async Task<TItem> GetItem<TItem>(
             IBlobCacheKey cacheKey,
             Func<TItem> itemSupplier)
@@ -118,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Caught error fetching cache entry from: {blobContainer}/{key}");
+                _logger.LogError(e, "Caught error fetching cache entry from: {BlobContainer}/{Key}", blobContainer, key);
             }
 
             return default;

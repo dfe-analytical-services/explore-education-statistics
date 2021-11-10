@@ -1,12 +1,17 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
@@ -14,90 +19,109 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     {
         private readonly TableBuilderMetaController _controller;
 
-        private static readonly Guid SubjectId = new Guid("3a5cbb72-ccd5-4afd-9a72-0f73d323d192");
-        private static readonly Guid NotFoundId = new Guid("9d20d622-b9ec-4199-9d89-57726a8588cb");
-        private static readonly Guid NotPublishedId = new Guid("200b8b6e-a033-42ba-9af5-236194ea3c7f");
-
-        private readonly SubjectMetaQueryContext _queryContext = new SubjectMetaQueryContext
+        private static readonly Guid SubjectId = Guid.NewGuid();
+        private static readonly SubjectMetaQueryContext QueryContext = new SubjectMetaQueryContext
         {
             SubjectId = SubjectId
         };
 
-        private readonly SubjectMetaQueryContext _queryContextNotFound = new SubjectMetaQueryContext
-        {
-            SubjectId = NotFoundId
-        };
-
-        private readonly SubjectMetaQueryContext _queryContextNotPublished = new SubjectMetaQueryContext
-        {
-            SubjectId = NotPublishedId
-        };
-
-        public TableBuilderMetaControllerTests()
-        {
-            var subjectMetaService = new Mock<ISubjectMetaService>();
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(SubjectId))
-                .ReturnsAsync(new SubjectMetaViewModel());
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(_queryContext))
-                .ReturnsAsync(new SubjectMetaViewModel());
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(NotFoundId)).ReturnsAsync(new NotFoundResult());
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(NotPublishedId)).ReturnsAsync(new ForbidResult());
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(
-                    It.Is<SubjectMetaQueryContext>(queryContext => queryContext == _queryContextNotFound)))
-                .ReturnsAsync(new NotFoundResult());
-
-            subjectMetaService.Setup(s => s.GetSubjectMeta(
-                    It.Is<SubjectMetaQueryContext>(queryContext => queryContext == _queryContextNotPublished)))
-                .ReturnsAsync(new ForbidResult());
-
-            _controller = new TableBuilderMetaController(subjectMetaService.Object);
-        }
-
         [Fact]
         public async Task Get_SubjectMetaAsync_Returns_Ok()
         {
-            var result = await _controller.GetSubjectMetaAsync(SubjectId);
-            Assert.IsAssignableFrom<SubjectMetaViewModel>(result.Value);
+            var subjectMetaViewModel = new SubjectMetaViewModel();
+            
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks
+                .subjectMetaService
+                .Setup(s => s.GetSubjectMeta(SubjectId))
+                .ReturnsAsync(subjectMetaViewModel);
+
+            mocks
+                .cacheKeyService
+                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
+                .ReturnsAsync(new SubjectMetaCacheKey("publication", "release", SubjectId));
+            
+            var result = await controller.GetSubjectMetaAsync(SubjectId);
+            VerifyAllMocks(mocks);
+
+            result.AssertOkResult(subjectMetaViewModel);
         }
 
         [Fact]
         public async Task Get_SubjectMetaAsync_Returns_NotFound()
         {
-            var result = await _controller.GetSubjectMetaAsync(NotFoundId);
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
+            var (controller, mocks) = BuildControllerAndMocks();
 
-        [Fact]
-        public async Task Get_SubjectMetaAsync_Returns_Forbidden()
-        {
-            var result = await _controller.GetSubjectMetaAsync(NotPublishedId);
-            Assert.IsAssignableFrom<ForbidResult>(result.Result);
+            mocks
+                .subjectMetaService
+                .Setup(s => s.GetSubjectMeta(SubjectId))
+                .ReturnsAsync(new NotFoundResult());
+
+            mocks
+                .cacheKeyService
+                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
+                .ReturnsAsync(new SubjectMetaCacheKey("publication", "release", SubjectId));
+            
+            var result = await controller.GetSubjectMetaAsync(SubjectId);
+            VerifyAllMocks(mocks);
+            
+            result.AssertNotFoundResult();
         }
 
         [Fact]
         public async Task Post_SubjectMetaAsync_Returns_Ok()
         {
-            var result = await _controller.GetSubjectMetaAsync(_queryContext);
-            Assert.IsAssignableFrom<SubjectMetaViewModel>(result.Value);
+            var subjectMetaViewModel = new SubjectMetaViewModel();
+
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks
+                .subjectMetaService
+                .Setup(s => s.GetSubjectMeta(QueryContext))
+                .ReturnsAsync(subjectMetaViewModel);
+
+            var result = await controller.GetSubjectMetaAsync(QueryContext);
+            VerifyAllMocks(mocks);
+
+            result.AssertOkResult(subjectMetaViewModel);
         }
 
         [Fact]
         public async Task Post_SubjectMetaAsync_Returns_NotFound()
         {
-            var result = await _controller.GetSubjectMetaAsync(_queryContextNotFound);
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks
+                .subjectMetaService
+                .Setup(s => s.GetSubjectMeta(QueryContext))
+                .ReturnsAsync(new NotFoundResult());
+
+            var result = await controller.GetSubjectMetaAsync(QueryContext);
+            VerifyAllMocks(mocks);
+            
+            result.AssertNotFoundResult();
         }
 
-        [Fact]
-        public async Task Post_SubjectMetaAsync_Returns_Forbidden()
+        private (
+            TableBuilderMetaController controller,
+            (
+            Mock<ISubjectMetaService> subjectMetaService,
+            Mock<ICacheKeyService> cacheKeyService
+            ) mocks
+            ) BuildControllerAndMocks()
         {
-            var result = await _controller.GetSubjectMetaAsync(_queryContextNotPublished);
-            Assert.IsAssignableFrom<ForbidResult>(result.Result);
+            var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
+            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+            var controller = new TableBuilderMetaController(subjectMetaService.Object, cacheKeyService.Object);
+            
+            return (
+                controller,
+                (
+                    subjectMetaService,
+                    cacheKeyService
+                )
+            );
         }
     }
 }

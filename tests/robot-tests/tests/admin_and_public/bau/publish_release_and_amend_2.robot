@@ -49,6 +49,8 @@ Add data guidance to second Subject
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
     user clicks button    Save guidance
+    user waits until page contains button    ${SUBJECT_NAME}
+    user waits until page contains button    ${SECOND_SUBJECT}
 
 Navigate to 'Footnotes' page
     user clicks link    Footnotes
@@ -271,10 +273,11 @@ Replace subject data
 
 Confirm data replacement
     user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
 
 Delete second subject file
     user clicks link    Data and files
-    user waits until h2 is visible    Add data file to release    %{WAIT_MEDIUM}
+    user waits until h2 is visible    Add data file to release
     user deletes subject file    ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for release amendment
@@ -474,7 +477,16 @@ Select the date cateogory
     user opens details dropdown    Date
     user clicks select all for category    Date
 
-Generate table
+Attempt to generate a table that is too large
+    user clicks element    id:filtersForm-submit
+    user waits until element contains    id:filtersForm-indicators-error
+    ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
+
+Reduce the number of selected Dates and generate a smaller table
+    user clicks unselect all for category    Date
+    user clicks category checkbox    Date    23/03/2020
+    user clicks category checkbox    Date    24/03/2020
+    user clicks category checkbox    Date    25/03/2020
     user clicks element    id:filtersForm-submit
     user waits until page contains    Generate shareable link    60
 

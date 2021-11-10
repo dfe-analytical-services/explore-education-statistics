@@ -5,6 +5,7 @@ import {
   releaseDataFileReplaceRoute,
   ReleaseDataFileReplaceRouteParams,
   ReleaseFootnoteRouteParams,
+  releaseFootnotesRoute,
 } from '@admin/routes/releaseRoutes';
 import dataReplacementService from '@admin/services/dataReplacementService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -93,7 +94,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                       <Link
                         unvisited
                         to={generatePath<ReleaseFootnoteRouteParams>(
-                          releaseDataBlocksRoute.path,
+                          releaseFootnotesRoute.path,
                           {
                             publicationId,
                             releaseId,

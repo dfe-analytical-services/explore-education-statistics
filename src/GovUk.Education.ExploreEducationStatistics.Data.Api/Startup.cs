@@ -101,6 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
+            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
+
             services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
@@ -144,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             services
                 .AddAuthentication(options => {

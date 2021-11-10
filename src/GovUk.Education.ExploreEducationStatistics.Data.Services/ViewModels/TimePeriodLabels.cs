@@ -6,8 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public class TimePeriodLabels
     {
-        public string From { get; } = string.Empty;
-        public string To { get; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
 
         public TimePeriodLabels()
         {

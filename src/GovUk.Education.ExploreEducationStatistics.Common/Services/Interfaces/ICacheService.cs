@@ -15,5 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task SetItem<TItem>(TKey cacheKey, TItem item);
 
         Task DeleteItem(TKey cacheKey);
+
+        Task DeleteCacheFolder(TKey cacheFolderKey);
     }
 }

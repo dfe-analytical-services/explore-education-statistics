@@ -134,6 +134,7 @@ export function convertServerFieldErrors<FormValues>(
 
 export function isServerValidationError(
   error: Error,
+  errorMessage?: string,
 ): error is AxiosError<ServerValidationErrorResponse> {
   if (!isAxiosError(error) || !error.response?.data) {
     return false;
@@ -142,9 +143,33 @@ export function isServerValidationError(
   const errorDataAsValidationError = error.response
     .data as ServerValidationErrorResponse;
 
-  return (
+  const isServerError =
     errorDataAsValidationError.errors !== undefined &&
     errorDataAsValidationError.status !== undefined &&
-    errorDataAsValidationError.title !== undefined
-  );
+    errorDataAsValidationError.title !== undefined;
+
+  if (!errorMessage) {
+    return isServerError;
+  }
+
+  if (isServerError && error.response?.data) {
+    const errors = Object.values(error.response?.data.errors);
+    if (errors.flat().includes(errorMessage)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function hasServerValidationError(
+  error: Error,
+  errorMessage: string,
+): boolean {
+  if (isServerValidationError(error) && error.response?.data) {
+    const errors = Object.values(error.response?.data.errors);
+    if (errors.flat().includes(errorMessage)) {
+      return true;
+    }
+  }
+  return false;
 }

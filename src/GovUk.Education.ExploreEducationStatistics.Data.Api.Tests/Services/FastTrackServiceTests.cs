@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
                 .Returns(release);
             
-            var result = await service.Get(fastTrackId);
+            var result = await service.GetFastTrackAndResults(fastTrackId);
             Assert.True(result.IsRight);
 
             var viewModel = result.Right;
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
                 .Returns(latestRelease);
             
-            var result = await service.Get(fastTrackId);
+            var result = await service.GetFastTrackAndResults(fastTrackId);
             Assert.True(result.IsRight);
 
             var viewModel = result.Right;
