@@ -50,11 +50,7 @@ const TableToolFinalStep = ({
   const getMethodologyLinks = () => {
     const links: ReactNode[] =
       publication?.methodologies?.map(methodology => (
-        <Link
-          key={methodology.id}
-          to="/methodology/[methodology]"
-          as={`/methodology/${methodology.slug}`}
-        >
+        <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
           {methodology.title}
         </Link>
       )) ?? [];
@@ -107,8 +103,7 @@ const TableToolFinalStep = ({
                 <Link
                   className="dfe-print-hidden"
                   unvisited
-                  to="/find-statistics/[publication]"
-                  as={`/find-statistics/${selectedPublication.slug}`}
+                  to={`/find-statistics/${selectedPublication.slug}`}
                   testId="View latest data link"
                 >
                   View latest data:{' '}
@@ -163,16 +158,12 @@ const TableToolFinalStep = ({
         releaseLink={
           <>
             {selectedPublication.selectedRelease.latestData ? (
-              <Link
-                to="/find-statistics/[publication]"
-                as={`/find-statistics/${selectedPublication.slug}`}
-              >
+              <Link to={`/find-statistics/${selectedPublication.slug}`}>
                 {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>
             ) : (
               <Link
-                to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+                to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
                 {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>

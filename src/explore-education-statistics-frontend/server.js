@@ -20,11 +20,11 @@ const basicAuth = require('express-basic-auth');
 const express = require('express');
 const helmet = require('helmet');
 const nextApp = require('next');
+const { loadEnvConfig } = require('@next/env');
 const path = require('path');
 const referrerPolicy = require('referrer-policy');
-const dotenv = require('dotenv');
 
-dotenv.config();
+loadEnvConfig(__dirname);
 
 const app = nextApp({
   dev: process.env.NODE_ENV !== 'production',

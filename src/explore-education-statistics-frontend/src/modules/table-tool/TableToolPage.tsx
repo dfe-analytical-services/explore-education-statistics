@@ -117,8 +117,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         loadingFastTrack={loadingFastTrack}
         renderFeaturedTable={highlight => (
           <Link
-            to="/data-tables/fast-track/[fastTrackId]"
-            as={`/data-tables/fast-track/${highlight.id}`}
+            to={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
               logEvent({

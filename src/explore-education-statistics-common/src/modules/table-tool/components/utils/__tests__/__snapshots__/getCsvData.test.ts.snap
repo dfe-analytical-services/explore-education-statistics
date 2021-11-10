@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Download CSV utils getCsvData can contain suppressed cells 1`] = `
+exports[`getCsvData can contain suppressed cells 1`] = `
 Array [
   Array [
     "location",
@@ -23,7 +23,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData contains full set of data 1`] = `
+exports[`getCsvData contains full set of data 1`] = `
 Array [
   Array [
     "location",
@@ -78,7 +78,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData contains n/a's if matching result but no matching indicator 1`] = `
+exports[`getCsvData contains n/a's if matching result but no matching indicator 1`] = `
 Array [
   Array [
     "location",
@@ -101,7 +101,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData contains n/a's if there are some matching results 1`] = `
+exports[`getCsvData contains n/a's if there are some matching results 1`] = `
 Array [
   Array [
     "location",
@@ -136,7 +136,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData does not format values in any way 1`] = `
+exports[`getCsvData does not format values in any way 1`] = `
 Array [
   Array [
     "location",
@@ -159,7 +159,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData returns only header if there are no results 1`] = `
+exports[`getCsvData returns only header if there are no results 1`] = `
 Array [
   Array [
     "location",
@@ -173,7 +173,7 @@ Array [
 ]
 `;
 
-exports[`Download CSV utils getCsvData strips out rows with only n/a's 1`] = `
+exports[`getCsvData strips out rows with only n/a's 1`] = `
 Array [
   Array [
     "location",

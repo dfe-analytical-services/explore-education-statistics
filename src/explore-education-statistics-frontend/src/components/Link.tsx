@@ -4,7 +4,6 @@ import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 
 export type LinkProps = {
-  as?: RouterLinkProps['as'];
   children: ReactNode;
   className?: string;
   prefetch?: boolean;
@@ -14,7 +13,6 @@ export type LinkProps = {
 } & OmitStrict<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
 const Link = ({
-  as,
   children,
   className,
   prefetch,
@@ -48,7 +46,7 @@ const Link = ({
   }
 
   return (
-    <RouterLink href={to} as={as} prefetch={prefetch} passHref>
+    <RouterLink href={to} prefetch={prefetch} passHref>
       {link}
     </RouterLink>
   );

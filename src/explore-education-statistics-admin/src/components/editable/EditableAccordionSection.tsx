@@ -144,18 +144,17 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
             header={header}
           >
             <ButtonGroup>
-              {onHeadingChange &&
-                (isEditingHeading ? (
-                  <Button onClick={saveHeading}>Save section title</Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={toggleEditingHeading}
-                    variant="secondary"
-                  >
-                    Edit section title
-                  </Button>
-                ))}
+              {isEditingHeading ? (
+                <Button onClick={saveHeading}>Save section title</Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={toggleEditingHeading}
+                  variant="secondary"
+                >
+                  Edit section title
+                </Button>
+              )}
 
               {headerButtons}
 

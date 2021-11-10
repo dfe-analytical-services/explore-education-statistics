@@ -2,7 +2,7 @@ import { contentApi } from '@common/services/api';
 import downloadFile from '@common/utils/file/downloadFile';
 import qs from 'qs';
 
-export default {
+const downloadService = {
   getFile(releaseId: string, fileId: string): Promise<Blob> {
     return contentApi.get<Blob>(`/releases/${releaseId}/files/${fileId}`, {
       responseType: 'blob',
@@ -12,7 +12,9 @@ export default {
     const query = qs.stringify({ fileIds }, { arrayFormat: 'comma' });
 
     downloadFile(
-      `${process.env.CONTENT_API_BASE_URL}/releases/${releaseId}/files?${query}`,
+      `${contentApi.axios.defaults.baseURL}/releases/${releaseId}/files?${query}`,
     );
   },
 };
+
+export default downloadService;

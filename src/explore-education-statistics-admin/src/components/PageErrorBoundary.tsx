@@ -3,7 +3,7 @@ import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
-import { AxiosError } from 'axios';
+import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
@@ -59,13 +59,11 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     this.handleError(event.reason);
   };
 
-  private handleError = (error: Error) => {
+  private handleError = (error: unknown) => {
     logger.error(error);
 
-    const axiosError = error as AxiosError;
-
     this.setState({
-      errorCode: axiosError.response?.status || 500,
+      errorCode: isAxiosError(error) ? error.response?.status : 500,
     });
   };
 

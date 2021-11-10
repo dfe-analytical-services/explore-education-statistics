@@ -57,10 +57,7 @@ const PublicationReleaseHelpAndSupportSection = ({
           >
             {methodologies.map(methodology => (
               <p key={methodology.id} className="govuk-!-margin-bottom-9">
-                <Link
-                  to="/methodology/[methodology]"
-                  as={`/methodology/${methodology.slug}`}
-                >
+                <Link to={`/methodology/${methodology.slug}`}>
                   {methodology.title}
                 </Link>
               </p>

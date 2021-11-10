@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { getApplicationInsights } from '@common/services/applicationInsightsService';
+import isErrorLike from '@common/utils/error/isErrorLike';
 import { SeverityLevel } from '@microsoft/applicationinsights-web';
 
 const logger = {
@@ -42,16 +43,18 @@ const logger = {
       severityLevel: SeverityLevel.Warning,
     });
   },
-  error(error: Error) {
+  error(error: unknown) {
     if (process.env.NODE_ENV === 'test') {
       return;
     }
 
     console.error(error);
 
-    getApplicationInsights().trackException({
-      exception: error,
-    });
+    if (isErrorLike(error)) {
+      getApplicationInsights().trackException({
+        exception: error,
+      });
+    }
   },
 };
 

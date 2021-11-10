@@ -82,8 +82,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <Link
                   className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
                   unvisited
-                  to="/find-statistics/[publication]"
-                  as={`/find-statistics/${release.publication.slug}`}
+                  to={`/find-statistics/${release.publication.slug}`}
                 >
                   View latest data:{' '}
                   <span className="govuk-!-font-weight-bold">
@@ -236,11 +235,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <Link
                       to={
                         release.latestRelease
-                          ? '/find-statistics/[publication]/prerelease-access-list'
-                          : '/find-statistics/[publication]/[release]/prerelease-access-list'
-                      }
-                      as={
-                        release.latestRelease
                           ? `/find-statistics/${release.publication.slug}/prerelease-access-list`
                           : `/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`
                       }
@@ -275,8 +269,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                             ({ id, slug, title }) => (
                               <li key={id} data-testid="other-release-item">
                                 <Link
-                                  to="/find-statistics/[publication]/[release]"
-                                  as={`/find-statistics/${release.publication.slug}/${slug}`}
+                                  to={`/find-statistics/${release.publication.slug}/${slug}`}
                                 >
                                   {title}
                                 </Link>
@@ -309,10 +302,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                   {release.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
-                      <Link
-                        to="/methodology/[methodology]"
-                        as={`/methodology/${methodology.slug}`}
-                      >
+                      <Link to={`/methodology/${methodology.slug}`}>
                         {methodology.title}
                       </Link>
                     </li>
@@ -407,8 +397,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDataCatalogueLink={
             <ButtonLink
               className="govuk-!-width-full"
-              to="/data-catalogue/[publication]/[release]"
-              as={`/data-catalogue/${release.publication.slug}/${release.slug}`}
+              to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
             >
               Browse data files
             </ButtonLink>
@@ -432,11 +421,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDataGuidanceLink={
             <Link
               to={
-                release.latestRelease
-                  ? '/find-statistics/[publication]/meta-guidance'
-                  : '/find-statistics/[publication]/[release]/meta-guidance'
-              }
-              as={
                 release.latestRelease
                   ? `/find-statistics/${release.publication.slug}/meta-guidance`
                   : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
@@ -500,16 +484,14 @@ const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
   return release.latestRelease ? (
     <ButtonLink
       className={className}
-      to="/data-tables/[publication]"
-      as={`/data-tables/${release.publication.slug}`}
+      to={`/data-tables/${release.publication.slug}`}
     >
       Create tables
     </ButtonLink>
   ) : (
     <ButtonLink
       className={className}
-      to="/data-tables/[publication]/[release]"
-      as={`/data-tables/${release.publication.slug}/${release.slug}`}
+      to={`/data-tables/${release.publication.slug}/${release.slug}`}
     >
       Create tables
     </ButtonLink>
