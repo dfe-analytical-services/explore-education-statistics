@@ -17,12 +17,14 @@ export interface Props {
   publication: MyPublication;
   topicId: string;
   onChangePublication: () => void;
+  showManageTeamAccessButton?: boolean;
 }
 
 const PublicationSummary = ({
   publication,
   topicId,
   onChangePublication,
+  showManageTeamAccessButton = false,
 }: Props) => {
   const { contact, permissions, releases, id, title } = publication;
 
@@ -102,17 +104,19 @@ const PublicationSummary = ({
                   >
                     Manage this publication
                   </ButtonLink>
-                  <ButtonLink
-                    data-testid={`Manage team access for publication ${publication.title}`}
-                    to={generatePath<PublicationRouteParams>(
-                      publicationManageTeamAccessRoute.path,
-                      {
-                        publicationId: publication.id,
-                      },
-                    )}
-                  >
-                    Manage team access
-                  </ButtonLink>
+                  {showManageTeamAccessButton && (
+                    <ButtonLink
+                      data-testid={`Manage team access for publication ${publication.title}`}
+                      to={generatePath<PublicationRouteParams>(
+                        publicationManageTeamAccessRoute.path,
+                        {
+                          publicationId: publication.id,
+                        },
+                      )}
+                    >
+                      Manage team access
+                    </ButtonLink>
+                  )}
                 </ButtonGroup>
               </td>
             </tr>
