@@ -21,17 +21,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _contentDbContext;
         private readonly IPublicationRepository _publicationRepository;
+        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserService _userService;
 
         public ReleasePermissionService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext contentDbContext,
             IPublicationRepository publicationRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
             _contentDbContext = contentDbContext;
             _publicationRepository = publicationRepository;
+            _userReleaseRoleRepository = userReleaseRoleRepository;
             _userService = userService;
         }
 
@@ -52,13 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(r => r.Id)
                         .ToList();
 
-                    var allContributorReleaseRoles = await _contentDbContext.UserReleaseRoles
-                        .Include(releaseRole => releaseRole.User)
-                        .AsAsyncEnumerable()
-                        .Where(releaseRole =>
-                            allLatestReleaseIds.Contains(releaseRole.ReleaseId)
-                            && releaseRole.Role == ReleaseRole.Contributor)
-                        .ToListAsync();
+                    var allContributorReleaseRoles = await _userReleaseRoleRepository.GetAllReleaseRoles(
+                        ReleaseRole.Contributor,
+                        allLatestReleaseIds.ToArray());
 
                     var allPublicationContributors = allContributorReleaseRoles
                         .Select(releaseRole => releaseRole.User)

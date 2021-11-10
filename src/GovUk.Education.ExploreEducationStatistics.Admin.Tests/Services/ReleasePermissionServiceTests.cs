@@ -143,6 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
                 new PublicationRepository(contentDbContext, AdminMapper()),
+                new UserReleaseRoleRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
