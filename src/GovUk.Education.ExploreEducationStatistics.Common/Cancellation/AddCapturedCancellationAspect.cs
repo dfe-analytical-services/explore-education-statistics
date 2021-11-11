@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading;
 using AspectInjector.Broker;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.CancellationAspects;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoCapturedTokenBehaviour;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoExistingTokensBehaviour;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
@@ -43,13 +43,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
             
             if (currentlyCapturedToken == null && passedInToken == null)
             {
-                if (Throw == trigger.NoCapturedBehaviour)
+                if (Throw == trigger.NoExistingTokens)
                 {
                     throw new ArgumentException($"Was expecting a CancellationToken to have been captured prior " +
                                                 $"to method {method.Name} having been called, but was null.");
                 }
 
-                if (DoNothing == trigger.NoCapturedBehaviour)
+                if (DoNothing == trigger.NoExistingTokens)
                 {
                     return target(args);
                 }

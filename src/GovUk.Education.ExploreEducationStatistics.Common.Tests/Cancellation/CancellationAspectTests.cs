@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoCapturedTokenBehaviour;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoExistingTokensBehaviour;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
@@ -297,7 +297,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     assertions.Invoke(providedToken);
                 }
                 
-                [AddCapturedCancellation(noCapturedBehaviour: Throw)]
+                [AddCapturedCancellation(noExistingTokens: DoNothing)]
+                public static void CancellationTokenParameterWithDefaultFallback(
+                    Action<CancellationToken> assertions, 
+                    CancellationToken providedToken = default)
+                {
+                    assertions.Invoke(providedToken);
+                }
+                
+                [AddCapturedCancellation(noExistingTokens: Throw)]
                 public static void CancellationTokenParameterThrowsIfNoneExists(
                     Action<CancellationToken?>? assertions = null, 
                     CancellationToken? providedToken = null)
@@ -305,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     assertions?.Invoke(providedToken);
                 }
                 
-                [AddCapturedCancellation(noCapturedBehaviour: DoNothing)]
+                [AddCapturedCancellation(noExistingTokens: DoNothing)]
                 public static void CancellationTokenParameterDoesNothingIfNoneExists(
                     Action<CancellationToken?>? assertions = null, 
                     CancellationToken? providedToken = null)
@@ -400,6 +408,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     Assert.True(providedToken.Value.IsCancellationRequested);
                     
                 }, originalToken);
+            }
+            
+            [Fact]
+            public void AddCapturedCancellation_WithDefaultTokenFallback()
+            {
+                TestMethods.CancellationTokenParameterWithDefaultFallback(providedToken =>
+                {
+                    // Although the Advice is instructed not to create a new Token if none already exist, the
+                    // "default" parameter fallback when no CancellationToken is passed in as a parameter is retained
+                    // and passed into the method, so that it always has that default.
+                    //
+                    // Note the fact we're in this method means that a non-null CancellationToken has been created!
+                });
+            }
+            
+            [Fact]
+            public void AddCapturedCancellation_WithDefaultTokenFallback_MergeWithCapturedToken()
+            {
+                var capturedTokenSource = new CancellationTokenSource();
+                var capturedToken = capturedTokenSource.Token;
+                CancellationContext.SetCurrent(capturedToken);
+                
+                TestMethods.CancellationTokenParameterWithDefaultFallback(providedToken =>
+                {
+                    // The Advice will provide a new token based on the captured one and the "default" one that is
+                    // setup when no token parameter is passed into this method.
+                    Assert.NotEqual(capturedToken, providedToken);
+                    
+                    // Show that both the original and the provided Token are uncancelled at
+                    // this point.
+                    Assert.False(capturedToken.IsCancellationRequested);
+                    Assert.False(providedToken.IsCancellationRequested);
+                
+                    // Now cancel the original CancellationToken - if the providedToken is 
+                    // properly merged with it, they will now both be marked as Cancelled.
+                    capturedTokenSource.Cancel();
+
+                    // Now show that both the captured and the provided Token are now marked
+                    // as cancelled at this point, due to being linked (although the original
+                    // passed in one is not).
+                    Assert.True(capturedToken.IsCancellationRequested);
+                    Assert.True(providedToken.IsCancellationRequested);
+
+                });
             }
             
             [Fact]

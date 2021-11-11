@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using AspectInjector.Broker;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoCapturedTokenBehaviour;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoExistingTokensBehaviour;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
@@ -13,18 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
     {
         /// <summary>
         /// </summary>
-        public enum NoCapturedTokenBehaviour
+        public enum NoExistingTokensBehaviour
         {
             Throw,
             DoNothing,
             CreateNew,
         }
         
-        public NoCapturedTokenBehaviour NoCapturedBehaviour { get; }
+        public NoExistingTokensBehaviour NoExistingTokens { get; }
 
-        public AddCapturedCancellationAttribute(NoCapturedTokenBehaviour noCapturedBehaviour = CreateNew)
+        public AddCapturedCancellationAttribute(NoExistingTokensBehaviour noExistingTokens = CreateNew)
         {
-            NoCapturedBehaviour = noCapturedBehaviour;
+            NoExistingTokens = noExistingTokens;
         }
     }
 }
