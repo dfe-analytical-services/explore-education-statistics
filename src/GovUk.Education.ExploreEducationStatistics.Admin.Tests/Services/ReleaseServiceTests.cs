@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddAsync(
                     new ReleaseType
                     {
-                        Title = "Ad Hoc",
+                        Title = "Ad Hoc Statistics",
                     }
                 );
                 await context.AddAsync(publication);
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddAsync(
                     new ReleaseType
                     {
-                        Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc",
+                        Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc Statistics",
                     }
                 );
                 await context.AddAsync(
@@ -629,7 +629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseId = Guid.NewGuid();
 
-            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
+            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
             var officialStatisticsReleaseType = new ReleaseType {Title = "Official Statistics"};
 
             var release = new Release
@@ -701,7 +701,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease_FailsNonUniqueSlug()
         {
-            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+            var releaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var publication = new Publication();
 
@@ -763,7 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var adHocReleaseType = new ReleaseType
             {
-                Title = "Ad Hoc"
+                Title = "Ad Hoc Statistics"
             };
 
             var releaseId = Guid.NewGuid();

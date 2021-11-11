@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     new ReleaseType()
                     {
-                        Title = "Ad Hoc"
+                        Title = "Ad Hoc Statistics"
                     }
                 }
             );
