@@ -70,6 +70,10 @@ module.exports = (proxy, allowedHost) => {
       },
     },
     client: {
+      // EES - Disable default overlay as we're using the error-overlay-webpack-plugin
+      overlay: false,
+      // EES - Enables logging of compiler warnings to the browser console
+      logging: 'warn',
       webSocketURL: {
         // Enable custom sockjs pathname for websocket connection to hot reloading server.
         // Enable custom sockjs hostname, pathname and port for websocket connection
