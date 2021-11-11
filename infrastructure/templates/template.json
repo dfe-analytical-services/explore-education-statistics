@@ -1814,6 +1814,7 @@
         "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
+        "kind": "linux",
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
