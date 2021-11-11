@@ -1790,8 +1790,9 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2019-08-01",
+      "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
+      "kind": "linux",
       "identity": {
         "type": "SystemAssigned"
       },
@@ -1814,7 +1815,6 @@
         "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
-        "kind": "linux",
         "reserved": true,
         "siteConfig": {
           "linuxFxVersion": "NODE|14-LTS",
@@ -1840,7 +1840,7 @@
       "name": "[concat(variables('publicAppName'), '/appsettings')]",
       "type": "Microsoft.Web/sites/config",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
+      "apiVersion": "2021-02-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
       ],
