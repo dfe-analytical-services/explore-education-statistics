@@ -1817,7 +1817,7 @@
         "kind": "linux",
         "reserved": true,
         "siteConfig": {
-          "linuxFxVersion": "NODE|14",
+          "linuxFxVersion": "NODE|14-LTS",
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
