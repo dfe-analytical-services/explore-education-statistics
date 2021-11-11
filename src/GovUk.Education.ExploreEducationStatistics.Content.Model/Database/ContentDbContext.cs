@@ -421,12 +421,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new ReleaseType
                 {
                     Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
-                    Title = "Ad Hoc"
+                    Title = "Ad Hoc Statistics"
                 },
                 new ReleaseType
                 {
                     Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
                     Title = "National Statistics"
+                },
+                new ReleaseType
+                {
+                    Id = new Guid("f5de8522-3150-435d-98d5-1d14763f8c54"),
+                    Title = "Experimental Statistics"
+                },
+                new ReleaseType
+                {
+                    Id = new Guid("15bd4f57-c837-4821-b308-7f4169cd9330"),
+                    Title = "Management Information"
                 });
 
             modelBuilder.Entity<GlossaryEntry>()

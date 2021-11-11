@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseType()
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Ad Hoc",
+                        Title = "Ad Hoc Statistics",
                     },
                     new ReleaseType()
                     {
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = new MetaService(context);
                 // Method under test
                 var retrievedReleaseTypes = service.GetReleaseTypes();
-                Assert.True(retrievedReleaseTypes.Exists(rt => rt.Title == "Ad Hoc"));
+                Assert.True(retrievedReleaseTypes.Exists(rt => rt.Title == "Ad Hoc Statistics"));
                 Assert.True(retrievedReleaseTypes.Exists(rt => rt.Title == "Official Statistics"));
             }
         }

@@ -82,7 +82,7 @@ const ReleaseHelpAndSupportSection = ({
             <OfficialStatisticsSection />
           </AccordionSection>
         )}
-        {release.type.title === ReleaseType.AdHoc && (
+        {release.type.title === ReleaseType.AdHocStatistics && (
           <AccordionSection
             heading="Ad hoc Official Statistics"
             headingTag="h3"
@@ -90,7 +90,7 @@ const ReleaseHelpAndSupportSection = ({
             <AdHocOfficialStatisticsSection />
           </AccordionSection>
         )}
-        {release.type.title === ReleaseType.Experimental && (
+        {release.type.title === ReleaseType.ExperimentalStatistics && (
           <AccordionSection heading="Experimental Statistics" headingTag="h3">
             <ExperimentalStatisticsSection />
           </AccordionSection>

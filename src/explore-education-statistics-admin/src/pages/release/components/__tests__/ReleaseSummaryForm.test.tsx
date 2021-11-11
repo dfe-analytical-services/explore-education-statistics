@@ -16,7 +16,7 @@ jest.mock('@admin/services/metaService');
 
 describe('ReleaseSummaryForm', () => {
   const testReleaseTypes: IdTitlePair[] = [
-    { id: 'a', title: 'Ad Hoc' },
+    { id: 'a', title: 'Ad Hoc Statistics' },
     {
       id: 'b',
       title: 'National Statistics',
@@ -79,7 +79,7 @@ describe('ReleaseSummaryForm', () => {
         'radio',
       ),
     ).toHaveLength(3);
-    expect(screen.getByLabelText('Ad Hoc')).toBeInTheDocument();
+    expect(screen.getByLabelText('Ad Hoc Statistics')).toBeInTheDocument();
     expect(screen.getByLabelText('National Statistics')).toBeInTheDocument();
     expect(screen.getByLabelText('Official Statistics')).toBeInTheDocument();
 
@@ -178,7 +178,7 @@ describe('ReleaseSummaryForm', () => {
     });
 
     userEvent.type(inputYear, '2');
-    userEvent.click(screen.getByLabelText('Ad Hoc'));
+    userEvent.click(screen.getByLabelText('Ad Hoc Statistics'));
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
@@ -234,7 +234,7 @@ describe('ReleaseSummaryForm', () => {
     });
 
     userEvent.type(inputYear, '202021');
-    userEvent.click(screen.getByLabelText('Ad Hoc'));
+    userEvent.click(screen.getByLabelText('Ad Hoc Statistics'));
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
