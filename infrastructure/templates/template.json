@@ -1815,7 +1815,9 @@
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "kind": "linux",
+        "reserved": true,
         "siteConfig": {
+          "linuxFxVersion": "NODE|14",
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
