@@ -531,7 +531,7 @@ user checks summary list contains
     ...    %{WAIT_MEDIUM}
     ${element}=    get child element    ${parent}
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible    ${element}    %{WAIT_MEDIUM}
+    user waits until element is visible    ${element}    %{WAIT_LONG}
 
 user checks select contains x options
     [Arguments]    ${locator}    ${num}

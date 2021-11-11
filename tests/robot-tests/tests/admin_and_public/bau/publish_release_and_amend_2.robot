@@ -479,8 +479,10 @@ Select the date cateogory
 
 Attempt to generate a table that is too large
     user clicks element    id:filtersForm-submit
-    user waits until element contains    id:filtersForm-indicators-error
-    ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
+    user waits until page contains
+    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
+    user waits until page contains    Select different filters or download the subject data.
+    user waits until page contains button    Download Seven filters (csv, 17 Kb)    %{WAIT_MEDIUM}
 
 Reduce the number of selected Dates and generate a smaller table
     user clicks unselect all for category    Date

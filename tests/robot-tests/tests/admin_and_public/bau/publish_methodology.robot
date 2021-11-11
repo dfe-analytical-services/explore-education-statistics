@@ -46,7 +46,7 @@ Verify that the publication is not visible on the public methodologies page with
 
 Verify that the methodology is not publicly accessible by URL without a published release
     user goes to url    ${ACCESSIBLE_METHODOLOGY_URL}
-    user waits until page contains    Page not found
+    user waits until h1 is visible    Page not found    %{WAIT_MEDIUM}
 
 Alter the approval to publish the methodology with the release
     user approves methodology for publication
