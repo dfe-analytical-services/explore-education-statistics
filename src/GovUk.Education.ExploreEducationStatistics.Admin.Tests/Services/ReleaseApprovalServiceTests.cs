@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Amendment_NoUniqueSlugFailure()
         {
-            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+            var releaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var publication = new Publication();
 
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateReleaseStatus()
         {
             var releaseId = Guid.NewGuid();
-            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
+            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
             var release = new Release
             {
                 Id = releaseId,
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Type = new ReleaseType {Title = "Ad Hoc"},
+                Type = new ReleaseType {Title = "Ad Hoc Statistics"},
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
                 Slug = "2030",
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Type = new ReleaseType
                 {
-                    Title = "Ad Hoc"
+                    Title = "Ad Hoc Statistics"
                 },
                 Publication = new Publication
                 {
@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Type = new ReleaseType
                 {
-                    Title = "Ad Hoc"
+                    Title = "Ad Hoc Statistics"
                 },
                 Publication = new Publication
                 {
@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Type = new ReleaseType {Title = "Ad Hoc"},
+                Type = new ReleaseType {Title = "Ad Hoc Statistics"},
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
                 Slug = "2030",
@@ -427,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Type = new ReleaseType {Title = "Ad Hoc"},
+                Type = new ReleaseType {Title = "Ad Hoc Statistics"},
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
                 Slug = "2030",
@@ -510,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Amendment_NotifySubscribers_False()
         {
-            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+            var releaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var publication = new Publication();
 
@@ -615,7 +615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Amendment_NotifySubscribers_True()
         {
-            var releaseType = new ReleaseType {Title = "Ad Hoc"};
+            var releaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var publication = new Publication();
 
@@ -721,7 +721,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Type = new ReleaseType {Title = "Ad Hoc"},
+                Type = new ReleaseType {Title = "Ad Hoc Statistics"},
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
                 Slug = "2030",
@@ -768,7 +768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseId = Guid.NewGuid();
 
-            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
+            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var release = new Release
             {
@@ -886,7 +886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseId = Guid.NewGuid();
 
-            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc"};
+            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
 
             var release = new Release
             {
