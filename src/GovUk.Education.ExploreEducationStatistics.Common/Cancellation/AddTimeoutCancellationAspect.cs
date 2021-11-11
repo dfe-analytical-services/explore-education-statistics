@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using AspectInjector.Broker;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.CancellationAspects;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
@@ -27,49 +28,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
                                             $"its final parameter");
             }
             
-            if (!CancellationAspects.Enabled)
+            if (!Enabled)
             {
                 return target(args);
             }
-            
-            var lastParameterIsCancellationToken = 
-                method.GetParameters().Length != 0
-                && (method.GetParameters()[^1].ParameterType != typeof(CancellationToken)
-                    || method.GetParameters()[^1].ParameterType != typeof(CancellationToken?));
             
             var trigger = triggers
                 .OfType<AddTimeoutCancellationAttribute>()
                 .Single();
 
             var timeoutToken = TimeoutToken(trigger.TimeoutMillis);
-                
-            if (!lastParameterIsCancellationToken)
-            {
-                return target(args);
-            }
-            
-            if (args[^1] is CancellationToken currentToken)
-            {
-                args[^1] = CombineTimeout(currentToken, timeoutToken);
-            }
-            else
-            {
-                args[^1] = timeoutToken;
-            }
-            
-            return target(args);
-        }
-        
-        private static CancellationToken CombineTimeout(CancellationToken? currentToken, CancellationToken timeoutToken)
-        {
-            if (currentToken == null)
-            {
-                return timeoutToken;
-            }
-
-            return CancellationTokenSource
-                .CreateLinkedTokenSource((CancellationToken) currentToken, timeoutToken)
-                .Token;
+            var passedInToken = args[^1] as CancellationToken?;
+            var newArgs = args.ToArray();
+            newArgs[^1] = CombineTokens(passedInToken, timeoutToken);
+            return target(newArgs);
         }
 
         private static CancellationToken TimeoutToken(int timeoutMillis)

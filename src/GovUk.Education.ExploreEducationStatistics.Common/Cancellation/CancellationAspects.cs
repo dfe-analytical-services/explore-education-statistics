@@ -1,9 +1,12 @@
+using System.Linq;
+using System.Threading;
+
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
-    public class CancellationAspects
+    public static class CancellationAspects
     {
         /// <summary>
-        /// Enables the Aspects AddTimeout, CaptureCancellationToken and UseCapturedCancellationToken.
+        /// Enables the Aspects AddTimeout, CaptureCancellationToken and AddCapturedCancellation.
         /// <para>
         /// This is set to false by default so that test code
         /// isn't affected by these aspects. It should be set to
@@ -12,5 +15,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
         /// </para>
         /// </summary>
         public static bool Enabled { get; set; }
+        
+        public static CancellationToken CombineTokens(params CancellationToken?[] tokens)
+        {
+            var nonNullTokens = tokens
+                .Where(token => token != null)
+                .Cast<CancellationToken>()
+                .ToArray();
+
+            if (nonNullTokens.Length == 0)
+            {
+                return new CancellationToken();
+            }
+
+            if (nonNullTokens.Length == 1)
+            {
+                return nonNullTokens[0];
+            }
+
+            return CancellationTokenSource
+                .CreateLinkedTokenSource(nonNullTokens)
+                .Token;
+        }
     }
 }

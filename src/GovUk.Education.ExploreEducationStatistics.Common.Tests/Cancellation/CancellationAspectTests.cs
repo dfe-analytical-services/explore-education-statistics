@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.UseCapturedCancellationTokenAttribute.NoExistingTokenBehaviour;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoCapturedTokenBehaviour;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
@@ -279,17 +279,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
         }
         
         [Collection(CancellationTestFixture.CollectionName)]
-        public class UseCapturedCancellationTokenTests : IClassFixture<CancellationTestFixture>
+        public class AddCapturedCancellationTests : IClassFixture<CancellationTestFixture>
         {
             private static class TestMethods
             {
-                [UseCapturedCancellationToken]
+                [AddCapturedCancellation]
                 public static void NoCancellationTokenParameter()
                 {
                     
                 }
                 
-                [UseCapturedCancellationToken]
+                [AddCapturedCancellation]
                 public static void CancellationTokenParameter(
                     Action<CancellationToken?> assertions, 
                     CancellationToken? providedToken = null)
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     assertions.Invoke(providedToken);
                 }
                 
-                [UseCapturedCancellationToken(noTokenBehaviour: Throw)]
+                [AddCapturedCancellation(noCapturedBehaviour: Throw)]
                 public static void CancellationTokenParameterThrowsIfNoneExists(
                     Action<CancellationToken?>? assertions = null, 
                     CancellationToken? providedToken = null)
@@ -305,9 +305,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     assertions?.Invoke(providedToken);
                 }
                 
-                [UseCapturedCancellationToken]
+                [AddCapturedCancellation(noCapturedBehaviour: DoNothing)]
+                public static void CancellationTokenParameterDoesNothingIfNoneExists(
+                    Action<CancellationToken?>? assertions = null, 
+                    CancellationToken? providedToken = null)
+                {
+                    assertions?.Invoke(providedToken);
+                }
+                
+                [AddCapturedCancellation]
                 [AddTimeoutCancellation(TimeoutMillis)]
-                public static void UseCapturedTokenAndAddTimeout(
+                public static void AddCapturedTokenAndAddTimeout(
                     Action<CancellationToken?> assertions, 
                     CancellationToken? providedToken = null)
                 {
@@ -316,23 +324,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
             }
             
             [Fact]
-            public void UseCapturedCancellationTokenWithNoCancellationTokenParameter()
+            public void AddCapturedCancellationWithNoCancellationTokenParameter()
             {
                 Assert.Throws<ArgumentException>(TestMethods.NoCancellationTokenParameter);
             }
             
             [Fact]
-            public void UseCapturedCancellationToken_WithNoExistingCapturedToken()
+            public void AddCapturedCancellation_WithNoExistingCapturedToken()
             {
                 TestMethods.CancellationTokenParameter(providedToken =>
                 {
-                    // A CancellationToken could not be provided as none has yet been captured.
-                    Assert.Null(providedToken);
+                    // The Advice should provide a brand new CancellationToken.
+                    Assert.NotNull(providedToken);
                 });
             }
             
             [Fact]
-            public void UseCapturedCancellationToken_WithExistingCapturedToken()
+            public void AddCapturedCancellation_WithExistingCapturedToken()
             {
                 var capturedToken = new CancellationToken();
                 CancellationContext.SetCurrent(capturedToken);
@@ -345,13 +353,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
             }
             
             [Fact]
-            public void UseCapturedCancellationTokenThrowsIfNoneExists_WithNoExistingCapturedToken()
+            public void AddCapturedCancellation_WithNoExistingCapturedToken_ManuallyPassedInToken()
+            {
+                var originalTokenSource = new CancellationTokenSource();
+                var originalToken = originalTokenSource.Token;
+                
+                TestMethods.CancellationTokenParameter(providedToken =>
+                {
+                    // The Advice should provide the original CancellationToken passed into the method if no
+                    // CancellationToken is captured on the thread.
+                    Assert.Equal(originalToken, providedToken);
+                }, originalToken);
+            }
+            
+            [Fact]
+            public void AddCapturedCancellation_WithExistingCapturedToken_ManuallyPassedInToken()
+            {
+                var originalTokenSource = new CancellationTokenSource();
+                var originalToken = originalTokenSource.Token;
+                
+                var capturedTokenSource = new CancellationTokenSource();
+                var capturedToken = capturedTokenSource.Token;
+                CancellationContext.SetCurrent(capturedToken);
+
+                TestMethods.CancellationTokenParameter(providedToken =>
+                {
+                    // The Advice should combine the captured Token with the original one passed to the method to
+                    // create a new token.
+                    Assert.NotNull(providedToken);
+                    Assert.NotEqual(originalToken, providedToken);
+                    
+                    // Show that both the original and the provided Token are uncancelled at
+                    // this point.
+                    Assert.False(originalToken.IsCancellationRequested);
+                    Assert.False(capturedToken.IsCancellationRequested);
+                    Assert.False(providedToken!.Value.IsCancellationRequested);
+                
+                    // Now cancel the original CancellationToken - if the providedToken is 
+                    // properly merged with it, they will now both be marked as Cancelled.
+                    originalTokenSource.Cancel();
+
+                    // Now show that both the original and the provided Token are now marked
+                    // as cancelled at this point, due to being linked (although the captured one is not).
+                    Assert.True(originalToken.IsCancellationRequested);
+                    Assert.False(capturedToken.IsCancellationRequested);
+                    Assert.True(providedToken.Value.IsCancellationRequested);
+                    
+                }, originalToken);
+            }
+            
+            [Fact]
+            public void AddCapturedCancellation_WithExistingCapturedToken_ManuallyPassedInToken_CancelCaptured()
+            {
+                var originalTokenSource = new CancellationTokenSource();
+                var originalToken = originalTokenSource.Token;
+                
+                var capturedTokenSource = new CancellationTokenSource();
+                var capturedToken = capturedTokenSource.Token;
+                CancellationContext.SetCurrent(capturedToken);
+
+                TestMethods.CancellationTokenParameter(providedToken =>
+                {
+                    // The Advice should combine the captured Token with the original one passed to the method to
+                    // create a new token.
+                    Assert.NotNull(providedToken);
+                    Assert.NotEqual(originalToken, providedToken);
+                    
+                    // Show that both the original and the provided Token are uncancelled at
+                    // this point.
+                    Assert.False(originalToken.IsCancellationRequested);
+                    Assert.False(capturedToken.IsCancellationRequested);
+                    Assert.False(providedToken!.Value.IsCancellationRequested);
+                
+                    // Now cancel the original CancellationToken - if the providedToken is 
+                    // properly merged with it, they will now both be marked as Cancelled.
+                    capturedTokenSource.Cancel();
+
+                    // Now show that both the captured and the provided Token are now marked
+                    // as cancelled at this point, due to being linked (although the original
+                    // passed in one is not).
+                    Assert.False(originalToken.IsCancellationRequested);
+                    Assert.True(capturedToken.IsCancellationRequested);
+                    Assert.True(providedToken.Value.IsCancellationRequested);
+                    
+                }, originalToken);
+            }
+            
+            [Fact]
+            public void AddCapturedCancellationThrowsIfNoneExists_WithNoExistingCapturedToken()
             {
                 Assert.Throws<ArgumentException>(() => TestMethods.CancellationTokenParameterThrowsIfNoneExists());
             }
             
             [Fact]
-            public void UseCapturedCancellationTokenThrowsIfNoneExists_WithExistingCapturedToken()
+            public void AddCapturedCancellationThrowsIfNoneExists_WithExistingCapturedToken()
             {
                 var capturedToken = new CancellationToken();
                 CancellationContext.SetCurrent(capturedToken);
@@ -362,15 +457,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                     Assert.Equal(capturedToken, providedToken);
                 });
             }
+            
+            [Fact]
+            public void DoesNothingIfNoneExists_WithNoExistingCapturedToken()
+            {
+                TestMethods.CancellationTokenParameterDoesNothingIfNoneExists(providedToken =>
+                {
+                    // A CancellationToken could not be provided as none has yet been captured.
+                    Assert.Null(providedToken);
+                });
+            }
 
             [Fact]
-            public void UseCapturedTokenAndAddTimeout_WithExistingCapturedToken()
+            public void AddCapturedTokenAndAddTimeout_WithExistingCapturedToken()
             {
                 var capturedToken = new CancellationToken();
                 CancellationContext.SetCurrent(capturedToken);
 
                 var exception = Assert.Throws<AggregateException>(() => 
-                    TestMethods.UseCapturedTokenAndAddTimeout(providedToken =>
+                    TestMethods.AddCapturedTokenAndAddTimeout(providedToken =>
                     {
                         // A CancellationToken should get provided by the Advice, based on the captured Token and with the
                         // additional Timeout.
@@ -385,13 +490,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
             }
             
             [Fact]
-            public void UseCapturedTokenAndAddTimeout_ManuallyCancellingOriginalToken()
+            public void AddCapturedTokenAndAddTimeout_ManuallyCancellingOriginalToken()
             {
                 var capturedTokenSource = new CancellationTokenSource();
                 var capturedToken = capturedTokenSource.Token;
                 CancellationContext.SetCurrent(capturedToken);
 
-                TestMethods.UseCapturedTokenAndAddTimeout(providedToken =>
+                TestMethods.AddCapturedTokenAndAddTimeout(providedToken =>
                 {
                     // A CancellationToken should get provided by the Advice, based on the captured Token and with the
                     // additional Timeout.

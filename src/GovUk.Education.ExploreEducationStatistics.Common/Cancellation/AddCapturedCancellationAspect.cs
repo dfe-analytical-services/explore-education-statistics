@@ -4,12 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using AspectInjector.Broker;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.UseCapturedCancellationTokenAttribute.NoExistingTokenBehaviour;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.CancellationAspects;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.AddCapturedCancellationAttribute.NoCapturedTokenBehaviour;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
     [Aspect(Scope.Global)]
-    public class UseCapturedCancellationTokenAspect
+    public class AddCapturedCancellationAspect
     {
         [Advice(Kind.Around)]
         public object Handle(
@@ -24,33 +25,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
                     && method.GetParameters()[^1].ParameterType != typeof(CancellationToken?)))
             {
                 throw new ArgumentException($"Method {method.Name}  annotated with the " +
-                                                    $"UseCapturedCancellationToken attribute must accept a " +
+                                                    $"AddCapturedCancellation attribute must accept a " +
                                                     $"CancellationToken as its final parameter");
             }
             
-            if (!CancellationAspects.Enabled)
+            if (!Enabled)
             {
                 return target(args);
             }
             
             var trigger = triggers
-                .OfType<UseCapturedCancellationTokenAttribute>()
+                .OfType<AddCapturedCancellationAttribute>()
                 .Single();
             
             var currentlyCapturedToken = CancellationContext.GetCurrent();
-
-            if (currentlyCapturedToken == null && trigger.NoTokenBehaviour == Throw)
+            var passedInToken = args[^1] as CancellationToken?;
+            
+            if (currentlyCapturedToken == null && passedInToken == null)
             {
-                throw new ArgumentException($"Was expecting a CancellationToken to have been captured prior " +
-                                            $"to method {method.Name} having been called, but was null.");
+                if (Throw == trigger.NoCapturedBehaviour)
+                {
+                    throw new ArgumentException($"Was expecting a CancellationToken to have been captured prior " +
+                                                $"to method {method.Name} having been called, but was null.");
+                }
+
+                if (DoNothing == trigger.NoCapturedBehaviour)
+                {
+                    return target(args);
+                }
             }
 
-            if (currentlyCapturedToken != null)
-            {
-                args[^1] = currentlyCapturedToken;
-            }
-
-            return target(args);
+            var newArgs = args.ToArray();
+            newArgs[^1] = CombineTokens(passedInToken, currentlyCapturedToken);
+            return target(newArgs);
         }
     }
 }
