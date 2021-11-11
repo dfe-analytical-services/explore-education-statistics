@@ -1792,7 +1792,7 @@
       "name": "[variables('publicAppName')]",
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
-      "kind": "linux",
+      "kind": "app,linux",
       "identity": {
         "type": "SystemAssigned"
       },
@@ -1870,6 +1870,7 @@
       "name": "[variables('publicPlanName')]",
       "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
+      "kind": "linux",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1886,7 +1887,7 @@
       "properties": {
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
-        "reserved": false,
+        "reserved": true,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
       }
