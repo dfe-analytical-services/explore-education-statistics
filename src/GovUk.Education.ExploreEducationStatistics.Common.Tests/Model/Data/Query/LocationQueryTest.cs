@@ -8,36 +8,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model.Data.Que
     public class LocationQueryTest
     {
         [Fact]
-        public void CountItems_QueryIsEmpty()
+        public void CountItems_HandlesNullCollections()
         {
             var locationQuery = new LocationQuery();
             Assert.Equal(0, locationQuery.CountItems());
         }
 
         [Fact]
-        public void CountItems()
+        public void CountItems_CountsAllCollections()
         {
             var locationQuery = new LocationQuery
             {
-                Country = AsList("code"),
-                EnglishDevolvedArea = AsList("code"),
-                Institution = AsList("code"),
-                LocalAuthority = AsList("code"),
-                LocalAuthorityDistrict = AsList("code"),
-                LocalEnterprisePartnership = AsList("code"),
-                MultiAcademyTrust = AsList("code"),
-                MayoralCombinedAuthority = AsList("code"),
-                OpportunityArea = AsList("code"),
-                ParliamentaryConstituency = AsList("code"),
-                Provider = AsList("code"),
-                PlanningArea = AsList("code"),
-                Region = AsList("code"),
-                RscRegion = AsList("code"),
-                School = AsList("code"),
-                Sponsor = AsList("code"),
-                Ward = AsList("code")
+                Country = AsList("code1", "code2"),
+                EnglishDevolvedArea = AsList("code1", "code2"),
+                Institution = AsList("code1", "code2"),
+                LocalAuthority = AsList("code1", "code2"),
+                LocalAuthorityDistrict = AsList("code1", "code2"),
+                LocalEnterprisePartnership = AsList("code1", "code2"),
+                MultiAcademyTrust = AsList("code1", "code2"),
+                MayoralCombinedAuthority = AsList("code1", "code2"),
+                OpportunityArea = AsList("code1", "code2"),
+                ParliamentaryConstituency = AsList("code1", "code2"),
+                Provider = AsList("code1", "code2"),
+                PlanningArea = AsList("code1", "code2"),
+                Region = AsList("code1", "code2"),
+                RscRegion = AsList("code1", "code2"),
+                School = AsList("code1", "code2"),
+                Sponsor = AsList("code1", "code2"),
+                Ward = AsList("code1", "code2")
             };
-            Assert.Equal(17, locationQuery.CountItems());
+            Assert.Equal(34, locationQuery.CountItems());
         }
     }
 }
