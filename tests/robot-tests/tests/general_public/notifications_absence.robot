@@ -15,7 +15,9 @@ Navigate to Absence publication
     user waits until page contains    Explore our statistics and data
 
     user clicks link    Explore
-    user waits until page contains    Browse to find the statistics and data you’re looking for
+    user waits until page contains
+    ...    Browse to find the statistics and data you’re looking for and open the section to get links to:
+    ...    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
     user opens accordion section    Pupils and schools

@@ -76,7 +76,7 @@ Navigate to published release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    90
 
 Check latest release contains glossary info icon
-    user waits until page contains title caption    ${RELEASE_NAME}
+    user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
     user opens accordion section    Test section    css:#content
     user waits until page contains button    Absence
