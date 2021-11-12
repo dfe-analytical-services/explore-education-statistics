@@ -24,10 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release1 = new Release
             {
                 Publication = publication,
+                ReleaseName = "2000",
             };
             var release2 = new Release
             {
                 Publication = publication,
+                ReleaseName = "2001",
             };
             var user1 = new User
             {
@@ -52,6 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release2,
                 Role = Contributor,
             };
+            var userReleaseRole3 = new UserReleaseRole
+            {
+                User = user2,
+                Release = release1,
+                Role = Contributor,
+            };
 
             var user3 = new User();
             var userReleaseRoleIgnored1 = new UserReleaseRole
@@ -71,41 +79,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2,
-                    userReleaseRole1, userReleaseRole2,
+                    userReleaseRole1, userReleaseRole2, userReleaseRole3,
                     userReleaseRoleIgnored1, userReleaseRoleIgnored2);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupReleasePermissionService(contentDbContext: contentDbContext);
+                var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.GetManageAccessPageContributorList(release1.Id);
-                var manageAccessList = result.AssertRight();
+                var result = await service.GetManageAccessPageContributorList(publication.Id);
+                var viewModel = result.AssertRight();
 
-                Assert.Equal(2, manageAccessList.Count);
+                Assert.Equal(publication.Id, viewModel.PublicationId);
+                Assert.Equal(publication.Title, viewModel.PublicationTitle);
+                Assert.Equal(2, viewModel.Releases.Count);
 
-                Assert.Equal(release1.Id, manageAccessList[0].ReleaseId);
-                Assert.Equal(userReleaseRole1.Id, manageAccessList[0].ReleaseRoleId);
-                Assert.Equal("User1 One", manageAccessList[0].UserFullName);
-                Assert.Equal(user1.Id, manageAccessList[0].UserId);
-
-                // Appears because has contributor role on another release under the same publication as release1
-                Assert.Equal(release1.Id, manageAccessList[1].ReleaseId);
-                Assert.Null(manageAccessList[1].ReleaseRoleId);
-                Assert.Equal("User2 Two", manageAccessList[1].UserFullName);
-                Assert.Equal(user2.Id, manageAccessList[1].UserId);
+                Assert.Equal(release1.Id, viewModel.Releases[0].ReleaseId);
+                Assert.Equal(release1.Title, viewModel.Releases[0].ReleaseTitle);
             }
         }
 
         [Fact]
-        public async Task GetManageAccessPageContributorList_NoRelease()
+        public async Task GetManageAccessPageContributorList_NoPublication()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
-            var service = SetupReleasePermissionService(contentDbContext: contentDbContext);
+            var service = SetupReleasePermissionService(contentDbContext);
 
             var result = await service.GetManageAccessPageContributorList(Guid.NewGuid());
             result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetManageAccessPageContributorList_NoReleases()
+        {
+            var publication = new Publication { Title = "Test Publication" };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service.GetManageAccessPageContributorList(publication.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(publication.Id, viewModel.PublicationId);
+                Assert.Equal(publication.Title, viewModel.PublicationTitle);
+                Assert.Empty(viewModel.Releases);
+            }
         }
 
         [Fact]
@@ -114,6 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication();
             var release1 = new Release
             {
+                ReleaseName = "2000",
                 Publication = publication,
             };
 
@@ -126,24 +154,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupReleasePermissionService(contentDbContext: contentDbContext);
+                var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.GetManageAccessPageContributorList(release1.Id);
-                var manageAccessList = result.AssertRight();
+                var result = await service.GetManageAccessPageContributorList(publication.Id);
+                var viewModel = result.AssertRight();
 
-                Assert.Empty(manageAccessList);
+                Assert.Equal(publication.Id, viewModel.PublicationId);
+                Assert.Equal(publication.Title, viewModel.PublicationTitle);
+                Assert.Single(viewModel.Releases);
+                Assert.Empty(viewModel.Releases[0].UserList);
             }
         }
 
-        private ReleasePermissionService SetupReleasePermissionService(
+        private static ReleasePermissionService SetupReleasePermissionService(
             ContentDbContext contentDbContext,
             IUserService? userService = null)
         {
-            return new ReleasePermissionService(
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
+            return new(
                 contentDbContext,
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
                 new PublicationRepository(contentDbContext, AdminMapper()),
-                new UserReleaseRoleRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }

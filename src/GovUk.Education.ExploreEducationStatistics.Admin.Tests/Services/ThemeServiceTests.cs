@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -463,11 +463,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ThemeService SetupThemeService(
             ContentDbContext context,
-            IMapper mapper = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            ITopicService topicService = null,
-            IPublishingService publishingService = null,
+            IMapper? mapper = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            ITopicService? topicService = null,
+            IPublishingService? publishingService = null,
             bool enableThemeDeletion = true)
         {
             var configuration =

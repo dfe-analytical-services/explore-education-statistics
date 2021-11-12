@@ -1,10 +1,10 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -35,15 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (releaseRole == ReleaseRole.Contributor) // First, to avoid unnecessary DB call
+            if (releaseRole == ReleaseRole.Contributor
+                && await _userPublicationRoleRepository
+                    .IsUserPublicationOwner(context.User.GetUserId(), publication.Id))
             {
-                var publicationRoles =
-                    await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
-
-                if (ContainPublicationOwnerRole(publicationRoles))
-                {
-                    context.Succeed(requirement);
-                }
+                context.Succeed(requirement);
             }
         }
     }

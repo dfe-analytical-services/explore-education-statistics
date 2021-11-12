@@ -1050,55 +1050,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetLatestReleases()
         {
-            var publicationId = Guid.NewGuid();
-
-            var release2000OriginalId = Guid.NewGuid();
             var release2000Original = new Release
             {
-                Id = release2000OriginalId,
-                PublicationId = publicationId,
                 ReleaseName = "2000",
-                PreviousVersionId = release2000OriginalId,
+                PreviousVersionId = null,
             };
             var release2000Latest = new Release
             {
-                PublicationId = publicationId,
                 ReleaseName = "2000",
-                PreviousVersionId = release2000OriginalId,
+                PreviousVersion = release2000Original,
             };
 
-            var release2001OriginalId = Guid.NewGuid();
             var release2001Original = new Release
             {
-                Id = release2001OriginalId,
-                PublicationId = publicationId,
                 ReleaseName = "2001",
-                PreviousVersionId = release2000OriginalId,
+                PreviousVersion = release2000Original,
             };
             var release2001Amendment = new Release
             {
                 Id = Guid.NewGuid(),
-                PublicationId = publicationId,
                 ReleaseName = "2001",
-                PreviousVersionId = release2001OriginalId,
+                PreviousVersion = release2001Original,
             };
             var release2001Latest = new Release
             {
-                PublicationId = publicationId,
                 ReleaseName = "2001",
-                PreviousVersionId = release2001Amendment.Id,
+                PreviousVersion = release2001Amendment,
             };
-            var release2002LatestId = Guid.NewGuid();
             var release2002Latest = new Release
             {
-                Id = release2002LatestId,
-                PublicationId = publicationId,
                 ReleaseName = "2002",
-                PreviousVersionId = release2002LatestId,
+                PreviousVersionId = null,
             };
             var publication = new Publication
             {
-                Id = publicationId,
                 Releases =
                 {
                     release2000Original,
@@ -1120,7 +1105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(context, AdminMapper());
-                var latestReleases = await service.GetLatestReleases(publicationId);
+                var latestReleases = await service.GetLatestVersionsOfAllReleases(publication.Id);
 
                 Assert.Equal(3, latestReleases.Count);
 

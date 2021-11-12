@@ -1,43 +1,54 @@
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import releasePermissionService, {
-  ReleaseContributor,
+import {
+  ManageAccessPageRelease,
+  ManageAccessPageContributor,
 } from '@admin/services/releasePermissionService';
 import ButtonText from '@common/components/ButtonText';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import styles from '@admin/pages/publication/components/ReleaseContributorPermissions.module.scss';
-import { Release } from '@admin/services/releaseService';
 import userService from '@admin/services/userService';
 import React, { useState } from 'react';
 
 export interface Props {
-  release: Release;
+  release: ManageAccessPageRelease;
+  onChange: (
+    release: ManageAccessPageRelease,
+    removeUser: string | undefined,
+  ) => void;
 }
 
-const ReleaseContributorPermissions = ({ release }: Props) => {
-  const {
-    value: releaseContributors,
-    isLoading,
-    retry: reloadReleaseContributors,
-  } = useAsyncRetry(
-    () => releasePermissionService.getReleaseContributors(release.id),
-    [release.id],
-  );
+const ReleaseContributorPermissions = ({ release, onChange }: Props) => {
+  const releaseContributors = release.userList;
 
-  const [changeContributorAccess, setChangeContributerAccess] = useState<
-    ReleaseContributor
+  const [changeContributorAccess, setChangeContributorAccess] = useState<
+    ManageAccessPageContributor
   >();
+
+  const handleRemove = (userReleaseRoleId: string) => {
+    onChange(release, undefined);
+  };
+
+  const handleAdd = (userId: string) => {
+    onChange(release, undefined);
+  };
+
+  const handleGrantAll = () => {
+    onChange(release, undefined);
+  };
+
+  const handleUserRemoval = (userId: string) => {
+    onChange(release, userId);
+  };
 
   const [
     grantAllContributorAccess,
     toggleGrantAllContributorAccess,
   ] = useToggle(false);
 
-  const [removeUser, setRemoveUser] = useState<ReleaseContributor>();
+  const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
 
   const showGrantAllButton =
     releaseContributors &&
@@ -47,7 +58,7 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
     );
 
   return (
-    <LoadingSpinner loading={isLoading}>
+    <>
       {!releaseContributors || releaseContributors.length === 0 ? (
         <WarningMessage testId="releaseContributors-warning">
           There are currently no team members associated to this publication.
@@ -76,7 +87,7 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
                       variant={
                         contributor.releaseRoleId ? 'warning' : 'secondary'
                       }
-                      onClick={() => setChangeContributerAccess(contributor)}
+                      onClick={() => setChangeContributorAccess(contributor)}
                     >
                       {contributor.releaseRoleId
                         ? 'Remove access'
@@ -118,8 +129,8 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
                 await userService.removeUserReleaseRole(
                   changeContributorAccess.releaseRoleId,
                 );
-                setChangeContributerAccess(undefined);
-                reloadReleaseContributors();
+                setChangeContributorAccess(undefined);
+                handleRemove(changeContributorAccess.releaseRoleId);
                 return;
               }
               await userService.addUserReleaseRole(
@@ -129,11 +140,14 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
                   releaseRole: 'Contributor',
                 },
               );
-              setChangeContributerAccess(undefined);
-              reloadReleaseContributors();
+              setChangeContributorAccess(undefined);
+              handleAdd(
+                changeContributorAccess.userId,
+                changeContributorAccess.releaseId,
+              );
             }}
-            onCancel={() => setChangeContributerAccess(undefined)}
-            onExit={() => setChangeContributerAccess(undefined)}
+            onCancel={() => setChangeContributorAccess(undefined)}
+            onExit={() => setChangeContributorAccess(undefined)}
           >
             <p>
               Are you sure you want to{' '}
@@ -141,7 +155,7 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
                 {changeContributorAccess?.releaseRoleId ? 'remove' : 'grant'}{' '}
                 access
               </strong>{' '}
-              for <strong>{release.title}</strong>?
+              for <strong>{release.releaseTitle}</strong>?
             </p>
           </ModalConfirm>
 
@@ -149,9 +163,8 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
             title="Grant access to all listed users"
             open={grantAllContributorAccess}
             onConfirm={async () => {
-              // await request here
               toggleGrantAllContributorAccess.off();
-              reloadReleaseContributors();
+              handleGrantAll();
             }}
             onCancel={toggleGrantAllContributorAccess.off}
             onExit={toggleGrantAllContributorAccess.off}
@@ -163,9 +176,8 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
             title="Confirm user removal"
             open={!!removeUser}
             onConfirm={async () => {
-              // await request here
+              handleUserRemoval(removeUser?.userId);
               setRemoveUser(undefined);
-              reloadReleaseContributors();
             }}
             onCancel={() => setRemoveUser(undefined)}
             onExit={() => setRemoveUser(undefined)}
@@ -178,7 +190,7 @@ const ReleaseContributorPermissions = ({ release }: Props) => {
           </ModalConfirm>
         </>
       )}
-    </LoadingSpinner>
+    </>
   );
 };
 

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 {
     [ApiController]
     [Route("api/user-management")]
-    [Authorize(Policy = "CanManageUsersOnSystem")]
+    [Authorize]
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;
@@ -61,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpPost("users/{userId:guid}/release-role")]
-        [AllowAnonymous] // We don't want above "CanManageUsersOnSystem" policy applied here
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, AddReleaseRoleViewModel request)
         {
@@ -80,7 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpDelete("users/release-role/{id:guid}")]
-        [AllowAnonymous] // We don't want above "CanManageUsersOnSystem" policy applied here
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid id)
         {

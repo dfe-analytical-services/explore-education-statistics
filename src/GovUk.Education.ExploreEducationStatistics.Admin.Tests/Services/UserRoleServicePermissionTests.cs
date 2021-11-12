@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -209,15 +210,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserRoleService SetupUserRoleService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserPublicationRoleRepository userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository userReleaseRoleRepository = null,
-            UserManager<ApplicationUser> userManager = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IUserService? userService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -226,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
+                usersAndRolesPersistenceHelper  ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,

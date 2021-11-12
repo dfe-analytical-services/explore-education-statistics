@@ -1,17 +1,18 @@
-import { BasicPublicationDetails } from '@admin/services/publicationService';
 import ReleaseContributorPermissions from '@admin/pages/publication/components/ReleaseContributorPermissions';
 import Details from '@common/components/Details';
 import WarningMessage from '@common/components/WarningMessage';
 import React, { useState } from 'react';
+import { ManageAccessPageRelease } from '@admin/services/releasePermissionService';
 
 export interface Props {
-  publication: BasicPublicationDetails;
+  releases: ManageAccessPageRelease[];
+  onChange: (release: ManageAccessPageRelease) => void;
 }
 
-const PublicationManageTeamAccessTab = ({ publication }: Props) => {
+const PublicationManageTeamAccessTab = ({ releases, onChange }: Props) => {
   const [renderedReleases, setRenderedReleases] = useState<string[]>([]);
 
-  if (!publication.releases || !publication.releases.length) {
+  if (!releases || !releases.length) {
     return (
       <WarningMessage>
         Create a release for this publication to manage team access.
@@ -19,36 +20,42 @@ const PublicationManageTeamAccessTab = ({ publication }: Props) => {
     );
   }
 
-  const latestRelease = publication.releases[publication.releases.length - 1];
-  const previousReleases = publication.releases
-    .filter(release => release.id !== latestRelease.id)
+  const latestRelease = releases[releases.length - 1];
+  const previousReleases = releases
+    .filter(release => release.releaseId !== latestRelease.releaseId)
     .reverse();
 
   return (
     <>
-      <h2>Update access for latest release ({latestRelease?.title})</h2>
+      <h2>Update access for latest release ({latestRelease?.releaseTitle})</h2>
       <p>
         Allow team members to be able to access and edit this release. You can
         also{' '}
         <a href="#previous-releases">control access to previous releases</a>.
       </p>
-      <ReleaseContributorPermissions release={latestRelease} />
+      <ReleaseContributorPermissions
+        release={latestRelease}
+        onChange={onChange}
+      />
 
       <h3 id="previous-releases">Previous releases</h3>
 
       {previousReleases.length > 0 ? (
         <>
           {previousReleases.map(release => (
-            <div key={release.id}>
+            <div key={release.releaseId}>
               <Details
-                summary={`${release.title}`}
+                summary={`${release.releaseTitle}`}
                 onToggle={isOpen => {
-                  if (isOpen && !renderedReleases.includes(release.id)) {
-                    setRenderedReleases([...renderedReleases, release.id]);
+                  if (isOpen && !renderedReleases.includes(release.releaseId)) {
+                    setRenderedReleases([
+                      ...renderedReleases,
+                      release.releaseId,
+                    ]);
                   }
                 }}
               >
-                {renderedReleases.includes(release.id) && (
+                {renderedReleases.includes(release.releaseId) && (
                   <ReleaseContributorPermissions release={release} />
                 )}
               </Details>

@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
         }
 
-        public async Task<List<Release>> GetLatestReleases(Guid publicationId)
+        public async Task<List<Release>> GetLatestVersionsOfAllReleases(Guid publicationId)
         {
             var publication = await _context.Publications
                 .Include(p => p.Releases)

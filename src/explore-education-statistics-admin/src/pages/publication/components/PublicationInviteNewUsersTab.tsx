@@ -1,11 +1,11 @@
-import { BasicPublicationDetails } from '@admin/services/publicationService';
 import React from 'react';
+import { ManageAccessPageRelease } from '@admin/services/releasePermissionService';
 
 export interface Props {
-  publication: BasicPublicationDetails;
+  releases: ManageAccessPageRelease[];
 }
 
-const PublicationInviteNewUsersTab = ({ publication }: Props) => {
+const PublicationInviteNewUsersTab = ({ releases }: Props) => {
   return <p>Invite new users tab content</p>;
 };
 

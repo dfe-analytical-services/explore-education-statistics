@@ -13,74 +13,100 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleasePermissionService : IReleasePermissionService
     {
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _contentDbContext;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserService _userService;
 
         public ReleasePermissionService(
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext contentDbContext,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPublicationRepository publicationRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserService userService)
         {
-            _persistenceHelper = persistenceHelper;
             _contentDbContext = contentDbContext;
+            _persistenceHelper = persistenceHelper;
             _publicationRepository = publicationRepository;
-            _userReleaseRoleRepository = userReleaseRoleRepository;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, List<ManageAccessPageContributorViewModel>>> GetManageAccessPageContributorList(Guid releaseId)
+        public async Task<Either<ActionResult, ManageAccessPageViewModel>>
+            GetManageAccessPageContributorList(Guid publicationId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
+                .CheckEntityExists<Publication>(publicationId,
                     query =>
-                        query.Include(r => r.Publication))
-                .OnSuccessDo(release => _userService
-                    .CheckCanUpdateReleaseRole(release.Publication, ReleaseRole.Contributor))
-                .OnSuccess(async release =>
+                        query.Include(r => r.Releases))
+                .OnSuccessDo(publication => _userService
+                    .CheckCanUpdateReleaseRole(publication, Contributor))
+                .OnSuccess(async publication =>
                 {
                     var allLatestReleases = await _publicationRepository
-                        .GetLatestReleases(release.PublicationId);
+                        .GetLatestVersionsOfAllReleases(publicationId);
 
-                    var allLatestReleaseIds = allLatestReleases
+                    var allLatestReleasesOrdered = allLatestReleases
+                        .OrderBy(r => r.Year)
+                        .ThenBy(r => r.TimePeriodCoverage)
+                        .ToList();
+
+                    var allLatestReleaseIds = allLatestReleasesOrdered
                         .Select(r => r.Id)
                         .ToList();
 
-                    var allContributorReleaseRoles = await _userReleaseRoleRepository.GetAllReleaseRoles(
-                        ReleaseRole.Contributor,
-                        allLatestReleaseIds.ToArray());
+                    var allContributorReleaseRoles = await _contentDbContext.UserReleaseRoles
+                        .Include(releaseRole => releaseRole.User)
+                        .AsAsyncEnumerable()
+                        .Where(userReleaseRole =>
+                            allLatestReleaseIds.Contains(userReleaseRole.ReleaseId)
+                            && userReleaseRole.Role == Contributor)
+                        .ToListAsync();
 
                     var allPublicationContributors = allContributorReleaseRoles
                         .Select(releaseRole => releaseRole.User)
                         .Distinct()
                         .ToList();
 
-                    return allPublicationContributors
-                        .Select(user =>
+                    var releases = allLatestReleasesOrdered
+                        .Select(release =>
                         {
-                            var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(releaseRole =>
-                                releaseRole.UserId == user.Id
-                                && releaseRole.ReleaseId == releaseId);
+                            var contributorList = allPublicationContributors
+                                .Select(user =>
+                                {
+                                    var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(releaseRole =>
+                                        releaseRole.UserId == user.Id
+                                        && releaseRole.ReleaseId == release.Id);
 
-                            return new ManageAccessPageContributorViewModel
+                                    return new ManageAccessPageContributorViewModel
+                                    {
+                                        UserId = user.Id,
+                                        UserFullName = user.DisplayName,
+                                        ReleaseId = release.Id,
+                                        // Some don't have a contributor release role for this release, as they are a
+                                        // contributor on a different release on the same publication
+                                        ReleaseRoleId = roleForThisRelease?.Id,
+                                    };
+                                }).ToList();
+
+                            return new ManageAccessPageReleaseViewModel
                             {
-                                UserId = user.Id,
-                                UserFullName = user.DisplayName,
-                                ReleaseId = releaseId,
-                                // Some don't have a contributor release role for this release, as they are a
-                                // contributor on a different release on the same publication
-                                ReleaseRoleId = roleForThisRelease?.Id,
+                                ReleaseId = release.Id,
+                                ReleaseTitle = release.Title,
+                                UserList = contributorList,
                             };
                         }).ToList();
+
+                    return new ManageAccessPageViewModel
+                    {
+                        PublicationId = publication.Id,
+                        PublicationTitle = publication.Title,
+                        Releases = releases,
+                    };
                 });
         }
     }

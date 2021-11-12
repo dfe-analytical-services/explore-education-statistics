@@ -1,6 +1,18 @@
 import client from '@admin/services/utils/service';
 
-export interface ReleaseContributor {
+export interface ManageAccessPage {
+  publicationId: string;
+  publicationTitle: string;
+  releases: ManageAccessPageRelease[];
+}
+
+export interface ManageAccessPageRelease {
+  releaseId: string;
+  releaseTitle: string;
+  userList: ManageAccessPageContributor[];
+}
+
+export interface ManageAccessPageContributor {
   userId: string;
   userFullName: string;
   releaseId: string;
@@ -8,8 +20,8 @@ export interface ReleaseContributor {
 }
 
 const releasePermissionService = {
-  getReleaseContributors(releaseId: string): Promise<ReleaseContributor[]> {
-    return client.get(`/releases/${releaseId}/contributors`);
+  getPublicationContributors(publicationId: string): Promise<ManageAccessPage> {
+    return client.get(`/publications/${publicationId}/contributors`);
   },
 };
 
