@@ -1792,7 +1792,6 @@
       "name": "[variables('publicAppName')]",
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
-      "kind": "app,linux",
       "identity": {
         "type": "SystemAssigned"
       },
@@ -1815,9 +1814,7 @@
         "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
-        "reserved": true,
         "siteConfig": {
-          "linuxFxVersion": "NODE|14-lts",
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
@@ -1870,7 +1867,6 @@
       "name": "[variables('publicPlanName')]",
       "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
-      "kind": "linux",
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
@@ -1887,7 +1883,6 @@
       "properties": {
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
-        "reserved": true,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
       }
