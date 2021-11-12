@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -1095,15 +1096,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private UserRoleService SetupUserRoleService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserPublicationRoleRepository userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository userReleaseRoleRepository = null,
-            UserManager<ApplicationUser> userManager = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IUserService? userService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();

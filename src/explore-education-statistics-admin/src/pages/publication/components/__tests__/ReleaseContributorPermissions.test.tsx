@@ -47,7 +47,7 @@ describe('ReleaseContributorPermissions', () => {
   ];
 
   test('renders a message when there are no release contributors', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue([]);
+    releasePermissionService.getPublicationContributors.mockResolvedValue([]);
 
     render(<ReleaseContributorsPermissions release={testRelease} />);
 
@@ -63,7 +63,7 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('renders the contributors table correctly', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue(
+    releasePermissionService.getPublicationContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
@@ -109,7 +109,7 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('granting user access', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue(
+    releasePermissionService.getPublicationContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
@@ -149,7 +149,7 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('removing user access', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue(
+    releasePermissionService.getPublicationContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
@@ -188,7 +188,7 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('remove user', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue(
+    releasePermissionService.getPublicationContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
@@ -224,7 +224,7 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('grant all users access', async () => {
-    releasePermissionService.getReleaseContributors.mockResolvedValue(
+    releasePermissionService.getPublicationContributors.mockResolvedValue(
       testReleaseContributors,
     );
 

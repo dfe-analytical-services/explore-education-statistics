@@ -1,5 +1,5 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -22,11 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePermissionService = releasePermissionService;
         }
 
-        [HttpGet("releases/{releaseId}/contributors")]
-        public async Task<ActionResult<List<ManageAccessPageContributorViewModel>>> GetReleaseContributors(Guid releaseId)
+        [HttpGet("publications/{publicationId}/contributors")]
+        public async Task<ActionResult<ManageAccessPageViewModel>> GetReleaseContributors(Guid publicationId)
         {
             return await _releasePermissionService
-                .GetManageAccessPageContributorList(releaseId)
+                .GetManageAccessPageContributorList(publicationId)
                 .HandleFailuresOrOk();
         }
     }

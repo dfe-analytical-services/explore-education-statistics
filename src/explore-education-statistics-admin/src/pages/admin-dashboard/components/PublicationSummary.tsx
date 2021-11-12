@@ -24,7 +24,7 @@ const PublicationSummary = ({
   publication,
   topicId,
   onChangePublication,
-  showManageTeamAccessButton = false,
+  showManageTeamAccessButton = true,
 }: Props) => {
   const { contact, permissions, releases, id, title } = publication;
 

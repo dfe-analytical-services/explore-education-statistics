@@ -29,7 +29,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,
             Guid publicationId,
             IEnumerable<ReleaseRole> roles);
-
-        Task<List<UserReleaseRole>> GetAllReleaseRoles(ReleaseRole role, params Guid[] releaseIds);
     }
 }
