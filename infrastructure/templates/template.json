@@ -1852,6 +1852,7 @@
         "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
         "HOTJAR_ID": "[parameters('publicAppHotjarId')]",
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
+        "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
