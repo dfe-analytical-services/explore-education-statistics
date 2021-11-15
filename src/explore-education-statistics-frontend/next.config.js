@@ -14,6 +14,7 @@ const nextConfig = {
     HOTJAR_ID: process.env.HOTJAR_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
   },
+  productionBrowserSourceMaps: true,
   async redirects() {
     return [
       {
