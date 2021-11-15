@@ -221,10 +221,11 @@ Validate rows after reordering
 User generates a permanent link
     user waits until page contains button    Generate shareable link
     user clicks button    Generate shareable link
-    user waits until page contains element    xpath://a[text()="View share link"]    60
+    user waits until page contains link    View share link
     user checks generated permalink is valid
 
 User validates permanent link works correctly
+    [Documentation]    EES-2892
     user clicks link    View share link
     user waits until h1 is visible    'Absence by characteristic' from 'Pupil absence in schools in England'
 
