@@ -1,17 +1,14 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public abstract class ObservationalUnit
     {
-        public string Code { get; }
-        public string Name { get; }
-        
-        protected ObservationalUnit()
-        {
-        }
+        public string? Code { get; }
+        public string? Name { get; }
 
-        protected ObservationalUnit(string code, string name)
+        protected ObservationalUnit(string? code, string? name)
         {
             Code = code;
             Name = name;
