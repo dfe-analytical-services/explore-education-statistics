@@ -93,6 +93,7 @@ user opens chrome headless
     Call Method    ${c_opts}    add_argument    disable-logging
 
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    setup chromedriver
 
 user opens chrome with xvfb
     start virtual display    1920    1080
@@ -104,6 +105,7 @@ user opens chrome with xvfb
     END
 
     create webdriver    Chrome    chrome_options=${options}
+    setup chromedriver
     set window size    1920    1080
 
 user opens chrome without xvfb
@@ -114,6 +116,7 @@ user opens chrome without xvfb
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    setup chromedriver
     maximize browser window
 
 user opens firefox headless
