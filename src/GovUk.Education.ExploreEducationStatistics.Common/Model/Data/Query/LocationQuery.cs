@@ -10,23 +10,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel? GeographicLevel { get; set; }
-        public List<string> Country { get; set; } = new();
-        public List<string> EnglishDevolvedArea { get; set; } = new();
-        public List<string> Institution { get; set; } = new();
-        public List<string> LocalAuthority { get; set; } = new();
-        public List<string> LocalAuthorityDistrict { get; set; } = new();
-        public List<string> LocalEnterprisePartnership { get; set; } = new();
-        public List<string> MultiAcademyTrust { get; set; } = new();
-        public List<string> MayoralCombinedAuthority { get; set; } = new();
-        public List<string> OpportunityArea { get; set; } = new();
-        public List<string> ParliamentaryConstituency { get; set; } = new();
-        public List<string> Provider { get; set; } = new();
-        public List<string> PlanningArea { get; set; } = new();
-        public List<string> Region { get; set; } = new();
-        public List<string> RscRegion { get; set; } = new();
-        public List<string> School { get; set; } = new();
-        public List<string> Sponsor { get; set; } = new();
-        public List<string> Ward { get; set; } = new();
+        public List<string>? Country { get; set; }
+        public List<string>? EnglishDevolvedArea { get; set; }
+        public List<string>? Institution { get; set; }
+        public List<string>? LocalAuthority { get; set; }
+        public List<string>? LocalAuthorityDistrict { get; set; }
+        public List<string>? LocalEnterprisePartnership { get; set; }
+        public List<string>? MultiAcademyTrust { get; set; }
+        public List<string>? MayoralCombinedAuthority { get; set; }
+        public List<string>? OpportunityArea { get; set; }
+        public List<string>? ParliamentaryConstituency { get; set; }
+        public List<string>? Provider { get; set; }
+        public List<string>? PlanningArea { get; set; }
+        public List<string>? Region { get; set; }
+        public List<string>? RscRegion { get; set; }
+        public List<string>? School { get; set; }
+        public List<string>? Sponsor { get; set; }
+        public List<string>? Ward { get; set; }
 
         public int CountItems()
         {

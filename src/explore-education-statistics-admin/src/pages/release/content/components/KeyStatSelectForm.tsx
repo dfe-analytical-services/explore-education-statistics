@@ -29,7 +29,9 @@ const KeyStatSelectForm = ({
     return availableDataBlocks.filter(dataBlock => {
       const { timePeriod, locations, indicators } = dataBlock.query;
 
-      const locationLevels = Object.values(locations);
+      const locationLevels = Object.values(locations).filter(
+        level => level?.length,
+      );
 
       const hasSingleLocation =
         locationLevels.length === 1 && locationLevels[0].length === 1;
