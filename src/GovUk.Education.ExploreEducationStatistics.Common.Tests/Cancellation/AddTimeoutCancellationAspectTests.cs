@@ -3,16 +3,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using Microsoft.Extensions.Configuration;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation.AddTimeoutCancellationTestFixture;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
 {
-    [Collection(AddTimeoutCancellationTestFixture.CollectionName)]
+    [Collection(CollectionName)]
     public class AddTimeoutCancellationAspectTests : IClassFixture<AddTimeoutCancellationTestFixture>
     {
-        private const int TimeoutMillis = 10;
-        
         private static class TestMethods
         {
             [AddTimeoutCancellation(TimeoutMillis)]
@@ -34,6 +34,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
                 CancellationToken? token = null)
             {
                 await assertions.Invoke(token);
+            }
+            
+            [AddTimeoutCancellation(ExistingConfigurationItemKey)]
+            public static void AddTimeoutWithConfiguration(
+                Action<CancellationToken?> assertions, 
+                CancellationToken? token = null)
+            {
+                assertions.Invoke(token);
+            }
+            
+            [AddTimeoutCancellation(MisconfiguredConfigurationItemKey)]
+            public static void AddTimeoutWithMisconfiguredConfiguration(CancellationToken? token = null)
+            {
+            }
+            
+            [AddTimeoutCancellation(MissingConfigurationItemKey)]
+            public static void AddTimeoutWithMissingConfiguration(CancellationToken? token = null)
+            {
             }
         }
         
@@ -104,6 +122,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
         }
         
         [Fact]
+        public void TimeoutExceededWithConfiguration()
+        {
+            var exception = Assert.Throws<AggregateException>(() => 
+                TestMethods.AddTimeoutWithConfiguration(providedToken =>
+                {
+                    // A CancellationToken should have been provided by the Aspect
+                    Assert.NotNull(providedToken);
+
+                    Task.WaitAll(Task.Delay(TimeoutMillis * 2, providedToken!.Value));
+                }));
+
+            Assert.IsAssignableFrom<TaskCanceledException>(exception.InnerExceptions[0]);
+        }
+        
+        [Fact]
+        public void TimeoutExceededWithMisconfiguredConfiguration()
+        {
+            var exception = Assert.Throws<ArgumentException>(() => TestMethods.AddTimeoutWithMisconfiguredConfiguration());
+            Assert.Equal($"TimeoutConfiguration configuration setting for key {MisconfiguredConfigurationItemKey} " +
+                         $"must be an integer", exception.Message);
+        }
+        
+        [Fact]
+        public void TimeoutExceededWithMissingConfiguration()
+        {
+            var exception = Assert.Throws<ArgumentException>(() => TestMethods.AddTimeoutWithMissingConfiguration());
+            Assert.Equal($"Could not find TimeoutConfiguration configuration setting for " +
+                         $"key {MissingConfigurationItemKey}", exception.Message);
+        }
+        
+        [Fact]
+        public void TimeoutExceededWithNoConfigurationSection()
+        {
+            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(null);
+
+            try
+            {
+                var exception = Assert.Throws<ArgumentException>(() => 
+                    TestMethods.AddTimeoutWithMissingConfiguration());
+                
+                Assert.StartsWith("TimeoutConfiguration section cannot be null", exception.Message);
+            }
+            finally
+            {
+                AddTimeoutCancellationAttribute.SetTimeoutConfiguration(TimeoutConfiguration);
+            }
+        }
+        
+        [Fact]
         public async Task MergeWithOriginalCancellationToken()
         {
             var originalTokenSource = new CancellationTokenSource();
@@ -139,6 +206,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
         public void NoCancellationTokenParameterAvailableForAddTimeout()
         {
             Assert.Throws<ArgumentException>(TestMethods.NoCancellationTokenParameterAvailableForAddTimeout);
+        }
+    }
+
+    internal class AddTimeoutCancellationTestFixture : IDisposable
+    {
+        public const string CollectionName = "AddTimeoutCancellation tests";
+        public const int TimeoutMillis = 10;
+        public const string ExistingConfigurationItemKey = "ExistingConfigurationItem";
+        public const string MisconfiguredConfigurationItemKey = "MisconfiguredConfigurationItem";
+        public const string MissingConfigurationItemKey = "NonExistentConfigurationItem";
+
+        public static readonly IConfiguration TimeoutConfiguration = CreateMockConfiguration(
+            new Tuple<string, string>(ExistingConfigurationItemKey, $"{TimeoutMillis}"),
+            new Tuple<string, string>(MisconfiguredConfigurationItemKey, "Not a number"),
+            new Tuple<string, string>(MissingConfigurationItemKey, null!)
+            ).Object;
+        
+        public AddTimeoutCancellationTestFixture()
+        {
+            AddTimeoutCancellationAspect.Enabled = true;
+            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(TimeoutConfiguration);
+        }
+
+        public void Dispose()
+        {
+            AddTimeoutCancellationAspect.Enabled = false;
+            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(null);
         }
     }
 }

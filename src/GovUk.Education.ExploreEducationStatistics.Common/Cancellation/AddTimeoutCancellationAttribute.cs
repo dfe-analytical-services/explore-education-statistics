@@ -14,9 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
         private static IConfiguration? _timeoutConfiguration;
 
         /// <summary>
-        /// Defaults to 1 minute.
         /// </summary>
-        public int TimeoutMillis { get; } = 60000;
+        public int TimeoutMillis { get; }
         
         public AddTimeoutCancellationAttribute(int timeoutMillis)
         {
@@ -44,10 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
                                             $"key {configurationKey}");
             }
             
-            TimeoutMillis = int.Parse(timeoutConfig);
+            if (!int.TryParse(timeoutConfig, out var timeoutValue))
+            {
+                throw new ArgumentException($"TimeoutConfiguration configuration setting for " +
+                                            $"key {configurationKey} must be an integer");
+            }
+            
+            TimeoutMillis = timeoutValue;
         }
 
-        public static void SetTimeoutConfiguration(IConfiguration timeoutConfiguration)
+        public static void SetTimeoutConfiguration(IConfiguration? timeoutConfiguration)
         {
             _timeoutConfiguration = timeoutConfiguration;
         }

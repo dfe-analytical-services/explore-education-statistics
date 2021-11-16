@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
 
-        private readonly ObservationQueryContext _query = new ObservationQueryContext
+        private readonly ObservationQueryContext _query = new()
         {
             SubjectId = Guid.NewGuid()
         };
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Results = new List<ObservationViewModel>
                         {
-                            new ObservationViewModel()
+                            new()
                         }
                     });
 
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Results = new List<ObservationViewModel>
                         {
-                            new ObservationViewModel()
+                            new()
                         }
                     }
                 );

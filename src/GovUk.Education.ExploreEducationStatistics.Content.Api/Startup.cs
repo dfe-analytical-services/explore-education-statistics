@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
