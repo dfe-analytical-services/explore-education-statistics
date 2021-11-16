@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -59,7 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddApplicationInsightsTelemetry();
-            services.AddMvc(options => { options.EnableEndpointRouting = false; })
+            services.AddMvc(options =>
+                {
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.EnableEndpointRouting = false;
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -154,7 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
-
+            // Enable cancellation aspects.
+            CancellationAspects.Enabled = true;
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
