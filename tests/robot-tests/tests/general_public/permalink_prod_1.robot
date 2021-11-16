@@ -12,7 +12,7 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Go to permalink
-    user goes to url    %{PUBLIC_URL}/data-tables/permalink/30999037-fcd4-409f-9ff4-d3680da7402d
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables/permalink/30999037-fcd4-409f-9ff4-d3680da7402d
     user waits until h1 is visible
     ...    'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England'
 

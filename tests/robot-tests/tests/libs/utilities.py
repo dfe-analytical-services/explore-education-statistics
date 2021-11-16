@@ -52,7 +52,7 @@ if not utilities_init.initialised:
     utilities_init.initialised = True
 
 
-def setup_chromedriver():
+def enable_basic_auth_headers():
     # Setup basic auth headers for public frontend
     public_auth_user = os.getenv('PUBLIC_AUTH_USER')
     public_auth_password = os.getenv('PUBLIC_AUTH_PASSWORD')
@@ -66,6 +66,11 @@ def setup_chromedriver():
                 'Authorization': f'Basic {token.decode()}'
             }
         })
+
+
+def disable_basic_auth_headers():
+    # Must be disabled to visit admin frontend
+    sl.driver.execute_cdp_cmd('Network.disable', {})
 
 
 def raise_assertion_error(err_msg):
@@ -331,6 +336,7 @@ def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, the
 
 
 def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
+    disable_basic_auth_headers()
     if user_is_on_admin_dashboard(admin_url):
         return
 

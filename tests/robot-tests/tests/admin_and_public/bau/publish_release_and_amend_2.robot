@@ -235,7 +235,7 @@ Generate the permalink
     Set Suite Variable    ${PERMA_LOCATION_URL}
 
 Go to permalink
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
@@ -311,7 +311,7 @@ Approve release amendment
     user approves amended release for immediate publication
 
 Go to permalink page & check for error element to be present
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
 
 Check the table has the same results as original table
@@ -371,7 +371,7 @@ Check the table has the same results as original table
     user checks results table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -431,7 +431,7 @@ Go to "Sign off" to approve amended release for immediate publication
     user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 Select publication
@@ -503,7 +503,7 @@ Generate the new permalink
     Set Suite Variable    ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink
-    user goes to url    ${PERMA_LOCATION_URL_TWO}
+    user navigates to public frontend    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Updating ${SUBJECT_NAME} footnote

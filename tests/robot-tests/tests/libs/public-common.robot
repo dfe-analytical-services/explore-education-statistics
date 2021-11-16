@@ -36,7 +36,7 @@ user goes to release page via breadcrumb
 
 user navigates to public methodologies page
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/methodology
+    user navigates to public frontend    %{PUBLIC_URL}/methodology
     user waits until h1 is visible    Methodologies
 
 user checks methodology note

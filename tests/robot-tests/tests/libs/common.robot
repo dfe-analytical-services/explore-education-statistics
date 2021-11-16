@@ -93,7 +93,7 @@ user opens chrome headless
     Call Method    ${c_opts}    add_argument    disable-logging
 
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
-    setup chromedriver
+    enable basic auth headers
 
 user opens chrome with xvfb
     start virtual display    1920    1080
@@ -105,7 +105,7 @@ user opens chrome with xvfb
     END
 
     create webdriver    Chrome    chrome_options=${options}
-    setup chromedriver
+    enable basic auth headers
     set window size    1920    1080
 
 user opens chrome without xvfb
@@ -116,7 +116,7 @@ user opens chrome without xvfb
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
-    setup chromedriver
+    enable basic auth headers
     maximize browser window
 
 user opens firefox headless
@@ -138,7 +138,9 @@ user closes the browser
 
 user goes to url
     [Arguments]    ${destination}
-    go to    ${destination}
+    # Due to the need to set and unset basic auth for public and admin respectively, we now want to coerce any switches
+    # in test suites through "user navigates to public frontend" or "user navigates to admin frontend"
+    fail    Use 'user navigates to public frontend' or 'user navigates to admin frontend'
 
 user gets url
     ${url}=    get location
@@ -768,19 +770,24 @@ user checks page does not contain other release
     user checks page does not contain element
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
+user navigates to admin frontend
+    [Arguments]    ${URL}=%{ADMIN_URL}
+    disable basic auth headers
+    go to    ${URL}
+
 user navigates to public frontend
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
-    user waits until h1 is visible    Explore our statistics and data
+    [Arguments]    ${URL}=%{PUBLIC_URL}
+    enable basic auth headers
+    go to    ${URL}
 
 user navigates to find statistics page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
 
 user navigates to data tables page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 check that variable is not empty

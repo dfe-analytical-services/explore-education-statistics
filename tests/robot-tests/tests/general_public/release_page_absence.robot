@@ -10,9 +10,9 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore our statistics and data
+
     user clicks link    Explore
     user waits until page contains
     ...    Browse to find the statistics and data you’re looking for and open the section to get links to:

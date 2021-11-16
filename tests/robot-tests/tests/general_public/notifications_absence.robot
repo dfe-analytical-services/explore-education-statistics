@@ -10,8 +10,7 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to Absence publication
     [Tags]    Local
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore our statistics and data
 
     user clicks link    Explore

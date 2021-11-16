@@ -9,8 +9,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Navigate to glossary page
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until h1 is visible    Explore our statistics and data
 
     user clicks link    Glossary

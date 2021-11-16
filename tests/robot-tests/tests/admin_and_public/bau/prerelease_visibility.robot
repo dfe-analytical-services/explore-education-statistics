@@ -36,10 +36,7 @@ Go to 'Sign Off' page
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Go to Public Release Link
-    # To get around basic auth on public frontend
-    user goes to url    %{PUBLIC_URL}
-    user waits until h1 is visible    Explore our statistics and data
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user checks page does not contain    ${RELEASE_NAME}
 
@@ -112,7 +109,7 @@ Check scheduled release isn't visible on public Table Tool
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Go to public release URL and check release isn't visible
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check "Page not found" appears
@@ -137,5 +134,5 @@ Approve release for immediate publication but don't wait to finish
     user checks summary list contains    Current status    Approved
 
 Go to public release URL again and check release isn't visible
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found

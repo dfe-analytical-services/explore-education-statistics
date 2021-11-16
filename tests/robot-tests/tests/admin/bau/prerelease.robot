@@ -17,7 +17,6 @@ ${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFI
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
 ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
-${RELEASE_URL}=
 
 *** Test Cases ***
 Create test publication and release via API
@@ -136,7 +135,7 @@ Navigate to prerelease page
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
-    user goes to url    ${RELEASE_URL}/prerelease/content
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
     user waits until h1 is visible    Pre-release access is not yet available    60
@@ -152,7 +151,7 @@ Validate prerelease has not started
     user checks page contains    Pre-release access will be available from ${time_start} until ${time_end}.
 
 Go to prerelease access page
-    user goes to url    ${RELEASE_URL}/prerelease-access
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
 Validate the invite emails field is required
@@ -229,7 +228,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
 
 Validate prerelease has not started for Analyst user
     user changes to analyst1
-    user goes to url    ${RELEASE_URL}/prerelease/content
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
     user waits until h1 is visible    Pre-release access is not yet available    60
     user checks breadcrumb count should be    2
@@ -249,7 +248,7 @@ Start prerelease
     ${month}=    get current datetime    %-m    1
     ${month_word}=    get current datetime    %B    1
     ${year}=    get current datetime    %Y    1
-    user goes to url    ${RELEASE_URL}/status
+    user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${day}
     user enters text into element    id:releaseStatusForm-publishScheduled-month    ${month}
@@ -266,7 +265,7 @@ Validate prerelease has started
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
-    user goes to url    ${RELEASE_URL}/prerelease/content
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -364,7 +363,7 @@ Create and validate custom table
 
 Validate prerelease has started for Analyst user
     user changes to analyst1
-    user goes to url    ${RELEASE_URL}/prerelease/content
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -470,7 +469,7 @@ Unschedule release
     # EES-2826 Cancel scheduled publishing because ReleaseStatus row in table storage isn't removed
     # by test topic teardown. Unscheduling prevents an error when the scheduled publishing begins.
     user changes to bau1
-    user goes to url    ${RELEASE_URL}/status
+    user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    In draft
     user clicks button    Update status
