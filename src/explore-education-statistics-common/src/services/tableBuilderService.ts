@@ -301,7 +301,7 @@ const tableBuilderService = {
       );
     }
     return mergeDuplicateLocationsInTableDataResponse(
-      await dataApi.post(`/tablebuilder`, query),
+      await dataApi.post('/tablebuilder', query),
     );
   },
   async getDataBlockTableData(

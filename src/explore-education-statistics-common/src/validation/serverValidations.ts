@@ -163,13 +163,22 @@ export function isServerValidationError(
 
 export function hasServerValidationError(
   error: Error,
-  errorMessage: string,
+  ...errorCodes: string[]
 ): boolean {
   if (isServerValidationError(error) && error.response?.data) {
-    const errors = Object.values(error.response?.data.errors);
-    if (errors.flat().includes(errorMessage)) {
-      return true;
-    }
+    const existingCodes = Object.values(error.response?.data.errors).flat();
+    return existingCodes.every(existingCode =>
+      errorCodes.includes(existingCode),
+    );
   }
   return false;
+}
+
+export function getServerValidationError(error: Error): string | null {
+  if (!isServerValidationError(error) || !error.response?.data) {
+    return null;
+  }
+
+  const errors = Object.values(error.response?.data.errors);
+  return errors.flat()[0];
 }

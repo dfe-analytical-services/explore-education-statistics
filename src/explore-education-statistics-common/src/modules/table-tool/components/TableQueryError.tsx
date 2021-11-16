@@ -3,19 +3,22 @@ import { BaseErrorSummary } from '@common/components/ErrorSummary';
 import downloadService from '@common/services/downloadService';
 import { Subject } from '@common/services/tableBuilderService';
 import React, { useEffect, useRef } from 'react';
+import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
 
 interface Props {
   id: string;
   releaseId?: string;
   showDownloadOption?: boolean;
   subject: Subject;
+  errorCode: TableQueryErrorCode;
 }
 
-const TableSizeError = ({
+const TableQueryError = ({
   id,
   releaseId,
   showDownloadOption = true,
   subject,
+  errorCode,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -26,10 +29,17 @@ const TableSizeError = ({
 
   return (
     <BaseErrorSummary id={id} ref={ref} title="There is a problem">
-      <p>
-        Could not create table as the filters chosen may exceed the maximum
-        allowed table size.
-      </p>
+      {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
+        <p>
+          Could not create table as the filters chosen may exceed the maximum
+          allowed table size.
+        </p>
+      )}
+      {errorCode === 'REQUEST_CANCELLED' && (
+        <p>
+          Could not create table as the filters chosen took too long to respond.
+        </p>
+      )}
       {showDownloadOption ? (
         <>
           <p>Select different filters or download the subject data.</p>
@@ -55,4 +65,4 @@ const TableSizeError = ({
   );
 };
 
-export default TableSizeError;
+export default TableQueryError;

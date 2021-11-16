@@ -21,6 +21,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
+import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
@@ -130,12 +131,25 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {highlight.name}
           </Link>
         )}
-        onTableSizeError={(publicationTitle: string, subjectName: string) => {
-          logEvent({
-            category: 'Table tool size error',
-            action: 'Table exceeeded maximum size',
-            label: `${publicationTitle}/${subjectName}`,
-          });
+        onTableQueryError={(
+          errorCode: TableQueryErrorCode,
+          publicationTitle: string,
+          subjectName: string,
+        ) => {
+          if (errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE') {
+            logEvent({
+              category: 'Table tool size error',
+              action: 'Table exceeded maximum size',
+              label: `${publicationTitle}/${subjectName}`,
+            });
+          }
+          if (errorCode === 'REQUEST_CANCELLED') {
+            logEvent({
+              category: 'Table tool query timeout error',
+              action: 'Table exceeded maximum timeout duration',
+              label: `${publicationTitle}/${subjectName}`,
+            });
+          }
         }}
         finalStep={({
           query,
