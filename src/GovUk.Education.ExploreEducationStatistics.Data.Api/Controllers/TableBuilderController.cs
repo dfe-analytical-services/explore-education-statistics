@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -38,15 +40,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
+        [AddTimeoutCancellation(1000)]
+        [CaptureCancellationToken]
+        public Task<ActionResult<TableBuilderResultViewModel>> Query(
+            [FromBody] ObservationQueryContext query, 
+            CancellationToken cancellationToken = default)
         {
             return _tableBuilderService.Query(query).HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
+        [AddTimeoutCancellation(1000)]
+        [CaptureCancellationToken]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,
-            [FromBody] ObservationQueryContext query)
+            [FromBody] ObservationQueryContext query, 
+            CancellationToken cancellationToken = default)
         {
             return _tableBuilderService.Query(releaseId, query).HandleFailuresOrOk();
         }

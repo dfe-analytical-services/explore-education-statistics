@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -8,7 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IObservationService : IRepository<Observation, long>
     {
-        IEnumerable<Observation> FindObservations(ObservationQueryContext query);
+        Task<IEnumerable<Observation>> FindObservations(
+            ObservationQueryContext query,
+            CancellationToken cancellationToken = default);
 
         IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query);
     }

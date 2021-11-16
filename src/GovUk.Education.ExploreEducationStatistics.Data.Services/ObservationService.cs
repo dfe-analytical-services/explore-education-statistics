@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -19,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
+        private const int ObservationFetchBatchSize = 100;
+
         private readonly ILogger<ObservationService> _logger;
 
         public ObservationService(
@@ -28,14 +33,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
+        [AddCapturedCancellation]
+        public async Task<IEnumerable<Observation>> FindObservations(
+            ObservationQueryContext query,
+            CancellationToken cancellationToken = default)
         {
             var totalStopwatch = Stopwatch.StartNew();
             var phasesStopwatch = Stopwatch.StartNew();
 
             var locationsQuery = query.Locations;
 
-            var localAuthorityOldCodes = locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList();
+            var localAuthorityOldCodes = locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList() ?? new List<string>();
             var localAuthorityCodes = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
@@ -122,34 +130,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     planningAreaListParam,
                     filterItemListParam);
 
-            _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+            var ids = await inner
+                .Select(obs => obs.Id)
+                .ToArrayAsync(cancellationToken);
+
+            _logger.LogDebug($"Executed FilteredObservations stored procedure in " +
+                             $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms - fetched {ids.Length} " +
+                             $"Observation ids");
             phasesStopwatch.Restart();
 
-            var ids = inner.Select(obs => obs.Id).ToArray();
+            var batchesOfIds = ids.Batch(ObservationFetchBatchSize).ToList();
 
-            _logger.LogDebug($"Fetched {ids.Length} Observation ids from inner result in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-            phasesStopwatch.Restart();
+            var observations = new List<Observation>();
 
-            var batchesOfIds = ids.Batch(10000).ToList();
-
-            var observations = batchesOfIds.SelectMany(batchOfIds =>
+            await batchesOfIds.ForEachAsync(async batchOfIds =>
             {
-                var observationBatch = _context
+                var observationBatch = await _context
                     .Observation
                     .AsNoTracking()
                     .Include(o => o.FilterItems)
                     .Include(o => o.Location)
                     .Where(o => batchOfIds.Contains(o.Id))
-                    .ToList();
+                    .ToListAsync(cancellationToken);
 
-                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
+                                 $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
                 phasesStopwatch.Restart();
 
-                return observationBatch;
-            })
-                .ToList();
+                observations.AddRange(observationBatch);
+            });
 
-            _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
+            _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of " +
+                             $"{totalStopwatch.Elapsed.TotalMilliseconds} ms");
             return observations;
         }
 
