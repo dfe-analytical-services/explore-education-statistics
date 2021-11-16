@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -43,12 +44,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost("release/{releaseId}")]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(Guid releaseId, [FromBody] ObservationQueryContext query)
+        public Task<ActionResult<TableBuilderResultViewModel>> Query(
+            Guid releaseId, 
+            [FromBody] ObservationQueryContext query,
+            CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query);
+            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query, cancellationToken);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
@@ -59,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
-            Guid dataBlockId)
+            Guid dataBlockId,
+            CancellationToken cancellationToken = default)
         {
             return await _contentPersistenceHelper.CheckEntityExists<ReleaseContentBlock>(
                     query => query
@@ -79,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                             query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
 
                             return await _userService.CheckCanViewRelease(block.Release)
-                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query));
+                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
                         }
 
                         return new NotFoundResult();
