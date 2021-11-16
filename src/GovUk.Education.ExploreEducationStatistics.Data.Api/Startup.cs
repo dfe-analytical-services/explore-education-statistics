@@ -183,10 +183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         {
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
             // Enable cancellation aspects.
             CancellationAspects.Enabled = true;
-
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
             UpdateDatabase(app);
 

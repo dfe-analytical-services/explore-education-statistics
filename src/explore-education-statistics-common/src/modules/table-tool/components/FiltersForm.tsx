@@ -125,8 +125,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   const handleSubmit = async (values: FormValues) => {
     setPreviousValues(values);
     try {
-      await onSubmit(values);
       setTableQueryError(undefined);
+      await onSubmit(values);
       goToNextStep();
     } catch (error) {
       if (
@@ -186,7 +186,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 form.submitCount > 0 &&
                 isEqual(form.values, previousValues) && (
                   <TableQueryError
-                    id={`${formId}-tableSizeError`}
+                    id={`${formId}-tableQueryError`}
                     errorCode={tableQueryError}
                     releaseId={selectedPublication?.selectedRelease.id}
                     showDownloadOption={showTableQueryErrorDownload}

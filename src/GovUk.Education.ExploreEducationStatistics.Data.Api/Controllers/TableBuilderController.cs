@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        [AddTimeoutCancellation(1000)]
+        [AddTimeoutCancellation(TableBuilderQuery)]
         [CaptureCancellationToken]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             [FromBody] ObservationQueryContext query, 
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost("release/{releaseId}")]
-        [AddTimeoutCancellation(1000)]
+        [AddTimeoutCancellation(TableBuilderQuery)]
         [CaptureCancellationToken]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,

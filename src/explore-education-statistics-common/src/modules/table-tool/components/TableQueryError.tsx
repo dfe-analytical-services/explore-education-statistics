@@ -42,7 +42,15 @@ const TableQueryError = ({
       )}
       {showDownloadOption ? (
         <>
-          <p>Select different filters or download the subject data.</p>
+          {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
+            <p>Select different filters or download the subject data.</p>
+          )}
+          {errorCode === 'REQUEST_CANCELLED' && (
+            <p>
+              Select different filters, try again later or download the subject
+              data.
+            </p>
+          )}
           <Button
             className="govuk-!-margin-bottom-0"
             disabled={!releaseId}
@@ -59,7 +67,14 @@ const TableQueryError = ({
           </Button>
         </>
       ) : (
-        <p>Select different filters and try again.</p>
+        <>
+          {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
+            <p>Select different filters and try again.</p>
+          )}
+          {errorCode === 'REQUEST_CANCELLED' && (
+            <p>Select different filters or try again later.</p>
+          )}
+        </>
       )}
     </BaseErrorSummary>
   );

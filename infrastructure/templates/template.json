@@ -493,6 +493,13 @@
       "type": "bool",
       "defaultValue": false
     },
+    "requestTimeoutsTableBuilderQuery": {
+      "type": "int",
+      "defaultValue": 60000,
+      "metadata": {
+        "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
+      }
+    },
     "tableBuilderMaxTableCellsAllowed": {
       "type": "int",
       "defaultValue": 25000,
@@ -1204,6 +1211,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
+        "RequestTimeouts:TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
