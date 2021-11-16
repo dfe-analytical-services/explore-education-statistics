@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -20,13 +20,15 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
+        private readonly IFeatureManager _featureManager;
         private readonly ContentDbContext _contentDbContext;
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFootnoteRepository _footnoteRepository;
@@ -37,13 +39,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ISubjectRepository _subjectRepository;
-        private readonly ILogger _logger;
-        private readonly IMapper _mapper;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
+        private readonly LocationsOptions _locationOptions;
+        private readonly ILogger _logger;
 
-        public ResultSubjectMetaService(ContentDbContext contentDbContext,
-            IBoundaryLevelRepository boundaryLevelRepository,
+        public ResultSubjectMetaService(
+            IFeatureManager featureManager,
+            ContentDbContext contentDbContext,
             IFilterItemRepository filterItemRepository,
+            IBoundaryLevelRepository boundaryLevelRepository,
             IFootnoteRepository footnoteRepository,
             IGeoJsonRepository geoJsonRepository,
             IIndicatorRepository indicatorRepository,
@@ -52,10 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ITimePeriodService timePeriodService,
             IUserService userService,
             ISubjectRepository subjectRepository,
-            ILogger<ResultSubjectMetaService> logger,
-            IMapper mapper,
-            IReleaseDataFileRepository releaseDataFileRepository) : base(filterItemRepository)
+            IReleaseDataFileRepository releaseDataFileRepository,
+            IOptions<LocationsOptions> locationOptions,
+            ILogger<ResultSubjectMetaService> logger) : base(filterItemRepository)
         {
+            _featureManager = featureManager;
             _contentDbContext = contentDbContext;
             _boundaryLevelRepository = boundaryLevelRepository;
             _footnoteRepository = footnoteRepository;
@@ -66,23 +71,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
             _userService = userService;
             _subjectRepository = subjectRepository;
-            _logger = logger;
-            _mapper = mapper;
             _releaseDataFileRepository = releaseDataFileRepository;
+            _locationOptions = locationOptions.Value;
+            _logger = logger;
         }
 
-        public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, 
-            SubjectMetaQueryContext query, IQueryable<Observation> observations)
+        public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
+            Guid releaseId,
+            SubjectMetaQueryContext query,
+            IQueryable<Observation> observations)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
+            return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
 
-                    var locations = await _locationRepository.GetLocationAttributes(observations);
-                    _logger.LogTrace("Got Locations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    // TODO EES-2902 Remove the location hierarchies feature toggle after EES-2777
+                    var locationHierarchiesEnabled = await _featureManager.IsEnabledAsync("LocationHierarchies");
+
+                    // Uses the new GetLocationAttributesHierarchical to get the locations regardless of whether the
+                    // feature is enabled or not.  If the feature is disabled, requests the locations without a hierarchy.
+                    var locationAttributes = await _locationRepository.GetLocationAttributesHierarchical(
+                        observations,
+                        hierarchies: locationHierarchiesEnabled ? _locationOptions.Hierarchies : null);
+                    _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterViewModels = GetFilters(query.SubjectId, observations, true);
@@ -93,49 +107,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var geographicLevels = locations.Keys.ToList();
-
-                    var geoJsonAvailable = HasBoundaryLevelDataForAnyGeographicLevel(geographicLevels);
-                    _logger.LogTrace("Got GeoJsonAvailable in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
-
-                    var boundaryLevelViewModels = GetBoundaryLevelViewModels(
-                        query.BoundaryLevel,
-                        locations.Keys);
-
                     var indicatorViewModels = GetIndicatorViewModels(query);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var locationViewModels = GetLegacyLocationViewModels(
-                        locations,
-                        query.IncludeGeoJson ?? false,
-                        query.BoundaryLevel);
-                    _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
-
                     var timePeriodViewModels = GetTimePeriodViewModels(observations);
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Stop();
+                    stopwatch.Restart();
 
                     var publicationId = await _subjectRepository.GetPublicationIdForSubject(subject.Id);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
-                    var subjectName = releaseFile.Name;
-                    
-                    return new ResultSubjectMetaViewModel
+                    var subjectName = releaseFile.Name ?? "";
+
+                    var locationsHelper =
+                        new LocationsQueryHelper(locationAttributes, query, _boundaryLevelRepository,
+                            _geoJsonRepository);
+
+                    if (locationHierarchiesEnabled)
                     {
-                        Filters = filterViewModels,
-                        Footnotes = footnoteViewModels,
-                        GeoJsonAvailable = geoJsonAvailable,
-                        Indicators = indicatorViewModels,
-                        Locations = locationViewModels,
-                        BoundaryLevels = boundaryLevelViewModels,
-                        PublicationName = publicationTitle,
-                        SubjectName = subjectName,
-                        TimePeriodRange = timePeriodViewModels
-                    };
+                        var locationViewModels = locationsHelper.GetLocationViewModels();
+                        _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        stopwatch.Stop();
+
+                        return new ResultSubjectMetaViewModel
+                        {
+                            Filters = filterViewModels,
+                            Footnotes = footnoteViewModels,
+                            GeoJsonAvailable = locationsHelper.GeoJsonAvailable,
+                            Indicators = indicatorViewModels,
+                            LocationsHierarchical = locationViewModels,
+                            BoundaryLevels = locationsHelper.GetBoundaryLevelViewModels(),
+                            PublicationName = publicationTitle,
+                            SubjectName = subjectName,
+                            TimePeriodRange = timePeriodViewModels
+                        };
+                    }
+                    else
+                    {
+                        var locationViewModels = locationsHelper.GetLegacyLocationViewModels();
+                        _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        stopwatch.Stop();
+
+                        return new ResultSubjectMetaViewModel
+                        {
+                            Filters = filterViewModels,
+                            Footnotes = footnoteViewModels,
+                            GeoJsonAvailable = locationsHelper.GeoJsonAvailable,
+                            Indicators = indicatorViewModels,
+                            Locations = locationViewModels,
+                            BoundaryLevels = locationsHelper.GetBoundaryLevelViewModels(),
+                            PublicationName = publicationTitle,
+                            SubjectName = subjectName,
+                            TimePeriodRange = timePeriodViewModels
+                        };
+                    }
                 });
         }
 
@@ -149,115 +176,229 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new ForbidResult();
         }
 
-        [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
-        private IEnumerable<ObservationalUnitMetaViewModel> GetLegacyLocationViewModels(
-            Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>> locationAttributes,
-            bool geoJsonRequested,
-            long? boundaryLevelId)
-        {
-            var viewModels = locationAttributes.SelectMany(pair =>
-                GetLegacyLocationAttributeViewModels(
-                    pair.Key,
-                    pair.Value.ToList(),
-                    geoJsonRequested,
-                    boundaryLevelId));
-
-            return TransformDuplicateLocationAttributesWithUniqueLabels(viewModels)
-                .OrderBy(model => model.Level.ToString())
-                .ThenBy(model => model.Label);
-        }
-
-        private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelViewModels(
-            long? boundaryLevelId,
-            IEnumerable<GeographicLevel> geographicLevels)
-        {
-            var boundaryLevels = boundaryLevelId.HasValue
-                ? _boundaryLevelRepository.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
-                : _boundaryLevelRepository.FindByGeographicLevels(geographicLevels);
-            return boundaryLevels.Select(level => _mapper.Map<BoundaryLevelIdLabel>(level));
-        }
-
-        private IEnumerable<IndicatorMetaViewModel> GetIndicatorViewModels(SubjectMetaQueryContext query)
+        private List<IndicatorMetaViewModel> GetIndicatorViewModels(SubjectMetaQueryContext query)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
             return BuildIndicatorViewModels(indicators);
         }
 
-        private IEnumerable<FootnoteViewModel> GetFilteredFootnoteViewModels(
+        private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
             Guid releaseId,
             IQueryable<Observation> observations,
             SubjectMetaQueryContext queryContext)
         {
-            return _footnoteRepository.GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
+            return _footnoteRepository
+                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Id,
                     Label = footnote.Content
-                });
+                })
+                .ToList();
         }
 
-        [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
-        private IEnumerable<ObservationalUnitMetaViewModel> GetLegacyLocationAttributeViewModels(
-            GeographicLevel geographicLevel,
-            ICollection<ILocationAttribute> locationAttributes,
-            bool geoJsonRequested,
-            long? boundaryLevelId)
+        private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IQueryable<Observation> observations)
         {
-            var geoJsonByCode = new Dictionary<string, GeoJson>();
+            return _timePeriodService.GetTimePeriodRange(observations)
+                .Select(tuple => new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier))
+                .ToList();
+        }
 
-            if (geoJsonRequested)
+        private class LocationsQueryHelper
+        {
+            private readonly Dictionary<GeographicLevel, List<LocationAttributeNode>> _locationAttributes;
+            private readonly SubjectMetaQueryContext _query;
+            private readonly IBoundaryLevelRepository _boundaryLevelRepository;
+            private readonly IGeoJsonRepository _geoJsonRepository;
+            private readonly List<GeographicLevel> _geographicLevels;
+
+            internal LocationsQueryHelper(
+                Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes,
+                SubjectMetaQueryContext query,
+                IBoundaryLevelRepository boundaryLevelRepository,
+                IGeoJsonRepository geoJsonRepository)
             {
-                var boundaryLevel = boundaryLevelId ?? GetBoundaryLevel(geographicLevel)?.Id;
-                if (boundaryLevel.HasValue)
-                {
-                    var codes = locationAttributes.Select(
-                        locationAttribute =>
-                            locationAttribute is LocalAuthority localAuthority ?
-                                localAuthority.GetCodeOrOldCodeIfEmpty()
-                                : locationAttribute.Code);
-                    geoJsonByCode = _geoJsonRepository.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code);
-                }
+                _locationAttributes = locationAttributes;
+                _query = query;
+                _boundaryLevelRepository = boundaryLevelRepository;
+                _geoJsonRepository = geoJsonRepository;
+                _geographicLevels = locationAttributes.Keys.ToList();
             }
 
-            return locationAttributes.Select(locationAttribute =>
+            public bool GeoJsonAvailable => _geographicLevels.Any(level =>
+                _boundaryLevelRepository.FindLatestByGeographicLevel(level) != null);
+
+            public List<BoundaryLevelViewModel> GetBoundaryLevelViewModels()
             {
-                var value = locationAttribute is LocalAuthority localAuthority
+                var boundaryLevels = _query.BoundaryLevel.HasValue
+                    ? _boundaryLevelRepository.FindRelatedByBoundaryLevel(_query.BoundaryLevel.Value)
+                    : _boundaryLevelRepository.FindByGeographicLevels(_geographicLevels);
+                return boundaryLevels
+                    .Select(level => new BoundaryLevelViewModel(level.Id, level.Label))
+                    .ToList();
+            }
+
+            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            public List<ObservationalUnitMetaViewModel> GetLegacyLocationViewModels()
+            {
+                var viewModels = _locationAttributes.SelectMany(pair =>
+                {
+                    var (geographicLevel, hierarchicalLocationAttributes) = pair;
+
+                    // Location attributes should be flat because we retrieve the locations without specifying a hierarchy
+                    // Throw an exception if this isn't true
+                    if (hierarchicalLocationAttributes.Any(node => !node.IsLeaf))
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected flat list of location attributes building legacy location view model when locationHierarchies feature is disabled"
+                        );
+                    }
+
+                    // Get the flat list of location attributes
+                    var locationAttributes = hierarchicalLocationAttributes
+                        .Select(node => node.Attribute)
+                        .WhereNotNull()
+                        .ToList();
+
+                    return GetLegacyLocationAttributeViewModels(
+                        geographicLevel,
+                        locationAttributes);
+                });
+
+                return TransformDuplicateLocationAttributesWithUniqueLabels(viewModels)
+                    .OrderBy(model => model.Level.ToString())
+                    .ThenBy(model => model.Label)
+                    .ToList();
+            }
+
+            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            private IEnumerable<ObservationalUnitMetaViewModel> GetLegacyLocationAttributeViewModels(
+                GeographicLevel geographicLevel,
+                IReadOnlyList<ILocationAttribute> locationAttributes)
+            {
+                var geoJsonByCode = GetGeoJson(geographicLevel, locationAttributes);
+
+                return locationAttributes.Select(locationAttribute =>
+                {
+                    var code = GetLocationAttributeCode(locationAttribute);
+                    var geoJson = code == null ? null : geoJsonByCode.GetValueOrDefault(code)?.Deserialized;
+
+                    return new ObservationalUnitMetaViewModel
+                    {
+                        GeoJson = geoJson,
+                        Label = locationAttribute.Name,
+                        Level = geographicLevel,
+                        Value = code
+                    };
+                });
+            }
+
+            public Dictionary<string, List<LocationAttributeViewModel>> GetLocationViewModels()
+            {
+                var allGeoJson = GetGeoJson(_locationAttributes);
+
+                return _locationAttributes.ToDictionary(
+                    pair => pair.Key.ToString().CamelCase(),
+                    pair =>
+                    {
+                        var (geographicLevel, locationAttributes) = pair;
+                        var geoJsonByCode = allGeoJson.GetValueOrDefault(geographicLevel);
+                        return locationAttributes
+                            .Select(locationAttribute =>
+                                GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                            .ToList();
+                    });
+            }
+
+            private static LocationAttributeViewModel GetLocationAttributeViewModel(
+                LocationAttributeNode locationAttributeNode,
+                IReadOnlyDictionary<string, GeoJson>? geoJsonByCode)
+            {
+                var locationAttribute = locationAttributeNode.Attribute;
+
+                if (locationAttributeNode.IsLeaf)
+                {
+                    var code = GetLocationAttributeCode(locationAttribute);
+                    var geoJson = code == null ? null : geoJsonByCode?.GetValueOrDefault(code)?.Deserialized;
+
+                    return new LocationAttributeViewModel
+                    {
+                        GeoJson = geoJson,
+                        Label = locationAttribute?.Name ?? string.Empty,
+                        Value = locationAttribute?.Code ?? string.Empty
+                    };
+                }
+
+                return new LocationAttributeViewModel
+                {
+                    Label = locationAttribute?.Name ?? string.Empty,
+                    Level = locationAttribute?.GetType().Name,
+                    Value = locationAttribute?.Code ?? string.Empty,
+                    Options = locationAttributeNode.Children
+                        .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
+                        .ToList()
+                };
+            }
+
+            private long? GetLatestBoundaryLevelByGeographicLevel(GeographicLevel geographicLevel)
+            {
+                return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel)?.Id;
+            }
+
+            private Dictionary<GeographicLevel, Dictionary<string, GeoJson>> GetGeoJson(
+                Dictionary<GeographicLevel, List<LocationAttributeNode>> locations)
+            {
+                if (!GeoJsonRequested)
+                {
+                    return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
+                }
+
+                return locations.ToDictionary(
+                    pair => pair.Key,
+                    pair =>
+                    {
+                        var (geographicLevel, locationAttributes) = pair;
+                        return GetGeoJson(
+                            geographicLevel,
+                            locationAttributes
+                                .SelectMany(node => node.GetLeafAttributes())
+                                .ToList());
+                    });
+            }
+
+            private Dictionary<string, GeoJson> GetGeoJson(
+                GeographicLevel geographicLevel,
+                IReadOnlyList<ILocationAttribute> locationAttributes)
+            {
+                if (!GeoJsonRequested)
+                {
+                    return new Dictionary<string, GeoJson>();
+                }
+
+                // If no boundary level is requested, get the latest boundary level id for the geographic level
+                var boundaryLevelId = _query.BoundaryLevel ?? GetLatestBoundaryLevelByGeographicLevel(geographicLevel);
+
+                // Not all geographic levels have boundary level data configured so expect to return an empty result
+                if (boundaryLevelId == null)
+                {
+                    return new Dictionary<string, GeoJson>();
+                }
+
+                var locationAttributeCodes = locationAttributes
+                    .Select(GetLocationAttributeCode)
+                    .WhereNotNull();
+
+                return _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, locationAttributeCodes);
+            }
+
+            private bool GeoJsonRequested => _query.IncludeGeoJson != null && _query.IncludeGeoJson.Value;
+
+            private static string? GetLocationAttributeCode(ILocationAttribute locationAttribute)
+            {
+                return locationAttribute is LocalAuthority localAuthority
                     ? localAuthority.GetCodeOrOldCodeIfEmpty()
                     : locationAttribute.Code;
-
-                var serializedGeoJson = geoJsonByCode.GetValueOrDefault(value);
-                var geoJson = DeserializeGeoJson(serializedGeoJson);
-
-                return new ObservationalUnitMetaViewModel
-                {
-                    GeoJson = geoJson,
-                    Label = locationAttribute.Name,
-                    Level = geographicLevel,
-                    Value = value
-                };
-            });
-        }
-
-        private static dynamic? DeserializeGeoJson(GeoJson? geoJson)
-        {
-            return geoJson == null ? null : JsonConvert.DeserializeObject(geoJson.Value);
-        }
-
-        private BoundaryLevel? GetBoundaryLevel(GeographicLevel geographicLevel)
-        {
-            return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel);
-        }
-
-        private IEnumerable<TimePeriodMetaViewModel> GetTimePeriodViewModels(IQueryable<Observation> observations)
-        {
-            return _timePeriodService.GetTimePeriodRange(observations).Select(tuple =>
-                new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier));
-        }
-
-        private bool HasBoundaryLevelDataForAnyGeographicLevel(IEnumerable<GeographicLevel> geographicLevels)
-        {
-            return geographicLevels.Any(level =>
-                _boundaryLevelRepository.FindLatestByGeographicLevel(level) != null);
+            }
         }
     }
 }

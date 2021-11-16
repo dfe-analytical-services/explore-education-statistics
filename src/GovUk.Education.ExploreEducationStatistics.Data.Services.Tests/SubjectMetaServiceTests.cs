@@ -312,18 +312,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var regionOption1 = regions.Options[0];
                 var regionOption2 = regions.Options[1];
                 var regionOption3 = regions.Options[2];
+
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
                 Assert.Null(regionOption1.Level);
                 Assert.Null(regionOption1.Options);
+
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
                 Assert.Null(regionOption2.Level);
                 Assert.Null(regionOption2.Options);
+
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
-                Assert.Null(regions.Options[2].Level);
-                Assert.Null(regions.Options[2].Options);
+                Assert.Null(regionOption3.Level);
+                Assert.Null(regionOption3.Options);
 
                 // Expect a hierarchy of Country-Region-LA within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
@@ -332,17 +335,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_england.Name, laOption1!.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("Country", laOption1.Level);
+
                 var laOption1SubOption1 = Assert.Single(laOption1.Options);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("Region", laOption1SubOption1.Level);
                 Assert.Equal(2, laOption1SubOption1.Options.Count);
+
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1SubOption1.Options);
+
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
@@ -476,6 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_england.Name, laOption1!.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("Country", laOption1.Level);
+
                 // Expect an empty Region option grouping the Local Authorities
                 var laOption1SubOption1 = Assert.Single(laOption1.Options);
                 Assert.NotNull(laOption1SubOption1);
@@ -483,11 +490,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(string.Empty, laOption1SubOption1.Value);
                 Assert.Equal("Region", laOption1SubOption1.Level);
                 Assert.Equal(2, laOption1SubOption1.Options.Count);
+
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1SubOption1.Options);
+
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);

@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
     public record LocationAttributeViewModel
     {
+        public dynamic? GeoJson { get; init; }
         public string Label { get; init; } = string.Empty;
         public string Value { get; init; } = string.Empty;
         public string? Level { get; init; }
