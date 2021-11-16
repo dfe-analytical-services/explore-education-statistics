@@ -3,6 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public enum ValidationErrorMessages
     {
-        QueryExceedsMaxAllowableTableSize
+        QueryExceedsMaxAllowableTableSize,
+        RequestCancelled
     }
 }
