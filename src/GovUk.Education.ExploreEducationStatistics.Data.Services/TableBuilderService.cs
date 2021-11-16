@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -58,7 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _options = options.Value;
         }
 
-        public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
+        public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
+            ObservationQueryContext queryContext,
+            CancellationToken cancellationToken = default)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(queryContext.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -68,12 +71,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new NotFoundResult();
             }
 
-            return await Query(release, queryContext);
+            return await Query(release, queryContext, cancellationToken);
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseId,
-            ObservationQueryContext queryContext)
+            ObservationQueryContext queryContext,
+            CancellationToken cancellationToken = default)
         {
             return await _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
                     query => query
@@ -81,12 +85,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Where(rs => rs.ReleaseId == releaseId
                                      && rs.SubjectId == queryContext.SubjectId)
                 )
-                .OnSuccess(rs => Query(rs.Release, queryContext));
+                .OnSuccess(rs => Query(rs.Release, queryContext, cancellationToken));
         }
 
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Release release,
-            ObservationQueryContext queryContext)
+            ObservationQueryContext queryContext, 
+            CancellationToken cancellationToken)
         {
             return await _statisticsPersistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccessDo(CheckCanViewSubjectData)
@@ -97,7 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var observations = (await _observationService.FindObservations(queryContext)).AsQueryable();
+                    var observations = 
+                        (await _observationService.FindObservations(queryContext, cancellationToken))
+                        .AsQueryable();
 
                     if (!observations.Any())
                     {
@@ -105,7 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _resultSubjectMetaService
-                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
+                        .GetSubjectMeta(
+                            release.Id, 
+                            SubjectMetaQueryContext.FromObservationQueryContext(queryContext), 
                             observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {

@@ -8,18 +8,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
     /// Simple class fixture for enabling/disabling
     /// cancellation aspects before and after a test suite.
     /// </summary>
-    public class CancellationTestFixture : IDisposable
+    public class AddTimeoutCancellationTestFixture : IDisposable
     {
-        public const string CollectionName = "Cancellation tests";
+        public const string CollectionName = "AddTimeoutCancellation tests";
 
-        public CancellationTestFixture()
+        public AddTimeoutCancellationTestFixture()
         {
-            CancellationAspects.Enabled = true;
+            AddTimeoutCancellationAspect.Enabled = true;
         }
 
         public void Dispose()
         {
-            CancellationAspects.Enabled = false;
+            AddTimeoutCancellationAspect.Enabled = false;
         }
     }
 }

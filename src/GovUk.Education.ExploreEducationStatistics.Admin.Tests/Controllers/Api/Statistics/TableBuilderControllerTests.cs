@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistic
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -35,15 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
 
-            tableBuilderService.Setup(s => s.Query(_releaseId, _query)).ReturnsAsync(
-                new TableBuilderResultViewModel
-                {
-                    Results = new List<ObservationViewModel>
+            tableBuilderService
+                .Setup(s => s.Query(_releaseId, _query, default))
+                .ReturnsAsync(new TableBuilderResultViewModel
                     {
-                        new ObservationViewModel()
-                    }
-                }
-            );
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
+                    });
 
             var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
             var result = await controller.Query(_releaseId, _query);
@@ -65,7 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             _releaseId,
                             It.Is<ObservationQueryContext>(
                                 q => q.SubjectId == _query.SubjectId
-                            )
+                            ),
+                            default
                         )
                 )
                 .ReturnsAsync(
@@ -130,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             It.Is<ObservationQueryContext>(
                                 q =>
                                     q.SubjectId == subjectId && q.IncludeGeoJson == true
-                            )
+                            ),
+                            default
                         )
                 )
                 .ReturnsAsync(
@@ -138,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Results = new List<ObservationViewModel>
                         {
-                            new ObservationViewModel()
+                            new()
                         }
                     }
                 );

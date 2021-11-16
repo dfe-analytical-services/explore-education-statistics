@@ -42,23 +42,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpPost]
         [AddTimeoutCancellation(TableBuilderQuery)]
-        [CaptureCancellationToken]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             [FromBody] ObservationQueryContext query, 
             CancellationToken cancellationToken = default)
         {
-            return _tableBuilderService.Query(query).HandleFailuresOrOk();
+            return _tableBuilderService
+                .Query(query, cancellationToken)
+                .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
         [AddTimeoutCancellation(TableBuilderQuery)]
-        [CaptureCancellationToken]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,
             [FromBody] ObservationQueryContext query, 
             CancellationToken cancellationToken = default)
         {
-            return _tableBuilderService.Query(releaseId, query).HandleFailuresOrOk();
+            return _tableBuilderService
+                .Query(releaseId, query, cancellationToken)
+                .HandleFailuresOrOk();
         }
 
         [ResponseCache(Duration = 300)]

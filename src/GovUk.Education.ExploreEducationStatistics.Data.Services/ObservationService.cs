@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        [AddCapturedCancellation]
         public async Task<IEnumerable<Observation>> FindObservations(
             ObservationQueryContext query,
             CancellationToken cancellationToken = default)

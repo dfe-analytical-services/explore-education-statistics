@@ -34,12 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
 
-            tableBuilderService.Setup(s => s.Query(_releaseId, _query)).ReturnsAsync(
-                new TableBuilderResultViewModel
+            tableBuilderService
+                .Setup(s => s.Query(_releaseId, _query, default))
+                .ReturnsAsync(new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>
                     {
-                        new ObservationViewModel()
+                        new()
                     }
                 }
             );

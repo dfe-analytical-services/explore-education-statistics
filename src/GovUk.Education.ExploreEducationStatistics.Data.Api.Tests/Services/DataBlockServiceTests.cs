@@ -74,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     s =>
                         s.Query(
                             _releaseId,
-                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId)
+                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
+                            default
                         )
                 )
                 .ReturnsAsync(tableResult);
@@ -150,7 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             It.Is<ObservationQueryContext>(
                                 q =>
                                     q.SubjectId == subjectId && q.IncludeGeoJson == true
-                            )
+                            ),
+                            default
                         )
                 )
                 .ReturnsAsync(tableResult);

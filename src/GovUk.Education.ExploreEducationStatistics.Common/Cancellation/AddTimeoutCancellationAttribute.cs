@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
         
         public AddTimeoutCancellationAttribute(string configurationKey)
         {
-            if (!CancellationAspects.Enabled)
+            if (!AddTimeoutCancellationAspect.Enabled)
             {
                 return;
             }

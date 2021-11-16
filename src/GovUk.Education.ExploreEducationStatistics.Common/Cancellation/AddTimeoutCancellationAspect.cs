@@ -4,13 +4,23 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using AspectInjector.Broker;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.CancellationAspects;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
     [Aspect(Scope.Global)]
     public class AddTimeoutCancellationAspect
     {
+        /// <summary>
+        /// Enables the Aspects AddTimeout, CaptureCancellationToken and AddCapturedCancellation.
+        /// <para>
+        /// This is set to false by default so that test code
+        /// isn't affected by these aspects. It should be set to
+        /// true in your application startup, or if your tests
+        /// are concerned with testing cancellation.
+        /// </para>
+        /// </summary>
+        public static bool Enabled { get; set; }
+        
         [Advice(Kind.Around)]
         public object Handle(
             [Argument(Source.Target)] Func<object[], object> target,
@@ -47,6 +57,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
         private static CancellationToken TimeoutToken(int timeoutMillis)
         {
             return new CancellationTokenSource(timeoutMillis).Token;
+        }
+        
+        private static CancellationToken CombineTokens(params CancellationToken?[] tokens)
+        {
+            var nonNullTokens = tokens
+                .Where(token => token != null)
+                .Cast<CancellationToken>()
+                .ToArray();
+
+            if (nonNullTokens.Length == 0)
+            {
+                return new CancellationToken();
+            }
+
+            if (nonNullTokens.Length == 1)
+            {
+                return nonNullTokens[0];
+            }
+
+            return CancellationTokenSource
+                .CreateLinkedTokenSource(nonNullTokens)
+                .Token;
         }
     }
 }
