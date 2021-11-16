@@ -1,3 +1,4 @@
+import base64
 import json
 import pytz
 import time
@@ -49,6 +50,22 @@ if not utilities_init.initialised:
     element_finder.register('testid', _find_by_testid, persist=True)
 
     utilities_init.initialised = True
+
+
+def setup_chromedriver():
+    # Setup basic auth headers for public frontend
+    public_auth_user = os.getenv('PUBLIC_AUTH_USER')
+    public_auth_password = os.getenv('PUBLIC_AUTH_PASSWORD')
+
+    if public_auth_user and public_auth_password:
+        token = base64.b64encode(f'{public_auth_user}:{public_auth_password}'.encode())
+
+        sl.driver.execute_cdp_cmd('Network.enable', {})
+        sl.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'Authorization': f'Basic {token.decode()}'
+            }
+        })
 
 
 def raise_assertion_error(err_msg):
@@ -141,7 +158,7 @@ def get_child_element(parent_locator: object, child_locator: str):
                     f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
                     f"was expecting only one. Consider making the parent selector more specific. "
                     f"Returning the first element found.")
-            
+
         return children[0]
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
@@ -326,13 +343,13 @@ def is_webelement(variable: object) -> bool:
 
 def _normalise_child_locator(child_locator: str) -> str:
     if isinstance(child_locator, str):
-        # the below substitution is necessary in order to correctly find the parent's descendants.  Without the 
-        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query 
-        # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below 
-        # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward 
+        # the below substitution is necessary in order to correctly find the parent's descendants.  Without the
+        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query
+        # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below
+        # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward
         # slashes without the "xpath:" prefix are inferred as being xpath expressions.
         return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
-    
+
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 
