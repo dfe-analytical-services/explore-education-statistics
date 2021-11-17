@@ -12,7 +12,7 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Go to permalink
-    user goes to url    %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
     user waits until h1 is visible
     ...    'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 

@@ -372,7 +372,7 @@ Validate line chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood): 4,198
 
 Configure basic vertical bar chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
@@ -470,7 +470,7 @@ Save and validate vertical bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic horizontal bar chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    60
     user waits until page does not contain loading spinner
 
@@ -552,7 +552,7 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic geographic chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    60
     user waits until page does not contain loading spinner
 
@@ -636,7 +636,7 @@ Save and validate geographic chart embeds correctly
     user checks map chart indicator tile contains    ${datablock}    5    Admissions in 2016    4,198
 
 Configure basic infographic chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -668,7 +668,7 @@ Delete embedded data block
     user clicks button    Confirm
 
 Delete chart from data block
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Chart

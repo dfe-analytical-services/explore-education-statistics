@@ -8,8 +8,7 @@ user signs in as bau1
     IF    ${open_browser}
         user opens the browser
     END
-    environment variable should be set    ADMIN_URL
-    user goes to url    %{ADMIN_URL}
+    user navigates to admin frontend
     user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
     user signs in as    ADMIN
     user navigates to admin dashboard    Bau1
@@ -22,8 +21,7 @@ user signs in as analyst1
     IF    ${open_browser}
         user opens the browser
     END
-    environment variable should be set    ADMIN_URL
-    user goes to url    %{ADMIN_URL}
+    user navigates to admin frontend
     user waits until h1 is visible    Sign in
     user signs in as    ANALYST
     user navigates to admin dashboard    Analyst1
@@ -721,7 +719,7 @@ user removes release access from analyst
 
 user goes to manage user
     [Arguments]    ${EMAIL_ADDRESS}
-    user goes to url    %{ADMIN_URL}/administration/users
+    user navigates to admin frontend    %{ADMIN_URL}/administration/users
     user clicks link    Manage    xpath://td[text()="${EMAIL_ADDRESS}"]/..
     user waits until page does not contain loading spinner
     # stale element exception if you don't wait until it's enabled

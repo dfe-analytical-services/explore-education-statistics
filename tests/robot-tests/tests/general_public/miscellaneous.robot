@@ -9,8 +9,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Verify public page loads
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore education statistics
 
 Verify can accept cookie banner
@@ -53,9 +52,9 @@ Validate homepage
 
 Validate Cookies page
     user clicks link    Cookies
-    user checks url contains    %{PUBLIC_URL}/cookies
-
     user waits until h1 is visible    Cookies on Explore education statistics    %{WAIT_MEDIUM}
+
+    user checks url contains    %{PUBLIC_URL}/cookies
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home

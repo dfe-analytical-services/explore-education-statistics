@@ -1,5 +1,7 @@
+import os
 import requests
 from bs4 import BeautifulSoup
+from robot.libraries.BuiltIn import BuiltIn
 
 requests.sessions.HTTPAdapter(
         pool_connections=50,
@@ -7,9 +9,10 @@ requests.sessions.HTTPAdapter(
         max_retries=3
     )
 session = requests.Session()
+httpBasicAuth = requests.auth.HTTPBasicAuth
 
 def user_gets_parsed_html_from_page(url):
-    response = session.get(url, stream=True)
+    response = session.get(url, stream=False, auth=httpBasicAuth(os.getenv('PUBLIC_AUTH_USER'), os.getenv('PUBLIC_AUTH_PASSWORD')))
     return BeautifulSoup(response.text, "html.parser")
 
 
