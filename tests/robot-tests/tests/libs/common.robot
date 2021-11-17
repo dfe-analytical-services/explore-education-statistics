@@ -93,7 +93,6 @@ user opens chrome headless
     Call Method    ${c_opts}    add_argument    disable-logging
 
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
-    enable basic auth headers
 
 user opens chrome with xvfb
     start virtual display    1920    1080
@@ -105,7 +104,6 @@ user opens chrome with xvfb
     END
 
     create webdriver    Chrome    chrome_options=${options}
-    enable basic auth headers
     set window size    1920    1080
 
 user opens chrome without xvfb
@@ -116,7 +114,6 @@ user opens chrome without xvfb
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
     Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
-    enable basic auth headers
     maximize browser window
 
 user opens firefox headless
@@ -135,12 +132,6 @@ user opens firefox without xvfb
 
 user closes the browser
     close browser
-
-user goes to url
-    [Arguments]    ${destination}
-    # Due to the need to set and unset basic auth for public and admin respectively, we now want to coerce any switches
-    # in test suites through "user navigates to public frontend" or "user navigates to admin frontend"
-    fail    Use 'user navigates to public frontend' or 'user navigates to admin frontend'
 
 user gets url
     ${url}=    get location
