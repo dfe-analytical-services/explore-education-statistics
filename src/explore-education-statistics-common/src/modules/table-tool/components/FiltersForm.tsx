@@ -147,10 +147,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           );
         }
         setTableQueryError(errorCode);
-        return;
+      } else {
+        throw error;
       }
-
-      throw error;
     }
   };
 

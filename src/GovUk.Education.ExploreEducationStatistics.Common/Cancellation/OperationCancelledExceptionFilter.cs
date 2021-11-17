@@ -1,9 +1,12 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Mvc.Filters;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
+    /// <summary>
+    /// A filter that converts CancellationToken-initiated cancellations into a 400 API error response. 
+    /// </summary>
     public class OperationCancelledExceptionFilter : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)
@@ -11,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
             if (context.Exception is OperationCanceledException)
             {
                 context.ExceptionHandled = true;
-                context.Result = ValidationUtils.ValidationResult("RequestCancelled");
+                context.Result = ValidationResult("RequestCancelled");
             }
         }
     }

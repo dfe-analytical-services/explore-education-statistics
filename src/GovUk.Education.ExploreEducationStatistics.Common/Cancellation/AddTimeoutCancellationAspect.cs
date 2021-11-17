@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
     public class AddTimeoutCancellationAspect
     {
         /// <summary>
-        /// Enables the Aspects AddTimeout, CaptureCancellationToken and AddCapturedCancellation.
+        /// Enables the AddTimeoutCancellation aspect.
         /// <para>
         /// This is set to false by default so that test code
-        /// isn't affected by these aspects. It should be set to
+        /// isn't affected by this aspect. It should be set to
         /// true in your application startup, or if your tests
-        /// are concerned with testing cancellation.
+        /// are concerned with testing cancellations.
         /// </para>
         /// </summary>
         public static bool Enabled { get; set; }

@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var phasesStopwatch = Stopwatch.StartNew();
 
             var ids = await MatchingObservationGetter
-                .GetMatchingObservationIdsQuery(_context, query);
+                .GetMatchingObservationIdsQuery(_context, query, cancellationToken);
 
             _logger.LogDebug($"Executed FilteredObservations stored procedure in " +
                              $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms - fetched {ids.Length} " +
@@ -84,15 +84,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         
         public interface IMatchingObservationsGetter
         {
-            Task<Guid[]> GetMatchingObservationIdsQuery(StatisticsDbContext context,
-                ObservationQueryContext query);
+            Task<Guid[]> GetMatchingObservationIdsQuery(
+                StatisticsDbContext context,
+                ObservationQueryContext query, 
+                CancellationToken cancellationToken);
         }
 
         private class MatchingObservationsGetter : IMatchingObservationsGetter
         {
             public async Task<Guid[]> GetMatchingObservationIdsQuery(
                 StatisticsDbContext context,
-                ObservationQueryContext query)
+                ObservationQueryContext query, 
+                CancellationToken cancellationToken)
             {
                 var locationsQuery = query.Locations;
 
@@ -186,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 return await inner
                     .Select(obs => obs.Id)
-                    .ToArrayAsync();
+                    .ToArrayAsync(cancellationToken);
             }
         }
 

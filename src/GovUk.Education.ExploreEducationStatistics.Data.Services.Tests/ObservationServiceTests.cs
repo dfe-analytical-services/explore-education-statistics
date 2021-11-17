@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             
             matchingObservationsGetter
                 .Setup(s => s
-                    .GetMatchingObservationIdsQuery(context, observationQueryContext))
+                    .GetMatchingObservationIdsQuery(context, observationQueryContext, cancellationToken))
                 .Callback(() => cancellationTokenSource.Cancel())
                 .ReturnsAsync(AsArray(Guid.NewGuid()));
 
