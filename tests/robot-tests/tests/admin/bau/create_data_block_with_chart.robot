@@ -25,7 +25,6 @@ Create test publication and release via API
 Upload subject
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Start creating a data block
@@ -174,11 +173,7 @@ Embed data block into release content
 
     user creates new content section    1    ${CONTENT_SECTION_NAME}
     user clicks button    Add data block
-    user chooses select option    css:select[name="selectedDataBlock"]    ${DATABLOCK_NAME}
-    user waits until element is visible    css:table
-    user clicks button    Embed
-    user waits until page does not contain button    Embed
-    user waits until page does not contain loading spinner
+    user chooses and embeds data block    ${DATABLOCK_NAME}
 
 Validate embedded table rows
     ${table}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"] table

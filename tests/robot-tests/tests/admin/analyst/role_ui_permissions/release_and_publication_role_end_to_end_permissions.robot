@@ -43,8 +43,6 @@ Check publication owner cannot approve methodology for publication
 Check publication owner can upload subject file
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
-    user clicks link    Data and files
-    user waits until page does not contain loading spinner
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME}
@@ -133,7 +131,6 @@ Check that a publication owner can make a new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Check publication owner can upload subject file on new release
-    user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME} on new release

@@ -24,7 +24,6 @@ Verify release summary
     ...    National Statistics
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Go to 'Sign Off' page

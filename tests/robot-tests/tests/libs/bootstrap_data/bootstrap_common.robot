@@ -81,9 +81,7 @@ user creates a fully populated draft release
     ...    ${TOPIC_NAME}
 
     # add data files
-    user clicks link    Data and files
-    user waits until page does not contain loading spinner
-    user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
+    user uploads subjec t    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
     # add data guidance
     user clicks link    Data guidance

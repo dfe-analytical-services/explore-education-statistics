@@ -586,6 +586,7 @@ user navigates to admin dashboard
 
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}
+    user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle    60
     user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}${SUBJECT_FILE}

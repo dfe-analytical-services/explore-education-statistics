@@ -24,7 +24,6 @@ Verify Release summary
     ...    National Statistics
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 

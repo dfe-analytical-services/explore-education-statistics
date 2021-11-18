@@ -18,6 +18,17 @@ ${PUBLICATION_NAME}     UI tests - release content %{RUN_IDENTIFIER}
 Create test publication and release via API
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2025
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2025/26 (not Live)
+
+Upload a subject
+    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+
+Create 3 data blocks
+    user creates data block for dates csv    Dates test subject    Data Block 1
+    user creates data block for dates csv    Dates test subject    Data Block 2
+    user creates key stats data block for dates csv    Dates test subject    Key Stats Data Block 1
+    user creates key stats data block for dates csv    Dates test subject    Key Stats Data Block 2
 
 Navigate to 'Content' page
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
@@ -50,11 +61,33 @@ Add Useful information related page link to release
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
     user clicks button    Create link
 
-# TODO: Add Secondary Stats
+Add Secondary Stats
+    user checks page does not contain link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+    user clicks button    Add secondary stats
+    user chooses and embeds data block    Data Block 1
+    user checks page contains link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+    user waits until page contains button    Change secondary stats
+    user waits until page contains button    Remove secondary stats
+    user checks page does not contain button    Add secondary stats
+
+Check Secondary Stats are included correctly
+    user clicks link    Table
+    user checks page contains    'nd01' in England for 2013/14
+
+Change Secondary Stats
+    user clicks link    Change secondary stats
+    user chooses and embeds data block    Data Block 2
+    user clicks link    Table
+    user checks page contains    'nd01' in England for 2013/14
+
+Remove Secondary Stats
+    user clicks link    Remove secondary stats
+    user checks page does not contain link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+
 # TODO: Add key statistics
 
 Add key statistics summary content to release
-    user clicks button    Add a headlines text block    id:releaseHeadlines
+    user clicks button    Add a headlines text bl2ock    id:releaseHeadlines
     user waits until element contains    id:releaseHeadlines    This section is empty
     user clicks button    Edit block    id:releaseHeadlines
     user presses keys    Test key statistics summary text for ${PUBLICATION_NAME}

@@ -66,7 +66,6 @@ Verify new release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subjects to release
-    user clicks link    Data and files
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
     user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
