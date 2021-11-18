@@ -262,11 +262,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(id))
+                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
                 .OnSuccessVoid(async userPublicationRole =>
                 {
                     _contentDbContext.Remove(userPublicationRole);

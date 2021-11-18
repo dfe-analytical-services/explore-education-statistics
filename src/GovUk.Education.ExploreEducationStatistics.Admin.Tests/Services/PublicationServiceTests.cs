@@ -1252,6 +1252,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetLatestReleaseVersions()
+        {
+            var release1Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var release1Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                PreviousVersion = release1Original,
+            };
+            var release2 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var release3Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+            };
+            var release3Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                PreviousVersion = release3Original,
+            };
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release1Original,
+                    release1Amendment,
+                    release2,
+                    release3Original,
+                    release3Amendment,
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, release1Original, release1Amendment);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.GetLatestReleaseVersions(
+                    publication.Id);
+
+                var releases = result.AssertRight();
+
+                Assert.Equal(3, releases.Count);
+
+                Assert.Equal(release3Amendment.Id, releases[0].Id);
+                Assert.Equal(release2.Id, releases[1].Id);
+                Assert.Equal(release1Amendment.Id, releases[2].Id);
+            }
+        }
+
         private static PublicationService BuildPublicationService(ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,

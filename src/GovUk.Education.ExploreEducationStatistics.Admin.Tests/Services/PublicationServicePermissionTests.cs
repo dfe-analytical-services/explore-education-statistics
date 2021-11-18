@@ -276,6 +276,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
+        [Fact]
+        public void GetLatestReleaseVersions()
+        {
+            var mocks = Mocks();
+
+            PermissionTestUtil.AssertSecurityPoliciesChecked(
+                async service => await service.GetLatestReleaseVersions(_publication.Id),
+                _publication,
+                mocks.UserService,
+                BuildPublicationService(mocks),
+                SecurityPolicies.CanViewSpecificPublication);
+        }
+
         private static PublicationService BuildPublicationService(
             (Mock<ContentDbContext>, Mock<IMapper>,
                 Mock<IUserService> userService,

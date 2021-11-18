@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> RemoveGlobalRole(string userId, string roleId);
 
-        Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid id);
+        Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 
         Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId);
     }

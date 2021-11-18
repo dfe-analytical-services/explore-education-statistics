@@ -1,27 +1,39 @@
 import client from '@admin/services/utils/service';
 
-export interface ManageAccessPage {
-  publicationId: string;
-  publicationTitle: string;
-  releases: ManageAccessPageRelease[];
-}
-
-export interface ManageAccessPageRelease {
-  releaseId: string;
-  releaseTitle: string;
-  userList: ManageAccessPageContributor[];
-}
-
 export interface ManageAccessPageContributor {
   userId: string;
   userFullName: string;
-  releaseId: string;
-  releaseRoleId?: string;
+  userEmail: string;
+  releaseRoleId: string | undefined;
 }
 
 const releasePermissionService = {
-  getPublicationContributors(publicationId: string): Promise<ManageAccessPage> {
-    return client.get(`/publications/${publicationId}/contributors`);
+  getPublicationReleaseContributors(
+    publicationId: string,
+    releaseId: string,
+  ): Promise<ManageAccessPageContributor[]> {
+    return client.get(`/publications/${publicationId}/contributors`, {
+      params: { releaseId },
+    });
+  },
+  getAllPublicationContributors(
+    releaseId: string,
+  ): Promise<ManageAccessPageContributor[]> {
+    return client.get(`/releases/${releaseId}/contributors`);
+  },
+  updateReleaseContributors(
+    releaseId: string,
+    userIds: string[],
+  ): Promise<void> {
+    return client.post(`/releases/${releaseId}/contributors`, userIds);
+  },
+  deleteAllUserContributorReleaseRolesForPublication(
+    publicationId: string,
+    userId: string,
+  ): Promise<void> {
+    return client.delete(
+      `/publications/${publicationId}/users/${userId}/contributors`,
+    );
   },
 };
 

@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper  ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
+                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
                 emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,

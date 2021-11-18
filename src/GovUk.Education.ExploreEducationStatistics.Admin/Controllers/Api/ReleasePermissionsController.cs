@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -23,11 +24,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId}/contributors")]
-        public async Task<ActionResult<ManageAccessPageViewModel>> GetReleaseContributors(Guid publicationId)
+        public async Task<ActionResult<List<ContributorViewModel>>> GetReleaseContributors(
+            Guid publicationId,
+            [FromQuery] Guid releaseId)
         {
             return await _releasePermissionService
-                .GetManageAccessPageContributorList(publicationId)
+                .GetReleaseContributorPermissions(publicationId, releaseId)
                 .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}/contributors")]
+        public async Task<ActionResult<List<ContributorViewModel>>> GetPublicationContributors(
+            Guid releaseId)
+        {
+            return await _releasePermissionService
+                .GetPublicationContributorList(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("releases/{releaseId}/contributors")]
+        public async Task<ActionResult> UpdateReleaseContributors(Guid releaseId, List<Guid> userIds)
+        {
+            return await _releasePermissionService
+                .UpdateReleaseContributors(releaseId, userIds)
+                .HandleFailuresOr(result => new AcceptedResult());
+        }
+
+        [HttpDelete("publications/{publicationId}/users/{userId}/contributors")]
+        public async Task<ActionResult> RemoveUserContributorReleaseRolesForPublication(
+            Guid publicationId, Guid userId)
+        {
+            return await _releasePermissionService
+                .RemoveAllUserContributorPermissionsForPublication(publicationId, userId)
+                .HandleFailuresOr(result => new AcceptedResult());
         }
     }
 }
