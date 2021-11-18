@@ -1,11 +1,6 @@
 import React from 'react';
-import { ManageAccessPageRelease } from '@admin/services/releasePermissionService';
 
-export interface Props {
-  releases: ManageAccessPageRelease[];
-}
-
-const PublicationInviteNewUsersTab = ({ releases }: Props) => {
+const PublicationInviteNewUsersTab = () => {
   return <p>Invite new users tab content</p>;
 };
 

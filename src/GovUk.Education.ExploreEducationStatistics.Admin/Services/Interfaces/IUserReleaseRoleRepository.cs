@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
@@ -13,7 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role,
             Guid createdById);
 
-        Task Remove(UserReleaseRole releaseRole, Guid deletedById);
+        Task<Unit> CreateAll(List<Guid> userIds,
+            Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task Remove(UserReleaseRole userReleaseRole, Guid deletedById);
+
+        Task RemoveAll(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
+
+        Task RemoveAllUserReleaseRolesForPublication(
+            Guid userId, Publication publication,
+            ReleaseRole role, Guid deletedById);
 
         Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
             Guid releaseId);

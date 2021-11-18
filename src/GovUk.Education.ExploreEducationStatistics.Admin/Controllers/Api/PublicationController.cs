@@ -49,6 +49,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("api/publication/{publicationId}/releases")]
+        public async Task<ActionResult<List<ReleaseViewModel>>> GetLatestReleaseVersions(
+            [Required] Guid publicationId)
+        {
+            return await _publicationService
+                .GetLatestReleaseVersions(publicationId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPost("api/publications")]
         public async Task<ActionResult<PublicationViewModel>> CreatePublication(
             PublicationSaveViewModel publication)

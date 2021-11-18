@@ -2,81 +2,91 @@ import Page from '@admin/components/Page';
 import { PublicationRouteParams } from '@admin/routes/routes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
+import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import TabsSection from '@common/components/TabsSection';
 import Tabs from '@common/components/Tabs';
 import PublicationManageTeamAccessTab from '@admin/pages/publication/components/PublicationManageTeamAccessTab';
 import PublicationInviteNewUsersTab from '@admin/pages/publication/components/PublicationInviteNewUsersTab';
-import releasePermissionService, {
-  ManageAccessPageRelease,
-} from '@admin/services/releasePermissionService';
+import { FormSelect } from '@common/components/form';
+import publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
+import { ReleaseSummary } from '@admin/services/releaseService';
+import WarningMessage from '@common/components/WarningMessage';
+
+interface Model {
+  releases: ReleaseSummary[];
+  publication: BasicPublicationDetails;
+}
 
 const PublicationManageTeamAccessPage = ({
   match,
 }: RouteComponentProps<PublicationRouteParams>) => {
   const { publicationId } = match.params;
+  const [releaseId, setReleaseId] = useState('');
 
-  const {
-    value: viewModel,
-    isLoading,
-    setState: setViewModel,
-  } = useAsyncHandledRetry(
-    () => releasePermissionService.getPublicationContributors(publicationId),
-    [publicationId],
-  );
-
-  const handleChange = (
-    release: ManageAccessPageRelease,
-    addUser?: string,
-    removeUser?: string,
-    totalRemoval?: boolean,
-  ) => {
-    if (!viewModel) {
-      return;
+  const { value: model, isLoading } = useAsyncHandledRetry(async () => {
+    const [releases, publication] = await Promise.all([
+      publicationService.getReleases(publicationId),
+      publicationService.getPublication(publicationId),
+    ]);
+    if (releases.length) {
+      setReleaseId(releases[0].id);
     }
+    return { releases, publication } as Model;
+  }, [publicationId]);
 
-    if (removeUser && !totalRemoval) {
-      viewModel.releases = viewModel.releases.map(r => {
-        const newRelease: ManageAccessPageRelease = {
-          releaseId: r.releaseId,
-          releaseTitle: r.releaseTitle,
-          userList: r.userList.filter(u => u.userId === removeUser),
-        };
-        return newRelease;
-      });
-    }
-
-    viewModel.releases = viewModel.releases.map(r =>
-      r.releaseId !== release.releaseId ? r : release,
-    );
-    setViewModel({ value: viewModel });
-  };
-
-  if (!viewModel) {
-    return null;
+  if (!model || isLoading) {
+    return <LoadingSpinner />;
   }
+  const { releases, publication } = model;
+
+  const release = releases.find(r => r.id === releaseId);
 
   return (
-    <LoadingSpinner loading={isLoading}>
-      <Page
-        title="Manage team access"
-        caption={viewModel.publicationTitle}
-        breadcrumbs={[{ name: 'Manage team access' }]}
-      >
-        <Tabs id="manageTeamAccessTabs">
-          <TabsSection id="manage-access" title="Manage team access">
-            <PublicationManageTeamAccessTab
-              releases={viewModel.releases}
-              onChange={handleChange}
+    <Page
+      title="Manage team access"
+      caption={publication.title}
+      breadcrumbs={[{ name: 'Manage team access' }]}
+    >
+      {!releases.length ? (
+        <WarningMessage>
+          Create a release for this publication to manage team access.
+        </WarningMessage>
+      ) : (
+        <>
+          <div className="dfe-align--right">
+            <FormSelect
+              id="currentRelease"
+              name="release"
+              label="Select release"
+              options={releases.map(r => ({
+                label: r.title,
+                value: r.id,
+              }))}
+              order={[]}
+              value={releaseId}
+              onChange={e => setReleaseId(e.target.value)}
             />
-          </TabsSection>
-          <TabsSection id="invite-users" title="Invite new users">
-            <PublicationInviteNewUsersTab releases={viewModel.releases} />
-          </TabsSection>
-        </Tabs>
-      </Page>
-    </LoadingSpinner>
+          </div>
+
+          {release && (
+            <Tabs id="manageTeamAccessTabs">
+              <TabsSection id="manage-access" title="Manage team access">
+                <PublicationManageTeamAccessTab
+                  publication={publication}
+                  release={release}
+                />
+              </TabsSection>
+              <TabsSection id="invite-users" title="Invite new users">
+                <PublicationInviteNewUsersTab />
+              </TabsSection>
+            </Tabs>
+          )}
+        </>
+      )}
+    </Page>
   );
 };
 

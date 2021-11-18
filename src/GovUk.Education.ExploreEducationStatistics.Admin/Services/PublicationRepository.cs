@@ -119,9 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AsAsyncEnumerable()
                 .SingleAsync(p => p.Id == publicationId);
 
-            return publication.Releases
-                .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
-                .ToList();
+            return publication.GetLatestVersionsOfAllReleases();
         }
 
         public async Task<Release?> GetLatestReleaseForPublication(Guid publicationId)

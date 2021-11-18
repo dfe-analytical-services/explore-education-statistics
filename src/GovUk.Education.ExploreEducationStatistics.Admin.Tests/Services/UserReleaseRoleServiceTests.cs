@@ -34,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-
             var releaseIgnored1 = new Release
             {
                 Id = Guid.NewGuid(),

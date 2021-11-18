@@ -24,6 +24,7 @@ import {
   preReleaseTableToolRoute,
 } from '@admin/routes/preReleaseRoutes';
 import PublicationManageTeamAccessPage from '@admin/pages/publication/PublicationManageTeamAccessPage';
+import ReleaseManageTeamAccessAddUsersPage from '@admin/pages/publication/ReleaseManageTeamAccessAddUsersPage';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -115,6 +116,13 @@ export const publicationManageTeamAccessRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const releaseManageTeamAccessAddUsersRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/add-contributors',
+  component: ReleaseManageTeamAccessAddUsersPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
 export const methodologyRoute: ProtectedRouteProps = {
   path: '/methodology/:methodologyId',
   component: MethodologyPage,
@@ -186,6 +194,7 @@ const routes = {
   publicationCreateRoute,
   publicationEditRoute,
   publicationManageTeamAccessRoute,
+  releaseManageTeamAccessAddUsersRoute,
   methodologyRoute,
   methodologyAdoptRoute,
   externalMethodologyEditRoute,

@@ -21,23 +21,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IPublicationRepository _publicationRepository;
+        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserService _userService;
 
         public ReleasePermissionService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublicationRepository publicationRepository,
+            IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _publicationRepository = publicationRepository;
+            _userReleaseRoleRepository = userReleaseRoleRepository;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ManageAccessPageViewModel>>
-            GetManageAccessPageContributorList(Guid publicationId)
+        public async Task<Either<ActionResult, List<ContributorViewModel>>>
+            GetReleaseContributorPermissions(Guid publicationId, Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId,
@@ -47,15 +47,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccess(async publication =>
                 {
-                    var allLatestReleases = await _publicationRepository
-                        .GetLatestVersionsOfAllReleases(publicationId);
+                    var release = publication.Releases.SingleOrDefault(r => r.Id == releaseId);
 
-                    var allLatestReleasesOrdered = allLatestReleases
-                        .OrderBy(r => r.Year)
-                        .ThenBy(r => r.TimePeriodCoverage)
+                    var allContributorsForRelease = await _contentDbContext.UserReleaseRoles
+                        .Include(urr => urr.User)
+                        .ToAsyncEnumerable()
+                        .Where(urr =>
+                            urr.ReleaseId == release?.Id
+                            && urr.Role == Contributor)
+                        .ToListAsync();
+
+                    return allContributorsForRelease
+                        .Select(urr => new ContributorViewModel
+                        {
+                            ReleaseRoleId = urr.Id,
+                            UserId = urr.UserId,
+                            UserFullName = urr.User.DisplayName,
+                            UserEmail = urr.User.Email,
+                        })
+                        .OrderBy(model => model.UserFullName)
                         .ToList();
+                });
+        }
 
-                    var allLatestReleaseIds = allLatestReleasesOrdered
+        public async Task<Either<ActionResult, List<ContributorViewModel>>>
+            GetPublicationContributorList(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    query =>
+                        query.Include(r => r.Publication.Releases))
+                .OnSuccessDo(release => _userService
+                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
+                .OnSuccess(async release =>
+                {
+                    var allLatestReleases = release.Publication.GetLatestVersionsOfAllReleases();
+
+                    var allLatestReleaseIds = allLatestReleases
                         .Select(r => r.Id)
                         .ToList();
 
@@ -72,41 +100,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Distinct()
                         .ToList();
 
-                    var releases = allLatestReleasesOrdered
-                        .Select(release =>
+                    return allPublicationContributors
+                        .Select(user =>
                         {
-                            var contributorList = allPublicationContributors
-                                .Select(user =>
-                                {
-                                    var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(releaseRole =>
-                                        releaseRole.UserId == user.Id
-                                        && releaseRole.ReleaseId == release.Id);
+                            var roleForThisRelease = allContributorReleaseRoles.SingleOrDefault(releaseRole =>
+                                releaseRole.UserId == user.Id
+                                && releaseRole.ReleaseId == releaseId);
 
-                                    return new ManageAccessPageContributorViewModel
-                                    {
-                                        UserId = user.Id,
-                                        UserFullName = user.DisplayName,
-                                        ReleaseId = release.Id,
-                                        // Some don't have a contributor release role for this release, as they are a
-                                        // contributor on a different release on the same publication
-                                        ReleaseRoleId = roleForThisRelease?.Id,
-                                    };
-                                }).ToList();
-
-                            return new ManageAccessPageReleaseViewModel
+                            return new ContributorViewModel
                             {
-                                ReleaseId = release.Id,
-                                ReleaseTitle = release.Title,
-                                UserList = contributorList,
+                                UserId = user.Id,
+                                UserFullName = user.DisplayName,
+                                UserEmail = user.Email,
+                                ReleaseRoleId = roleForThisRelease?.Id,
                             };
+                        })
+                        .OrderBy(model => model.UserFullName)
+                        .ToList();
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> UpdateReleaseContributors(
+            Guid releaseId, List<Guid> userIds)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    query =>
+                        query.Include(r => r.Publication.Releases))
+                .OnSuccessDo(release => _userService
+                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
+                .OnSuccess(async release =>
+                {
+                    var releaseContributorReleaseRoles = await _contentDbContext.UserReleaseRoles
+                        .Include(releaseRole => releaseRole.User)
+                        .AsAsyncEnumerable()
+                        .Where(userReleaseRole =>
+                            userReleaseRole.ReleaseId == release.Id
+                            && userReleaseRole.Role == Contributor)
+                        .ToListAsync();
+
+                    var releaseRolesToBeRemoved = releaseContributorReleaseRoles
+                        .Where(urr => !userIds.Contains(urr.UserId))
+                        .ToList();
+
+                    await _userReleaseRoleRepository.RemoveAll(releaseRolesToBeRemoved, _userService.GetUserId());
+
+                    var usersToBeAdded = userIds
+                        .Where(userId =>
+                        {
+                            var userIdsWithReleaseRole = releaseContributorReleaseRoles
+                                .Select(urr => urr.UserId)
+                                .ToList();
+
+                            return !userIdsWithReleaseRole.Contains(userId);
                         }).ToList();
 
-                    return new ManageAccessPageViewModel
-                    {
-                        PublicationId = publication.Id,
-                        PublicationTitle = publication.Title,
-                        Releases = releases,
-                    };
+                    await _userReleaseRoleRepository.CreateAll(usersToBeAdded, release.Id, Contributor,
+                        _userService.GetUserId());
+
+                    return Unit.Instance;
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> RemoveAllUserContributorPermissionsForPublication(
+            Guid publicationId, Guid userId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId,
+                    query =>
+                        query.Include(p => p.Releases))
+                .OnSuccessDo(publication => _userService
+                    .CheckCanUpdateReleaseRole(publication, Contributor))
+                .OnSuccessVoid(async publication =>
+                {
+                    await _userReleaseRoleRepository.RemoveAllUserReleaseRolesForPublication(
+                        userId, publication, Contributor, _userService.GetUserId());
                 });
         }
     }

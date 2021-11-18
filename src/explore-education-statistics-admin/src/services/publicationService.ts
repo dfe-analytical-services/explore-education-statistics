@@ -6,7 +6,11 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import { MyRelease, Release } from '@admin/services/releaseService';
+import {
+  MyRelease,
+  Release,
+  ReleaseSummary,
+} from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
@@ -119,6 +123,12 @@ const publicationService = {
 
   getMyPublication(publicationId: string): Promise<MyPublication> {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
+  },
+
+  getReleases(publicationId: string): Promise<ReleaseSummary[]> {
+    return client.get<ReleaseSummary[]>(
+      `/publication/${publicationId}/releases`,
+    );
   },
 
   getPublicationReleaseTemplate: (

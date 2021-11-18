@@ -1048,7 +1048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestReleases()
+        public async Task GetLatestVersionsOfAllReleases()
         {
             var release2000Original = new Release
             {
@@ -1077,6 +1077,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2001",
                 PreviousVersion = release2001Amendment,
             };
+
             var release2002Latest = new Release
             {
                 ReleaseName = "2002",
@@ -1093,7 +1094,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release2001Latest,
                     release2002Latest,
                 }
-
             };
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
