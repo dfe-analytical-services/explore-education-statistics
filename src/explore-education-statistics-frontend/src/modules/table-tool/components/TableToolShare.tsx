@@ -100,10 +100,7 @@ const TableToolShare = ({
           Copy link
         </Button>
 
-        <ButtonLink
-          to="/data-tables/permalink/[permalink]"
-          as={`/data-tables/permalink/${permalinkId}`}
-        >
+        <ButtonLink to={`/data-tables/permalink/${permalinkId}`}>
           View share link
         </ButtonLink>
       </ButtonGroup>

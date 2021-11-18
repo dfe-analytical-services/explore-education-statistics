@@ -10,21 +10,21 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore our statistics and data
+
     user clicks link    Explore
     user waits until page contains
-    ...    Browse to find the statistics and data you’re looking for and open the section to get links to
-    user waits for page to finish loading
+    ...    Browse to find the statistics and data you’re looking for and open the section to get links to:
+    ...    %{WAIT_MEDIUM}
 
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
     user clicks element    testid:View stats link for Pupil absence in schools in England
-    user waits until h1 is visible    Pupil absence in schools in England    90
+    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
 
 Validate title
-    user waits until h1 is visible    Pupil absence in schools in England    90
+    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic Year 2016/17
 
 Validate URL
@@ -314,7 +314,7 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Create your own tables
     user clicks link    Create tables
-    user waits until h1 is visible    Create your own tables    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
     user waits until table tool wizard step is available    2    Choose a subject

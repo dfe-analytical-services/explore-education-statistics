@@ -105,7 +105,7 @@ Verify newly published release is on Find Statistics page
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 User navigates to /data-catalogue page
-    user goes to url    %{PUBLIC_URL}/data-catalogue
+    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
     user waits until page contains title caption    Data catalogue
     user waits until h1 is visible    Browse our open data
     user waits until page contains    View all of the open data available and choose files to download.

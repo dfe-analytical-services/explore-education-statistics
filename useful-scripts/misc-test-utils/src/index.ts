@@ -12,10 +12,13 @@ import createMethodology from './modules/methodology/createMethodology';
 import addMethodlogyTextContentBlock from './modules/methodology/addMethodlogyTextContentBlock';
 import createPublication from './modules/publication/createPublication';
 import addReleaseTextContentBlock from './modules/release/addContentBlock';
+import themeService from './services/themeService';
+import topicService from './services/topicService';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const choices = [
+  'delete theme & topic',
   'create new publication',
   'create new release',
   'publish a new release',
@@ -36,6 +39,24 @@ const start = async () => {
     switch (answers.test) {
       case 'create new release':
         await createPublicationAndRelease();
+        break;
+
+      case 'delete theme & topic':
+        const topic = await inquirer.prompt({
+          name: 'id',
+          type: 'input',
+          message: 'Topic ID',
+          prefix: '>',
+        });
+        const theme = await inquirer.prompt({
+          name: 'id',
+          type: 'input',
+          message: 'Theme ID',
+          prefix: '>',
+        });
+        await topicService.renameTopic(topic.id, theme.id);
+        await themeService.renameTheme(theme.id);
+        await themeService.deleteTheme(theme.id);
         break;
 
       case 'create new publication':

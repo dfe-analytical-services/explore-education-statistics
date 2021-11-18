@@ -235,7 +235,7 @@ Generate the permalink
     Set Suite Variable    ${PERMA_LOCATION_URL}
 
 Go to permalink
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
@@ -311,7 +311,7 @@ Approve release amendment
     user approves amended release for immediate publication
 
 Go to permalink page & check for error element to be present
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
 
 Check the table has the same results as original table
@@ -371,7 +371,7 @@ Check the table has the same results as original table
     user checks results table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
@@ -431,7 +431,7 @@ Go to "Sign off" to approve amended release for immediate publication
     user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 Select publication
@@ -479,8 +479,10 @@ Select the date cateogory
 
 Attempt to generate a table that is too large
     user clicks element    id:filtersForm-submit
-    user waits until element contains    id:filtersForm-indicators-error
-    ...    A table cannot be returned as the filters chosen can exceed the maximum allowable table size
+    user waits until page contains
+    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
+    user waits until page contains    Select different filters or download the subject data.
+    user waits until page contains button    Download Seven filters (csv, 17 Kb)    %{WAIT_MEDIUM}
 
 Reduce the number of selected Dates and generate a smaller table
     user clicks unselect all for category    Date
@@ -501,7 +503,7 @@ Generate the new permalink
     Set Suite Variable    ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink
-    user goes to url    ${PERMA_LOCATION_URL_TWO}
+    user navigates to public frontend    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Updating ${SUBJECT_NAME} footnote

@@ -9,7 +9,7 @@
     <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
     <PackageReference Include="JWT" Version="7.3.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.2" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.5" />
     <!-- EES-1205 Temporarily downgrading dependency Microsoft.NET.Sdk.Functions to 3.0.3
     Prevents error when subscribing to Publications
     'Could not load file or assembly 'Microsoft.IdentityModel.Tokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'. The system cannot find the file specified'

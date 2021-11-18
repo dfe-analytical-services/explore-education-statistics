@@ -521,7 +521,7 @@ Approve amendment for immediate release
     user approves amended release for immediate publication
 
 Go back to public find-statistics page
-    user goes to url    %{PUBLIC_URL}/find-statistics
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
     user waits for page to finish loading
 

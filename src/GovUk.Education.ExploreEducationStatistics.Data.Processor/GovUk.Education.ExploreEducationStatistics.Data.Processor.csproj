@@ -9,7 +9,7 @@
     <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.1.7" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.2" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.18" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

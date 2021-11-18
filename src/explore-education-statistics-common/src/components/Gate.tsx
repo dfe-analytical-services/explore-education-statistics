@@ -7,7 +7,7 @@ import React, { ReactNode, useEffect } from 'react';
 interface GateProps {
   condition: boolean | (() => Promise<boolean>);
   children: ReactNode;
-  fallback?: ReactNode | ((error?: Error) => ReactNode);
+  fallback?: ReactNode | ((error?: unknown) => ReactNode);
   loading?: ReactNode;
 }
 

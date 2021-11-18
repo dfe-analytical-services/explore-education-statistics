@@ -41,7 +41,7 @@ const projects = {
   },
   frontendProd: {
     path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
-    command: 'npm run build && npm run start:prod',
+    command: 'npm run build && npm start',
     colour: chalk.greenBright,
   },
   content: {

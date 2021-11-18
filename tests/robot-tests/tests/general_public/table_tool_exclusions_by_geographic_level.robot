@@ -83,9 +83,10 @@ User clicks Create table button
     user clicks element    id:filtersForm-submit
 
 Validate the query could exceed the maximum allowable table size
-    user waits until page contains element    id:filtersForm-tableSizeError-title
-    user checks page contains    Could not create table as the filters chosen may exceed the maximum allowed table size
-    user clicks button    Download Exclusions by geographic level (csv, 0.00 B)
+    user waits until page contains
+    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
+    user waits until page contains    Select different filters or download the subject data.
+    user waits until page contains button    Download Exclusions by geographic level (csv, 512 B)    %{WAIT_MEDIUM}
 
 Go back to Locations step
     user clicks button    Edit locations
@@ -152,15 +153,15 @@ Validate Bury Number of fixed period exclusions row
     user checks row cell contains text    ${row}    3    1,298
 
 User generates a permanent link
-    user waits until page contains button    Generate shareable link    60
+    user waits until page contains button    Generate shareable link    %{WAIT_MEDIUM}
     user clicks button    Generate shareable link
-    user waits until page contains testid    permalink-generated-url
+    user waits until page contains testid    permalink-generated-url    %{WAIT_MEDIUM}
     user checks generated permalink is valid
 
 User validates permanent link works correctly
     user clicks link    View share link
     user waits until h1 is visible
-    ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'    60
+    ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 User validates permalink contains correct date
     ${date}=    get current datetime    %-d %B %Y

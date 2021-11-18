@@ -1,6 +1,10 @@
 import { NextRouter } from 'next/router';
 
 const mockRouter: NextRouter = {
+  isFallback: false,
+  isLocaleDomain: false,
+  isPreview: false,
+  isReady: true,
   basePath: '',
   pathname: '/',
   route: '/',
@@ -17,7 +21,6 @@ const mockRouter: NextRouter = {
     off: jest.fn(),
     emit: jest.fn(),
   },
-  isFallback: false,
 };
 
 export function useRouter() {

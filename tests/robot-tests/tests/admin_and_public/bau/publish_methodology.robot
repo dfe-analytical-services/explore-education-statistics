@@ -45,8 +45,8 @@ Verify that the publication is not visible on the public methodologies page with
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is not publicly accessible by URL without a published release
-    user goes to url    ${ACCESSIBLE_METHODOLOGY_URL}
-    user waits until page contains    Page not found
+    user navigates to public frontend    ${ACCESSIBLE_METHODOLOGY_URL}
+    user waits until h1 is visible    Page not found    %{WAIT_MEDIUM}
 
 Alter the approval to publish the methodology with the release
     user approves methodology for publication
@@ -59,7 +59,7 @@ Verify that the publication is still not visible on the public methodologies pag
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is still not publicly accessible by URL without publishing the release
-    user goes to url    ${ACCESSIBLE_METHODOLOGY_URL}
+    user navigates to public frontend    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
 Approve the release
@@ -162,7 +162,7 @@ Verify that the user cannot edit the status of the amended methodology
 
 Go to methodology amendment's public page
     ${METHODOLOGY_URL}=    get element attribute    css:#public-methodology-url    value
-    user goes to url    ${METHODOLOGY_URL}
+    user navigates to public frontend    ${METHODOLOGY_URL}
     user waits until page contains title    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
 

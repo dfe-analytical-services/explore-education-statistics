@@ -88,12 +88,7 @@ const SubscriptionPage: NextPage<Props> = ({
           <h1 className="govuk-panel__title">{title}</h1>
           <div className="govuk-panel__body">{message}</div>
           {verified && (
-            <Link
-              to="/find-statistics/[publication]"
-              as={`/find-statistics/${slug}`}
-            >
-              View {data.title}
-            </Link>
+            <Link to={`/find-statistics/${slug}`}>View {data.title}</Link>
           )}
         </div>
       ) : (

@@ -133,10 +133,6 @@ user opens firefox without xvfb
 user closes the browser
     close browser
 
-user goes to url
-    [Arguments]    ${destination}
-    go to    ${destination}
-
 user gets url
     ${url}=    get location
     [Return]    ${url}
@@ -531,7 +527,7 @@ user checks summary list contains
     ...    %{WAIT_MEDIUM}
     ${element}=    get child element    ${parent}
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible    ${element}    %{WAIT_MEDIUM}
+    user waits until element is visible    ${element}    %{WAIT_LONG}
 
 user checks select contains x options
     [Arguments]    ${locator}    ${num}
@@ -765,19 +761,24 @@ user checks page does not contain other release
     user checks page does not contain element
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
+user navigates to admin frontend
+    [Arguments]    ${URL}=%{ADMIN_URL}
+    disable basic auth headers
+    go to    ${URL}
+
 user navigates to public frontend
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
-    user waits until h1 is visible    Explore our statistics and data
+    [Arguments]    ${URL}=%{PUBLIC_URL}
+    enable basic auth headers
+    go to    ${URL}
 
 user navigates to find statistics page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
 
 user navigates to data tables page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 check that variable is not empty

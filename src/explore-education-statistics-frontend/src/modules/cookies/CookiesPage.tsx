@@ -12,6 +12,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
 import React, { useState } from 'react';
+import { StringSchema } from 'yup';
 import styles from './CookiesPage.module.scss';
 
 interface FormValues {
@@ -82,7 +83,7 @@ function CookiesPage({ cookies }: Props) {
               validationSchema={Yup.object<FormValues>({
                 googleAnalytics: Yup.string()
                   .required('Select an option for Google analytics and cookies')
-                  .oneOf(['on', 'off']),
+                  .oneOf(['on', 'off']) as StringSchema<'on' | 'off'>,
               })}
             >
               {() => {

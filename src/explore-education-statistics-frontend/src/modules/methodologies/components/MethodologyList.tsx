@@ -29,10 +29,7 @@ function MethodologyList({ publications }: Props) {
           <ul>
             {publication.methodologies.map(methodology => (
               <li key={methodology.id}>
-                <Link
-                  to="/methodology/[methodology]"
-                  as={`/methodology/${methodology.slug}`}
-                >
+                <Link to={`/methodology/${methodology.slug}`}>
                   {methodology.title}
                 </Link>
               </li>

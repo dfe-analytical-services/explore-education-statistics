@@ -101,10 +101,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                 <ul className="govuk-list govuk-list--spaced">
                   {data.publications.map(publication => (
                     <li key={publication.id}>
-                      <Link
-                        to="/find-statistics/[publication]"
-                        as={`/find-statistics/${publication.slug}`}
-                      >
+                      <Link to={`/find-statistics/${publication.slug}`}>
                         {publication.title}
                       </Link>{' '}
                     </li>

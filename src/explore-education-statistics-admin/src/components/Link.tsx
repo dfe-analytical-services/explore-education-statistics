@@ -26,6 +26,7 @@ const Link = ({
 
   if (isAbsolute || isHash) {
     return (
+      // eslint-disable-next-line react/jsx-no-target-blank
       <a
         rel={isAbsolute ? 'noopener noreferrer' : undefined}
         target={isAbsolute ? '_blank' : undefined}

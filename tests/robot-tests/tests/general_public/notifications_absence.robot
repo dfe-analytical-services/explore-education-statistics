@@ -10,12 +10,13 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to Absence publication
     [Tags]    Local
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore our statistics and data
 
     user clicks link    Explore
-    user waits until page contains    Browse to find the statistics and data you’re looking for
+    user waits until page contains
+    ...    Browse to find the statistics and data you’re looking for and open the section to get links to:
+    ...    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
     user opens accordion section    Pupils and schools

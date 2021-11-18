@@ -4,6 +4,7 @@ import ErrorSummary, {
 import { FormContextProvider } from '@common/components/form/contexts/FormContext';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
+import isErrorLike from '@common/utils/error/isErrorLike';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { useFormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -103,7 +104,7 @@ const Form = ({
         }
 
         if (showSubmitError) {
-          if (isMounted.current) {
+          if (isMounted.current && isErrorLike(error)) {
             setSubmitError({
               id: submitId,
               message: error.message,
