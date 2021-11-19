@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("api/meta")]
+    [Route("api")]
     [ApiController]
     public class TableBuilderMetaController : ControllerBase
     {
@@ -20,15 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private readonly ICacheKeyService _cacheKeyService;
 
         public TableBuilderMetaController(
-            ISubjectMetaService subjectMetaService, 
+            ISubjectMetaService subjectMetaService,
             ICacheKeyService cacheKeyService)
         {
             _subjectMetaService = subjectMetaService;
             _cacheKeyService = cacheKeyService;
         }
 
-        [HttpGet("subject/{subjectId}")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(Guid subjectId)
+        [HttpGet("meta/subject/{subjectId:guid}")]
+        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _cacheKeyService
                 .CreateCacheKeyForSubjectMeta(subjectId)
@@ -37,13 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [BlobCache(typeof(SubjectMetaCacheKey))]
-        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(SubjectMetaCacheKey cacheKey)
+        private Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(SubjectMetaCacheKey cacheKey)
         {
             return _subjectMetaService.GetSubjectMeta(cacheKey.SubjectId);
         }
 
-        [HttpPost("subject")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(
+        [HttpPost("meta/subject")]
+        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(
             [FromBody] SubjectMetaQueryContext query)
         {
             return _subjectMetaService.GetSubjectMeta(query).HandleFailuresOrOk();

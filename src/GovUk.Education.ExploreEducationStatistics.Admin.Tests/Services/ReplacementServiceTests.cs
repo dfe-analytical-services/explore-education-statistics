@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReplacementServiceTests
     {
         private const string CountryCodeEngland = "E92000001";
+        private readonly Country _england = new(CountryCodeEngland, "England");
 
         [Fact]
         public async Task GetReplacementPlan_FileHasWrongFileType()
@@ -136,6 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: contentReleaseVersion2.Id,
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
+
+                MockUtils.VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementFileTypesMustBeData);
             }
@@ -255,6 +259,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
+                MockUtils.VerifyAllMocks(mocks);
+
                 result.AssertNotFound();
             }
         }
@@ -330,6 +336,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>());
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -359,8 +371,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -524,8 +537,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var country = new Country(CountryCodeEngland, "England");
-
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
@@ -633,15 +644,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>());
 
             mocks.locationRepository
-                .Setup(s => s.GetObservationalUnits(GeographicLevel.Country, new [] { CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>(new List<ObservationalUnit>
-                {
-                    country
-                }));
+                .Setup(s => s.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -681,8 +689,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -696,8 +705,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
-                Assert.Equal(originalIndicator.IndicatorGroup.Label,  dataBlockIndicatorGroupPlan.Value.Label);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
                 Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
                 Assert.False(dataBlockIndicatorGroupPlan.Value.Valid);
 
@@ -747,8 +756,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ObservationalUnits
                     .First();
 
-                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
-                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
                 Assert.Empty(dataBlockLocationPlan.Target);
                 Assert.False(dataBlockLocationPlan.Valid);
 
@@ -822,9 +831,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilterItem.Id, footnoteForFilterItemFilterItemPlan.Id);
                 Assert.Equal(originalFilterItem.Label, footnoteForFilterItemFilterItemPlan.Label);
                 Assert.Equal(originalFilterItem.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
-                Assert.Equal(originalFilterItem.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalFilterItem.FilterGroup.Filter.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterLabel);
                 Assert.Equal(originalFilterItem.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
-                Assert.Equal(originalFilterItem.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
+                Assert.Equal(originalFilterItem.FilterGroup.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
                 Assert.Null(footnoteForFilterItemFilterItemPlan.Target);
                 Assert.False(footnoteForFilterItemFilterItemPlan.Valid);
 
@@ -841,8 +852,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
-                Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label,
+                    footnoteForIndicatorIndicatorGroupPlan.Value.Label);
                 Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
                 Assert.False(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
 
@@ -1022,8 +1034,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
-            var country = new Country(CountryCodeEngland, "England");
-
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -1084,24 +1094,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>
                 {
                     {
                         GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
+                        ListOf(_england)
                     }
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
-                });
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
@@ -1143,8 +1147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
@@ -1297,8 +1302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
-            var country = new Country(CountryCodeEngland, "England");
-
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -1357,24 +1360,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>
                 {
                     {
                         GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
+                        ListOf(_england)
                     }
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
-                });
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
@@ -1416,8 +1413,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
@@ -1595,8 +1593,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
-            var country = new Country(CountryCodeEngland, "England");
-
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -1655,24 +1651,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>
                 {
                     {
                         GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
+                        ListOf(_england)
                     }
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
-                });
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
@@ -1715,8 +1705,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
@@ -1969,8 +1960,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
-            var country = new Country(CountryCodeEngland, "England");
-
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -2075,24 +2064,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>
                 {
                     {
                         GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
+                        ListOf(_england)
                     }
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
-                });
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
@@ -2137,8 +2120,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                MockUtils.VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -2152,7 +2136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
                 Assert.Equal(originalIndicator.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
                 Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
                 Assert.True(dataBlockIndicatorGroupPlan.Value.Valid);
@@ -2234,9 +2218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ObservationalUnits
                     .First();
 
-                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
-                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
-                Assert.Equal(country.Code,dataBlockLocationPlan.Target);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.Target);
                 Assert.True(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
@@ -2327,7 +2311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var footnoteForIndicatorIndicatorGroupPlan =
                     footnoteForIndicatorPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
                 Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
                 Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
                 Assert.True(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
@@ -2464,8 +2448,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>());
+
+            mocks.locationRepository
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -2500,7 +2488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                mocks.ReleaseService.VerifyNoOtherCalls();
+                MockUtils.VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementMustBeValid);
             }
@@ -2886,17 +2874,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetLocationAttributes(replacementSubject.Id))
+                .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>
                 {
                     {
                         GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            new Country(CountryCodeEngland, "England")
-                        }
+                        ListOf(_england)
                     }
                 });
+
+            mocks.locationRepository
+                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
@@ -2950,9 +2939,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalFile.Id),
                     Times.Once());
 
-                mocks.ReleaseService.VerifyNoOtherCalls();
+                MockUtils.VerifyAllMocks(mocks);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3005,9 +2994,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementRowGroup = replacedDataBlock.Table.TableHeaders.RowGroups.First().ToList();
                 Assert.Equal(2, replacementRowGroup.Count());
                 Assert.Equal(TableHeaderType.Filter, replacementRowGroup[0].Type);
-                Assert.Equal(replacementFilterItem1.Id.ToString(),replacementRowGroup[0].Value);
+                Assert.Equal(replacementFilterItem1.Id.ToString(), replacementRowGroup[0].Value);
                 Assert.Equal(TableHeaderType.Filter, replacementRowGroup[1].Type);
-                Assert.Equal(replacementFilterItem2.Id.ToString(),replacementRowGroup[1].Value);
+                Assert.Equal(replacementFilterItem2.Id.ToString(), replacementRowGroup[1].Value);
 
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
@@ -3105,13 +3094,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Footnote CreateFootnote(Release release,
             string content,
-            List<FilterFootnote> filterFootnotes = null,
-            List<FilterGroupFootnote> filterGroupFootnotes = null,
-            List<FilterItemFootnote> filterItemFootnotes = null,
-            List<IndicatorFootnote> indicatorFootnotes = null,
-            Subject subject = null)
+            List<FilterFootnote>? filterFootnotes = null,
+            List<FilterGroupFootnote>? filterGroupFootnotes = null,
+            List<FilterItemFootnote>? filterItemFootnotes = null,
+            List<IndicatorFootnote>? indicatorFootnotes = null,
+            Subject? subject = null)
         {
-            return new Footnote
+            return new()
             {
                 Content = content,
                 Filters = filterFootnotes,
@@ -3121,7 +3110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Subjects = subject != null
                     ? new List<SubjectFootnote>
                     {
-                        new SubjectFootnote
+                        new()
                         {
                             Subject = subject
                         }
@@ -3129,7 +3118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     : new List<SubjectFootnote>(),
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     }
@@ -3181,9 +3170,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ITimePeriodService> TimePeriodService) Mocks()
         {
             return (
-                new Mock<ILocationRepository>(),
-                new Mock<IReleaseService>(),
-                new Mock<ITimePeriodService>());
+                new Mock<ILocationRepository>(MockBehavior.Strict),
+                new Mock<IReleaseService>(MockBehavior.Strict),
+                new Mock<ITimePeriodService>(MockBehavior.Strict));
         }
     }
 }

@@ -36,6 +36,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -91,6 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
+            services.AddFeatureManagement();
+
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -101,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
+            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             services.AddTransient<IBlobCacheService, BlobCacheService>();

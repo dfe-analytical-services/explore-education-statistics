@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,13 +17,15 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : AbstractSubjectMetaService,
-        ISubjectMetaService
+    public class SubjectMetaService : AbstractSubjectMetaService, ISubjectMetaService
     {
+        private readonly IFeatureManager _featureManager;
         private readonly IFilterRepository _filterRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -32,19 +35,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
+        private readonly LocationsOptions _locationOptions;
 
-        public SubjectMetaService(IBoundaryLevelRepository boundaryLevelRepository,
+        public SubjectMetaService(
+            IFeatureManager featureManager,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
-            IGeoJsonRepository geoJsonRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             ILogger<SubjectMetaService> logger,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
-            IUserService userService) : base(boundaryLevelRepository, filterItemRepository, geoJsonRepository)
+            IUserService userService,
+            IOptions<LocationsOptions> locationOptions) :
+            base(filterItemRepository)
         {
+            _featureManager = featureManager;
             _filterRepository = filterRepository;
             _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
@@ -54,66 +61,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
+            _locationOptions = locationOptions.Value;
         }
 
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
+        public Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
-        
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
+
+        public async Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
+            return await _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
+        public Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query));
         }
-        
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
+
+        public Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMetaRestricted(
             SubjectMetaQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query));
         }
-        
-        private SubjectMetaViewModel GetSubjectMetaViewModel(Subject subject)
+
+        private async Task<ISubjectMetaViewModel> GetSubjectMetaViewModel(Subject subject)
         {
-            return new SubjectMetaViewModel
+            if (await _featureManager.IsEnabledAsync("LocationHierarchies"))
+            {
+                return new SubjectMetaViewModel
+                {
+                    Filters = GetFilters(subject.Id),
+                    Indicators = GetIndicators(subject.Id),
+                    Locations = await GetLocations(subject.Id),
+                    TimePeriod = GetTimePeriods(subject.Id)
+                };
+            }
+
+            return new LegacySubjectMetaViewModel
             {
                 Filters = GetFilters(subject.Id),
                 Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id),
+                Locations = await GetLegacyLocations(subject.Id),
                 TimePeriod = GetTimePeriods(subject.Id)
             };
         }
 
-        private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
+        private async Task<ISubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
         {
+            var locationHierarchiesEnabled = await _featureManager.IsEnabledAsync("LocationHierarchies");
+
             var observations = _observationService.FindObservations(query).AsQueryable();
-            var locations = new Dictionary<string, ObservationalUnitsMetaViewModel>();
+            var legacyLocations = new Dictionary<string, ObservationalUnitsMetaViewModel>();
+            var locations = new Dictionary<string, LocationsMetaViewModel>();
             var timePeriods = new TimePeriodsMetaViewModel();
             var filters = new Dictionary<string, FilterMetaViewModel>();
             var indicators = new Dictionary<string, IndicatorsMetaViewModel>();
-            
+
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
             if (query.Locations == null)
             {
-                locations = GetObservationalUnits(observations);
-                
-                _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                if (locationHierarchiesEnabled)
+                {
+                    locations = await GetLocations(observations);
+                }
+                else
+                {
+                    legacyLocations = await GetLegacyLocations(observations);
+                }
+
+                _logger.LogTrace("Got Locations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
             }
-            
+
             if (query.TimePeriod == null && query.Locations != null)
             {
                 timePeriods = GetTimePeriods(observations);
@@ -121,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
             }
-            
+
             if (query.TimePeriod != null)
             {
                 filters = GetFilters(query.SubjectId, observations, false);
@@ -135,14 +164,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             stopwatch.Stop();
-            
+
             // Only data relevant to the step being executed in the table tool needs to be returned hence the 
             // null checks above so only the minimum requisite DB calls for the task are performed.
-            return new SubjectMetaViewModel
+
+            if (locationHierarchiesEnabled)
+            {
+                return new SubjectMetaViewModel
+                {
+                    Filters = filters,
+                    Indicators = indicators,
+                    Locations = locations,
+                    TimePeriod = timePeriods
+                };
+            }
+
+            return new LegacySubjectMetaViewModel
             {
                 Filters = filters,
                 Indicators = indicators,
-                Locations = locations,
+                Locations = legacyLocations,
                 TimePeriod = timePeriods
             };
         }
@@ -159,8 +200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Options = filter.FilterGroups
                             .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
                             .ToDictionary(
-                            filterGroup => filterGroup.Label.PascalCase(),
-                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
+                                filterGroup => filterGroup.Label.PascalCase(),
+                                filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
                         TotalValue = GetTotalValue(filter)
                     });
         }
@@ -177,17 +218,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
-        private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(Guid subjectId)
+        [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2773", false)]
+        private async Task<Dictionary<string, ObservationalUnitsMetaViewModel>> GetLegacyLocations(Guid subjectId)
         {
-            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
-            return BuildObservationalUnitsViewModels(observationalUnits);
+            var locations = await _locationRepository.GetLocationAttributes(subjectId);
+            return BuildLegacyLocationAttributeViewModel(locations);
         }
 
-        private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(
+        [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2773", false)]
+        private async Task<Dictionary<string, ObservationalUnitsMetaViewModel>> GetLegacyLocations(
             IQueryable<Observation> observations)
         {
-            var observationalUnits = _locationRepository.GetObservationalUnits(observations);
-            return BuildObservationalUnitsViewModels(observationalUnits);
+            var locations = await _locationRepository.GetLocationAttributes(observations);
+            return BuildLegacyLocationAttributeViewModel(locations);
+        }
+
+        private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
+        {
+            var locations =
+                await _locationRepository.GetLocationAttributesHierarchical(subjectId, _locationOptions.Hierarchies);
+            return BuildLocationAttributeViewModels(locations);
+        }
+
+        private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(
+            IQueryable<Observation> observations)
+        {
+            var locations =
+                await _locationRepository.GetLocationAttributesHierarchical(observations, _locationOptions.Hierarchies);
+            return BuildLocationAttributeViewModels(locations);
         }
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
@@ -204,10 +262,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 );
         }
 
-        private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
-            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits)
+        [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2773", false)]
+        private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildLegacyLocationAttributeViewModel(
+            Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>> locationAttributes)
         {
-            var viewModels = observationalUnits
+            var viewModels = locationAttributes
                 .OrderBy(pair => pair.Key.GetEnumLabel())
                 .ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
@@ -215,16 +274,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         Hint = "",
                         Legend = pair.Key.GetEnumLabel(),
-                        Options = pair.Value.Select(MapObservationalUnitToLabelValue)
+                        Options = pair.Value.Select(MapLocationAttributeToLabelValue)
                     });
 
             foreach (var (_, viewModel) in viewModels)
             {
-                viewModel.Options = TransformDuplicateObservationalUnitsWithUniqueLabels(viewModel.Options)
+                viewModel.Options = TransformDuplicateLocationAttributesWithUniqueLabels(viewModel.Options)
                     .OrderBy(value => value.Label);
             }
 
             return viewModels;
+        }
+
+        private static Dictionary<string, LocationsMetaViewModel> BuildLocationAttributeViewModels(
+            Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes)
+        {
+            return locationAttributes
+                .ToDictionary(
+                    pair => pair.Key.ToString().CamelCase(),
+                    pair =>
+                        new LocationsMetaViewModel
+                        {
+                            Legend = pair.Key.GetEnumLabel(),
+                            Options = pair.Value.Select(BuildLocationAttributeViewModel).ToList()
+                        });
+        }
+
+        private static LocationAttributeViewModel BuildLocationAttributeViewModel(
+            LocationAttributeNode locationAttributeNode)
+        {
+            return locationAttributeNode.IsLeaf
+                ? new LocationAttributeViewModel
+                {
+                    Label = locationAttributeNode.Attribute?.Name ?? string.Empty,
+                    Value = locationAttributeNode.Attribute?.Code ?? string.Empty
+                }
+                : new LocationAttributeViewModel
+                {
+                    Label = locationAttributeNode.Attribute?.Name ?? string.Empty,
+                    Level = locationAttributeNode.Attribute?.GetType().Name,
+                    Value = locationAttributeNode.Attribute?.Code ?? string.Empty,
+                    Options = locationAttributeNode.Children.Select(BuildLocationAttributeViewModel).ToList()
+                };
         }
 
         private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(
@@ -244,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
         }
 
-        private static LabelValue MapObservationalUnitToLabelValue(ObservationalUnit unit)
+        private static LabelValue MapLocationAttributeToLabelValue(ILocationAttribute unit)
         {
             var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
             return new LabelValue
@@ -263,5 +354,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return new ForbidResult();
         }
+    }
+
+    public class LocationsOptions
+    {
+        public const string Locations = "Locations";
+
+        /// <summary>
+        /// Map of <c>GeographicLevel</c> to attribute names of the <c>Location</c> type.
+        /// This is used to configure a hierarchy of location attributes for a geographic level.
+        /// Example: For Local Authority level data where Country, Region and Local Authority attributes are provided,
+        /// a hierarchy Country -> Region -> Local Authority can be configured for this level using configuration data
+        /// <c>
+        /// "Locations": {
+        ///   "Hierarchies": {
+        ///     "LocalAuthority": [
+        ///       "Country",
+        ///       "Region",
+        ///       "LocalAuthority"
+        ///     ]
+        ///   }
+        /// }
+        /// </c>
+        /// </summary>
+        /// <remarks>
+        /// Attributes of the <c>Location</c> type must be specified in order of the hierarchy from top to bottom.
+        /// </remarks>
+        public Dictionary<GeographicLevel, List<string>> Hierarchies { get; init; } = new();
     }
 }

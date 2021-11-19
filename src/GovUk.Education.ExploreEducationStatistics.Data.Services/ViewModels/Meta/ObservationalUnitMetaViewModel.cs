@@ -6,6 +6,9 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
+    /// <summary>
+    /// Legacy locations view model returned in Table result Subject meta data.
+    /// </summary>
     public class ObservationalUnitMetaViewModel : LabelValue
     {
         [JsonConverter(typeof(StringEnumConverter), true)]

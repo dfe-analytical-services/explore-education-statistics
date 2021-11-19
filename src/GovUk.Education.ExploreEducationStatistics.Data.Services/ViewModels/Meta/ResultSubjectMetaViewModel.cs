@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public IEnumerable<IndicatorMetaViewModel> Indicators { get; set; }
 
+        // TODO SOW8 EES-2881 Change this to support both proposed and old location formats 
         public IEnumerable<ObservationalUnitMetaViewModel> Locations { get; set; }
 
         public IEnumerable<BoundaryLevelIdLabel> BoundaryLevels { get; set; }

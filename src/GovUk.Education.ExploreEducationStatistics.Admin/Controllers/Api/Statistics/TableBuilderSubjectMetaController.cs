@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/meta")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderMetaController : ControllerBase
@@ -21,15 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _subjectMetaService = subjectMetaService;
         }
 
-        [HttpGet("subject/{subjectId}")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(Guid subjectId)
+        [HttpGet("data/meta/subject/{subjectId:guid}")]
+        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(subjectId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("subject")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(
+        [HttpPost("data/meta/subject")]
+        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(
             [FromBody] SubjectMetaQueryContext query)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(query)

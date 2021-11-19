@@ -80,12 +80,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async originalFile =>
                 {
                     return await CheckFileExists(releaseId, replacementFileId)
-                        .OnSuccess(replacementFile =>
+                        .OnSuccess(async replacementFile =>
                         {
                             var originalSubjectId = originalFile.SubjectId.Value;
                             var replacementSubjectId = replacementFile.SubjectId.Value;
 
-                            var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
+                            var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
                             var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
                             var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)
+        private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
         {
             var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToList();
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var indicators = _indicatorRepository.GetIndicators(subjectId)
                 .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
 
-            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
+            var locations = await _locationRepository.GetLocationAttributes(subjectId);
 
             var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
 
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Filters = filters,
                 Indicators = indicators,
-                ObservationalUnits = observationalUnits,
+                ObservationalUnits = locations,
                 TimePeriods = timePeriods
             };
         }
@@ -509,10 +509,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
             }
 
-            var locations = _locationRepository.GetObservationalUnits(geographicLevel, originalCodes);
+            var locations = _locationRepository.GetLocationAttributes(geographicLevel, originalCodes);
             var replacementLocations = replacementSubjectMeta.ObservationalUnits
                 .GetValueOrDefault(geographicLevel)
-                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ObservationalUnit>();
+                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ILocationAttribute>();
 
             return new LocationReplacementViewModel(
                 label: geographicLevel.GetEnumLabel(),
@@ -523,8 +523,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
-            ObservationalUnit location,
-            Dictionary<string, ObservationalUnit> replacementLocations)
+            ILocationAttribute location,
+            IReadOnlyDictionary<string, ILocationAttribute> replacementLocations)
         {
             return new ObservationalUnitReplacementViewModel(
                 label: location.Name,
@@ -943,7 +943,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             public Dictionary<string, Filter> Filters { get; set; }
             public Dictionary<string, Indicator> Indicators { get; set; }
-            public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> ObservationalUnits { get; set; }
+            public Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>> ObservationalUnits { get; set; }
             public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
         }
     }

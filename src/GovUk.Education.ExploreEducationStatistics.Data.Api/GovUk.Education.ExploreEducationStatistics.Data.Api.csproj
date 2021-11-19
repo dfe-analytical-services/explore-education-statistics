@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.18" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.18" />
+    <PackageReference Include="Microsoft.FeatureManagement" Version="2.4.0" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
   </ItemGroup>

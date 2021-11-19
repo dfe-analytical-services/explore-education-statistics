@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ISubjectMetaService
     {
-        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId);
-        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(SubjectMetaQueryContext query);
-        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId);
-        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(SubjectMetaQueryContext query);
+        Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId);
+        Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(SubjectMetaQueryContext query);
+        Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId);
+        Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMetaRestricted(SubjectMetaQueryContext query);
     }
 }
