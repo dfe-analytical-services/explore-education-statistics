@@ -27,6 +27,7 @@ user creates data block for dates csv
     [Arguments]
     ...    ${subject_name}
     ...    ${datablock_name}
+    ...    ${datablock_title}
 
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
@@ -68,7 +69,7 @@ user creates data block for dates csv
     user checks headed table body row cell contains    Proportion of settings open    1    1%
 
     user enters text into element    id:dataBlockDetailsForm-name    ${datablock_name}
-    user enters text into element    id:dataBlockDetailsForm-heading    Dates table title
+    user enters text into element    id:dataBlockDetailsForm-heading    ${datablock_title}
     user enters text into element    id:dataBlockDetailsForm-source    Dates source
 
     user clicks button    Save data block
@@ -80,6 +81,9 @@ user creates key stats data block for dates csv
     [Arguments]
     ...    ${subject_name}
     ...    ${datablock_name}
+    ...    ${datablock_title}
+    ...    ${indicator_name}
+    ...    ${expected_indicator_value}
 
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
@@ -104,8 +108,8 @@ user creates key stats data block for dates csv
     user clicks element    id:timePeriodForm-submit
 
     user waits until table tool wizard step is available    4    Choose your filters
-    user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
-    user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
+    user clicks subheaded indicator checkbox    Open settings    ${indicator_name}
+    user checks subheaded indicator checkbox is checked    Open settings    ${indicator_name}
 
     user opens details dropdown    Date
     user clicks category checkbox    Date    23/03/2020
@@ -115,10 +119,10 @@ user creates key stats data block for dates csv
     user waits until results table appears    %{WAIT_LONG}
 
     user checks table column heading contains    1    1    2020 Week 13
-    user checks headed table body row cell contains    Proportion of settings open    1%
+    user checks headed table body row cell contains    ${indicator_name}    1    ${expected_indicator_value}
 
     user enters text into element    id:dataBlockDetailsForm-name    ${datablock_name}
-    user enters text into element    id:dataBlockDetailsForm-heading    Dates table title
+    user enters text into element    id:dataBlockDetailsForm-heading    ${datablock_title}
     user enters text into element    id:dataBlockDetailsForm-source    Dates source
 
     user clicks button    Save data block
@@ -130,7 +134,6 @@ user chooses and embeds data block
     [Arguments]
     ...    ${datablock_name}
     user chooses select option    css:select[name="selectedDataBlock"]    ${datablock_name}
-    user waits until element is visible    css:table
     user clicks button    Embed
     user waits until page does not contain button    Embed
     user waits until page does not contain loading spinner

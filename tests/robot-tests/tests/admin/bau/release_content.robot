@@ -24,11 +24,27 @@ Create test publication and release via API
 Upload a subject
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
-Create 3 data blocks
-    user creates data block for dates csv    Dates test subject    Data Block 1
-    user creates data block for dates csv    Dates test subject    Data Block 2
-    user creates key stats data block for dates csv    Dates test subject    Key Stats Data Block 1
-    user creates key stats data block for dates csv    Dates test subject    Key Stats Data Block 2
+Create 4 data blocks
+    user creates data block for dates csv
+    ...    Dates test subject
+    ...    Data Block 1
+    ...    Data Block 1 title
+    user creates data block for dates csv
+    ...    Dates test subject
+    ...    Data Block 2
+    ...    Data Block 2 title
+    user creates key stats data block for dates csv
+    ...    Dates test subject
+    ...    Key Stats Data Block 1
+    ...    Key Stats Data Block 1 title
+    ...    Proportion of settings open
+    ...    1%
+    user creates key stats data block for dates csv
+    ...    Dates test subject
+    ...    Key Stats Data Block 2
+    ...    Key Stats Data Block 2 title
+    ...    Number of open settings
+    ...    22,900
 
 Navigate to 'Content' page
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
@@ -61,33 +77,94 @@ Add Useful information related page link to release
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
     user clicks button    Create link
 
-Add Secondary Stats
-    user checks page does not contain link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+Add secondary statistics
+    user waits until the page does not contain the secondary statistics table tab
     user clicks button    Add secondary stats
+    user checks select contains x options    css:select[name="selectedDataBlock"]    5
+    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
+    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 1
+    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 2
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 1
-    user checks page contains link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+    user waits until the page contains the secondary statistics table tab
+
+Check secondary statistics are included correctly
+    user clicks the secondary statistics table tab
+    user checks page contains    Data Block 1 title
+    user checks page contains element    css:table
     user waits until page contains button    Change secondary stats
     user waits until page contains button    Remove secondary stats
-    user checks page does not contain button    Add secondary stats
 
-Check Secondary Stats are included correctly
-    user clicks link    Table
-    user checks page contains    'nd01' in England for 2013/14
-
-Change Secondary Stats
-    user clicks link    Change secondary stats
+Change secondary statistics
+    user clicks button    Change secondary stats
+    user checks select contains x options    css:select[name="selectedDataBlock"]    4
+    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
+    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 2
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
-    user clicks link    Table
-    user checks page contains    'nd01' in England for 2013/14
+    user waits until the page contains the secondary statistics table tab
+    user checks page contains    Data Block 2 title
+    user waits until page contains button    Change secondary stats
+    user waits until page contains button    Remove secondary stats
 
-Remove Secondary Stats
-    user clicks link    Remove secondary stats
-    user checks page does not contain link with text and url    Table    ${'#releaseHeadlines-dataBlock-tables'}
+Remove secondary statistics
+    user clicks button    Remove secondary stats
+    user waits until modal is visible    Remove secondary statistics section
+    user clicks button    Confirm
+    user waits until modal is not visible    Remove secondary statistics section
+    user waits until the page does not contain the secondary statistics table tab
+    user waits until page does not contain button    Change secondary stats
+    user waits until page does not contain button    Remove secondary stats
+    user waits until page contains button    Add secondary stats
 
-# TODO: Add key statistics
+Add a key statistics tile
+    user clicks button    Add key statistic
+    user checks select contains x options    css:select[name="selectedDataBlock"]    3
+    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user chooses and embeds data block    Key Stats Data Block 1
+    user waits until page contains    Proportion of settings open
+    user waits until page contains    1%
+
+Edit the guidance information for the key statistics tile
+    user clicks element    //*[@data-testid="keyStat"][1]//button[.="Edit"]
+    user enters text into element    css:input[name="dataSummary"]    Down from last year
+    user enters text into element    label:Guidance title    Learn more about open settings
+    # Tab into the CK Editor guidance text editor
+    user presses keys    TAB
+    user presses keys    Some information about about open settings
+    user clicks element    //*[@data-testid="keyStat"][1]//button[.="Save"]
+    user waits until page does not contain element    css:input[name="dataSummary"]
+
+Check the guidance information for the key statistics tile
+    user waits until page contains    Down from last year
+    user waits until page contains    Some information about about open settings
+    user checks page for details dropdown    Learn more about open settings
+    user opens details dropdown    Learn more about open settings
+    user checks page contains    Some information about about open settings
+
+Add another key statistics tile
+    user clicks button    Add another key statistic
+    user checks select contains x options    css:select[name="selectedDataBlock"]    2
+    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
+    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user chooses and embeds data block    Key Stats Data Block 2
+    user waits until page contains    Number of open settings
+    user waits until page contains    22,900
+
+Remove a key statistics tile
+    # Remove the second tile
+    user clicks element    //*[@data-testid="keyStat"][2]//button[.="Remove"]
+    user waits until page does not contain    Number of open settings
+    user waits until page does not contain    22,900
+    # Make sure the first key stat tile is still there
+    user checks page contains    Proportion of settings open
 
 Add key statistics summary content to release
-    user clicks button    Add a headlines text bl2ock    id:releaseHeadlines
+    user clicks button    Add a headlines text block    id:releaseHeadlines
     user waits until element contains    id:releaseHeadlines    This section is empty
     user clicks button    Edit block    id:releaseHeadlines
     user presses keys    Test key statistics summary text for ${PUBLICATION_NAME}
@@ -125,3 +202,13 @@ Validate two remaining content blocks
     ...    id:releaseMainContent
     user checks accordion section text block contains    Test section one    2    block three test text
     ...    id:releaseMainContent
+
+*** Keywords ***
+user waits until the page contains the secondary statistics table tab
+    user waits until page contains link    Table
+
+user waits until the page does not contain the secondary statistics table tab
+    user waits until page does not contain element    id:releaseHeadlines-dataBlock-tables-tab
+
+user clicks the secondary statistics table tab
+    user clicks element    id:releaseHeadlines-dataBlock-tables-tab
