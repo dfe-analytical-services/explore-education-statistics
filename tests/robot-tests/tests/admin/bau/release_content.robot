@@ -205,7 +205,7 @@ Validate two remaining content blocks
 
 *** Keywords ***
 user waits until the page contains the secondary statistics table tab
-    user waits until page contains link    Table
+    user waits until page contains element    id:releaseHeadlines-dataBlock-tables-tab
 
 user waits until the page does not contain the secondary statistics table tab
     user waits until page does not contain element    id:releaseHeadlines-dataBlock-tables-tab
