@@ -221,9 +221,9 @@ Revisit the live Amendment after the cancellation to double check it remains una
 user verifies original Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
-    user waits until element contains    ${section}    Adding Methodology content
+    user waits until element contains    ${section}    Adding Methodology content    %{WAIT_MEDIUM}
     user waits until parent contains element    ${section}
-    ...    xpath://img[@alt="Alt text for the uploaded content image"]
+    ...    xpath://img[@alt="Alt text for the uploaded content image"]    %{WAIT_MEDIUM}
 
     ${section}=    user opens accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
