@@ -71,7 +71,7 @@ Add ancillary file
     user checks there are x accordion sections    1    id:file-uploads
 
 Create data block table
-    user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}
+    user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
 
 Create chart for data block
     user waits until page contains link    Chart
