@@ -23,8 +23,8 @@ import {
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import {
-  getServerValidationError,
-  isServerValidationError,
+  getErrorMessage,
+  isAnyServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -58,9 +58,12 @@ interface Props {
 
 const formId = 'filtersForm';
 
-export type TableQueryErrorCode =
-  | 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE'
-  | 'REQUEST_CANCELLED';
+const TableQueryErrorCodes = [
+  'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
+  'REQUEST_CANCELLED',
+] as const;
+
+export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -129,27 +132,23 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       await onSubmit(values);
       goToNextStep();
     } catch (error) {
-      if (
-        isServerValidationError(
-          error,
-          'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
-        ) ||
-        isServerValidationError(error, 'REQUEST_CANCELLED')
-      ) {
-        const errorCode = getServerValidationError(
-          error,
-        ) as TableQueryErrorCode;
-        if (onTableQueryError) {
+      if (!isAnyServerValidationError(error, TableQueryErrorCodes)) {
+        throw error;
+      }
+
+      const errorCode = getErrorMessage(error);
+
+      if (onTableQueryError) {
+        if (errorCode) {
           onTableQueryError(
             errorCode,
             selectedPublication?.title || '',
             subject?.name || '',
           );
         }
-        setTableQueryError(errorCode);
-      } else {
-        throw error;
       }
+
+      setTableQueryError(errorCode);
     }
   };
 

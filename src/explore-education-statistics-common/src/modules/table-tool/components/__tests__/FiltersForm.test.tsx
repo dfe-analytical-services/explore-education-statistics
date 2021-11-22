@@ -1,4 +1,6 @@
-import FiltersForm from '@common/modules/table-tool/components/FiltersForm';
+import FiltersForm, {
+  TableQueryErrorCode,
+} from '@common/modules/table-tool/components/FiltersForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
@@ -628,7 +630,7 @@ describe('FiltersForm', () => {
 
   test('shows table size error when the correct error response is returned from the API', async () => {
     const onSubmit = jest.fn();
-    const errorResponse = createServerValidationErrorMock([
+    const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
       'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
     ]);
     onSubmit.mockRejectedValue(errorResponse);
@@ -681,7 +683,7 @@ describe('FiltersForm', () => {
 
   test('shows table timeout error when the correct error response is returned from the API', async () => {
     const onSubmit = jest.fn();
-    const errorResponse = createServerValidationErrorMock([
+    const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
       'REQUEST_CANCELLED',
     ]);
     onSubmit.mockRejectedValue(errorResponse);

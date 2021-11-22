@@ -6,8 +6,8 @@ import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
 
-export interface ServerValidationErrorResponse {
-  errors: Dictionary<string[]>;
+export interface ServerValidationErrorResponse<T extends string = string> {
+  errors: Dictionary<T[]>;
   title: string;
   status: number;
 }
@@ -132,53 +132,44 @@ export function convertServerFieldErrors<FormValues>(
   );
 }
 
-export function isServerValidationError(
+export function isServerValidationError<T extends string = string>(
   error: unknown,
-  errorMessage?: string,
-): error is AxiosError<ServerValidationErrorResponse> {
+): error is AxiosError<ServerValidationErrorResponse<T>> {
   if (!isAxiosError(error) || !error.response?.data) {
     return false;
   }
 
   const errorDataAsValidationError = error.response
-    .data as ServerValidationErrorResponse;
+    .data as ServerValidationErrorResponse<T>;
 
-  const isServerError =
+  return (
     errorDataAsValidationError.errors !== undefined &&
     errorDataAsValidationError.status !== undefined &&
-    errorDataAsValidationError.title !== undefined;
-
-  if (!errorMessage) {
-    return isServerError;
-  }
-
-  if (isServerError && error.response?.data) {
-    const errors = Object.values(error.response?.data.errors);
-    if (errors.flat().includes(errorMessage)) {
-      return true;
-    }
-  }
-  return false;
+    errorDataAsValidationError.title !== undefined
+  );
 }
 
-export function hasServerValidationError(
-  error: Error,
-  ...errorCodes: string[]
-): boolean {
-  if (isServerValidationError(error) && error.response?.data) {
-    const existingCodes = Object.values(error.response?.data.errors).flat();
-    return existingCodes.every(existingCode =>
-      errorCodes.includes(existingCode),
-    );
+export function isAnyServerValidationError<T extends string = string>(
+  error: unknown,
+  errorMessages?: readonly T[],
+  fieldName = '',
+): error is AxiosError<ServerValidationErrorResponse<T>> {
+  if (!isServerValidationError<T>(error)) {
+    return false;
   }
-  return false;
+
+  if (!errorMessages?.length) {
+    return true;
+  }
+
+  return errorMessages.some(errorMessage =>
+    error.response?.data.errors[fieldName].includes(errorMessage),
+  );
 }
 
-export function getServerValidationError(error: Error): string | null {
-  if (!isServerValidationError(error) || !error.response?.data) {
-    return null;
-  }
-
-  const errors = Object.values(error.response?.data.errors);
-  return errors.flat()[0];
+export function getErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  fieldName = '',
+): T | undefined {
+  return error.response?.data?.errors[fieldName]?.[0];
 }

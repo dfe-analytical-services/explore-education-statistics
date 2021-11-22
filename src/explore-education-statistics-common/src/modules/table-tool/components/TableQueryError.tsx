@@ -2,7 +2,7 @@ import Button from '@common/components/Button';
 import { BaseErrorSummary } from '@common/components/ErrorSummary';
 import downloadService from '@common/services/downloadService';
 import { Subject } from '@common/services/tableBuilderService';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
 
 interface Props {
@@ -11,6 +11,12 @@ interface Props {
   showDownloadOption?: boolean;
   subject: Subject;
   errorCode: TableQueryErrorCode;
+}
+
+interface ErrorMessageText {
+  errorMessage: string;
+  downloadOptionMessage: string;
+  nonDownloadOptionMessage: string;
 }
 
 const TableQueryError = ({
@@ -27,30 +33,45 @@ const TableQueryError = ({
     }
   }, []);
 
+  const {
+    errorMessage,
+    downloadOptionMessage,
+    nonDownloadOptionMessage,
+  } = useMemo<ErrorMessageText>(() => {
+    switch (errorCode) {
+      case 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE':
+        return {
+          errorMessage:
+            'Could not create table as the filters chosen may exceed the maximum allowed table size.',
+          downloadOptionMessage:
+            'Select different filters or download the subject data.',
+          nonDownloadOptionMessage: 'Select different filters and try again.',
+        };
+      case 'REQUEST_CANCELLED':
+        return {
+          errorMessage:
+            'Could not create table as the filters chosen took too long to respond.',
+          downloadOptionMessage:
+            'Select different filters, try again later or download the subject data.',
+          nonDownloadOptionMessage:
+            'Select different filters or try again later.',
+        };
+      default:
+        return {
+          errorMessage: 'Could not create table.',
+          downloadOptionMessage:
+            'Try again later or download the subject data.',
+          nonDownloadOptionMessage: 'Try again later.',
+        };
+    }
+  }, [errorCode]);
+
   return (
     <BaseErrorSummary id={id} ref={ref} title="There is a problem">
-      {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
-        <p>
-          Could not create table as the filters chosen may exceed the maximum
-          allowed table size.
-        </p>
-      )}
-      {errorCode === 'REQUEST_CANCELLED' && (
-        <p>
-          Could not create table as the filters chosen took too long to respond.
-        </p>
-      )}
+      <p>{errorMessage}</p>
       {showDownloadOption ? (
         <>
-          {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
-            <p>Select different filters or download the subject data.</p>
-          )}
-          {errorCode === 'REQUEST_CANCELLED' && (
-            <p>
-              Select different filters, try again later or download the subject
-              data.
-            </p>
-          )}
+          <p>{downloadOptionMessage}</p>
           <Button
             className="govuk-!-margin-bottom-0"
             disabled={!releaseId}
@@ -67,14 +88,7 @@ const TableQueryError = ({
           </Button>
         </>
       ) : (
-        <>
-          {errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE' && (
-            <p>Select different filters and try again.</p>
-          )}
-          {errorCode === 'REQUEST_CANCELLED' && (
-            <p>Select different filters or try again later.</p>
-          )}
-        </>
+        <p>{nonDownloadOptionMessage}</p>
       )}
     </BaseErrorSummary>
   );
