@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        [AddTimeoutCancellation(TableBuilderQuery)]
+        [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             [FromBody] ObservationQueryContext query, 
             CancellationToken cancellationToken = default)
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost("release/{releaseId}")]
-        [AddTimeoutCancellation(TableBuilderQuery)]
+        [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,
             [FromBody] ObservationQueryContext query, 

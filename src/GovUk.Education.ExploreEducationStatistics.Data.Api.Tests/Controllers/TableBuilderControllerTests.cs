@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -19,13 +17,12 @@ using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class TableBuilderControllerTests
     {
-        private readonly ObservationQueryContext _query = new ObservationQueryContext
+        private readonly ObservationQueryContext _query = new()
         {
             SubjectId = Guid.NewGuid(),
         };
@@ -36,10 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task Query()
         {
+            var cancellationToken = new CancellationToken();
             var tableBuilderService = new Mock<ITableBuilderService>();
 
             tableBuilderService
-                .Setup(s => s.Query(_query, default))
+                .Setup(s => s.Query(_query, cancellationToken))
                 .ReturnsAsync(new TableBuilderResultViewModel
                     {
                         Results = new List<ObservationViewModel>
@@ -50,71 +48,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 );
 
             var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
-            var result = await controller.Query(_query);
+            var result = await controller.Query(_query, cancellationToken);
 
             Assert.IsType<TableBuilderResultViewModel>(result.Value);
             Assert.Single(result.Value.Results);
         }
         
         [Fact]
-        public async Task Query_CancellationToken()
-        {
-            AddTimeoutCancellationAspect.Enabled = true;
-            var timeoutConfiguration = 
-                CreateMockConfiguration(new Tuple<string, string>(TableBuilderQuery, "100"));
-            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(timeoutConfiguration.Object);
-
-            try
-            {
-                var tableBuilderService = new Mock<ITableBuilderService>();
-
-                var cancellationTokenSource = new CancellationTokenSource();
-                var originalCancellationToken = cancellationTokenSource.Token;
-                var capturedCancellationTokens = new List<CancellationToken>();
-
-                // Check that the CancellationToken is correctly passed to the child calls that need it.
-                tableBuilderService
-                    .Setup(s => s.Query(_query, Capture.In(capturedCancellationTokens)))
-                    .Callback(() => cancellationTokenSource.Cancel())
-                    .ReturnsAsync(new TableBuilderResultViewModel
-                        {
-                            Results = new List<ObservationViewModel>
-                            {
-                                new()
-                            }
-                        }
-                    );
-
-                var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
-                var result = await controller.Query(_query, originalCancellationToken);
-                
-                VerifyAllMocks(tableBuilderService);
-                result.AssertOkResult();
-                    
-                // Assert that the Advice around the method added a Timeout to the passed in CancellationToken
-                // before passing it on.
-                var capturedCancellationToken = Assert.Single(capturedCancellationTokens);
-                Assert.NotEqual(capturedCancellationToken, originalCancellationToken);
-
-                // Assert that cancelling the originally passed in CancellationToken also cancelled the token passed
-                // to the child methods.
-                Assert.True(originalCancellationToken.IsCancellationRequested);
-                Assert.True(capturedCancellationToken.IsCancellationRequested);
-            }
-            finally
-            {
-                AddTimeoutCancellationAspect.Enabled = false;
-                AddTimeoutCancellationAttribute.SetTimeoutConfiguration(null);
-            }
-        }
-        
-        [Fact]
         public async Task Query_ReleaseId()
         {
+            var cancellationToken = new CancellationToken();
             var tableBuilderService = new Mock<ITableBuilderService>();
 
             tableBuilderService
-                .Setup(s => s.Query(_releaseId, _query, default))
+                .Setup(s => s.Query(_releaseId, _query, cancellationToken))
                 .ReturnsAsync(new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>
@@ -125,64 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             );
 
             var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
-            var result = await controller.Query(_releaseId, _query);
+            var result = await controller.Query(_releaseId, _query, cancellationToken);
 
             Assert.IsType<TableBuilderResultViewModel>(result.Value);
             Assert.Single(result.Value.Results);
         }
         
-        [Fact]
-        public async Task Query_ReleaseId_CancellationToken()
-        {
-            AddTimeoutCancellationAspect.Enabled = true;
-            var timeoutConfiguration = CreateMockConfiguration(
-                new Tuple<string, string>(TableBuilderQuery, "100"));
-            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(timeoutConfiguration.Object);
-
-            try
-            {
-                var tableBuilderService = new Mock<ITableBuilderService>();
-
-                var cancellationTokenSource = new CancellationTokenSource();
-                var originalCancellationToken = cancellationTokenSource.Token;
-                var capturedCancellationTokens = new List<CancellationToken>();
-
-                // Check that the CancellationToken is correctly passed to the child calls that need it.
-                tableBuilderService
-                    .Setup(s => s.Query(_releaseId, _query, Capture.In(capturedCancellationTokens)))
-                    .Callback(() => cancellationTokenSource.Cancel())
-                    .ReturnsAsync(new TableBuilderResultViewModel
-                        {
-                            Results = new List<ObservationViewModel>
-                            {
-                                new()
-                            }
-                        }
-                    );
-
-                var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
-                var result = await controller.Query(_releaseId, _query, originalCancellationToken);
-                
-                VerifyAllMocks(tableBuilderService);
-                result.AssertOkResult();
-                    
-                // Assert that the Advice around the method added a Timeout to the passed in CancellationToken
-                // before passing it on.
-                var capturedCancellationToken = Assert.Single(capturedCancellationTokens);
-                Assert.NotEqual(capturedCancellationToken, originalCancellationToken);
-
-                // Assert that cancelling the originally passed in CancellationToken also cancelled the token passed
-                // to the child methods.
-                Assert.True(originalCancellationToken.IsCancellationRequested);
-                Assert.True(capturedCancellationToken.IsCancellationRequested);
-            }
-            finally
-            {
-                AddTimeoutCancellationAspect.Enabled = false;
-                AddTimeoutCancellationAttribute.SetTimeoutConfiguration(null);
-            }
-        }
-
         [Fact]
         public async Task QueryForDataBlock()
         {

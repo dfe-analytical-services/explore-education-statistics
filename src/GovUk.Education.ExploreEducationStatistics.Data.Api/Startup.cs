@@ -185,8 +185,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
             // Enable cancellation aspects and register request timeout configuration.
-            AddTimeoutCancellationAspect.Enabled = true;
-            AddTimeoutCancellationAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
+            CancellationTokenTimeoutAspect.Enabled = true;
+            CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
             UpdateDatabase(app);
 
