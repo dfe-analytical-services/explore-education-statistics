@@ -161,13 +161,17 @@ export function isServerValidationError<T extends string = string>(
  *
  * See {@link isServerValidationError}
  *
- * Additionally, this method checks whether or not the error contains any of the error messages provided, using {@param fieldName} to determine field validation, or global validation if {@param fieldName} is omitted.
+ * Additionally, this method checks whether or not the error contains any of
+ * the error messages provided, using {@param fieldName} to determine field
+ * validation, or global validation if {@param fieldName} is omitted.
  *
  * If any are included in this error object, this method will return true.
  *
  * @param error - the error object to check the type of.
- * @param errorMessages - array of error messages, any of which can appear in this error object in order for this method to return true.
- * @param fieldName - optional fieldName that, if omitted, will be treated as checking for global errors.
+ * @param errorMessages - array of error messages, any of which can appear
+ * in this error object in order for this method to return true.
+ * @param fieldName - optional fieldName that, if omitted, will be treated
+ * as checking for global errors.
  */
 export function isAnyServerValidationError<T extends string = string>(
   error: unknown,
@@ -188,11 +192,12 @@ export function isAnyServerValidationError<T extends string = string>(
 }
 
 /**
- * Retrieves the first error message for the given {@param fieldName}, or the first global error message if
- * {@param fieldName} is omitted.
+ * Retrieves the first error message for the given {@param fieldName}, or the
+ * first global error message if {@param fieldName} is omitted.
  *
  * @param error - the error containing messages.
- * @param fieldName - optional fieldName that, if omitted, will be treated as checking for global errors.
+ * @param fieldName - optional fieldName that, if omitted, will be treated as
+ * checking for global errors.
  */
 export function getErrorMessage<T extends string = string>(
   error: AxiosError<ServerValidationErrorResponse<T>>,
