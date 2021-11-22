@@ -46,9 +46,6 @@
     },
     "enableThemeDeletion": {
       "value": true
-    },
-    "requestTimeoutsTableBuilderQuery": {
-      "value": 120000
     }
   }
 }
