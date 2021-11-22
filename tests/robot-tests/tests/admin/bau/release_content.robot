@@ -130,13 +130,13 @@ Add a key statistics tile
     user waits until page contains    1%
 
 Edit the guidance information for the key statistics tile
-    user clicks element    //*[@data-testid="keyStat"][1]//button[.="Edit"]
+    user clicks the nth key stats tile button    1    Edit
     user enters text into element    css:input[name="dataSummary"]    Down from last year
     user enters text into element    label:Guidance title    Learn more about open settings
     # Tab into the CK Editor guidance text editor
     user presses keys    TAB
     user presses keys    Some information about about open settings
-    user clicks element    //*[@data-testid="keyStat"][1]//button[.="Save"]
+    user clicks the nth key stats tile button    1    Save
     user waits until page does not contain element    css:input[name="dataSummary"]
 
 Check the guidance information for the key statistics tile
@@ -157,7 +157,7 @@ Add another key statistics tile
 
 Remove a key statistics tile
     # Remove the second tile
-    user clicks element    //*[@data-testid="keyStat"][2]//button[.="Remove"]
+    user clicks the nth key stats tile button    2    Remove
     user waits until page does not contain    Number of open settings
     user waits until page does not contain    22,900
     # Make sure the first key stat tile is still there
@@ -212,3 +212,9 @@ user waits until the page does not contain the secondary statistics table tab
 
 user clicks the secondary statistics table tab
     user clicks element    id:releaseHeadlines-dataBlock-tables-tab
+
+user clicks the nth key stats tile button
+    [Arguments]
+    ...    ${tile_number}
+    ...    ${button_text}
+    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[.="${button_text}"]
