@@ -11,8 +11,9 @@ Test Setup          fail test fast if required
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${TOPIC_NAME}           %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}     UI tests - release content %{RUN_IDENTIFIER}
+${TOPIC_NAME}                               %{TEST_TOPIC_NAME}
+${PUBLICATION_NAME}                         UI tests - release content %{RUN_IDENTIFIER}
+${SECONDARY_STATS_TABLE_TAB_SELECTOR}       releaseHeadlines-dataBlock-tables-tab
 
 *** Test Cases ***
 Create test publication and release via API
@@ -78,7 +79,7 @@ Add Useful information related page link to release
     user clicks button    Create link
 
 Add secondary statistics
-    user waits until the page does not contain the secondary statistics table tab
+    user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user clicks button    Add secondary stats
     user checks select contains x options    css:select[name="selectedDataBlock"]    5
     user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
@@ -87,10 +88,10 @@ Add secondary statistics
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 1
-    user waits until the page contains the secondary statistics table tab
+    user waits until page contains element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
 
 Check secondary statistics are included correctly
-    user clicks the secondary statistics table tab
+    user clicks element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
     user waits until page contains button    Change secondary stats
@@ -104,7 +105,7 @@ Change secondary statistics
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
-    user waits until the page contains the secondary statistics table tab
+    user waits until page contains element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user checks page contains    Data Block 2 title
     user waits until page contains button    Change secondary stats
     user waits until page contains button    Remove secondary stats
@@ -114,7 +115,7 @@ Remove secondary statistics
     user waits until modal is visible    Remove secondary statistics section
     user clicks button    Confirm
     user waits until modal is not visible    Remove secondary statistics section
-    user waits until the page does not contain the secondary statistics table tab
+    user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user waits until page does not contain button    Change secondary stats
     user waits until page does not contain button    Remove secondary stats
     user waits until page contains button    Add secondary stats
@@ -204,15 +205,6 @@ Validate two remaining content blocks
     ...    id:releaseMainContent
 
 *** Keywords ***
-user waits until the page contains the secondary statistics table tab
-    user waits until page contains element    id:releaseHeadlines-dataBlock-tables-tab
-
-user waits until the page does not contain the secondary statistics table tab
-    user waits until page does not contain element    id:releaseHeadlines-dataBlock-tables-tab
-
-user clicks the secondary statistics table tab
-    user clicks element    id:releaseHeadlines-dataBlock-tables-tab
-
 user clicks the nth key stats tile button
     [Arguments]
     ...    ${tile_number}
