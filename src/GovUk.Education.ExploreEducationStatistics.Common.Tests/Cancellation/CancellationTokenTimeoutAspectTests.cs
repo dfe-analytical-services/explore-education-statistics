@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using Microsoft.Extensions.Configuration;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation.AddTimeoutCancellationTestFixture;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation.CancellationTokenTimeoutTestFixture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
 {
     [Collection(CollectionName)]
-    public class CancellationTokenTimeoutAspectTests : IClassFixture<AddTimeoutCancellationTestFixture>
+    public class CancellationTokenTimeoutAspectTests : IClassFixture<CancellationTokenTimeoutTestFixture>
     {
         private static class TestMethods
         {
@@ -247,9 +247,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
         }
     }
 
-    internal class AddTimeoutCancellationTestFixture : IDisposable
+    internal class CancellationTokenTimeoutTestFixture : IDisposable
     {
-        public const string CollectionName = "AddTimeoutCancellation tests";
+        public const string CollectionName = "CancellationTokenTimeout tests";
         public const int TimeoutMillis = 1000;
         public const string ExistingConfigurationItemKey = "ExistingConfigurationItem";
         public const string MisconfiguredConfigurationItemKey = "MisconfiguredConfigurationItem";
@@ -261,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
             new Tuple<string, string>(MissingConfigurationItemKey, null!)
             ).Object;
         
-        public AddTimeoutCancellationTestFixture()
+        public CancellationTokenTimeoutTestFixture()
         {
             CancellationTokenTimeoutAspect.Enabled = true;
             CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(TimeoutConfiguration);
