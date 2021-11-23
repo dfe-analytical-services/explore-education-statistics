@@ -136,19 +136,25 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           publicationTitle: string,
           subjectName: string,
         ) => {
-          if (errorCode === 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE') {
-            logEvent({
-              category: 'Table tool size error',
-              action: 'Table exceeded maximum size',
-              label: `${publicationTitle}/${subjectName}`,
-            });
-          }
-          if (errorCode === 'REQUEST_CANCELLED') {
-            logEvent({
-              category: 'Table tool query timeout error',
-              action: 'Table exceeded maximum timeout duration',
-              label: `${publicationTitle}/${subjectName}`,
-            });
+          switch (errorCode) {
+            case 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE': {
+              logEvent({
+                category: 'Table tool size error',
+                action: 'Table exceeded maximum size',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            case 'REQUEST_CANCELLED': {
+              logEvent({
+                category: 'Table tool query timeout error',
+                action: 'Table exceeded maximum timeout duration',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            default:
+              break;
           }
         }}
         finalStep={({

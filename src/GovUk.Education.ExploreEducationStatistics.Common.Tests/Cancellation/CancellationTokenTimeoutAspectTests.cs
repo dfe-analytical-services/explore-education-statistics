@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cancellation
     internal class AddTimeoutCancellationTestFixture : IDisposable
     {
         public const string CollectionName = "AddTimeoutCancellation tests";
-        public const int TimeoutMillis = 10;
+        public const int TimeoutMillis = 1000;
         public const string ExistingConfigurationItemKey = "ExistingConfigurationItem";
         public const string MisconfiguredConfigurationItemKey = "MisconfiguredConfigurationItem";
         public const string MissingConfigurationItemKey = "NonExistentConfigurationItem";
