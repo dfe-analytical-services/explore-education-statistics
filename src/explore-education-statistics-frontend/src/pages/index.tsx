@@ -140,6 +140,11 @@ function HomePage() {
       <h2 className="govuk-!-margin-top-9">Contact us</h2>
 
       <p className="govuk-!-margin-top-1">
+        The Explore education statistics service is operated by the Department
+        for Education (DfE).
+      </p>
+
+      <p className="govuk-!-margin-top-1">
         If you need help and support or have a question about Explore education
         statistics contact:
       </p>
