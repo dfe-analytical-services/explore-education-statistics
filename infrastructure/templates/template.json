@@ -797,7 +797,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -841,7 +841,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
@@ -863,7 +863,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -907,7 +907,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
@@ -929,7 +929,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -973,7 +973,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
