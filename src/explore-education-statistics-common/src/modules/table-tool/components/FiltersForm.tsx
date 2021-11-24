@@ -24,7 +24,8 @@ import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import {
   getErrorMessage,
-  isAnyServerValidationError,
+  hasErrorMessage,
+  isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -132,7 +133,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       await onSubmit(values);
       goToNextStep();
     } catch (error) {
-      if (!isAnyServerValidationError(error, TableQueryErrorCodes)) {
+      if (
+        !isServerValidationError<TableQueryErrorCode>(error) ||
+        !hasErrorMessage(error, TableQueryErrorCodes)
+      ) {
         throw error;
       }
 

@@ -156,33 +156,24 @@ export function isServerValidationError<T extends string = string>(
 }
 
 /**
- * Asserts whether the given error object is an
- * {@link AxiosError<ServerValidationErrorResponse<T>>}.
- *
- * See {@link isServerValidationError}
- *
- * Additionally, this method checks whether or not the error contains any of
- * the error messages provided, using {@param fieldName} to determine field
+ * This method checks whether or not the error contains any of the error
+ * messages provided, using {@param fieldName} to determine field
  * validation, or global validation if {@param fieldName} is omitted.
  *
- * If any are included in this error object, this method will return true.
+ * If any are included in this error, this method will return true.
  *
- * @param error - the error object to check the type of.
+ * @param error - the error to check the messages of.
  * @param errorMessages - array of error messages, any of which can appear
- * in this error object in order for this method to return true.
+ * in this error in order for this method to return true.
  * @param fieldName - optional fieldName that, if omitted, will be treated
  * as checking for global errors.
  */
-export function isAnyServerValidationError<T extends string = string>(
-  error: unknown,
-  errorMessages?: readonly T[],
+export function hasErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  errorMessages: readonly T[],
   fieldName = '',
-): error is AxiosError<ServerValidationErrorResponse<T>> {
-  if (!isServerValidationError<T>(error)) {
-    return false;
-  }
-
-  if (!errorMessages?.length) {
+): boolean {
+  if (!errorMessages.length) {
     return true;
   }
 
