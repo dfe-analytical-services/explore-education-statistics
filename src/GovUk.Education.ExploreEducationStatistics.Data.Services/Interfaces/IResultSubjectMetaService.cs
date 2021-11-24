@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IResultSubjectMetaService
     {
-        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, SubjectMetaQueryContext query,
+        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId,
+            SubjectMetaQueryContext query,
             IQueryable<Observation> observations);
     }
 }

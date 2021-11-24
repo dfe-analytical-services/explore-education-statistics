@@ -20,7 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _filterItemRepository = filterItemRepository;
         }
 
-        protected Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
+        protected Dictionary<string, FilterMetaViewModel> GetFilters(
+            Guid subjectId,
+            IQueryable<Observation> observations,
+            bool listFilterItems)
         {
             return _filterItemRepository.GetFilterItems(subjectId, observations, listFilterItems)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
@@ -44,9 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     });
         }
 
-        protected static IEnumerable<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
+        protected static List<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
         {
-            return indicators.OrderBy(indicator => indicator.Label, LabelComparer)
+            return indicators
+                .OrderBy(indicator => indicator.Label, LabelComparer)
                 .Select(indicator => new IndicatorMetaViewModel
                 {
                     Label = indicator.Label,
@@ -54,13 +58,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Unit = indicator.Unit.GetEnumValue(),
                     Value = indicator.Id.ToString(),
                     DecimalPlaces = indicator.DecimalPlaces
-                });
+                })
+                .ToList();
         }
 
         protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
-            return new FilterItemsMetaViewModel
+            return new()
             {
                 Label = filterGroup.Label,
                 Options = filterItems

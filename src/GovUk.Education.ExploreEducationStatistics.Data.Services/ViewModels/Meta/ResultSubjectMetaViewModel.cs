@@ -1,27 +1,32 @@
+#nullable enable
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public class ResultSubjectMetaViewModel
+    public record ResultSubjectMetaViewModel
     {
-        public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
+        public Dictionary<string, FilterMetaViewModel> Filters { get; init; } = new();
 
-        public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
+        public List<FootnoteViewModel> Footnotes { get; init; } = new();
 
-        public IEnumerable<IndicatorMetaViewModel> Indicators { get; set; }
+        public List<IndicatorMetaViewModel> Indicators { get; init; } = new();
 
-        // TODO SOW8 EES-2881 Change this to support both proposed and old location formats 
-        public IEnumerable<ObservationalUnitMetaViewModel> Locations { get; set; }
+        // TODO EES-2917 Work out how to maintain backwards compatibility for Locations with the hierarchical response type
+        // * Backwards compatibility required with existing Permalinks unless we migrate them.
+        // * Backwards compatibility required with the current UI expecting locations in this form until it's updated in EES-2777.
+        // For now hierarchical locations are populated in a separate field 'LocationsHierarchical' when the feature is turned on.
+        public List<ObservationalUnitMetaViewModel> Locations { get; init; } = new();
 
-        public IEnumerable<BoundaryLevelIdLabel> BoundaryLevels { get; set; }
+        public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; init; } = new();
 
-        public string PublicationName { get; set; }
+        public List<BoundaryLevelViewModel> BoundaryLevels { get; init; } = new();
 
-        public string SubjectName { get; set; }
+        public string PublicationName { get; init; } = string.Empty;
 
-        public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
+        public string SubjectName { get; init; } = string.Empty;
 
-        public bool GeoJsonAvailable { get; set; }
+        public List<TimePeriodMetaViewModel> TimePeriodRange { get; init; } = new();
+
+        public bool GeoJsonAvailable { get; init; }
     }
 }
