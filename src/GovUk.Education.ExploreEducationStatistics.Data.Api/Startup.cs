@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -61,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddApplicationInsightsTelemetry();
             services.AddMvc(options =>
             {
+                options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
                 options.EnableEndpointRouting = false;
@@ -183,9 +185,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable caching and register any caching services
+            // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            // Enable cancellation aspects and register request timeout configuration.
+            CancellationTokenTimeoutAspect.Enabled = true;
+            CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
             UpdateDatabase(app);
 

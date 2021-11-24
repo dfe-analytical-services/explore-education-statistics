@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
          * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
          * other testing frameworks.
          */
-        public static void AssertFail(string message) 
+        public static XunitException AssertFail(string message) 
         {
             throw new XunitException(message);
         }

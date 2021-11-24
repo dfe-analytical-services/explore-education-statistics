@@ -1,6 +1,7 @@
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
+  TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
@@ -23,11 +24,11 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
+  FeaturedTable,
   ReleaseTableDataQuery,
   SelectedPublication,
   Subject,
   SubjectMeta,
-  FeaturedTable,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
 import React, { ReactElement, ReactNode } from 'react';
@@ -71,8 +72,12 @@ export interface TableToolWizardProps {
   loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
-  showTableSizeErrorDownload?: boolean;
-  onTableSizeError?: (publicationTitle: string, subjectName: string) => void;
+  onTableQueryError?: (
+    errorCode: TableQueryErrorCode,
+    publicationTitle: string,
+    subjectName: string,
+  ) => void;
+  showTableQueryErrorDownload?: boolean;
   onSubmit?: (table: FullTable) => void;
   onSubjectStepBack?: () => void;
 }
@@ -84,10 +89,10 @@ const TableToolWizard = ({
   hidePublicationSelectionStage,
   renderFeaturedTable,
   finalStep,
-  showTableSizeErrorDownload = true,
-  onTableSizeError,
+  showTableQueryErrorDownload = true,
   onSubmit,
   onSubjectStepBack,
+  onTableQueryError,
   loadingFastTrack = false,
 }: TableToolWizardProps) => {
   const router = useRouter();
@@ -372,8 +377,8 @@ const TableToolWizard = ({
                     )[0]
                   }
                   subjectMeta={state.subjectMeta}
-                  showTableSizeErrorDownload={showTableSizeErrorDownload}
-                  onTableSizeError={onTableSizeError}
+                  showTableQueryErrorDownload={showTableQueryErrorDownload}
+                  onTableQueryError={onTableQueryError}
                   onSubmit={handleFiltersFormSubmit}
                 />
               )}

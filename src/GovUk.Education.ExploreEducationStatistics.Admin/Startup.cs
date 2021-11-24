@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -230,6 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })

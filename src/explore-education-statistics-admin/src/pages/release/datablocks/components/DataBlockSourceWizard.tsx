@@ -142,7 +142,7 @@ const DataBlockSourceWizard = ({
         themeMeta={[]}
         hidePublicationSelectionStage
         initialState={tableToolState}
-        showTableSizeErrorDownload={false}
+        showTableQueryErrorDownload={false}
         finalStep={({ response, query }) => (
           <WizardStep size="l">
             {wizardStepProps => (
