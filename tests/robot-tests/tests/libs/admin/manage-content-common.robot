@@ -135,7 +135,7 @@ user chooses and embeds data block
     ...    ${datablock_name}
     user chooses select option    css:select[name="selectedDataBlock"]    ${datablock_name}
     user clicks button    Embed
-    user waits until page does not contain button    Embed
+    user waits until page does not contain button    Embed    %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
 
 user opens nth editable accordion section

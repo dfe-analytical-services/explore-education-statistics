@@ -392,8 +392,8 @@ user checks element is not visible
     element should not be visible    ${element}    ${wait}
 
 user waits until element is enabled
-    [Arguments]    ${element}
-    wait until element is enabled    ${element}
+    [Arguments]    ${element}    ${wait}=${timeout}
+    wait until element is enabled    ${element}    ${wait}
 
 user checks element is enabled
     [Arguments]    ${element}
@@ -454,17 +454,21 @@ user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until page contains element    xpath://button[text()="${text}"]    ${wait}
 
+user checks page contains button
+    [Arguments]    ${text}
+    user checks page contains element    xpath://button[text()="${text}"]
+
 user checks page does not contain button
     [Arguments]    ${text}
     user checks page does not contain element    xpath://button[text()="${text}"]
 
 user waits until page does not contain button
-    [Arguments]    ${text}
-    user waits until page does not contain element    xpath://button[text()="${text}"]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until page does not contain element    xpath://button[text()="${text}"]    ${wait}
 
 user waits until button is enabled
-    [Arguments]    ${text}
-    user waits until element is enabled    xpath://button[text()="${text}"]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body

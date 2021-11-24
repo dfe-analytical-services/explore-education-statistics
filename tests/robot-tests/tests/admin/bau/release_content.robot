@@ -81,6 +81,7 @@ Add Useful information related page link to release
 Add secondary statistics
     user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user clicks button    Add secondary stats
+    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
     user checks select contains x options    css:select[name="selectedDataBlock"]    5
     user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
     user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 1
@@ -94,11 +95,12 @@ Check secondary statistics are included correctly
     user clicks element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
-    user waits until page contains button    Change secondary stats
-    user waits until page contains button    Remove secondary stats
+    user checks page contains button    Change secondary stats
+    user checks page contains button    Remove secondary stats
 
 Change secondary statistics
     user clicks button    Change secondary stats
+    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
     user checks select contains x options    css:select[name="selectedDataBlock"]    4
     user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
     user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 2
@@ -107,28 +109,29 @@ Change secondary statistics
     user chooses and embeds data block    Data Block 2
     user waits until page contains element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
     user checks page contains    Data Block 2 title
-    user waits until page contains button    Change secondary stats
-    user waits until page contains button    Remove secondary stats
+    user checks page contains button    Change secondary stats
+    user checks page contains button    Remove secondary stats
 
 Remove secondary statistics
     user clicks button    Remove secondary stats
     user waits until modal is visible    Remove secondary statistics section
     user clicks button    Confirm
-    user waits until modal is not visible    Remove secondary statistics section
+    user waits until modal is not visible    Remove secondary statistics section    %{WAIT_MEDIUM}
     user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
-    user waits until page does not contain button    Change secondary stats
-    user waits until page does not contain button    Remove secondary stats
-    user waits until page contains button    Add secondary stats
+    user checks page does not contain button    Change secondary stats
+    user checks page does not contain button    Remove secondary stats
+    user checks page contains button    Add secondary stats
 
 Add a key statistics tile
     user clicks button    Add key statistic
+    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
     user checks select contains x options    css:select[name="selectedDataBlock"]    3
     user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Key Stats Data Block 1
-    user waits until page contains    Proportion of settings open
-    user waits until page contains    1%
+    user waits until page contains    Proportion of settings open    %{WAIT_MEDIUM}
+    user checks page contains    1%
 
 Edit the guidance information for the key statistics tile
     user clicks the nth key stats tile button    1    Edit
@@ -138,29 +141,30 @@ Edit the guidance information for the key statistics tile
     user presses keys    TAB
     user presses keys    Some information about about open settings
     user clicks the nth key stats tile button    1    Save
-    user waits until page does not contain element    css:input[name="dataSummary"]
+    user waits until page does not contain element    css:input[name="dataSummary"]    %{WAIT_MEDIUM}
 
 Check the guidance information for the key statistics tile
-    user waits until page contains    Down from last year
-    user waits until page contains    Some information about about open settings
+    user waits until page contains    Down from last year    %{WAIT_MEDIUM}
+    user checks page contains    Some information about about open settings
     user checks page for details dropdown    Learn more about open settings
     user opens details dropdown    Learn more about open settings
     user checks page contains    Some information about about open settings
 
 Add another key statistics tile
     user clicks button    Add another key statistic
+    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
     user checks select contains x options    css:select[name="selectedDataBlock"]    2
     user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
     user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
     user chooses and embeds data block    Key Stats Data Block 2
-    user waits until page contains    Number of open settings
-    user waits until page contains    22,900
+    user checks page contains    Number of open settings
+    user checks page contains    22,900
 
 Remove a key statistics tile
     # Remove the second tile
     user clicks the nth key stats tile button    2    Remove
-    user waits until page does not contain    Number of open settings
-    user waits until page does not contain    22,900
+    user waits until page does not contain    Number of open settings    %{WAIT_MEDIUM}
+    user checks page does not contain    22,900
     # Make sure the first key stat tile is still there
     user checks page contains    Proportion of settings open
 
