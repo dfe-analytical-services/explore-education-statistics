@@ -324,16 +324,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     return new LocationAttributeViewModel
                     {
                         GeoJson = geoJson,
-                        Label = locationAttribute?.Name ?? string.Empty,
-                        Value = locationAttribute?.Code ?? string.Empty
+                        Label = locationAttribute.Name ?? string.Empty,
+                        Value = locationAttribute.Code ?? string.Empty
                     };
                 }
 
                 return new LocationAttributeViewModel
                 {
-                    Label = locationAttribute?.Name ?? string.Empty,
-                    Level = locationAttribute?.GetType().Name,
-                    Value = locationAttribute?.Code ?? string.Empty,
+                    Label = locationAttribute.Name ?? string.Empty,
+                    Level = locationAttribute.GetType().Name,
+                    Value = locationAttribute.Code ?? string.Empty,
                     Options = locationAttributeNode.Children
                         .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
                         .ToList()

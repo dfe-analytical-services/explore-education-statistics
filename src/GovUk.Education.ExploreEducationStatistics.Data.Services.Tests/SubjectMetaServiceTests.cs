@@ -168,10 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // No hierarchy in Country level data
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
@@ -179,18 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // No hierarchy in Regional level data
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 },
                 {
@@ -198,24 +186,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // Country-Region-LA hierarchy in the LA level data
                     new List<LocationAttributeNode>
                     {
-                        new()
+                        new(_england)
                         {
-                            Attribute = _england,
                             Children = new List<LocationAttributeNode>
                             {
-                                new()
+                                new(_eastMidlands)
                                 {
-                                    Attribute = _eastMidlands,
                                     Children = new List<LocationAttributeNode>
                                     {
-                                        new()
-                                        {
-                                            Attribute = _derby
-                                        },
-                                        new()
-                                        {
-                                            Attribute = _nottingham
-                                        }
+                                        new(_derby),
+                                        new(_nottingham)
                                     }
                                 }
                             }
@@ -336,12 +316,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("Country", laOption1.Level);
 
-                var laOption1SubOption1 = Assert.Single(laOption1.Options);
+                var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("Region", laOption1SubOption1.Level);
-                Assert.Equal(2, laOption1SubOption1.Options.Count);
+                Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
@@ -381,25 +361,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     GeographicLevel.LocalAuthority,
                     new List<LocationAttributeNode>
                     {
-                        new()
+                        new(_england)
                         {
-                            Attribute = _england,
                             Children = new List<LocationAttributeNode>
                             {
-                                new()
+                                // Omit the Region to simulate the Region data not being provided
+                                new(Region.Empty())
                                 {
-                                    // Omit the Region to simulate the Region data not being provided
                                     Attribute = Region.Empty(),
                                     Children = new List<LocationAttributeNode>
                                     {
-                                        new()
-                                        {
-                                            Attribute = _derby
-                                        },
-                                        new()
-                                        {
-                                            Attribute = _nottingham
-                                        }
+                                        new(_derby),
+                                        new(_nottingham)
                                     }
                                 }
                             }
@@ -484,12 +457,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Country", laOption1.Level);
 
                 // Expect an empty Region option grouping the Local Authorities
-                var laOption1SubOption1 = Assert.Single(laOption1.Options);
+                var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Equal(string.Empty, laOption1SubOption1!.Label);
                 Assert.Equal(string.Empty, laOption1SubOption1.Value);
                 Assert.Equal("Region", laOption1SubOption1.Level);
-                Assert.Equal(2, laOption1SubOption1.Options.Count);
+                Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);

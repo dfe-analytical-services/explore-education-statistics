@@ -221,28 +221,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     GeographicLevel.Country,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
                     GeographicLevel.Region,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 }
             };
@@ -387,28 +375,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     GeographicLevel.Country,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
                     GeographicLevel.Region,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 }
             };
@@ -574,28 +550,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     GeographicLevel.Country,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
                     GeographicLevel.Region,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 }
             };
@@ -809,18 +773,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     GeographicLevel.Region,
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 }
             };
@@ -1012,10 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // No hierarchy in Country level data
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
@@ -1023,18 +975,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // No hierarchy in Regional level data
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _northEast
-                        },
-                        new()
-                        {
-                            Attribute = _northWest
-                        },
-                        new()
-                        {
-                            Attribute = _eastMidlands
-                        }
+                        new(_northEast),
+                        new(_northWest),
+                        new(_eastMidlands)
                     }
                 },
                 {
@@ -1042,24 +985,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // Country-Region-LA hierarchy in the LA level data
                     new List<LocationAttributeNode>
                     {
-                        new()
+                        new(_england)
                         {
-                            Attribute = _england,
                             Children = new List<LocationAttributeNode>
                             {
-                                new()
+                                new(_eastMidlands)
                                 {
-                                    Attribute = _eastMidlands,
                                     Children = new List<LocationAttributeNode>
                                     {
-                                        new()
-                                        {
-                                            Attribute = _derby
-                                        },
-                                        new()
-                                        {
-                                            Attribute = _nottingham
-                                        }
+                                        new(_derby),
+                                        new(_nottingham)
                                     }
                                 }
                             }
@@ -1245,13 +1180,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Country", laOption1.Level);
                 Assert.NotNull(laOption1.Options);
 
-                var laOption1SubOption1 = Assert.Single(laOption1.Options);
+                var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("Region", laOption1SubOption1.Level);
                 Assert.NotNull(laOption1SubOption1.Options);
-                Assert.Equal(2, laOption1SubOption1.Options.Count);
+                Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
@@ -1288,10 +1223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // No hierarchy in Country level data
                     new List<LocationAttributeNode>
                     {
-                        new()
-                        {
-                            Attribute = _england
-                        }
+                        new(_england)
                     }
                 },
                 {
@@ -1299,23 +1231,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // Country-Region hierarchy in the Region level data
                     new List<LocationAttributeNode>
                     {
-                        new()
+                        new(_england)
                         {
-                            Attribute = _england,
                             Children = new List<LocationAttributeNode>
                             {
-                                new()
-                                {
-                                    Attribute = _northEast
-                                },
-                                new()
-                                {
-                                    Attribute = _northWest
-                                },
-                                new()
-                                {
-                                    Attribute = _eastMidlands
-                                }
+                                new(_northEast),
+                                new(_northWest),
+                                new(_eastMidlands)
                             }
                         }
                     }
@@ -1520,25 +1442,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1.GeoJson);
                 Assert.Equal("Country", regionOption1.Level);
                 Assert.NotNull(regionOption1.Options);
-                Assert.Equal(3, regionOption1.Options.Count);
-                
+                Assert.Equal(3, regionOption1.Options!.Count);
+
                 // Each Region option should have GeoJson
                 var regionOption1SubOption1 = regionOption1.Options[0];
-                Assert.Equal(_northEast.Name, regionOption1SubOption1!.Label);
+                Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
                 Assert.NotNull(regionOption1SubOption1.GeoJson);
                 Assert.Null(regionOption1SubOption1.Level);
                 Assert.Null(regionOption1SubOption1.Options);
 
                 var regionOption1SubOption2 = regionOption1.Options[1];
-                Assert.Equal(_northWest.Name, regionOption1SubOption2!.Label);
+                Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
                 Assert.NotNull(regionOption1SubOption2.GeoJson);
                 Assert.Null(regionOption1SubOption2.Level);
                 Assert.Null(regionOption1SubOption2.Options);
 
                 var regionOption1SubOption3 = regionOption1.Options[2];
-                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3!.Label);
+                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
                 Assert.NotNull(regionOption1SubOption3.GeoJson);
                 Assert.Null(regionOption1SubOption3.Level);
@@ -1567,23 +1489,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     // Country-Region hierarchy in the Region level data
                     new List<LocationAttributeNode>
                     {
-                        new()
+                        new(_england)
                         {
-                            Attribute = _england,
                             Children = new List<LocationAttributeNode>
                             {
-                                new()
-                                {
-                                    Attribute = _northEast
-                                },
-                                new()
-                                {
-                                    Attribute = _northWest
-                                },
-                                new()
-                                {
-                                    Attribute = _eastMidlands
-                                }
+                                new(_northEast),
+                                new(_northWest),
+                                new(_eastMidlands)
                             }
                         }
                     }
@@ -1758,25 +1670,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1.GeoJson);
                 Assert.Equal("Country", regionOption1.Level);
                 Assert.NotNull(regionOption1.Options);
-                Assert.Equal(3, regionOption1.Options.Count);
-                
+                Assert.Equal(3, regionOption1.Options!.Count);
+
                 // Each Region option should have GeoJson
                 var regionOption1SubOption1 = regionOption1.Options[0];
-                Assert.Equal(_northEast.Name, regionOption1SubOption1!.Label);
+                Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
                 Assert.NotNull(regionOption1SubOption1.GeoJson);
                 Assert.Null(regionOption1SubOption1.Level);
                 Assert.Null(regionOption1SubOption1.Options);
 
                 var regionOption1SubOption2 = regionOption1.Options[1];
-                Assert.Equal(_northWest.Name, regionOption1SubOption2!.Label);
+                Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
                 Assert.NotNull(regionOption1SubOption2.GeoJson);
                 Assert.Null(regionOption1SubOption2.Level);
                 Assert.Null(regionOption1SubOption2.Options);
 
                 var regionOption1SubOption3 = regionOption1.Options[2];
-                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3!.Label);
+                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
                 Assert.NotNull(regionOption1SubOption3.GeoJson);
                 Assert.Null(regionOption1SubOption3.Level);

@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             stopwatch.Stop();
 
-            // Only data relevant to the step being executed in the table tool needs to be returned hence the 
+            // Only data relevant to the step being executed in the table tool needs to be returned hence the
             // null checks above so only the minimum requisite DB calls for the task are performed.
 
             if (locationHierarchiesEnabled)
@@ -306,14 +306,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return locationAttributeNode.IsLeaf
                 ? new LocationAttributeViewModel
                 {
-                    Label = locationAttributeNode.Attribute?.Name ?? string.Empty,
-                    Value = locationAttributeNode.Attribute?.Code ?? string.Empty
+                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
+                    Value = locationAttributeNode.Attribute.Code ?? string.Empty
                 }
                 : new LocationAttributeViewModel
                 {
-                    Label = locationAttributeNode.Attribute?.Name ?? string.Empty,
-                    Level = locationAttributeNode.Attribute?.GetType().Name,
-                    Value = locationAttributeNode.Attribute?.Code ?? string.Empty,
+                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
+                    Level = locationAttributeNode.Attribute.GetType().Name,
+                    Value = locationAttributeNode.Attribute.Code ?? string.Empty,
                     Options = locationAttributeNode.Children.Select(BuildLocationAttributeViewModel).ToList()
                 };
         }
