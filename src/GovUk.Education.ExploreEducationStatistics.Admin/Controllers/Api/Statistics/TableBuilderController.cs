@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -75,22 +77,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                    && rcb.ContentBlockId == dataBlockId
                         )
                 )
-                .OnSuccess(
-                    async block =>
-                    {
-                        if (block.ContentBlock is DataBlock dataBlock)
-                        {
-                            var query = dataBlock.Query.Clone();
-                            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-                            return await _userService.CheckCanViewRelease(block.Release)
-                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
-                        }
-
-                        return new NotFoundResult();
-                    }
-                )
+                .OnSuccess(GetReleaseDataBlockResults(cancellationToken))
                 .HandleFailuresOrOk();
+        }
+
+        [BlobCache(typeof(DataBlockTableResultCacheKey))]
+        private Func<ReleaseContentBlock, Task<Either<ActionResult, TableBuilderResultViewModel>>> 
+            GetReleaseDataBlockResults(CancellationToken cancellationToken)
+        {
+            return async block =>
+            {
+                if (block.ContentBlock is DataBlock dataBlock)
+                {
+                    var query = dataBlock.Query.Clone();
+                    query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
+
+                    return await _userService.CheckCanViewRelease(block.Release)
+                        .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
+                }
+
+                return new NotFoundResult();
+            };
         }
     }
 }

@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -396,6 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -427,6 +429,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Enable caching and register any caching services.
+            CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+
             UpdateDatabase(app, env);
 
             if (env.IsDevelopment())
