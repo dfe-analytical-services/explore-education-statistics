@@ -23,14 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpGet("data/meta/subject/{subjectId:guid}")]
-        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(subjectId)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("data/meta/subject")]
-        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
             [FromBody] SubjectMetaQueryContext query)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(query)

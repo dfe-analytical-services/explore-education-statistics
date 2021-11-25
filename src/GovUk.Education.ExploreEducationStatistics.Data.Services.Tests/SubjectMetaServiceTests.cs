@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
@@ -482,14 +481,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static IFeatureManager DefaultFeatureManager()
-        {
-            var featureManager = new Mock<IFeatureManager>(MockBehavior.Strict);
-            featureManager.Setup(s => s.IsEnabledAsync("LocationHierarchies"))
-                .ReturnsAsync(true);
-            return featureManager.Object;
-        }
-
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
             return Options.Create(new LocationsOptions());
@@ -497,7 +488,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static SubjectMetaService BuildSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
-            IFeatureManager? featureManager = null,
             IFilterRepository? filterRepository = null,
             IFilterItemRepository? filterItemRepository = null,
             IIndicatorGroupRepository? indicatorGroupRepository = null,
@@ -509,7 +499,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<LocationsOptions>? options = null)
         {
             return new(
-                featureManager ?? DefaultFeatureManager(),
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
