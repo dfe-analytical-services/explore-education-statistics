@@ -31,7 +31,6 @@ Verify release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
 Add data guidance
@@ -72,54 +71,7 @@ Add ancillary file
     user checks there are x accordion sections    1    id:file-uploads
 
 Create data block table
-    user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
-
-    user clicks link    Create data block
-    user waits until h2 is visible    Create data block
-
-    user waits until table tool wizard step is available    1    Choose a subject
-    user waits until page contains    Dates test subject
-    user clicks radio    Dates test subject
-    user clicks element    id:publicationSubjectForm-submit
-
-    user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    National
-    user checks location checkbox is checked    England
-
-    user clicks element    id:locationFiltersForm-submit
-
-    user waits until table tool wizard step is available    3    Choose time period
-    user chooses select option    id:timePeriodForm-start    2020 Week 13
-    user chooses select option    id:timePeriodForm-end    2020 Week 16
-    user clicks element    id:timePeriodForm-submit
-
-    user waits until table tool wizard step is available    4    Choose your filters
-    user clicks subheaded indicator checkbox    Open settings    Number of open settings
-    user checks subheaded indicator checkbox is checked    Open settings    Number of open settings
-    user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
-    user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
-
-    user opens details dropdown    Date
-    user clicks category checkbox    Date    23/03/2020
-    user checks category checkbox is checked    Date    23/03/2020
-
-    user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_LONG}
-
-    user checks table column heading contains    1    1    2020 Week 13
-    user checks headed table body row cell contains    Number of open settings    1    22,900
-    user checks headed table body row cell contains    Proportion of settings open    1    1%
-
-Save data block
-    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user enters text into element    id:dataBlockDetailsForm-heading    Dates table title
-    user enters text into element    id:dataBlockDetailsForm-source    Dates source
-
-    user clicks button    Save data block
-
-    user waits until h2 is visible    Edit data block
-    user waits until page contains button    Delete this data block
+    user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
 
 Create chart for data block
     user waits until page contains link    Chart

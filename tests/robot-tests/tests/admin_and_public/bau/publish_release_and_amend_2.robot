@@ -27,7 +27,6 @@ Create new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
-    user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
@@ -386,7 +385,6 @@ Create amendment to modify release
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
 
 Add subject to release
-    user clicks link    Data and files
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 

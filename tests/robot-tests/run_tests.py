@@ -167,7 +167,6 @@ output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites e
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
-             # "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction",
              "--exclude", "BootstrapData"]

@@ -586,6 +586,7 @@ user navigates to admin dashboard
 
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}
+    user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle    60
     user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}${SUBJECT_FILE}
@@ -739,9 +740,9 @@ user waits until modal is visible
     [Return]    ${modal_element}
 
 user waits until modal is not visible
-    [Arguments]    ${MODAL_TITLE}
-    user waits until page does not contain element    css:.ReactModal__Content
-    user waits until h1 is not visible    ${MODAL_TITLE}
+    [Arguments]    ${modal_title}    ${wait}=${timeout}
+    user waits until page does not contain element    css:.ReactModal__Content    ${wait}
+    user waits until h1 is not visible    ${modal_title}
 
 user gets comment
     [Arguments]    ${comment_text}

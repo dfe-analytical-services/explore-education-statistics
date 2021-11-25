@@ -44,7 +44,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
               setShowConfirmation(true);
             }}
           >
-            Remove Secondary Stats
+            Remove secondary stats
           </Button>
         )}
 

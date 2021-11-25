@@ -31,7 +31,6 @@ Verify release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Add metadata guidance
