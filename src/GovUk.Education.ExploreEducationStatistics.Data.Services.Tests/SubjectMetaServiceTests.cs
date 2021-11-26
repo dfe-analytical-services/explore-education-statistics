@@ -67,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
 
             var userService = new Mock<IUserService>(MockBehavior.Strict);
+
             userService.Setup(s => s.MatchesPolicy(
                     It.Is<Subject>(resource => resource.Id == subject.Id),
                     DataSecurityPolicies.CanViewSubjectData))
@@ -110,14 +111,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            filterRepository.Setup(s => s.GetFiltersIncludingItems(subject.Id))
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
                 .Returns(Enumerable.Empty<Filter>());
-            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(subject.Id))
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+
+            locationRepository
+                .Setup(s => s.GetLocationAttributesHierarchical(
                     subject.Id,
                     new Dictionary<GeographicLevel, List<string>>()))
                 .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
+
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
@@ -233,14 +240,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            filterRepository.Setup(s => s.GetFiltersIncludingItems(subject.Id))
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
                 .Returns(Enumerable.Empty<Filter>());
-            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(subject.Id))
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    subject.Id,
-                    options.Value.Hierarchies))
+
+            locationRepository
+                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
                 .ReturnsAsync(locations);
+
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
@@ -410,14 +421,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            filterRepository.Setup(s => s.GetFiltersIncludingItems(subject.Id))
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
                 .Returns(Enumerable.Empty<Filter>());
-            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(subject.Id))
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    subject.Id,
-                    options.Value.Hierarchies))
+
+            locationRepository
+                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
                 .ReturnsAsync(locations);
+
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
