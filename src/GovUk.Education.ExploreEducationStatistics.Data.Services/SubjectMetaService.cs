@@ -218,15 +218,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
                     pair =>
-                        new LocationsMetaViewModel
+                    {
+                        var options = DeduplicateLocationViewModels(
+                            pair.Value.Select(BuildLocationAttributeViewModel)
+                        )
+                            .ToList();
+
+                        var hasSubOptions = options.Any(option => option.Options is not null);
+
+                        return new LocationsMetaViewModel
                         {
                             Legend = pair.Key.GetEnumLabel(),
-                            Options =
-                                DeduplicateLocationViewModels(
-                                    pair.Value.Select(BuildLocationAttributeViewModel)
+                            Options = options
+                                .OrderBy(
+                                    option =>
+                                    {
+                                        // Regions should be ordered by their code
+                                        if (!hasSubOptions && pair.Key == GeographicLevel.Region)
+                                        {
+                                            return option.Value;
+                                        }
+
+                                        return OrderLocationViewModel(option);
+                                    }
                                 )
                                 .ToList()
-                        });
+                        };
+                    }
+                );
         }
 
         private static LocationAttributeViewModel BuildLocationAttributeViewModel(
@@ -246,8 +265,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Options = DeduplicateLocationViewModels(
                             locationAttributeNode.Children.Select(BuildLocationAttributeViewModel)
                         )
+                        .OrderBy(OrderLocationViewModel)
                         .ToList()
                 };
+        }
+
+        private static string OrderLocationViewModel(LocationAttributeViewModel option)
+        {
+            return option switch
+            {
+                // Regions should be ordered by their code
+                { Level: "Region" } => option.Value,
+                _ => option.Label
+            };
         }
 
         private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(

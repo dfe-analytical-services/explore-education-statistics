@@ -29,9 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly Region _northEast = new("E12000001", "North East");
         private readonly Region _northWest = new("E12000002", "North West");
         private readonly Region _eastMidlands = new("E12000004", "East Midlands");
+        private readonly LocalAuthority _blackpool = new("E06000009", "", "Blackpool");
         private readonly LocalAuthority _derby = new("E06000015", "", "Derby");
         private readonly LocalAuthority _derbyDupe = new("E06000016", "", "Derby");
         private readonly LocalAuthority _nottingham = new("E06000018", "", "Nottingham");
+        private readonly LocalAuthority _sunderland = new("E08000024", "", "Sunderland");
 
         [Fact]
         public async Task GetSubjectMeta_SubjectNotFound()
@@ -156,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject()
+        public async Task GetSubjectMeta_LocationsForSubject()
         {
             var release = new Release();
             var subject = new Subject();
@@ -353,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_LocationAttributeOfHierarchyIsMissing()
+        public async Task GetSubjectMeta_LocationsForSubject_LocationAttributeOfHierarchyIsMissing()
         {
             var release = new Release();
             var subject = new Subject();
@@ -742,6 +744,175 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_nottingham.Code, laOption1SubOption3.Value);
                 Assert.Null(laOption1SubOption3.Level);
                 Assert.Null(laOption1SubOption3.Options);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectMeta_LocationRegionsOrderedByCode()
+        {
+            var release = new Release();
+            var subject = new Subject();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            // Regions have been ordered randomly, but we expect the returned
+            // view models to be ordered by the region's location code.
+            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
+            {
+                {
+                    GeographicLevel.Region,
+                    new List<LocationAttributeNode>
+                    {
+                        new(_northWest),
+                        new(_eastMidlands),
+                        new(_northEast),
+                    }
+                },
+                {
+                    GeographicLevel.LocalAuthority,
+                    new List<LocationAttributeNode>
+                    {
+                        new(_northWest)
+                        {
+                            Children = new List<LocationAttributeNode>
+                            {
+                                new(_blackpool),
+                            }
+                        },
+                        new(_eastMidlands)
+                        {
+                            Children = new List<LocationAttributeNode>
+                            {
+                                new(_derby),
+                            }
+                        },
+                        new(_northEast)
+                        {
+                            Children = new List<LocationAttributeNode>
+                            {
+                                new(_sunderland),
+                            }
+                        }
+                    }
+                }
+            };
+
+            var options = Options.Create(new LocationsOptions
+            {
+                Hierarchies = new Dictionary<GeographicLevel, List<string>>
+                {
+                    {
+                        GeographicLevel.LocalAuthority,
+                        new List<string>
+                        {
+                            "Region",
+                            "LocalAuthority"
+                        }
+                    }
+                }
+            });
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Returns(Enumerable.Empty<Filter>());
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Returns(Enumerable.Empty<IndicatorGroup>());
+
+            locationRepository
+                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
+                .ReturnsAsync(locations);
+
+            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext: statisticsDbContext,
+                    filterRepository: filterRepository.Object,
+                    indicatorGroupRepository: indicatorGroupRepository.Object,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    options: options
+                );
+
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    filterRepository,
+                    indicatorGroupRepository,
+                    locationRepository,
+                    timePeriodService);
+
+                var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
+
+                var locationViewModels = viewModel.Locations;
+
+                // Result has Region and Local Authority levels
+                Assert.Equal(2, locationViewModels.Count);
+                Assert.True(locationViewModels.ContainsKey("region"));
+                Assert.True(locationViewModels.ContainsKey("localAuthority"));
+
+                var regions = locationViewModels["region"];
+
+                Assert.Equal("Regional", regions.Legend);
+                Assert.Equal(3, regions.Options.Count);
+                var regionOption1 = regions.Options[0];
+                var regionOption2 = regions.Options[1];
+                var regionOption3 = regions.Options[2];
+
+                Assert.Equal(_northEast.Name, regionOption1.Label);
+                Assert.Equal(_northEast.Code, regionOption1.Value);
+
+                Assert.Equal(_northWest.Name, regionOption2.Label);
+                Assert.Equal(_northWest.Code, regionOption2.Value);
+
+                Assert.Equal(_eastMidlands.Name, regionOption3.Label);
+                Assert.Equal(_eastMidlands.Code, regionOption3.Value);
+
+                // Expect a hierarchy of Region-LA within the Local Authority level
+                var localAuthorities = locationViewModels["localAuthority"];
+                Assert.Equal(3, localAuthorities.Options.Count);
+
+                var laOption1 = localAuthorities.Options[0];
+                Assert.NotNull(laOption1);
+                Assert.Equal(_northEast.Name, laOption1.Label);
+                Assert.Equal(_northEast.Code, laOption1.Value);
+                Assert.Equal("Region", laOption1.Level);
+                Assert.Single(laOption1.Options!);
+
+                var laOption2 = localAuthorities.Options[1];
+                Assert.NotNull(laOption2);
+                Assert.Equal(_northWest.Name, laOption2.Label);
+                Assert.Equal(_northWest.Code, laOption2.Value);
+                Assert.Equal("Region", laOption2.Level);
+                Assert.Single(laOption2.Options!);
+
+                var laOption3 = localAuthorities.Options[2];
+                Assert.NotNull(laOption3);
+                Assert.Equal(_eastMidlands.Name, laOption3.Label);
+                Assert.Equal(_eastMidlands.Code, laOption3.Value);
+                Assert.Equal("Region", laOption3.Level);
+                Assert.Single(laOption2.Options!);
             }
         }
 
