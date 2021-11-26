@@ -71,17 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Options = filterItems
                     .OrderBy(item => item.Label.ToLower() != "total")
                     .ThenBy(item => item.Label, LabelComparer)
-                    .Select(item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                })
+                    .Select(item => new LabelValue(item.Label, item.Id.ToString()))
             };
         }
 
-        protected static IEnumerable<T> TransformDuplicateLocationAttributesWithUniqueLabels<T>(
+        protected static IEnumerable<T> DeduplicateLocationViewModels<T>(
             IEnumerable<T> viewModels) where T : LabelValue
         {
+            var list = viewModels.ToList();
+
             /*
              The list of Location attributes should in theory already be unique.
              If they are not, there's three possibilities:
@@ -94,13 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 These don't need any action.
             */
 
-            var case1 = viewModels
+            var case1 = list
                 .GroupBy(model => (model.Value, model.Label))
                 .Where(grouping => grouping.Count() > 1)
                 .SelectMany(grouping => grouping)
                 .ToList();
 
-            var case2 = viewModels.Except(case1)
+            var case2 = list.Except(case1)
                 .GroupBy(model => model.Label)
                 .Where(grouping => grouping.Count() > 1)
                 .SelectMany(grouping => grouping)
@@ -108,18 +106,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (!(case1.Any() || case2.Any()))
             {
-                return viewModels;
+                return list;
             }
 
-            return viewModels.Select(value =>
+            return list.Select(value =>
             {
                 if (case1.Contains(value))
                 {
-                    if (value is ObservationalUnitMetaViewModel observationalUnitMetaViewModel)
+                    switch (value)
                     {
-                        observationalUnitMetaViewModel.Label +=
-                            $" ({observationalUnitMetaViewModel.Level.GetEnumLabel()})";
+                        case ObservationalUnitMetaViewModel viewModel:
+                            viewModel.Label += $" ({viewModel.Level.GetEnumLabel()})";
+                            break;
+                        case LocationAttributeViewModel viewModel:
+                            viewModel.Label += $" ({viewModel.Level})";
+                            break;
                     }
+
                 }
 
                 if (case2.Contains(value))

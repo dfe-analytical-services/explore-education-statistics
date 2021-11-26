@@ -221,7 +221,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         new LocationsMetaViewModel
                         {
                             Legend = pair.Key.GetEnumLabel(),
-                            Options = pair.Value.Select(BuildLocationAttributeViewModel).ToList()
+                            Options =
+                                DeduplicateLocationViewModels(
+                                    pair.Value.Select(BuildLocationAttributeViewModel)
+                                )
+                                .ToList()
                         });
         }
 
@@ -239,7 +243,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Label = locationAttributeNode.Attribute.Name ?? string.Empty,
                     Level = locationAttributeNode.Attribute.GetType().Name,
                     Value = locationAttributeNode.Attribute.Code ?? string.Empty,
-                    Options = locationAttributeNode.Children.Select(BuildLocationAttributeViewModel).ToList()
+                    Options = DeduplicateLocationViewModels(
+                            locationAttributeNode.Children.Select(BuildLocationAttributeViewModel)
+                        )
+                        .ToList()
                 };
         }
 

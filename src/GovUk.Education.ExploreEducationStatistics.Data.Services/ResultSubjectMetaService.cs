@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         locationAttributes);
                 });
 
-                return TransformDuplicateLocationAttributesWithUniqueLabels(viewModels)
+                return DeduplicateLocationViewModels(viewModels)
                     .OrderBy(model => model.Level.ToString())
                     .ThenBy(model => model.Label)
                     .ToList();

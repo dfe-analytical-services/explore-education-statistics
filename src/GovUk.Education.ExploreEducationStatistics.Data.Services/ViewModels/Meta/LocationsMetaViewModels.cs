@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
@@ -9,12 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public List<LocationAttributeViewModel> Options { get; init; } = new();
     }
 
-    public record LocationAttributeViewModel
+    public record LocationAttributeViewModel : LabelValue
     {
         public dynamic? GeoJson { get; init; }
-        public string Label { get; init; } = string.Empty;
-        public string Value { get; init; } = string.Empty;
+
         public string? Level { get; init; }
+
         public List<LocationAttributeViewModel>? Options { get; init; }
     }
 }
