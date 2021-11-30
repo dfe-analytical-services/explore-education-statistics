@@ -67,7 +67,7 @@ Check publication owner can add a footnote to ${SUBJECT_NAME}
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote from the publication owner! (analyst)
     user clicks button    Save footnote
-    user waits until h2 is visible    Footnotes    60
+    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -98,7 +98,7 @@ Validates Release status table is correct
 
 Check publication owner can edit release status to "In draft"
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    30
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    In draft
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    Moving back to Draft state (publication owner)

@@ -89,7 +89,7 @@ Validate headlines -- Summary tab key stats
     [Documentation]    DFE-915    EES-806    EES-1508
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
-    user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
+    user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
     user checks key stat definition    1    What is overall absence?
     ...    Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
@@ -159,7 +159,7 @@ Validate Key Statistics data block -- Charts tab
 Validate Key Statistics data block -- Data tables tab
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    'Absence by characteristic' in England between 2012/13 and 2016/17    30
+    ...    'Absence by characteristic' in England between 2012/13 and 2016/17    %{WAIT_SMALL}
 
     user checks table column heading contains    1    1    2012/13    css:#releaseHeadlines-tables table
     user checks table column heading contains    1    2    2013/14    css:#releaseHeadlines-tables table
@@ -217,7 +217,7 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
-    ...    'Absence by characteristic' from 'Pupil absence in schools in England' in    90
+    ...    'Absence by characteristic' from 'Pupil absence in schools in England' in    %{WAIT_MEDIUM}
 
     user checks table column heading contains    1    1    2016/17    css:#content_9_datablock-tables table
 

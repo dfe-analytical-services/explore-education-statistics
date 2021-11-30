@@ -73,7 +73,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Check latest release contains glossary info icon
     user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}

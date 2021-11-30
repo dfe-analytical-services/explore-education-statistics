@@ -128,7 +128,7 @@ Approve release and wait for it to be Scheduled
     user checks summary list contains    Current status    Approved
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
     user checks summary list contains    Next release expected    January 2001
-    user waits for release process status to be    Scheduled    90
+    user waits for release process status to be    Scheduled    %{WAIT_MEDIUM}
 
 Navigate to prerelease page
     ${current_url}=    get location
@@ -137,7 +137,7 @@ Navigate to prerelease page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
-    user waits until h1 is visible    Pre-release access is not yet available    60
+    user waits until h1 is visible    Pre-release access is not yet available    %{WAIT_SMALL}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -229,7 +229,7 @@ Validate prerelease has not started for Analyst user
     user changes to analyst1
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
-    user waits until h1 is visible    Pre-release access is not yet available    60
+    user waits until h1 is visible    Pre-release access is not yet available    %{WAIT_SMALL}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -270,25 +270,26 @@ Validate prerelease has started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
-    user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}    60
+    user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
+    ...    %{WAIT_SMALL}
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
-    ...    60
+    ...    %{WAIT_SMALL}
 
 Validate metadata guidance page
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
     user clicks link    data files guide
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
-    user waits until h2 is visible    Data guidance    60
-    user waits until page contains    Test metadata guidance content    60
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
+    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
 
-    user waits until page contains accordion section    UI test subject    60
+    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
     user checks there are x accordion sections    1
 
     user opens accordion section    UI test subject
@@ -312,27 +313,27 @@ Go back to prerelease content page
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Validate public prerelease access list
     user clicks link    Pre-release access list
     user waits until page contains title caption    Calendar Year 2000    30
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
-    user waits until h2 is visible    Pre-release access list    60
-    user waits until page contains    Updated test public access list    60
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
+    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
 
 Go back to prerelease content page again
     user clicks link    Back
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
 Go to prerelease table tool page
     user clicks link    Table tool
-    user waits until h1 is visible    Create your own tables    60
-    user waits until table tool wizard step is available    1    Choose a subject    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
 Validate featured tables
     user waits until page contains element    id:featuredTables
@@ -348,12 +349,12 @@ Go to featured table and validate table
 Create and validate custom table
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
 
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    1    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
-    user waits until page contains    UI test subject    60
+    user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
 
@@ -368,8 +369,8 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
@@ -379,13 +380,13 @@ Validate public metdata guidance for Analyst user
     user waits until h3 is visible    Open data
     user clicks link    data files guide
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
-    user waits until h2 is visible    Data guidance    60
-    user waits until page contains    Test metadata guidance content    60
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
+    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
 
-    user waits until page contains accordion section    UI test subject    60
+    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
     user checks there are x accordion sections    1
 
     user opens accordion section    UI test subject
@@ -409,17 +410,17 @@ Go back to prerelease content page as Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Validate public prerelease access list as Analyst user
     user clicks link    Pre-release access list
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
-    user waits until h2 is visible    Pre-release access list    60
-    user waits until page contains    Updated test public access list    60
+    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
+    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
 
 Go back to prerelease content page again as Analyst user
     user clicks link    Back
@@ -428,17 +429,17 @@ Go back to prerelease content page again as Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    60
-    user waits until h1 is visible    ${PUBLICATION_NAME}    60
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    60
-    user waits until table tool wizard step is available    1    Choose a subject    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
 Validate featured tables as Analyst user
-    user waits until page contains element    id:featuredTables    60
+    user waits until page contains element    id:featuredTables    %{WAIT_SMALL}
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_FEATURED_NAME}
     user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
@@ -451,12 +452,12 @@ Go to featured table and validate table as Analyst user
 Create and validate custom table as Analyst user
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
 
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    1    Choose a subject    60
+    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
-    user waits until page contains    UI test subject    60
+    user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
 
@@ -477,14 +478,14 @@ Unschedule release
 
 *** Keywords ***
 user chooses location, time period and filters
-    user waits until table tool wizard step is available    2    Choose locations    90
+    user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
 
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
 
-    user waits until table tool wizard step is available    3    Choose time period    90
+    user waits until table tool wizard step is available    3    Choose time period    %{WAIT_MEDIUM}
 
     user waits until page contains element    id:timePeriodForm-start
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start

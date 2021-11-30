@@ -111,9 +111,10 @@ user navigates to release summary from admin dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-    ${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}    60
+    ${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}
+    ...    %{WAIT_SMALL}
     user clicks element    ${summary_button}
-    user waits until h2 is visible    Release summary    60
+    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 user opens release summary on the admin dashboard
@@ -131,8 +132,8 @@ user opens release summary on the admin dashboard
 
 user creates publication
     [Arguments]    ${title}
-    user waits until h1 is visible    Create new publication    60
-    user waits until page contains element    id:publicationForm-title    60
+    user waits until h1 is visible    Create new publication    %{WAIT_SMALL}
+    user waits until page contains element    id:publicationForm-title    %{WAIT_SMALL}
     user enters text into element    id:publicationForm-title    ${title}
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
     user enters text into element    id:publicationForm-teamEmail    Attainment.STATISTICS@education.gov.uk
@@ -144,16 +145,16 @@ user creates publication
 user creates release for publication
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
     user waits until page contains title caption    ${publication}
-    user waits until h1 is visible    Create new release    60
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    60
+    user waits until h1 is visible    Create new release    %{WAIT_SMALL}
+    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
     user clicks radio    National Statistics
     user clicks radio if exists    Create new template
     user clicks button    Create new release
 
-    user waits until page contains element    xpath://a[text()="Edit release summary"]    60
-    user waits until h2 is visible    Release summary    60
+    user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}
+    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user opens publication on the admin dashboard
     [Arguments]
@@ -213,19 +214,19 @@ user edits methodology summary for publication
 
     IF    "${existing_methodology_title}" == "${publication}"
         user checks radio is checked    Use publication title
-        user waits until element is not visible    label:Enter methodology title
+        user waits until element is not visible    label:Enter methodology title    10
     ELSE
         user checks radio is checked    Set an alternative title
-        user waits until element is visible    label:Enter methodology title
+        user waits until element is visible    label:Enter methodology title    %{WAIT_SMALL}
         user checks input field contains    label:Enter methodology title    ${existing_methodology_title}
     END
 
     IF    "${new_methodology_title}" == "${publication}"
         user clicks radio    Use publication title
-        user waits until element is not visible    label:Enter methodology title
+        user waits until element is not visible    label:Enter methodology title    10
     ELSE
         user clicks radio    Set an alternative title
-        user waits until element is visible    label:Enter methodology title
+        user waits until element is visible    label:Enter methodology title    %{WAIT_SMALL}
         user enters text into element    label:Enter methodology title    ${new_methodology_title}
     END
 
@@ -413,20 +414,21 @@ user removes an external methodology from publication
 user adds basic release content
     [Arguments]    ${publication}
     user clicks button    Add a summary text block
-    user waits until element contains    id:releaseSummary    This section is empty    60
+    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
     user clicks button    Edit block    id:releaseSummary
     user presses keys    Test summary text for ${publication}
     # To ensure Save button gets clicked
     user sets focus to element    xpath://button[.="Save"]    id:releaseSummary
     user clicks button    Save    id:releaseSummary
-    user waits until element contains    id:releaseSummary    Test summary text for ${publication}    60
+    user waits until element contains    id:releaseSummary    Test summary text for ${publication}    %{WAIT_SMALL}
 
     user clicks button    Add a headlines text block    id:releaseHeadlines
-    user waits until element contains    id:releaseHeadlines    This section is empty    60
+    user waits until element contains    id:releaseHeadlines    This section is empty    %{WAIT_SMALL}
     user clicks button    Edit block    id:releaseHeadlines
     user presses keys    Test headlines summary text for ${publication}
     user clicks button    Save    id:releaseHeadlines
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${publication}    60
+    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${publication}
+    ...    %{WAIT_SMALL}
 
     user waits until button is enabled    Add new section
     user clicks button    Add new section
@@ -587,13 +589,13 @@ user navigates to admin dashboard
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}
     user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle    60
+    user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
     user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    60
-    user waits until page contains accordion section    ${SUBJECT_NAME}    60
+    user waits until h2 is visible    Uploaded data files    %{WAIT_SMALL}
+    user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
@@ -603,7 +605,7 @@ user puts release into higher level review
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    60
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    Ready for higher review
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Ready for higher review
     user clicks button    Update status
