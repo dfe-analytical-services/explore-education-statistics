@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -11,6 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public LocalAuthority(string? code, string? oldCode, string? name) : base(code, name)
         {
             OldCode = oldCode;
+        }
+
+        public string GetCodeOrFallback()
+        {
+            return GetCodeOrOldCodeIfEmpty() ?? string.Empty;
         }
 
         public string? GetCodeOrOldCodeIfEmpty()

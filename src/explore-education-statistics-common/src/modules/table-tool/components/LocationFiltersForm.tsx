@@ -2,9 +2,11 @@ import CollapsibleList from '@common/components/CollapsibleList';
 import { Form, FormFieldset } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   FilterOption,
+  LocationOption,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
@@ -46,7 +48,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     initialValues = {},
   } = props;
 
-  const formOptions = useMemo(() => options, [options]);
   const stepEnabled = currentStep > stepNumber;
   const stepHeading = useMemo(
     () => (
@@ -57,23 +58,46 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     [props, stepEnabled],
   );
 
-  // Automatically select and expand group if only one location available
-  const autoSelectLocation =
-    Object.entries(formOptions).length === 1 &&
-    Object.entries(formOptions)[0][1].options.length === 1;
+  const formOptions = useMemo(() => Object.entries(options), [options]);
+
+  // Key options by their value to make future lookups faster/easier.
+  const keyedOptions = useMemo(
+    () =>
+      formOptions.reduce<Dictionary<LocationOption>>((acc, [, level]) => {
+        level.options.forEach(option => {
+          // There are nested options, so we need
+          // to iterate through these instead.
+          if (option.options) {
+            option.options.forEach(subOption => {
+              acc[subOption.value] = subOption;
+            });
+          } else {
+            acc[option.value] = option;
+          }
+        });
+
+        return acc;
+      }, {}),
+    [formOptions],
+  );
+
+  const allOptions = useMemo(() => Object.values(keyedOptions), [keyedOptions]);
+
+  const hasSingleOption = allOptions.length === 1;
 
   const initialFormValues = useMemo(() => {
     return {
       locations: mapValues(options, (levelOptions, level) => {
-        const initialLevel = autoSelectLocation
-          ? [levelOptions.options[0].value]
+        // Automatically select and expand group if
+        // only one location option is available.
+        const initialLevelValues = hasSingleOption
+          ? [allOptions[0].value]
           : initialValues[level] ?? [];
-        return initialLevel.filter(locationId =>
-          levelOptions.options.some(({ value }) => value === locationId),
-        );
+
+        return initialLevelValues.filter(value => keyedOptions[value]);
       }),
     };
-  }, [autoSelectLocation, initialValues, options]);
+  }, [allOptions, hasSingleOption, initialValues, keyedOptions, options]);
 
   return (
     <Formik<LocationFormValues>
@@ -119,16 +143,35 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               >
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
-                    {Object.entries(formOptions).map(([levelKey, level]) => {
-                      return (
-                        <FormFieldCheckboxMenu
-                          name={`locations.${levelKey}`}
+                    {formOptions.map(([levelKey, level]) => {
+                      const hasSubGroups = level.options.some(
+                        option => option.options,
+                      );
+
+                      return hasSubGroups ? (
+                        <FormFieldCheckboxGroupsMenu
                           key={levelKey}
-                          options={level.options}
+                          name={`locations.${levelKey}`}
+                          disabled={form.isSubmitting}
                           legend={level.legend}
                           legendHidden
+                          open={hasSingleOption}
+                          order={[]}
+                          options={level.options.map(group => ({
+                            legend: group.label,
+                            options: group.options ?? [],
+                          }))}
+                        />
+                      ) : (
+                        <FormFieldCheckboxMenu
+                          key={levelKey}
+                          name={`locations.${levelKey}`}
                           disabled={form.isSubmitting}
-                          open={autoSelectLocation}
+                          legend={level.legend}
+                          legendHidden
+                          open={hasSingleOption}
+                          order={[]}
+                          options={level.options}
                         />
                       );
                     })}
@@ -143,20 +186,14 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
         const locationLevels: Dictionary<FilterOption[]> = mapValues(
           form.values.locations,
-          (locations, locationKey) => {
-            const locationOptions =
-              (options[locationKey] && options[locationKey].options) || [];
-
-            return locations.reduce<FilterOption[]>((acc, n) => {
-              const found = locationOptions.find(option => option.value === n);
-
-              if (found) {
-                acc.push(found);
+          locations =>
+            locations.reduce<FilterOption[]>((acc, value) => {
+              if (keyedOptions[value]) {
+                acc.push(keyedOptions[value]);
               }
 
               return acc;
-            }, []);
-          },
+            }, []),
         );
 
         return (
@@ -167,11 +204,11 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 {Object.entries(locationLevels)
                   .filter(
                     ([levelKey, levelOptions]) =>
-                      levelOptions.length > 0 && formOptions[levelKey],
+                      levelOptions.length > 0 && options[levelKey],
                   )
                   .map(([levelKey, levelOptions]) => (
                     <SummaryListItem
-                      term={formOptions[levelKey].legend}
+                      term={options[levelKey].legend}
                       key={levelKey}
                     >
                       <CollapsibleList>

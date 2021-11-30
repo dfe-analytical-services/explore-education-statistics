@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             Dictionary<GeographicLevel, List<string>>? hierarchies)
         {
             var hierarchyWithLocationSelectors = hierarchies == null
-                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute?>>>()
+                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
                 : MapLocationAttributeSelectors(hierarchies);
 
             var locationsWithGeographicLevels = observations
@@ -126,10 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                     }
 
                     return locationsForLevel
-                        .Select(location => new LocationAttributeNode
-                        {
-                            Attribute = GetLocationAttributeForLocation(level, location)
-                        })
+                        .Select(location => new LocationAttributeNode(GetLocationAttributeForLocation(level, location)))
                         .ToList();
                 });
         }
@@ -265,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         private static List<LocationAttributeNode> GroupLocationAttributes(
             IEnumerable<Location> locations,
-            IReadOnlyList<Func<Location, ILocationAttribute?>> attributeSelectors)
+            IReadOnlyList<Func<Location, ILocationAttribute>> attributeSelectors)
         {
             if (attributeSelectors.IsNullOrEmpty())
             {
@@ -276,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return locations
                 .GroupBy(attributeSelectors[0])
                 .Select(
-                    grouping => new LocationAttributeNode
+                    grouping => new LocationAttributeNode(grouping.Key)
                     {
                         Attribute = grouping.Key,
                         Children = GroupLocationAttributes(grouping, attributeSelectors.Skip(1).ToList())
@@ -284,14 +281,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .ToList();
         }
 
-        private static Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute?>>>
+        private static Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>
             MapLocationAttributeSelectors(Dictionary<GeographicLevel, List<string>> hierarchies)
         {
             return hierarchies.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.Select(propertyName =>
                 {
-                    return (Func<Location, ILocationAttribute?>) (location =>
+                    return (Func<Location, ILocationAttribute>) (location =>
                     {
                         var propertyInfo = typeof(Location).GetProperty(propertyName);
                         if (propertyInfo == null)
@@ -300,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                         }
 
                         var value = propertyInfo.GetValue(location);
-                        return value as ILocationAttribute;
+                        return (value as ILocationAttribute)!;
                     });
                 }).ToList()
             );

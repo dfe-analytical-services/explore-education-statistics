@@ -14,18 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public void IsLeaf_ReturnsTrueWithoutChildren()
         {
-            var node = new LocationAttributeNode();
+            var node = new LocationAttributeNode(_england);
             Assert.True(node.IsLeaf);
         }
 
         [Fact]
         public void IsLeaf_ReturnsFalseWithChildren()
         {
-            var node = new LocationAttributeNode
+            var node = new LocationAttributeNode(_england)
             {
                 Children = new List<LocationAttributeNode>
                 {
-                    new()
+                    new(_eastMidlands)
                 }
             };
             Assert.False(node.IsLeaf);
@@ -34,10 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public void GetLeafAttributes_ReturnsOwnAttributeWhenLeaf()
         {
-            var node = new LocationAttributeNode
-            {
-                Attribute = _england
-            };
+            var node = new LocationAttributeNode(_england);
 
             Assert.True(node.IsLeaf);
 
@@ -49,24 +46,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public void GetLeafAttributes()
         {
-            var node = new LocationAttributeNode
+            var node = new LocationAttributeNode(_england)
             {
-                Attribute = _england,
                 Children = new List<LocationAttributeNode>
                 {
-                    new()
+                    new(_eastMidlands)
                     {
-                        Attribute = _eastMidlands,
                         Children = new List<LocationAttributeNode>
                         {
-                            new()
-                            {
-                                Attribute = _derby
-                            },
-                            new()
-                            {
-                                Attribute = _nottingham
-                            }
+                            new(_derby),
+                            new(_nottingham)
                         }
                     }
                 }

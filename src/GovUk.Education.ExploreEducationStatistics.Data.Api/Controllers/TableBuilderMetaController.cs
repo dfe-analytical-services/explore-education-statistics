@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("meta/subject/{subjectId:guid}")]
-        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _cacheKeyService
                 .CreateCacheKeyForSubjectMeta(subjectId)
@@ -37,13 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [BlobCache(typeof(SubjectMetaCacheKey))]
-        private Task<Either<ActionResult, ISubjectMetaViewModel>> GetSubjectMeta(SubjectMetaCacheKey cacheKey)
+        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(SubjectMetaCacheKey cacheKey)
         {
             return _subjectMetaService.GetSubjectMeta(cacheKey.SubjectId);
         }
 
         [HttpPost("meta/subject")]
-        public Task<ActionResult<ISubjectMetaViewModel>> GetSubjectMeta(
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
             [FromBody] SubjectMetaQueryContext query)
         {
             return _subjectMetaService.GetSubjectMeta(query).HandleFailuresOrOk();

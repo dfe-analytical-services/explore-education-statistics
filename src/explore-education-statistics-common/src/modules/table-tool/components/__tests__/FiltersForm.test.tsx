@@ -607,27 +607,6 @@ describe('FiltersForm', () => {
     expect(container.querySelector('dl')).toMatchSnapshot();
   });
 
-  test('automatically selects checkbox when there is only one indicator group with one option', () => {
-    render(
-      <FiltersForm
-        {...testWizardStepProps}
-        subject={testSubject}
-        subjectMeta={testSubjectMetaOneIndicator}
-        onSubmit={noop}
-      />,
-    );
-
-    const filterGroup = screen.getByRole('group', {
-      name: 'Indicators - 1 selected',
-    });
-
-    expect(within(filterGroup).getAllByRole('checkbox')).toHaveLength(1);
-
-    expect(
-      within(filterGroup).getByLabelText('Number of excluded sessions'),
-    ).toBeChecked();
-  });
-
   test('shows table size error when the correct error response is returned from the API', async () => {
     const onSubmit = jest.fn();
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
