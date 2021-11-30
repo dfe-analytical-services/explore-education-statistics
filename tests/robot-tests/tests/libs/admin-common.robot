@@ -209,7 +209,7 @@ user edits methodology summary for publication
     ...    ${edit_button_text}=Edit this methodology
     user views methodology for publication    ${publication}    ${existing_methodology_title}    ${edit_button_text}
     user clicks link    Edit summary
-    user waits until h2 is visible    Edit methodology summary
+    user waits until h2 is visible    Edit methodology summary    %{WAIT_MEDIUM}
 
     IF    "${existing_methodology_title}" == "${publication}"
         user checks radio is checked    Use publication title
@@ -238,7 +238,7 @@ user verifies methodology summary details
     ...    ${methodology_title}=${publication}
     ...    ${status}=Draft
     ...    ${published_on}=Not yet published
-    user waits until h2 is visible    Methodology summary
+    user waits until h2 is visible    Methodology summary    %{WAIT_MEDIUM}
     user checks summary list contains    Title    ${methodology_title}
     user checks summary list contains    Published on    ${published_on}
     user checks summary list contains    Owning publication    ${publication}
