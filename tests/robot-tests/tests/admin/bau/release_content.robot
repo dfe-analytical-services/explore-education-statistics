@@ -11,9 +11,9 @@ Test Setup          fail test fast if required
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${TOPIC_NAME}                               %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}                         UI tests - release content %{RUN_IDENTIFIER}
-${SECONDARY_STATS_TABLE_TAB_SELECTOR}       releaseHeadlines-dataBlock-tables-tab
+${TOPIC_NAME}                       %{TEST_TOPIC_NAME}
+${PUBLICATION_NAME}                 UI tests - release content %{RUN_IDENTIFIER}
+${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
 
 *** Test Cases ***
 Create test publication and release via API
@@ -79,20 +79,20 @@ Add Useful information related page link to release
     user clicks button    Create link
 
 Add secondary statistics
-    user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
+    user waits until page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
     user clicks button    Add secondary stats
-    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
-    user checks select contains x options    css:select[name="selectedDataBlock"]    5
-    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
-    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 1
-    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 2
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains x options    name:selectedDataBlock    5
+    user checks select contains option    name:selectedDataBlock    Select a data block
+    user checks select contains option    name:selectedDataBlock    Data Block 1
+    user checks select contains option    name:selectedDataBlock    Data Block 2
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 1
-    user waits until page contains element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
+    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
 
 Check secondary statistics are included correctly
-    user clicks element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
+    user clicks element    id:${SECONDARY_STATS_TABLE_TAB_ID}
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
     user checks page contains button    Change secondary stats
@@ -100,14 +100,14 @@ Check secondary statistics are included correctly
 
 Change secondary statistics
     user clicks button    Change secondary stats
-    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
-    user checks select contains x options    css:select[name="selectedDataBlock"]    4
-    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
-    user checks select contains option    css:select[name="selectedDataBlock"]    Data Block 2
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains x options    name:selectedDataBlock    4
+    user checks select contains option    name:selectedDataBlock    Select a data block
+    user checks select contains option    name:selectedDataBlock    Data Block 2
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
-    user waits until page contains element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
+    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
     user checks page contains button    Remove secondary stats
@@ -117,18 +117,19 @@ Remove secondary statistics
     user waits until modal is visible    Remove secondary statistics section
     user clicks button    Confirm
     user waits until modal is not visible    Remove secondary statistics section    %{WAIT_MEDIUM}
-    user waits until page does not contain element    ${SECONDARY_STATS_TABLE_TAB_SELECTOR}
+    user waits until page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
+    ...    %{WAIT_MEDIUM}
     user checks page does not contain button    Change secondary stats
     user checks page does not contain button    Remove secondary stats
     user checks page contains button    Add secondary stats
 
 Add a key statistics tile
     user clicks button    Add key statistic
-    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
-    user checks select contains x options    css:select[name="selectedDataBlock"]    3
-    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 1
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains x options    name:selectedDataBlock    3
+    user checks select contains option    name:selectedDataBlock    Select a data block
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Key Stats Data Block 1
     user waits until page contains    Proportion of settings open    %{WAIT_MEDIUM}
     user checks page contains    1%
@@ -152,10 +153,10 @@ Check the guidance information for the key statistics tile
 
 Add another key statistics tile
     user clicks button    Add another key statistic
-    user waits until page contains element    css:select[name="selectedDataBlock"]    %{WAIT_MEDIUM}
-    user checks select contains x options    css:select[name="selectedDataBlock"]    2
-    user checks select contains option    css:select[name="selectedDataBlock"]    Select a data block
-    user checks select contains option    css:select[name="selectedDataBlock"]    Key Stats Data Block 2
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains x options    name:selectedDataBlock    2
+    user checks select contains option    name:selectedDataBlock    Select a data block
+    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Key Stats Data Block 2
     user checks page contains    Number of open settings
     user checks page contains    22,900

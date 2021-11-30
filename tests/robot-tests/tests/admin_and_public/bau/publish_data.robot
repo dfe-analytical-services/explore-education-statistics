@@ -385,7 +385,7 @@ Edit footnote
 
 Check footnote was updated on data block
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
 
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until table is visible
