@@ -71,10 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
-            IEnumerable<Observation> observations)
+            IQueryable<Observation> observations)
         {
             return observations.Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
+                .AsNoTracking()
                 .ToList()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)

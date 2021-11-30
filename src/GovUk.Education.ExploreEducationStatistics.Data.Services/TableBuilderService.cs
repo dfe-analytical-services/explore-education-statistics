@@ -103,22 +103,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         return new TableBuilderResultViewModel();
                     }
-                    
-                    var subjectMeta = await _resultSubjectMetaService
-                        .GetSubjectMeta(
-                            release.Id,
-                            SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
-                            observations);
-                    
-                    var result = observations
-                        .Select(observation => _resultBuilder
-                            .BuildResult(observation, queryContext.Indicators));
 
-                    return subjectMeta
-                        .OnSuccess(subjectMetaViewModel => new TableBuilderResultViewModel
+                    return await _resultSubjectMetaService
+                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
+                            observations)
+                        .OnSuccess(subjectMetaViewModel =>
                         {
-                            SubjectMeta = subjectMetaViewModel,
-                            Results = result
+                            return new TableBuilderResultViewModel
+                            {
+                                SubjectMeta = subjectMetaViewModel,
+                                Results = observations.Select(observation =>
+                                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
+                            };
                         });
                 });
         }
