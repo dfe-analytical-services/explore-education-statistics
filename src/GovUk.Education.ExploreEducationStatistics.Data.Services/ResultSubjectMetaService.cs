@@ -67,25 +67,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _releaseDataFileRepository = releaseDataFileRepository;
         }
 
-        public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, 
-            SubjectMetaQueryContext query, IQueryable<Observation> observations)
+        public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
+            Guid releaseId,
+            SubjectMetaQueryContext query,
+            IList<Observation> observations)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
+            var queryableObservations = observations.AsQueryable();
+            
+            return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
 
-                    var observationalUnits = _locationRepository.GetObservationalUnits(observations);
+                    var observationalUnits = _locationRepository.GetObservationalUnits(queryableObservations);
                     _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var filters = GetFilters(query.SubjectId, observations, true);
+                    var filterItems = _filterItemRepository.GetFilterItemsFromObservationList(observations);
+                    var filters = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnotes = GetFilteredFootnotes(releaseId, observations, query);
+                    var footnotes = GetFilteredFootnotes(releaseId, queryableObservations, query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -104,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var timePeriodRange = GetTimePeriodRange(observations);
+                    var timePeriodRange = GetTimePeriodRange(queryableObservations);
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 

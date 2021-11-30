@@ -97,24 +97,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var observations = _observationService.FindObservations(queryContext).AsQueryable();
+                    var observations = _observationService.FindObservations(queryContext);
 
                     if (!observations.Any())
                     {
                         return new TableBuilderResultViewModel();
                     }
+                    
+                    var subjectMeta = await _resultSubjectMetaService
+                        .GetSubjectMeta(
+                            release.Id,
+                            SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
+                            observations);
+                    
+                    var result = observations
+                        .Select(observation => _resultBuilder
+                            .BuildResult(observation, queryContext.Indicators));
 
-                    return await _resultSubjectMetaService
-                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext),
-                            observations)
-                        .OnSuccess(subjectMetaViewModel =>
+                    return subjectMeta
+                        .OnSuccess(subjectMetaViewModel => new TableBuilderResultViewModel
                         {
-                            return new TableBuilderResultViewModel
-                            {
-                                SubjectMeta = subjectMetaViewModel,
-                                Results = observations.Select(observation =>
-                                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
-                            };
+                            SubjectMeta = subjectMetaViewModel,
+                            Results = result
                         });
                 });
         }

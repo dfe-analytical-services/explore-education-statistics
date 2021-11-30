@@ -37,34 +37,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
         }
 
-        public IEnumerable<FilterItem> GetFilterItems(Guid subjectId, IQueryable<Observation> observations,
-            bool listFilterItems)
+        public IEnumerable<FilterItem> GetFilterItemsFromObservationQuery(Guid subjectId, IQueryable<Observation> observations)
         {
-            // Temporary measure hopefully!
-            // The following query is optimal but since IQueryable observations can contain n number of conditions then LINQ
-            // may not be capable of converting it so allow a less efficient query to be executed
-
-            if (!listFilterItems)
-            {
-                // optimal query
-                return _context.FilterItem
-                    .Include(fi => fi.FilterGroup)
-                    .ThenInclude(fg => fg.Filter).AsNoTracking()
-                    .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
-                           observations.Any(o => o.FilterItems.Any(
-                               ofi => ofi.FilterItemId == fi.Id)));
-            }
-
-            // sub-optimal query
-            var allFilterItemsForSubject = _context.FilterItem
+            return _context.FilterItem
                 .Include(fi => fi.FilterGroup)
                 .ThenInclude(fg => fg.Filter).AsNoTracking()
-                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
-                .ToList();
+                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
+                       observations.Any(o => o.FilterItems.Any(
+                           ofi => ofi.FilterItemId == fi.Id)));
+        }
 
-            return allFilterItemsForSubject.Where(
-                fi => observations.Any(o => o.FilterItems.Any(
-                    ofi => ofi.FilterItemId == fi.Id)));
+        public IEnumerable<FilterItem> GetFilterItemsFromObservationList(IList<Observation> observations)
+        {
+            var filterItemIds =
+                observations
+                    .SelectMany(observation => observation.FilterItems)
+                    .Select(ofi => ofi.FilterItemId)
+                    .Distinct()
+                    .ToList();
+            
+            return _context
+                .FilterItem
+                .AsNoTracking()
+                .Include(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Where(fi => filterItemIds.Contains(fi.Id))
+                .ToList();
         }
 
         public FilterItem? GetTotal(Filter filter)
