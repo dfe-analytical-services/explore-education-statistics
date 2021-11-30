@@ -280,13 +280,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 return locationAttributes.Select(locationAttribute =>
                 {
-                    var code = GetLocationAttributeCode(locationAttribute);
-                    var geoJson = code == null ? null : geoJsonByCode.GetValueOrDefault(code)?.Deserialized;
+                    var code = locationAttribute.GetCodeOrFallback();
+                    var geoJson = code.IsNullOrEmpty()
+                        ? null
+                        : geoJsonByCode.GetValueOrDefault(code)?.Deserialized;
 
                     return new ObservationalUnitMetaViewModel
                     {
                         GeoJson = geoJson,
-                        Label = locationAttribute.Name,
+                        Label = locationAttribute.Name ?? string.Empty,
                         Level = geographicLevel,
                         Value = code
                     };
@@ -315,17 +317,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 IReadOnlyDictionary<string, GeoJson>? geoJsonByCode)
             {
                 var locationAttribute = locationAttributeNode.Attribute;
+                var code = locationAttribute.GetCodeOrFallback();
 
                 if (locationAttributeNode.IsLeaf)
                 {
-                    var code = GetLocationAttributeCode(locationAttribute);
-                    var geoJson = code == null ? null : geoJsonByCode?.GetValueOrDefault(code)?.Deserialized;
+                    var geoJson = code.IsNullOrEmpty()
+                        ? null
+                        : geoJsonByCode?.GetValueOrDefault(code)?.Deserialized;
 
                     return new LocationAttributeViewModel
                     {
                         GeoJson = geoJson,
                         Label = locationAttribute.Name ?? string.Empty,
-                        Value = locationAttribute.Code ?? string.Empty
+                        Value = code
                     };
                 }
 
@@ -333,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     Label = locationAttribute.Name ?? string.Empty,
                     Level = locationAttribute.GetType().Name,
-                    Value = locationAttribute.Code ?? string.Empty,
+                    Value = code,
                     Options = locationAttributeNode.Children
                         .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
                         .ToList()
@@ -385,20 +389,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 }
 
                 var locationAttributeCodes = locationAttributes
-                    .Select(GetLocationAttributeCode)
+                    .Select(locationAttribute => locationAttribute.GetCodeOrFallback())
                     .WhereNotNull();
 
                 return _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, locationAttributeCodes);
             }
 
             private bool GeoJsonRequested => _query.IncludeGeoJson != null && _query.IncludeGeoJson.Value;
-
-            private static string? GetLocationAttributeCode(ILocationAttribute locationAttribute)
-            {
-                return locationAttribute is LocalAuthority localAuthority
-                    ? localAuthority.GetCodeOrOldCodeIfEmpty()
-                    : locationAttribute.Code;
-            }
         }
     }
 }

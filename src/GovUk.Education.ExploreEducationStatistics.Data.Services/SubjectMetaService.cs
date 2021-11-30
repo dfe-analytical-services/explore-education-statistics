@@ -255,13 +255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 ? new LocationAttributeViewModel
                 {
                     Label = locationAttributeNode.Attribute.Name ?? string.Empty,
-                    Value = locationAttributeNode.Attribute.Code ?? string.Empty
+                    Value = locationAttributeNode.Attribute.GetCodeOrFallback()
                 }
                 : new LocationAttributeViewModel
                 {
                     Label = locationAttributeNode.Attribute.Name ?? string.Empty,
                     Level = locationAttributeNode.Attribute.GetType().Name,
-                    Value = locationAttributeNode.Attribute.Code ?? string.Empty,
+                    Value = locationAttributeNode.Attribute.GetCodeOrFallback(),
                     Options = DeduplicateLocationViewModels(
                             locationAttributeNode.Children.Select(BuildLocationAttributeViewModel)
                         )

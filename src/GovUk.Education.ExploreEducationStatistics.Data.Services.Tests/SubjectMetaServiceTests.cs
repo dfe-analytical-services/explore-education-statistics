@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly Region _northWest = new("E12000002", "North West");
         private readonly Region _eastMidlands = new("E12000004", "East Midlands");
         private readonly LocalAuthority _blackpool = new("E06000009", "", "Blackpool");
+        private readonly LocalAuthority _cheshireOldCode = new(null, "875", "Cheshire (Pre LGR 2009)");
         private readonly LocalAuthority _derby = new("E06000015", "", "Derby");
         private readonly LocalAuthority _derbyDupe = new("E06000016", "", "Derby");
         private readonly LocalAuthority _nottingham = new("E06000018", "", "Nottingham");
@@ -496,6 +497,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(viewModel.Filters);
                 Assert.Empty(viewModel.Indicators);
                 Assert.Empty(viewModel.TimePeriod.Options);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectMeta_LocationsForSpecialCases()
+        {
+            var release = new Release();
+            var subject = new Subject();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
+            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
+            {
+                {
+                    GeographicLevel.LocalAuthority,
+                    new List<LocationAttributeNode>
+                    {
+                        new(_cheshireOldCode)
+                    }
+                }
+            };
+
+            var options = Options.Create(new LocationsOptions
+            {
+                Hierarchies = new Dictionary<GeographicLevel, List<string>>()
+            });
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+
+            filterRepository
+                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Returns(Enumerable.Empty<Filter>());
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Returns(Enumerable.Empty<IndicatorGroup>());
+
+            locationRepository
+                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
+                .ReturnsAsync(locations);
+
+            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext: statisticsDbContext,
+                    filterRepository: filterRepository.Object,
+                    indicatorGroupRepository: indicatorGroupRepository.Object,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object,
+                    options: options
+                );
+
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    filterRepository,
+                    indicatorGroupRepository,
+                    locationRepository,
+                    timePeriodService);
+
+                var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
+
+                var locationViewModels = viewModel.Locations;
+
+                Assert.Single(locationViewModels);
+
+                var localAuthorities = locationViewModels["localAuthority"];
+
+                // This Cheshire LA does not have a new code, so we fallback to
+                // providing its old code the option value.
+                var laOption1 = localAuthorities.Options[0];
+                Assert.Equal(_cheshireOldCode.Name, laOption1.Label);
+                Assert.Equal(_cheshireOldCode.OldCode, laOption1.Value);
+                Assert.Null(laOption1.Level);
+                Assert.Null(laOption1.Options);
             }
         }
 
