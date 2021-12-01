@@ -351,7 +351,7 @@ const ChartAxisConfiguration = ({
                   <FormFieldNumberInput<AxisConfiguration>
                     name="size"
                     min={0}
-                    label="Size of axis (px)"
+                    label="Size of axis (pixels)"
                     width={3}
                   />
                 )}
@@ -398,7 +398,7 @@ const ChartAxisConfiguration = ({
                   <FormFieldTextInput label="Label" name="label.text" />
 
                   <FormFieldNumberInput
-                    label="Width (px)"
+                    label="Width (pixels)"
                     name="label.width"
                     width={5}
                     min={0}
