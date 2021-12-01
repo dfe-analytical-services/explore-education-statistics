@@ -17,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class TableBuilderMetaControllerTests
     {
-        private readonly TableBuilderMetaController _controller;
-
         private static readonly Guid SubjectId = Guid.NewGuid();
         private static readonly SubjectMetaQueryContext QueryContext = new SubjectMetaQueryContext
         {

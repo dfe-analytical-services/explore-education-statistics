@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
+        public IList<Observation> FindObservations(ObservationQueryContext query)
         {
             var totalStopwatch = Stopwatch.StartNew();
             var phasesStopwatch = Stopwatch.StartNew();
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return observations;
         }
 
-        public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
+        public IQueryable<Observation> FindObservations(SubjectMetaQueryContext query)
         {
             return DbSet()
                 .AsNoTracking()

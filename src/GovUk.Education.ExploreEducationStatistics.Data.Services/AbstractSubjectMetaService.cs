@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public abstract class AbstractSubjectMetaService
     {
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
-        private readonly IFilterItemRepository _filterItemRepository;
+        protected readonly IFilterItemRepository _filterItemRepository;
         private readonly IGeoJsonRepository _geoJsonRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -32,9 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel);
         }
 
-        protected Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
+        protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
         {
-            return _filterItemRepository.GetFilterItems(subjectId, observations, listFilterItems)
+            return filterItems
                 .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),

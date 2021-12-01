@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var observations = _observationService.FindObservations(queryContext).AsQueryable();
+                    var observations = _observationService.FindObservations(queryContext);
 
                     if (!observations.Any())
                     {

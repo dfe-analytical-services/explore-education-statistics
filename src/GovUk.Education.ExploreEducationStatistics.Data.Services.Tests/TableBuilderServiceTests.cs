@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -20,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -129,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             release.Id,
                             It.IsAny<SubjectMetaQueryContext>(),
-                            It.IsAny<IQueryable<Observation>>()
+                            It.IsAny<IList<Observation>>()
                         )
                     )
                     .ReturnsAsync(subjectMeta);
@@ -160,15 +162,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     observationService,
                     resultSubjectMetaService,
                     subjectRepository,
                     releaseRepository);
 
-                Assert.True(result.IsRight);
-
-                var observationResults = result.Right.Results.ToList();
+                var observationResults = result.AssertRight().Results.ToList();
 
                 Assert.Equal(2, observationResults.Count);
 
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
+                VerifyAllMocks(subjectRepository, releaseRepository);
 
                 result.AssertNotFound();
             }
@@ -242,32 +242,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
-            {
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+            await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId);
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
-                subjectRepository
-                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
-                    .ReturnsAsync(publicationId);
+            subjectRepository
+                .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                .ReturnsAsync(publicationId);
 
-                var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
-                releaseRepository
-                    .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                    .Returns(release);
+            releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(publicationId))
+                .Returns(release);
 
-                var service = BuildTableBuilderService(
-                    statisticsDbContext,
-                    subjectRepository: subjectRepository.Object,
-                    releaseRepository: releaseRepository.Object
-                );
+            var service = BuildTableBuilderService(
+                statisticsDbContext,
+                subjectRepository: subjectRepository.Object,
+                releaseRepository: releaseRepository.Object
+            );
 
-                var result = await service.Query(query);
+            var result = await service.Query(query);
 
-                MockUtils.VerifyAllMocks(subjectRepository, releaseRepository);
+            VerifyAllMocks(subjectRepository, releaseRepository);
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -373,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(query);
 
-                MockUtils.VerifyAllMocks(filterItemRepository, subjectRepository, releaseRepository);
+                VerifyAllMocks(filterItemRepository, subjectRepository, releaseRepository);
 
                 result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
             }
@@ -475,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseId,
                             It.IsAny<SubjectMetaQueryContext>(),
-                            It.IsAny<IQueryable<Observation>>()
+                            It.IsAny<IList<Observation>>()
                         )
                     )
                     .ReturnsAsync(subjectMeta);
@@ -494,11 +492,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                MockUtils.VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository);
+                VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository);
 
-                Assert.True(result.IsRight);
-
-                var observationResults = result.Right.Results.ToList();
+                var observationResults = result.AssertRight().Results.ToList();
 
                 Assert.Equal(2, observationResults.Count);
 
@@ -663,7 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                MockUtils.VerifyAllMocks(filterItemRepository, subjectRepository);
+                VerifyAllMocks(filterItemRepository, subjectRepository);
 
                 result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
             }
@@ -695,7 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 options ?? DefaultOptions()
