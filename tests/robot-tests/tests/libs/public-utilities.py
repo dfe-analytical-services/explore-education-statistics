@@ -93,6 +93,7 @@ def get_methodology_link(topic, publication, methodology):
         raise_assertion_error(
             f'Could not find methodology link with title "{methodology}""!')
 
+
 # Table tool
 def user_checks_generated_permalink_is_valid():
     elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
