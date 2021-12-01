@@ -116,6 +116,13 @@ export const publicationManageTeamAccessRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const publicationManageTeamAccessReleaseRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/manage-team/:releaseId',
+  component: PublicationManageTeamAccessPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
 export const releaseManageTeamAccessAddUsersRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/add-contributors',
   component: ReleaseManageTeamAccessAddUsersPage,
@@ -194,6 +201,7 @@ const routes = {
   publicationCreateRoute,
   publicationEditRoute,
   publicationManageTeamAccessRoute,
+  publicationManageTeamAccessReleaseRoute,
   releaseManageTeamAccessAddUsersRoute,
   methodologyRoute,
   methodologyAdoptRoute,

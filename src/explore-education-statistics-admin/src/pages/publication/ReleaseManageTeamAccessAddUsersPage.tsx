@@ -48,8 +48,7 @@ const ReleaseManageTeamAccessAddUsersPage = ({
       >
         <PublicationAddExistingUsersTab
           publicationId={publicationId}
-          releaseId={releaseId}
-          releaseTitle={release.title}
+          release={release}
           contributors={contributors}
         />
       </Page>

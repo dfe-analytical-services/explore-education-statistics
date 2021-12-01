@@ -1,5 +1,5 @@
 import Page from '@admin/components/Page';
-import { PublicationRouteParams } from '@admin/routes/routes';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
@@ -14,6 +14,8 @@ import publicationService, {
 } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import WarningMessage from '@common/components/WarningMessage';
+import { publicationManageTeamAccessReleaseRoute } from '@admin/routes/routes';
+import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
   releases: ReleaseSummary[];
@@ -22,17 +24,27 @@ interface Model {
 
 const PublicationManageTeamAccessPage = ({
   match,
-}: RouteComponentProps<PublicationRouteParams>) => {
-  const { publicationId } = match.params;
-  const [releaseId, setReleaseId] = useState('');
+}: RouteComponentProps<ReleaseRouteParams>) => {
+  const history = useHistory();
+  const { publicationId, releaseId } = match.params;
+  const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
   const { value: model, isLoading } = useAsyncHandledRetry(async () => {
     const [releases, publication] = await Promise.all([
       publicationService.getReleases(publicationId),
       publicationService.getPublication(publicationId),
     ]);
-    if (releases.length) {
-      setReleaseId(releases[0].id);
+    if (!releaseId && releases.length) {
+      setCurrentReleaseId(releases[0].id);
+      history.push(
+        generatePath<ReleaseRouteParams>(
+          publicationManageTeamAccessReleaseRoute.path,
+          {
+            publicationId,
+            releaseId: releases[0].id,
+          },
+        ),
+      );
     }
     return { releases, publication } as Model;
   }, [publicationId]);
@@ -42,7 +54,7 @@ const PublicationManageTeamAccessPage = ({
   }
   const { releases, publication } = model;
 
-  const release = releases.find(r => r.id === releaseId);
+  const release = releases.find(r => r.id === currentReleaseId);
 
   return (
     <Page
@@ -66,8 +78,19 @@ const PublicationManageTeamAccessPage = ({
                 value: r.id,
               }))}
               order={[]}
-              value={releaseId}
-              onChange={e => setReleaseId(e.target.value)}
+              value={currentReleaseId}
+              onChange={e => {
+                setCurrentReleaseId(e.target.value);
+                history.push(
+                  generatePath<ReleaseRouteParams>(
+                    publicationManageTeamAccessReleaseRoute.path,
+                    {
+                      publicationId,
+                      releaseId: e.target.value,
+                    },
+                  ),
+                );
+              }}
             />
           </div>
 

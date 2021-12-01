@@ -8,10 +8,9 @@ import { Form, FormFieldCheckboxGroup } from '@common/components/form';
 import Button from '@common/components/Button';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { generatePath, useHistory } from 'react-router-dom';
-import {
-  publicationManageTeamAccessRoute,
-  PublicationRouteParams,
-} from '@admin/routes/routes';
+import { publicationManageTeamAccessReleaseRoute } from '@admin/routes/routes';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
+import { Release } from '@admin/services/releaseService';
 
 interface AddExistingUsersFormValues {
   users: string[];
@@ -19,15 +18,13 @@ interface AddExistingUsersFormValues {
 
 export interface Props {
   publicationId: string;
-  releaseId: string;
-  releaseTitle: string;
+  release: Release;
   contributors: ManageAccessPageContributor[];
 }
 
 const PublicationAddExistingUsersTab = ({
   publicationId,
-  releaseId,
-  releaseTitle,
+  release,
   contributors,
 }: Props) => {
   const history = useHistory();
@@ -35,14 +32,15 @@ const PublicationAddExistingUsersTab = ({
   const handleSubmit = useFormSubmit<AddExistingUsersFormValues>(
     async values => {
       await releasePermissionService.updateReleaseContributors(
-        releaseId,
+        release.id,
         values.users,
       );
       history.push(
-        generatePath<PublicationRouteParams>(
-          publicationManageTeamAccessRoute.path,
+        generatePath<ReleaseRouteParams>(
+          publicationManageTeamAccessReleaseRoute.path,
           {
             publicationId,
+            releaseId: release.id,
           },
         ),
       );
@@ -75,7 +73,7 @@ const PublicationAddExistingUsersTab = ({
 
   return (
     <>
-      <h2>Add existing publication users to release ({releaseTitle})</h2>
+      <h2>Add existing publication users to release ({release.title})</h2>
 
       <Formik<AddExistingUsersFormValues>
         initialValues={initialValues}

@@ -38,8 +38,29 @@ describe('PublicationAddExistingUsersTab', () => {
     render(
       <PublicationAddExistingUsersTab
         publicationId="publication-id"
-        releaseId="release-id"
-        releaseTitle="Test release title"
+        release={{
+          id: 'release-id',
+          title: 'Test release title',
+          slug: '',
+          approvalStatus: 'Approved',
+          latestRelease: true,
+          live: true,
+          amendment: true,
+          releaseName: '',
+          publicationId: '',
+          publicationTitle: '',
+          publicationSlug: '',
+          timePeriodCoverage: { value: '', label: '' },
+          type: { id: '', title: '' },
+          contact: {
+            id: '',
+            contactName: '',
+            contactTelNo: '',
+            teamEmail: '',
+          },
+          previousVersionId: '',
+          preReleaseAccessList: '',
+        }}
         contributors={testContributors}
       />,
     );
