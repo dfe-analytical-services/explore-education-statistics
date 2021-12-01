@@ -35,6 +35,7 @@ def user_signs_in_as(user: str):
     except Exception as e:
         raise_assertion_error(e)
 
+
 def get_theme_id_from_url():
     url = sl.get_location()
     assert '/themes/' in url, 'URL does not contain /themes'

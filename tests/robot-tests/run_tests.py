@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
 from robot import rebot_cli as robot_rebot_cli
-
 import scripts.keyword_profile as kp
+from tests.libs.slack import send_slack_report
 from tests.libs.setup_auth_variables import setup_auth_variables
 
 current_dir = Path(__file__).absolute().parent
@@ -111,6 +111,10 @@ parser.add_argument("--print-keywords",
                     dest="print_keywords",
                     action='store_true',
                     help="choose to print out keywords as they are started")
+parser.add_argument("--enable-slack",
+                    dest="enable_slack",
+                    action='store_true'
+                    )
 parser.add_argument("--prompt-to-continue",
                     dest="prompt_to_continue",
                     action='store_true',
@@ -162,7 +166,7 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
-output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
@@ -195,7 +199,7 @@ if args.ci:
     robotArgs += ['--removekeywords',
                   'name:common.user goes to url']  # To hide basic auth credentials
 else:
-    if args.custom_env: 
+    if args.custom_env:
         load_dotenv(args.custom_env)
 
     else:
@@ -205,6 +209,7 @@ assert os.getenv('PUBLIC_URL') is not None
 assert os.getenv('ADMIN_URL') is not None
 assert os.getenv('ADMIN_EMAIL') is not None
 assert os.getenv('ADMIN_PASSWORD') is not None
+
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
@@ -428,15 +433,17 @@ finally:
         delete_test_topic()
 
     if args.rerun_failed_tests or args.rerun_failed_suites:
-        print("Combining rerun test results with original test results") 
-        merge_options=[
-            "--outputdir","test-results/",
-            "-o","output.xml",
+        print("Combining rerun test results with original test results")
+        merge_options = [
+            "--outputdir", "test-results/",
+            "-o", "output.xml",
             "--prerebotmodifier", "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            "--merge","test-results/output.xml","test-results/rerun.xml"
+            "--merge", "test-results/output.xml", "test-results/rerun.xml"
         ]
         robot_rebot_cli(merge_options, exit=False)
 
     print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     print("\nTests finished!")
+    if args.enable_slack:
+        send_slack_report()
