@@ -31,17 +31,17 @@ Enters contact details
     user enters text into element    id:publicationForm-contactTelNo    0123456789
 
 Error message appears when submitting and title is empty
-    user checks element is not visible    id:publicationForm-title-error    30
+    user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
     user clicks button    Save publication
-    user waits until element is visible    id:publicationForm-title-error    30
+    user waits until element is visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication title
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
-    user checks element is not visible    id:publicationForm-title-error    60
+    user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
-    user waits until h1 is visible    Dashboard    60
+    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
 
 Verify that new publication has been created
     user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)
@@ -59,7 +59,7 @@ Create new test theme and topic
 
 Go to edit publication
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME} (created)
-    user waits until page contains title caption    ${PUBLICATION_NAME} (created)    60
+    user waits until page contains title caption    ${PUBLICATION_NAME} (created)    %{WAIT_SMALL}
     user waits until h1 is visible    Manage publication
 
 Update publication

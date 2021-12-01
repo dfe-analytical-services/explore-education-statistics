@@ -377,11 +377,11 @@ Configure basic vertical bar chart
 
 Change vertical bar chart legend
     user clicks link    Legend
-    user waits until h3 is visible    Legend    60
+    user waits until h3 is visible    Legend    %{WAIT_SMALL}
 
     user counts legend form item rows    1
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label
-    ...    Admission Numbers (Nailsea Youngwood)    60
+    ...    Admission Numbers (Nailsea Youngwood)    %{WAIT_SMALL}
 
     user enters text into element    id:chartLegendConfigurationForm-items-0-label    Admissions
 
@@ -426,7 +426,7 @@ Save and validate vertical bar chart embeds correctly
     user waits until button is enabled    Save chart options
 
     user clicks link    Content
-    user waits until h2 is visible    ${PUBLICATION_NAME}    60
+    user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -466,7 +466,7 @@ Save and validate vertical bar chart embeds correctly
 
 Configure basic horizontal bar chart
     user navigates to admin frontend    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    60
+    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
@@ -548,7 +548,7 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    60
+    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
@@ -556,7 +556,7 @@ Configure basic geographic chart
 
 Change geographic chart legend
     user clicks link    Legend
-    user waits until h3 is visible    Legend    90
+    user waits until h3 is visible    Legend    %{WAIT_MEDIUM}
 
     user counts legend form item rows    5
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Admission Numbers (2005)

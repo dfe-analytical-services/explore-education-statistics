@@ -103,7 +103,7 @@ user creates a fully populated draft release
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote
     user clicks button    Save footnote
-    user waits until h2 is visible    Footnotes    60
+    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
 
     # add public prerelease access list
     user clicks link    Pre-release access

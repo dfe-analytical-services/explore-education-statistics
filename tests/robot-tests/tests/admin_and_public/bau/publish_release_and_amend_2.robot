@@ -35,7 +35,7 @@ Upload another subject (for deletion later)
 
 Add data guidance to subject
     user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance    90
+    user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
@@ -227,7 +227,7 @@ Validate table cells
 
 Generate the permalink
     [Documentation]    EES-214
-    user waits until page contains button    Generate shareable link    60
+    user waits until page contains button    Generate shareable link    %{WAIT_SMALL}
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
     ${PERMA_LOCATION_URL}    Get Value    testid:permalink-generated-url
@@ -488,7 +488,7 @@ Reduce the number of selected Dates and generate a smaller table
     user clicks category checkbox    Date    24/03/2020
     user clicks category checkbox    Date    25/03/2020
     user clicks element    id:filtersForm-submit
-    user waits until page contains    Generate shareable link    60
+    user waits until page contains    Generate shareable link    %{WAIT_SMALL}
 
 Validate generated table
     user checks page contains    Updating ${SUBJECT_NAME} footnote

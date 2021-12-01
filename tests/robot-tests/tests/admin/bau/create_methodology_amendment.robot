@@ -221,17 +221,20 @@ Revisit the live Amendment after the cancellation to double check it remains una
 user verifies original Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology content section 1
     user waits until element contains    ${section}    Adding Methodology content    %{WAIT_MEDIUM}
     user waits until parent contains element    ${section}
     ...    xpath://img[@alt="Alt text for the uploaded content image"]    %{WAIT_MEDIUM}
 
     ${section}=    user opens accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 1
     user waits until element contains    ${section}    Adding Methodology annex
     user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded annex image"]
 
     ${section}=    user opens accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 2
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 1
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2
     user waits until parent contains element    ${section}
@@ -242,7 +245,7 @@ user verifies original Methodology readonly content
 user verifies amended Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
-    user waits until element contains    ${section}    Adding Methodology content
+    user waits until element contains    ${section}    Adding Methodology content    %{WAIT_SMALL}
     user waits until parent contains element    ${section}
     ...    xpath://img[@alt="Alt text for the uploaded content image"]
     user waits until parent contains element    ${section}
@@ -250,4 +253,5 @@ user verifies amended Methodology readonly content
 
     ${section}=    user opens accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 2
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2

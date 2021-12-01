@@ -91,7 +91,7 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    60
+    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
 Add two accordion sections to release
     user waits for page to finish loading
@@ -105,7 +105,7 @@ Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    css:#releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until page contains element    ${datablock}    60
+    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
@@ -147,7 +147,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify release URL and page caption
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
@@ -167,10 +167,10 @@ Verify publish and update dates
 Verify release associated files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user waits until page contains element    ${downloads}    60
+    user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
     user checks element should contain    ${downloads}    Download all files
-    ...    60
+    ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
     ...    All data used to create this release is published as open data and is available for download.
     user checks element should contain    ${downloads}
@@ -388,10 +388,11 @@ Add ancillary file to amendment
 
 User navigates to Data blocks page
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
 Edit data block for amendment
     user waits until table is visible
+
     user checks table body has x rows    1
     user checks results table cell contains    1    1    ${DATABLOCK_NAME}
     user checks results table cell contains    1    2    Yes
@@ -490,7 +491,7 @@ Verify amendment is on Find Statistics page again
 
 Navigate to amendment release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}

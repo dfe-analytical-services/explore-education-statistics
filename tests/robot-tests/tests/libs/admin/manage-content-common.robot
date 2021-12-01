@@ -187,7 +187,7 @@ user adds text block to editable accordion section
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
     user clicks button    Add text block    ${section}
-    user waits until element contains    ${section}    This section is empty
+    user waits until element contains    ${section}    This section is empty    %{WAIT_SMALL}
 
 user adds data block to editable accordion section
     [Arguments]
