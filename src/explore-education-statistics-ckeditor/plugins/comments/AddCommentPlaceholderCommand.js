@@ -7,17 +7,13 @@ export default class AddCommentPlaceholderCommand extends Command {
   refresh() {
     const { editor } = this;
     const range = editor.model.document.selection.getFirstRange();
-    const items = range.getItems();
-    const itemsArray = [];
-    [...items].forEach(item => itemsArray.push(item));
-    const item = itemsArray[0];
+    const items = [...range.getItems()];
 
     // Can select an empty range by double clicking at the end of a line.
     const isEmptyRange =
-      itemsArray.length === 1 &&
-      item.name &&
-      (item.name === 'paragraph' || item.name === 'softBreak') &&
-      !item.textNode;
+      items.length === 1 &&
+      (items[0].name === 'paragraph' || items[0].name === 'softBreak') &&
+      !items[0].textNode;
 
     // Only enable the button when a range with content is selected.
     this.isEnabled =

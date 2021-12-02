@@ -33,7 +33,7 @@ Create Methodology with some content and images
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology content section 1    1    test-infographic.png
     ...    Alt text for the uploaded content image    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
@@ -41,7 +41,7 @@ Create Methodology with some content and images
     user adds text block to editable accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 1    1    Adding Methodology annex
-    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
@@ -49,14 +49,14 @@ Create Methodology with some content and images
     user adds text block to editable accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 2    1
-    ...    Adding Methodology annex 2 text block 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    Adding Methodology annex 2 text block 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology annex section 2    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
     user adds text block to editable accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 2    2
-    ...    Adding Methodology annex 2 text block 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    Adding Methodology annex 2 text block 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology annex section 2    2    test-infographic.png
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
@@ -141,7 +141,7 @@ Remove an image from a Content Block
     user closes Set Page View box
     user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user removes image from accordion section text block    Methodology annex section 2    2
-    ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user checks accordion section text block does not contain image with alt text    Methodology annex section 2    2
     ...    Alt text for the uploaded content image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 

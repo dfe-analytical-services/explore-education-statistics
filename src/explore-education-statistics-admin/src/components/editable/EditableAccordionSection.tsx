@@ -1,5 +1,5 @@
 import styles from '@admin/components/editable/EditableAccordionSection.module.scss';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import AccordionSection, {
   accordionSectionClasses,
   AccordionSectionProps,

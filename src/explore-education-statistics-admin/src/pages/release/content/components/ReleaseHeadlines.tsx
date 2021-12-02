@@ -1,12 +1,11 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -62,25 +61,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
     [actions, release.id, release.headlinesSection.id],
   );
 
-  const updateBlockComments = useCallback(
-    async (blockId: string, comments: Comment[]) => {
-      await actions.updateBlockComments({
-        sectionId: release.headlinesSection.id,
-        blockId,
-        sectionKey: 'headlinesSection',
-        comments,
-      });
-    },
-    [actions, release.headlinesSection.id],
-  );
-
-  const updateCommentsPendingDeletion = useCallback(
-    async (blockId, commentId) => {
-      await actions.setCommentsPendingDeletion({ blockId, commentId });
-    },
-    [actions],
-  );
-
   const headlinesTab = (
     <TabsSection title="Headlines">
       <section id="releaseHeadlines-keyStatistics">
@@ -99,8 +79,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
               block={block}
               sectionId={release.headlinesSection.id}
               releaseId={release.id}
-              onBlockCommentsChange={updateBlockComments}
-              onCommentsPendingDeletionChange={updateCommentsPendingDeletion}
               onSave={updateBlock}
               onDelete={removeBlock}
             />

@@ -57,7 +57,7 @@ Update the Methodology Content
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology content section 1    1    test-infographic.png
     ...    Alt text for the uploaded content image    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
@@ -65,7 +65,7 @@ Update the Methodology Content
     user adds text block to editable accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 1    1    Adding Methodology annex
-    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 

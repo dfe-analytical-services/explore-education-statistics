@@ -1,35 +1,31 @@
 import Comment, {
-  toggleResolveCommentHandler,
+  ResolveCommentEvent,
 } from '@admin/components/comments/Comment';
+import styles from '@admin/components/comments/CommentsList.module.scss';
 import { SelectedComment } from '@admin/components/editable/EditableContentForm';
 import { Comment as CommentType } from '@admin/services/types/content';
 import Details from '@common/components/Details';
+import sortBy from 'lodash/sortBy';
 import React, { useEffect, useState } from 'react';
 
 interface Props {
   comments: CommentType[];
-  commentsPendingDeletion: string[];
   markersOrder: string[];
   selectedComment: SelectedComment;
-  onCommentRemoved: (id: string) => void;
-  onCommentResolved: ({
-    comment,
-    resolve,
-    updateMarker,
-  }: toggleResolveCommentHandler) => void;
-  onCommentSelect: (id: string) => void;
-  onCommentUpdated: (comment: CommentType) => void;
+  onRemove: (commentId: string) => void;
+  onResolve: (event: ResolveCommentEvent) => void;
+  onSelect: (id: string) => void;
+  onUpdate: (comment: CommentType) => void;
 }
 
 const CommentsList = ({
   comments,
-  commentsPendingDeletion,
   markersOrder,
   selectedComment,
-  onCommentRemoved,
-  onCommentResolved,
-  onCommentSelect,
-  onCommentUpdated,
+  onRemove,
+  onResolve,
+  onSelect,
+  onUpdate,
 }: Props) => {
   const [unresolvedComments, setUnresolvedComments] = useState<CommentType[]>(
     [],
@@ -39,47 +35,41 @@ const CommentsList = ({
   useEffect(() => {
     setResolvedComments(comments.filter(comment => comment.resolved));
     const unresolved = comments.filter(comment => !comment.resolved);
-    // Order comments by marker order.
-    unresolved.sort((a, b) => {
-      if (markersOrder.indexOf(a.id) > markersOrder.indexOf(b.id)) {
-        return 1;
-      }
-      if (markersOrder.indexOf(a.id) < markersOrder.indexOf(b.id)) {
-        return -1;
-      }
-      return 0;
-    });
-    setUnresolvedComments(unresolved);
+    setUnresolvedComments(
+      sortBy(unresolved, comment => markersOrder.indexOf(comment.id)),
+    );
   }, [comments, markersOrder]);
 
   return (
     <>
-      {unresolvedComments.map(comment => (
-        <Comment
-          key={comment.id}
-          active={selectedComment.commentId === comment.id}
-          comment={comment}
-          isPendingDeletion={commentsPendingDeletion.includes(comment.id)}
-          onCommentRemoved={onCommentRemoved}
-          onCommentResolved={onCommentResolved}
-          onCommentSelect={onCommentSelect}
-          onCommentUpdated={onCommentUpdated}
-        />
-      ))}
+      <ol className={styles.list} data-testid="unresolvedComments">
+        {unresolvedComments.map(comment => (
+          <Comment
+            key={comment.id}
+            active={selectedComment.commentId === comment.id}
+            comment={comment}
+            onRemove={onRemove}
+            onResolve={onResolve}
+            onSelect={onSelect}
+            onUpdate={onUpdate}
+          />
+        ))}
+      </ol>
       {resolvedComments.length > 0 && (
         <Details summary={`Resolved comments (${resolvedComments.length})`}>
-          {resolvedComments.map(comment => (
-            <Comment
-              key={comment.id}
-              active={false}
-              comment={comment}
-              isPendingDeletion={commentsPendingDeletion.includes(comment.id)}
-              onCommentRemoved={onCommentRemoved}
-              onCommentResolved={onCommentResolved}
-              onCommentSelect={onCommentSelect}
-              onCommentUpdated={onCommentUpdated}
-            />
-          ))}
+          <ol className={styles.list} data-testid="resolvedComments">
+            {resolvedComments.map(comment => (
+              <Comment
+                key={comment.id}
+                active={false}
+                comment={comment}
+                onRemove={onRemove}
+                onResolve={onResolve}
+                onSelect={onSelect}
+                onUpdate={onUpdate}
+              />
+            ))}
+          </ol>
         </Details>
       )}
     </>

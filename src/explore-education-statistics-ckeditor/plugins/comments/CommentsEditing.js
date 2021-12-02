@@ -1,10 +1,10 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import { scrollViewportToShowTarget } from '@ckeditor/ckeditor5-utils/src/dom/scroll';
-import AddCommentCommand from './addCommentCommand';
-import AddCommentPlaceholderCommand from './addCommentPlaceholderCommand';
-import SelectCommentCommand from './selectCommentCommand';
-import RemoveCommentCommand from './removeCommentCommand';
-import ToggleResolveCommentCommand from './toggleResolveCommentCommand';
+import AddCommentCommand from './AddCommentCommand';
+import AddCommentPlaceholderCommand from './AddCommentPlaceholderCommand';
+import SelectCommentCommand from './SelectCommentCommand';
+import RemoveCommentCommand from './RemoveCommentCommand';
+import ToggleResolveCommentCommand from './ToggleResolveCommentCommand';
 
 export default class CommentsEditing extends Plugin {
   constructor(editor) {
@@ -51,10 +51,9 @@ export default class CommentsEditing extends Plugin {
           docVersion - 1,
         );
 
-        if (lastOperation.name && lastOperation.name.startsWith('comment:')) {
+        if (lastOperation.name?.startsWith('comment:')) {
           if (
-            lastOperation.batch.operations[0].name &&
-            lastOperation.batch.operations[0].name.startsWith(
+            lastOperation.batch.operations[0].name?.startsWith(
               'resolvedcomment:',
             )
           ) {
@@ -73,7 +72,6 @@ export default class CommentsEditing extends Plugin {
         }
 
         if (
-          lastOperation.name &&
           lastOperation.name === 'commentplaceholder' &&
           lastOperation.newRange &&
           !lastOperation.oldRange
@@ -85,10 +83,7 @@ export default class CommentsEditing extends Plugin {
           return;
         }
 
-        if (
-          lastOperation.name &&
-          lastOperation.name.startsWith('resolvedcomment:')
-        ) {
+        if (lastOperation.name?.startsWith('resolvedcomment:')) {
           this.config.undoRedoComment(
             'undoUnresolveComment',
             lastOperation.name,
@@ -105,10 +100,9 @@ export default class CommentsEditing extends Plugin {
           docVersion - 1,
         );
 
-        if (lastOperation.name && lastOperation.name.startsWith('comment:')) {
+        if (lastOperation.name?.startsWith('comment:')) {
           if (
-            lastOperation.batch.operations[0].name &&
-            lastOperation.batch.operations[0].name.startsWith(
+            lastOperation.batch.operations[0].name?.startsWith(
               'resolvedcomment:',
             )
           ) {
@@ -119,10 +113,7 @@ export default class CommentsEditing extends Plugin {
             return;
           }
 
-          if (
-            lastOperation.batch.operations[0].name &&
-            lastOperation.batch.operations[0].name === 'commentplaceholder'
-          ) {
+          if (lastOperation.batch.operations[0].name === 'commentplaceholder') {
             this.config.undoRedoComment('redoAddComment', lastOperation.name);
             return;
           }
@@ -131,24 +122,10 @@ export default class CommentsEditing extends Plugin {
           return;
         }
 
-        if (
-          lastOperation.name &&
-          lastOperation.name.startsWith('resolvedcomment:')
-        ) {
+        if (lastOperation.name?.startsWith('resolvedcomment:')) {
           this.config.undoRedoComment('redoResolveComment', lastOperation.name);
         }
       });
-    });
-
-    /**
-     * Remove the marker when the remove comment command is executed.
-     */
-    this.listenTo(removeCommentCommand, 'execute', () => {
-      if (editor.model.markers.has(removeCommentCommand.commentName)) {
-        editor.model.change(writer =>
-          writer.removeMarker(removeCommentCommand.commentName),
-        );
-      }
     });
 
     /**
@@ -158,7 +135,6 @@ export default class CommentsEditing extends Plugin {
       this.selectedComment = selectCommentCommand.commentName;
       const markerCollection = [...editor.model.markers];
       let selectedMarker;
-
       markerCollection.forEach(marker => {
         if (
           marker.name.startsWith('comment:') &&
@@ -168,7 +144,6 @@ export default class CommentsEditing extends Plugin {
         }
         editor.model.change(writer => writer.updateMarker(marker));
       });
-
       if (selectedMarker) {
         const viewRange = editor.editing.mapper.toViewRange(
           selectedMarker.getRange(),

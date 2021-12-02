@@ -1,6 +1,6 @@
 import BlockDraggable from '@admin/components/editable/BlockDraggable';
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
 import reorder from '@common/utils/reorder';

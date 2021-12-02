@@ -1,5 +1,5 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { Dictionary } from '@common/types';
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';

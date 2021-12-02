@@ -1,13 +1,12 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { Comment, EditableBlock } from '@admin/services/types/content';
+import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import useToggle from '@common/hooks/useToggle';
@@ -26,8 +25,11 @@ const ReleaseContentAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { editingMode, unsavedEdits } = useEditingContext();
-  const { commentsPendingDeletion } = useReleaseContentState();
+  const {
+    editingMode,
+    unsavedCommentDeletions,
+    unsavedBlocks,
+  } = useEditingContext();
 
   const actions = useReleaseContentActions();
 
@@ -37,21 +39,14 @@ const ReleaseContentAccordionSection = ({
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
   const updatedHeading = () => {
-    if (unsavedEdits.findIndex(edit => edit.sectionId === sectionId) !== -1) {
+    if (
+      blocks.find(block => unsavedBlocks.includes(block.id)) ||
+      blocks.find(block =>
+        Object.keys(unsavedCommentDeletions).includes(block.id),
+      )
+    ) {
       return `${heading} (Unsaved changes)`;
     }
-
-    if (commentsPendingDeletion) {
-      const blocksWithCommentsPendingDeletions = blocks.filter(
-        block =>
-          commentsPendingDeletion[`block-${block.id}`] &&
-          commentsPendingDeletion[`block-${block.id}`].length,
-      );
-      if (blocksWithCommentsPendingDeletions.length) {
-        return `${heading} (Unsaved changes)`;
-      }
-    }
-
     return heading;
   };
 
@@ -144,25 +139,6 @@ const ReleaseContentAccordionSection = ({
     });
   }, [actions, sectionId, release.id]);
 
-  const updateBlockComments = useCallback(
-    async (blockId: string, comments: Comment[]) => {
-      await actions.updateBlockComments({
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-        comments,
-      });
-    },
-    [actions, sectionId],
-  );
-
-  const updateCommentsPendingDeletion = useCallback(
-    async (blockId, commentId) => {
-      await actions.setCommentsPendingDeletion({ blockId, commentId });
-    },
-    [actions],
-  );
-
   return (
     <EditableAccordionSection
       {...props}
@@ -209,8 +185,6 @@ const ReleaseContentAccordionSection = ({
                 editable={!isReordering}
                 releaseId={release.id}
                 visible={open}
-                onBlockCommentsChange={updateBlockComments}
-                onCommentsPendingDeletionChange={updateCommentsPendingDeletion}
                 onSave={updateBlock}
                 onDelete={removeBlock}
               />

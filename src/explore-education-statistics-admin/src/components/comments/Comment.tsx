@@ -1,26 +1,16 @@
 import styles from '@admin/components/comments/Comment.module.scss';
+import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { Comment as CommentType } from '@admin/services/types/content';
 import FormattedDate from '@common/components/FormattedDate';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import classNames from 'classnames';
-import releaseContentCommentService, {
-  UpdateComment,
-} from '@admin/services/releaseContentCommentService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import Yup from '@common/validation/yup';
 import useToggle from '@common/hooks/useToggle';
-import { Formik } from 'formik';
 import React, { useEffect, useRef } from 'react';
 
-interface FormValues {
-  content: string;
-}
-
-export interface toggleResolveCommentHandler {
+export interface ResolveCommentEvent {
   comment: CommentType;
   resolve?: boolean;
   updateMarker?: boolean;
@@ -29,24 +19,18 @@ export interface toggleResolveCommentHandler {
 interface Props {
   active: boolean;
   comment: CommentType;
-  isPendingDeletion: boolean;
-  onCommentRemoved: (id: string) => void;
-  onCommentResolved: ({
-    comment,
-    resolve,
-    updateMarker,
-  }: toggleResolveCommentHandler) => void;
-  onCommentSelect: (id: string) => void;
-  onCommentUpdated: (comment: CommentType) => void;
+  onRemove: (commentId: string) => void;
+  onResolve: (event: ResolveCommentEvent) => void;
+  onSelect: (id: string) => void;
+  onUpdate: (comment: CommentType) => void;
 }
 const Comment = ({
   active,
   comment,
-  isPendingDeletion,
-  onCommentRemoved,
-  onCommentResolved,
-  onCommentSelect,
-  onCommentUpdated,
+  onRemove,
+  onResolve,
+  onSelect,
+  onUpdate,
 }: Props) => {
   const {
     content,
@@ -58,7 +42,6 @@ const Comment = ({
     updated,
   } = comment;
   const [isEditingComment, toggleIsEditingComment] = useToggle(false);
-  const [isSubmitting, toggleSubmitting] = useToggle(false);
   const ref = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
 
@@ -72,145 +55,120 @@ const Comment = ({
     }
   }, [active]);
 
-  const updateComment = async (updatedContent: string) => {
-    toggleSubmitting.on();
-    const editedComment: UpdateComment = {
-      ...comment,
-      content: updatedContent,
-    };
-    const updatedComment = await releaseContentCommentService.updateContentSectionComment(
-      editedComment,
-    );
-    onCommentUpdated(updatedComment);
-    toggleSubmitting.off();
-    toggleIsEditingComment.off();
-  };
-
   const handleCommentSelection = () => {
     if (!comment.resolved) {
-      onCommentSelect(comment.id);
+      onSelect(comment.id);
     }
   };
 
-  if (isPendingDeletion) {
-    return null;
-  }
-
   return (
-    <div
-      aria-label="Comment"
-      className={classNames(styles.comment, {
-        [styles.active]: active,
-      })}
-      ref={ref}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => {
-        if (e.key === 'Enter') {
-          handleCommentSelection();
-        }
-      }}
-      onClick={() => {
-        handleCommentSelection();
-      }}
-    >
-      <p className="govuk-!-margin-bottom-0 govuk-body-s">
-        <strong>{`${createdBy.firstName} ${createdBy.lastName} `}</strong>
-        <br />
-        <FormattedDate format="dd/MM/yy HH:mm">{created}</FormattedDate>
-        {updated && (
-          <>
-            {' '}
-            (Updated{' '}
-            <FormattedDate format="dd/MM/yy HH:mm">{updated}</FormattedDate>)
-          </>
-        )}
-      </p>
-
+    <li className={styles.container}>
       {isEditingComment ? (
-        <Formik<FormValues>
-          initialValues={{
-            content,
-          }}
-          validationSchema={Yup.object({
-            content: Yup.string().required('Enter a comment'),
-          })}
-          onSubmit={async values => {
-            await updateComment(values.content);
-          }}
-        >
-          <Form id={`${id}-editCommentForm`} showErrorSummary={false}>
-            <FormFieldTextArea<FormValues>
-              label="Edit comment"
-              hideLabel
-              name="content"
-              data-testid="comment-textarea"
-              rows={3}
-            />
-            <ButtonGroup>
-              <Button type="submit" disabled={isSubmitting}>
-                Update
-              </Button>
-              <ButtonText onClick={toggleIsEditingComment.off}>
-                Cancel
-              </ButtonText>
-            </ButtonGroup>
-          </Form>
-        </Formik>
+        <div className={styles.form}>
+          <CommentEditForm
+            comment={comment}
+            id={id}
+            onCancel={toggleIsEditingComment.off}
+            onSubmit={updatedComment => {
+              onUpdate(updatedComment);
+              toggleIsEditingComment.off();
+            }}
+          />
+        </div>
       ) : (
         <>
           <div
-            className="govuk-!-margin-bottom-3 govuk-!-margin-top-2"
-            data-testid="comment-content"
+            aria-label="Comment"
+            className={classNames(styles.comment, {
+              [styles.active]: active,
+            })}
+            ref={ref}
+            role={!comment.resolved ? 'button' : undefined}
+            tabIndex={!comment.resolved ? 0 : undefined}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleCommentSelection();
+              }
+            }}
+            onClick={() => {
+              handleCommentSelection();
+            }}
           >
-            {content}
-          </div>
+            <p className="govuk-!-margin-bottom-0 govuk-body-s">
+              <strong>{`${createdBy.firstName} ${createdBy.lastName} `}</strong>
+              <span className="govuk-visually-hidden"> commented on </span>
+              <br />
+              <FormattedDate format="d MMM yyyy, HH:mm">
+                {created}
+              </FormattedDate>
+              {updated && (
+                <>
+                  <br />
+                  (Updated{' '}
+                  <FormattedDate format="d MMM yyyy, HH:mm">
+                    {updated}
+                  </FormattedDate>
+                  )
+                </>
+              )}
+            </p>
 
-          {resolved ? (
-            <>
+            <div
+              className="govuk-!-margin-bottom-3 govuk-!-margin-top-2"
+              data-testid="comment-content"
+            >
+              {content}
+            </div>
+
+            {resolved && (
               <p className="govuk-!-margin-bottom-0 govuk-body-s">
                 Resolved by {resolvedBy?.firstName} {resolvedBy?.lastName} on{' '}
-                <FormattedDate format="dd/MM/yy HH:mm">
+                <FormattedDate format="d MMM yyyy, HH:mm">
                   {resolved}
                 </FormattedDate>
               </p>
+            )}
+          </div>
+
+          <div className={styles.controls}>
+            {resolved ? (
               <ButtonText
                 onClick={async () => {
-                  await onCommentResolved({ comment });
+                  await onResolve({ comment });
                 }}
               >
                 Unresolve
               </ButtonText>
-            </>
-          ) : (
-            <ButtonGroup className="govuk-!-margin-bottom-0">
-              <Button
-                onClick={async () => {
-                  await onCommentResolved({ comment });
-                }}
-              >
-                Resolve
-              </Button>
-              {user?.id === createdBy.id && (
-                <>
-                  <ButtonText onClick={toggleIsEditingComment.on}>
-                    Edit
-                  </ButtonText>
+            ) : (
+              <ButtonGroup className="govuk-!-margin-bottom-0">
+                <Button
+                  onClick={async () => {
+                    await onResolve({ comment });
+                  }}
+                >
+                  Resolve
+                </Button>
+                {user?.id === createdBy.id && (
+                  <>
+                    <ButtonText onClick={toggleIsEditingComment.on}>
+                      Edit
+                    </ButtonText>
 
-                  <ButtonText
-                    onClick={async () => {
-                      onCommentRemoved(id);
-                    }}
-                  >
-                    Delete
-                  </ButtonText>
-                </>
-              )}
-            </ButtonGroup>
-          )}
+                    <ButtonText
+                      onClick={async () => {
+                        onRemove(comment.id);
+                      }}
+                    >
+                      Delete
+                    </ButtonText>
+                  </>
+                )}
+              </ButtonGroup>
+            )}
+          </div>
         </>
       )}
-    </div>
+    </li>
   );
 };
 

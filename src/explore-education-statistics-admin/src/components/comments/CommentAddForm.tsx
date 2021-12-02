@@ -1,13 +1,14 @@
-import styles from '@admin/components/comments/AddCommentForm.module.scss';
-import releaseContentCommentService, {
-  AddComment,
-} from '@admin/services/releaseContentCommentService';
+import styles from '@admin/components/comments/CommentAddForm.module.scss';
+import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { AddComment } from '@admin/services/releaseContentCommentService';
 import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
+
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import Yup from '@common/validation/yup';
 import useMounted from '@common/hooks/useMounted';
 import { Formik } from 'formik';
@@ -22,20 +23,12 @@ interface FormValues {
 interface Props {
   blockId: string;
   containerRef?: RefObject<HTMLDivElement>;
-  releaseId?: string;
-  sectionId?: string;
   onCancel: () => void;
   onSave: (comment: Comment) => void;
 }
 
-const AddCommentForm = ({
-  blockId,
-  containerRef,
-  releaseId,
-  sectionId,
-  onCancel,
-  onSave,
-}: Props) => {
+const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
+  const { onAddComment } = useCommentsContext();
   const [isSubmitting, toggleSubmitting] = useToggle(false);
   const [fixPosition, toggleFixPosition] = useToggle(false);
   const [focus, toggleFocus] = useToggle(false);
@@ -43,14 +36,14 @@ const AddCommentForm = ({
 
   useMounted(() => {
     const setPosition = () => {
-      const formEl = ref.current?.getBoundingClientRect();
-      const containerEl = containerRef?.current?.getBoundingClientRect();
+      const formRect = ref.current?.getBoundingClientRect();
+      const containerRect = containerRef?.current?.getBoundingClientRect();
 
-      if (!formEl || !containerEl) {
+      if (!formRect || !containerRect) {
         return;
       }
 
-      if (containerEl.top >= 0 || containerEl.bottom <= formEl?.height) {
+      if (containerRect.top >= 0 || containerRect.bottom <= formRect.height) {
         toggleFixPosition.off();
         return;
       }
@@ -65,28 +58,25 @@ const AddCommentForm = ({
     return () => window.removeEventListener('scroll', setPosition);
   });
 
-  const addComment = async (content: string) => {
+  const handleSubmit = useFormSubmit(async (values: FormValues) => {
     const additionalComment: AddComment = {
-      content,
+      content: values.content,
     };
     toggleSubmitting.on();
-
-    if (releaseId && sectionId) {
-      const theBlockId = blockId?.replace('block-', '');
-      const newComment = await releaseContentCommentService.addContentSectionComment(
-        releaseId,
-        sectionId,
-        theBlockId,
-        additionalComment,
-      );
-
+    const newComment = await onAddComment?.(additionalComment);
+    if (newComment) {
       return onSave(newComment);
     }
     return toggleSubmitting.off();
-  };
+  });
 
   return (
-    <div className={classNames(styles.container, { fixPosition })} ref={ref}>
+    <div
+      className={classNames(styles.container, {
+        [styles.fixPosition]: fixPosition,
+      })}
+      ref={ref}
+    >
       <Formik<FormValues>
         initialValues={{
           content: '',
@@ -94,9 +84,7 @@ const AddCommentForm = ({
         validationSchema={Yup.object({
           content: Yup.string().required('Enter a comment'),
         })}
-        onSubmit={async values => {
-          await addComment(values.content);
-        }}
+        onSubmit={handleSubmit}
       >
         <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
           <FormFieldTextArea<FormValues>
@@ -119,4 +107,4 @@ const AddCommentForm = ({
   );
 };
 
-export default AddCommentForm;
+export default CommentAddForm;

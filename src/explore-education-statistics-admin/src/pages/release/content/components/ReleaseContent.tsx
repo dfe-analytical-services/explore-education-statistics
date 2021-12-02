@@ -1,10 +1,9 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
-import { Comment } from '@admin/services/types/content';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
@@ -35,8 +34,6 @@ interface MethodologyLink {
   title: string;
   url: string;
 }
-
-type CommentsChangeHandler = (blockId: string, comments: Comment[]) => void;
 
 const ReleaseContent = () => {
   const config = useConfig();
@@ -97,25 +94,6 @@ const ReleaseContent = () => {
     [release, actions],
   );
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId: release.summarySection.id,
-        blockId,
-        sectionKey: 'summarySection',
-        comments,
-      });
-    },
-    [actions, release.summarySection.id],
-  );
-
-  const updateCommentsPendingDeletion = useCallback(
-    async (blockId, commentId) => {
-      await actions.setCommentsPendingDeletion({ blockId, commentId });
-    },
-    [actions],
-  );
-
   if (!release) {
     return null;
   }
@@ -166,10 +144,6 @@ const ReleaseContent = () => {
                         block={block}
                         releaseId={release.id}
                         sectionId={release.summarySection.id}
-                        onBlockCommentsChange={updateBlockComments}
-                        onCommentsPendingDeletionChange={
-                          updateCommentsPendingDeletion
-                        }
                         onSave={updateBlock}
                         onDelete={removeBlock}
                       />

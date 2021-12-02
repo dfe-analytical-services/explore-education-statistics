@@ -1,6 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
-import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import { EditingProvider } from '@admin/contexts/editing/EditingContext';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyContentService from '@admin/services/methodologyContentService';
@@ -29,8 +29,13 @@ const MethodologyContentPageInternal = () => {
     canUpdateMethodology && methodology.status === 'Draft';
 
   return (
-    <EditingContextProvider
-      initialEditingMode={canUpdateContent ? 'edit' : 'preview'}
+    <EditingProvider
+      value={{
+        editingMode: canUpdateContent ? 'edit' : 'preview',
+        unresolvedComments: {},
+        unsavedBlocks: [],
+        unsavedCommentDeletions: {},
+      }}
     >
       {({ editingMode }) => (
         <>
@@ -92,7 +97,7 @@ const MethodologyContentPageInternal = () => {
           </div>
         </>
       )}
-    </EditingContextProvider>
+    </EditingProvider>
   );
 };
 

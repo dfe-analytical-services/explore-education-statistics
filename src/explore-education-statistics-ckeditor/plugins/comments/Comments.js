@@ -1,7 +1,7 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 
-import CommentsEditing from './commentsEditing';
-import CommentsUI from './commentsUi';
+import CommentsEditing from './CommentsEditing';
+import CommentsUI from './CommentsUi';
 
 export default class Comments extends Plugin {
   static get pluginName() {

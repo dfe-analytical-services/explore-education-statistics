@@ -4,7 +4,7 @@ import { ContentSectionKeys } from '@admin/pages/release/content/contexts/Releas
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { Comment, ContentBlockPostModel } from '@admin/services/types/content';
+import { ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 
@@ -98,14 +98,6 @@ export default function useReleaseContentActions() {
       sectionKey: ContentSectionKeys;
       bodyContent: string;
     }) => {
-      dispatch({
-        type: 'UPDATE_BLOCK_FROM_SECTION',
-        payload: {
-          meta: { sectionId, blockId, sectionKey },
-          isSaving: true,
-        },
-      });
-
       const updateBlock = await releaseContentService.updateContentSectionBlock(
         releaseId,
         sectionId,
@@ -118,7 +110,6 @@ export default function useReleaseContentActions() {
         payload: {
           meta: { sectionId, blockId, sectionKey },
           block: updateBlock,
-          isSaving: false,
         },
       });
     },
@@ -293,42 +284,6 @@ export default function useReleaseContentActions() {
     [dispatch],
   );
 
-  const updateBlockComments = useCallback(
-    async ({
-      sectionId,
-      blockId,
-      sectionKey,
-      comments,
-    }: {
-      sectionId: string;
-      blockId: string;
-      sectionKey: ContentSectionKeys;
-      comments: Comment[];
-    }) => {
-      dispatch({
-        type: 'UPDATE_BLOCK_COMMENTS',
-        payload: {
-          meta: { sectionId, blockId, sectionKey },
-          comments,
-        },
-      });
-    },
-    [dispatch],
-  );
-
-  const setCommentsPendingDeletion = useCallback(
-    async ({ blockId, commentId }: { blockId: string; commentId?: string }) => {
-      dispatch({
-        type: 'SET_COMMENTS_PENDING_DELETION',
-        payload: {
-          meta: { blockId },
-          commentId,
-        },
-      });
-    },
-    [dispatch],
-  );
-
   return useMemo(
     () => ({
       updateAvailableDataBlocks,
@@ -342,8 +297,6 @@ export default function useReleaseContentActions() {
       updateContentSectionsOrder,
       removeContentSection,
       updateContentSectionHeading,
-      setCommentsPendingDeletion,
-      updateBlockComments,
     }),
     [
       addContentSection,
@@ -352,13 +305,11 @@ export default function useReleaseContentActions() {
       deleteContentSectionBlock,
       removeContentSection,
       updateAvailableDataBlocks,
-      updateBlockComments,
       updateContentSectionBlock,
       updateContentSectionDataBlock,
       updateContentSectionHeading,
       updateContentSectionsOrder,
       updateSectionBlockOrder,
-      setCommentsPendingDeletion,
     ],
   );
 }

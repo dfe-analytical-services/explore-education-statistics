@@ -28,7 +28,7 @@ Approve a methodology for publishing immediately
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
 
     user approves methodology for publication    ${PUBLICATION_NAME}
 
@@ -127,7 +127,7 @@ Update the methodology amendment's content
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
     user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
 Add a note describing the amendment

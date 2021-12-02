@@ -1,4 +1,4 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';

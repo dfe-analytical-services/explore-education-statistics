@@ -35,6 +35,17 @@ export interface EditorConfig {
   link?: {
     decorators: Dictionary<LinkDecoratorAutomatic | LinkDecoratorManual>;
   };
+  comments?: {
+    addComment: () => void;
+    commentCancelled: () => void;
+    commentRemoved: (markerId: string) => void;
+    commentSelected: (markerId?: string) => void;
+    undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
+  };
+  autosave?: {
+    save: () => void;
+    waitingTime: number;
+  };
 }
 
 export interface PluginCollection {

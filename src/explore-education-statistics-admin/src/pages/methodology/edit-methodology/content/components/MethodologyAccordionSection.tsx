@@ -1,6 +1,6 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';

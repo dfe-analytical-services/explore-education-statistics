@@ -1,4 +1,4 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useEditingContext } from '@admin/contexts/editing/EditingContext';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';

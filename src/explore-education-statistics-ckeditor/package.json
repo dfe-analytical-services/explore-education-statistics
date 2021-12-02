@@ -7,6 +7,8 @@
   "private": true,
   "main": "./build/ckeditor.js",
   "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
     "@ckeditor/ckeditor5-autoformat": "^31.0.0",
     "@ckeditor/ckeditor5-autosave": "^31.0.0",
     "@ckeditor/ckeditor5-basic-styles": "^31.0.0",
@@ -30,6 +32,7 @@
     "@ckeditor/ckeditor5-typing": "^31.0.0",
     "@ckeditor/ckeditor5-ui": "^31.0.0",
     "@ckeditor/ckeditor5-utils": "^31.0.0",
+    "babel-loader": "^8.2.3",
     "css-loader": "^5.2.7",
     "eslint": "^8.3.0",
     "postcss": "^8.3.8",

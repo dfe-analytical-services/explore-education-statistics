@@ -1,6 +1,6 @@
 import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
-import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import { EditingProvider } from '@admin/contexts/editing/EditingContext';
 import _methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';
@@ -47,11 +47,18 @@ describe('MethodologyNotesSection', () => {
   describe('displaying notes', () => {
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated-value')).toHaveTextContent('TBA');
@@ -62,11 +69,18 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly with notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated date')).toHaveTextContent(
@@ -112,11 +126,18 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated-value')).toHaveTextContent('TBA');
@@ -136,11 +157,18 @@ describe('MethodologyNotesSection', () => {
         notes: [oldNote, ...testMethodologyContentWithNotes.notes],
       };
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithOldNote}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated date')).toHaveTextContent(
@@ -152,11 +180,18 @@ describe('MethodologyNotesSection', () => {
   describe('adding a note', () => {
     test('shows validation error if no note given and does not submit', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add note' }));
@@ -195,11 +230,18 @@ describe('MethodologyNotesSection', () => {
         id: 'note-4',
       });
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add note' }));
@@ -241,11 +283,18 @@ describe('MethodologyNotesSection', () => {
   describe('editing a note', () => {
     test('shows validation error if note or date removed and does not submit', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -298,11 +347,18 @@ describe('MethodologyNotesSection', () => {
         id: 'note-1',
       });
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -343,11 +399,18 @@ describe('MethodologyNotesSection', () => {
   describe('removing notes', () => {
     test('shows the confirm modal when clicking the Remove button', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -373,11 +436,18 @@ describe('MethodologyNotesSection', () => {
 
     test('successfully removes a note', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingProvider
+          value={{
+            editingMode: 'edit',
+            unresolvedComments: {},
+            unsavedBlocks: [],
+            unsavedCommentDeletions: {},
+          }}
+        >
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingContextProvider>,
+        </EditingProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');

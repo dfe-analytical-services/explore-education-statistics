@@ -1,8 +1,10 @@
+import { testComments } from '@admin/components/comments/__data__/testComments';
+import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import { CommentsProvider } from '@admin/contexts/comments/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import EditableContentBlock from '../EditableContentBlock';
 
 describe('EditableContentBlock', () => {
   const testMarkdown = `
@@ -140,7 +142,7 @@ Test paragraph
 
     await waitFor(() => {
       expect(handleSave).toHaveBeenCalledTimes(1);
-      expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>');
+      expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>', undefined);
     });
   });
 
@@ -172,6 +174,58 @@ Test paragraph
     await waitFor(() => {
       expect(handleDelete).toHaveBeenCalledTimes(1);
       expect(handleDelete).toHaveBeenCalled();
+    });
+  });
+
+  describe('comments allowed', () => {
+    test('renders the view comments button with the number of unresolved comments', () => {
+      render(
+        <CommentsProvider
+          value={{
+            comments: testComments,
+            pendingDeletions: [],
+          }}
+        >
+          <EditableContentBlock
+            allowComments
+            id="test-id"
+            label="Block content"
+            value="<p>Test content</p>"
+            onSave={noop}
+            onDelete={noop}
+          />
+        </CommentsProvider>,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'View comments (3 unresolved)' }),
+      ).toBeInTheDocument();
+    });
+
+    test('clicking the view comments button opens the editor', () => {
+      render(
+        <CommentsProvider
+          value={{
+            comments: testComments,
+            pendingDeletions: [],
+          }}
+        >
+          <EditableContentBlock
+            allowComments
+            id="test-id"
+            label="Block content"
+            value="<p>Test content</p>"
+            onSave={noop}
+            onDelete={noop}
+          />
+        </CommentsProvider>,
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'View comments (3 unresolved)' }),
+      );
+
+      expect(screen.getByLabelText('Block content')).toBeInTheDocument();
     });
   });
 });

@@ -1,5 +1,4 @@
 import {
-  Comment,
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
@@ -38,9 +37,8 @@ export type RemoveBlockFromSection = {
 export type UpdateBlockFromSection = {
   type: 'UPDATE_BLOCK_FROM_SECTION';
   payload: {
-    block?: EditableBlock;
+    block: EditableBlock;
     meta: BlockMeta;
-    isSaving?: boolean;
   };
 };
 
@@ -74,27 +72,11 @@ export type SetReleaseContent = {
   };
 };
 
-export type SetCommentsPendingDeletion = {
-  type: 'SET_COMMENTS_PENDING_DELETION';
-  payload: {
-    meta: { blockId: string };
-    commentId?: string;
-  };
-};
-
 export type UpdateContentSection = {
   type: 'UPDATE_CONTENT_SECTION';
   payload: {
     meta: { sectionId: string };
     section: ContentSection<EditableBlock>;
-  };
-};
-
-export type UpdateBlockComments = {
-  type: 'UPDATE_BLOCK_COMMENTS';
-  payload: {
-    meta: BlockMeta;
-    comments: Comment[];
   };
 };
 
@@ -106,6 +88,4 @@ export type ReleaseDispatchAction =
   | UpdateSectionContent
   | AddContentSection
   | SetReleaseContent
-  | SetCommentsPendingDeletion
-  | UpdateContentSection
-  | UpdateBlockComments;
+  | UpdateContentSection;

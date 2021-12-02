@@ -84,6 +84,5 @@ function FormFieldEditor<T>({
     </Field>
   );
 }
-FormFieldEditor.displayName = 'FormFieldEditor';
 
 export default FormFieldEditor;

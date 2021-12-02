@@ -37,7 +37,7 @@ Add text block with link to absence glossary entry to accordion section
     user waits until page contains element    css:.ck-link-form
     user presses keys    %{PUBLIC_URL}/glossary#absence
     user clicks element    css:.ck-button-save
-    user clicks button    Save
+    user clicks button    Save & close
     user waits until element contains    ${block}    Absence
 
 Check glossary info icon appears on release preview

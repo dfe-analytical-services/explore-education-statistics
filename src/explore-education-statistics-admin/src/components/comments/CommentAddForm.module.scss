@@ -11,7 +11,7 @@
   width: $dfe-comments-width;
   z-index: 9;
 
-  &:global(.fixPosition) {
+  &.fixPosition {
     position: fixed;
   }
 }

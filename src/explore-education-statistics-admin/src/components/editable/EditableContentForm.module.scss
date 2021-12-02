@@ -17,7 +17,7 @@
   top: 0;
   width: $dfe-comments-width - $dfe-comments-gutter;
 
-  &:global(.showAddCommentForm) {
+  &.showCommentAddForm {
     top: 200px;
   }
 }

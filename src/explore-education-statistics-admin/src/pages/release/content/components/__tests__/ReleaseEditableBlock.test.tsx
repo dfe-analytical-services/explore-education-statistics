@@ -1,5 +1,7 @@
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { EditableBlock } from '@admin/services/types/content';
+import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
@@ -14,16 +16,26 @@ describe('ReleaseEditableBlock', () => {
     order: 0,
   };
 
+  const testValue = {
+    release: testEditableRelease,
+    canUpdateRelease: true,
+    commentsPendingDeletion: {},
+    availableDataBlocks: [],
+    unresolvedComments: [],
+  };
+
   test('renders HTML block', () => {
     render(
-      <ReleaseEditableBlock
-        releaseId="release-1"
-        sectionId="section-1"
-        block={testHtmlBlock}
-        onBlockCommentsChange={noop}
-        onSave={noop}
-        onDelete={noop}
-      />,
+      <ReleaseContentProvider value={testValue}>
+        <ReleaseEditableBlock
+          releaseId="release-1"
+          sectionId="section-1"
+          block={testHtmlBlock}
+          onBlockCommentsChange={noop}
+          onSave={noop}
+          onDelete={noop}
+        />
+      </ReleaseContentProvider>,
     );
 
     expect(
@@ -47,22 +59,24 @@ describe('ReleaseEditableBlock', () => {
       'https://test/some-image-url-300.jpg 300w';
 
     render(
-      <ReleaseEditableBlock
-        releaseId="release-1"
-        sectionId="section-1"
-        block={{
-          ...testHtmlBlock,
-          body: `
+      <ReleaseContentProvider value={testValue}>
+        <ReleaseEditableBlock
+          releaseId="release-1"
+          sectionId="section-1"
+          block={{
+            ...testHtmlBlock,
+            body: `
           <h3>Test heading</h3>
           <p>Some test content</p>
           <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
           <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
           `,
-        }}
-        onBlockCommentsChange={noop}
-        onSave={noop}
-        onDelete={noop}
-      />,
+          }}
+          onBlockCommentsChange={noop}
+          onSave={noop}
+          onDelete={noop}
+        />
+      </ReleaseContentProvider>,
     );
 
     expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(

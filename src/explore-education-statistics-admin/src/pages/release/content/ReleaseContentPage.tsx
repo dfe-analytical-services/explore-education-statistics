@@ -1,6 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
-import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import { EditingProvider } from '@admin/contexts/editing/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
@@ -13,31 +13,47 @@ import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { getNumberOfUnsavedBlocks } from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
-import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
-
+import getUnresolvedComments, {
+  getTotalUnresolvedComments,
+} from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
+import uniq from 'lodash/uniq';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
-  const {
-    canUpdateRelease,
-    unresolvedComments,
-    release,
-    commentsPendingDeletion,
-  } = useReleaseContentState();
+  const { canUpdateRelease, release } = useReleaseContentState();
 
   return (
-    <EditingContextProvider
-      initialEditingMode={canUpdateRelease ? 'edit' : 'preview'}
+    <EditingProvider
+      value={{
+        editingMode: canUpdateRelease ? 'edit' : 'preview',
+        unresolvedComments: getUnresolvedComments(release),
+        unsavedBlocks: [],
+        unsavedCommentDeletions: {},
+      }}
     >
-      {({ editingMode, unsavedEdits }) => {
-        const numOfEdits = getNumberOfUnsavedBlocks(
-          unsavedEdits,
-          commentsPendingDeletion,
+      {({
+        editingMode,
+        unresolvedComments,
+        unsavedCommentDeletions,
+        unsavedBlocks,
+      }) => {
+        const blocksWithCommentDeletions = Object.entries(
+          unsavedCommentDeletions,
+        )
+          .filter(deletion => deletion[1].length)
+          .map(deletion => deletion[0]);
+        const totalUnsavedBlocks = uniq([
+          ...unsavedBlocks,
+          ...blocksWithCommentDeletions,
+        ]).length;
+        const totalUnresolvedComments = getTotalUnresolvedComments(
+          unresolvedComments,
+          unsavedCommentDeletions,
         );
+
         return (
           <>
             {editingMode === 'edit' && (
@@ -52,18 +68,18 @@ const ReleaseContentPageLoaded = () => {
 
             {canUpdateRelease && (
               <div className="govuk-form-group">
-                {numOfEdits > 0 && (
+                {totalUnsavedBlocks > 0 && (
                   <WarningMessage>
-                    {numOfEdits === 1
+                    {totalUnsavedBlocks === 1
                       ? 'One content block has unsaved changes. Clicking away from this tab will result in the changes being lost.'
-                      : `${numOfEdits} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
+                      : `${totalUnsavedBlocks} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
                   </WarningMessage>
                 )}
-                {unresolvedComments.length > 0 && (
+                {totalUnresolvedComments > 0 && (
                   <WarningMessage>
-                    {unresolvedComments.length === 1
+                    {totalUnresolvedComments === 1
                       ? 'There is 1 unresolved comment'
-                      : `There are ${unresolvedComments.length} unresolved comments`}
+                      : `There are ${totalUnresolvedComments} unresolved comments`}
                   </WarningMessage>
                 )}
 
@@ -109,7 +125,7 @@ const ReleaseContentPageLoaded = () => {
           </>
         );
       }}
-    </EditingContextProvider>
+    </EditingProvider>
   );
 };
 
@@ -132,8 +148,6 @@ const ReleaseContentPage = ({
       release,
       availableDataBlocks,
       canUpdateRelease,
-      unresolvedComments: getUnresolvedComments(release),
-      commentsPendingDeletion: {},
     };
   }, [releaseId]);
 

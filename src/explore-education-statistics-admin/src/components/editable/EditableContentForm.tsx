@@ -1,3 +1,6 @@
+import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import useCommentActions from '@admin/contexts/comments/useCommentsActions';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { CommentUndoRedoActions, Element } from '@admin/types/ckeditor';
@@ -5,18 +8,14 @@ import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import AddCommentForm from '@admin/components/comments/AddCommentForm';
-import { toggleResolveCommentHandler } from '@admin/components/comments/Comment';
+import CommentAddForm from '@admin/components/comments/CommentAddForm';
+import { ResolveCommentEvent } from '@admin/components/comments/Comment';
 import CommentsList from '@admin/components/comments/CommentsList';
-import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
-import { BlockCommentsState } from '@admin/components/form/FormEditor';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import releaseContentCommentService from '@admin/services/releaseContentCommentService';
-import { CommentsPendingDeletion } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Formik } from 'formik';
 import React, { useCallback, useRef, useState } from 'react';
@@ -34,57 +33,47 @@ export interface SelectedComment {
 export interface Props {
   allowComments?: boolean;
   autoSave?: boolean;
-  comments?: Comment[];
-  commentsPendingDeletion?: CommentsPendingDeletion;
   content: string;
   hideLabel?: boolean;
   handleBlur?: (isDirty: boolean) => void;
   id: string;
   isSaving?: boolean;
   label: string;
-  releaseId?: string;
-  sectionId?: string;
-  onBlockCommentsChange?: (blockId: string, comments: Comment[]) => void;
   onCancel: () => void;
-  onCommentsPendingDeletionChange?: (
-    blockId: string,
-    commentId?: string,
-  ) => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onSubmit: (content: string, closeEditor?: boolean) => void;
+  onSubmit: (content: string, isAutoSave?: boolean) => void;
 }
 
 const EditableContentForm = ({
   allowComments = false,
   autoSave = false,
-  commentsPendingDeletion,
   content,
   hideLabel = false,
   handleBlur,
   id,
   isSaving = false,
   label,
-  comments,
-  releaseId,
-  sectionId,
-  onBlockCommentsChange,
   onCancel,
-  onCommentsPendingDeletionChange,
   onImageUpload,
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
+  const {
+    comments,
+    pendingDeletions,
+    onDeletePendingComments,
+    onToggleResolveComment,
+  } = useCommentsContext();
+  const commentActions = useCommentActions();
+  const editingActions = useEditingActions();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [showAddCommentForm, toggleAddCommentForm] = useToggle(false);
+  const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
   const [selectedComment, setSelectedComment] = useState<SelectedComment>({
     commentId: '',
     fromEditor: false,
   });
   const [markersOrder, setMarkersOrder] = useState<string[]>([]);
-  const [blockCommentsState, setBlockCommentsState] = useState<
-    BlockCommentsState
-  >({});
 
   const validateElements = useCallback((elements: Element[]) => {
     let error: string | undefined;
@@ -105,24 +94,25 @@ const EditableContentForm = ({
     type: CommentUndoRedoActions,
     commentId: string,
   ) => {
-    if (
-      type === 'undoRemoveComment' ||
-      type === 'redoAddComment' ||
-      type === 'undoAddComment' ||
-      type === 'redoRemoveComment'
-    ) {
-      if (onCommentsPendingDeletionChange) {
-        onCommentsPendingDeletionChange(id, commentId);
-      }
-      if (onBlockCommentsChange && comments) {
-        onBlockCommentsChange(id.replace('block-', ''), comments);
-      }
-
+    if (type === 'undoRemoveComment' || type === 'redoAddComment') {
+      commentActions.undeleteComment(commentId);
+      editingActions.updateUnsavedCommentDeletions(
+        id.replace('block-', ''),
+        commentId,
+      );
+      return;
+    }
+    if (type === 'undoAddComment' || type === 'redoRemoveComment') {
+      commentActions.deleteComment(commentId);
+      editingActions.updateUnsavedCommentDeletions(
+        id.replace('block-', ''),
+        commentId,
+      );
       return;
     }
 
     if (type === 'undoResolveComment' || type === 'redoUnresolveComment') {
-      const commentToUnresolve = comments?.find(
+      const commentToUnresolve = comments.find(
         comment => comment.id === commentId,
       );
       if (commentToUnresolve) {
@@ -135,7 +125,7 @@ const EditableContentForm = ({
       return;
     }
     if (type === 'undoUnresolveComment' || type === 'redoResolveComment') {
-      const commentToResolve = comments?.find(
+      const commentToResolve = comments.find(
         comment => comment.id === commentId,
       );
       if (commentToResolve) {
@@ -148,108 +138,80 @@ const EditableContentForm = ({
     }
   };
 
-  const handleUpdateComment = (updatedComment: Comment) => {
-    if (!comments) {
-      return;
-    }
-    const index = comments.findIndex(
-      comment => comment.id === updatedComment.id,
-    );
-    const updatedComments = [...comments];
-    updatedComments[index] = updatedComment;
-
-    if (onBlockCommentsChange) {
-      onBlockCommentsChange(id.replace('block-', ''), updatedComments);
-    }
-  };
-
   const handleToggleResolveComment = async ({
     comment,
     resolve,
     updateMarker = true,
-  }: toggleResolveCommentHandler) => {
+  }: ResolveCommentEvent) => {
     const resolvedComment = {
       ...comment,
       setResolved: resolve !== undefined ? resolve : !comment.resolved,
     };
-    const updatedComment = await releaseContentCommentService.updateContentSectionComment(
-      resolvedComment,
-    );
+    const updatedComment = await onToggleResolveComment?.(resolvedComment);
     if (updateMarker) {
-      if (comment.resolved) {
-        setBlockCommentsState({
-          unresolving: comment.id,
-        });
-      }
-      if (!comment.resolved) {
-        setBlockCommentsState({
-          resolving: comment.id,
-        });
-      }
+      commentActions.setCurrentInteraction({
+        type: comment.resolved ? 'unresolving' : 'resolving',
+        id: comment.id,
+      });
     }
-    handleUpdateComment(updatedComment);
+    if (updatedComment) {
+      commentActions.updateComment(updatedComment);
+    }
+    editingActions.updateUnresolvedComments(
+      id.replace('block-', ''),
+      resolvedComment.id,
+    );
   };
 
   return (
     <div className={styles.container} ref={containerRef}>
-      {showAddCommentForm && (
-        <AddCommentForm
+      {showCommentAddForm && (
+        <CommentAddForm
           blockId={id}
           containerRef={containerRef}
-          releaseId={releaseId}
-          sectionId={sectionId}
           onCancel={() => {
-            setBlockCommentsState({
-              removing: 'commentplaceholder',
+            commentActions.setCurrentInteraction({
+              type: 'removing',
+              id: 'commentplaceholder',
             });
-            toggleAddCommentForm.off();
+            toggleCommentAddForm.off();
           }}
           onSave={comment => {
-            setBlockCommentsState({
-              adding: comment.id,
-            });
-
-            const updatedComments = comments
-              ? [...comments, comment]
-              : [comment];
-
-            if (onBlockCommentsChange) {
-              onBlockCommentsChange(id.replace('block-', ''), updatedComments);
-            }
-
-            toggleAddCommentForm.off();
+            commentActions.addComment(comment);
+            editingActions.updateUnresolvedComments(
+              id.replace('block-', ''),
+              comment.id,
+            );
+            toggleCommentAddForm.off();
           }}
         />
       )}
       <div
-        className={classNames(styles.commentsSidebar, { showAddCommentForm })}
+        className={classNames(styles.commentsSidebar, {
+          [styles.showCommentAddForm]: showCommentAddForm,
+        })}
       >
-        {allowComments && comments && comments.length > 0 && (
+        {allowComments && comments.length > 0 && (
           <CommentsList
             comments={comments}
-            commentsPendingDeletion={
-              commentsPendingDeletion && commentsPendingDeletion[id]
-                ? commentsPendingDeletion[id]
-                : []
-            }
             markersOrder={markersOrder}
             selectedComment={selectedComment}
-            onCommentRemoved={commentId => {
-              if (onCommentsPendingDeletionChange) {
-                onCommentsPendingDeletionChange(id, commentId);
-              }
-              if (onBlockCommentsChange) {
-                onBlockCommentsChange(id.replace('block-', ''), comments);
-              }
-              setBlockCommentsState({
-                removing: commentId,
+            onRemove={commentId => {
+              commentActions.deleteComment(commentId);
+              commentActions.setCurrentInteraction({
+                type: 'removing',
+                id: commentId,
               });
+              editingActions.updateUnsavedCommentDeletions(
+                id.replace('block-', ''),
+                commentId,
+              );
             }}
-            onCommentResolved={handleToggleResolveComment}
-            onCommentSelect={commentId =>
+            onResolve={handleToggleResolveComment}
+            onSelect={commentId =>
               setSelectedComment({ commentId, fromEditor: false })
             }
-            onCommentUpdated={handleUpdateComment}
+            onUpdate={commentActions.updateComment}
           />
         )}
       </div>
@@ -264,25 +226,9 @@ const EditableContentForm = ({
             content: Yup.string().required('Enter content'),
           })}
           onSubmit={async values => {
-            if (
-              commentsPendingDeletion &&
-              commentsPendingDeletion[id] &&
-              comments?.length
-            ) {
-              const promises: Promise<void>[] = [];
-              commentsPendingDeletion[id].forEach(commentId => {
-                if (comments.find(comment => comment.id === commentId)) {
-                  promises.push(
-                    releaseContentCommentService.deleteContentSectionComment(
-                      commentId,
-                    ),
-                  );
-                }
-              });
-              await Promise.all(promises);
-              if (onCommentsPendingDeletionChange) {
-                onCommentsPendingDeletionChange(id);
-              }
+            if (pendingDeletions.length) {
+              await onDeletePendingComments?.(pendingDeletions);
+              commentActions.resetPendingDeletion();
             }
             onSubmit(values.content);
           }}
@@ -291,7 +237,6 @@ const EditableContentForm = ({
             <FormFieldEditor<FormValues>
               id={id}
               allowComments={allowComments}
-              blockCommentsState={blockCommentsState}
               focusOnInit
               handleBlur={handleBlur}
               hideLabel={hideLabel}
@@ -299,26 +244,27 @@ const EditableContentForm = ({
               name="content"
               selectedComment={selectedComment}
               validateElements={validateElements}
-              onAddCommentClicked={toggleAddCommentForm.on}
               onAutoSave={values => {
-                setBlockCommentsState({});
-                onSubmit(values, false);
+                commentActions.setCurrentInteraction(undefined);
+                onSubmit(values, true);
               }}
-              onCancelComment={toggleAddCommentForm.off}
-              onCommentMarkerClicked={commentId =>
+              onCancelComment={toggleCommentAddForm.off}
+              onClickAddComment={toggleCommentAddForm.on}
+              onClickCommentMarker={commentId =>
                 setSelectedComment({ commentId, fromEditor: true })
               }
-              onCommentMarkerRemoved={commentId => {
-                if (onCommentsPendingDeletionChange) {
-                  onCommentsPendingDeletionChange(id, commentId);
-                }
-                if (onBlockCommentsChange && comments) {
-                  onBlockCommentsChange(id.replace('block-', ''), comments);
-                }
-              }}
               onImageUpload={onImageUpload}
               onImageUploadCancel={onImageUploadCancel}
-              onUndoRedo={handleUndoRedoComment}
+              onRemoveCommentMarker={commentId => {
+                commentActions.deleteComment(commentId);
+                editingActions.updateUnsavedCommentDeletions(
+                  id.replace('block-', ''),
+                  commentId,
+                );
+              }}
+              onUndoRedo={(type, commentId) => {
+                handleUndoRedoComment(type, commentId);
+              }}
               onUpdateMarkersOrder={setMarkersOrder}
             />
 
@@ -337,6 +283,9 @@ const EditableContentForm = ({
                 <Button variant="secondary" onClick={onCancel}>
                   Cancel
                 </Button>
+              )}
+              {!isSaving && pendingDeletions.length > 0 && (
+                <em>(Unsaved deletions)</em>
               )}
             </ButtonGroup>
           </Form>

@@ -1,3 +1,4 @@
+import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
 import { SelectedComment } from '@admin/components/editable/EditableContentForm';
 import {
@@ -15,7 +16,7 @@ import {
   resizeOptions,
   tableContentToolbar,
   toolbarConfigs,
-} from '@admin/utils/ckeditor/ckEditorConfig';
+} from '@admin/config/ckEditorConfig';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -39,17 +40,10 @@ import React, {
 
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
-export interface BlockCommentsState {
-  adding?: string;
-  removing?: string;
-  resolving?: string;
-  unresolving?: string;
-}
 
 export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockCommentsState?: BlockCommentsState;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
@@ -60,17 +54,17 @@ export interface FormEditorProps {
   testId?: string;
   toolbarConfig?: string[];
   value: string;
-  onAddCommentClicked?: () => void;
   onAutoSave?: (values: string) => void;
   onBlur?: () => void;
   onCancelComment?: () => void;
   onChange: EditorChangeHandler;
-  onCommentMarkerClicked?: (commentId: string) => void;
-  onCommentMarkerRemoved?: (commentId: string) => void;
+  onClickAddComment?: () => void;
+  onClickCommentMarker?: (commentId: string) => void;
   onElementsChange?: EditorElementsHandler;
   onElementsReady?: EditorElementsHandler;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
+  onRemoveCommentMarker?: (commentId: string) => void;
   onUndoRedo?: (type: CommentUndoRedoActions, commentId: string) => void;
   onUpdateMarkersOrder?: (markerIds: string[]) => void;
 }
@@ -78,7 +72,6 @@ export interface FormEditorProps {
 const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
-  blockCommentsState,
   error,
   focusOnInit,
   hideLabel,
@@ -90,19 +83,21 @@ const FormEditor = ({
   toolbarConfig = toolbarConfigs.full,
   value,
   onAutoSave,
-  onAddCommentClicked,
   onBlur,
   onCancelComment,
   onChange,
-  onCommentMarkerClicked,
-  onCommentMarkerRemoved,
+  onClickAddComment,
+  onClickCommentMarker,
   onElementsChange,
   onElementsReady,
   onImageUpload,
   onImageUploadCancel,
+  onRemoveCommentMarker,
   onUndoRedo,
   onUpdateMarkersOrder,
 }: FormEditorProps) => {
+  const { currentInteraction } = useCommentsContext();
+
   const editorInstance = useRef<EditorType>();
   const commentsPlugin = useRef<CommentsPlugin>();
 
@@ -112,25 +107,21 @@ const FormEditor = ({
   // Get the order of the markers based on their position in the editor.
   // Used to order the comments list.
   const getMarkersOrder = (markers: Marker[]) => {
-    const orderedMarkerIds: string[] = [];
-    markers.sort((a, b) => {
-      if (a.getStart().isAfter(b.getStart())) {
-        return 1;
-      }
-      if (a.getStart().isBefore(b.getStart())) {
-        return -1;
-      }
-      return 0;
-    });
-
-    markers.forEach(marker => {
-      const markerId = marker.name.startsWith('comment:')
-        ? marker.name.replace('comment:', '')
-        : marker.name.replace('resolvedcomment:', '');
-      orderedMarkerIds.push(markerId);
-    });
-
-    return orderedMarkerIds;
+    return [...markers]
+      .sort((a, b) => {
+        if (a.getStart().isAfter(b.getStart())) {
+          return 1;
+        }
+        if (a.getStart().isBefore(b.getStart())) {
+          return -1;
+        }
+        return 0;
+      })
+      .map(marker =>
+        marker.name.startsWith('comment:')
+          ? marker.name.replace('comment:', '')
+          : marker.name.replace('resolvedcomment:', ''),
+      );
   };
 
   const config = useMemo<EditorConfig>(() => {
@@ -193,43 +184,31 @@ const FormEditor = ({
         ? {
             addComment() {
               // Add comment button in editor clicked
-              if (onAddCommentClicked) {
-                onAddCommentClicked();
-              }
+              onClickAddComment?.();
             },
-            commentSelected(markerId?: string) {
+            commentSelected(markerId) {
               // Comment marker selected in the editor
-              if (onCommentMarkerClicked) {
-                const commentId = markerId
-                  ? markerId.replace('comment:', '')
-                  : '';
-                onCommentMarkerClicked(commentId);
-              }
+              const commentId = markerId
+                ? markerId.replace('comment:', '')
+                : '';
+              onClickCommentMarker?.(commentId);
             },
-            commentRemoved(markerId: string) {
+            commentRemoved(markerId) {
               // Comment marker removed in the editor
-              if (
-                onCommentMarkerRemoved &&
-                onAutoSave &&
-                editorInstance.current
-              ) {
-                onCommentMarkerRemoved(markerId.replace('comment:', ''));
-                onAutoSave(editorInstance.current.getData());
+              if (editorInstance.current) {
+                onRemoveCommentMarker?.(markerId.replace('comment:', ''));
+                onAutoSave?.(editorInstance.current.getData());
               }
             },
             commentCancelled() {
               // if adding a comment is cancelled from within the editor (by clicking outside the placeholder marker)
-              if (onCancelComment) {
-                onCancelComment();
-              }
+              onCancelComment?.();
             },
-            undoRedoComment(type: CommentUndoRedoActions, markerId: string) {
-              if (onUndoRedo) {
-                const commentId = markerId.startsWith('comment:')
-                  ? markerId.replace('comment:', '')
-                  : markerId.replace('resolvedcomment:', '');
-                onUndoRedo(type, commentId);
-              }
+            undoRedoComment(type, markerId) {
+              const commentId = markerId.startsWith('comment:')
+                ? markerId.replace('comment:', '')
+                : markerId.replace('resolvedcomment:', '');
+              onUndoRedo?.(type, commentId);
             },
           }
         : undefined,
@@ -237,9 +216,8 @@ const FormEditor = ({
         ? {
             save() {
               if (editorInstance.current) {
-                return onAutoSave(editorInstance.current.getData());
+                onAutoSave(editorInstance.current.getData());
               }
-              return false;
             },
             waitingTime: 5000,
           }
@@ -249,11 +227,11 @@ const FormEditor = ({
     allowComments,
     allowedHeadings,
     editorInstance,
-    onAddCommentClicked,
+    onClickAddComment,
     onAutoSave,
     onCancelComment,
-    onCommentMarkerClicked,
-    onCommentMarkerRemoved,
+    onClickCommentMarker,
+    onRemoveCommentMarker,
     onImageUpload,
     onImageUploadCancel,
     onUndoRedo,
@@ -302,12 +280,9 @@ const FormEditor = ({
 
   const handleChange = useCallback<CKEditorProps['onChange']>(
     (event, editor) => {
-      if (onElementsChange) {
-        onElementsChange(
-          Array.from(editor.model.document.getRoot('main').getChildren()),
-        );
-      }
-
+      onElementsChange?.(
+        Array.from(editor.model.document.getRoot('main').getChildren()),
+      );
       onChange(editor.getData());
     },
     [onChange, onElementsChange],
@@ -315,10 +290,7 @@ const FormEditor = ({
 
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
-
-    if (onBlur) {
-      onBlur();
-    }
+    onBlur?.();
   }, [onBlur, toggleFocused]);
 
   const handleReady = useCallback<CKEditorProps['onReady']>(
@@ -326,18 +298,12 @@ const FormEditor = ({
       if (focusOnInit) {
         editor.editing.view.focus();
       }
-
-      if (onElementsReady) {
-        onElementsReady(
-          Array.from(editor.model.document.getRoot('main').getChildren()),
-        );
-      }
+      onElementsReady?.(
+        Array.from(editor.model.document.getRoot('main').getChildren()),
+      );
       editorInstance.current = editor;
-      commentsPlugin.current = editor.plugins.get('Comments') as CommentsPlugin;
-
-      if (onUpdateMarkersOrder) {
-        onUpdateMarkersOrder(getMarkersOrder([...editor.model.markers]));
-      }
+      commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
+      onUpdateMarkersOrder?.(getMarkersOrder([...editor.model.markers]));
     },
     [focusOnInit, onElementsReady, onUpdateMarkersOrder],
   );
@@ -354,48 +320,43 @@ const FormEditor = ({
 
   useEffect(() => {
     function updateMarker() {
-      if (!commentsPlugin.current || !blockCommentsState) {
+      if (!commentsPlugin.current || !currentInteraction) {
         return;
       }
-      if (blockCommentsState.adding) {
-        commentsPlugin.current.addCommentMarker(blockCommentsState.adding);
-        if (onUpdateMarkersOrder && editorInstance.current) {
-          onUpdateMarkersOrder(
+      if (currentInteraction?.type === 'adding') {
+        commentsPlugin.current.addCommentMarker(currentInteraction.id);
+        if (editorInstance.current) {
+          onUpdateMarkersOrder?.(
             getMarkersOrder([...editorInstance.current.model.markers]),
           );
         }
         return;
       }
-      if (blockCommentsState.removing) {
-        commentsPlugin.current.removeCommentMarker(blockCommentsState.removing);
+      if (currentInteraction?.type === 'removing') {
+        commentsPlugin.current.removeCommentMarker(currentInteraction.id);
         return;
       }
-      if (blockCommentsState.resolving) {
+      if (currentInteraction?.type === 'resolving') {
         commentsPlugin.current.resolveCommentMarker(
-          blockCommentsState.resolving,
+          currentInteraction.id,
           false,
         );
         return;
       }
-      if (blockCommentsState.unresolving) {
+      if (currentInteraction?.type === 'unresolving') {
         commentsPlugin.current.resolveCommentMarker(
-          blockCommentsState.unresolving,
+          currentInteraction.id,
           true,
         );
       }
     }
 
     updateMarker();
-    if (onAutoSave && editorInstance.current) {
-      onAutoSave(editorInstance.current.getData());
+    if (editorInstance.current) {
+      onAutoSave?.(editorInstance.current.getData());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    blockCommentsState?.adding,
-    blockCommentsState?.removing,
-    blockCommentsState?.resolving,
-    blockCommentsState?.unresolving,
-  ]);
+  }, [currentInteraction]);
 
   const isReadOnly = isBrowser('IE');
 

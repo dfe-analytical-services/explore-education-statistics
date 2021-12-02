@@ -60,7 +60,7 @@ Add summary content to release
     user waits until element contains    id:releaseSummary    This section is empty
     user clicks button    Edit block    id:releaseSummary
     user presses keys    Test intro text for ${PUBLICATION_NAME}
-    user clicks button    Save    id:releaseSummary
+    user clicks button    Save & close    id:releaseSummary
     user waits until element contains    id:releaseSummary    Test intro text for ${PUBLICATION_NAME}
 
 # TODO: Add comment to summary content
@@ -176,7 +176,7 @@ Add key statistics summary content to release
     user waits until element contains    id:releaseHeadlines    This section is empty
     user clicks button    Edit block    id:releaseHeadlines
     user presses keys    Test key statistics summary text for ${PUBLICATION_NAME}
-    user clicks button    Save    id:releaseHeadlines
+    user clicks button    Save & close    id:releaseHeadlines
 
     user waits until page contains    Test key statistics summary text for ${PUBLICATION_NAME}
 
