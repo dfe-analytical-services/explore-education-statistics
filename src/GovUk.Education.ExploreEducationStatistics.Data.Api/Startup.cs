@@ -37,7 +37,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -93,8 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
-
-            services.AddFeatureManagement();
 
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing

@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -42,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Id = 1,
             Label = "Countries November 2021"
         };
+
         private readonly BoundaryLevel _regionsBoundaryLevel = new()
         {
             Id = 2,
@@ -412,7 +412,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
 
             var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var featureManager = new Mock<IFeatureManager>(MockBehavior.Strict);
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
@@ -431,10 +430,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.Region
                     }))
                 .Returns(new List<BoundaryLevel>());
-
-            // Setup the location hierarchies featured as disabled
-            featureManager.Setup(s => s.IsEnabledAsync("LocationHierarchies"))
-                .ReturnsAsync(false);
 
             filterItemRepository.Setup(s => s.GetFilterItems(
                     subject.Id,
@@ -472,7 +467,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildResultSubjectMetaService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    featureManager: featureManager.Object,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -480,7 +474,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object
+                    timePeriodService: timePeriodService.Object,
+                    // Setup the location hierarchies featured as disabled
+                    options: DisabledLocationHierarchiesOptions()
                 );
 
                 var result = await service.GetSubjectMeta(
@@ -590,7 +586,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
 
             var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var featureManager = new Mock<IFeatureManager>(MockBehavior.Strict);
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
@@ -613,10 +608,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.Region
                     }))
                 .Returns(new List<BoundaryLevel>());
-
-            // Setup the location hierarchies featured as disabled
-            featureManager.Setup(s => s.IsEnabledAsync("LocationHierarchies"))
-                .ReturnsAsync(false);
 
             filterItemRepository.Setup(s => s.GetFilterItems(
                     subject.Id,
@@ -689,7 +680,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildResultSubjectMetaService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    featureManager: featureManager.Object,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -698,7 +688,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object
+                    timePeriodService: timePeriodService.Object,
+                    // Setup the location hierarchies featured as disabled
+                    options: DisabledLocationHierarchiesOptions()
                 );
 
                 var result = await service.GetSubjectMeta(
@@ -806,7 +798,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
 
             var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var featureManager = new Mock<IFeatureManager>(MockBehavior.Strict);
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
@@ -824,10 +815,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     _regionsBoundaryLevel
                 });
-
-            // Setup the location hierarchies featured as disabled
-            featureManager.Setup(s => s.IsEnabledAsync("LocationHierarchies"))
-                .ReturnsAsync(false);
 
             filterItemRepository.Setup(s => s.GetFilterItems(
                     subject.Id,
@@ -887,7 +874,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildResultSubjectMetaService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    featureManager: featureManager.Object,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -896,7 +882,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object
+                    timePeriodService: timePeriodService.Object,
+                    // Setup the location hierarchies featured as disabled
+                    options: DisabledLocationHierarchiesOptions()
                 );
 
                 var result = await service.GetSubjectMeta(
@@ -1006,6 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
+                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1247,6 +1236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
+                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1505,6 +1495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
+                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1724,10 +1715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var options = Options.Create(new LocationsOptions
-            {
-                Hierarchies = new Dictionary<GeographicLevel, List<string>>()
-            });
+            var options = DefaultLocationOptions();
 
             var query = new SubjectMetaQueryContext
             {
@@ -1851,23 +1839,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static IFeatureManager DefaultFeatureManager()
-        {
-            var featureManager = new Mock<IFeatureManager>(MockBehavior.Strict);
-            featureManager.Setup(s => s.IsEnabledAsync("LocationHierarchies"))
-                .ReturnsAsync(true);
-            return featureManager.Object;
-        }
-
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
-            return Options.Create(new LocationsOptions());
+            return Options.Create(new LocationsOptions
+            {
+                TableResultLocationHierarchiesEnabled = true
+            });
+        }
+
+        private static IOptions<LocationsOptions> DisabledLocationHierarchiesOptions()
+        {
+            return Options.Create(new LocationsOptions
+            {
+                TableResultLocationHierarchiesEnabled = false
+            });
         }
 
         private static ResultSubjectMetaService BuildResultSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
-            IFeatureManager? featureManager = null,
             IFilterItemRepository? filterItemRepository = null,
             IBoundaryLevelRepository? boundaryLevelRepository = null,
             IFootnoteRepository? footnoteRepository = null,
@@ -1882,7 +1872,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<LocationsOptions>? options = null)
         {
             return new(
-                featureManager ?? DefaultFeatureManager(),
                 contentDbContext ?? InMemoryContentDbContext(),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 boundaryLevelRepository ?? Mock.Of<IBoundaryLevelRepository>(MockBehavior.Strict),
