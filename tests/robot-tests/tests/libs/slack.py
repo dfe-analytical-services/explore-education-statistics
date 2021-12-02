@@ -9,13 +9,10 @@ from bs4 import BeautifulSoup
 PATH = f'{os.getcwd()}{os.sep}test-results'
 
 
-def _generate_slack_attachments():
-    failed_tests = dict()
-    passed_tests = dict()
-
-    report = open(f'{PATH}{os.sep}output.xml', 'rb')
-    contents = report.read()
-
+def _generate_slack_attachments(env: str):
+    with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
+        contents = report.read()
+    
     soup = BeautifulSoup(contents, 'xml')
     test = soup.find('total').find('stat')
 
@@ -30,6 +27,10 @@ def _generate_slack_attachments():
                 "pretext"
             ],
             "fields": [
+                {
+                    "title": "Environment",
+                    "value": env
+                },
                 {
                     "title": "Total test cases",
                     "value": passed_tests + failed_tests
@@ -52,8 +53,8 @@ def _generate_slack_attachments():
     ]
 
 
-def send_slack_report():
-    attachments = _generate_slack_attachments()
+def send_slack_report(env: str):
+    attachments = _generate_slack_attachments(env)
     data = {"attachments": attachments}
 
     webhook_url = os.getenv('SLACK_TEST_REPORT_WEBHOOK_URL')
