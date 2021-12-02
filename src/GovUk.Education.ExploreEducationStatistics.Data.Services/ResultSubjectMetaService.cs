@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
-                    var subjectName = releaseFile.Name ?? "";
+                    var subjectName = releaseFile.Name!;
 
                     var locationsHelper =
                         new LocationsQueryHelper(locationAttributes, query, _boundaryLevelRepository,
