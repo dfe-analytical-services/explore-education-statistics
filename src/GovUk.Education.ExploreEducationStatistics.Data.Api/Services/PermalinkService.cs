@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Net;
 using System.Net.Mime;
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> GetAsync(Guid id)
+        public async Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
+        public async Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkRequest request)
         {
             var publicationId = _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId).Result;
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -64,10 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 return new NotFoundResult();
             }
 
-            return await CreateAsync(release.Id, request);
+            return await Create(release.Id, request);
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId,
+        public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
             CreatePermalinkRequest request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
