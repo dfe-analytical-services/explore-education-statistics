@@ -13,7 +13,7 @@ def _generate_slack_attachments(env: str):
     with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
         contents = report.read()
     
-    soup = BeautifulSoup(contents, 'xml')
+    soup = BeautifulSoup(contents, 'lxml')
     test = soup.find('total').find('stat')
 
     failed_tests = int(test['fail'])
