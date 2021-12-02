@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserReleaseRoleService
     {
-        Task<List<UserReleaseRole>> GetAllUserReleaseRolesByPublication(
+        Task<List<UserReleaseRole>> ListUserReleaseRolesByPublication(
             ReleaseRole role, Guid publicationId);
     }
 }

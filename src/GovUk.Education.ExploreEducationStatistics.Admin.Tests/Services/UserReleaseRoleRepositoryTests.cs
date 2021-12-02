@@ -69,12 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAll()
+        public async Task CreateMany()
         {
             var release = new Release();
 
             var user1 = new User();
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 Release = release,
                 User = user1,
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    userReleaseRole1, user2, user3, user4, createdByUser);
+                    user1ReleaseRole1, user2, user3, user4, createdByUser);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.CreateAll(new List<Guid>{user1.Id, user2.Id, user3.Id, user4.Id},
+                var result = await service.CreateMany(ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
                     release.Id, Contributor, createdByUser.Id);
 
                 Assert.Equal(Unit.Instance, result);
@@ -117,8 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
-                Assert.Equal(userReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
-                Assert.Equal(userReleaseRole1.Created, userReleaseRoles[0].Created);
+                Assert.Equal(user1ReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
+                Assert.Equal(user1ReleaseRole1.Created, userReleaseRoles[0].Created);
 
                 Assert.Equal(user2.Id, userReleaseRoles[1].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[1].ReleaseId);
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAll_NoUsersToAdd()
+        public async Task CreateMany_NoUsersToAdd()
         {
             var release = new Release();
             var createdByUser = new User();
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.CreateAll(new List<Guid>(),
+                var result = await service.CreateMany(new List<Guid>(),
                     release.Id, Contributor, createdByUser.Id);
                 Assert.Equal(Unit.Instance, result);
             }
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveAll()
+        public async Task RemoveMany()
         {
             var deletedById = Guid.NewGuid();
             var userReleaseRole1 = new UserReleaseRole
@@ -291,8 +291,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = new UserReleaseRoleRepository(contentDbContext);
-                await service.RemoveAll(
-                    new List<UserReleaseRole>{userReleaseRole1, userReleaseRole2, userReleaseRole3},
+                await service.RemoveMany(
+                    ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
 
                 var userReleaseRoles = contentDbContext.UserReleaseRoles
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveAll_IgnoreQueryFilters()
+        public async Task RemoveMany_IgnoreQueryFilters()
         {
             var deletedById = Guid.NewGuid();
             var userReleaseRole1 = new UserReleaseRole
@@ -350,8 +350,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = new UserReleaseRoleRepository(contentDbContext);
-                await service.RemoveAll(
-                    new List<UserReleaseRole>{userReleaseRole1, userReleaseRole2, userReleaseRole3},
+                await service.RemoveMany(
+                    ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
 
                 var userReleaseRoles = contentDbContext.UserReleaseRoles
@@ -386,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveAllUserReleaseRolesForPublication()
+        public async Task RemoveAllForPublication()
         {
             var user = new User();
             var deletedById = Guid.NewGuid();
@@ -451,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = new UserReleaseRoleRepository(contentDbContext);
-                await service.RemoveAllUserReleaseRolesForPublication(user.Id, publication, Contributor,
+                await service.RemoveAllForPublication(user.Id, publication, Contributor,
                     deletedById);
 
                 var userReleaseRoles = contentDbContext.UserReleaseRoles

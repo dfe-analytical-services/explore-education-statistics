@@ -98,9 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(query => query
-                    .Include(r => r.Publication)
-                    .Where(r => r.Id == releaseId))
+                .CheckEntityExists<Release>(releaseId, query => query
+                    .Include(r => r.Publication))
                 .OnSuccess(release =>
                     _userService.CheckCanUpdateReleaseRole(release.Publication, role)
                     .OnSuccess(async () =>

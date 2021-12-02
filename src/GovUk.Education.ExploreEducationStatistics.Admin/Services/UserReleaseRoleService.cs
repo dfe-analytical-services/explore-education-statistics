@@ -22,11 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publicationRepository = publicationRepository;
         }
 
-        public async Task<List<UserReleaseRole>> GetAllUserReleaseRolesByPublication(ReleaseRole role,
+        public async Task<List<UserReleaseRole>> ListUserReleaseRolesByPublication(ReleaseRole role,
             Guid publicationId)
         {
             var allLatestReleases = await _publicationRepository
-                .GetLatestVersionsOfAllReleases(publicationId);
+                .ListActiveReleases(publicationId);
 
             var allLatestReleaseIds = allLatestReleases
                 .Select(r => r.Id)
@@ -34,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _contentDbContext.UserReleaseRoles
                 .Include(releaseRole => releaseRole.User)
-                .AsAsyncEnumerable()
                 .Where(userReleaseRole =>
                     allLatestReleaseIds.Contains(userReleaseRole.ReleaseId)
                     && userReleaseRole.Role == role)

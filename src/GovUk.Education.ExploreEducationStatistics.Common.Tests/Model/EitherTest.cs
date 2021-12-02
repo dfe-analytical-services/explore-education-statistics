@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 });
 
             Assert.True(either.IsRight);
-            Assert.Equal(AsTuple("Success number one!", "Success number two!"), either.Right);
+            Assert.Equal(TupleOf("Success number one!", "Success number two!"), either.Right);
         }
 
         [Fact]
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 });
 
             Assert.True(either.IsRight);
-            Assert.Equal(AsTuple("Success number one!", '2'), either.Right);
+            Assert.Equal(TupleOf("Success number one!", '2'), either.Right);
         }
 
         [Fact]

@@ -538,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        AsTuple(release, section));
+                        TupleOf(release, section));
                 });
         }
 

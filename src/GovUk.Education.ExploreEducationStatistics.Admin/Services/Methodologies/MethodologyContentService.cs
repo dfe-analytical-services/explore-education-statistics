@@ -402,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     }
 
                     return new Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>(
-                        AsTuple(methodology, section));
+                        TupleOf(methodology, section));
                 });
         }
 
@@ -477,12 +477,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             if (ContentListContainsAllSectionIds(methodologyVersion.Content, contentSectionIds))
             {
-                return AsTuple(methodologyVersion, methodologyVersion.Content);
+                return TupleOf(methodologyVersion, methodologyVersion.Content);
             }
 
             if (ContentListContainsAllSectionIds(methodologyVersion.Annexes, contentSectionIds))
             {
-                return AsTuple(methodologyVersion, methodologyVersion.Annexes);
+                return TupleOf(methodologyVersion, methodologyVersion.Annexes);
             }
 
             return new NotFoundResult();

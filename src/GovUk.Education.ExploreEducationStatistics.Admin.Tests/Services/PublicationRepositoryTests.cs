@@ -1048,7 +1048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestVersionsOfAllReleases()
+        public async Task ListActiveReleases()
         {
             var release2000Original = new Release
             {
@@ -1105,7 +1105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(context, AdminMapper());
-                var latestReleases = await service.GetLatestVersionsOfAllReleases(publication.Id);
+                var latestReleases = await service.ListActiveReleases(publication.Id);
 
                 Assert.Equal(3, latestReleases.Count);
 

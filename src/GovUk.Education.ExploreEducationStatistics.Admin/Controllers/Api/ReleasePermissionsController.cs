@@ -23,35 +23,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePermissionService = releasePermissionService;
         }
 
-        [HttpGet("publications/{publicationId}/contributors")]
-        public async Task<ActionResult<List<ContributorViewModel>>> GetReleaseContributors(
-            Guid publicationId,
-            [FromQuery] Guid releaseId)
-        {
-            return await _releasePermissionService
-                .GetReleaseContributorPermissions(publicationId, releaseId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpGet("releases/{releaseId}/contributors")]
-        public async Task<ActionResult<List<ContributorViewModel>>> GetPublicationContributors(
+        public async Task<ActionResult<List<ContributorViewModel>>> ListReleaseContributors(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .GetPublicationContributorList(releaseId)
+                .ListReleaseContributors(releaseId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseId}/contributors")]
-        public async Task<ActionResult> UpdateReleaseContributors(Guid releaseId, List<Guid> userIds)
+        [HttpGet("publications/{publicationId}/contributors")]
+        public async Task<ActionResult<List<ContributorViewModel>>> ListPublicationContributors(
+            Guid publicationId)
         {
             return await _releasePermissionService
-                .UpdateReleaseContributors(releaseId, userIds)
+                .ListPublicationContributors(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("releases/{releaseId}/contributors")]
+        public async Task<ActionResult> UpdateReleaseContributors(Guid releaseId, UpdateReleaseContributorsViewModel request)
+        {
+            return await _releasePermissionService
+                .UpdateReleaseContributors(releaseId, request.UserIds)
                 .HandleFailuresOr(result => new AcceptedResult());
         }
 
         [HttpDelete("publications/{publicationId}/users/{userId}/contributors")]
-        public async Task<ActionResult> RemoveUserContributorReleaseRolesForPublication(
+        public async Task<ActionResult> RemoveAllUserContributorPermissionsForPublication(
             Guid publicationId, Guid userId)
         {
             return await _releasePermissionService

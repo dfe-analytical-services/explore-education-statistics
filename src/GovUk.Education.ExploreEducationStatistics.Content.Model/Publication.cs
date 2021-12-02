@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             return !Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
 
-        public List<Release> GetLatestVersionsOfAllReleases()
+        public List<Release> ListActiveReleases()
         {
             return Releases?
                 .Where(r => IsLatestVersionOfRelease(r.Id))

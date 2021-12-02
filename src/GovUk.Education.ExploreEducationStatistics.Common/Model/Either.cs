@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         {
             return await task.OnSuccess(success =>
             {
-                return func(success).OnSuccess(combinator => AsTuple(success, combinator));
+                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
             });
         }
 

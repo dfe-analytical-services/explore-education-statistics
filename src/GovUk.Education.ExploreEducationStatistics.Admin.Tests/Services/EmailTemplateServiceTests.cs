@@ -156,10 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> ConfigurationMock()
         {
             return CreateMockConfiguration(
-                AsTuple("NotifyInviteTemplateId", "invite-template-id"),
-                AsTuple("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
-                AsTuple("NotifyReleaseRoleTemplateId", "release-role-template-id"),
-                AsTuple("AdminUri", "admin-uri"));
+                TupleOf("NotifyInviteTemplateId", "invite-template-id"),
+                TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
+                TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
+                TupleOf("AdminUri", "admin-uri"));
         }
 
         private static EmailTemplateService SetupEmailTemplateService(

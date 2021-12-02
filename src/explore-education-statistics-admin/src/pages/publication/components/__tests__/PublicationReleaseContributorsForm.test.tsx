@@ -1,67 +1,55 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import PublicationAddExistingUsersTab from '@admin/pages/publication/components/PublicationAddExistingUsersTab';
+import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import _releasePermissionService, {
   ManageAccessPageContributor,
 } from '@admin/services/releasePermissionService';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/releasePermissionService');
 
-describe('PublicationAddExistingUsersTab', () => {
-  const testContributors: ManageAccessPageContributor[] = [
+describe('PublicationReleaseContributorsForm', () => {
+  const testPublicationContributors: ManageAccessPageContributor[] = [
     {
       userId: 'user-1',
-      userFullName: 'User Name 1',
+      userDisplayName: 'User Name 1',
       userEmail: 'user1@test.com',
-      releaseRoleId: 'release-role-1',
     },
     {
       userId: 'user-2',
-      userFullName: 'User Name 2',
+      userDisplayName: 'User Name 2',
       userEmail: 'user2@test.com',
-      releaseRoleId: undefined,
     },
     {
       userId: 'user-3',
-      userFullName: 'User Name 3',
+      userDisplayName: 'User Name 3',
       userEmail: 'user3@test.com',
-      releaseRoleId: 'release-role-3',
     },
     {
       userId: 'user-4',
-      userFullName: 'User Name 4',
+      userDisplayName: 'User Name 4',
       userEmail: 'user4@test.com',
-      releaseRoleId: undefined,
     },
   ];
-  test('Submits correct userIds to backend', async () => {
+  const testReleaseContributors: ManageAccessPageContributor[] = [
+    {
+      userId: 'user-1',
+      userDisplayName: 'User Name 1',
+      userEmail: 'user1@test.com',
+    },
+    {
+      userId: 'user-3',
+      userDisplayName: 'User Name 3',
+      userEmail: 'user3@test.com',
+    },
+  ];
+  test('submits correct userIds to backend', async () => {
     render(
-      <PublicationAddExistingUsersTab
+      <PublicationReleaseContributorsForm
         publicationId="publication-id"
-        release={{
-          id: 'release-id',
-          title: 'Test release title',
-          slug: '',
-          approvalStatus: 'Approved',
-          latestRelease: true,
-          live: true,
-          amendment: true,
-          releaseName: '',
-          publicationId: '',
-          publicationTitle: '',
-          publicationSlug: '',
-          timePeriodCoverage: { value: '', label: '' },
-          type: { id: '', title: '' },
-          contact: {
-            id: '',
-            contactName: '',
-            contactTelNo: '',
-            teamEmail: '',
-          },
-          previousVersionId: '',
-          preReleaseAccessList: '',
-        }}
-        contributors={testContributors}
+        releaseId="release-id"
+        publicationContributors={testPublicationContributors}
+        releaseContributors={testReleaseContributors}
       />,
     );
 
@@ -97,8 +85,8 @@ describe('PublicationAddExistingUsersTab', () => {
     expect(checkboxes[3].checked).toBe(false);
     expect(checkboxes[3]).toHaveAttribute('value', undefined);
 
-    fireEvent.click(checkboxes[0]);
-    fireEvent.click(checkboxes[1]);
+    userEvent.click(checkboxes[0]);
+    userEvent.click(checkboxes[1]);
 
     await waitFor(() => {
       expect(checkboxes[0].checked).toBe(false);
@@ -109,9 +97,11 @@ describe('PublicationAddExistingUsersTab', () => {
 
     expect(
       _releasePermissionService.updateReleaseContributors,
-    ).toHaveBeenCalledTimes(0);
+    ).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Update permissions' }));
+    userEvent.click(
+      screen.getByRole('button', { name: 'Update contributors' }),
+    );
 
     await waitFor(() => {
       expect(

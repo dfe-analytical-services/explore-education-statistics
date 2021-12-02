@@ -1828,7 +1828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> DefaultConfigurationMock()
         {
             return CreateMockConfiguration(
-                AsTuple("NotifyPreReleaseTemplateId", PreReleaseTemplateId));
+                TupleOf("NotifyPreReleaseTemplateId", PreReleaseTemplateId));
         }
 
         private static Mock<IHttpContextAccessor> DefaultHttpContextAccessorMock()

@@ -1253,7 +1253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestReleaseVersions()
+        public async Task ListActiveReleases()
         {
             var release1Original = new Release
             {
@@ -1305,7 +1305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.GetLatestReleaseVersions(
+                var result = await publicationService.ListActiveReleases(
                     publication.Id);
 
                 var releases = result.AssertRight();

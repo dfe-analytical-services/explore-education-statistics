@@ -7,29 +7,31 @@ import React, { useState } from 'react';
 
 export interface Props {
   contributors: ManageAccessPageContributor[];
-  handleUserRemoval: (userId: string) => void;
+  onUserRemove: (userId: string) => void;
 }
 
 const ReleaseContributorPermissions = ({
   contributors,
-  handleUserRemoval,
+  onUserRemove,
 }: Props) => {
   const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
 
   return (
     <>
-      {!contributors || contributors.length <= 0 ? (
+      {!contributors || !contributors.length ? (
         <WarningMessage testId="releaseContributors-warning">
-          There are currently no team members associated to this publication.
+          There are currently no team members associated with this publication.
+          You can invite new users by clicking the "Add or remove users" button
+          or by going to the <a href="#invite-users">invite users tab</a>.
         </WarningMessage>
       ) : (
         <>
           <table>
             <tbody>
-              {contributors?.map(contributor => (
+              {contributors.map(contributor => (
                 <tr key={contributor.userId}>
                   <td className="govuk-!-width-one-half">
-                    {contributor.userFullName}
+                    {contributor.userDisplayName}
                   </td>
                   <td className={styles.control}>
                     <ButtonText onClick={() => setRemoveUser(contributor)}>
@@ -46,7 +48,7 @@ const ReleaseContributorPermissions = ({
             open={!!removeUser}
             onConfirm={async () => {
               if (removeUser) {
-                handleUserRemoval(removeUser.userId);
+                onUserRemove(removeUser.userId);
                 setRemoveUser(undefined);
               }
             }}
@@ -55,8 +57,8 @@ const ReleaseContributorPermissions = ({
           >
             <p>
               Are you sure you want to remove{' '}
-              <strong>{removeUser?.userFullName}</strong> from all releases in
-              this publication?
+              <strong>{removeUser?.userDisplayName}</strong> from all releases
+              in this publication?
             </p>
           </ModalConfirm>
         </>

@@ -2,32 +2,28 @@ import client from '@admin/services/utils/service';
 
 export interface ManageAccessPageContributor {
   userId: string;
-  userFullName: string;
+  userDisplayName: string;
   userEmail: string;
-  releaseRoleId: string | undefined;
 }
 
 const releasePermissionService = {
-  getPublicationReleaseContributors(
-    publicationId: string,
-    releaseId: string,
-  ): Promise<ManageAccessPageContributor[]> {
-    return client.get(`/publications/${publicationId}/contributors`, {
-      params: { releaseId },
-    });
-  },
-  getAllPublicationContributors(
+  listReleaseContributors(
     releaseId: string,
   ): Promise<ManageAccessPageContributor[]> {
     return client.get(`/releases/${releaseId}/contributors`);
+  },
+  listPublicationContributors(
+    publicationId: string,
+  ): Promise<ManageAccessPageContributor[]> {
+    return client.get(`/publications/${publicationId}/contributors`);
   },
   updateReleaseContributors(
     releaseId: string,
     userIds: string[],
   ): Promise<void> {
-    return client.post(`/releases/${releaseId}/contributors`, userIds);
+    return client.put(`/releases/${releaseId}/contributors`, { userIds });
   },
-  deleteAllUserContributorReleaseRolesForPublication(
+  removeAllUserContributorPermissionsForPublication(
     publicationId: string,
     userId: string,
   ): Promise<void> {

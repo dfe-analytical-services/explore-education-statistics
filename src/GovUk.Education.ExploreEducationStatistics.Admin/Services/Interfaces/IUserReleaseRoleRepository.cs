@@ -14,16 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role,
             Guid createdById);
 
-        Task<Unit> CreateAll(List<Guid> userIds,
+        Task<Unit> CreateMany(List<Guid> userIds,
             Guid releaseId,
             ReleaseRole role,
             Guid createdById);
 
         Task Remove(UserReleaseRole userReleaseRole, Guid deletedById);
 
-        Task RemoveAll(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
+        Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
 
-        Task RemoveAllUserReleaseRolesForPublication(
+        Task RemoveAllForPublication(
             Guid userId, Publication publication,
             ReleaseRole role, Guid deletedById);
 

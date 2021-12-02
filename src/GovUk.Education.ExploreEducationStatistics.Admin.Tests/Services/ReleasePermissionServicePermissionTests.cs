@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReleasePermissionServicePermissionTests
     {
         [Fact]
-        public async Task GetReleaseContributorPermissions()
+        public async Task ListReleaseContributors()
         {
             var release = new Release();
             var publication = new Publication
@@ -48,22 +48,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.GetReleaseContributorPermissions(publication.Id, release.Id);
+                        return await service.ListReleaseContributors(release.Id);
                     }
                 });
         }
 
         [Fact]
-        public async Task GetPublicationContributorList()
+        public async Task ListPublicationContributors()
         {
-            var release = new Release();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
-                {
-                    release,
-                }
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -82,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.GetPublicationContributorList(release.Id);
+                        return await service.ListPublicationContributors(publication.Id);
                     }
                 });
         }
@@ -149,13 +144,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleasePermissionService SetupReleasePermissionService(
             ContentDbContext contentDbContext,
-            IUserService? userService = null)
+            IUserService userService)
         {
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 new UserReleaseRoleRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService
             );
         }
     }

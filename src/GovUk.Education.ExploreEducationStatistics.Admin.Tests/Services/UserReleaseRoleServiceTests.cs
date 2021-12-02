@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -15,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class UserReleaseRoleServiceTests
     {
         [Fact]
-        public async Task GetAllUserReleaseRolesByPublication()
+        public async Task ListUserReleaseRolesByPublication()
         {
             var release1 = new Release
             {
@@ -28,13 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
-                {
-                    release1, release2
-                }
+                Releases = ListOf(release1, release2),
             };
 
-            var releaseIgnored1 = new Release
+            var releaseIgnored1 = new Release // Ignored because different publication
             {
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
@@ -58,20 +56,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release2,
                 Role = Contributor,
             };
-            var userReleaseRoleIgnored1 = new UserReleaseRole
+            var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = new User{ Id = Guid.NewGuid() },
                 Release = release1,
                 Role = Lead,
             };
-            var userReleaseRoleIgnored2 = new UserReleaseRole
+            var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {
                 User = new User{ Id = Guid.NewGuid() },
                 Release = release1,
-                Role = Lead,
+                Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
-            var userReleaseRoleIgnored3 = new UserReleaseRole
+            var userReleaseRoleIgnored3 = new UserReleaseRole // Ignored due to release under different publication
             {
                 User = new User{ Id = Guid.NewGuid() },
                 Release = releaseIgnored1,
@@ -91,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserReleaseRoleService(contentDbContext);
-                var userReleaseRoles = await service.GetAllUserReleaseRolesByPublication(Contributor,
+                var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor,
                     publication.Id);
 
                 Assert.Equal(3, userReleaseRoles.Count);

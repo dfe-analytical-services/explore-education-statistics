@@ -29,14 +29,14 @@ const PublicationManageTeamAccessPage = ({
   const { publicationId, releaseId } = match.params;
   const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
-  const { value: model, isLoading } = useAsyncHandledRetry(async () => {
+  const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [releases, publication] = await Promise.all([
       publicationService.getReleases(publicationId),
       publicationService.getPublication(publicationId),
     ]);
     if (!releaseId && releases.length) {
       setCurrentReleaseId(releases[0].id);
-      history.push(
+      history.replace(
         generatePath<ReleaseRouteParams>(
           publicationManageTeamAccessReleaseRoute.path,
           {
@@ -46,7 +46,7 @@ const PublicationManageTeamAccessPage = ({
         ),
       );
     }
-    return { releases, publication } as Model;
+    return { releases, publication };
   }, [publicationId]);
 
   if (!model || isLoading) {
@@ -81,7 +81,7 @@ const PublicationManageTeamAccessPage = ({
               value={currentReleaseId}
               onChange={e => {
                 setCurrentReleaseId(e.target.value);
-                history.push(
+                history.replace(
                   generatePath<ReleaseRouteParams>(
                     publicationManageTeamAccessReleaseRoute.path,
                     {

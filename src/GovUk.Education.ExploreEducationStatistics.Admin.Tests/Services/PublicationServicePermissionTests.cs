@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var mocks = Mocks();
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.GetLatestReleaseVersions(_publication.Id),
+                async service => await service.ListActiveReleases(_publication.Id),
                 _publication,
                 mocks.UserService,
                 BuildPublicationService(mocks),

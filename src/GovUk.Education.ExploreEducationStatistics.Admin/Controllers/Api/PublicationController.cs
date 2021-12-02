@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publications/{publicationId}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublicationById(
+        public async Task<ActionResult<PublicationViewModel>> GetPublication(
             [Required] Guid publicationId)
         {
             return await _publicationService
@@ -50,11 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId}/releases")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> GetLatestReleaseVersions(
+        public async Task<ActionResult<List<ReleaseViewModel>>> ListActiveReleases(
             [Required] Guid publicationId)
         {
             return await _publicationService
-                .GetLatestReleaseVersions(publicationId)
+                .ListActiveReleases(publicationId)
                 .HandleFailuresOrOk();
         }
 

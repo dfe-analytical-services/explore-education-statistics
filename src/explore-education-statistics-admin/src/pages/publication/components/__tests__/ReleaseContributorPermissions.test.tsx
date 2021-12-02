@@ -1,63 +1,46 @@
 import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseContributorPermissions';
-import { Release } from '@admin/services/releaseService';
 import _releasePermissionService, {
   ManageAccessPageContributor,
 } from '@admin/services/releasePermissionService';
-import _userService from '@admin/services/userService';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/releasePermissionService');
 jest.mock('@admin/services/userService');
+
 const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
-const userService = _userService as jest.Mocked<typeof _userService>;
 
 describe('ReleaseContributorPermissions', () => {
-  const testRelease = {
-    id: 'release-1',
-    title: 'Release 1',
-  } as Release;
-
   const testReleaseContributors: ManageAccessPageContributor[] = [
     {
       userId: 'user-1',
-      userFullName: 'User Name 1',
+      userDisplayName: 'User Name 1',
       userEmail: 'user1@test.com',
-      releaseRoleId: 'release-role-1',
     },
     {
       userId: 'user-2',
-      userFullName: 'User Name 2',
+      userDisplayName: 'User Name 2',
       userEmail: 'user2@test.com',
-      releaseRoleId: undefined,
     },
     {
       userId: 'user-3',
-      userFullName: 'User Name 3',
+      userDisplayName: 'User Name 3',
       userEmail: 'user3@test.com',
-      releaseRoleId: 'release-role-3',
     },
   ];
 
   test('renders a message when there are no release contributors', async () => {
-    releasePermissionService.getPublicationReleaseContributors.mockResolvedValue(
-      [],
-    );
+    releasePermissionService.listReleaseContributors.mockResolvedValue([]);
 
-    const handleUserRemoval = jest.fn();
+    const onUserRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={[]}
-        handleUserRemoval={handleUserRemoval}
+        onUserRemove={onUserRemove}
       />,
     );
 
@@ -67,22 +50,22 @@ describe('ReleaseContributorPermissions', () => {
       expect(
         screen.getByTestId('releaseContributors-warning').textContent,
       ).toContain(
-        'There are currently no team members associated to this publication.',
+        'There are currently no team members associated with this publication.',
       );
     });
   });
 
   test('renders the contributors table correctly', async () => {
-    releasePermissionService.getPublicationReleaseContributors.mockResolvedValue(
+    releasePermissionService.listReleaseContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
-    const handleUserRemoval = (userId: string) => {};
+    const onUserRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={testReleaseContributors}
-        handleUserRemoval={handleUserRemoval}
+        onUserRemove={onUserRemove}
       />,
     );
 
@@ -110,16 +93,16 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('remove user', async () => {
-    releasePermissionService.getPublicationReleaseContributors.mockResolvedValue(
+    releasePermissionService.listReleaseContributors.mockResolvedValue(
       testReleaseContributors,
     );
 
-    const handleUserRemoval = jest.fn();
+    const onUserRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={testReleaseContributors}
-        handleUserRemoval={handleUserRemoval}
+        onUserRemove={onUserRemove}
       />,
     );
 
@@ -128,7 +111,7 @@ describe('ReleaseContributorPermissions', () => {
     });
     const rows = screen.getAllByRole('row');
 
-    fireEvent.click(
+    userEvent.click(
       within(rows[0]).getByRole('button', { name: 'Remove user' }),
     );
 
@@ -144,13 +127,13 @@ describe('ReleaseContributorPermissions', () => {
       'Are you sure you want to remove User Name 1 from all releases in this publication?',
     );
 
-    expect(handleUserRemoval).not.toBeCalled();
+    expect(onUserRemove).not.toBeCalled();
 
-    fireEvent.click(within(modal).getByRole('button', { name: 'Confirm' }));
+    userEvent.click(within(modal).getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
-      expect(handleUserRemoval).toHaveBeenCalledTimes(1);
-      expect(handleUserRemoval).toHaveBeenCalledWith('user-1');
+      expect(onUserRemove).toHaveBeenCalledTimes(1);
+      expect(onUserRemove).toHaveBeenCalledWith('user-1');
     });
   });
 });

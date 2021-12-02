@@ -38,11 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
-        public async Task<Unit> CreateAll(List<Guid> userIds, Guid releaseId, ReleaseRole role,
+        public async Task<Unit> CreateMany(List<Guid> userIds, Guid releaseId, ReleaseRole role,
             Guid createdById)
         {
             var userIdsAlreadyHaveRole = await _contentDbContext.UserReleaseRoles
-                .AsAsyncEnumerable()
+                .AsQueryable()
                 .Where(urr =>
                     urr.ReleaseId == releaseId
                     && urr.Role == role
@@ -50,9 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(urr => urr.UserId)
                 .ToListAsync();
 
-            var userIdsToAdd = userIds.Except(userIdsAlreadyHaveRole).ToList();
-
-            var newUserReleaseRoles = userIdsToAdd
+            var newUserReleaseRoles = userIds
+                .Except(userIdsAlreadyHaveRole)
                 .Select(userId =>
                     new UserReleaseRole
                     {
@@ -77,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task RemoveAll(List<UserReleaseRole> userReleaseRoles, Guid deletedById)
+        public async Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById)
         {
             userReleaseRoles.ForEach(userReleaseRole =>
             {
@@ -88,25 +87,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task RemoveAllUserReleaseRolesForPublication(Guid userId, Publication publication, ReleaseRole role, Guid deletedById)
+        public async Task RemoveAllForPublication(Guid userId, Publication publication, ReleaseRole role, Guid deletedById)
         {
             _contentDbContext.Update(publication);
             await _contentDbContext
                 .Entry(publication)
                 .Collection(p => p.Releases)
                 .LoadAsync();
-            var allLatestReleaseVersionIds = publication
-                .GetLatestVersionsOfAllReleases()
+            var allReleaseIds = publication
+                .Releases // Remove on previous release versions as well
                 .Select(r => r.Id)
                 .ToList();
-            var userReleaseRoles = _contentDbContext.UserReleaseRoles
+            var userReleaseRoles = await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
                 .Where(urr =>
                     urr.UserId == userId
-                    && allLatestReleaseVersionIds.Contains(urr.ReleaseId)
+                    && allReleaseIds.Contains(urr.ReleaseId)
                     && urr.Role == role)
-                .ToList();
-            await RemoveAll(userReleaseRoles, deletedById);
+                .ToListAsync();
+            await RemoveMany(userReleaseRoles, deletedById);
         }
 
         public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)

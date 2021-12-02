@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public async Task GetReleaseContributorPermissions()
+        public async Task ListReleaseContributors()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "One",
                 Email = "user1@test.com",
             };
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
                 Release = release1,
@@ -63,13 +64,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Two",
                 Email = "user2@test.com",
             };
-            var userReleaseRole2 = new UserReleaseRole
+            var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
                 Release = release2Amendment,
                 Role = Contributor,
             };
-            var userReleaseRole3 = new UserReleaseRole
+            var user2ReleaseRole2 = new UserReleaseRole
             {
                 User = user2,
                 Release = release1,
@@ -77,19 +78,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var user3 = new User();
-            var userReleaseRoleIgnored1 = new UserReleaseRole
+            var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
             {
                 User = user3,
                 Release = new Release { Publication = new Publication() },
                 Role = Contributor,
             };
-            var userReleaseRoleIgnored2 = new UserReleaseRole
+            var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
                 Release = release1,
                 Role = PrereleaseViewer,
             };
-            var userReleaseRoleIgnored3 = new UserReleaseRole
+            var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
             {
                 User = user3,
                 Release = release2Original,
@@ -101,8 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    userReleaseRole1, userReleaseRole2, userReleaseRole3,
-                    userReleaseRoleIgnored1, userReleaseRoleIgnored2, userReleaseRoleIgnored3);
+                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -110,35 +111,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.GetReleaseContributorPermissions(publication.Id, release1.Id);
+                var result = await service.ListReleaseContributors(release1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
 
                 Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserFullName);
+                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
                 Assert.Equal(user1.Email, viewModel[0].UserEmail);
-                Assert.Equal(userReleaseRole1.Id, viewModel[0].ReleaseRoleId);
 
                 Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserFullName);
+                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
                 Assert.Equal(user2.Email, viewModel[1].UserEmail);
-                Assert.Equal(userReleaseRole3.Id, viewModel[1].ReleaseRoleId);
             }
         }
 
         [Fact]
-        public async Task GetReleaseContributorPermissions_NoPublication()
+        public async Task ListReleaseContributors_NoPublication()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleasePermissionService(contentDbContext);
 
-            var result = await service.GetReleaseContributorPermissions(Guid.NewGuid(), Guid.NewGuid());
+            var result = await service.ListReleaseContributors(Guid.NewGuid());
             result.AssertNotFound();
         }
 
         [Fact]
-        public async Task GetReleaseContributorPermissions_NoReleases()
+        public async Task ListReleaseContributors_NoRelease()
         {
             var publication = new Publication { Title = "Test Publication" };
 
@@ -153,15 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.GetReleaseContributorPermissions(publication.Id, Guid.NewGuid());
-                var viewModel = result.AssertRight();
-
-                Assert.Empty(viewModel);
+                var result = await service.ListReleaseContributors(Guid.NewGuid());
+                result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task GetReleaseContributorPermissions_NoUserReleaseRoles()
+        public async Task ListReleaseContributors_NoUserReleaseRoles()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -182,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result = await service
-                    .GetReleaseContributorPermissions(publication.Id, release1.Id);
+                    .ListReleaseContributors(release1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Empty(viewModel);
@@ -190,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationContributorList()
+        public async Task ListPublicationContributors()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -218,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "One",
                 Email = "user1@test.com",
             };
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
                 Release = release1,
@@ -231,33 +228,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Two",
                 Email = "user2@test.com",
             };
-            var userReleaseRole2 = new UserReleaseRole
+            var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
                 Release = release2Amendment,
                 Role = Contributor,
             };
-            var userReleaseRole3 = new UserReleaseRole
-            {
-                User = user2,
-                Release = release1,
-                Role = Contributor,
-            };
 
             var user3 = new User();
-            var userReleaseRoleIgnored1 = new UserReleaseRole
+            var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
             {
                 User = user3,
                 Release = new Release { Publication = new Publication() },
                 Role = Contributor,
             };
-            var userReleaseRoleIgnored2 = new UserReleaseRole
+            var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
                 Release = release1,
                 Role = PrereleaseViewer,
             };
-            var userReleaseRoleIgnored3 = new UserReleaseRole
+            var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
             {
                 User = user3,
                 Release = release2Original,
@@ -269,8 +260,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    userReleaseRole1, userReleaseRole2, userReleaseRole3,
-                    userReleaseRoleIgnored1, userReleaseRoleIgnored2, userReleaseRoleIgnored3);
+                    user1ReleaseRole1, user2ReleaseRole1,
+                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -279,37 +270,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result =
-                    await service.GetPublicationContributorList(release2Amendment.Id);
+                    await service.ListPublicationContributors(publication.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
 
                 Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserFullName);
+                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
                 Assert.Equal(user1.Email, viewModel[0].UserEmail);
-                Assert.Null(viewModel[0].ReleaseRoleId);
 
                 Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserFullName);
+                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
                 Assert.Equal(user2.Email, viewModel[1].UserEmail);
-                Assert.Equal(userReleaseRole2.Id, viewModel[1].ReleaseRoleId);
             }
         }
 
         [Fact]
-        public async Task GetPublicationContributorList_NoRelease()
+        public async Task ListPublicationContributors_NoPublication()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
             var service = SetupReleasePermissionService(contentDbContext);
 
             var result =
-                await service.GetPublicationContributorList(Guid.NewGuid());
+                await service.ListPublicationContributors(Guid.NewGuid());
             result.AssertNotFound();
         }
 
+
         [Fact]
-        public async Task GetPublicationContributorList_NoUserReleaseRoles()
+        public async Task ListPublicationContributors_NoRelease()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result =
+                    await service.ListPublicationContributors(publication.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublicationContributors_NoUserReleaseRoles()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -331,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result =
-                    await service.GetPublicationContributorList(release1.Id);
+                    await service.ListPublicationContributors(publication.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Empty(viewModel);
@@ -354,11 +368,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "One",
                 Email = "user1@test.com",
             };
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
                 Release = release1,
                 Role = Contributor,
+                Created = new DateTime(2000, 12, 25),
+                CreatedById = Guid.NewGuid(),
             };
             var user2 = new User
             {
@@ -366,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Two",
                 Email = "user2@test.com",
             };
-            var userReleaseRole2 = new UserReleaseRole
+            var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
                 Release = release1,
@@ -377,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, userReleaseRole1, userReleaseRole2);
+                await contentDbContext.AddRangeAsync(release1, user1ReleaseRole1, user2ReleaseRole1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -386,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result =
-                    await service.UpdateReleaseContributors(release1.Id, new List<Guid>{ user1.Id, user3.Id });
+                    await service.UpdateReleaseContributors(release1.Id, ListOf(user1.Id, user3.Id));
                 result.AssertRight();
             }
 
@@ -401,9 +417,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, userReleaseRoles.Count);
 
-                Assert.Equal(userReleaseRole1.Id, userReleaseRoles[0].Id);
+                Assert.Equal(user1ReleaseRole1.Id, userReleaseRoles[0].Id);
                 Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
+                Assert.Equal(user1ReleaseRole1.Created, userReleaseRoles[0].Created);
+                Assert.Equal(user1ReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
 
+                // userReleaseRole[1] is newly created, so cannot check Id
                 Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds,
                     0, 1500);
@@ -428,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "One",
                 Email = "user1@test.com",
             };
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
                 Release = release1,
@@ -441,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Two",
                 Email = "user2@test.com",
             };
-            var userReleaseRole2 = new UserReleaseRole
+            var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
                 Release = release1,
@@ -451,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, userReleaseRole1, userReleaseRole2);
+                await contentDbContext.AddRangeAsync(release1, user1ReleaseRole1, user2ReleaseRole1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -506,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "One",
                 Email = "user1@test.com",
             };
-            var userReleaseRole1 = new UserReleaseRole
+            var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
                 Release = release1,
@@ -519,13 +538,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Two",
                 Email = "user2@test.com",
             };
-            var userReleaseRole2 = new UserReleaseRole
+            var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
                 Release = release2Amendment,
                 Role = Contributor,
             };
-            var userReleaseRole3 = new UserReleaseRole
+            var user2ReleaseRole2 = new UserReleaseRole
             {
                 User = user2,
                 Release = release1,
@@ -538,7 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Three",
                 Email = "user3@test.com",
             };
-            var userReleaseRole4 = new UserReleaseRole
+            var user3ReleaseRole1 = new UserReleaseRole
             {
                 User = user3,
                 Release = release2Amendment,
@@ -549,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    userReleaseRole1, userReleaseRole2, userReleaseRole3, userReleaseRole4);
+                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2, user3ReleaseRole1);
                 await contentDbContext.SaveChangesAsync();
             }
 

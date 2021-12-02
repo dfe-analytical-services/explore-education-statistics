@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
             this IUserService userService, Publication publication, ReleaseRole role)
         {
-            return userService.CheckPolicy(AsTuple(publication, role),
+            return userService.CheckPolicy(TupleOf(publication, role),
                 SecurityPolicies.CanUpdateSpecificReleaseRole);
         }
 
