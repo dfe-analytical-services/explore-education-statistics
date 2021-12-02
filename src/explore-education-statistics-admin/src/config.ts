@@ -6,9 +6,9 @@ export interface Config {
   readonly PublicAppUrl: string;
 }
 
-let config: Config;
+let config: Config | undefined;
 
-export async function getConfig(): Promise<Config> {
+export async function getConfig(): Promise<Config | undefined> {
   if (config) {
     return config;
   }

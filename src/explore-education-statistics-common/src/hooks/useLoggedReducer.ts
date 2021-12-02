@@ -1,5 +1,5 @@
 import logger from '@common/services/logger';
-import produce from 'immer';
+import produce, { Draft, Immutable } from 'immer';
 import {
   Dispatch,
   Reducer,
@@ -7,16 +7,16 @@ import {
   useCallback,
   useReducer,
 } from 'react';
-import { Reducer as ImmerReducer } from 'use-immer';
+import { ImmerHook, Reducer as ImmerReducer } from 'use-immer';
 
 export default function useLoggedReducer<S, A>(
   name: string,
-  reducer: Reducer<S, A>,
-  initialState: S,
+  reducer: ImmerReducer<S, A>,
+  initialState: S | (() => S),
   initializer?: ReducerWithoutAction<S>,
-): [S, Dispatch<A>] {
+): ImmerHook<S> {
   const cachedReducer = useCallback(
-    (state: S, action: A) => {
+    (state: Draft<S>, action: A) => {
       logger.debugGroup(`${name} reducer:`);
       logger.debug(
         '%cPrevious State:',
@@ -47,6 +47,14 @@ export default function useLoggedReducer<S, A>(
     initializer as ReducerWithoutAction<S>,
   );
 }
+export function useLoggedImmerReducer2<S, A>(
+  name: string,
+  initialState: S | (() => S),
+  reducer: ImmerReducer<S, A>,
+  initializer?: ReducerWithoutAction<S>,
+): ImmerHook<S> {
+  return useLoggedReducer();
+}
 
 export function useLoggedImmerReducer<S, A>(
   name: string,
@@ -58,7 +66,7 @@ export function useLoggedImmerReducer<S, A>(
   const cachedReducer = useCallback(produce(reducer), [reducer]);
   return useLoggedReducer(
     name,
-    cachedReducer as Reducer<S, A>,
+    cachedReducer as any,
     initialState,
     initializer,
   );
