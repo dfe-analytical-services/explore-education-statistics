@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _logger.LogDebug("Listing blobs in container: {Container}", Permalinks);
 
-            var blobs = (await _blobStorageService.ListBlobs(Permalinks)).ToList();
+            var blobs = await _blobStorageService.ListBlobs(Permalinks);
 
             _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, Permalinks);
 
