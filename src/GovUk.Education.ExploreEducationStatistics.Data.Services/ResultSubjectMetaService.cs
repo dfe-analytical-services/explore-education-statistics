@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ToList();
             }
 
-            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
             public List<ObservationalUnitMetaViewModel> GetLegacyLocationViewModels()
             {
                 var viewModels = _locationAttributes.SelectMany(pair =>
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ToList();
             }
 
-            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
             private IEnumerable<ObservationalUnitMetaViewModel> GetLegacyLocationAttributeViewModels(
                 GeographicLevel geographicLevel,
                 IReadOnlyList<ILocationAttribute> locationAttributes)

@@ -11,10 +11,15 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -25,27 +30,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseRepository _releaseRepository;
+        private readonly LocationsOptions _locationOptions;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
             ISubjectRepository subjectRepository,
             IReleaseRepository releaseRepository,
+            IOptions<LocationsOptions> locationOptions,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
             _subjectRepository = subjectRepository;
             _releaseRepository = releaseRepository;
+            _locationOptions = locationOptions.Value;
             _mapper = mapper;
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id)
         {
+            JsonSerializerSettings settings = new()
+            {
+                ContractResolver = new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
+            };
+
             try
             {
                 var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
-                var permalink = JsonConvert.DeserializeObject<Permalink>(text);
+                var permalink = JsonConvert.DeserializeObject<Permalink>(text, settings);
                 return await BuildViewModel(permalink);
             }
             catch (StorageException e)
@@ -95,6 +108,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             viewModel.Invalidated = !isValid;
 
             return viewModel;
+        }
+    }
+
+    internal class PermalinkContractResolver : DefaultContractResolver
+    {
+        private readonly bool _tableResultLocationHierarchiesEnabled;
+
+        public PermalinkContractResolver(bool tableResultLocationHierarchiesEnabled)
+        {
+            _tableResultLocationHierarchiesEnabled = tableResultLocationHierarchiesEnabled;
+        }
+
+        protected override JsonObjectContract CreateObjectContract(Type objectType)
+        {
+            JsonObjectContract contract = base.CreateObjectContract(objectType);
+
+            if (_tableResultLocationHierarchiesEnabled && objectType == typeof(ResultSubjectMetaViewModel))
+            {
+                contract.Converter = new ResultSubjectMetaViewModelJsonConverter();
+            }
+
+            return contract;
         }
     }
 }

@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
@@ -11,13 +13,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public List<IndicatorMetaViewModel> Indicators { get; init; } = new();
 
-        // TODO EES-2917 Work out how to maintain backwards compatibility for Locations with the hierarchical response type
-        // * Backwards compatibility required with existing Permalinks unless we migrate them.
-        // * Backwards compatibility required with the current UI expecting locations in this form until it's updated in EES-2777.
-        // For now hierarchical locations are populated in a separate field 'LocationsHierarchical' when the feature is turned on.
+        /// <summary>
+        /// Legacy locations field replaced by <see cref="LocationsHierarchical"/>.
+        /// </summary>
+        /// <remarks>
+        /// This should be safe to drop after the feature to add hierarchical locations in Table Result Subject Metadata
+        /// becomes permanent, since a transformation from data in old Permalinks is made during deserialization by
+        /// <see cref="ResultSubjectMetaViewModelJsonConverter"/>.
+        /// </remarks>
+        [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
         public List<ObservationalUnitMetaViewModel> Locations { get; init; } = new();
 
-        public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; init; } = new();
+        /// <summary>
+        /// Hierarchical locations field intended to be renamed 'Locations'.
+        /// </summary>
+        /// <remarks>
+        /// Renaming as 'Locations' will require a future migration of old Permalinks which already have a legacy
+        /// 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
+        /// </remarks>
+        public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; set; } = new();
 
         public List<BoundaryLevelViewModel> BoundaryLevels { get; init; } = new();
 
