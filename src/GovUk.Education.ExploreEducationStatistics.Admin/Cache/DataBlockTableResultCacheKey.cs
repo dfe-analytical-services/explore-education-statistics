@@ -7,18 +7,19 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
 {
-    public class AdminDataBlockTableResultCacheKey : IBlobCacheKey
+    public class DataBlockTableResultCacheKey : IBlobCacheKey
     {
         private Guid PublicationId { get; }
         private Guid ReleaseId { get; }
         private Guid DataBlockId { get; }
 
-        public AdminDataBlockTableResultCacheKey(ReleaseContentBlock releaseContentBlock)
+        public DataBlockTableResultCacheKey(ReleaseContentBlock releaseContentBlock)
         {
-            if (releaseContentBlock.ContentBlock.GetType().IsAssignableFrom(typeof(DataBlock)))
+            if (!releaseContentBlock.ContentBlock.GetType().IsAssignableFrom(typeof(DataBlock)))
             {
                 throw new ArgumentException(
-                    "Attempting to build key with incorrect type of content block");
+                    $"Attempting to build key with incorrect type of content block - " +
+                    $"{releaseContentBlock.ContentBlock.GetType()}");
             }
 
             var release = releaseContentBlock.Release;

@@ -339,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service => service.GetStatus(file.Id))
                 .ReturnsAsync(DataImportStatus.COMPLETE);
@@ -498,7 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service =>
                     service.GetStatus(It.IsIn(file.Id, replacementFile.Id)))

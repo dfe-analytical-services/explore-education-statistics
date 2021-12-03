@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -13,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -68,36 +68,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             Guid dataBlockId,
             CancellationToken cancellationToken = default)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<ReleaseContentBlock>(
+            return await _contentPersistenceHelper
+                .CheckEntityExists<ReleaseContentBlock>(
                     query => query
                         .Include(rcb => rcb.ContentBlock)
                         .Include(rcb => rcb.Release)
+                        .ThenInclude(release => release.Publication)
                         .Where(
                             rcb => rcb.ReleaseId == releaseId
                                    && rcb.ContentBlockId == dataBlockId
                         )
                 )
-                .OnSuccess(GetReleaseDataBlockResults(cancellationToken))
+                .OnSuccess(block => GetReleaseDataBlockResults(block, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
-        private Func<ReleaseContentBlock, Task<Either<ActionResult, TableBuilderResultViewModel>>> 
-            GetReleaseDataBlockResults(CancellationToken cancellationToken)
+        private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
+            ReleaseContentBlock block, 
+            CancellationToken cancellationToken)
         {
-            return async block =>
+            if (!(block.ContentBlock is DataBlock dataBlock))
             {
-                if (block.ContentBlock is DataBlock dataBlock)
-                {
-                    var query = dataBlock.Query.Clone();
-                    query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-                    return await _userService.CheckCanViewRelease(block.Release)
-                        .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
-                }
-
                 return new NotFoundResult();
-            };
+            }
+            
+            var query = dataBlock.Query.Clone();
+            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
+
+            return await _userService
+                .CheckCanViewRelease(block.Release)
+                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
         }
     }
 }

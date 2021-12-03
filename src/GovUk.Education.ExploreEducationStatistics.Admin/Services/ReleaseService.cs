@@ -434,28 +434,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(() => CheckFileExists(fileId))
-                .OnSuccess(file =>
+                .OnSuccessDo(file => CheckCanDeleteDataFiles(releaseId, file))
+                .OnSuccessDo(async file =>
                 {
-                    return CheckCanDeleteDataFiles(releaseId, file)
-                        .OnSuccessDo(async _ =>
-                        {
-                            // Delete any replacement that might exist
-                            if (file.ReplacedById.HasValue)
-                            {
-                                return await RemoveDataFiles(releaseId, file.ReplacedById.Value);
-                            }
-                            return Unit.Instance;
-                        })
-                        .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
-                        .OnSuccess(async deletePlan =>
-                        {
-                            await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                            await _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId,
-                                deletePlan.SubjectId);
-
-                            return await _releaseDataFileService.Delete(releaseId, fileId);
-                        });
-                });
+                    // Delete any replacement that might exist
+                    if (file.ReplacedById.HasValue)
+                    {
+                        return await RemoveDataFiles(releaseId, file.ReplacedById.Value);
+                    }
+                    return Unit.Instance;
+                })
+                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
+                .OnSuccessDo(deletePlan => _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
+                .OnSuccess(deletePlan => _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId))
+                .OnSuccess(_ => _releaseDataFileService.Delete(releaseId, fileId));
         }
 
         public async Task<Either<ActionResult, DataImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
