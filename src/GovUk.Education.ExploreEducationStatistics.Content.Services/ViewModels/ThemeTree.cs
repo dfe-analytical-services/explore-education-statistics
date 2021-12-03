@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -13,5 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Summary { get; init; } = string.Empty;
 
         public List<TopicTree<TNode>> Topics { get; init; } = new();
+
+        public virtual bool Equals(ThemeTree<TNode>? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id.Equals(other.Id) && Title == other.Title && Summary == other.Summary 
+                   && Topics.SequenceEqual(other.Topics);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Title, Summary, Topics);
+        }
     }
 }
