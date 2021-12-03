@@ -6,16 +6,19 @@ export interface Config {
   readonly PublicAppUrl: string;
 }
 
-let config: Config | undefined;
+let config: Config;
 
-export async function getConfig(): Promise<Config | undefined> {
+export async function getConfig(): Promise<Config> {
   if (config) {
     return config;
   }
 
   const configResponse = await client.get<Config>('/config');
 
-  config = produce(undefined, () => configResponse);
+  config = produce<Config>(
+    (undefined as unknown) as Config,
+    () => configResponse,
+  );
 
   return config;
 }
