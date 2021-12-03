@@ -25,11 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public List<ObservationalUnitMetaViewModel> Locations { get; init; } = new();
 
         /// <summary>
-        /// Hierarchical locations field intended to be renamed 'Locations'.
+        /// Hierarchical locations field.
         /// </summary>
         /// <remarks>
-        /// Renaming as 'Locations' will require a future migration of old Permalinks which already have a legacy
-        /// 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
+        /// EES-2943: This could potentially be renamed back to 'Locations' but requires a migration of
+        /// old Permalinks which already have a legacy 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
         /// </remarks>
         public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; set; } = new();
 

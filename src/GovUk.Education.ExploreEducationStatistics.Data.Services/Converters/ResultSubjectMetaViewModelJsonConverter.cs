@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Converters
     /// <summary>
     /// JsonConverter which transforms the legacy 'Locations' field of ResultSubjectMetaViewModel to 'LocationsHierarchical'.
     ///
-    /// Intended to be temporary until this transformation is made permanent by migrating old Permalinks in blob storage.
+    /// Intended to be temporary until this transformation is made permanent by migrating old Permalinks in blob storage (EES-2943).
     ///
     /// Note that this doesn't infer any hierarchy so the location attributes will continue to be single level
     /// meaning there's no overall change to the data of Permalinks except for moving it between fields and transformation of format.

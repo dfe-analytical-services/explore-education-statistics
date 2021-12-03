@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
@@ -29,6 +31,200 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
     public class PermalinkServiceTests
     {
         private readonly Guid _publicationId = Guid.NewGuid();
+
+        [Fact]
+        public async Task Create_LatestPublishedReleaseForSubjectNotFound()
+        {
+            var request = new CreatePermalinkRequest
+            {
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
+            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+
+            releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+                .Returns((Release?) null);
+
+            subjectRepository
+                .Setup(s => s.GetPublicationIdForSubject(request.Query.SubjectId))
+                .ReturnsAsync(_publicationId);
+
+            var service = BuildService(releaseRepository: releaseRepository.Object,
+                subjectRepository: subjectRepository.Object);
+
+            var result = await service.Create(request);
+
+            MockUtils.VerifyAllMocks(
+                releaseRepository,
+                subjectRepository);
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task Create_WithoutReleaseId()
+        {
+            var subject = new Subject
+            {
+                Id = new Guid()
+            };
+
+            var request = new CreatePermalinkRequest
+            {
+                Configuration = new TableBuilderConfiguration(),
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subject.Id
+                }
+            };
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var tableResult = new TableBuilderResultViewModel();
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+
+            // Permalink id is assigned on creation and used as the blob path
+            // Capture it so we can compare it with the view model result
+            string blobPath = string.Empty;
+            var blobPathCapture = new CaptureMatch<string>(callback => blobPath = callback);
+
+            blobStorageService.Setup(s => s.UploadAsJson(
+                    Permalinks,
+                    Capture.With(blobPathCapture),
+                    It.Is<Permalink>(p =>
+                        p.Configuration.Equals(request.Configuration) &&
+                        p.FullTable.Equals(tableResult) &&
+                        p.Query.Equals(request.Query)),
+                    It.IsAny<JsonSerializerSettings>()))
+                .Returns(Task.CompletedTask);
+
+            releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+                .Returns(release);
+
+            subjectRepository
+                .Setup(s => s.Get(subject.Id))
+                .ReturnsAsync(subject);
+
+            subjectRepository
+                .Setup(s => s.GetPublicationIdForSubject(subject.Id))
+                .ReturnsAsync(_publicationId);
+
+            subjectRepository
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
+                .ReturnsAsync(_publicationId);
+
+            subjectRepository
+                .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
+                .ReturnsAsync(true);
+
+            tableBuilderService
+                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
+                .ReturnsAsync(tableResult);
+
+            var service = BuildService(blobStorageService: blobStorageService.Object,
+                releaseRepository: releaseRepository.Object,
+                subjectRepository: subjectRepository.Object,
+                tableBuilderService: tableBuilderService.Object);
+
+            var result = (await service.Create(request)).AssertRight();
+
+            MockUtils.VerifyAllMocks(
+                blobStorageService,
+                releaseRepository,
+                subjectRepository,
+                tableBuilderService);
+            
+            Assert.Equal(Guid.Parse(blobPath), result.Id);
+            Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+            Assert.False(result.Invalidated);
+            Assert.Equal(_publicationId, result.Query.PublicationId);
+        }
+
+        [Fact]
+        public async Task Create_WithReleaseId()
+        {
+            var subject = new Subject
+            {
+                Id = new Guid()
+            };
+
+            var request = new CreatePermalinkRequest
+            {
+                Configuration = new TableBuilderConfiguration(),
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subject.Id
+                }
+            };
+
+            var releaseId = Guid.NewGuid();
+
+            var tableResult = new TableBuilderResultViewModel();
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+
+            // Permalink id is assigned on creation and used as the blob path
+            // Capture it so we can compare it with the view model result
+            string blobPath = string.Empty;
+            var blobPathCapture = new CaptureMatch<string>(callback => blobPath = callback);
+
+            blobStorageService.Setup(s => s.UploadAsJson(
+                    Permalinks,
+                    Capture.With(blobPathCapture),
+                    It.Is<Permalink>(p =>
+                        p.Configuration.Equals(request.Configuration) &&
+                        p.FullTable.Equals(tableResult) &&
+                        p.Query.Equals(request.Query)),
+                    It.IsAny<JsonSerializerSettings>()))
+                .Returns(Task.CompletedTask);
+
+            subjectRepository
+                .Setup(s => s.Get(subject.Id))
+                .ReturnsAsync(subject);
+
+            subjectRepository
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
+                .ReturnsAsync(_publicationId);
+
+            subjectRepository
+                .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
+                .ReturnsAsync(true);
+
+            tableBuilderService
+                .Setup(s => s.Query(releaseId, request.Query, CancellationToken.None))
+                .ReturnsAsync(tableResult);
+
+            var service = BuildService(blobStorageService: blobStorageService.Object,
+                subjectRepository: subjectRepository.Object,
+                tableBuilderService: tableBuilderService.Object);
+
+            var result = (await service.Create(releaseId, request)).AssertRight();
+
+            MockUtils.VerifyAllMocks(
+                blobStorageService,
+                subjectRepository,
+                tableBuilderService);
+
+            Assert.Equal(Guid.Parse(blobPath), result.Id);
+            Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+            Assert.False(result.Invalidated);
+            Assert.Equal(_publicationId, result.Query.PublicationId);
+        }
 
         [Fact]
         public async Task Get()

@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Net;
-using System.Net.Mime;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -50,15 +50,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id)
         {
-            JsonSerializerSettings settings = new()
-            {
-                ContractResolver = new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
-            };
-
             try
             {
                 var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
-                var permalink = JsonConvert.DeserializeObject<Permalink>(text, settings);
+                var permalink = JsonConvert.DeserializeObject<Permalink>(
+                    value: text,
+                    settings: new JsonSerializerSettings
+                    {
+                        ContractResolver =
+                            new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
+                    });
                 return await BuildViewModel(permalink);
             }
             catch (StorageException e)
@@ -70,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkRequest request)
         {
-            var publicationId = _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId).Result;
+            var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
@@ -87,10 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
-                await _blobStorageService.UploadText(containerName: Permalinks,
+                await _blobStorageService.UploadAsJson(containerName: Permalinks,
                     path: permalink.Id.ToString(),
-                    content: JsonConvert.SerializeObject(permalink),
-                    contentType: MediaTypeNames.Application.Json);
+                    content: permalink,
+                    settings: new JsonSerializerSettings
+                    {
+                        ContractResolver =
+                            new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
+                    });
                 return await BuildViewModel(permalink);
             });
         }
@@ -118,6 +123,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public PermalinkContractResolver(bool tableResultLocationHierarchiesEnabled)
         {
             _tableResultLocationHierarchiesEnabled = tableResultLocationHierarchiesEnabled;
+        }
+
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            JsonProperty property = base.CreateProperty(member, memberSerialization);
+            if (property.DeclaringType == typeof(Permalink))
+            {
+                property.ShouldSerialize = property.PropertyName switch
+                {
+                    "Locations" => _ => !_tableResultLocationHierarchiesEnabled,
+                    "HierarchicalLocations" => _ => _tableResultLocationHierarchiesEnabled,
+                    _ => property.ShouldSerialize
+                };
+            }
+
+            return property;
         }
 
         protected override JsonObjectContract CreateObjectContract(Type objectType)
