@@ -55,6 +55,7 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Add summary content to release
+    user closes Set Page View box
     user clicks button    Add a summary text block
     user waits until element contains    id:releaseSummary    This section is empty
     user clicks button    Edit block    id:releaseSummary
@@ -79,7 +80,7 @@ Add Useful information related page link to release
     user clicks button    Create link
 
 Add secondary statistics
-    user waits until page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
+    user waits until page does not contain element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]
     user clicks button    Add secondary stats
     user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
     user checks select contains x options    name:selectedDataBlock    5
@@ -89,10 +90,11 @@ Add secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 1
-    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
 
 Check secondary statistics are included correctly
-    user clicks element    id:${SECONDARY_STATS_TABLE_TAB_ID}
+    user waits until element is visible    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
+    user scrolls to element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]
+    user clicks element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
     user checks page contains button    Change secondary stats
@@ -107,7 +109,7 @@ Change secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
-    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
+    user waits until element is visible    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
     user checks page contains button    Remove secondary stats
@@ -117,7 +119,7 @@ Remove secondary statistics
     user waits until modal is visible    Remove secondary statistics section
     user clicks button    Confirm
     user waits until modal is not visible    Remove secondary statistics section    %{WAIT_MEDIUM}
-    user waits until page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
+    user waits until page does not contain element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]
     ...    %{WAIT_MEDIUM}
     user checks page does not contain button    Change secondary stats
     user checks page does not contain button    Remove secondary stats
