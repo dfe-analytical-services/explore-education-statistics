@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -120,13 +121,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private DataBlockService BuildDataBlockService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseContentBlockRepository releaseContentBlockRepository = null,
-            IUserService userService = null,
-            IBlobCacheService cacheService = null,
-            ICacheKeyService cacheKeyService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseContentBlockRepository? releaseContentBlockRepository = null,
+            IUserService? userService = null,
+            IBlobCacheService? cacheService = null,
+            ICacheKeyService? cacheKeyService = null)
         {
             using var context = DbUtils.InMemoryApplicationDbContext();
 

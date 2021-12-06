@@ -1290,7 +1290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteService? footnoteService = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IBlobCacheService cacheService = null)
+            IBlobCacheService? cacheService = null)
         {
             var userService = AlwaysTrueUserService();
 
