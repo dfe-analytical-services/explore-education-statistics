@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -37,25 +38,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
             };
 
-            var (controller, glossaryService) = BuildControllerAndDependencies();
+            var (controller, mocks) = BuildControllerAndDependencies();
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(
                   It.IsAny<GlossaryCacheKey>(), typeof(List<GlossaryCategoryViewModel>)))
                 .ReturnsAsync(null);
 
-            glossaryService
+            mocks.glossaryService
                 .Setup(s => s.GetAllGlossaryEntries())
                 .ReturnsAsync(glossaryEntries);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     It.IsAny<GlossaryCacheKey>(), 
                     glossaryEntries))
                 .Returns(Task.CompletedTask);
 
             var result = await controller.GetAllGlossaryEntries();
-            VerifyAllMocks(glossaryService, CacheService);
+            VerifyAllMocks(mocks);
             
             Assert.Equal(glossaryEntries, result);
         }
@@ -70,15 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 Title = "A title"
             };
 
-            var (controller, glossaryService) = 
+            var (controller, mocks) = 
                 BuildControllerAndDependencies();
             
-            glossaryService
+            mocks.glossaryService
                 .Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
                 .ReturnsAsync(glossaryEntry);
             
             var result = await controller.GetGlossaryEntry(glossaryEntry.Slug);
-            VerifyAllMocks(glossaryService, CacheService);
+            VerifyAllMocks(mocks);
             
             result.AssertOkResult(glossaryEntry);
         }
@@ -106,12 +107,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private static (
             GlossaryController controller, 
-            Mock<IGlossaryService> glossaryService) 
+            (
+                Mock<IGlossaryService> glossaryService,
+                Mock<IBlobCacheService> cacheService) mocks) 
             BuildControllerAndDependencies()
         {
             var glossaryService = new Mock<IGlossaryService>(Strict);
             var controller = new GlossaryController(glossaryService.Object);
-            return (controller, (glossaryService));
+            return (controller, (glossaryService, CacheService));
         }
     }
 }

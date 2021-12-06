@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -40,34 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Query()
         {
-            var tableBuilderResults = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new()
-                }
-            };
-            
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            mocks.tableBuilderService
-                .Setup(s => s.Query(_releaseId, _query, default))
-                .ReturnsAsync(tableBuilderResults);
-            
-            var result = await controller.Query(_releaseId, _query);
-            VerifyAllMocks(mocks);
-            
-            result.AssertOkResult(tableBuilderResults);
-        }
-
-        [Fact]
-        public async Task Query_CancellationToken()
-        {
             var cancellationToken = new CancellationToken();
 
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            // Assert that the passed in CancellationToken is passed down to the child calls.
             mocks.tableBuilderService
                 .Setup(s => s.Query(_releaseId, _query, cancellationToken))
                 .ReturnsAsync(new TableBuilderResultViewModel
@@ -87,72 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task QueryForDataBlock()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = _query,
-                    Charts = new List<IChart>()
-                }
-            };
-
-            var tableBuilderResults = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new()
-                }
-            };
-
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
-
-            CacheService
-                .Setup(s => s.GetItem(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock), 
-                    typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
-
-            mocks.tableBuilderService
-                .Setup(
-                    s =>
-                        s.Query(
-                            _releaseId,
-                            It.Is<ObservationQueryContext>(
-                                q => q.SubjectId == _query.SubjectId
-                            ),
-                            default
-                        )
-                )
-                .ReturnsAsync(tableBuilderResults);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock),
-                    tableBuilderResults))
-                .Returns(Task.CompletedTask);
-
-            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
-            VerifyAllMocks(mocks, CacheService);
-
-            result.AssertOkResult(tableBuilderResults);
-        }
-
-        [Fact]
-        public async Task QueryForDataBlock_CancellationToken()
-        {
             var cancellationToken = new CancellationToken();
             
             var releaseContentBlock = new ReleaseContentBlock
@@ -173,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Query = _query,
                     Charts = new List<IChart>()
                 }
-            };// Assert that the passed in CancellationToken is passed down to the child calls.
+            };
 
             var tableBuilderResults = new TableBuilderResultViewModel
             {
@@ -187,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(
                     IsMatchingDataBlockCacheKey(releaseContentBlock), 
                     typeof(TableBuilderResultViewModel)))
@@ -206,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 )
                 .ReturnsAsync(tableBuilderResults);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     IsMatchingDataBlockCacheKey(releaseContentBlock),
                     tableBuilderResults))
@@ -262,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(
                     IsMatchingDataBlockCacheKey(releaseContentBlock), 
                     typeof(TableBuilderResultViewModel)))
@@ -282,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 )
                 .ReturnsAsync(tableBuilderResults);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     IsMatchingDataBlockCacheKey(releaseContentBlock),
                     tableBuilderResults))
@@ -474,7 +385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private (TableBuilderController controller, 
             (
                 Mock<ITableBuilderService> tableBuilderService, 
-                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper) mocks) 
+                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
+                Mock<IBlobCacheService> cacheService) mocks) 
             BuildControllerAndDependencies()
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -489,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 logger.Object
             );
 
-            return (controller, (tableBuilderService, persistenceHelper));
+            return (controller, (tableBuilderService, persistenceHelper, CacheService));
         }
     }
 }

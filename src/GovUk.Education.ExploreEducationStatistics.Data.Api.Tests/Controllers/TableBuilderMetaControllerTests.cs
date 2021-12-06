@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
                 .ReturnsAsync(cacheKey);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(ISubjectMetaViewModel)))
                 .ReturnsAsync(null);
 
@@ -50,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.GetSubjectMeta(SubjectId))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
             var result = await controller.GetSubjectMeta(SubjectId);
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
         }
@@ -72,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
                 .ReturnsAsync(cacheKey);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(ISubjectMetaViewModel)))
                 .ReturnsAsync(null);
             
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(new NotFoundResult());
 
             var result = await controller.GetSubjectMeta(SubjectId);
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertNotFoundResult();
         }
@@ -125,20 +126,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             TableBuilderMetaController controller,
             (
                 Mock<ISubjectMetaService> subjectMetaService, 
-                Mock<ICacheKeyService> cacheKeyService) mocks)
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndMocks()
         {
             var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new TableBuilderMetaController(subjectMetaService.Object, cacheKeyService.Object);
             
-            return (
-                controller,
-                (
-                    subjectMetaService,
-                    cacheKeyService
-                )
-            );
+            return (controller, (subjectMetaService, cacheKeyService, CacheService));
         }
     }
 }

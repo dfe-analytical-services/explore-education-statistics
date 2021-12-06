@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<PublicationTreeCacheKey>(),
                     typeof(IList<ThemeTree<PublicationTreeNode>>)))
@@ -83,15 +84,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .Setup(s => s.GetPublicationTree(null))
                 .ReturnsAsync(Themes);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     It.IsAny<PublicationTreeCacheKey>(), 
                     Themes))
                 .Returns(Task.CompletedTask);
             
             var result = await controller.GetThemes();
-
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             var theme = Assert.Single(result);
 
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<AllMethodologiesCacheKey>(),
                     typeof(List<AllMethodologiesThemeViewModel>)))
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .Setup(mock => mock.GetTree())
                 .ReturnsAsync(MethodologyThemes);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     It.IsAny<AllMethodologiesCacheKey>(), 
                     MethodologyThemes))
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = await controller.GetMethodologyThemes();
 
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertOkResult(MethodologyThemes);
         }
@@ -188,13 +188,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private static (ThemeController controller, (
                 Mock<IThemeService> themeService, 
-                Mock<IMethodologyService> methodologyService) mocks) 
+                Mock<IMethodologyService> methodologyService,
+                Mock<IBlobCacheService> cacheService) mocks) 
                 BuildControllerAndDependencies()
         {
             var themeService = new Mock<IThemeService>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var controller = new ThemeController(themeService.Object, methodologyService.Object);
-            return (controller, (themeService, methodologyService));
+            return (controller, (themeService, methodologyService, CacheService));
         }
     }
 }

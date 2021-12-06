@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -71,14 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var (service, tableBuilderService) = BuildServiceAndDependencies(contentDbContext);
+            var (service, mocks) = BuildServiceAndDependencies(contentDbContext);
 
             CacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<DataBlockTableResultCacheKey>(), typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
             
-            tableBuilderService
+            mocks.tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Returns(Task.CompletedTask);
             
             var result = await service.GetDataBlockTableResult(releaseContentBlock);
-            VerifyAllMocks(tableBuilderService, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertRight(tableBuilderResults);
         }
@@ -150,14 +151,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var (service, tableBuilderService) = BuildServiceAndDependencies(contentDbContext);
+            var (service, mocks) = BuildServiceAndDependencies(contentDbContext);
     
             CacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<DataBlockTableResultCacheKey>(), typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
             
-            tableBuilderService
+            mocks.tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
@@ -178,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Returns(Task.CompletedTask);
 
             var result = await service.GetDataBlockTableResult(releaseContentBlock);
-            VerifyAllMocks(tableBuilderService, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertRight(tableBuilderResults);
         }
@@ -217,7 +218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         private static (
             DataBlockService service, 
-            Mock<ITableBuilderService> tableBuilderService) 
+            (
+                Mock<ITableBuilderService> tableBuilderService,
+                Mock<IBlobCacheService> cacheService) mocks) 
             BuildServiceAndDependencies(ContentDbContext contentDbContext)
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -229,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 userService.Object
             );
 
-            return (controller, tableBuilderService);
+            return (controller, (tableBuilderService, CacheService));
         }
     }
 }

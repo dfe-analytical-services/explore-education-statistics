@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.CreateCacheKeyForReleaseSubjects(release.Id))
                 .ReturnsAsync(cacheKey);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(List<SubjectViewModel>)))
                 .ReturnsAsync(null);
             
@@ -56,12 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.ListSubjects(release.Id))
                 .ReturnsAsync(subjects);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjects))
                 .Returns(Task.CompletedTask);
             
             var result = await controller.ListLatestReleaseSubjects(publicationId);
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjects);
         }
@@ -132,7 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             (
                 Mock<IPublicationService> publicationService,
                 Mock<IReleaseService> releaseService,
-                Mock<ICacheKeyService> cacheKeyService
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService
             ) mocks
             ) BuildControllerAndMocks()
         {
@@ -142,14 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var controller = new PublicationController(
                 publicationService.Object, releaseService.Object, cacheKeyService.Object);
             
-            return (
-                controller,
-                (
-                    publicationService,
-                    releaseService,
-                    cacheKeyService
-                )
-            );
+            return (controller, (publicationService, releaseService, cacheKeyService, CacheService));
         }
     }
 }

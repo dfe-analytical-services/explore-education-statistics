@@ -145,16 +145,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 });
         }
         
-        public static void VerifyAllMocks(ITuple mocks, params Mock[] additionalMocks)
+        public static void VerifyAllMocks(ITuple mocks)
         {
-            Mock[] tupleMocks = mocks
+            Mock[] values = mocks
                 .GetType()
                 .GetFields()
                 .Select(f => f.GetValue(mocks))
                 .Cast<Mock>()
                 .ToArray();
             
-            VerifyAllMocks(tupleMocks.Concat(additionalMocks).ToArray());
+            VerifyAllMocks(values);
         }
 
         public static Mock<IConfiguration> CreateMockConfiguration(params Tuple<string, string>[] keysAndValues)

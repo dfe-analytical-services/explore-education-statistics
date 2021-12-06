@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.CreateCacheKeyForFastTrackResults(fastTrackId))
                 .ReturnsAsync(cacheKey);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(FastTrackViewModel)))
                 .ReturnsAsync(null);
 
@@ -49,13 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.GetFastTrackAndResults(fastTrackId))
                 .ReturnsAsync(fastTrackViewModel);
 
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, fastTrackViewModel))
                 .Returns(Task.CompletedTask);
 
             var result = await controller.Get(fastTrackId.ToString());
             
-            VerifyAllMocks(mocks, CacheService);
+            VerifyAllMocks(mocks);
 
             result.AssertOkResult(fastTrackViewModel);
         }
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.CreateCacheKeyForFastTrackResults(fastTrackId))
                 .ReturnsAsync(cacheKey);
             
-            CacheService
+            mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(FastTrackViewModel)))
                 .ReturnsAsync(null);
 
@@ -300,7 +301,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             FastTrackController controller,
             (
                 Mock<IFastTrackService> fastTrackService,
-                Mock<ICacheKeyService> cacheKeyService
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService
             ) mocks
             ) BuildControllerAndMocks()
         {
@@ -308,13 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new FastTrackController(fastTrackService.Object, cacheKeyService.Object);
             
-            return (
-                controller,
-                (
-                    fastTrackService,
-                    cacheKeyService
-                )
-            );
+            return (controller, (fastTrackService, cacheKeyService, CacheService));
         }
     }
 }
