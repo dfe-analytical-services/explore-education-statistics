@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -69,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkRequest request)
+        public async Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkViewModel request)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -83,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
-            CreatePermalinkRequest request)
+            CreatePermalinkViewModel request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {

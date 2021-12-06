@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -30,14 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PermalinkViewModel>> Create([FromBody] CreatePermalinkRequest request)
+        public async Task<ActionResult<PermalinkViewModel>> Create([FromBody] CreatePermalinkViewModel request)
         {
             return await _permalinkService.Create(request).HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
         public async Task<ActionResult<PermalinkViewModel>> Create(Guid releaseId,
-            [FromBody] CreatePermalinkRequest request)
+            [FromBody] CreatePermalinkViewModel request)
         {
             return await _permalinkService.Create(releaseId, request).HandleFailuresOrOk();
         }

@@ -9,10 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
@@ -35,9 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Create_LatestPublishedReleaseForSubjectNotFound()
         {
-            var request = new CreatePermalinkRequest
+            var request = new CreatePermalinkViewModel
             {
-                Query = new ObservationQueryContext
+                Query =
                 {
                     SubjectId = Guid.NewGuid()
                 }
@@ -74,10 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = new Guid()
             };
 
-            var request = new CreatePermalinkRequest
+            var request = new CreatePermalinkViewModel
             {
-                Configuration = new TableBuilderConfiguration(),
-                Query = new ObservationQueryContext
+                Query =
                 {
                     SubjectId = subject.Id
                 }
@@ -146,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 releaseRepository,
                 subjectRepository,
                 tableBuilderService);
-            
+
             Assert.Equal(Guid.Parse(blobPath), result.Id);
             Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             Assert.False(result.Invalidated);
@@ -161,10 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = new Guid()
             };
 
-            var request = new CreatePermalinkRequest
+            var request = new CreatePermalinkViewModel
             {
-                Configuration = new TableBuilderConfiguration(),
-                Query = new ObservationQueryContext
+                Query =
                 {
                     SubjectId = subject.Id
                 }
