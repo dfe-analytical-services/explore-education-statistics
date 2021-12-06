@@ -1,3 +1,4 @@
+using KellermanSoftware.CompareNetObjects;
 using Xunit;
 using Xunit.Sdk;
 
@@ -12,6 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static XunitException AssertFail(string message) 
         {
             throw new XunitException(message);
+        }
+
+        public static bool AssertDeepEquals<T>(this T actual, T expected)
+        {
+            var compareLogic = new CompareLogic();
+            var comparison = compareLogic.Compare(actual, expected);
+            Assert.True(comparison.AreEqual, comparison.DifferencesString);
+            return true;
         }
     }
 }
