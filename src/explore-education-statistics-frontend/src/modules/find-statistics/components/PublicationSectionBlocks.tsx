@@ -1,3 +1,4 @@
+import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
@@ -16,11 +17,13 @@ import React from 'react';
 export interface PublicationSectionBlocksProps {
   release: Release;
   blocks: Block[];
+  visible?: boolean;
 }
 
 const PublicationSectionBlocks = ({
   release,
   blocks,
+  visible,
 }: PublicationSectionBlocksProps) => {
   const getReleaseFile = useGetReleaseFile(release.id);
 
@@ -34,29 +37,31 @@ const PublicationSectionBlocks = ({
       {blocks.map(block => {
         if (block.type === 'DataBlock') {
           return (
-            <DataBlockTabs
-              key={block.id}
-              dataBlock={block}
-              releaseId={release.id}
-              getInfographic={getReleaseFile}
-              onToggle={section => {
-                logEvent({
-                  category: 'Publication Release Data Tabs',
-                  action: `${section.title} (${block.name}) tab opened`,
-                  label: window.location.pathname,
-                });
-              }}
-              additionalTabContent={
-                <div className="dfe-print-hidden">
-                  <h3 className="govuk-heading-m">
-                    Explore and edit this data online
-                  </h3>
+            <Gate condition={!!visible}>
+              <DataBlockTabs
+                key={block.id}
+                dataBlock={block}
+                releaseId={release.id}
+                getInfographic={getReleaseFile}
+                onToggle={section => {
+                  logEvent({
+                    category: 'Publication Release Data Tabs',
+                    action: `${section.title} (${block.name}) tab opened`,
+                    label: window.location.pathname,
+                  });
+                }}
+                additionalTabContent={
+                  <div className="dfe-print-hidden">
+                    <h3 className="govuk-heading-m">
+                      Explore and edit this data online
+                    </h3>
 
-                  <p>Use our table tool to explore this data.</p>
-                  <ExploreDataButton block={block} />
-                </div>
-              }
-            />
+                    <p>Use our table tool to explore this data.</p>
+                    <ExploreDataButton block={block} />
+                  </div>
+                }
+              />
+            </Gate>
           );
         }
 

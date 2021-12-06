@@ -176,12 +176,12 @@ Embed data block into release content
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
 Validate embedded table rows
-    ${table}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
-    user scrolls to element    xpath://button[text()="${CONTENT_SECTION_NAME}"]
-    # The below is to avoid React lazy-loading the table which causes the test to fail here
-    user scrolls down    400
-    user waits until page contains element    ${table}    30
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
 
+    ${table}=    set variable    ${datablock} >> css:table
+    user waits until page contains element    ${table}    30
     user checks table column heading contains    1    1    Admission Numbers    ${table}
 
     ${row}=    user gets row number with heading    Bolton 001 (E02000984)    ${table}
@@ -332,9 +332,10 @@ Validate line chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
-    # The below is to avoid React lazy-loading the chart which causes the test to fail here
-    user scrolls down    400
+
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element contains line chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -429,10 +430,10 @@ Save and validate vertical bar chart embeds correctly
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element does not contain line chart    ${datablock}
-    # below is to prevent React lazy loading the chart
-    user scrolls down    400
     user waits until element contains bar chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -514,7 +515,9 @@ Save and validate horizontal bar chart embeds correctly
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element contains bar chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -607,14 +610,16 @@ Save and validate geographic chart embeds correctly
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
     user waits until page does not contain loading spinner
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element does not contain bar chart    ${datablock}
     user waits until element contains map chart    ${datablock}
 
     user checks map chart height    ${datablock}    700
     user checks map chart width    ${datablock}    600
 
-    user chooses select option    ${datablock} select[name="selectedLocation"]    Nailsea Youngwood
+    user chooses select option    ${datablock} >> name:selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    ${datablock}
     user checks chart tooltip label contains    ${datablock}    Nailsea Youngwood
@@ -654,7 +659,9 @@ Save and validate infographic chart embeds correctly
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user checks chart title contains    ${datablock}    Test chart title
     user checks infographic chart contains alt    ${datablock}    Test chart alt
 
