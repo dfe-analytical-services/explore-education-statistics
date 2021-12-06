@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -47,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IBlobCacheService _cacheService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -65,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator, 
+            IBlobCacheService cacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -82,6 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
+            _cacheService = cacheService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
@@ -159,6 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolder(
+                    new ReleaseContentFolderCacheKey(release.PublicationId, release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
                 .OnSuccessVoid(async release =>
