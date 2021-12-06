@@ -4,6 +4,7 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
@@ -24,12 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
             }
 
             var release = releaseContentBlock.Release;
-            PublicationId = release.Publication.Id;
+            PublicationId = release.PublicationId;
             ReleaseId = release.Id;
             DataBlockId = releaseContentBlock.ContentBlockId;
         }
 
-        public IBlobContainer Container => BlobContainers.PrivateContent;
+        public IBlobContainer Container => PrivateContent;
 
         public string Key => PrivateContentDataBlockPath(
             PublicationId,

@@ -27,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseContentBlock>(query => query
                     .Include(rcb => rcb.Release)
-                    .ThenInclude(release => release.Publication)
                     .Include(rcb => rcb.ContentBlock)
                     .Where(rcb => rcb.ContentBlockId == dataBlockId && rcb.ReleaseId == releaseId))
                 .OnSuccess(releaseContentBlock => new DataBlockTableResultCacheKey(releaseContentBlock));

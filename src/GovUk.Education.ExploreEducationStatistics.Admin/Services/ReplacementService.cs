@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -10,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -42,6 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
+        private readonly ICacheKeyService _cacheKeyService;
+        private readonly IBlobCacheService _cacheService;
 
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -54,7 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService)
+            IUserService userService, 
+            ICacheKeyService cacheKeyService,
+            IBlobCacheService cacheService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -66,6 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _cacheKeyService = cacheKeyService;
+            _cacheService = cacheService;
         }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
@@ -82,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await CheckFileExists(releaseId, replacementFileId)
                         .OnSuccess(async replacementFile =>
                         {
-                            var originalSubjectId = originalFile.SubjectId.Value;
-                            var replacementSubjectId = replacementFile.SubjectId.Value;
+                            var originalSubjectId = originalFile.SubjectId!.Value;
+                            var replacementSubjectId = replacementFile.SubjectId!.Value;
 
                             var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
@@ -112,6 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
+                    await replacementPlan.DataBlocks.ForEachAsync(plan =>
+                        InvalidateDataBlockCachedResults(plan, releaseId));
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
                         ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
@@ -937,6 +948,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             });
                 })
                 .OnSuccess(async _ => await _releaseService.RemoveDataFiles(releaseId, originalFileId));
+        }
+
+        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
+            DataBlockReplacementPlanViewModel plan, Guid releaseId)
+        {
+            return _cacheKeyService
+                .CreateCacheKeyForDataBlock(releaseId, plan.Id)
+                .OnSuccessVoid(_cacheService.DeleteItem);
         }
 
         private class ReplacementSubjectMeta

@@ -73,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     query => query
                         .Include(rcb => rcb.ContentBlock)
                         .Include(rcb => rcb.Release)
-                        .ThenInclude(release => release.Publication)
                         .Where(
                             rcb => rcb.ReleaseId == releaseId
                                    && rcb.ContentBlockId == dataBlockId

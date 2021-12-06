@@ -3,13 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -26,7 +28,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -139,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementFileTypesMustBeData);
             }
@@ -259,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 result.AssertNotFound();
             }
@@ -371,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
 
@@ -689,7 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
 
@@ -762,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
-                Assert.False(dataBlockPlan.TimePeriods.Valid);
+                Assert.False(dataBlockPlan.TimePeriods!.Valid);
 
                 Assert.Equal(timePeriod.StartYear, dataBlockPlan.TimePeriods.Start.Year);
                 Assert.Equal(timePeriod.StartCode, dataBlockPlan.TimePeriods.Start.Code);
@@ -1147,7 +1151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
@@ -1413,7 +1417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
@@ -1705,7 +1709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
@@ -2120,7 +2124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 var replacementPlan = result.AssertRight();
 
@@ -2488,7 +2492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementMustBeValid);
             }
@@ -2507,16 +2511,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+            
             var contentReleaseVersion1 = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PreviousVersionId = null
+                PreviousVersionId = null,
+                Publication = publication
             };
 
             var contentReleaseVersion2 = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PreviousVersionId = contentReleaseVersion1.Id
+                PreviousVersionId = contentReleaseVersion1.Id,
+                Publication = publication
             };
 
             var statsReleaseVersion1 = new Release
@@ -2925,6 +2936,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                     contentReleaseVersion2.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
+            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+            
+            mocks.cacheKeyService
+                .Setup(service => service
+                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                .ReturnsAsync(cacheKey);
+
+            mocks.cacheService
+                .Setup(service => service.DeleteItem(cacheKey))
+                .Returns(Task.CompletedTask);
+            
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
@@ -2939,7 +2961,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalFile.Id),
                     Times.Once());
 
-                MockUtils.VerifyAllMocks(mocks);
+                VerifyAllMocks(mocks);
 
                 result.AssertRight();
             }
@@ -3000,17 +3022,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
-                Assert.Single(chartMajorAxis.DataSets);
+                Assert.Single(chartMajorAxis!.DataSets);
                 Assert.Single(chartMajorAxis.DataSets[0].Filters);
                 Assert.Equal(replacementFilterItem1.Id, chartMajorAxis.DataSets[0].Filters[0]);
                 Assert.Equal(replacementIndicator.Id, chartMajorAxis.DataSets[0].Indicator);
 
                 var chartLegendItems = replacedDataBlock.Charts[0].Legend?.Items;
                 Assert.NotNull(chartLegendItems);
-                Assert.Single(chartLegendItems);
-                Assert.Single(chartLegendItems[0].DataSet.Filters);
-                Assert.Equal(replacementFilterItem1.Id, chartLegendItems[0].DataSet.Filters[0]);
-                Assert.Equal(replacementIndicator.Id, chartLegendItems[0].DataSet.Indicator);
+                var chartLegendItem = Assert.Single(chartLegendItems);
+                Assert.Single(chartLegendItem.DataSet.Filters);
+                Assert.Equal(replacementFilterItem1.Id, chartLegendItem.DataSet.Filters[0]);
+                Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
@@ -3147,9 +3169,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext,
             (Mock<ILocationRepository> locationRepository,
                 Mock<IReleaseService> releaseService,
-                Mock<ITimePeriodService> timePeriodService) mocks)
+                Mock<ITimePeriodService> timePeriodService,
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService) mocks)
         {
-            var (locationRepository, releaseService, timePeriodService) = mocks;
+            var (locationRepository, releaseService, timePeriodService, cacheKeyService, cacheService) = mocks;
 
             return new ReplacementService(
                 contentDbContext,
@@ -3161,18 +3185,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseService.Object,
                 timePeriodService.Object,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                MockUtils.AlwaysTrueUserService().Object
+                AlwaysTrueUserService().Object,
+                cacheKeyService.Object,
+                cacheService.Object
             );
         }
 
         private static (Mock<ILocationRepository> locationRepository,
             Mock<IReleaseService> ReleaseService,
-            Mock<ITimePeriodService> TimePeriodService) Mocks()
+            Mock<ITimePeriodService> TimePeriodService,
+            Mock<ICacheKeyService> cacheKeyService,
+            Mock<IBlobCacheService> cacheService) Mocks()
         {
             return (
-                new Mock<ILocationRepository>(MockBehavior.Strict),
-                new Mock<IReleaseService>(MockBehavior.Strict),
-                new Mock<ITimePeriodService>(MockBehavior.Strict));
+                new Mock<ILocationRepository>(Strict),
+                new Mock<IReleaseService>(Strict),
+                new Mock<ITimePeriodService>(Strict),
+                new Mock<ICacheKeyService>(Strict),
+                new Mock<IBlobCacheService>(Strict));
         }
     }
 }
