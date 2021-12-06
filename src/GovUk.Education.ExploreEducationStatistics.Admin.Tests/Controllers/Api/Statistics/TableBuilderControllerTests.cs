@@ -33,6 +33,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
 
+        private readonly TableBuilderResultViewModel _tableBuilderResults = new()
+        {
+            Results = new List<ObservationViewModel>
+            {
+                new()
+                {
+                    Filters = new List<string>
+                    {
+                        "filter1"
+                    },
+                    Location = new LocationViewModel
+                    {
+                        Country = new CodeNameViewModel
+                        {
+                            Code = "code",
+                            Name = "name"
+                        }
+                    },
+                    Measures = new Dictionary<string, string>
+                    {
+                        { "key", "value" }
+                    },
+                    GeographicLevel = GeographicLevel.Country,
+                    TimePeriod = "2017/18"
+                }
+            },
+            SubjectMeta = new ResultSubjectMetaViewModel
+            {
+                Filters = new Dictionary<string, FilterMetaViewModel>
+                {
+                    {
+                        "filter1", new FilterMetaViewModel
+                        {
+                            Hint = "A hint",
+                            Legend = "A legend",
+                            Name = "A name",
+                            Options = new Dictionary<string, FilterItemsMetaViewModel>
+                            {
+                                {
+                                    "option1", new FilterItemsMetaViewModel
+                                    {
+                                        Label = "filter",
+                                        Options = new List<LabelValue>
+                                        {
+                                            new("label", "value")
+                                        }
+                                    }
+                                }
+                            },
+                            TotalValue = "1234"
+                        }
+                    }
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Label = "footnote"
+                    }
+                },
+                Indicators = new List<IndicatorMetaViewModel>
+                {
+                    new()
+                    {
+                        Label = "A label",
+                        Name = "A name",
+                        Unit = "cm",
+                        Value = "1234",
+                        DecimalPlaces = 2
+                    }
+                },
+                Locations = new List<ObservationalUnitMetaViewModel>
+                {
+                    new()
+                    {
+                        Label = "A label",
+                        Level = GeographicLevel.Institution,
+                        Value = "1234",
+                        GeoJson = true
+                    }
+                },
+                BoundaryLevels = new List<BoundaryLevelViewModel>
+                {
+                    new(1234, "boundary")
+                },
+                LocationsHierarchical = new Dictionary<string, List<LocationAttributeViewModel>>
+                {
+                    {
+                        "location", new List<LocationAttributeViewModel>
+                        {
+                            new()
+                            {
+                                Label = "A label",
+                                Level = "Level",
+                                Options = new List<LocationAttributeViewModel>
+                                {
+                                    new()
+                                    {
+                                        Label = "A label",
+                                        Level = "Level",
+                                        Options = new List<LocationAttributeViewModel>()
+                                    }
+                                },
+                                Value = "A value",
+                                GeoJson = true
+                            }
+                        }
+                    }
+                },
+                PublicationName = "Publication name",
+                SubjectName = "Subject name",
+                GeoJsonAvailable = true,
+                TimePeriodRange = new List<TimePeriodMetaViewModel>
+                {
+                    new(1234, TimeIdentifier.April)
+                    {
+                        Label = "A label"
+                    }
+                }
+            }
+        };
+
         private readonly ObservationQueryContext _query = new()
         {
             SubjectId = Guid.NewGuid()
@@ -47,13 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.tableBuilderService
                 .Setup(s => s.Query(_releaseId, _query, cancellationToken))
-                .ReturnsAsync(new TableBuilderResultViewModel
-                {
-                    Results = new List<ObservationViewModel>
-                    {
-                        new()
-                    }
-                });
+                .ReturnsAsync(_tableBuilderResults);
 
             var result = await controller.Query(_releaseId, _query, cancellationToken);
             VerifyAllMocks(mocks);
@@ -85,14 +202,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Charts = new List<IChart>()
                 }
             };
-
-            var tableBuilderResults = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new()
-                }
-            };
             
             var (controller, mocks) = BuildControllerAndDependencies();
 
@@ -115,18 +224,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             cancellationToken
                         )
                 )
-                .ReturnsAsync(tableBuilderResults);
+                .ReturnsAsync(_tableBuilderResults);
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     IsMatchingDataBlockCacheKey(releaseContentBlock),
-                    tableBuilderResults))
+                    _tableBuilderResults))
                 .Returns(Task.CompletedTask);
             
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId, cancellationToken);
             VerifyAllMocks(mocks);
 
-            result.AssertOkResult(tableBuilderResults);
+            result.AssertOkResult(_tableBuilderResults);
         }
 
         [Fact]
@@ -160,14 +269,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     }
                 }
             };
-
-            var tableBuilderResults = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new()
-                }
-            };
             
             var (controller, mocks) = BuildControllerAndDependencies();
 
@@ -191,18 +292,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             default
                         )
                 )
-                .ReturnsAsync(tableBuilderResults);
+                .ReturnsAsync(_tableBuilderResults);
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(
                     IsMatchingDataBlockCacheKey(releaseContentBlock),
-                    tableBuilderResults))
+                    _tableBuilderResults))
                 .Returns(Task.CompletedTask);
             
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
             VerifyAllMocks(mocks);
 
-            result.AssertOkResult(tableBuilderResults);
+            result.AssertOkResult(_tableBuilderResults);
         }
 
         [Fact]
@@ -250,131 +351,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void TableBuilderResultViewModel_SerialiseAndDeserialise()
         {
-            var original = new TableBuilderResultViewModel
-            {
-                Results = new List<ObservationViewModel>
-                {
-                    new()
-                    {
-                        Filters = new List<string>
-                        {
-                            "filter1"
-                        },
-                        Location = new LocationViewModel
-                        {
-                            Country = new CodeNameViewModel
-                            {
-                                Code = "code",
-                                Name = "name"
-                            }
-                        },
-                        Measures = new Dictionary<string, string>
-                        {
-                            { "key", "value" }
-                        },
-                        GeographicLevel = GeographicLevel.Country,
-                        TimePeriod = "2017/18"
-                    }
-                },
-                SubjectMeta = new ResultSubjectMetaViewModel
-                {
-                    Filters = new Dictionary<string, FilterMetaViewModel>
-                    {
-                        {
-                            "filter1", new FilterMetaViewModel
-                            {
-                                Hint = "A hint",
-                                Legend = "A legend",
-                                Name = "A name",
-                                Options = new Dictionary<string, FilterItemsMetaViewModel>
-                                {
-                                    {
-                                        "option1", new FilterItemsMetaViewModel
-                                        {
-                                            Label = "filter",
-                                            Options = new List<LabelValue>
-                                            {
-                                                new("label", "value")
-                                            }
-                                        }
-                                    }
-                                },
-                                TotalValue = "1234"
-                            }
-                        }
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "footnote"
-                        }
-                    },
-                    Indicators = new List<IndicatorMetaViewModel>
-                    {
-                        new()
-                        {
-                            Label = "A label",
-                            Name = "A name",
-                            Unit = "cm",
-                            Value = "1234",
-                            DecimalPlaces = 2
-                        }
-                    },
-                    Locations = new List<ObservationalUnitMetaViewModel>
-                    {
-                        new()
-                        {
-                            Label = "A label",
-                            Level = GeographicLevel.Institution,
-                            Value = "1234",
-                            GeoJson = true
-                        }
-                    },
-                    BoundaryLevels = new List<BoundaryLevelViewModel>
-                    {
-                        new(1234, "boundary")
-                    },
-                    LocationsHierarchical = new Dictionary<string, List<LocationAttributeViewModel>>
-                    {
-                        {
-                            "location", new List<LocationAttributeViewModel>
-                            {
-                                new()
-                                {
-                                    Label = "A label",
-                                    Level = "Level",
-                                    Options = new List<LocationAttributeViewModel>
-                                    {
-                                        new()
-                                        {
-                                            Label = "A label",
-                                            Level = "Level",
-                                            Options = new List<LocationAttributeViewModel>()
-                                        }
-                                    },
-                                    Value = "A value",
-                                    GeoJson = true
-                                }
-                            }
-                        }
-                    },
-                    PublicationName = "Publication name",
-                    SubjectName = "Subject name",
-                    GeoJsonAvailable = true,
-                    TimePeriodRange = new List<TimePeriodMetaViewModel>
-                    {
-                        new(1234, TimeIdentifier.April)
-                        {
-                            Label = "A label"
-                        }
-                    }
-                }
-            };
-
-            var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
+            converted.AssertDeepEquals(_tableBuilderResults);
         }
 
         private static DataBlockTableResultCacheKey IsMatchingDataBlockCacheKey(ReleaseContentBlock releaseContentBlock)

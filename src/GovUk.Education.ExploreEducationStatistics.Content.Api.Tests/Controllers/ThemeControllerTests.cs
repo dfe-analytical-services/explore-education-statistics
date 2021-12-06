@@ -133,57 +133,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void ThemeTree_SerialiseAndDeserialise()
         {
-            var original = new ThemeTree<PublicationTreeNode>
-            {
-                Topics = new List<TopicTree<PublicationTreeNode>>
-                {
-                    new()
-                    {
-                        Publications = new List<PublicationTreeNode>
-                        {
-                            new()
-                        }
-                    }
-                }
-            };
-
-            var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(Themes[0]));
+            converted.AssertDeepEquals(Themes[0]);
         }
         
         [Fact]
         public void AllMethodologiesThemeViewModel_SerialiseAndDeserialise()
         {
-            var original = new AllMethodologiesThemeViewModel
-            {
-                Id = Guid.NewGuid(),
-                Title = "Publication title",
-                Topics = AsList(
-                    new AllMethodologiesTopicViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Topic title",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Id = Guid.NewGuid(),
-                                Title = "Publication title",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Slug = "methodology-slug",
-                                        Title = "Methodology title"
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
-            };
-
-            var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(MethodologyThemes[0]));
+            converted.AssertDeepEquals(MethodologyThemes[0]);
         }
 
         private static (ThemeController controller, (
