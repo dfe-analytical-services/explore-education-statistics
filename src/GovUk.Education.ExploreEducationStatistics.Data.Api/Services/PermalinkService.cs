@@ -54,12 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(
                     value: text,
-                    settings: new JsonSerializerSettings
-                    {
-                        ContractResolver =
-                            new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
-                    });
-                return await BuildViewModel(permalink);
+                    settings: BuildJsonSerializerSettings());
+                return await BuildViewModel(permalink!);
             }
             catch (StorageException e)
                 when ((HttpStatusCode) e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
@@ -90,13 +86,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 await _blobStorageService.UploadAsJson(containerName: Permalinks,
                     path: permalink.Id.ToString(),
                     content: permalink,
-                    settings: new JsonSerializerSettings
-                    {
-                        ContractResolver =
-                            new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled)
-                    });
+                    settings: BuildJsonSerializerSettings());
                 return await BuildViewModel(permalink);
             });
+        }
+
+        private JsonSerializerSettings BuildJsonSerializerSettings()
+        {
+            return new()
+            {
+                ContractResolver =
+                    new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled),
+                NullValueHandling = NullValueHandling.Ignore
+            };
         }
 
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
@@ -127,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             JsonProperty property = base.CreateProperty(member, memberSerialization);
-            if (property.DeclaringType == typeof(Permalink))
+            if (property.DeclaringType == typeof(ResultSubjectMetaViewModel))
             {
                 property.ShouldSerialize = property.PropertyName switch
                 {
