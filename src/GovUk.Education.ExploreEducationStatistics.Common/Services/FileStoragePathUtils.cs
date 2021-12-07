@@ -17,6 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{AppendPathSeparator(prefix)}fast-track";
         }
 
+        private static string PrivateContentPublicationsPath(string prefix = null)
+        {
+            return $"{AppendPathSeparator(prefix)}publications";
+        }
+
         private static string PublicContentPublicationsPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}publications";
@@ -32,9 +37,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
         }
 
+        public static string PrivateContentPublicationParentPath(Guid publicationId, string prefix = null)
+        {
+            return $"{PrivateContentPublicationsPath(prefix)}/{publicationId}";
+        }
+
         public static string PublicContentPublicationParentPath(string slug, string prefix = null)
         {
             return $"{PublicContentPublicationsPath(prefix)}/{slug}";
+        }
+
+        public static string PrivateContentReleaseParentPath(Guid publicationId, Guid releaseId, string prefix = null)
+        {
+            return $"{PrivateContentPublicationParentPath(publicationId, prefix)}/releases/{releaseId}";
         }
 
         public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug, string prefix = null)
@@ -57,11 +72,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}.json";
         }
         
+        public static string PrivateContentDataBlockParentPath(
+            Guid publicationId,
+            Guid releaseId)
+        {
+            return $"{PrivateContentReleaseParentPath(publicationId, releaseId)}/data-blocks";
+        }
+        
         public static string PublicContentDataBlockParentPath(
             string publicationSlug,
             string releaseSlug)
         {
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/data-blocks";
+        }
+
+        public static string PrivateContentDataBlockPath(
+            Guid publicationId,
+            Guid releaseId,
+            Guid dataBlockId)
+        {
+            return $"{PrivateContentDataBlockParentPath(publicationId, releaseId)}/{dataBlockId}.json";
         }
 
         public static string PublicContentDataBlockPath(

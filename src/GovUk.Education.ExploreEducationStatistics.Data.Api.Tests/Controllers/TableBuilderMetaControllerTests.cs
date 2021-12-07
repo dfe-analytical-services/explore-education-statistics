@@ -1,7 +1,9 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -16,7 +18,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    public class TableBuilderMetaControllerTests
+    [Collection(BlobCacheServiceTests)]
+    public class TableBuilderMetaControllerTests : BlobCacheServiceTestFixture
     {
         private static readonly Guid SubjectId = Guid.NewGuid();
 
@@ -26,21 +29,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         };
 
         [Fact]
-        public async Task GetSubjectMeta_Returns_Ok()
+        public async Task GetSubjectMeta()
         {
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
+            var cacheKey = new SubjectMetaCacheKey("publication", "release", SubjectId);
+
             var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks
+                .cacheKeyService
+                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
+                .ReturnsAsync(cacheKey);
+            
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
+                .ReturnsAsync(null);
 
             mocks
                 .subjectMetaService
                 .Setup(s => s.GetSubjectMeta(SubjectId))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            mocks
-                .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
-                .ReturnsAsync(new SubjectMetaCacheKey("publication", "release", SubjectId));
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
+                .Returns(Task.CompletedTask);
 
             var result = await controller.GetSubjectMeta(SubjectId);
             VerifyAllMocks(mocks);
@@ -49,19 +62,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetSubjectMeta_Returns_NotFound()
+        public async Task GetSubjectMeta_NotFound()
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
+            var cacheKey = new SubjectMetaCacheKey("publication", "release", SubjectId);
+            
+            mocks
+                .cacheKeyService
+                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
+                .ReturnsAsync(cacheKey);
+            
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
+                .ReturnsAsync(null);
+            
             mocks
                 .subjectMetaService
                 .Setup(s => s.GetSubjectMeta(SubjectId))
                 .ReturnsAsync(new NotFoundResult());
-
-            mocks
-                .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
-                .ReturnsAsync(new SubjectMetaCacheKey("publication", "release", SubjectId));
 
             var result = await controller.GetSubjectMeta(SubjectId);
             VerifyAllMocks(mocks);
@@ -70,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task Post_GetSubjectMeta_Returns_Ok()
+        public async Task Post_GetSubjectMeta()
         {
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
@@ -88,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task Post_GetSubjectMeta_Returns_NotFound()
+        public async Task Post_GetSubjectMeta_NotFound()
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
@@ -105,20 +124,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static (
             TableBuilderMetaController controller,
-            (Mock<ISubjectMetaService> subjectMetaService, Mock<ICacheKeyService> cacheKeyService) mocks)
+            (
+                Mock<ISubjectMetaService> subjectMetaService, 
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndMocks()
         {
             var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new TableBuilderMetaController(subjectMetaService.Object, cacheKeyService.Object);
-
-            return (
-                controller,
-                (
-                    subjectMetaService,
-                    cacheKeyService
-                )
-            );
+            
+            return (controller, (subjectMetaService, cacheKeyService, CacheService));
         }
     }
 }

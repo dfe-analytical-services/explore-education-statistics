@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -54,6 +55,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static void AssertBadRequest(this ActionResult result, params Enum[] expectedValidationErrors)
         {
             AssertBadRequestWithValidationErrors(result, expectedValidationErrors);
+        }
+        
+        public static void AssertNotModified<T>(this ActionResult<T> result)
+        {
+            var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
+            Assert.Equal(StatusCodes.Status304NotModified, statusCodeResult.StatusCode);
         }
         
         private static void AssertBadRequestWithValidationErrors(this object result, params Enum[] expectedValidationErrors)
